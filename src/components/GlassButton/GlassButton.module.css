@@ -1,0 +1,32 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.button:focus-visible {
+  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline-offset: 2px;
+}
+/* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
+.tinted { background-color: color-mix(in srgb, var(--glass-tint) 55%, transparent); }
+.prominent { background-color: color-mix(in srgb, var(--glass-tint, #0a84ff) 85%, transparent); color: #fff; }
+
+.sm { padding: 6px 14px; font-size: 13px; }
+.md { padding: 10px 20px; font-size: 15px; }
+.lg { padding: 14px 28px; font-size: 17px; }
+.xl { padding: 18px 36px; font-size: 19px; } /* Apple'ın yeni extra-large boyutu */
+
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+.button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
