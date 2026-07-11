@@ -6,6 +6,8 @@ const CHROME_UA =
 const SAFARI_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15'
 const FIREFOX_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14.6; rv:141.0) Gecko/20100101 Firefox/141.0'
+const CRIOS_UA =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/126.0.6478.54 Mobile/15E148 Safari/604.1'
 
 describe('detectTier', () => {
   it('userAgentData Chromium markası → refraction', () => {
@@ -19,5 +21,8 @@ describe('detectTier', () => {
   })
   it('Firefox UA → fallback', () => {
     expect(detectTier({ userAgent: FIREFOX_UA })).toBe('fallback')
+  })
+  it('iOS Chrome (CriOS) UA → fallback (WebKit tabanlı, backdrop-filter: url() render edemez)', () => {
+    expect(detectTier({ userAgent: CRIOS_UA })).toBe('fallback')
   })
 })

@@ -8,10 +8,13 @@ interface NavigatorLike {
 // backdrop-filter: url(#f) yalnız Chromium'da çalışır (WebKit bug 245510, Firefox desteklemiyor).
 // CSS.supports güvenilmez (parse edip render etmeyen motorlar var) → engine tespiti.
 export function detectTier(nav: NavigatorLike = navigator as NavigatorLike): GlassTier {
+  // iOS'ta tüm tarayıcılar (Chrome dahil) WebKit motorunu kullanmak zorunda (App Store kuralı),
+  // bu yüzden CriOS/Chrome UA'sı taşısa da backdrop-filter: url() render edemez.
+  if (/iPhone|iPad|iPod/.test(nav.userAgent)) return 'fallback'
   const brands = nav.userAgentData?.brands
   if (brands?.some((b) => /Chromium|Google Chrome|Microsoft Edge/i.test(b.brand))) return 'refraction'
   const ua = nav.userAgent
-  const isChromiumUA = /(Chrome|Chromium|Edg|CriOS)\//.test(ua) && !/Firefox\//.test(ua)
+  const isChromiumUA = /(Chrome|Chromium|Edg)\//.test(ua) && !/Firefox\//.test(ua)
   return isChromiumUA ? 'refraction' : 'fallback'
 }
 

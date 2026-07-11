@@ -1,4 +1,4 @@
-import { useId, type CSSProperties, type ElementType, type HTMLAttributes, type ReactNode } from 'react'
+import { useId, useRef, type CSSProperties, type ElementType, type HTMLAttributes, type ReactNode } from 'react'
 import type { MotionValue } from 'motion/react'
 import { getDisplacementMap } from '../../core/displacementMap'
 import { getSpecularMap } from '../../core/specularMap'
@@ -21,6 +21,11 @@ export interface GlassSurfaceProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode
 }
 
+// useId, aynı React kökü içinde benzersizdir; ama Storybook docs sayfaları birden fazla
+// React kökü render eder ve bu kökler arasında useId çakışabilir → yanlış filtre uygulanır.
+// Modül seviyesinde bir sayaç ekleyerek kökler arası tekilliği garanti ediyoruz.
+let instanceCounter = 0
+
 export function GlassSurface({
   variant = 'regular',
   thickness = 0.5,
@@ -36,7 +41,9 @@ export function GlassSurface({
 }: GlassSurfaceProps) {
   const tier = useGlassTier()
   const rawId = useId()
-  const filterId = `glass-${rawId.replace(/[^a-zA-Z0-9-]/g, '')}`
+  const instanceId = useRef<number>(undefined)
+  if (instanceId.current === undefined) instanceId.current = ++instanceCounter
+  const filterId = `glass-${rawId.replace(/[^a-zA-Z0-9-]/g, '')}-${instanceId.current}`
   const { ref, size } = useElementSize<HTMLElement>()
 
   const radius = shape === 'capsule' ? (size ? size.height / 2 : 999) : shape
