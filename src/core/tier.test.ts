@@ -1,0 +1,23 @@
+import { describe, expect, it } from 'vitest'
+import { detectTier } from './tier'
+
+const CHROME_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+const SAFARI_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15'
+const FIREFOX_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14.6; rv:141.0) Gecko/20100101 Firefox/141.0'
+
+describe('detectTier', () => {
+  it('userAgentData Chromium markası → refraction', () => {
+    expect(detectTier({ userAgent: '', userAgentData: { brands: [{ brand: 'Chromium' }, { brand: 'Google Chrome' }] } })).toBe('refraction')
+  })
+  it('Chrome UA → refraction', () => {
+    expect(detectTier({ userAgent: CHROME_UA })).toBe('refraction')
+  })
+  it('Safari UA → fallback', () => {
+    expect(detectTier({ userAgent: SAFARI_UA })).toBe('fallback')
+  })
+  it('Firefox UA → fallback', () => {
+    expect(detectTier({ userAgent: FIREFOX_UA })).toBe('fallback')
+  })
+})
