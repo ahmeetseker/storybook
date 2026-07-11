@@ -8,7 +8,7 @@ export interface SpecularMapOptions {
   lightAngleDeg?: number
 }
 
-export function computeSpecularPixels(opts: SpecularMapOptions): Uint8ClampedArray {
+export function computeSpecularPixels(opts: SpecularMapOptions): Uint8ClampedArray<ArrayBuffer> {
   const { width, height, cornerRadius, bezelWidth } = opts
   const lightAngle = ((opts.lightAngleDeg ?? -60) * Math.PI) / 180
   const lx = Math.cos(lightAngle)

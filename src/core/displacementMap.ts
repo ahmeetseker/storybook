@@ -26,7 +26,7 @@ export function roundedRectSDF(px: number, py: number, width: number, height: nu
 }
 
 export function computeDisplacementPixels(opts: DisplacementMapOptions): {
-  data: Uint8ClampedArray
+  data: Uint8ClampedArray<ArrayBuffer>
   maxDisplacement: number
 } {
   const { width, height, cornerRadius, bezelWidth } = opts

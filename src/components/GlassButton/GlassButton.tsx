@@ -47,9 +47,8 @@ export function GlassButton({
       displacementScale={press.displacementScale}
       className={classes}
       style={{ ...cssVars, scale: press.transformScale, ...style } as CSSProperties}
-      disabled={disabled}
       {...press.handlers}
-      {...(rest as unknown as GlassSurfaceProps)}
+      {...({ disabled, ...rest } as unknown as GlassSurfaceProps)}
     >
       {children}
       <motion.span className={styles.glow} style={{ background: glow, opacity: press.glowOpacity }} aria-hidden />
