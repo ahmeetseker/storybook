@@ -14,15 +14,17 @@ const renderSplit = (props: Partial<Parameters<typeof GlassSplitView>[0]> = {}, 
 
 describe('GlassSplitView', () => {
   it('sidebar ve içerik render olur', () => {
-    renderSplit()
+    const { container } = renderSplit()
     expect(screen.getByText('Yan Panel')).toBeTruthy()
     expect(screen.getByText('İçerik A')).toBeTruthy()
+    expect(container.querySelector('[data-sidebar-slot]')!.hasAttribute('inert')).toBe(false)
   })
 
   it('kontrollü mod: sidebarOpen=false sidebar bölmesini gizler', () => {
     const { container } = renderSplit({ sidebarOpen: false })
     const slot = container.querySelector('[data-sidebar-slot]')!
     expect(slot.getAttribute('aria-hidden')).toBe('true')
+    expect(slot.hasAttribute('inert')).toBe(true)
   })
 
   it('toggle butonu kontrolsüz modda açar/kapar ve onSidebarOpenChange bildirir', () => {

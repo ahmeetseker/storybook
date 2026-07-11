@@ -38,7 +38,7 @@ export function GlassSplitView({
   const reduced = prefersReducedMotion()
 
   const setOpen = (next: boolean) => {
-    setInternalOpen(next)
+    if (sidebarOpen === undefined) setInternalOpen(next)
     onSidebarOpenChange?.(next)
   }
 
@@ -67,6 +67,7 @@ export function GlassSplitView({
         data-sidebar-slot
         className={styles.sidebarSlot}
         aria-hidden={!open}
+        inert={!open}
         initial={false}
         animate={{ width: open ? sidebarWidth : 0, opacity: open ? 1 : 0 }}
         transition={panelSpring}
