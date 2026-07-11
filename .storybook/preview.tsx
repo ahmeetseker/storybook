@@ -7,14 +7,14 @@ const preview: Preview = {
   globalTypes: {
     backgroundKey: {
       description: 'Demo arka planı',
-      toolbar: { title: 'Arka plan', icon: 'photo', items: ['vivid', 'dark', 'mono'], dynamicTitle: true },
+      toolbar: { title: 'Arka plan', icon: 'photo', items: ['blinds', 'vivid', 'dark', 'mono'], dynamicTitle: true },
     },
     forceTier: {
       description: 'Cam katmanını zorla',
       toolbar: { title: 'Tier', icon: 'beaker', items: ['auto', 'refraction', 'fallback'], dynamicTitle: true },
     },
   },
-  initialGlobals: { backgroundKey: 'vivid', forceTier: 'auto' },
+  initialGlobals: { backgroundKey: 'blinds', forceTier: 'auto' },
   decorators: [
     (Story, ctx) => {
       const forced = ctx.globals.forceTier as string
