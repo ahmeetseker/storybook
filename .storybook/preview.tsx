@@ -1,5 +1,7 @@
 import type { Preview } from '@storybook/react-vite'
 import { DemoBackground } from './DemoBackground'
+import { GlassTierProvider } from '../src/components/GlassSurface/GlassTierContext'
+import { detectTier, type GlassTier } from '../src/core/tier'
 
 const preview: Preview = {
   globalTypes: {
@@ -7,14 +9,24 @@ const preview: Preview = {
       description: 'Demo arka planı',
       toolbar: { title: 'Arka plan', icon: 'photo', items: ['vivid', 'dark', 'mono'], dynamicTitle: true },
     },
+    forceTier: {
+      description: 'Cam katmanını zorla',
+      toolbar: { title: 'Tier', icon: 'beaker', items: ['auto', 'refraction', 'fallback'], dynamicTitle: true },
+    },
   },
-  initialGlobals: { backgroundKey: 'vivid' },
+  initialGlobals: { backgroundKey: 'vivid', forceTier: 'auto' },
   decorators: [
-    (Story, ctx) => (
-      <DemoBackground variant={ctx.globals.backgroundKey as string}>
-        <Story />
-      </DemoBackground>
-    ),
+    (Story, ctx) => {
+      const forced = ctx.globals.forceTier as string
+      const tier: GlassTier = forced === 'auto' ? detectTier() : (forced as GlassTier)
+      return (
+        <GlassTierProvider tier={tier}>
+          <DemoBackground variant={ctx.globals.backgroundKey as string}>
+            <Story />
+          </DemoBackground>
+        </GlassTierProvider>
+      )
+    },
   ],
   parameters: { layout: 'fullscreen' },
 }

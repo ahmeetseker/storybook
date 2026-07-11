@@ -1,0 +1,99 @@
+import { useId, type CSSProperties, type ElementType, type HTMLAttributes, type ReactNode } from 'react'
+import type { MotionValue } from 'motion/react'
+import { getDisplacementMap } from '../../core/displacementMap'
+import { getSpecularMap } from '../../core/specularMap'
+import { GlassFilter } from '../../core/GlassFilter'
+import { prefersReducedTransparency } from '../../core/tier'
+import { useGlassTier } from './GlassTierContext'
+import { useElementSize } from './useElementSize'
+import styles from './GlassSurface.module.css'
+
+export interface GlassSurfaceProps extends HTMLAttributes<HTMLElement> {
+  variant?: 'regular' | 'clear'
+  /** 0–1: gölge derinliği, lensing gücü ve blur'u birlikte ölçekler (Apple'ın kalınlık kuralı) */
+  thickness?: number
+  shape?: number | 'capsule'
+  tone?: 'light' | 'dark' | 'auto'
+  interactive?: boolean
+  /** Basınç animasyonu için dışarıdan verilen çarpan (1 = normal) */
+  displacementScale?: MotionValue<number>
+  as?: ElementType
+  children?: ReactNode
+}
+
+export function GlassSurface({
+  variant = 'regular',
+  thickness = 0.5,
+  shape = 16,
+  tone = 'auto',
+  interactive = false,
+  displacementScale,
+  as: Comp = 'div',
+  className,
+  style,
+  children,
+  ...rest
+}: GlassSurfaceProps) {
+  const tier = useGlassTier()
+  const rawId = useId()
+  const filterId = `glass-${rawId.replace(/[^a-zA-Z0-9-]/g, '')}`
+  const { ref, size } = useElementSize<HTMLElement>()
+
+  const radius = shape === 'capsule' ? (size ? size.height / 2 : 999) : shape
+  const frosted = prefersReducedTransparency()
+
+  let filterNode: ReactNode = null
+  let backdrop = `blur(${(2 + thickness * 10).toFixed(1)}px) saturate(180%)`
+
+  if (tier === 'refraction' && size && !frosted) {
+    const bezelWidth = Math.max(6, Math.min(size.width, size.height) * 0.18)
+    const map = getDisplacementMap({
+      width: size.width,
+      height: size.height,
+      cornerRadius: Math.min(radius, size.height / 2),
+      bezelWidth,
+      glassThickness: 6 + thickness * 22,
+    })
+    if (map) {
+      const specular = getSpecularMap({
+        width: size.width,
+        height: size.height,
+        cornerRadius: Math.min(radius, size.height / 2),
+        bezelWidth,
+      })
+      filterNode = (
+        <GlassFilter
+          id={filterId}
+          width={size.width}
+          height={size.height}
+          displacementMapUrl={map.dataUrl}
+          maxDisplacement={map.maxDisplacement}
+          specularMapUrl={specular}
+          scaleValue={displacementScale}
+          blur={0.4 + thickness * 1.2}
+          saturation={3 + thickness * 3}
+        />
+      )
+      backdrop = `url(#${filterId})`
+    }
+  }
+
+  const toneClass = tone === 'light' ? styles.toneLight : tone === 'dark' ? styles.toneDark : ''
+  const surfaceStyle: CSSProperties = {
+    borderRadius: radius,
+    backdropFilter: backdrop,
+    WebkitBackdropFilter: backdrop,
+    boxShadow: `0 ${4 + thickness * 12}px ${16 + thickness * 24}px rgba(0,0,0,${0.12 + thickness * 0.14}), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(255,255,255,0.12)`,
+    cursor: interactive ? 'pointer' : undefined,
+    touchAction: interactive ? 'manipulation' : undefined,
+    ...style,
+  }
+
+  return (
+    <Comp ref={ref} className={[styles.surface, toneClass, className].filter(Boolean).join(' ')} style={surfaceStyle} {...rest}>
+      {filterNode}
+      {variant === 'clear' ? <span className={styles.dimming} data-glass-dimming /> : null}
+      <span className={styles.content}>{children}</span>
+    </Comp>
+  )
+}

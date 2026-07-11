@@ -1,0 +1,41 @@
+.surface {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 6px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+  color: inherit;
+}
+
+/* Açıya göre değişen hairline rim — her iki tier'da ortak */
+.surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(var(--glass-light-angle, 120deg), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08) 40%, rgba(255, 255, 255, 0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dimming {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.35); /* Apple clear varyant kuralı */
+  z-index: 0;
+  pointer-events: none;
+}
+
+.toneLight { color: rgba(255, 255, 255, 0.95); }
+.toneDark { color: rgba(0, 0, 0, 0.85); }
+.content { position: relative; z-index: 1; }
