@@ -14,7 +14,7 @@ const preview: Preview = {
       toolbar: { title: 'Tier', icon: 'beaker', items: ['auto', 'refraction', 'fallback'], dynamicTitle: true },
     },
   },
-  initialGlobals: { backgroundKey: 'blinds', forceTier: 'auto' },
+  initialGlobals: { backgroundKey: 'mono', forceTier: 'auto' },
   decorators: [
     (Story, ctx) => {
       const forced = ctx.globals.forceTier as string

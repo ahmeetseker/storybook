@@ -16,8 +16,9 @@ const blob = (size: number, color: string, top: string, left: string): CSSProper
 
 export function DemoBackground({ variant, children }: { variant: string; children: ReactNode }) {
   const isBlinds = variant === 'blinds'
+  const isMono = variant === 'mono'
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: isBlinds ? '#0b0b14' : (palettes[variant] ?? palettes.vivid), padding: '4rem 2rem' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden', background: isBlinds ? '#0b0b14' : (palettes[variant] ?? palettes.mono), padding: '4rem 2rem' }}>
       {isBlinds ? (
         <div style={{ position: 'absolute', inset: 0 }}>
           <GradientBlinds
@@ -32,6 +33,13 @@ export function DemoBackground({ variant, children }: { variant: string; childre
             mouseDampening={0.25}
           />
         </div>
+      ) : isMono ? (
+        <>
+          {/* Sade tema: camın kenar kırılmasının okunması için yumuşak gri şekiller yeterli */}
+          <div style={blob(220, '#dde2e8', '10%', '15%')} />
+          <div style={blob(280, '#d3d9e0', '50%', '60%')} />
+          <div style={blob(150, '#e6e9ed', '68%', '22%')} />
+        </>
       ) : (
         <>
           <div style={blob(180, '#ff5e62', '8%', '12%')} />
