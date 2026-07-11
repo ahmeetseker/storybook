@@ -34,9 +34,13 @@
   display: flex;
   flex: none;
 }
+/* Child'ı slot genişliğine width yerine flex ile doldur: iki selektör de aynı
+   specificity'de olduğundan width, stylesheet (cascade) sırasına göre sidebar'ın
+   sabit genişliğine kaybedebiliyor; flex bu sıradan bağımsız çalışır */
 .sidebarInner > * {
   height: 100%;
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   overflow-y: auto;
 }
 

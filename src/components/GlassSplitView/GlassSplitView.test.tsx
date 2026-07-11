@@ -56,6 +56,7 @@ describe('GlassSplitView', () => {
     await waitFor(() => expect(screen.queryByText('İçerik A')).toBeNull())
   })
 
+  // Yalnızca prop-plumbing'i (inline width) doğrular; CSS cascade davranışı jsdom'da test edilemiyor
   it('sidebarWidth={360} sidebarInner genişliğini doğru ayarlar', () => {
     const { container } = renderSplit({ sidebarWidth: 360 })
     const sidebarSlot = container.querySelector('[data-sidebar-slot]')
