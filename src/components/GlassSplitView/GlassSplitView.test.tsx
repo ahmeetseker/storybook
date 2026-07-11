@@ -55,4 +55,11 @@ describe('GlassSplitView', () => {
     expect(await screen.findByText('İçerik B')).toBeTruthy()
     await waitFor(() => expect(screen.queryByText('İçerik A')).toBeNull())
   })
+
+  it('sidebarWidth={360} sidebarInner genişliğini doğru ayarlar', () => {
+    const { container } = renderSplit({ sidebarWidth: 360 })
+    const sidebarSlot = container.querySelector('[data-sidebar-slot]')
+    const sidebarInner = sidebarSlot?.querySelector('[class*="sidebarInner"]') as HTMLDivElement | null
+    expect(sidebarInner?.style.width).toBe('360px')
+  })
 })

@@ -53,7 +53,12 @@ export function GlassSplitView({
             key={contentKey ?? '__static__'}
             className={styles.contentInner}
             initial={{ opacity: 0, y: reduced ? 0 : 12 }}
-            animate={{ opacity: 1, y: 0, paddingLeft: open ? sidebarWidth + GAP * 3 : GAP + 40 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              // sol padding = slot inset (GAP) + sidebar genişliği + nefes payı (GAP*2)
+              paddingLeft: open ? sidebarWidth + GAP * 3 : GAP + 40, // kapalıyken toggle (40px) + inset (GAP) kadar boşluk bırak
+            }}
             exit={{ opacity: 0, y: reduced ? 0 : -8 }}
             transition={contentTween}
           >

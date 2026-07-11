@@ -94,7 +94,7 @@ function Item({ id, icon, label }: GlassTabBarItemProps) {
       <span className={styles.icon} aria-hidden>
         {icon}
       </span>
-      <span className={styles.labelWrap} aria-hidden={false}>
+      <span className={styles.labelWrap}>
         <span className={styles.label}>{label}</span>
       </span>
     </button>
