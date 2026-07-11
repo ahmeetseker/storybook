@@ -4,7 +4,6 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { GlassButton } from '../components/GlassButton'
 import { GlassBackButton } from '../components/GlassNavbar'
-import { CardNav } from './CardNav'
 
 type Category = 'Navigasyon' | 'Kontroller' | 'Overlay'
 type Status = 'hazır' | 'planlandı'
@@ -101,38 +100,6 @@ const ENTRIES: CatalogEntry[] = [
 
 const CATEGORIES: Array<Category | 'Tümü'> = ['Tümü', 'Navigasyon', 'Kontroller', 'Overlay']
 
-const NAV_ITEMS = [
-  {
-    label: 'Componentler',
-    bgColor: '#1B1722',
-    textColor: '#fff',
-    links: [
-      { label: 'Button', href: '?path=/story/components-glassbutton--default', target: '_top', ariaLabel: 'GlassButton story' },
-      { label: 'Navbar', href: '?path=/story/components-glassnavbar--with-back-and-actions', target: '_top', ariaLabel: 'GlassNavbar story' },
-      { label: 'GlassSurface', href: '?path=/story/primitives-glasssurface--regular', target: '_top', ariaLabel: 'GlassSurface story' },
-    ],
-  },
-  {
-    label: 'Yol Haritası',
-    bgColor: '#2F293A',
-    textColor: '#fff',
-    links: [
-      { label: 'Dropdown / Menü', ariaLabel: 'Dropdown planlandı' },
-      { label: 'Switch & Slider', ariaLabel: 'Switch ve Slider planlandı' },
-      { label: 'Sheet & Tab Bar', ariaLabel: 'Sheet ve Tab Bar planlandı' },
-    ],
-  },
-  {
-    label: 'Kaynaklar',
-    bgColor: '#2F293A',
-    textColor: '#fff',
-    links: [
-      { label: 'Apple Liquid Glass', href: 'https://developer.apple.com/documentation/technologyoverviews/liquid-glass', target: '_blank', ariaLabel: 'Apple Liquid Glass dokümanı' },
-      { label: 'kube.io makalesi', href: 'https://kube.io/blog/liquid-glass-css-svg/', target: '_blank', ariaLabel: 'kube.io liquid glass makalesi' },
-    ],
-  },
-]
-
 const chipStyle = (active: boolean): CSSProperties => ({
   border: active ? '1px solid #111827' : '1px solid #e5e7eb',
   background: active ? '#111827' : '#fff',
@@ -171,20 +138,7 @@ export function ComponentCatalog() {
   }, [query, category])
 
   return (
-    <div style={{ position: 'relative', borderRadius: 20, background: '#f7f8fa', border: '1px solid #e5e7eb', padding: '0 2rem 3rem', color: '#111827', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" }}>
-      <div style={{ position: 'relative', height: 110 }}>
-        <CardNav
-          logoText="liquid-glass-ui"
-          items={NAV_ITEMS}
-          baseColor="#fff"
-          menuColor="#111"
-          buttonBgColor="#111"
-          buttonTextColor="#fff"
-          ctaLabel="Katalog"
-          ease="power3.out"
-        />
-      </div>
-
+    <div style={{ position: 'relative', borderRadius: 20, background: '#f7f8fa', border: '1px solid #e5e7eb', padding: '2.5rem 2rem 3rem', color: '#111827', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" }}>
       <h2 style={{ margin: 0, fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>Liquid Glass Componentleri</h2>
       <p style={{ margin: '8px 0 24px', maxWidth: 560, fontSize: 15, lineHeight: 1.55, color: '#4b5563' }}>
         Apple'ın Liquid Glass tasarım dilinin web karşılıkları. Hazır olanlar canlı önizlemeyle;
