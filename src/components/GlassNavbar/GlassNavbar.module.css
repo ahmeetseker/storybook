@@ -33,11 +33,11 @@
 .actionGroup {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
   padding: 4px;
 }
-.actionGroup > * { border: none; background: none; font: inherit; color: inherit; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
-.actionGroup > *:hover { background: rgba(255, 255, 255, 0.18); }
+.actionGroup > * { display: inline-flex; align-items: center; gap: 4px; }
+.actionGroup button, .actionGroup a { border: none; background: none; font: inherit; color: inherit; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.actionGroup button:hover, .actionGroup a:hover { background: rgba(255, 255, 255, 0.18); }
 
 .chevron { width: 10px; height: 10px; border-left: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(45deg); margin-right: 2px; }
 .spacer { width: 44px; }
