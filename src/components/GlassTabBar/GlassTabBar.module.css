@@ -1,0 +1,83 @@
+.bar {
+  display: inline-flex;
+  padding: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Seçili ikonun arkasındaki daire — layoutId ile sekmeler arasında süzülür */
+.highlight {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Etiketler grid 0fr→1fr numarasıyla genişler: width animasyonundan akıcı, JS'siz */
+.labelWrap {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.bar[data-expanded='true'] .labelWrap {
+  grid-template-columns: 1fr;
+}
+
+.label {
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.22s ease 0.06s,
+    transform 0.3s cubic-bezier(0.32, 0.72, 0, 1) 0.04s;
+}
+.bar[data-expanded='true'] .label {
+  opacity: 1;
+  transform: none;
+  padding-right: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .labelWrap,
+  .label {
+    transition: none;
+  }
+}
