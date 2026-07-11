@@ -8,19 +8,38 @@
   white-space: nowrap;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease;
 }
 .button:focus-visible {
   outline: 2px solid rgba(10, 132, 255, 0.9);
   outline-offset: 2px;
 }
+
+/* Apple hover highlight: işaretçili cihazlarda cam hover'da beyazlaşır/aydınlanır */
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  .button:active:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+  .tinted:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--glass-tint) 45%, rgba(255, 255, 255, 0.3));
+  }
+  .prominent:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--glass-tint, #0a84ff) 75%, #ffffff);
+  }
+}
+
 /* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 55%, transparent); }
 .prominent { background-color: color-mix(in srgb, var(--glass-tint, #0a84ff) 85%, transparent); color: #fff; }
 
-.sm { padding: 6px 14px; font-size: 13px; }
-.md { padding: 10px 20px; font-size: 15px; }
-.lg { padding: 14px 28px; font-size: 17px; }
-.xl { padding: 18px 36px; font-size: 19px; } /* Apple'ın yeni extra-large boyutu */
+/* SF tracking tablosuna yakın, boyuta özel letter-spacing (Apple tipografi kuralı) */
+.sm { padding: 6px 14px; font-size: 13px; letter-spacing: 0; }
+.md { padding: 10px 20px; font-size: 15px; letter-spacing: -0.01em; }
+.lg { padding: 14px 28px; font-size: 17px; letter-spacing: -0.022em; }
+.xl { padding: 18px 36px; font-size: 19px; letter-spacing: -0.022em; } /* Apple'ın yeni extra-large boyutu */
 
 .glow {
   position: absolute;

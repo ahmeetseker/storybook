@@ -1,8 +1,30 @@
+/* Apple sistem renkleri ve tipografisi — light/dark otomatik */
+:root {
+  color-scheme: light dark;
+  --lg-bg: #f2f2f7;                          /* iOS systemGroupedBackground (light) */
+  --lg-label: #1d1d1f;                       /* Apple label (light) */
+  --lg-label-secondary: rgba(60, 60, 67, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --lg-bg: #000000;                        /* iOS systemBackground (dark) */
+    --lg-label: #f5f5f7;
+    --lg-label-secondary: rgba(235, 235, 245, 0.6);
+  }
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: var(--lg-label);
+  background: var(--lg-bg);
 }
