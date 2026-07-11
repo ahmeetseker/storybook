@@ -4,3 +4,12 @@ export { GlassNavbar, GlassBackButton, type GlassNavbarProps, type GlassBackButt
 export { useGlassPress } from './motion/useGlassPress'
 export { presets } from './motion/presets'
 export { detectTier, type GlassTier } from './core/tier'
+export { GlassTabBar, type GlassTabBarProps, type GlassTabBarItemProps } from './components/GlassTabBar'
+export {
+  GlassSidebar,
+  type GlassSidebarProps,
+  type GlassSidebarHeaderProps,
+  type GlassSidebarItemProps,
+  type GlassSidebarGroupProps,
+} from './components/GlassSidebar'
+export { GlassSplitView, type GlassSplitViewProps } from './components/GlassSplitView'

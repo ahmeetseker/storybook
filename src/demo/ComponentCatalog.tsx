@@ -44,9 +44,10 @@ const ENTRIES: CatalogEntry[] = [
   },
   {
     name: 'Sidebar',
-    description: 'İçeriğin arkasından aktığı, kenarlardan içeri alınmış yüzen cam kenar çubuğu.',
+    description: "visionOS tarzı yüzen cam kenar çubuğu — kayan seçim highlight'ı, disclosure grupları, split view ile içerik geçişi.",
     category: 'Navigasyon',
-    status: 'planlandı',
+    status: 'hazır',
+    storyPath: '/story/demo-music--default',
   },
   {
     name: 'Switch',
@@ -62,9 +63,10 @@ const ENTRIES: CatalogEntry[] = [
   },
   {
     name: 'Tab Bar',
-    description: 'Aşağı kaydırınca küçülen, yukarıda genişleyen yüzen sekme barı; arama sekmesi ayrık.',
+    description: "Dikey visionOS ornament'ı — hover'da genişleyip etiketleri gösterir, seçim highlight'ı sekmeler arasında süzülür.",
     category: 'Navigasyon',
-    status: 'planlandı',
+    status: 'hazır',
+    storyPath: '/story/components-glasstabbar--default',
   },
   {
     name: 'Sheet',
@@ -186,7 +188,11 @@ export function ComponentCatalog() {
                 border: entry.preview ? 'none' : '1px dashed #d1d5db',
               }}
             >
-              {entry.preview ?? <span style={{ fontSize: 12, color: '#9ca3af' }}>Yakında</span>}
+              {entry.preview ?? (
+                <span style={{ fontSize: 12, color: '#9ca3af' }}>
+                  {entry.status === 'hazır' ? "Story'de izle →" : 'Yakında'}
+                </span>
+              )}
             </div>
             {entry.storyPath ? (
               <a
