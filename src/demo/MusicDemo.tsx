@@ -38,22 +38,21 @@ const CONTENT_TITLES: Record<string, { title: string; caption: string }> = {
   family: { title: 'Family Dance Party', caption: '25 Songs' },
 }
 
-const CARD_HUES = [18, 210, 280, 140, 340, 45]
-
-const cardStyle = (hue: number): CSSProperties => ({
+// Referans (visionOS Music): kartlar renkli değil, pencere camından hafif koyu nötr placeholder'lar
+const cardStyle: CSSProperties = {
   aspectRatio: '1',
-  borderRadius: 18,
-  background: `linear-gradient(150deg, hsl(${hue} 24% 46% / 0.55), hsl(${hue} 30% 24% / 0.65))`,
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)',
-})
+  borderRadius: 22,
+  background: 'linear-gradient(160deg, rgba(105, 96, 88, 0.5), rgba(62, 56, 50, 0.55))',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
+}
 
 function PlaylistGrid() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 20, marginTop: 24 }}>
-      {CARD_HUES.map((hue) => (
-        <div key={hue}>
-          <div style={cardStyle(hue)} />
-          <div style={{ height: 10, width: '55%', marginTop: 12, borderRadius: 999, background: 'rgba(255,255,255,0.35)' }} />
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 24, marginTop: 28 }}>
+      {[0, 1, 2, 3].map((i) => (
+        <div key={i}>
+          <div style={cardStyle} />
+          <div style={{ height: 10, width: '55%', marginTop: 14, borderRadius: 999, background: 'rgba(255,255,255,0.3)' }} />
         </div>
       ))}
     </div>
@@ -89,7 +88,7 @@ export function MusicDemo() {
         minHeight: '100vh',
         padding: '48px 48px 48px 36px',
         boxSizing: 'border-box',
-        background: 'radial-gradient(120% 140% at 70% 20%, #cfc4b4 0%, #a99a89 45%, #7d6f60 100%)',
+        background: 'radial-gradient(120% 140% at 65% 15%, #eae5dd 0%, #cfc5b8 45%, #9d9080 100%)',
         color: 'rgba(255, 255, 255, 0.95)',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
       }}
@@ -103,8 +102,8 @@ export function MusicDemo() {
       </GlassTabBar>
 
       <GlassSurface shape={36} variant="clear" thickness={0.3} style={{ flex: 1, height: 'calc(100vh - 96px)', minHeight: 480 }}>
+        {/* HIG: visionOS'ta pencere sidebar'a yer açar, gizle/göster nadirdir → demo'da toggle yok */}
         <GlassSplitView
-          toggle
           contentKey={sel}
           sidebar={
             <GlassSidebar selected={sel} onSelect={setSel} tone="light">
@@ -123,9 +122,9 @@ export function MusicDemo() {
             </GlassSidebar>
           }
         >
-          <div style={{ paddingTop: 40, paddingRight: 12 }}>
-            <h1 style={{ margin: 0, fontSize: 34, fontWeight: 800, letterSpacing: '-0.02em' }}>{content.title}</h1>
-            <p style={{ margin: '6px 0 0', fontSize: 15, opacity: 0.65 }}>{content.caption}</p>
+          <div style={{ paddingTop: 44, paddingRight: 16 }}>
+            <h1 style={{ margin: 0, fontSize: 38, fontWeight: 700, letterSpacing: '-0.02em' }}>{content.title}</h1>
+            <p style={{ margin: '8px 0 0', fontSize: 15, opacity: 0.6 }}>{content.caption}</p>
             <SearchCapsule placeholder={`Search in ${content.title}`} />
             <PlaylistGrid />
           </div>

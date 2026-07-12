@@ -25,3 +25,9 @@ const media = (query: string): boolean =>
 
 export const prefersReducedMotion = () => media('(prefers-reduced-motion: reduce)')
 export const prefersReducedTransparency = () => media('(prefers-reduced-transparency: reduce)')
+
+// Apple kuralı: lensing (kenar kırılması) kontroller içindir; büyük paneller düz malzeme (blur) kalır.
+// Ayrıca pratik zorunluluk: tam boy SVG displacement filtresi büyük yüzeylerde Chrome'da kare düşürür.
+export const REFRACTION_MAX_AREA = 160_000 // px² (~400×400)
+
+export const exceedsRefractionArea = (width: number, height: number) => width * height > REFRACTION_MAX_AREA

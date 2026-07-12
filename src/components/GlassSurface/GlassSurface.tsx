@@ -3,7 +3,7 @@ import type { MotionValue } from 'motion/react'
 import { getDisplacementMap } from '../../core/displacementMap'
 import { getSpecularMap } from '../../core/specularMap'
 import { GlassFilter } from '../../core/GlassFilter'
-import { prefersReducedTransparency } from '../../core/tier'
+import { exceedsRefractionArea, prefersReducedTransparency } from '../../core/tier'
 import { useGlassTier } from './GlassTierContext'
 import { useElementSize } from './useElementSize'
 import styles from './GlassSurface.module.css'
@@ -52,7 +52,7 @@ export function GlassSurface({
   let filterNode: ReactNode = null
   let backdrop = `blur(${(2 + thickness * 10).toFixed(1)}px) saturate(180%)`
 
-  if (tier === 'refraction' && size && !frosted) {
+  if (tier === 'refraction' && size && !frosted && !exceedsRefractionArea(size.width, size.height)) {
     const bezelWidth = Math.max(6, Math.min(size.width, size.height) * 0.18)
     const map = getDisplacementMap({
       width: size.width,
