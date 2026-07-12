@@ -1,0 +1,27 @@
+.carousel {
+  position: relative;
+}
+
+.track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px;
+  scrollbar-width: none;
+}
+.track::-webkit-scrollbar { display: none; }
+
+.track > * {
+  scroll-snap-align: start;
+  flex: none;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.navLeft { left: -8px; }
+.navRight { right: -8px; }

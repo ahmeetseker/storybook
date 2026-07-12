@@ -4,8 +4,9 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { GlassButton } from '../components/GlassButton'
 import { GlassBackButton } from '../components/GlassNavbar'
+import { GlassBadge } from '../components/GlassBadge'
 
-type Category = 'Navigasyon' | 'Kontroller' | 'Overlay'
+type Category = 'Navigasyon' | 'Kontroller' | 'Overlay' | 'İçerik'
 type Status = 'hazır' | 'planlandı'
 
 interface CatalogEntry {
@@ -98,9 +99,87 @@ const ENTRIES: CatalogEntry[] = [
     category: 'Navigasyon',
     status: 'planlandı',
   },
+  {
+    name: 'Badge',
+    description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassbadge--default',
+    preview: <GlassBadge tint="#ff453a">Acil</GlassBadge>,
+  },
+  {
+    name: 'Icon Button',
+    description: 'Dairesel cam ikon butonu — favori/paylaş gibi tekil aksiyonlar, aria-pressed destekli.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassiconbutton--default',
+  },
+  {
+    name: 'Breadcrumb',
+    description: 'Kapsül cam kategori yolu — ara adımlar tıklanabilir, son adım sayfa olarak işaretli.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassbreadcrumb--default',
+  },
+  {
+    name: 'Gallery',
+    description: 'Thumbnail şeritli görsel galerisi — ok tuşları, sayaç ve tam ekran cam lightbox.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassgallery--default',
+  },
+  {
+    name: 'Price Header',
+    description: 'İlan başlığı + fiyat bloğu — rozetler, meta satırı ve aksiyon alanıyla.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasspriceheader--default',
+  },
+  {
+    name: 'Spec Table',
+    description: 'Etiket/değer özellik tablosu — tek ya da çift sütun, ayraç çizgili.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassspectable--default',
+  },
+  {
+    name: 'Tabs',
+    description: 'Kapsül sekme barı + cam içerik paneli — controlled/uncontrolled, tablist semantiği.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasstabs--default',
+  },
+  {
+    name: 'Seller Card',
+    description: 'Satıcı kartı — baş harfli avatar, doğrulanmış rozeti, maskeli "Telefonu Göster" ve mesaj aksiyonu.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasssellercard--default',
+  },
+  {
+    name: 'Location Card',
+    description: 'Stilize harita placeholder\'ı + pin ve adres — "Haritada Aç" aksiyonuyla.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasslocationcard--default',
+  },
+  {
+    name: 'Listing Card',
+    description: 'Benzer ilan kartı — görsel, iki satır başlık, konum ve fiyat; tamamı tıklanabilir.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasslistingcard--default',
+  },
+  {
+    name: 'Carousel',
+    description: 'Scroll-snap yatay şerit — cam ok butonlarıyla sayfa sayfa kaydırma.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasscarousel--similar-listings',
+  },
 ]
 
-const CATEGORIES: Array<Category | 'Tümü'> = ['Tümü', 'Navigasyon', 'Kontroller', 'Overlay']
+const CATEGORIES: Array<Category | 'Tümü'> = ['Tümü', 'Navigasyon', 'Kontroller', 'Overlay', 'İçerik']
 
 const chipStyle = (active: boolean): CSSProperties => ({
   border: active ? '1px solid #111827' : '1px solid #e5e7eb',

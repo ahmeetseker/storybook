@@ -1,0 +1,56 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bar {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 4px;
+  max-width: 100%;
+}
+
+.list {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.list::-webkit-scrollbar { display: none; }
+
+.tab {
+  border: none;
+  background: none;
+  margin: 0;
+  padding: 8px 18px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: inherit;
+  opacity: 0.7;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, opacity 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab:hover { opacity: 1; }
+.tab:focus-visible {
+  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline-offset: 1px;
+}
+
+.tabActive {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.panel {
+  display: block;
+  box-sizing: border-box;
+  padding: 20px;
+  font-size: 15px;
+  line-height: 1.55;
+}

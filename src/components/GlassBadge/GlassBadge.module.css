@@ -1,0 +1,17 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sm { padding: 3px 10px; font-size: 12px; letter-spacing: 0; }
+.md { padding: 5px 14px; font-size: 13px; letter-spacing: 0; }
+
+/* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
+.tinted {
+  background-color: color-mix(in srgb, var(--glass-tint) 65%, transparent);
+  color: #fff;
+}

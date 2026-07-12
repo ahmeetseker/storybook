@@ -1,0 +1,56 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font: inherit;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease;
+}
+.button:focus-visible {
+  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  .button:active:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+  .active:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--glass-tint) 75%, #ffffff);
+  }
+}
+
+/* Kare gövde + capsule shape = daire */
+.sm { width: 32px; height: 32px; font-size: 14px; }
+.md { width: 40px; height: 40px; font-size: 17px; }
+.lg { width: 48px; height: 48px; font-size: 20px; }
+
+.active {
+  background-color: color-mix(in srgb, var(--glass-tint) 85%, transparent);
+  color: #fff;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.icon svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }

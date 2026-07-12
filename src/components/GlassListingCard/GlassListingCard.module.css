@@ -1,0 +1,76 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  padding: 6px;
+  margin: 0;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease;
+}
+.card:focus-visible {
+  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .card:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.media {
+  position: relative;
+  display: block;
+  border-radius: 13px;
+  overflow: hidden;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 8px 8px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.location {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.price {
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.022em;
+}
+
+.card:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
