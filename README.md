@@ -10,7 +10,7 @@ npm run storybook   # http://localhost:6006 — component vitrini
 npm test            # vitest ile birim testleri çalıştırır
 ```
 
-Vite dev server ile hızlı manuel test için `src/App.tsx` mini bir vitrin sayfası içerir (`npm run dev`).
+Proje yalnızca Storybook üzerinden çalışır; ayrı bir uygulama kabuğu yoktur (`npm run dev` de Storybook'u açar).
 
 ## Tarayıcı tier tablosu
 
