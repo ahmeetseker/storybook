@@ -180,7 +180,7 @@ export const magaza: Magaza = {
   sehirler: ['İzmir', 'Antalya', 'Bursa'],
   hakkinda:
     'Ege Arsa Ofisi, 2021 yılından bu yana İzmir ve çevresinde imarlı arsa alım-satımına aracılık eder. ' +
-    'Portföydeki tüm ilanlar EİDS üzerinden tapu kaydıyla doğrulanır; ekspertiz eşliğinde yerinde gösterim yapılır.',
+    'Yayındaki ilanlar EİDS üzerinden tapu kaydıyla doğrulanır; ekspertiz eşliğinde yerinde gösterim yapılır.',
   portfoy: [ilanlar[0], ilanlar[3], ilanlar[2], ilanlar[4]],
 }
 

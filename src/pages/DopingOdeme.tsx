@@ -26,17 +26,19 @@ export function DopingOdeme() {
 
   return (
     <PublicShell title="Doping Satın Al" onBack={noop} cta={null}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 16,
-          alignItems: 'start',
-          maxWidth: 880,
-          margin: '0 auto',
-        }}
-      >
-        <GlassSpecTable
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 880, margin: '0 auto' }}>
+        <h1 style={{ margin: '4px 0 0', fontSize: 'var(--lg-text-display, 28px)', fontWeight: 700, letterSpacing: '-0.022em' }}>
+          Doping Satın Al
+        </h1>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: 16,
+            alignItems: 'start',
+          }}
+        >
+          <GlassSpecTable
           material="flat"
           title="Sipariş Özeti"
           items={[
@@ -68,7 +70,7 @@ export function DopingOdeme() {
               setOdendi(true)
             }}
           >
-            <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.022em' }}>Kart Bilgileri</h2>
+            <h3 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.022em' }}>Kart Bilgileri</h3>
             <Field label="Kart üzerindeki ad">
               {(id) => <TextInput id={id} autoComplete="cc-name" placeholder="Mehmet Yılmaz" required />}
             </Field>
@@ -96,6 +98,7 @@ export function DopingOdeme() {
             </div>
           </form>
         )}
+        </div>
       </div>
     </PublicShell>
   )
