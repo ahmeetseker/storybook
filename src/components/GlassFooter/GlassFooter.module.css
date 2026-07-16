@@ -1,0 +1,104 @@
+/* GlassFooter — içerik katmanı footer'ı. Her zaman flat + hairline üst çizgi. */
+.root { border-top: 1px solid var(--lg-hairline); background: var(--lg-surface); color: var(--lg-label); }
+
+.inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 44px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  box-sizing: border-box;
+}
+
+.top { display: grid; grid-template-columns: minmax(220px, 1.2fr) 3fr; gap: 32px; align-items: start; }
+.brandBlock { display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--lg-label-secondary); }
+.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.022em; color: var(--lg-label); }
+
+.columnsNav { min-width: 0; }
+.columnsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; }
+.column { display: flex; flex-direction: column; gap: 10px; }
+.columnTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+.columnList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: var(--lg-radius-chip, 10px);
+  color: var(--lg-label-secondary);
+  text-decoration: none;
+  font-size: 14px;
+}
+@media (hover: hover) { .link:hover { color: var(--lg-label); } }
+.link:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
+@media (pointer: coarse) { .link { min-height: 44px; } }
+
+.legalRow {
+  border-top: 1px solid var(--lg-hairline);
+  padding-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+.legal { font-size: 13px; color: var(--lg-label-secondary); }
+.social { display: inline-flex; align-items: center; gap: 12px; }
+
+/* slim */
+.slimInner {
+  padding: 18px 20px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+}
+.inlineList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  justify-content: center;
+}
+
+/* centered */
+.centeredInner { align-items: center; text-align: center; gap: 18px; }
+
+/* cta / newsletter bantları */
+.ctaBand {
+  background: color-mix(in srgb, var(--lg-accent) 10%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 22%, transparent);
+  border-radius: var(--lg-radius-card, 20px);
+  padding: 26px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.newsletterBand {
+  background: var(--lg-bg);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  padding: 26px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+
+@media (max-width: 760px) {
+  .top { grid-template-columns: 1fr; }
+  .legalRow { justify-content: center; text-align: center; }
+}
