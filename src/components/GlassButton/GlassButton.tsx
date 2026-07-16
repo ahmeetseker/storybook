@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties } from 'react'
-import { motion, useMotionTemplate } from 'motion/react'
+import { motion } from 'motion/react'
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface'
 import { useGlassPress } from '../../motion/useGlassPress'
 import styles from './GlassButton.module.css'
@@ -9,6 +9,8 @@ export interface GlassButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
   tint?: string
   prominent?: boolean
   tone?: 'light' | 'dark' | 'auto'
+  /** Async işlem sürerken: tekrar aktivasyon engellenir, genişlik korunur, aria-busy verilir */
+  loading?: boolean
 }
 
 export function GlassButton({
@@ -16,20 +18,23 @@ export function GlassButton({
   tint,
   prominent = false,
   tone = 'auto',
+  loading = false,
   className,
   style,
   children,
   disabled,
+  type = 'button',
+  onClick,
   ...rest
 }: GlassButtonProps) {
-  const press = useGlassPress({ disabled })
-  const glow = useMotionTemplate`radial-gradient(120px circle at ${press.glowX}px ${press.glowY}px, rgba(255,255,255,0.55), transparent 70%)`
+  const press = useGlassPress({ disabled: disabled || loading })
 
   const classes = [
     styles.button,
     styles[size],
     tint && !prominent ? styles.tinted : '',
     prominent ? styles.prominent : '',
+    loading ? styles.loading : '',
     className,
   ]
     .filter(Boolean)
@@ -48,10 +53,17 @@ export function GlassButton({
       className={classes}
       style={{ ...cssVars, scale: press.transformScale, ...style } as CSSProperties}
       {...press.handlers}
-      {...({ disabled, ...rest } as unknown as GlassSurfaceProps)}
+      {...({
+        disabled,
+        type,
+        onClick: loading || disabled ? undefined : onClick,
+        'aria-busy': loading || undefined,
+        'data-loading': loading || undefined,
+        ...rest,
+      } as unknown as GlassSurfaceProps)}
     >
-      {children}
-      <motion.span className={styles.glow} style={{ background: glow, opacity: press.glowOpacity }} aria-hidden />
+      {loading ? <span className={styles.spinner} aria-hidden /> : null}
+      <span className={styles.label}>{children}</span>
     </GlassSurface>
   )
 }

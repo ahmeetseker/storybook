@@ -12,6 +12,7 @@ export interface GlassListingCardProps extends Omit<ButtonHTMLAttributes<HTMLBut
   /** Sol üst köşede gösterilen rozet (GlassBadge) */
   badge?: ReactNode
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
 export function GlassListingCard({
@@ -21,6 +22,7 @@ export function GlassListingCard({
   location,
   badge,
   tone = 'auto',
+  material,
   className,
   style,
   disabled,
@@ -34,6 +36,7 @@ export function GlassListingCard({
       shape={18}
       interactive
       tone={tone}
+      material={material}
       thickness={0.35}
       displacementScale={press.displacementScale}
       className={[styles.card, className].filter(Boolean).join(' ')}

@@ -1,0 +1,94 @@
+.root {
+  --lg-slider-thumb: 20px;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 28px;
+  -webkit-tap-highlight-color: transparent;
+}
+.disabled { opacity: 0.45; }
+
+/* Native input görünmez ama tüm alanı kaplar: sürükleme/odak/rol ondan gelir */
+.input {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.input:disabled { cursor: default; }
+
+/* Ray: hairline sınırlı yarı saydam kanal (cam his, filtre maliyeti yok) */
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 6px;
+  transform: translateY(-50%);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
+  box-shadow: inset 0 0 0 1px var(--lg-hairline, rgba(0, 0, 0, 0.09)), inset 0 1px 1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Dolu kısım accent */
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--pct) * 1%);
+  background: var(--lg-accent, #b45309);
+  border-radius: inherit;
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  /* Native range gibi: thumb uçlarda raydan taşmaz (offset thumb genişliğiyle telafi edilir) */
+  left: calc(var(--pct) * 1% + (50 - var(--pct)) * 0.01 * var(--lg-slider-thumb));
+  width: var(--lg-slider-thumb);
+  height: var(--lg-slider-thumb);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fff; /* beyaz thumb — bilinçli raw (kontrast) */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input:focus-visible ~ .thumb {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+
+/* Değer baloncuğu: flat chip, thumb'ın üstünde */
+.bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface, #fff);
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  color: var(--lg-label, #24211b);
+  white-space: nowrap;
+}
+
+/* Dokunmatik: thumb 28px, kök 44px dokunma hedefi */
+@media (pointer: coarse) {
+  .root {
+    --lg-slider-thumb: 28px;
+    height: 44px;
+  }
+  .track { height: 8px; }
+}

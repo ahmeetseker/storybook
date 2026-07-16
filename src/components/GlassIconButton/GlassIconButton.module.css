@@ -6,29 +6,42 @@
   font: inherit;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.18s ease;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out, scale 0.16s ease-out, box-shadow 0.16s ease-out;
 }
 .button:focus-visible {
-  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 2px;
 }
 
+/* tvOS focus modeli: hover'da opak beyaz zemin + koyu ikon + lift (bkz. GlassButton) */
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.94);
+    color: rgba(0, 0, 0, 0.85);
+    scale: 1.08;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
   }
   .button:active:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: #fff;
+    scale: 1.03;
   }
   .active:hover:not(:disabled) {
     background-color: color-mix(in srgb, var(--glass-tint) 75%, #ffffff);
+    color: #fff;
   }
 }
 
-/* Kare gövde + capsule shape = daire */
-.sm { width: 32px; height: 32px; font-size: 14px; }
-.md { width: 40px; height: 40px; font-size: 17px; }
-.lg { width: 48px; height: 48px; font-size: 20px; }
+@media (prefers-reduced-motion: reduce) {
+  .button:hover:not(:disabled),
+  .button:active:not(:disabled) {
+    scale: none;
+  }
+}
+
+/* Kare gövde + capsule shape = daire; boyutlar kontrol token'larından */
+.sm { width: var(--lg-control-sm, 32px); height: var(--lg-control-sm, 32px); font-size: 14px; }
+.md { width: var(--lg-control-md, 40px); height: var(--lg-control-md, 40px); font-size: 17px; }
+.lg { width: var(--lg-control-lg, 48px); height: var(--lg-control-lg, 48px); font-size: 20px; }
 
 .active {
   background-color: color-mix(in srgb, var(--glass-tint) 85%, transparent);
@@ -43,14 +56,6 @@
 .icon svg {
   width: 1.1em;
   height: 1.1em;
-}
-
-.glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
 }
 
 .button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }

@@ -15,3 +15,8 @@
   background-color: color-mix(in srgb, var(--glass-tint) 65%, transparent);
   color: #fff;
 }
+/* Flat malzemede yarı saydam tint soluk kalır; opak tam renk kullan */
+.tinted[data-material='flat'] {
+  background-color: var(--glass-tint);
+  border-color: transparent;
+}

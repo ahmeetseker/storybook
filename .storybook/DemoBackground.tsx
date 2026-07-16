@@ -1,11 +1,34 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { GradientBlinds } from '../src/demo/GradientBlinds'
 
-// light/dark: Apple'ın düz sistem arka planları (iOS systemGroupedBackground / systemBackground).
+// light/dark: "Kağıt" temasının açık (fildişi) ve koyu (Grafit) zeminleri.
+// Toolbar seçimi OS temasından bağımsız çalışsın diye token'lar burada override edilir.
 // blinds/vivid: kırılmanın gözle test edilebildiği canlı arka planlar (toolbar'dan seçilir).
-const FLAT: Record<string, { bg: string; label: string; scheme: 'light' | 'dark' }> = {
-  light: { bg: '#f2f2f7', label: '#1d1d1f', scheme: 'light' },
-  dark: { bg: '#000000', label: '#f5f5f7', scheme: 'dark' },
+const FLAT: Record<string, { scheme: 'light' | 'dark'; vars: Record<string, string> }> = {
+  light: {
+    scheme: 'light',
+    vars: {
+      '--lg-bg': '#faf8f4',
+      '--lg-surface': '#ffffff',
+      '--lg-label': '#24211b',
+      '--lg-label-secondary': '#79726a',
+      '--lg-hairline': 'rgba(36, 33, 27, 0.09)',
+      '--lg-accent': '#b45309',
+      '--lg-accent-contrast': '#ffffff',
+    },
+  },
+  dark: {
+    scheme: 'dark',
+    vars: {
+      '--lg-bg': '#121316',
+      '--lg-surface': '#1b1c20',
+      '--lg-label': '#f2f2f3',
+      '--lg-label-secondary': '#9d9da4',
+      '--lg-hairline': 'rgba(255, 255, 255, 0.1)',
+      '--lg-accent': '#e09143',
+      '--lg-accent-contrast': '#1a140c',
+    },
+  },
 }
 
 const vividGradient =
@@ -23,7 +46,17 @@ export function DemoBackground({ variant, children }: { variant: string; childre
 
   if (flat) {
     return (
-      <div style={{ position: 'relative', minHeight: '100vh', background: flat.bg, color: flat.label, colorScheme: flat.scheme, padding: '4rem 2rem' }}>
+      <div
+        style={{
+          position: 'relative',
+          minHeight: '100vh',
+          background: 'var(--lg-bg)',
+          color: 'var(--lg-label)',
+          colorScheme: flat.scheme,
+          padding: '4rem 2rem',
+          ...flat.vars,
+        } as CSSProperties}
+      >
         {children}
       </div>
     )

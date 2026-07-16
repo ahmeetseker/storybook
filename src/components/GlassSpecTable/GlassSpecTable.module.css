@@ -36,6 +36,13 @@
 .row:last-child {
   border-bottom: none;
 }
+/* Flat malzemede beyaz-alfa ayraç görünmez; koyu hairline kullan */
+[data-material='flat'] .row {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+[data-material='flat'] .row:last-child {
+  border-bottom: none;
+}
 /* İki sütunda son satırın çifti de çizgisiz kalsın */
 .twoColumns .row:nth-last-child(2):nth-child(odd) {
   border-bottom: none;

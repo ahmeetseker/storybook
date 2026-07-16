@@ -1,0 +1,54 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Tasarım Sistemi/Genel Bakış" />
+
+# Tasarım Sistemi — Genel Bakış
+
+Bu kütüphane dört kavramı birbirinden ayırır. Bir özelliğin nerede tanımlanacağına
+bu tablo karar verir:
+
+| Kavram | Örnekler | Nerede tanımlanır |
+|---|---|---|
+| **Foundation token** | spacing, radius, tipografi ölçeği, kontrol yükseklikleri | `src/index.css` (`--lg-*`) |
+| **Semantic token** | accent, success/warning/danger, hairline | `src/index.css` (tema başına) |
+| **Component seçeneği** | `material`, `tone`, `size`, `variant`, `thickness` | Component public API'si |
+| **Component state'i** | hover, focus-visible, pressed, disabled, loading | CSS pseudo-class / DOM / kontrollü prop |
+
+Temel ilkeler:
+
+- `hover`, `focus-visible`, `active` **asla production prop olmaz** — CSS/DOM işidir.
+- `light` / `dark` component variantı değil **tema bağlamıdır**; component'ler token tüketir.
+- Component dışı boşluk (`margin`) component'in değil, **parent layout'un** sorumluluğudur.
+- Raw px / hex değeri component CSS'inde kullanılmaz; token'a bağlanır.
+
+## Katman modeli (Apple kuralı)
+
+- **Cam (`material="glass"`)** yalnız navigasyon/kontrol katmanı: Navbar, TabBar, Sidebar,
+  Button, IconButton, galeri okları. Sayfa başına **en fazla 6 cam yüzey**.
+- **Düz (`material="flat"`)** içerik katmanı: kartlar, tablolar, paneller, rozetler.
+- Cam üstüne cam koyulmaz; büyük yüzeylerde refraction otomatik kapanır
+  (`REFRACTION_MAX_AREA`, `src/core/tier.ts`).
+
+## Tema
+
+Açık tema **Kağıt** (fildişi zemin + amber vurgu), koyu tema **Grafit**.
+Tema `prefers-color-scheme` ve Storybook toolbar'ından gelir; component'ler tema
+bilmez, token okur.
+
+## Dosya yapısı
+
+```txt
+src/
+├── index.css                  ← foundation + semantic token'lar
+├── design/                    ← bu global kural dokümanları
+└── components/
+    └── GlassButton/
+        ├── GlassButton.tsx
+        ├── GlassButton.module.css
+        ├── GlassButton.stories.tsx
+        ├── GlassButton.test.tsx
+        └── rules.md           ← component sözleşmesi (şablon: "Component Şablonu")
+```
+
+**Öncelik sırası:** kullanıcının açık prop'u → parent context (ör. `GlassTierProvider`)
+→ tema token'ı → component default'u.

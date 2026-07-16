@@ -1,0 +1,64 @@
+/* Flat yüzey: içerik katmanı — cam değil (backdrop-filter maliyeti yok) */
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  color: var(--lg-label);
+  font-family: var(--lg-font);
+}
+
+/* Mobile-first: <640px'de padding dar, ikon küçük */
+.md { padding: var(--lg-space-6) var(--lg-space-4); }
+.sm { padding: var(--lg-space-4) var(--lg-space-3); }
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-label) 6%, transparent);
+  color: var(--lg-label-secondary);
+}
+.sm .icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: var(--lg-space-2);
+}
+
+.error .icon {
+  background: color-mix(in srgb, var(--lg-danger) 14%, transparent);
+  color: var(--lg-danger);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.sm .title { font-size: var(--lg-text-body); }
+
+.description {
+  margin: var(--lg-space-1) 0 0;
+  max-width: 40ch;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.action { margin-top: var(--lg-space-4); }
+.sm .action { margin-top: var(--lg-space-3); }
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .md { padding: var(--lg-space-7) var(--lg-space-6); }
+  .md .icon { width: 56px; height: 56px; }
+  .md .title { font-size: var(--lg-text-title); }
+  .md .description { font-size: var(--lg-text-body); }
+}

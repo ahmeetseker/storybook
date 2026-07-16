@@ -32,6 +32,20 @@ describe('GlassTabs', () => {
     expect(screen.queryByText('Açıklama içeriği')).toBeNull()
   })
 
+  it('ok tuşları sekmeler arasında gezinir (sarmalı) ve Home/End uçlara gider', () => {
+    const onTabChange = vi.fn()
+    renderTabs({ onTabChange })
+    const tablist = screen.getByRole('tablist')
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    expect(onTabChange).toHaveBeenLastCalledWith('b')
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' }) // son sekmeden başa sarar
+    expect(onTabChange).toHaveBeenLastCalledWith('a')
+    fireEvent.keyDown(tablist, { key: 'End' })
+    expect(onTabChange).toHaveBeenLastCalledWith('b')
+    fireEvent.keyDown(tablist, { key: 'Home' })
+    expect(onTabChange).toHaveBeenLastCalledWith('a')
+  })
+
   it('controlled kullanımda activeId belirleyicidir', () => {
     renderTabs({ activeId: 'b' })
     expect(screen.getByText('Konum içeriği')).toBeDefined()

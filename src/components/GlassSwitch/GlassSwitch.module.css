@@ -1,0 +1,67 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease-out;
+}
+.root:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+.root:disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Ray ölçüleri: GlassSurface .content sarmalayıcısı içerikten boyut aldığı için
+   track kendi ölçüsünü taşır; kök padding'iyle birlikte kapsül oluşur */
+.sm { --lg-switch-w: 34px; --lg-switch-h: 18px; --lg-switch-thumb: 14px; }
+.md { --lg-switch-w: 44px; --lg-switch-h: 24px; --lg-switch-thumb: 20px; }
+
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--lg-switch-w);
+  height: var(--lg-switch-h);
+}
+.on .track { justify-content: flex-end; }
+
+/* Açıkken ray vurgusu: tint verilmezse accent */
+.on {
+  background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #b45309)) 80%, transparent);
+}
+
+.thumb {
+  width: var(--lg-switch-thumb);
+  height: var(--lg-switch-thumb);
+  border-radius: 50%;
+  background: #fff; /* beyaz thumb — bilinçli raw (cam üstü kontrast) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+/* Dokunmatik: ray büyür + görünmez halo dokunma hedefini 44px'e tamamlar */
+@media (pointer: coarse) {
+  .sm { --lg-switch-w: 40px; --lg-switch-h: 22px; --lg-switch-thumb: 18px; }
+  .md { --lg-switch-w: 50px; --lg-switch-h: 28px; --lg-switch-thumb: 24px; }
+  .root::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root { transition: none; }
+}

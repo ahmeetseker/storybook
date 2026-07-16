@@ -16,6 +16,8 @@ export interface GlassGalleryProps extends HTMLAttributes<HTMLDivElement> {
   initialIndex?: number
   onIndexChange?: (index: number) => void
   tone?: 'light' | 'dark' | 'auto'
+  /** Ana görsel çerçevesinin malzemesi; ok butonları (kontrol) her zaman cam kalır */
+  material?: 'glass' | 'flat'
 }
 
 const ChevronLeft = () => (
@@ -42,6 +44,7 @@ export function GlassGallery({
   initialIndex = 0,
   onIndexChange,
   tone = 'auto',
+  material,
   className,
   ...rest
 }: GlassGalleryProps) {
@@ -117,7 +120,7 @@ export function GlassGallery({
 
   return (
     <div className={[styles.gallery, className].filter(Boolean).join(' ')} {...rest}>
-      <GlassSurface as="div" shape={20} tone={tone} thickness={0.4} className={styles.stage}>
+      <GlassSurface as="div" shape={20} tone={tone} material={material} thickness={0.4} className={styles.stage}>
         <button
           type="button"
           className={styles.stageButton}

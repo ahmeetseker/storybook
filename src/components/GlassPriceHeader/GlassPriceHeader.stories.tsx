@@ -51,3 +51,50 @@ export const WithBadgesAndActions: Story = {
   },
   render: Default.render,
 }
+
+/**
+ * Malzeme karşılaştırması: içerik sayfasında `material="flat"` önerilir (bkz. rules.md §12);
+ * cam yalnız hero/medya üstünde kullanılmalı. İki malzeme yan yana.
+ */
+export const Materials: Story = {
+  args: {
+    title: 'Kadıköy Moda’da Deniz Manzaralı 3+1 Satılık Daire',
+    price: '14.750.000 TL',
+    meta: 'İstanbul, Kadıköy · İlan Tarihi: 8 Temmuz 2026 · İlan No: 1092337415',
+  },
+  render: (args) => (
+    <div style={{ display: 'grid', gap: 24, maxWidth: 560, margin: '48px auto' }}>
+      <div>
+        <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>material=&quot;glass&quot; — yalnız hero/medya üstü</p>
+        <GlassPriceHeader {...args} material="glass" />
+      </div>
+      <div>
+        <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>material=&quot;flat&quot; — içerik sayfası (önerilen)</p>
+        <GlassPriceHeader {...args} material="flat" />
+      </div>
+    </div>
+  ),
+}
+
+/**
+ * Uzun içerik: başlık kırpılmaz, `overflow-wrap: anywhere` ile sarar — 2 satırı aşan
+ * başlığı kısaltmak çağıranın işidir. Dar container'da heading daralır, actions sabit kalır.
+ */
+export const UzunIcerik: Story = {
+  args: {
+    title:
+      'Sahibinden 2019 Volkswagen Golf 1.6 TDI Comfortline — Boyasız, Değişensiz, Tüm Bakımları Yetkili Serviste Yapılmış Garaj Arabası',
+    price: '1.185.000 TL',
+    meta: 'İstanbul, Kadıköy, Fenerbahçe Mahallesi · İlan Tarihi: 12 Temmuz 2026 · İlan No: 1084526631',
+    actions: (
+      <GlassIconButton label="Favorilere ekle" onClick={fn()}>
+        <HeartIcon />
+      </GlassIconButton>
+    ),
+  },
+  render: (args) => (
+    <div style={{ maxWidth: 320, margin: '48px auto' }}>
+      <GlassPriceHeader {...args} />
+    </div>
+  ),
+}

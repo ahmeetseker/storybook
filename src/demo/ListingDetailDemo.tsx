@@ -102,8 +102,9 @@ export function ListingDetailDemo() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 16, alignItems: 'start' }}>
           <div style={columnStyle}>
-            <GlassGallery images={galleryImages} />
+            <GlassGallery images={galleryImages} material="flat" />
             <GlassTabs
+              material="flat"
               tabs={[
                 {
                   id: 'aciklama',
@@ -124,7 +125,7 @@ export function ListingDetailDemo() {
                 {
                   id: 'ozellikler',
                   label: 'İlan Bilgileri',
-                  content: <GlassSpecTable items={specs} columns={2} />,
+                  content: <GlassSpecTable items={specs} columns={2} material="flat" />,
                 },
                 {
                   id: 'konum',
@@ -134,6 +135,7 @@ export function ListingDetailDemo() {
                       address="İstanbul, Kadıköy — Fenerbahçe Mah."
                       note="Güvenlik nedeniyle konum yaklaşık gösterilir."
                       onOpenMap={noop}
+                      material="flat"
                     />
                   ),
                 },
@@ -143,14 +145,15 @@ export function ListingDetailDemo() {
 
           <div style={columnStyle}>
             <GlassPriceHeader
+              material="flat"
               title="Volkswagen Golf 1.6 TDI Comfortline — İlk Sahibinden, Hatasız"
               price="1.185.000 TL"
-              priceTint="#ffd60a"
+              priceTint="var(--lg-accent, #b45309)"
               meta="İstanbul, Kadıköy · 12 Temmuz 2026 · İlan No: 1084526631"
               badges={
                 <>
-                  <GlassBadge tint="#ff453a">Acil</GlassBadge>
-                  <GlassBadge tint="#ff9f0a">Öne Çıkan</GlassBadge>
+                  <GlassBadge tint="var(--lg-danger, #ff3b30)" material="flat">Acil</GlassBadge>
+                  <GlassBadge tint="var(--lg-warning, #ff9500)" material="flat">Öne Çıkan</GlassBadge>
                 </>
               }
               actions={
@@ -170,8 +173,9 @@ export function ListingDetailDemo() {
               phone="0 (532) 123 45 67"
               verified
               onMessage={noop}
+              material="flat"
             />
-            <GlassSpecTable title="İlan Özeti" items={specs.slice(3, 8)} />
+            <GlassSpecTable title="İlan Özeti" items={specs.slice(3, 8)} material="flat" />
           </div>
         </div>
 
@@ -186,6 +190,7 @@ export function ListingDetailDemo() {
                 price={car.price}
                 location={car.location}
                 onClick={noop}
+                material="flat"
               />
             ))}
           </GlassCarousel>

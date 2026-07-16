@@ -1,0 +1,49 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  /* Form alanları default blok akışında tam genişlik — grid/flex ile daraltmak çağıranın işi */
+  width: 100%;
+  font-family: var(--lg-font, inherit);
+  text-align: left;
+}
+
+.label {
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label, inherit);
+  margin-bottom: var(--lg-space-1, 4px);
+  cursor: default;
+}
+
+.required {
+  color: var(--lg-danger, #ff3b30);
+  margin-left: 2px;
+}
+
+.description {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.5));
+  margin-top: var(--lg-space-1, 4px);
+}
+
+/* Live region her zaman DOM'da; yalnız içerik varken yer kaplasın */
+.error {
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 500;
+  color: var(--lg-danger, #ff3b30);
+}
+.error:not(:empty) {
+  margin-top: var(--lg-space-1, 4px);
+}
+
+/* bp-sm altı: dokunmatikte label ile kontrol arası nefes payı biraz artar */
+.label {
+  line-height: 1.4;
+}
+/* bp-md */
+@media (min-width: 768px) {
+  .field {
+    /* Masaüstünde form alanı yine %100; sütun genişliğini üstteki layout belirler */
+    min-width: 0;
+  }
+}

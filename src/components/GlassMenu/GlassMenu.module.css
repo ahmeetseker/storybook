@@ -1,0 +1,107 @@
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+}
+
+/* Panel: floating-ui yok — tetikleyiciyi saran relative wrapper içinde absolute.
+   Mobilde geniş panel (dokunma hedefleri), ≥ bp-sm içerik genişliğine iner. */
+.panelWrap {
+  position: absolute;
+  z-index: 30;
+  min-width: 60vw;
+}
+/* bp-sm */
+@media (min-width: 640px) {
+  .panelWrap { min-width: 200px; }
+}
+
+.bottomStart { top: calc(100% + var(--lg-space-2)); left: 0; transform-origin: top left; }
+.bottomEnd { top: calc(100% + var(--lg-space-2)); right: 0; transform-origin: top right; }
+.topStart { bottom: calc(100% + var(--lg-space-2)); left: 0; transform-origin: bottom left; }
+.topEnd { bottom: calc(100% + var(--lg-space-2)); right: 0; transform-origin: bottom right; }
+
+.panel {
+  display: block;
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--lg-space-1);
+  gap: 1px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  width: 100%;
+  border: none;
+  background: none;
+  margin: 0;
+  padding: var(--lg-space-2) var(--lg-space-3);
+  min-height: var(--lg-control-sm);
+  font: inherit;
+  font-size: var(--lg-text-body);
+  text-align: left;
+  color: inherit;
+  border-radius: var(--lg-radius-chip);
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease;
+}
+
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44) */
+@media (pointer: coarse) {
+  .item { min-height: var(--lg-control-md); }
+}
+
+@media (hover: hover) {
+  .item:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.28); }
+  .destructive:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--lg-danger) 16%, transparent);
+  }
+}
+.item:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 1px;
+}
+
+.item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.destructive { color: var(--lg-danger); }
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2em;
+  flex-shrink: 0;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.separator {
+  height: 1px;
+  flex-shrink: 0;
+  background: var(--lg-hairline);
+  margin: var(--lg-space-1) var(--lg-space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item { transition: none; }
+}

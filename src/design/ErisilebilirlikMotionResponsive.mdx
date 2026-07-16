@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Tasarım Sistemi/Erişilebilirlik · Motion · Responsive" />
+
+# Erişilebilirlik
+
+- **Focus halkası** tüm etkileşimli öğelerde aynıdır:
+  `outline: 2px solid var(--lg-accent)` + `outline-offset`, yalnız `:focus-visible`.
+- İkon-tek butonlarda `label` prop'u zorunludur (`aria-label` + `title`).
+- Kalıcı durumlar ARIA'ya yansır: `aria-pressed`, `aria-selected`, `aria-current`,
+  `aria-expanded`, `role="tablist|tab|tabpanel"`, lightbox `role="dialog"` + `aria-modal`.
+- Kontrast: metin/zemin çiftleri WCAG AA (amber koyu temada bu yüzden `#E09143`'e açılır,
+  üstü koyu kahve metin alır).
+- `prefers-reduced-transparency` → cam donuklaşır (refraction kapanır, blur kalır).
+- `prefers-reduced-motion` → spring/lift animasyonları kapanır; yalnız renk geçişi kalır.
+
+# Motion
+
+Kaynak: `src/motion/presets.ts` + `useGlassPress`.
+
+| Geçiş | Mekanizma | Reduced motion |
+|---|---|---|
+| Basınç (sıvılaşma + jöle) | spring (`press`, `jelly`) — transform/filter | kapalı |
+| Hover lift | CSS `scale` + gölge, 160ms ease-out | scale kapalı |
+| Sekme/sidebar seçim geçişi | motion layout (FLIP) | anında |
+
+Kurallar: animasyon yalnız `transform` / `opacity` / `filter` üzerinde (layout
+tetiklemez) · kesilebilir (spring) · exit tamamlanmadan DOM kaldırılmaz.
+
+# Responsive
+
+- Breakpoint yerine **yetenek sorguları**: `@media (pointer: coarse)` kontrol
+  yüksekliklerini 44px+ yapar; `@media (hover: hover)` hover'ı yalnız imleçli
+  cihazlara verir.
+- Genişlik davranışı container'a göre: kartlar `minmax()` grid'de akar,
+  thumb şeritleri ve carousel yatay scroll'a düşer (`scrollbar-width: none`).
+- Cam yüzeyler büyüdüğünde refraction alan sınırıyla otomatik düz blur'a iner —
+  performans responsive'i de tasarımın parçasıdır.
+- Safe-area: tam ekran overlay'ler (lightbox) viewport birimleriyle sınırlanır.

@@ -1,0 +1,21 @@
+/* GlassInput default'u blok/tam genişliktir; arama alanı satır içi yaşar */
+.root {
+  display: inline-block;
+  width: var(--lg-search-w, 220px);
+  max-width: 100%;
+}
+
+/* Odak genişlemesi: bilinçli layout geçişi (bkz. rules.md §7 — Açık Kararlar).
+   Genişlik değişimi zaten layout ister; transition yalnız yumuşatır. */
+.expanding {
+  transition:
+    width 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 0.16s ease-out;
+}
+.expanding:focus-within {
+  width: var(--lg-search-w-focus, 300px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expanding { transition: box-shadow 0.16s ease-out; }
+}

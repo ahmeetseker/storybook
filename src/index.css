@@ -1,16 +1,84 @@
-/* Apple sistem renkleri ve tipografisi — light/dark otomatik */
+/* ─────────────────────────────────────────────────────────────
+   liquid-glass-ui design token'ları — "Kağıt" teması
+   Açık: fildişi zemin + amber vurgu · Koyu: grafit zemin
+   Font: Manrope Variable (self-host, .storybook/preview.tsx'te import)
+   ───────────────────────────────────────────────────────────── */
 :root {
   color-scheme: light dark;
-  --lg-bg: #f2f2f7;                          /* iOS systemGroupedBackground (light) */
-  --lg-label: #1d1d1f;                       /* Apple label (light) */
-  --lg-label-secondary: rgba(60, 60, 67, 0.6);
+
+  /* Renk — Kağıt (açık) */
+  --lg-bg: #faf8f4;                          /* fildişi zemin */
+  --lg-surface: #ffffff;                     /* flat kart */
+  --lg-label: #24211b;
+  --lg-label-secondary: #79726a;
+  --lg-hairline: rgba(36, 33, 27, 0.09);
+  --lg-accent: #b45309;                      /* amber */
+  --lg-accent-contrast: #ffffff;             /* amber üstü metin */
+
+  /* Semantic tone'lar (rozet, uyarı, durum) — Apple sistem renkleri */
+  --lg-danger: #ff3b30;
+  --lg-warning: #ff9500;
+  --lg-success: #34c759;
+
+  /* Tipografi ölçeği */
+  --lg-font: 'Manrope Variable', 'Manrope', -apple-system, BlinkMacSystemFont,
+    system-ui, 'Segoe UI', Roboto, sans-serif;
+  --lg-text-caption: 12px;
+  --lg-text-footnote: 13px;
+  --lg-text-body: 15px;
+  --lg-text-headline: 17px;
+  --lg-text-title: 22px;
+  --lg-text-display: 28px;
+
+  /* Radius */
+  --lg-radius-chip: 10px;
+  --lg-radius-media: 14px;
+  --lg-radius-card: 20px;
+  --lg-radius-capsule: 999px;
+
+  /* Boşluk ölçeği */
+  --lg-space-1: 4px;
+  --lg-space-2: 8px;
+  --lg-space-3: 12px;
+  --lg-space-4: 16px;
+  --lg-space-5: 20px;
+  --lg-space-6: 24px;
+  --lg-space-7: 32px;
+
+  /* Kontrol yükseklikleri (masaüstü) */
+  --lg-control-sm: 32px;
+  --lg-control-md: 40px;
+  --lg-control-lg: 48px;
+  --lg-control-xl: 56px;
+
+  /* Breakpoint ölçeği (Tailwind eşdeğeri) — CSS var media query'de çalışmadığı
+     için component CSS'lerinde raw px kullanılır, başına `bp-*` yorumu yazılır:
+     sm 640px · md 768px · lg 1024px · xl 1280px · 2xl 1536px (mobile-first, min-width) */
 }
 
+/* Koyu tema — Grafit */
 @media (prefers-color-scheme: dark) {
   :root {
-    --lg-bg: #000000;                        /* iOS systemBackground (dark) */
-    --lg-label: #f5f5f7;
-    --lg-label-secondary: rgba(235, 235, 245, 0.6);
+    --lg-bg: #121316;
+    --lg-surface: #1b1c20;
+    --lg-label: #f2f2f3;
+    --lg-label-secondary: #9d9da4;
+    --lg-hairline: rgba(255, 255, 255, 0.1);
+    --lg-accent: #e09143;                    /* amber koyuda açılır */
+    --lg-accent-contrast: #1a140c;
+    --lg-danger: #ff453a;
+    --lg-warning: #ff9f0a;
+    --lg-success: #30d158;
+  }
+}
+
+/* Dokunmatik cihazlar: minimum 44px dokunma hedefi */
+@media (pointer: coarse) {
+  :root {
+    --lg-control-sm: 36px;
+    --lg-control-md: 44px;
+    --lg-control-lg: 50px;
+    --lg-control-xl: 56px;
   }
 }
 
@@ -20,8 +88,9 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--lg-font);
+  font-size: var(--lg-text-body);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

@@ -34,4 +34,18 @@ describe('GlassButton', () => {
     renderBtn({ size: 'xl' })
     expect(screen.getByRole('button').className).toMatch(/xl/)
   })
+
+  it('type varsayılanı button olur (form içinde kazara submit engellenir)', () => {
+    renderBtn()
+    expect(screen.getByRole('button').getAttribute('type')).toBe('button')
+  })
+
+  it('loading iken tekrar aktivasyon engellenir ve aria-busy verilir', () => {
+    const onClick = vi.fn()
+    renderBtn({ onClick, loading: true })
+    const btn = screen.getByRole('button')
+    expect(btn.getAttribute('aria-busy')).toBe('true')
+    fireEvent.click(btn)
+    expect(onClick).not.toHaveBeenCalled()
+  })
 })

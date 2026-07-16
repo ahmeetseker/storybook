@@ -21,7 +21,9 @@ const meta = {
   args: { onClick: fn() },
   argTypes: {
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
-    tint: { control: 'color' },
+    tint: { control: 'color', description: 'Kalıcı aktif durumun vurgu rengi — active=true olmadan görünmez' },
+    tone: { control: 'select', options: ['light', 'dark', 'auto'] },
+    // hover/focus/basılı-anı control değildir — CSS state'idir; `active` yalnız kalıcı durumu taşır (bkz. rules.md)
   },
 } satisfies Meta<typeof GlassIconButton>
 
@@ -33,3 +35,58 @@ export const FavoriteOff: Story = { args: { label: 'Favorilere ekle', active: fa
 export const FavoriteOn: Story = { args: { label: 'Favorilerden çıkar', active: true, tint: '#ff453a', children: <HeartIcon /> } }
 export const Large: Story = { args: { label: 'Paylaş', size: 'lg', children: <ShareIcon /> } }
 export const Disabled: Story = { args: { label: 'Paylaş', disabled: true, children: <ShareIcon /> } }
+
+/** Boyut ekseni tek bakışta — üç boyut da dokunmatik hedef kurallarına uyar. */
+export const Sizes: Story = {
+  args: { label: 'Paylaş', children: <ShareIcon /> },
+  render: () => (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+      <GlassIconButton size="sm" label="Paylaş (sm)">
+        <ShareIcon />
+      </GlassIconButton>
+      <GlassIconButton size="md" label="Paylaş (md)">
+        <ShareIcon />
+      </GlassIconButton>
+      <GlassIconButton size="lg" label="Paylaş (lg)">
+        <ShareIcon />
+      </GlassIconButton>
+    </div>
+  ),
+}
+
+/**
+ * Görsel state matrisi: default · kalıcı aktif (tint'li, aria-pressed=true) · aktif değil · disabled.
+ * Hover/focus/basılı-anı burada zorlanmaz — bunlar CSS state'idir (bkz. rules.md).
+ */
+export const States: Story = {
+  args: { label: 'Favorilere ekle', children: <HeartIcon /> },
+  render: () => (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+      <GlassIconButton label="Paylaş">
+        <ShareIcon />
+      </GlassIconButton>
+      <GlassIconButton label="Favorilerden çıkar" active tint="#ff453a">
+        <HeartIcon />
+      </GlassIconButton>
+      <GlassIconButton label="Favorilere ekle" active={false} tint="#ff453a">
+        <HeartIcon />
+      </GlassIconButton>
+      <GlassIconButton label="Paylaş" disabled>
+        <ShareIcon />
+      </GlassIconButton>
+    </div>
+  ),
+}
+
+/**
+ * Uzun etiket: ikon tek başına anlam taşımaz; uzun `label` ekranda görünmez ama
+ * tooltip (title) ve ekran okuyucu (aria-label) üzerinden aynen aktarılır — kırpılmaz.
+ */
+export const UzunEtiket: Story = {
+  args: {
+    label: 'Bu ilanı favorilere ekle ve fiyat değişikliklerinde bildirim al',
+    tint: '#ff453a',
+    active: false,
+    children: <HeartIcon />,
+  },
+}

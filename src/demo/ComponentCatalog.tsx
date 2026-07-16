@@ -5,8 +5,13 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { GlassButton } from '../components/GlassButton'
 import { GlassBackButton } from '../components/GlassNavbar'
 import { GlassBadge } from '../components/GlassBadge'
+import { GlassSwitch } from '../components/GlassSwitch'
+import { GlassSegmentedControl } from '../components/GlassSegmentedControl'
+import { GlassSearchField } from '../components/GlassSearchField'
+import { GlassChip } from '../components/GlassChip'
+import { GlassAvatar } from '../components/GlassAvatar'
 
-type Category = 'Navigasyon' | 'Kontroller' | 'Overlay' | 'İçerik'
+type Category = 'Navigasyon' | 'Kontroller' | 'Overlay' | 'İçerik' | 'Primitive'
 type Status = 'hazır' | 'planlandı'
 
 interface CatalogEntry {
@@ -21,91 +26,14 @@ interface CatalogEntry {
 const noop = () => {}
 
 const ENTRIES: CatalogEntry[] = [
+  // ── Kontroller ──────────────────────────────────────────────────────────
   {
     name: 'Button',
-    description: 'Capsule cam buton — basınca sıvılaşma, parmak ucundan iç ışıma, bırakınca jöle salınımı.',
+    description: 'Capsule cam buton — basınca sıvılaşma, parmak ucundan iç ışıma, bırakınca jöle salınımı; loading ve prominent eksenleri.',
     category: 'Kontroller',
     status: 'hazır',
     storyPath: '/story/components-glassbutton--default',
     preview: <GlassButton size="sm" tone="dark" onClick={noop}>Devam Et</GlassButton>,
-  },
-  {
-    name: 'Navbar',
-    description: "Yüzen navigasyon barı — geri pill'i, başlık, paylaşımlı action grubu ve soft scroll edge.",
-    category: 'Navigasyon',
-    status: 'hazır',
-    storyPath: '/story/components-glassnavbar--with-back-and-actions',
-    preview: <GlassBackButton onClick={noop} label="Geri" tone="dark" />,
-  },
-  {
-    name: 'Dropdown / Menü',
-    description: 'Butonun baloncuk gibi patlayarak menüye morph olması (layoutId FLIP); cam büyürken kalınlaşır.',
-    category: 'Overlay',
-    status: 'planlandı',
-  },
-  {
-    name: 'Sidebar',
-    description: "visionOS tarzı yüzen cam kenar çubuğu — kayan seçim highlight'ı, disclosure grupları, split view ile içerik geçişi.",
-    category: 'Navigasyon',
-    status: 'hazır',
-    storyPath: '/story/demo-music--default',
-  },
-  {
-    name: 'Switch',
-    description: 'Lip bezel profili — kenarlar içe kırar, merkez hafif çukur; başparmak basınca cama dönüşür.',
-    category: 'Kontroller',
-    status: 'planlandı',
-  },
-  {
-    name: 'Slider',
-    description: 'Konveks cam başparmak; mevcut seviye camın içinden kırılarak görünür.',
-    category: 'Kontroller',
-    status: 'planlandı',
-  },
-  {
-    name: 'Tab Bar',
-    description: "Dikey visionOS ornament'ı — hover'da genişleyip etiketleri gösterir, seçim highlight'ı sekmeler arasında süzülür.",
-    category: 'Navigasyon',
-    status: 'hazır',
-    storyPath: '/story/components-glasstabbar--default',
-  },
-  {
-    name: 'Sheet',
-    description: 'Yarım sayfa cam panel — yukarı çekildikçe büyür, opaklaşır ve kalınlaşır.',
-    category: 'Overlay',
-    status: 'planlandı',
-  },
-  {
-    name: 'Search Field',
-    description: 'Cam arama kutusu — odaklanınca genişler, içi vibrancy katmanıyla ayrılır.',
-    category: 'Kontroller',
-    status: 'planlandı',
-  },
-  {
-    name: 'Segmented Control',
-    description: 'Seçili segmentin tek cam damla gibi kaydığı bölmeli kontrol.',
-    category: 'Kontroller',
-    status: 'planlandı',
-  },
-  {
-    name: 'Popover / Alert',
-    description: 'Kaynağından materialize olan cam balon; kalın varyant, bold tipografi.',
-    category: 'Overlay',
-    status: 'planlandı',
-  },
-  {
-    name: 'Toolbar',
-    description: 'İşleve göre pill gruplarına toplanan araç çubuğu; primary action ayrı ve tintli.',
-    category: 'Navigasyon',
-    status: 'planlandı',
-  },
-  {
-    name: 'Badge',
-    description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
-    category: 'İçerik',
-    status: 'hazır',
-    storyPath: '/story/components-glassbadge--default',
-    preview: <GlassBadge tint="#ff453a">Acil</GlassBadge>,
   },
   {
     name: 'Icon Button',
@@ -115,6 +43,133 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassiconbutton--default',
   },
   {
+    name: 'Switch',
+    description: 'Cam ray + beyaz thumb; spring ile kayar, açıkken tint dolgusu. Anında etkili tercihler için.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassswitch--default',
+    preview: <GlassSwitch label="Fiyat düşünce bildir" defaultChecked />,
+  },
+  {
+    name: 'Slider',
+    description: 'Cam başparmaklı aralık kontrolü — native input tabanı, tint dolgu ve erişilebilir değer.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassslider--default',
+  },
+  {
+    name: 'Stepper',
+    description: 'Artır/azalt çifti — spinbutton semantiği, min/max sınırları, basılı tutunca tekrar.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassstepper--default',
+  },
+  {
+    name: 'Segmented Control',
+    description: 'Seçili segmentin tek cam damla gibi kaydığı bölmeli kontrol — radiogroup semantiği, roving tabindex.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glasssegmentedcontrol--default',
+    preview: (
+      <GlassSegmentedControl
+        size="sm"
+        label="Görünüm"
+        options={[
+          { value: 'liste', label: 'Liste' },
+          { value: 'izgara', label: 'Izgara' },
+        ]}
+      />
+    ),
+  },
+  {
+    name: 'Checkbox',
+    description: 'Form onay kutusu — indeterminate desteği, etiketli, native input tabanı.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glasscheckbox--default',
+  },
+  {
+    name: 'Radio Group',
+    description: 'Tekil seçim grubu — dikey/yatay yerleşim, native radyo semantiği.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassradiogroup--default',
+  },
+  {
+    name: 'Select',
+    description: 'Cam açılır seçim — listbox paneli, klavye gezinmesi, GlassField entegrasyonu.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassselect--default',
+  },
+  {
+    name: 'Input',
+    description: 'Cam metin girişi — prefix/suffix slotları, temizle butonu, invalid durumu, iOS zoom önlemi.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassinput--default',
+  },
+  {
+    name: 'Textarea',
+    description: 'Çok satırlı giriş — içerikle büyüyen autoResize, minRows/maxRows sınırları.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glasstextarea--default',
+  },
+  {
+    name: 'Search Field',
+    description: 'Cam arama kutusu — mercek ikonu, odaklanınca yumuşak genişler, Enter arar, Esc temizler.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glasssearchfield--default',
+    preview: <GlassSearchField size="sm" aria-label="Component ara" expandOnFocus={false} style={{ width: 180 }} />,
+  },
+  {
+    name: 'Date Picker',
+    description: 'Cam takvim paneli — min/max sınırları, klavye gezinmesi, Türkçe locale.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassdatepicker--default',
+  },
+  {
+    name: 'File Upload',
+    description: 'Sürükle-bırak dosya alanı — accept/maxSize doğrulaması, hata listesi, çoklu dosya.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassfileupload--default',
+  },
+  {
+    name: 'Field',
+    description: 'Form alanı sarmalayıcısı — label, açıklama, hata metni; id ve aria bağlarını context ile dağıtır.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glassfield--default',
+  },
+  {
+    name: 'Chip',
+    description: 'Kapsül filtre/etiket — toggle seçimi, kaldırma çarpısı, tint desteği.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/components-glasschip--default',
+    preview: <GlassChip defaultSelected onSelectedChange={noop}>Boyasız</GlassChip>,
+  },
+  // ── Navigasyon ──────────────────────────────────────────────────────────
+  {
+    name: 'Navbar',
+    description: "Yüzen navigasyon barı — geri pill'i, başlık, paylaşımlı action grubu ve soft scroll edge.",
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassnavbar--with-back-and-actions',
+    preview: <GlassBackButton onClick={noop} label="Geri" tone="dark" />,
+  },
+  {
+    name: 'Sidebar',
+    description: "visionOS tarzı yüzen cam kenar çubuğu — kayan seçim highlight'ı, disclosure grupları. Hesabım sayfa demolarında kullanılıyor.",
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/sayfalar-hesabım-hesap-özeti--default',
+  },
+  {
     name: 'Breadcrumb',
     description: 'Kapsül cam kategori yolu — ara adımlar tıklanabilir, son adım sayfa olarak işaretli.',
     category: 'Navigasyon',
@@ -122,11 +177,162 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassbreadcrumb--default',
   },
   {
+    name: 'Pagination',
+    description: 'Sayfa gezintisi — ellipsis mantığı, önceki/sonraki oklar, kontrollü sayfa durumu.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glasspagination--default',
+  },
+  {
+    name: 'Toolbar',
+    description: 'İşleve göre cam pill gruplarına toplanan araç çubuğu; primary action ayrı ve tintli, ok tuşlarıyla gezilir.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glasstoolbar--default',
+  },
+  {
+    name: 'Link',
+    description: 'Metin bağlantısı — inline ve chevron\'lu standalone varyantları, external güvenlik otomatiği.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glasslink--default',
+  },
+  // ── Overlay ─────────────────────────────────────────────────────────────
+  {
+    name: 'Dropdown / Menü',
+    description: 'Tetikleyiciden açılan cam menü paneli — item/separator yapısı, klavye gezinmesi, konumlandırma.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glassmenu--default',
+  },
+  {
+    name: 'Context Menu',
+    description: 'Sağ tık menüsü — imleç konumunda materialize olur, viewport kenarında kendini düzeltir.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glasscontextmenu--default',
+  },
+  {
+    name: 'Modal',
+    description: 'Ortalanmış karar diyaloğu — focus trap, scroll kilidi, kapanışta tetikleyiciye dönüş.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glassmodal--default',
+  },
+  {
+    name: 'Drawer',
+    description: 'Kenardan kayan panel — sol/sağ/alt, üç boyut, dismissible sözleşmesi.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glassdrawer--default',
+  },
+  {
+    name: 'Sheet',
+    description: 'Yarım sayfa cam panel — tutamaçtan çekilerek duraklar arasında büyür; yükseldikçe opaklaşır ve kalınlaşır.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glasssheet--default',
+  },
+  {
+    name: 'Popover',
+    description: 'Kaynağından materialize olan cam balon — başlıklı panel, yerleşim/hizalama eksenleri.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glasspopover--default',
+  },
+  {
+    name: 'Toast',
+    description: 'Kısa ömürlü bildirim — provider + useGlassToast API\'si, severity tonları, kuyruk yönetimi.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glasstoast--default',
+  },
+  {
+    name: 'Tooltip',
+    description: 'Hover/focus ipucu balonu — gecikmeli açılış, dokunmatikte bilinçli kapalı.',
+    category: 'Overlay',
+    status: 'hazır',
+    storyPath: '/story/components-glasstooltip--default',
+  },
+  // ── İçerik ──────────────────────────────────────────────────────────────
+  {
+    name: 'Badge',
+    description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassbadge--default',
+    preview: <GlassBadge tint="#ff453a">Acil</GlassBadge>,
+  },
+  {
+    name: 'Avatar',
+    description: 'Kullanıcı görseli — baş harf fallback\'i, deterministik pastel zemin, durum noktası.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassavatar--default',
+    preview: <GlassAvatar name="Ahmet Şeker" size="lg" />,
+  },
+  {
+    name: 'Alert',
+    description: 'Satır içi uyarı paneli — severity tonları, kapatma ve aksiyon slotları.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassalert--default',
+  },
+  {
+    name: 'Divider',
+    description: 'İçerik ayracı — yatay/dikey, ortalı etiket, inset liste varyantı.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassdivider--default',
+  },
+  {
+    name: 'Empty State',
+    description: 'Boş/hata durumu paneli — ikon, başlık, açıklama ve aksiyon slotu.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassemptystate--default',
+  },
+  {
+    name: 'List',
+    description: 'iOS Settings kalıbı gruplu liste — header/footer, inset kart görünümü, satır item\'ları.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasslist--default',
+  },
+  {
+    name: 'Skeleton',
+    description: 'Yüklenme iskeleti — text/circle/rect varyantları, shimmer animasyonu, çok satır desteği.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassskeleton--default',
+  },
+  {
+    name: 'Progress',
+    description: 'İlerleme göstergesi — bar/circle varyantları, indeterminate modu, yüzde etiketi.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassprogress--default',
+  },
+  {
+    name: 'Tabs',
+    description: 'Kapsül sekme barı + cam içerik paneli — controlled/uncontrolled, tablist semantiği.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasstabs--default',
+  },
+  {
     name: 'Gallery',
     description: 'Thumbnail şeritli görsel galerisi — ok tuşları, sayaç ve tam ekran cam lightbox.',
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/components-glassgallery--default',
+  },
+  {
+    name: 'Carousel',
+    description: 'Scroll-snap yatay şerit — cam ok butonlarıyla sayfa sayfa kaydırma.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasscarousel--default',
   },
   {
     name: 'Price Header',
@@ -141,13 +347,6 @@ const ENTRIES: CatalogEntry[] = [
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/components-glassspectable--default',
-  },
-  {
-    name: 'Tabs',
-    description: 'Kapsül sekme barı + cam içerik paneli — controlled/uncontrolled, tablist semantiği.',
-    category: 'İçerik',
-    status: 'hazır',
-    storyPath: '/story/components-glasstabs--default',
   },
   {
     name: 'Seller Card',
@@ -170,16 +369,17 @@ const ENTRIES: CatalogEntry[] = [
     status: 'hazır',
     storyPath: '/story/components-glasslistingcard--default',
   },
+  // ── Primitive ───────────────────────────────────────────────────────────
   {
-    name: 'Carousel',
-    description: 'Scroll-snap yatay şerit — cam ok butonlarıyla sayfa sayfa kaydırma.',
-    category: 'İçerik',
+    name: 'Surface',
+    description: 'Tüm cam görünümün temeli — regular/clear varyantları, thickness ölçeği, tier algılamalı refraction.',
+    category: 'Primitive',
     status: 'hazır',
-    storyPath: '/story/components-glasscarousel--similar-listings',
+    storyPath: '/story/primitives-glasssurface--regular',
   },
 ]
 
-const CATEGORIES: Array<Category | 'Tümü'> = ['Tümü', 'Navigasyon', 'Kontroller', 'Overlay', 'İçerik']
+const CATEGORIES: Array<Category | 'Tümü'> = ['Tümü', 'Navigasyon', 'Kontroller', 'Overlay', 'İçerik', 'Primitive']
 
 const chipStyle = (active: boolean): CSSProperties => ({
   border: active ? '1px solid #111827' : '1px solid #e5e7eb',
@@ -222,8 +422,8 @@ export function ComponentCatalog() {
     <div style={{ position: 'relative', borderRadius: 20, background: '#f7f8fa', border: '1px solid #e5e7eb', padding: '2.5rem 2rem 3rem', color: '#111827', fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" }}>
       <h2 style={{ margin: 0, fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>Liquid Glass Componentleri</h2>
       <p style={{ margin: '8px 0 24px', maxWidth: 560, fontSize: 15, lineHeight: 1.55, color: '#4b5563' }}>
-        Apple'ın Liquid Glass tasarım dilinin web karşılıkları. Hazır olanlar canlı önizlemeyle;
-        planlananlar sırayla geliştirilecek — bir kart seç, birlikte yapalım.
+        Apple'ın Liquid Glass tasarım dilinin web karşılıkları. Set tamamlandı — {ENTRIES.length} component,
+        hepsi story ve test kapsamıyla hazır. Karttan story'sine atla, canlı dene.
       </p>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 10 }}>
@@ -261,9 +461,7 @@ export function ComponentCatalog() {
                 display: 'grid',
                 placeItems: 'center',
                 borderRadius: 12,
-                background: entry.preview
-                  ? 'linear-gradient(135deg,#bfe3fb 0%,#dccdf6 45%,#f7cfe4 100%)'
-                  : '#f3f4f6',
+                background: entry.preview ? '#fff' : '#f3f4f6',
                 border: entry.preview ? 'none' : '1px dashed #d1d5db',
               }}
             >

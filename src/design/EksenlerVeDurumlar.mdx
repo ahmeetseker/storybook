@@ -1,0 +1,69 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Tasarım Sistemi/Eksenler ve Durumlar" />
+
+# Seçenek Eksenleri ve State Modeli
+
+## Variant patlamasını önleme
+
+`"primary-small-loading"` gibi birleşik variant'lar **yasak**. Her eksen bağımsızdır:
+
+```ts
+material: 'glass' | 'flat'      // malzeme (katman kuralına bağlı)
+tone: 'light' | 'dark' | 'auto' // zemin bağlamı ipucu (bkz. Açık Kararlar)
+size: 'sm' | 'md' | 'lg' | 'xl' // geometri — kontrol token'larına bağlanır
+variant: 'regular' | 'clear'    // yalnız GlassSurface: cam ailesi
+thickness: 0..1                 // yalnız cam: gölge+lensing+blur birlikte
+tint: string                    // semantik vurgu rengi (badge, buton)
+prominent: boolean              // birincil aksiyon (Button)
+```
+
+## Yeni seçenek ekleme karar tablosu
+
+| Soru | Sonuç |
+|---|---|
+| Anlamı/davranışı değiştiriyor mu? | Public prop olabilir |
+| Tekrar eden görsel aile mi? | `variant` / `tone` / `size` |
+| Geçici kullanıcı etkileşimi mi? | CSS/DOM state — **prop olamaz** |
+| Tema genelinde mi değişiyor? | Token/context — prop olamaz |
+| Parent yerleşimi mi? | Layout'un işi — prop olamaz |
+| Tek ekranlık istisna mı? | Core API'ye eklenmez |
+| Semantiği tümden değişiyor mu? | Ayrı component (ör. ToggleButton) |
+
+## State modeli
+
+| State | Kaynak | Bastırdığı | ARIA / DOM |
+|---|---|---|---|
+| hover | CSS `:hover` (`@media (hover:hover)`) | — | — |
+| focus-visible | CSS | — | outline: `--lg-accent` |
+| active (basılı) | CSS + `useGlassPress` | — | — |
+| pressed (kalıcı) | prop | — | `aria-pressed` |
+| selected | prop/controlled | — | `aria-selected` / `aria-current` |
+| expanded | controlled/internal | — | `aria-expanded` |
+| disabled | native attribute | hover, active | `disabled` |
+| loading | prop (GlassButton) | active, hover lift | `aria-busy` |
+
+**Katman sırası:** availability (disabled/loading) → value (selected/invalid)
+→ interaction (hover/active/focus) → tema uyarlaması.
+
+**Yasak birliktelikler:** `disabled + hover` görsel uygulanmaz ·
+`disabled + focus` alınmaz · `material="flat"` + `variant="clear"` → dimming
+render edilmez (flat kazanır).
+
+## İsimlendirme kuralları
+
+- Geçici basılı durum = `active` (yalnız CSS); kalıcı durum = `pressed`/`selected`.
+- Cihaz adı (`mobile`, `tablet`) hiçbir API'de geçmez; davranış `pointer` /
+  container koşuluyla tanımlanır.
+- Event isimleri: `onX` (`onTabChange`, `onIndexChange`, `onSidebarOpenChange`).
+- Controlled çiftleri: `value` + `defaultValue` + `onValueChange` deseni
+  (`activeId` / `defaultActiveId` / `onTabChange` gibi).
+
+## Açık kararlar
+
+| Konu | Durum |
+|---|---|
+| `tone` adı tema bağlamı taşıyor (semantic tone değil) | v2'de `surfaceTone` veya context'e taşınması değerlendirilecek |
+| `GlassIconButton.active` kalıcı durum için `pressed` olmalı | API yeniden adlandırma — breaking, v2 |
+| ~~`loading` ekseni yok~~ | ✅ GlassButton'a eklendi (aria-busy + spinner + genişlik koruma) |
+| ~~success/warning/danger token'ları~~ | ✅ `--lg-danger/-warning/-success` eklendi (tema başına) |

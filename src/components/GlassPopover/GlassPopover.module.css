@@ -1,0 +1,65 @@
+.root {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+}
+
+/* Panel konumlandırıcı: floating-ui yok — placement + align eksenleri saf CSS.
+   translate özelliği kullanılır ki içteki motion transform'uyla (scale) çakışmasın. */
+.positioner {
+  position: absolute;
+  z-index: 30;
+  /* abspos shrink-to-fit tetikleyici genişliğine sıkışmasın */
+  width: max-content;
+}
+
+.bottom { top: calc(100% + var(--lg-space-2)); }
+.top { bottom: calc(100% + var(--lg-space-2)); }
+.left { right: calc(100% + var(--lg-space-2)); }
+.right { left: calc(100% + var(--lg-space-2)); }
+
+/* top/bottom → yatay hizalama */
+.alignStartX { left: 0; }
+.alignCenterX { left: 50%; translate: -50% 0; }
+.alignEndX { right: 0; }
+
+/* left/right → dikey hizalama */
+.alignStartY { top: 0; }
+.alignCenterY { top: 50%; translate: 0 -50%; }
+.alignEndY { bottom: 0; }
+
+.card {
+  display: block;
+  min-width: 220px;
+  /* mobil: viewport'tan taşmasın */
+  max-width: calc(100vw - 32px);
+  padding: var(--lg-space-4);
+  font-size: var(--lg-text-body);
+  line-height: 1.45;
+}
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .card {
+    max-width: 320px;
+  }
+}
+
+.title {
+  margin: 0 0 var(--lg-space-2);
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  color: inherit;
+}
+
+.card :focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}

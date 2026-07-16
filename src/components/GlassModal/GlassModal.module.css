@@ -1,0 +1,91 @@
+/* Overlay kökü — mobil-first: bottom-sheet (alta yapışık) */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* z token'ı yok — overlay katmanı için raw (bkz. rules.md Borç) */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Panel: içerik katmanı — flat yüzey, cam değil (compositor maliyeti yok) */
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: min(85dvh, 100%);
+  overflow: auto;
+  background: var(--lg-surface, #ffffff);
+  color: var(--lg-label, #24211b);
+  /* Mobil bottom-sheet: yalnız üst köşeler yuvarlak */
+  border-radius: var(--lg-radius-card, 20px) var(--lg-radius-card, 20px) 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.25);
+  padding: var(--lg-space-5, 20px) var(--lg-space-4, 16px);
+  outline: none;
+}
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .root {
+    align-items: center;
+    padding: var(--lg-space-6, 24px);
+  }
+  .panel {
+    border-radius: var(--lg-radius-card, 20px);
+    padding: var(--lg-space-6, 24px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+  .sm { max-width: 400px; }
+  .md { max-width: 560px; }
+  .lg { max-width: 760px; }
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: var(--lg-space-1, 4px) 0 0;
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.body {
+  flex: 1 1 auto;
+  margin-top: var(--lg-space-4, 16px);
+  font-size: var(--lg-text-body, 15px);
+}
+.title + .body,
+.description + .body {
+  margin-top: var(--lg-space-4, 16px);
+}
+.body:first-child {
+  margin-top: 0;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--lg-space-2, 8px);
+  margin-top: var(--lg-space-5, 20px);
+}
+
+/* İç odaklanabilir yoksa panel focus alır — programatik focus'ta halka çizme,
+   yalnız klavye focus'unda göster */
+.panel:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}

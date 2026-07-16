@@ -1,0 +1,112 @@
+/* Overlay kökü — panel alta absolute yerleşir */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* z token'ı yok — overlay katmanı için raw (GlassDrawer ile aynı borç) */
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Panel: yarım sayfa CAM yüzey — yukarı çekildikçe --sheet-t (0..1) ile
+   opaklaşır ve blur'u artar ("kalınlaşma"). Drawer'dan farkı budur. */
+.panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--lg-radius-card, 20px) var(--lg-radius-card, 20px) 0 0;
+  background: color-mix(in srgb, var(--lg-surface, #ffffff) calc((72 + 24 * var(--sheet-t, 0)) * 1%), transparent);
+  backdrop-filter: blur(calc((14 + 10 * var(--sheet-t, 0)) * 1px));
+  -webkit-backdrop-filter: blur(calc((14 + 10 * var(--sheet-t, 0)) * 1px));
+  color: var(--lg-label, #24211b);
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, calc(0.2 + 0.15 * var(--sheet-t, 0)));
+  padding: 0 var(--lg-space-4, 16px) var(--lg-space-5, 20px);
+  overflow: hidden;
+  outline: none;
+  /* Duraklar arası yükseklik geçişi — bilinçli layout transition (bkz. rules.md) */
+  transition: height 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.panel:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: -2px;
+}
+
+/* Sürükleme sırasında yükseklik parmağı birebir izler */
+.dragging {
+  transition: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { transition: none; }
+}
+
+/* Tutamaç: tüm üst şerit tutulabilir; görsel bar ortada */
+.grabber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 100%;
+  min-height: 28px;
+  margin: 0;
+  padding: var(--lg-space-2, 8px) 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.dragging .grabber { cursor: grabbing; }
+.grabber:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: -2px;
+  border-radius: var(--lg-radius-chip, 10px);
+}
+
+.grabberBar {
+  width: 36px;
+  height: 5px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label, #24211b) 25%, transparent);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: var(--lg-space-1, 4px) 0 0;
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+/* Gövde kendi içinde kayar — panel yüksekliği duraklarla sınırlı */
+.body {
+  flex: 1 1 auto;
+  margin-top: var(--lg-space-4, 16px);
+  font-size: var(--lg-text-body, 15px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* bp-sm: geniş ekranda kenarlardan kopar, ortalanır.
+   translateX kullanılmaz — motion panelin transform'unu (y) yönetiyor. */
+@media (min-width: 640px) {
+  .panel {
+    width: min(560px, calc(100vw - 48px));
+    margin-inline: auto;
+    padding: 0 var(--lg-space-6, 24px) var(--lg-space-6, 24px);
+  }
+}

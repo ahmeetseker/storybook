@@ -16,6 +16,7 @@ export interface GlassSellerCardProps extends HTMLAttributes<HTMLElement> {
   /** "Mesaj Gönder" aksiyonu; verilmezse buton gösterilmez */
   onMessage?: () => void
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
 const VerifiedIcon = () => (
@@ -39,6 +40,7 @@ export function GlassSellerCard({
   onPhoneReveal,
   onMessage,
   tone = 'auto',
+  material,
   className,
   ...rest
 }: GlassSellerCardProps) {
@@ -56,6 +58,7 @@ export function GlassSellerCard({
       as="section"
       shape={20}
       tone={tone}
+      material={material}
       thickness={0.45}
       className={[styles.card, className].filter(Boolean).join(' ')}
       {...rest}
@@ -106,7 +109,7 @@ export function GlassSellerCard({
       ) : null}
 
       {onMessage ? (
-        <GlassButton prominent tint="#0a84ff" onClick={onMessage}>
+        <GlassButton prominent onClick={onMessage}>
           Mesaj Gönder
         </GlassButton>
       ) : null}

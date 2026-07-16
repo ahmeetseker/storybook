@@ -1,0 +1,36 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3, 12px);
+  max-width: 100%;
+}
+
+.groups {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Focus halkası kapsül dışına taşar; scroll kırpmasın */
+  padding: 3px;
+  margin: -3px;
+}
+.groups::-webkit-scrollbar { display: none; }
+
+.group {
+  display: inline-flex;
+  flex: none;
+}
+
+.groupInner {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+}
+
+/* Primary action gruplardan kopuk, satırın sonunda durur */
+.primary {
+  flex: none;
+  margin-inline-start: auto;
+}

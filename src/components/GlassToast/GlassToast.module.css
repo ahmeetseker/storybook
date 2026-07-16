@@ -1,0 +1,120 @@
+/* Mobile-first: <640px'te position prop'u yok sayılır — yığın altta tam genişlik
+   (left/right 16px), fiilen bottom-center davranışı. */
+.stack {
+  position: fixed;
+  z-index: 60;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  pointer-events: none; /* boş alan alttaki sayfayı engellemesin */
+}
+
+.item {
+  pointer-events: auto;
+}
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .stack {
+    width: 380px;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
+  .bottomRight { right: var(--lg-space-6); bottom: var(--lg-space-6); }
+  .bottomCenter { left: 50%; translate: -50% 0; bottom: var(--lg-space-6); }
+  .topRight { right: var(--lg-space-6); top: var(--lg-space-6); }
+}
+
+.toast {
+  display: block;
+  padding: var(--lg-space-3) var(--lg-space-3) var(--lg-space-3) var(--lg-space-4);
+  font-size: var(--lg-text-body);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+}
+
+/* Severity şeridi: sol kenarda, satır yüksekliğince uzar */
+.stripe {
+  align-self: stretch;
+  flex: none;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--lg-accent);
+}
+.info { background: var(--lg-accent); }
+.success { background: var(--lg-success); }
+.warning { background: var(--lg-warning); }
+.danger { background: var(--lg-danger); }
+
+.texts {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+  padding-top: 1px;
+}
+
+.title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.action,
+.close {
+  flex: none;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--lg-radius-chip);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action {
+  padding: var(--lg-space-1) var(--lg-space-2);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  color: var(--lg-accent);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: var(--lg-text-caption);
+  opacity: 0.7;
+  transition: opacity 0.16s ease-out;
+}
+
+@media (hover: hover) {
+  .close:hover { opacity: 1; }
+  .action:hover { text-decoration: underline; }
+}
+
+/* Dokunmatik: kapat butonu 44px hedefe büyür */
+@media (pointer: coarse) {
+  .close { width: 44px; height: 44px; margin: -8px; }
+}
+
+.action:focus-visible,
+.close:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  opacity: 1;
+}

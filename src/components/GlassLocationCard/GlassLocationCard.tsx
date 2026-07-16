@@ -10,6 +10,7 @@ export interface GlassLocationCardProps extends HTMLAttributes<HTMLElement> {
   /** "Haritada Aç" aksiyonu; verilmezse buton gösterilmez */
   onOpenMap?: () => void
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
 const PinIcon = () => (
@@ -18,12 +19,13 @@ const PinIcon = () => (
   </svg>
 )
 
-export function GlassLocationCard({ address, note, onOpenMap, tone = 'auto', className, ...rest }: GlassLocationCardProps) {
+export function GlassLocationCard({ address, note, onOpenMap, tone = 'auto', material, className, ...rest }: GlassLocationCardProps) {
   return (
     <GlassSurface
       as="section"
       shape={20}
       tone={tone}
+      material={material}
       thickness={0.45}
       className={[styles.card, className].filter(Boolean).join(' ')}
       {...rest}

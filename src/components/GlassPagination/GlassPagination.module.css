@@ -1,0 +1,94 @@
+.pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--lg-space-1);
+  max-width: 100%;
+}
+
+.pages {
+  display: none; /* mobilde tam liste gizli — kompakt mod gösterilir */
+  align-items: center;
+  gap: 2px;
+}
+
+.compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--lg-space-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .pages { display: flex; }
+  .compact { display: none; }
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  margin: 0;
+  padding: 0 var(--lg-space-2);
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: inherit;
+  opacity: 0.75;
+  border-radius: var(--lg-radius-capsule);
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+
+/* Boyutlar kontrol token'ından — dokunmatikte otomatik büyür */
+.sm .item { min-width: var(--lg-control-sm); min-height: var(--lg-control-sm); font-size: var(--lg-text-footnote); }
+.md .item { min-width: var(--lg-control-md); min-height: var(--lg-control-md); font-size: var(--lg-text-body); }
+.sm .compact { font-size: var(--lg-text-footnote); }
+.md .compact { font-size: var(--lg-text-body); }
+
+@media (hover: hover) {
+  .item:hover:not(:disabled):not(.active) {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.28);
+  }
+}
+.item:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 1px;
+  opacity: 1;
+}
+
+/* Aktif sayfa: accent dolgu (GlassTabs'ın beyaz dolgusundan bilinçli ayrışır —
+   sayfalama konum bildirir, sekme içerik değiştirir) */
+.active {
+  opacity: 1;
+  background-color: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.item:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lg-space-6);
+  opacity: 0.55;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item { transition: none; }
+}

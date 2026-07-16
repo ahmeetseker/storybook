@@ -1,0 +1,163 @@
+/* iOS Settings tarzı gruplu liste. İçerik katmanı → flat yüzey (--lg-surface),
+   cam yok; ayraçlar hairline, ikon hizasından inset. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.header {
+  padding: 0 var(--lg-space-3);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lg-label-secondary);
+}
+.footer {
+  padding: 0 var(--lg-space-3);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.4;
+  color: var(--lg-label-secondary);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--lg-surface);
+}
+.inset .list {
+  border-radius: var(--lg-radius-media);
+  overflow: hidden;
+}
+/* inset=false: kenardan kenara — radius yok, çağıran tam genişlik yerleştirir */
+.plain .list {
+  border-radius: 0;
+}
+
+.item {
+  display: block;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--lg-space-3);
+  padding: 0 0 0 var(--lg-space-3);
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: var(--lg-label);
+  -webkit-tap-highlight-color: transparent;
+}
+button.row {
+  cursor: pointer;
+  transition: background-color 0.12s ease-out;
+}
+/* Hover zemini bilinçli hafif: useGlassPress/jöle yok, liste satırı buton değildir */
+@media (hover: hover) {
+  button.row:hover:not(:disabled) {
+    background-color: var(--lg-hairline);
+  }
+}
+button.row:active:not(:disabled) {
+  background-color: var(--lg-hairline);
+}
+button.row:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: -2px;
+}
+button.row:disabled,
+.rowDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  button.row {
+    transition: none;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  font-size: var(--lg-text-headline);
+}
+
+/* Ayraç: sonraki satırların .inner üstünde — ikon varsa ikondan sonra başlar.
+   box-shadow (border yerine) satır yüksekliğini oynatmaz. */
+.inner {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: var(--lg-space-3);
+  min-height: 44px; /* dokunma hedefi */
+  padding: var(--lg-space-2) var(--lg-space-3) var(--lg-space-2) 0;
+}
+.item + .item .inner {
+  box-shadow: inset 0 1px 0 var(--lg-hairline);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 1px;
+}
+.title {
+  font-size: var(--lg-text-body);
+  color: var(--lg-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.subtitle {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail {
+  flex-shrink: 0;
+  font-size: var(--lg-text-body);
+  color: var(--lg-label-secondary);
+}
+.chevron {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  margin-right: 2px;
+  border-top: 2px solid var(--lg-label-secondary);
+  border-right: 2px solid var(--lg-label-secondary);
+  transform: rotate(45deg);
+  opacity: 0.6;
+}
+
+.destructive .title {
+  color: var(--lg-danger);
+}
+
+/* bp-md: geniş ekranda yatay padding rahatlar. inset görünümü prop'a saygıyla
+   AYNEN korunur — dar ekranda köşesize düşürme yok, yalnız padding daralmıştı. */
+@media (min-width: 768px) {
+  .row {
+    padding-left: var(--lg-space-4);
+  }
+  .inner {
+    padding-right: var(--lg-space-4);
+  }
+  .header,
+  .footer {
+    padding: 0 var(--lg-space-4);
+  }
+}

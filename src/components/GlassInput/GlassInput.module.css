@@ -1,0 +1,115 @@
+.root {
+  display: block;
+  /* Form kontrolleri default blok akışında tam genişlik */
+  width: 100%;
+  font-family: var(--lg-font, inherit);
+  color: var(--lg-label, inherit);
+  transition: box-shadow 0.16s ease-out;
+}
+
+/* GlassSurface içeriği .content span'inde sarar; onu doldur (yapısal: her zaman son çocuk) */
+.root > :last-child {
+  display: block;
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  width: 100%;
+}
+
+/* Focus halkası kabukta: içerideki input odaklanınca dış çerçeve yanar */
+.root:focus-within {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+/* GlassSurface gölgeyi inline style ile verdiği için !important şart (GlassButton emsali) */
+.invalid {
+  box-shadow:
+    inset 0 0 0 1.5px var(--lg-danger, #ff3b30),
+    0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.disabled {
+  opacity: 0.45;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 0;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.input::placeholder {
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.45));
+  opacity: 1;
+}
+.input:disabled {
+  cursor: default;
+}
+/* type="search": WebKit'in kendi çarpısını gizle — clearable kendi butonunu sunar */
+.input[type='search']::-webkit-search-cancel-button,
+.input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Yükseklikler kontrol token'larından (dokunmatikte otomatik 44px+) */
+.sm .inner { min-height: var(--lg-control-sm, 32px); padding: 0 10px; }
+.md .inner { min-height: var(--lg-control-md, 40px); padding: 0 12px; }
+.lg .inner { min-height: var(--lg-control-lg, 48px); padding: 0 16px; }
+
+/* iOS Safari, font-size < 16px olan input'a odaklanınca sayfaya zoom yapar.
+   bp-sm altında tüm boyutlarda 16px kalır; ≥640px'te tipografi token ölçeğine iner. */
+.input { font-size: 16px; }
+/* bp-sm */
+@media (min-width: 640px) {
+  .sm .input { font-size: var(--lg-text-footnote, 13px); }
+  .md .input { font-size: var(--lg-text-body, 15px); }
+  .lg .input { font-size: var(--lg-text-headline, 17px); }
+}
+
+.adornment {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.5));
+  font-size: 0.9em;
+  user-select: none;
+}
+
+.clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.16s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (hover: hover) {
+  .clear:hover {
+    background: color-mix(in srgb, currentColor 22%, transparent);
+  }
+}
+.clear:focus-visible {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: 2px;
+}

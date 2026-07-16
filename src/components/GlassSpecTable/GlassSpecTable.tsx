@@ -13,14 +13,16 @@ export interface GlassSpecTableProps extends HTMLAttributes<HTMLElement> {
   columns?: 1 | 2
   title?: string
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
-export function GlassSpecTable({ items, columns = 1, title, tone = 'auto', className, ...rest }: GlassSpecTableProps) {
+export function GlassSpecTable({ items, columns = 1, title, tone = 'auto', material, className, ...rest }: GlassSpecTableProps) {
   return (
     <GlassSurface
       as="section"
       shape={20}
       tone={tone}
+      material={material}
       thickness={0.4}
       className={[styles.card, className].filter(Boolean).join(' ')}
       {...rest}

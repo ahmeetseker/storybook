@@ -1,0 +1,93 @@
+/* Overlay kökü — panel kenara absolute yerleşir */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* z token'ı yok — overlay katmanı için raw (bkz. rules.md Borç) */
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Panel: içerik katmanı — flat yüzey, cam değil */
+.panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: var(--lg-surface, #ffffff);
+  color: var(--lg-label, #24211b);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  padding: var(--lg-space-5, 20px) var(--lg-space-4, 16px);
+  overflow: auto;
+  outline: none;
+}
+
+/* Yan çekmeceler — mobil-first: tam genişlik */
+.left,
+.right {
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+.left { left: 0; }
+.right { right: 0; }
+
+/* Alt çekmece: üst köşeler yuvarlak, max-height boyuta göre */
+.bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--lg-radius-card, 20px) var(--lg-radius-card, 20px) 0 0;
+}
+.bottom.sm { max-height: 50dvh; }
+.bottom.md { max-height: 70dvh; }
+.bottom.lg { max-height: 90dvh; }
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .panel { padding: var(--lg-space-6, 24px); }
+  .left.sm, .right.sm { width: 320px; }
+  .left.md, .right.md { width: 400px; }
+  .left.lg, .right.lg { width: 560px; }
+  /* İç kenar yuvarlanır — panel dış kenara yapışık kalır */
+  .left { border-radius: 0 var(--lg-radius-card, 20px) var(--lg-radius-card, 20px) 0; }
+  .right { border-radius: var(--lg-radius-card, 20px) 0 0 var(--lg-radius-card, 20px); }
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: var(--lg-space-1, 4px) 0 0;
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+/* body flex:1 → yan çekmecede footer alta yapışır */
+.body {
+  flex: 1 1 auto;
+  margin-top: var(--lg-space-4, 16px);
+  font-size: var(--lg-text-body, 15px);
+}
+.body:first-child { margin-top: 0; }
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--lg-space-2, 8px);
+  margin-top: var(--lg-space-5, 20px);
+}
+
+.panel:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}

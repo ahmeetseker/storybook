@@ -7,9 +7,10 @@ export interface GlassBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tint?: string
   size?: 'sm' | 'md'
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
-export function GlassBadge({ tint, size = 'sm', tone = 'auto', className, style, children, ...rest }: GlassBadgeProps) {
+export function GlassBadge({ tint, size = 'sm', tone = 'auto', material, className, style, children, ...rest }: GlassBadgeProps) {
   const classes = [styles.badge, styles[size], tint ? styles.tinted : '', className].filter(Boolean).join(' ')
   const cssVars: CSSProperties = tint ? ({ '--glass-tint': tint } as CSSProperties) : {}
 
@@ -18,6 +19,7 @@ export function GlassBadge({ tint, size = 'sm', tone = 'auto', className, style,
       as="span"
       shape="capsule"
       tone={tone}
+      material={material}
       thickness={0.15}
       className={classes}
       style={{ ...cssVars, ...style }}

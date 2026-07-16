@@ -1,0 +1,30 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Panel bilinçli olarak CAM DEĞİL: küçük metin yüzeyinde okunabilirlik önce gelir.
+   Ters kontrast: --lg-label zemin + --lg-bg metin (açık temada koyu panel, koyuda açık). */
+.panel {
+  position: absolute;
+  z-index: 10;
+  width: max-content;
+  max-width: 240px;
+  padding: var(--lg-space-1) var(--lg-space-2);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-label);
+  color: var(--lg-bg);
+  font-size: var(--lg-text-footnote);
+  font-weight: 500;
+  line-height: 1.35;
+  /* Panel etkileşim hedefi değildir; altındaki öğenin hover'ını bozmasın */
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* Konumlama: CSS `translate` özelliği motion'ın inline `transform`'undan bağımsızdır,
+   ikisi çarpışmadan birleşir (merkezleme CSS'te, giriş animasyonu motion'da kalır). */
+.top    { bottom: 100%; left: 50%;  translate: -50% 0; margin-bottom: var(--lg-space-2); }
+.bottom { top: 100%;    left: 50%;  translate: -50% 0; margin-top: var(--lg-space-2); }
+.left   { right: 100%;  top: 50%;   translate: 0 -50%; margin-right: var(--lg-space-2); }
+.right  { left: 100%;   top: 50%;   translate: 0 -50%; margin-left: var(--lg-space-2); }

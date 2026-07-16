@@ -1,0 +1,107 @@
+/* Durum göstergesi içerik katmanındadır: cam yok, hairline ray + accent dolgu.
+   Bar her genişlikte %100 — genişliği çağıranın konteyneri belirler. */
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+.bar {
+  display: flex;
+  width: 100%;
+}
+
+/* ── Bar ── */
+.track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-hairline);
+}
+.sm .track { height: 4px; }
+.md .track { height: 6px; }
+.lg .track { height: 8px; }
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--glass-tint, var(--lg-accent));
+  transition: width 0.3s ease-out;
+}
+/* Indeterminate: kayan bant */
+[data-indeterminate] .fill {
+  position: absolute;
+  top: 0;
+  width: 40%;
+  animation: lg-progress-slide 1.2s ease-in-out infinite;
+}
+@keyframes lg-progress-slide {
+  from { left: -40%; }
+  to { left: 100%; }
+}
+
+.value {
+  flex-shrink: 0;
+  min-width: 3.2em;
+  text-align: right;
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label-secondary);
+}
+
+/* ── Circle ── */
+.circleBox {
+  position: relative;
+  display: inline-flex;
+}
+.svg {
+  /* Dolgu 12 hizasından (üstten) başlasın */
+  transform: rotate(-90deg);
+}
+.circleTrack {
+  fill: none;
+  stroke: var(--lg-hairline);
+  stroke-width: 4;
+}
+.circleFill {
+  fill: none;
+  stroke: var(--glass-tint, var(--lg-accent));
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s ease-out;
+}
+/* Indeterminate: sabit çeyrek yay döner */
+[data-indeterminate] .svg {
+  animation: lg-progress-spin 1s linear infinite;
+}
+@keyframes lg-progress-spin {
+  from { transform: rotate(-90deg); }
+  to { transform: rotate(270deg); }
+}
+.circleValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label-secondary);
+}
+
+/* Erişilebilirlik: hareket azaltmada transition kapanır, indeterminate yavaşlar
+   (tamamen durdurulmaz — "çalışıyor" bilgisinin kendisi harekettir) */
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .circleFill {
+    transition: none;
+  }
+  [data-indeterminate] .fill {
+    animation-duration: 3s;
+  }
+  [data-indeterminate] .svg {
+    animation-duration: 2.6s;
+  }
+}

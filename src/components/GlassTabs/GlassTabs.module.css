@@ -38,7 +38,7 @@
 }
 .tab:hover { opacity: 1; }
 .tab:focus-visible {
-  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 1px;
 }
 

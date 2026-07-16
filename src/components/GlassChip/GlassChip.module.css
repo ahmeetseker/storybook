@@ -1,0 +1,86 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out;
+}
+.chip:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+
+/* Chip ölçüleri buton kontrol token'larından bir kademe küçük — bilinçli raw
+   (etiket yoğun dizilir; --lg-control-sm bile chip için yüksek kalır, bkz. rules.md) */
+.sm { min-height: 26px; padding: 0 10px; font-size: var(--lg-text-caption, 12px); }
+.md { min-height: 32px; padding: 0 14px; font-size: var(--lg-text-footnote, 13px); }
+
+/* Dokunmatikte minimum 36px dokunma hedefi (görev gereksinimi; 44px'lik buton ölçeği chip'e ağır) */
+@media (pointer: coarse) {
+  .sm,
+  .md { min-height: 36px; }
+}
+
+/* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
+.tinted { background-color: color-mix(in srgb, var(--glass-tint) 30%, transparent); }
+
+/* Seçili: accent dolgu + kontrast metin; tint verildiyse tint kazanır */
+.selected {
+  background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #b45309)) 85%, transparent);
+  color: var(--lg-accent-contrast, #ffffff);
+}
+
+@media (hover: hover) {
+  .chip[role='button']:hover:not(.disabled):not(.selected) {
+    background-color: color-mix(in srgb, var(--lg-label, #24211b) 8%, transparent);
+  }
+  .selected[role='button']:hover:not(.disabled) {
+    background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #b45309)) 95%, transparent);
+  }
+}
+
+.disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+.icon { display: inline-flex; align-items: center; }
+.label { display: inline-flex; align-items: center; }
+
+/* Kaldırma butonu: currentColor tabanlı — seçili/tint'li her zeminde okunur */
+.remove {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  margin-inline-end: -0.3em;
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.16s ease-out;
+}
+.remove:hover:not(:disabled) {
+  background-color: color-mix(in srgb, currentColor 24%, transparent);
+}
+.remove:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 1px;
+}
+
+/* Hareket azaltma: renk geçişi kalır, basınç jölesi useGlassPress içinde zaten kapanır */
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .remove { transition: none; }
+}

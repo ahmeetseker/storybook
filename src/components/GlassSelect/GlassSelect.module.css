@@ -1,0 +1,149 @@
+.root {
+  position: relative;
+  /* Form kontrolleri default blok akışında tam genişlik */
+  width: 100%;
+  font-family: var(--lg-font, inherit);
+  color: var(--lg-label, inherit);
+}
+
+/* ── Trigger ── */
+.trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 0.16s ease-out;
+}
+.trigger:focus-visible {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+/* GlassSurface içeriği .content span'inde sarar; onu flex satırına çevir (yapısal: son çocuk) */
+.trigger > :last-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-2, 8px);
+  width: 100%;
+}
+
+/* Yükseklikler kontrol token'larından (dokunmatikte otomatik 44px+) */
+.sm { min-height: var(--lg-control-sm, 32px); }
+.md { min-height: var(--lg-control-md, 40px); }
+.lg { min-height: var(--lg-control-lg, 48px); }
+.sm > :last-child { padding: 0 10px; }
+.md > :last-child { padding: 0 12px; }
+.lg > :last-child { padding: 0 16px; }
+
+/* iOS Safari zoom kuralıyla tutarlılık: bp-sm altında 16px, ≥640px'te token ölçeği */
+.value {
+  font-size: 16px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* bp-sm */
+@media (min-width: 640px) {
+  .sm .value { font-size: var(--lg-text-footnote, 13px); }
+  .md .value { font-size: var(--lg-text-body, 15px); }
+  .lg .value { font-size: var(--lg-text-headline, 17px); }
+}
+
+.placeholder {
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.45));
+  font-weight: 400;
+}
+
+.chevron {
+  flex: none;
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.5));
+  transition: transform 0.16s ease-out;
+}
+.chevron[data-open] {
+  transform: rotate(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+/* GlassSurface gölgeyi inline style ile verdiği için !important şart (GlassButton emsali) */
+.invalid {
+  box-shadow:
+    inset 0 0 0 1.5px var(--lg-danger, #ff3b30),
+    0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Panel (overlay kalıbı: relative kök + absolute slot, portal yok) ── */
+.panelSlot {
+  position: absolute;
+  top: calc(100% + var(--lg-space-1, 4px));
+  left: 0;
+  right: 0;
+  z-index: 30;
+}
+.panelMotion {
+  transform-origin: top center;
+}
+.panel {
+  display: block;
+  width: 100%;
+  /* Cam liste okunur kalsın: yüzey token'ı üzerine yarı saydam dolgu */
+  background: color-mix(in srgb, var(--lg-surface, #fff) 72%, transparent);
+}
+
+.list {
+  /* bp-sm altı (mobil): panel en fazla ekranın yarısı, içeride scroll */
+  max-height: 50vh;
+  overflow-y: auto;
+  padding: var(--lg-space-1, 4px);
+  overscroll-behavior: contain;
+}
+/* bp-sm */
+@media (min-width: 640px) {
+  .list {
+    max-height: 320px;
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-2, 8px);
+  min-height: var(--lg-control-sm, 32px);
+  padding: 6px 10px;
+  border-radius: var(--lg-radius-chip, 10px);
+  font-size: var(--lg-text-body, 15px);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.option[data-active] {
+  background: color-mix(in srgb, var(--lg-accent, #0a84ff) 18%, transparent);
+}
+.optionSelected {
+  font-weight: 600;
+  color: var(--lg-accent, inherit);
+}
+.optionDisabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.optionLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

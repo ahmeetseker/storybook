@@ -1,0 +1,72 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  vertical-align: middle;
+  user-select: none;
+}
+
+/* Boyutlar SABİTTİR — responsive değil (bkz. rules.md): avatar bir kimlik simgesidir,
+   breakpoint ile büyüyüp küçülmez; bağlam değişirse çağıran farklı `size` seçer.
+   Font-size'lar boyutun ~%40'ı; token'a denk gelenler token'dan. */
+.xs { width: 24px; height: 24px; font-size: 10px; } /* 10px raw — caption'dan küçük, ölçek dışı */
+.sm { width: 32px; height: 32px; font-size: var(--lg-text-caption, 12px); }
+.md { width: 40px; height: 40px; font-size: var(--lg-text-body, 15px); }
+.lg { width: 56px; height: 56px; font-size: var(--lg-text-title, 22px); }
+.xl { width: 72px; height: 72px; font-size: var(--lg-text-display, 28px); }
+
+/* Radius kökte tanımlı; görsel/baş-harf katmanı inherit eder — durum noktası kırpılmaz */
+.circle { border-radius: 50%; }
+.rounded { border-radius: 25%; } /* boyutla orantılı köşe — px token avatar ölçeğinde tutmaz */
+
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--lg-hairline, rgba(0, 0, 0, 0.09));
+}
+
+.initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  font-weight: 600;
+  line-height: 1;
+  /* tint/pastel verilmediyse nötr zemin */
+  background-color: color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
+  /* Pastel zemin her zaman açıktır (L %74) → koyu metin sabit kontrast verir; raw bilinçli */
+  color: rgba(0, 0, 0, 0.62);
+  box-shadow: inset 0 0 0 1px var(--lg-hairline, rgba(0, 0, 0, 0.09));
+}
+
+/* Durum noktası: boyutun ~%26'sı, zemin renginde halka ile ayrılır */
+.status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 26%;
+  height: 26%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--lg-bg, #faf8f4);
+}
+.online { background-color: var(--lg-success, #34c759); }
+.offline { background-color: var(--lg-label-secondary, #79726a); }
+.busy { background-color: var(--lg-danger, #ff3b30); }
+
+/* Ekran okuyucuya durum metni; görsel olarak gizli */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

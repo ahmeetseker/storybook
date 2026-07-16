@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, CSSProperties } from 'react'
-import { motion, useMotionTemplate } from 'motion/react'
+import { motion } from 'motion/react'
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface'
 import { useGlassPress } from '../../motion/useGlassPress'
 import styles from './GlassIconButton.module.css'
@@ -28,7 +28,6 @@ export function GlassIconButton({
   ...rest
 }: GlassIconButtonProps) {
   const press = useGlassPress({ disabled })
-  const glow = useMotionTemplate`radial-gradient(80px circle at ${press.glowX}px ${press.glowY}px, rgba(255,255,255,0.55), transparent 70%)`
 
   const classes = [styles.button, styles[size], active && tint ? styles.active : '', className]
     .filter(Boolean)
@@ -55,7 +54,6 @@ export function GlassIconButton({
       <span className={styles.icon} aria-hidden>
         {children}
       </span>
-      <motion.span className={styles.glow} style={{ background: glow, opacity: press.glowOpacity }} aria-hidden />
     </GlassSurface>
   )
 }

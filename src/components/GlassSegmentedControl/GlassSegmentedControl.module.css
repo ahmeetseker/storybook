@@ -1,0 +1,83 @@
+.root {
+  display: inline-flex;
+  padding: 3px;
+  max-width: 100%;
+}
+.root.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.list {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.list::-webkit-scrollbar { display: none; }
+
+.segment {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  margin: 0;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: inherit;
+  opacity: 0.7;
+  border-radius: var(--lg-radius-capsule, 999px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.segment:hover { opacity: 1; }
+.segment:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 1px;
+}
+.segment:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.segmentActive { opacity: 1; }
+
+/* Boyut ekseni: kontrol yüksekliği token'dan; kök padding'i (3px×2) düşülür */
+.sm .segment {
+  height: calc(var(--lg-control-sm, 32px) - 6px);
+  padding: 0 14px;
+  font-size: var(--lg-text-footnote, 13px);
+}
+.md .segment {
+  height: calc(var(--lg-control-md, 40px) - 6px);
+  padding: 0 18px;
+  font-size: 14px;
+}
+
+/* Seçim damlası — segmentler arasında FLIP ile süzülen cam katman */
+.drop {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.icon,
+.segmentLabel {
+  position: relative; /* damlanın üstünde kalır */
+}
+.icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segment { transition: none; }
+}

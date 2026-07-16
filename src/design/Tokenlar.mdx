@@ -1,0 +1,72 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Tasarım Sistemi/Token'lar" />
+
+# Token'lar
+
+Tek kaynak: `src/index.css`. Component'ler yalnız bu değişkenleri tüketir;
+raw px/hex kullanmaz (fallback değeri hariç: `var(--lg-accent, #0a84ff)`).
+
+## Renk — tema başına değişir
+
+| Token | Kağıt (açık) | Grafit (koyu) | Kullanım |
+|---|---|---|---|
+| `--lg-bg` | `#FAF8F4` | `#121316` | Sayfa zemini |
+| `--lg-surface` | `#FFFFFF` | `#1B1C20` | Flat kart zemini |
+| `--lg-label` | `#24211B` | `#F2F2F3` | Birincil metin |
+| `--lg-label-secondary` | `#79726A` | `#9D9DA4` | İkincil metin |
+| `--lg-hairline` | `rgba(36,33,27,.09)` | `rgba(255,255,255,.10)` | Ayraç, kart kenarı |
+| `--lg-accent` | `#B45309` | `#E09143` | Vurgu (amber) |
+| `--lg-accent-contrast` | `#FFFFFF` | `#1A140C` | Vurgu üstü metin |
+
+Semantic tone renkleri (rozet, uyarı vb. için component'e `tint` olarak verilir):
+`danger #FF453A` · `warning #FF9F0A` · `success #30D158`. Bunlar şimdilik prop
+değeridir; sık kullanım artarsa `--lg-danger` vb. token'a yükseltilir (bkz. Açık Kararlar).
+
+## Tipografi
+
+Font: **Manrope Variable** (`--lg-font`, self-host `@fontsource-variable/manrope`).
+
+| Token | Değer | Ağırlık kuralı |
+|---|---|---|
+| `--lg-text-caption` | 12px | 500 |
+| `--lg-text-footnote` | 13px | 400 |
+| `--lg-text-body` | 15px | 400 |
+| `--lg-text-headline` | 17px | 600 |
+| `--lg-text-title` | 22px | 700 |
+| `--lg-text-display` | 28px | 700 |
+
+Üçten fazla ağırlık kullanılmaz: **400 gövde · 600 başlık/etkileşim · 700 display**.
+
+## Radius
+
+| Token | Değer | Kullanım |
+|---|---|---|
+| `--lg-radius-chip` | 10px | Küçük rozet/chip zemini |
+| `--lg-radius-media` | 14px | Kart içi görsel |
+| `--lg-radius-card` | 20px | Kart, panel, galeri çerçevesi |
+| `--lg-radius-capsule` | 999px | Buton, badge, tab bar |
+
+Keyfî radius verilmez; `shape` prop'u yalnız bu ölçekten değer alır.
+
+## Boşluk
+
+`--lg-space-1..7` → 4 · 8 · 12 · 16 · 20 · 24 · 32. Kart içi 16–20,
+kartlar arası 16, bölümler arası 32.
+
+## Kontrol yükseklikleri — responsive
+
+| Token | Masaüstü | Dokunmatik (`pointer: coarse`) |
+|---|---|---|
+| `--lg-control-sm` | 32px | 36px |
+| `--lg-control-md` | 40px | 44px |
+| `--lg-control-lg` | 48px | 50px |
+| `--lg-control-xl` | 56px | 56px |
+
+Dokunma hedefi kuralı: etkileşimli öğe dokunmatikte **min. 44px**.
+
+## Kurallar
+
+- Dış margin token'ı yoktur; boşluk parent layout'tan (`gap`) gelir.
+- Disabled görünümü yalnız opacity düşürerek çözülmez (etkileşim de kapanır).
+- Tema değişimi hiçbir component'e prop olarak sızmaz.

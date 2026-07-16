@@ -1,0 +1,88 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  color: var(--lg-label, #24211b);
+}
+.disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Native input görsel olarak gizli (sr-only) — odak ve aktivasyon onda kalır */
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.box {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out;
+}
+.sm .box { width: 18px; height: 18px; }
+.md .box { width: 22px; height: 22px; }
+
+/* GlassSurface'ün .content span'i inline'dır; işaretin kutu içinde ortalanması
+   için tam alanlı flex konteynere çevrilir (DatePicker'daki > span:last-child deseni) */
+.box > span:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sm .text { font-size: var(--lg-text-footnote, 13px); }
+.md .text { font-size: var(--lg-text-body, 15px); }
+.text { line-height: 1.3; }
+
+/* İşaret boyutu px sabit: % değer inline içerik span'ında çözülemiyor,
+   SVG taşıp kırpılınca işaret kaymış görünüyordu */
+.mark {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sm .mark { width: 12px; height: 12px; }
+.md .mark { width: 14px; height: 14px; }
+
+/* Seçili / karışık: kutu accent'e döner, işaret kontrast renkte */
+.input:checked ~ .box,
+.input:indeterminate ~ .box {
+  background-color: color-mix(in srgb, var(--lg-accent, #b45309) 88%, transparent);
+  color: var(--lg-accent-contrast, #fff);
+}
+
+.input:focus-visible ~ .box {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+
+/* Dokunmatik: kutu büyür, satır 44px dokunma hedefine ulaşır */
+@media (pointer: coarse) {
+  .root { min-height: 44px; }
+  .sm .box { width: 22px; height: 22px; }
+  .md .box { width: 26px; height: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box { transition: none; }
+}

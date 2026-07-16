@@ -1,0 +1,56 @@
+.skeleton {
+  display: block;
+  /* Zemin: label'ın %8'i — açık/koyu temada otomatik doğru kontrast */
+  background-color: color-mix(in srgb, var(--lg-label, #24211b) 8%, transparent);
+  flex: none;
+}
+
+/* Shimmer: zeminin üstünde kayan hafif parlaklık bandı */
+.animate {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--lg-label, #24211b) 6%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: lg-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes lg-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Hareket azaltma: shimmer tamamen kapanır, statik zemin kalır */
+@media (prefers-reduced-motion: reduce) {
+  .animate {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/* Varyant default ölçüleri — width/height prop'ları inline style ile ezer */
+.text {
+  width: 100%;
+  height: 0.9em; /* satır yüksekliğine oturur; font-size bağlamdan miras */
+  border-radius: calc(var(--lg-radius-chip, 10px) / 2);
+}
+.circle {
+  width: 40px;  /* avatar md default'u; prop ile ezilir */
+  height: 40px;
+  border-radius: 50%;
+}
+.rect {
+  width: 100%;
+  height: 96px; /* medya placeholder default'u — bilinçli raw, prop ile ezilir */
+  border-radius: var(--lg-radius-media, 14px);
+}
+
+/* Çok satır grubu */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+  width: 100%;
+}

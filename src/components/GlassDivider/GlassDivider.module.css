@@ -1,0 +1,53 @@
+.divider {
+  border: 0;
+  margin: 0;
+  flex: none;
+}
+
+/* Yatay: 1px hairline çizgi */
+.horizontal {
+  width: auto;
+  height: 1px;
+  background-color: var(--lg-hairline, rgba(36, 33, 27, 0.09));
+}
+
+/* Etiketli yatay: çizgi iki yana bölünür, ortada footnote metin */
+.withLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3, 12px);
+  height: auto;
+  background-color: transparent;
+}
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--lg-hairline, rgba(36, 33, 27, 0.09));
+}
+.label {
+  font-size: var(--lg-text-footnote, 13px);
+  line-height: 1.4;
+  color: var(--lg-label-secondary, #79726a);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Dikey: 1px sütun; satır (flex) içinde kendini uzatır */
+.vertical {
+  width: 1px;
+  min-height: 1em;
+  align-self: stretch;
+  background-color: var(--lg-hairline, rgba(36, 33, 27, 0.09));
+}
+
+/* Spacing token'ları — bilinçli olarak responsive DEĞİL, her breakpoint'te aynı
+   (ayraç ritmi sayfa genişliğiyle değişmez, bkz. rules.md) */
+.horizontal.spacingSm { margin-block: var(--lg-space-2, 8px); }
+.horizontal.spacingMd { margin-block: var(--lg-space-4, 16px); }
+.horizontal.spacingLg { margin-block: var(--lg-space-6, 24px); }
+.vertical.spacingSm { margin-inline: var(--lg-space-2, 8px); }
+.vertical.spacingMd { margin-inline: var(--lg-space-4, 16px); }
+.vertical.spacingLg { margin-inline: var(--lg-space-6, 24px); }
+
+/* Liste kullanımı: soldan içeriden başlar (iOS inset separator kalıbı) */
+.inset { margin-inline-start: var(--lg-space-4, 16px); }

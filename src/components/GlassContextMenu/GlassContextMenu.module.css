@@ -1,0 +1,82 @@
+.area {
+  display: block; /* sağ tıklanabilir alan; genişliği çağıran belirler */
+}
+
+/* İmleç koordinatında sabit panel — portal yok, transform'lu ata varsa
+   fixed'in davranışı değişebilir (rules.md'de not) */
+.positioner {
+  position: fixed;
+  z-index: 50;
+  width: max-content;
+}
+
+.menu {
+  display: block;
+  min-width: 200px;
+  max-width: calc(100vw - 16px);
+  padding: var(--lg-space-2);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  width: 100%;
+  min-height: var(--lg-control-sm);
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border: none;
+  background: none;
+  border-radius: var(--lg-radius-chip);
+  font: inherit;
+  font-size: var(--lg-text-body);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.12s ease-out;
+}
+
+@media (hover: hover) {
+  .item:hover:not(:disabled) {
+    background-color: color-mix(in srgb, currentColor 10%, transparent);
+  }
+}
+.item:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: -2px;
+}
+.item:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.destructive {
+  color: var(--lg-danger);
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  width: 1.1em;
+  justify-content: center;
+}
+
+.label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.separator {
+  display: block;
+  height: 1px;
+  margin: var(--lg-space-1) var(--lg-space-2);
+  background: var(--lg-hairline);
+}
+
+/* Dokunmatikte hedefler token üzerinden büyür (--lg-control-sm coarse'ta 36px);
+   masaüstü deseni olduğu için ekstra 44px zorlaması yapılmaz — bkz. rules.md */
+@media (prefers-reduced-motion: reduce) {
+  .item { transition: none; }
+}

@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react-vite'
 import { DemoBackground } from './DemoBackground'
 import { GlassTierProvider } from '../src/components/GlassSurface/GlassTierContext'
 import { detectTier, type GlassTier } from '../src/core/tier'
+import '@fontsource-variable/manrope'
 import '../src/index.css'
 
 const preview: Preview = {

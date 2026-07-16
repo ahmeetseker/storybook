@@ -10,6 +10,11 @@ import styles from './GlassSurface.module.css'
 
 export interface GlassSurfaceProps extends HTMLAttributes<HTMLElement> {
   variant?: 'regular' | 'clear'
+  /**
+   * 'glass': cam malzeme (backdrop-filter + refraction) — navigasyon/kontrol katmanı için.
+   * 'flat': opak, filtresiz yüzey — içerik katmanı için (compositor maliyeti yok).
+   */
+  material?: 'glass' | 'flat'
   /** 0–1: gölge derinliği, lensing gücü ve blur'u birlikte ölçekler (Apple'ın kalınlık kuralı) */
   thickness?: number
   shape?: number | 'capsule'
@@ -28,6 +33,7 @@ let instanceCounter = 0
 
 export function GlassSurface({
   variant = 'regular',
+  material = 'glass',
   thickness = 0.5,
   shape = 16,
   tone = 'auto',
@@ -52,7 +58,7 @@ export function GlassSurface({
   let filterNode: ReactNode = null
   let backdrop = `blur(${(2 + thickness * 10).toFixed(1)}px) saturate(180%)`
 
-  if (tier === 'refraction' && size && !frosted && !exceedsRefractionArea(size.width, size.height)) {
+  if (material === 'glass' && tier === 'refraction' && size && !frosted && !exceedsRefractionArea(size.width, size.height)) {
     const bezelWidth = Math.max(6, Math.min(size.width, size.height) * 0.18)
     const map = getDisplacementMap({
       width: size.width,
@@ -86,20 +92,31 @@ export function GlassSurface({
   }
 
   const toneClass = tone === 'light' ? styles.toneLight : tone === 'dark' ? styles.toneDark : ''
+  const materialClass = material === 'flat' ? styles.flat : ''
   const surfaceStyle: CSSProperties = {
     borderRadius: radius,
-    backdropFilter: backdrop,
-    WebkitBackdropFilter: backdrop,
-    boxShadow: `0 ${4 + thickness * 12}px ${16 + thickness * 24}px rgba(0,0,0,${0.12 + thickness * 0.14}), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(255,255,255,0.12)`,
+    ...(material === 'glass'
+      ? {
+          backdropFilter: backdrop,
+          WebkitBackdropFilter: backdrop,
+          boxShadow: `0 ${4 + thickness * 12}px ${16 + thickness * 24}px rgba(0,0,0,${0.12 + thickness * 0.14}), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(255,255,255,0.12)`,
+        }
+      : null),
     cursor: interactive ? 'pointer' : undefined,
     touchAction: interactive ? 'manipulation' : undefined,
     ...style,
   }
 
   return (
-    <Comp ref={ref} className={[styles.surface, toneClass, className].filter(Boolean).join(' ')} style={surfaceStyle} {...rest}>
-      {filterNode}
-      {variant === 'clear' ? <span className={styles.dimming} data-glass-dimming /> : null}
+    <Comp
+      ref={ref}
+      className={[styles.surface, materialClass, toneClass, className].filter(Boolean).join(' ')}
+      style={surfaceStyle}
+      data-material={material}
+      {...rest}
+    >
+      {material === 'glass' ? filterNode : null}
+      {material === 'glass' && variant === 'clear' ? <span className={styles.dimming} data-glass-dimming /> : null}
       <span className={styles.content}>{children}</span>
     </Comp>
   )

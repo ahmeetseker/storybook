@@ -14,6 +14,7 @@ export interface GlassPriceHeaderProps extends Omit<HTMLAttributes<HTMLElement>,
   /** Fiyat vurgu rengi */
   priceTint?: string
   tone?: 'light' | 'dark' | 'auto'
+  material?: 'glass' | 'flat'
 }
 
 export function GlassPriceHeader({
@@ -24,6 +25,7 @@ export function GlassPriceHeader({
   actions,
   priceTint,
   tone = 'auto',
+  material,
   className,
   ...rest
 }: GlassPriceHeaderProps) {
@@ -32,6 +34,7 @@ export function GlassPriceHeader({
       as="header"
       shape={20}
       tone={tone}
+      material={material}
       thickness={0.45}
       className={[styles.card, className].filter(Boolean).join(' ')}
       {...rest}

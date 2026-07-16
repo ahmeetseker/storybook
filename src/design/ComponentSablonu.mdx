@@ -1,0 +1,83 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Tasarım Sistemi/Component Şablonu" />
+
+# `rules.md` Şablonu
+
+Her component klasöründe bir `rules.md` bulunur. Uygulanmayan bölüm silinmez,
+`N/A — gerekçe` yazılır. Şablon:
+
+```markdown
+---
+name: ComponentName
+category: kontroller | navigasyon | içerik | overlay | primitive
+status: hazır | taslak
+lastReviewed: YYYY-MM-DD
+---
+
+# ComponentName Kuralları
+
+## 1. Amaç
+Tek cümlelik görev + kullanılacağı / kullanılmayacağı durumlar + ilgili
+component'ler (farklarıyla).
+
+## 2. Semantik sözleşme
+Varsayılan HTML elementi, role, accessible name kaynağı, portal kullanımı,
+korunması gereken DOM değişmezleri.
+
+## 3. Anatomy ve slotlar
+| Slot | Zorunlu | İçerik | Kurallar |
+
+## 4. Public API
+| Ad | Tür | Type | Default | Controlled | Açıklama |
+Ref hedefi + event sözleşmesi (ne zaman çalışır / çalışmaz).
+
+## 5. Seçenek eksenleri
+Eksen tablosu + varsayılan kombinasyon + yasak kombinasyonlar + türetilen
+seçenekler (ör. iconOnly → kare).
+
+## 6. State modeli
+| State | Kaynak | Bastırdığı | ARIA |
++ katman sırası (availability → value → interaction).
+
+## 7. Davranış
+Pointer/touch, keyboard tablosu, focus akışı, controlled/uncontrolled,
+async (varsa), overlay (varsa).
+
+## 8. İçerik kuralları
+Uzun metin/truncation, boş içerik, ikon-etiket ilişkisi, lokalizasyon notları.
+
+## 9. Token eşlemesi
+| Part | Property | Token | State override |
+Raw değer kullanılmışsa buraya "borç" olarak yazılır.
+
+## 10. Storybook kapsamı
+Aşağıdaki matristen hangileri var / eksik.
+
+## 11. Test kabul kriterleri
+Unit · interaction · visual · a11y maddeleri.
+
+## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
+```
+
+## Storybook kapsam matrisi
+
+Her component için zorunlu story seti:
+
+| Story | Zorunlu | Amaç |
+|---|---|---|
+| Default / Overview | ✅ | Temel sözleşme |
+| Playground (Controls) | ✅ | Yalnız public API |
+| Variants / Materials | ✅ | `material`, `variant` eksenleri |
+| Sizes | Uygunsa | `size` ekseni |
+| States | ✅ | disabled + zorlanmış hover/focus görselleri |
+| Uzun içerik | ✅ | Overflow, truncation, TR uzun kelimeler |
+| Responsive | ✅ | Dar container + dokunmatik boyutlar |
+| Temalar | ✅ | Kağıt + Grafit (toolbar'la) |
+| Erişilebilirlik | ✅ | Focus sırası, ARIA |
+
+### Controls kuralları
+
+- Controls yalnız public API'yi gösterir; `hover`/`focus`/`active` control olamaz.
+- Yasak kombinasyonlar control açıklamasında belirtilir.
+- Control default'ları implementasyon default'larıyla birebir aynıdır.

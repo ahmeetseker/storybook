@@ -8,44 +8,76 @@
   white-space: nowrap;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.18s ease;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out, scale 0.16s ease-out, box-shadow 0.16s ease-out;
 }
 .button:focus-visible {
-  outline: 2px solid rgba(10, 132, 255, 0.9);
+  outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 2px;
 }
 
-/* Apple hover highlight: işaretçili cihazlarda cam hover'da beyazlaşır/aydınlanır */
+/* tvOS focus modeli: hover'da cam opak beyaza döner, metin koyulaşır, öğe "lift" olur.
+   scale CSS özelliği, motion'ın inline transform'uyla (basınç jölesi) çarpılarak birleşir. */
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.94);
+    color: rgba(0, 0, 0, 0.85);
+    scale: 1.05;
+    /* GlassSurface gölgeyi inline style ile verdiği için !important şart */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
   }
   .button:active:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: #fff;
+    scale: 1.02;
   }
   .tinted:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--glass-tint) 45%, rgba(255, 255, 255, 0.3));
+    background-color: color-mix(in srgb, var(--glass-tint) 30%, #ffffff);
   }
   .prominent:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--glass-tint, #0a84ff) 75%, #ffffff);
+    background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #0a84ff)) 78%, #ffffff);
+    color: #fff;
+  }
+}
+
+/* Erişilebilirlik: hareket azaltma açıkken lift yok, yalnız renk değişir */
+@media (prefers-reduced-motion: reduce) {
+  .button:hover:not(:disabled),
+  .button:active:not(:disabled) {
+    scale: none;
   }
 }
 
 /* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 55%, transparent); }
-.prominent { background-color: color-mix(in srgb, var(--glass-tint, #0a84ff) 85%, transparent); color: #fff; }
+.prominent { background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #0a84ff)) 85%, transparent); color: #fff; }
 
-/* SF tracking tablosuna yakın, boyuta özel letter-spacing (Apple tipografi kuralı) */
-.sm { padding: 6px 14px; font-size: 13px; letter-spacing: 0; }
-.md { padding: 10px 20px; font-size: 15px; letter-spacing: -0.01em; }
-.lg { padding: 14px 28px; font-size: 17px; letter-spacing: -0.022em; }
-.xl { padding: 18px 36px; font-size: 19px; letter-spacing: -0.022em; } /* Apple'ın yeni extra-large boyutu */
+/* Yükseklikler kontrol token'larından gelir (dokunmatikte otomatik 44px+);
+   letter-spacing SF tracking tablosuna yakın, boyuta özel */
+.sm { min-height: var(--lg-control-sm, 32px); padding: 0 14px; font-size: 13px; letter-spacing: 0; }
+.md { min-height: var(--lg-control-md, 40px); padding: 0 20px; font-size: 15px; letter-spacing: -0.01em; }
+.lg { min-height: var(--lg-control-lg, 48px); padding: 0 28px; font-size: 17px; letter-spacing: -0.022em; }
+.xl { min-height: var(--lg-control-xl, 56px); padding: 0 36px; font-size: 19px; letter-spacing: -0.022em; } /* Apple'ın yeni extra-large boyutu */
 
-.glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 1;
-}
 .button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
+
+/* Loading: genişlik korunur (etiket görünmez ama yer tutar), spinner ortada döner */
+.label { display: inline-flex; align-items: center; gap: 0.5em; transition: opacity 0.15s ease; }
+.loading { cursor: progress; }
+.loading .label { opacity: 0; }
+.loading:hover:not(:disabled) { scale: none; }
+.spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.1em;
+  height: 1.1em;
+  margin: -0.55em 0 0 -0.55em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: lg-spin 0.7s linear infinite;
+  z-index: 2;
+}
+@keyframes lg-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.6s; }
+}
