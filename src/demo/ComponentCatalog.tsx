@@ -197,6 +197,13 @@ const ENTRIES: CatalogEntry[] = [
     status: 'hazır',
     storyPath: '/story/components-glasslink--default',
   },
+  {
+    name: 'Header',
+    description: 'Site seviyesi header — 5 yerleşim varyantı (bar/centered/split/capsule/minimal), flat default + opsiyonel cam, GlassDrawer mobil menü.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassheader--default',
+  },
   // ── Overlay ─────────────────────────────────────────────────────────────
   {
     name: 'Dropdown / Menü',
