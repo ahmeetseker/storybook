@@ -77,6 +77,19 @@ describe('GlassHeader', () => {
     expect(screen.queryByRole('button', { name: 'Menü' })).toBeNull()
   })
 
+  it('drawer menüsünde href verilen öğe gerçek link olarak render olur', () => {
+    const links = [{ label: 'Harita', href: '#harita' }]
+    render(
+      <GlassTierProvider tier="fallback">
+        <GlassHeader logo="A" links={links} />
+      </GlassTierProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Menü' }))
+    const dialog = screen.getByRole('dialog')
+    const item = within(dialog).getByRole('link', { name: 'Harita' })
+    expect(item.getAttribute('href')).toBe('#harita')
+  })
+
   it('material="glass" iken hamburger cam değil düz butondur', () => {
     renderHeader({ variant: 'minimal', material: 'glass' })
     const burger = screen.getByRole('button', { name: 'Menü' })

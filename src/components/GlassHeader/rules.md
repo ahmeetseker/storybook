@@ -38,7 +38,7 @@ Beş yerleşim varyantı; default görünüm flat (site zeminiyle uyumlu), cam o
 | links | — | `GlassHeaderLink[]`; boşsa nav + hamburger render edilmez |
 | actions | — | `<GlassButton>` önerilir; en fazla 2-3 CTA |
 | utility | — | Yalnız `variant="split"`; her zaman flat üst satır |
-| mobil menü | otomatik | GlassDrawer sağ panel; linkler tam genişlik buton |
+| mobil menü | otomatik | GlassDrawer sağ panel; href'liler tam genişlik link, href'sizler buton |
 
 ## 4. Public API
 
@@ -64,6 +64,7 @@ Beş yerleşim varyantı; default görünüm flat (site zeminiyle uyumlu), cam o
 | `variant="minimal"` | Nav listesi hiçbir genişlikte görünmez; linkler yalnız menüde |
 | `material="glass"` | Sayfada 1 cam yüzey harcar; cam üstüne cam yasağı gereği linkler düz `<a>` |
 | `material="glass"` + `actions` | `actions`'a cam component (GlassButton/GlassIconButton) **verme**; düz buton/link ver — cam üstüne cam yasağı (kod düzeyinde denetlenemez, çağıran sorumluluğunda) |
+| `material="glass"` + variant ≠ `capsule` | Desteklenir ama önerilmez — logo/actions saydam zeminde kalır; v1'de glass yalnız `capsule` ile önerilir |
 
 ## 6. State modeli
 
@@ -96,7 +97,8 @@ Tek iç state: mobil menü `open`. Link hover/focus CSS'tedir (`:focus-visible` 
 | kapsül (glass) | malzeme | GlassSurface capsule, thickness 0.35 |
 
 **Borç (raw):** min-height 60px (header yüksekliği), padding/gap değerleri,
-font-size 15/17/13px, 760px breakpoint, kapsül max-width 960px.
+font-size 15/17/13px, 760px breakpoint, kapsül max-width 960px, `z-index: 20`,
+1120px container genişliği.
 
 ## 10. Storybook kapsamı
 
@@ -124,7 +126,11 @@ Temalar/tier toolbar'dan.
 - ❌ `material="glass"` + sayfada 5'ten fazla başka cam yüzey (≤6 kuralı).
 - ❌ Linklere ikon dışında blok element koyma.
 - ❌ `material="glass"` iken `actions`'a cam component (GlassButton/GlassIconButton) koyma.
+- ❌ `material="glass"`'ı bar/centered/split ile üretimde kullanma — v1'de glass yalnız capsule için tasarlandı.
 
 **Bilinen kısıtlar:** nav çökmesi viewport media query'siyledir; dar bir container
-içinde kullanılırsa çökme tetiklenmez. **Açık kararlar:** megamenü/dropdown (v2,
-GlassMenu ile) · `--lg-space-*` token'ları gelince raw boşluk borcunun kapanması.
+içinde kullanılırsa çökme tetiklenmez. `material="glass"` bar/centered/split ile
+kullanılırsa `.glassRoot { background: none }` nedeniyle logo/actions saydam sticky
+zeminde kalır (okunabilirlik riski) — bu yüzden glass v1'de yalnız capsule ile
+önerilir. **Açık kararlar:** megamenü/dropdown (v2, GlassMenu ile) ·
+`--lg-space-*` token'ları gelince raw boşluk borcunun kapanması.

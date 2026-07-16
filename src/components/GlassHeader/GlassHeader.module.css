@@ -108,7 +108,7 @@
   max-width: 960px;
   margin: 0 auto;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: var(--lg-radius-capsule, 999px);
   box-sizing: border-box;
 }
 .capsuleFlat { background: var(--lg-surface); border: 1px solid var(--lg-hairline); }
@@ -129,6 +129,7 @@
   color: var(--lg-label);
   cursor: pointer;
   text-align: start;
+  text-decoration: none;
 }
 @media (hover: hover) {
   .drawerLink:hover { background: color-mix(in srgb, var(--lg-label) 7%, transparent); }

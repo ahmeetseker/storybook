@@ -179,21 +179,38 @@ export function GlassHeader({
       {links.length > 0 ? (
         <GlassDrawer open={menuOpen} onClose={() => setMenuOpen(false)} title={menuLabel} side="right" size="sm">
           <ul className={styles.drawerList}>
-            {links.map((link) => (
-              <li key={link.label}>
-                <button
-                  type="button"
-                  aria-current={link.active ? 'page' : undefined}
-                  className={link.active ? `${styles.drawerLink} ${styles.drawerLinkActive}` : styles.drawerLink}
-                  onClick={() => {
-                    link.onClick?.()
-                    setMenuOpen(false)
-                  }}
-                >
-                  {link.label}
-                </button>
-              </li>
-            ))}
+            {links.map((link) => {
+              const className = link.active
+                ? `${styles.drawerLink} ${styles.drawerLinkActive}`
+                : styles.drawerLink
+              const handleClick = () => {
+                link.onClick?.()
+                setMenuOpen(false)
+              }
+              return (
+                <li key={link.label}>
+                  {link.href ? (
+                    <a
+                      href={link.href}
+                      aria-current={link.active ? 'page' : undefined}
+                      className={className}
+                      onClick={handleClick}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-current={link.active ? 'page' : undefined}
+                      className={className}
+                      onClick={handleClick}
+                    >
+                      {link.label}
+                    </button>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         </GlassDrawer>
       ) : null}

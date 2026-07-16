@@ -143,6 +143,7 @@ export const VaryantKarsilastirma: Story = {
             'split',
             {
               title: 'Kurumsal portföyünüzü tek panelden yönetin',
+              subtitle: 'Toplu ilan yükleme, vitrin sayfası ve performans raporlarıyla kurumsal hesap.',
               actions: <GlassButton prominent size="lg">Kurumsal Başvuru</GlassButton>,
               media: <StatPanel />,
             },
@@ -151,6 +152,7 @@ export const VaryantKarsilastirma: Story = {
             'showcase',
             {
               title: 'Deniz manzaralı yatırım fırsatları',
+              subtitle: 'Ege ve Akdeniz hattında, imar durumu doğrulanmış seçkin parseller.',
               actions: <GlassButton prominent size="lg">Fırsatları Gör</GlassButton>,
               media: <img src={placeholderImage('Ege Sahili', '#3a7a8a', '#1f4a5f', 1600, 640)} alt="" />,
             },
@@ -159,6 +161,7 @@ export const VaryantKarsilastirma: Story = {
             'centered',
             {
               title: 'İlanını 3 dakikada yayına al',
+              subtitle: 'EİDS doğrulaması, akıllı fiyat önerisi ve moderasyon — hepsi tek sihirbazda.',
               actions: <GlassButton prominent size="lg">İlan Ver</GlassButton>,
             },
           ],
