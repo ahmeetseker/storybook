@@ -4,8 +4,9 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { GlassNavbar } from '../components/GlassNavbar'
 import { GlassButton } from '../components/GlassButton'
+import { GlassSpecTable } from '../components/GlassSpecTable'
 import { CheckRow, Field, Select, TextArea, TextInput } from './shared/forms'
-import { sihirbazAdimlari } from './shared/data'
+import { dopingPaketleri, sihirbazAdimlari } from './shared/data'
 
 const noop = () => {}
 
@@ -94,6 +95,28 @@ function Stepper({ aktif, onSec }: { aktif: number; onSec: (adim: number) => voi
 }
 
 /* ---------- Adım içerikleri ---------- */
+
+function AdimOnizleme({ doping }: { doping: string }) {
+  const paket = dopingPaketleri.find((p) => p.id === doping) ?? dopingPaketleri[0]
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <GlassSpecTable
+        material="flat"
+        title="İlan Önizlemesi"
+        items={[
+          { label: 'Başlık', value: 'İzmir Urla Denize 900 m — İmarlı Köşe Parsel' },
+          { label: 'Fiyat', value: '4.250.000 TL' },
+          { label: 'Konum', value: 'İzmir, Urla — İskele Mah.' },
+          { label: 'Öne çıkarma', value: `${paket.ad} — ${paket.fiyat}` },
+        ]}
+      />
+      <span style={{ fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)' }}>
+        Yayına alınmadan önce ilan moderasyon ekibince incelenir. Ücretli paket seçtiysen ödeme,
+        gönderimden sonraki adımda alınır.
+      </span>
+    </div>
+  )
+}
 
 function AdimPlaceholder({ baslik }: { baslik: string }) {
   return (
@@ -214,7 +237,7 @@ function AdimImarTapu() {
   )
 }
 
-function AdimFiyat() {
+function AdimFiyat({ doping, onDopingChange }: { doping: string; onDopingChange: (id: string) => void }) {
   const [fiyat, setFiyat] = useState('4250000')
   const m2 = 512
   const sayi = Number(fiyat.replace(/[^\d]/g, ''))
@@ -267,6 +290,56 @@ function AdimFiyat() {
       <span style={{ fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)' }}>
         m² fiyatın bölge ortalamasının %20 üzerindeyse ilanın "pazarlıklı" filtresinde daha az gösterilebilir.
       </span>
+      <fieldset style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <legend style={{ padding: 0, fontSize: 'var(--lg-text-headline, 17px)', fontWeight: 700 }}>
+          Öne çıkarma paketleri
+        </legend>
+        <span style={{ fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)' }}>
+          Doping yalnız sıralama önceliği verir; ilanın hangi aramalarda listeleneceğini değiştirmez.
+          Ücretli paketler ödeme onayından sonra aktifleşir.
+        </span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+          {dopingPaketleri.map((paket) => {
+            const secili = doping === paket.id
+            return (
+              <label
+                key={paket.id}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                  padding: '14px 16px',
+                  borderRadius: 'var(--lg-radius-media, 14px)',
+                  border: secili ? '2px solid var(--lg-accent)' : '1px solid var(--lg-hairline)',
+                  background: 'var(--lg-surface)',
+                  cursor: 'pointer',
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="radio"
+                    name="doping-paketi"
+                    value={paket.id}
+                    checked={secili}
+                    onChange={() => onDopingChange(paket.id)}
+                    style={{ accentColor: 'var(--lg-accent)' }}
+                  />
+                  <strong style={{ fontSize: 15 }}>{paket.ad}</strong>
+                  <span style={{ marginLeft: 'auto', fontSize: 13, fontWeight: 700, color: 'var(--lg-accent)' }}>
+                    {paket.fiyat}
+                  </span>
+                </span>
+                <span style={{ fontSize: 13, color: 'var(--lg-label-secondary)', lineHeight: 1.45 }}>{paket.aciklama}</span>
+                <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: 'var(--lg-label-secondary)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {paket.avantajlar.map((a) => (
+                    <li key={a}>{a}</li>
+                  ))}
+                </ul>
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
     </div>
   )
 }
@@ -358,6 +431,7 @@ export interface YeniIlanSihirbaziProps {
 export function YeniIlanSihirbazi({ eidsSonucu = 'basarili', baslangicAdimi = 3 }: YeniIlanSihirbaziProps) {
   const [adim, setAdim] = useState(Math.min(Math.max(baslangicAdimi, 1), 13))
   const [gonderildi, setGonderildi] = useState(false)
+  const [doping, setDoping] = useState('standart')
 
   const icerik: ReactNode = useMemo(() => {
     switch (adim) {
@@ -366,15 +440,17 @@ export function YeniIlanSihirbazi({ eidsSonucu = 'basarili', baslangicAdimi = 3 
       case 6:
         return <AdimImarTapu />
       case 8:
-        return <AdimFiyat />
+        return <AdimFiyat doping={doping} onDopingChange={setDoping} />
       case 10:
         return <AdimAciklama />
+      case 12:
+        return <AdimOnizleme doping={doping} />
       case 13:
         return <AdimBeyan onGonder={() => setGonderildi(true)} />
       default:
         return <AdimPlaceholder baslik={sihirbazAdimlari[adim - 1]} />
     }
-  }, [adim, eidsSonucu])
+  }, [adim, eidsSonucu, doping])
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

@@ -37,8 +37,8 @@ Adım sayısı ve stepper değişmez (13 adım). Mevcut **Adım 8 "Fiyat" (AdimF
 genişletilir: fiyat girişinin altına "Öne çıkarma paketleri" bölümü.
 
 - Paketler: **Standart (ücretsiz) · Öne Çıkan · Vitrin** — flat seçilebilir kartlar,
-  fiyat etiketli. Erişilebilirlik: her kart görsel olarak gizlenmiş gerçek
-  `<input type="radio">` içerir (tek `fieldset` + `legend`); focus halkası kartta görünür.
+  fiyat etiketli. Erişilebilirlik: her kart, görünür gerçek `<input type="radio">` içeren
+  bir `<label>`'dır (tek `fieldset` + `legend`); native focus halkası radio üzerinde görünür.
 - Veri: `dopingPaketleri` dizisi `shared/data.ts`'e
   (`{ id, ad, fiyat, aciklama, avantajlar[] }`).
 - Adım 12 "Önizleme" seçilen paketi özet satırı olarak gösterir.
