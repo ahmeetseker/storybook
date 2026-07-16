@@ -5,132 +5,146 @@ status: hazır
 lastReviewed: 2026-07-16
 ---
 
-# GlassHeader Kuralları
+# GlassHeader Kuralları (v2)
 
 ## 1. Amaç
 
-Site seviyesi header: logo, nav linkleri, CTA aksiyonları ve mobil menü.
-Beş yerleşim varyantı; default görünüm flat (site zeminiyle uyumlu), cam opsiyonel.
+Dört farklı anatomili premium site header'ı. Cam bir malzeme ekseni DEĞİLDİR —
+her varyantta tek küçük liquid-glass state göstergesi vardır (seçili öğenin
+kayan pill/çizgi/boncuğu). Yüzeyler flat/saydam.
 
-- **Kullan:** kamuya açık site sayfalarının üst navigasyonu (ana sayfa, listeleme, kurumsal).
-- **Kullanma:** uygulama içi geri+başlık barı (→ `GlassNavbar`), sekmeler (→ `GlassTabBar`).
+- **Kullan:** kamuya açık site sayfalarının üst navigasyonu; varyantı sayfanın
+  baskın görevine göre seç (aşağıdaki tablo).
+- **Kullanma:** uygulama içi geri+başlık barı (→ `GlassNavbar`), sekmeler (→ GlassTabs).
 
-| İlgili | Farkı |
-|---|---|
-| GlassNavbar | iOS tarzı kompakt araç çubuğu; GlassHeader site markası + tam nav taşır |
-| GlassDrawer | Mobil menünün overlay'i; sözleşmesi (focus trap, focus dönüşü) miras alınır |
+| Varyant | Baskın görev | İlham |
+|---|---|---|
+| `islands` (default) | Genel gezinme — wordmark · nav kapsülü · tek CTA | Linear/Stripe |
+| `command` | Arama/harita — menü değil arama rayı merkezde | Airbnb/Zillow |
+| `masthead` | Kurumsal/analiz — yayın kimliği + sticky indeks rayı | The Modern House |
+| `overlay` | Görsel ağırlıklı açılış — yüzeysiz, fotoğraf üstünde | Christie's RE |
 
 ## 2. Semantik sözleşme
 
-- Kök `<header>` (banner landmark) + içinde `<nav aria-label="Site">`.
-- Linkler gerçek `<a>`; `href` yoksa `#` + `preventDefault` + `onClick`.
-- Aktif link `aria-current="page"`.
-- Hamburger `GlassIconButton` — `menuLabel` accessible name'idir (default 'Menü').
-  `material="glass"` iken hamburger düz `<button>` (cam-üstüne-cam yasağı); accessible
-  name yine `menuLabel` — `aria-label` ile korunur.
-- Logo `<span>`; heading değildir.
+- Kök `<header>` (banner) + `<nav aria-label="Site">`; aktif link `aria-current="page"`.
+- Kayan cam gösterge `aria-hidden` + `data-nav-glass`; motion `layoutId`
+  (`presets.springs.sidebar`), reduced-motion'da `duration: 0`.
+- Mobil menü GlassDrawer: `href`'liler gerçek `<a>`, `href`'sizler `<button>`.
+- Hamburger `GlassIconButton` — accessible name `menuLabel` (default 'Menü').
+- `overlay` kompakt rayı scroll öncesi `inert` (focus/AT sızmaz); linkler rayda
+  TEKRARLANMAZ (layoutId çakışması + çift landmark önlenir).
 
 ## 3. Anatomy
 
 | Slot | Zorunlu | Kurallar |
 |---|---|---|
-| logo | ✅ | Marka; tek satır |
-| links | — | `GlassHeaderLink[]`; boşsa nav + hamburger render edilmez |
-| actions | — | `<GlassButton>` önerilir; en fazla 2-3 CTA |
-| utility | — | Yalnız `variant="split"`; her zaman flat üst satır |
-| mobil menü | otomatik | GlassDrawer sağ panel; href'liler tam genişlik link, href'sizler buton |
+| logo | ✅ | Wordmark/monogram — harf-kutusu kalıbı kullanılmaz |
+| links | — | Boşsa nav + hamburger render edilmez |
+| action | — | TEK birincil CTA; ikili buton kalıbı yok |
+| secondaryAction | — | Sade metin aksiyonu — CSS link görünümüne stiller |
+| meta | yalnız `masthead` | Otorite satırı ("81 il · EİDS doğrulamalı") |
+| search / searchSummary | yalnız `command` | Ray slotu + scroll'da kapanan özet |
 
 ## 4. Public API
 
-| Ad | Type | Default | Açıklama |
-|---|---|---|---|
-| logo | `ReactNode` | — | Marka alanı |
-| links | `GlassHeaderLink[]` | `[]` | `{label, onClick?, href?, active?}` |
-| actions | `ReactNode` | — | Sağ CTA alanı |
-| utility | `ReactNode` | — | Yalnız split |
-| variant | `'bar'\|'centered'\|'split'\|'capsule'\|'minimal'` | `'bar'` | Yerleşim |
-| material | `'glass'\|'flat'` | `'flat'` | Cam yalnız kapsayıcıda |
-| sticky | `boolean` | `true` | `position: sticky; top: 0` |
-| tone | `'light'\|'dark'\|'auto'` | `'auto'` | GlassSurface'a iletilir |
-| menuLabel | `string` | `'Menü'` | Hamburger adı + drawer başlığı |
+| Ad | Type | Default |
+|---|---|---|
+| logo | `ReactNode` | — |
+| links | `GlassHeaderLink[]` | `[]` |
+| action / secondaryAction / meta / search / searchSummary | `ReactNode` | — |
+| variant | `'islands'\|'command'\|'masthead'\|'overlay'` | `'islands'` |
+| sticky | `boolean` | `true` |
+| tone | `'light'\|'dark'\|'auto'` | `'auto'` |
+| menuLabel | `string` | `'Menü'` |
 
-`...rest` yok.
+`...rest` yok. Controlled/Ref: N/A — tek iç state mobil menü + scroll bayrağı.
 
 ## 5. Seçenek eksenleri
 
 | Kural | Davranış |
 |---|---|
-| `utility` + variant ≠ split | Render edilmez |
-| `variant="minimal"` | Nav listesi hiçbir genişlikte görünmez; linkler yalnız menüde |
-| `material="glass"` | Sayfada 1 cam yüzey harcar; cam üstüne cam yasağı gereği linkler düz `<a>` |
-| `material="glass"` + `actions` | `actions`'a cam component (GlassButton/GlassIconButton) **verme**; düz buton/link ver — cam üstüne cam yasağı (kod düzeyinde denetlenemez, çağıran sorumluluğunda) |
-| `material="glass"` + variant ≠ `capsule` | Desteklenir ama önerilmez — logo/actions saydam zeminde kalır; v1'de glass yalnız `capsule` ile önerilir |
+| `meta` + variant ≠ masthead | Sessizce render edilmez |
+| `search`/`searchSummary` + variant ≠ command | Sessizce render edilmez |
+| `material` | ❌ YOK (v2'de kaldırıldı) — cam yalnız state göstergesi |
+| `sticky=false` | islands/command kök akışta kalır; masthead indeksi sabitlenmez; overlay kompakt rayı render edilmez |
 
 ## 6. State modeli
 
-Tek iç state: mobil menü `open`. Link hover/focus CSS'tedir (`:focus-visible` halka,
-`@media (hover: hover)` hover). `disabled` ekseni yok.
+İç state: mobil menü `open` + `useScrolled` bayrağı (passive scroll listener →
+`data-scrolled`; görsel geçişler tamamen CSS transition'da). Link hover/focus
+CSS'te; basışta `scale(0.98)`.
 
 ## 7. Davranış
 
-- `sticky`: `position: sticky; top: 0; z-index: 20`.
-- Dar viewport (`max-width: 760px` media query): nav gizlenir, hamburger görünür,
-  utility gizlenir. **Container query kullanılmadı** çünkü header sayfa kökünde
-  sticky'dir ve containment sticky konumlandırmayı bozar — bilinçli istisna.
-- Mobil menü: GlassDrawer (portal + focus trap + kapanışta hamburger'a focus dönüşü).
-  Menü öğesi tıklanınca `onClick` çağrılır ve menü kapanır.
+- `islands`: scroll'da dikey padding daralır, zemin `--lg-bg` karışımına döner,
+  nav kapsülü gölgelenir ("raya kenetlenme").
+- `command`: scroll'da arama rayı `searchSummary` özetine kapanır
+  (opacity/transform), `:focus-within` yeniden açar. Merkez nav yoktur; linkler
+  her genişlikte hamburger menüsündedir.
+- `masthead`: kimlik satırı akışta kaybolur; yalnız 42px indeks rayı sticky.
+  Dar ekranda indeks menüye çökmez, yatay kayar (editorial desen).
+- `overlay`: kök `position: absolute` — çağıran onu `position: relative` bir
+  hero kapsayıcısının İÇİNE koyar; scroll eşiğinde `position: fixed` kompakt
+  ray süzülür. Metin renkleri `--lg-on-scrim`.
+- Dar viewport (760px media query): islands/overlay nav'ı hamburger'a çöker.
+  Container query kullanılmadı — kök sticky, containment sticky'i bozar.
 
 ## 8. İçerik
 
-- Link etiketleri kısa (1-3 kelime); 6-8 linkten fazlası `UzunIcerik` story'sindeki
-  gibi sarmalanır, ideal değildir — bilgi mimarisini sadeleştir.
-- `menuLabel` lokalizasyon için dışarıdan verilebilir.
+- Link etiketleri 1-3 kelime; islands kapsülü 5-6 linkten fazlasında UzunIcerik
+  story'sindeki gibi sıkışır — bilgi mimarisini sadeleştir.
+- `secondaryAction` içine cam component verme; sade `<a>`/`<button>` ver
+  (görünümü component stiller).
 
 ## 9. Token eşlemesi
 
-| Part | Property | Token |
-|---|---|---|
-| flat kabuk | background / border | `--lg-surface` / `--lg-hairline` |
-| link | renk / radius / yükseklik | `--lg-label(-secondary)` / `--lg-radius-chip` / `--lg-control-sm` |
-| focus halkası | outline | `--lg-accent` |
-| hover/aktif zemin | background | `color-mix(--lg-label 7%)` |
-| kapsül (glass) | malzeme | GlassSurface capsule, thickness 0.35 |
+| Part | Token |
+|---|---|
+| yüzey/çizgiler | `--lg-bg` / `--lg-surface` / `--lg-hairline` |
+| metinler | `--lg-label(-secondary)`; overlay: `--lg-on-scrim` |
+| cam pill | `color-mix(--lg-surface)` zemin + blur(8px) + iç kenar ışıması |
+| refraktif çizgi | `color-mix(--lg-accent 78%)` + blur(4px) |
+| radius/kontrol | `--lg-radius-capsule/chip`, `--lg-control-sm/lg` |
 
-**Borç (raw):** min-height 60px (header yüksekliği), padding/gap değerleri,
-font-size 15/17/13px, 760px breakpoint, kapsül max-width 960px, `z-index: 20`,
-1120px container genişliği.
+**Borç (raw):** padding/gap değerleri, font-size 13-17px + clamp 24-32px,
+760px breakpoint, z-index 30/40, 1120px container, scroll eşiği 24px,
+kapsül gölge blur değerleri.
 
 ## 10. Storybook kapsamı
 
-Default, Playground, Centered, Split, Capsule, Minimal, CamMalzeme (gradyan zeminde),
-UzunIcerik, VaryantKarsilastirma (5 varyant alt alta — seçim story'si).
-Temalar/tier toolbar'dan.
+Default(Islands), Command, Masthead, Overlay (hero görsel bağlamında),
+Playground, UzunIcerik, Erisilebilirlik (docs), VaryantKarsilastirma
+(4 varyant kendi bağlamıyla — seçim story'si). Responsive: ayrı story YOK (N/A) —
+kırılma viewport media query'sinde, doğrulama viewport toolbar'ıyla.
+Scroll davranışları story zeminleri 180vh olduğu için canlı denenebilir.
 
 ## 11. Test kabul kriterleri
 
 - [x] banner + "Site" navigation landmark
-- [x] aktif link `aria-current="page"`
-- [x] href'siz link onClick + preventDefault yolu
-- [x] hamburger menüyü açar; menü öğesi onClick çağırır
-- [x] utility yalnız split'te
-- [x] minimal'de nav yok, hamburger var
-- [x] data-variant / data-material işaretleri
+- [x] aktif link `aria-current` + `data-nav-glass` göstergesi
+- [x] href'siz link onClick; drawer'da href → `<a>`, href'siz → `<button>`
+- [x] 4 varyant `data-variant` + varyanta özgü içerik (search/meta)
+- [x] meta/search yalnız kendi varyantında
+- [x] action + secondaryAction render
+- [x] scroll eşiği → `data-scrolled` (ileri/geri)
+- [x] overlay kompakt rayı `inert` döngüsü
 - [x] links boşken nav + hamburger yok
-- [ ] dar viewport nav çökmesi (visual, Chrome)
-- [ ] glass kapsülün cam görünümü (visual, Chrome)
+- [ ] kayan cam pill'in görsel süzülüşü (visual, Chrome)
+- [ ] command rayının kapanma/açılma geçişi (visual, Chrome)
 
 ## 12. Do / Don't
 
-- ✅ actions'a yalnız buton/link ver; blok içerik verme.
-- ✅ Sayfada tek GlassHeader kullan (tek banner landmark).
-- ❌ `material="glass"` + sayfada 5'ten fazla başka cam yüzey (≤6 kuralı).
-- ❌ Linklere ikon dışında blok element koyma.
-- ❌ `material="glass"` iken `actions`'a cam component (GlassButton/GlassIconButton) koyma.
-- ❌ `material="glass"`'ı bar/centered/split ile üretimde kullanma — v1'de glass yalnız capsule için tasarlandı.
+- ✅ Varyantı sayfanın görevine göre seç (§1 tablosu); tüm sitede tek varyantta karar kıl.
+- ✅ `overlay`'i yalnız güçlü görselli açılışta ve `position: relative` kapsayıcıda kullan.
+- ❌ `action`'a birden çok buton koyma — tek CTA sözleşmesi.
+- ❌ Nav linklerine/secondaryAction'a cam component koyma — cam yalnız göstergede.
 
-**Bilinen kısıtlar:** nav çökmesi viewport media query'siyledir; dar bir container
-içinde kullanılırsa çökme tetiklenmez. `material="glass"` bar/centered/split ile
-kullanılırsa `.glassRoot { background: none }` nedeniyle logo/actions saydam sticky
-zeminde kalır (okunabilirlik riski) — bu yüzden glass v1'de yalnız capsule ile
-önerilir. **Açık kararlar:** megamenü/dropdown (v2, GlassMenu ile) ·
-`--lg-space-*` token'ları gelince raw boşluk borcunun kapanması.
+**Bilinen kısıtlar:** overlay kompakt rayı `position: fixed` — Storybook docs
+iframe'inde viewport'a göre konumlanır. **Açık kararlar:** overlay dikey köşe
+nav (Codex konseptinin tam hâli, v2+) · megamenü (GlassMenu ile) · command
+arama segmenti cam merceği (slot içeriğinin işi).
+
+**Changelog:** 2026-07-16 v2 — KIRICI: `bar/centered/split/capsule/minimal`
+varyantları ve `material`/`utility`/`actions` prop'ları kaldırıldı; yerine
+`islands/command/masthead/overlay` + `action/secondaryAction/meta/search/
+searchSummary` geldi (kullanıcı reddi + web araştırması + Codex danışması).
