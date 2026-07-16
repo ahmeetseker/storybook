@@ -23,6 +23,8 @@ export { GlassSellerCard, type GlassSellerCardProps } from './components/GlassSe
 export { GlassLocationCard, type GlassLocationCardProps } from './components/GlassLocationCard'
 export { GlassListingCard, type GlassListingCardProps } from './components/GlassListingCard'
 export { GlassCarousel, type GlassCarouselProps } from './components/GlassCarousel'
+export { GlassHero, type GlassHeroProps } from './components/GlassHero'
+export { GlassFooter, type GlassFooterProps, type GlassFooterColumn, type GlassFooterLinkItem } from './components/GlassFooter'
 export { GlassAlert, type GlassAlertProps } from './components/GlassAlert'
 export { GlassAvatar, type GlassAvatarProps } from './components/GlassAvatar'
 export { GlassCheckbox, type GlassCheckboxProps } from './components/GlassCheckbox'

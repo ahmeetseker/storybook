@@ -15,6 +15,10 @@
   --lg-accent: #b45309;                      /* amber */
   --lg-accent-contrast: #ffffff;             /* amber üstü metin */
 
+  /* Hero showcase overlay: medya üstü karartma + üzerindeki metin rengi */
+  --lg-scrim: rgba(10, 12, 16, 0.55);
+  --lg-on-scrim: #ffffff;
+
   /* Semantic tone'lar (rozet, uyarı, durum) — Apple sistem renkleri */
   --lg-danger: #ff3b30;
   --lg-warning: #ff9500;
@@ -66,6 +70,8 @@
     --lg-hairline: rgba(255, 255, 255, 0.1);
     --lg-accent: #e09143;                    /* amber koyuda açılır */
     --lg-accent-contrast: #1a140c;
+    --lg-scrim: rgba(4, 5, 8, 0.62);
+    --lg-on-scrim: #ffffff;
     --lg-danger: #ff453a;
     --lg-warning: #ff9f0a;
     --lg-success: #30d158;

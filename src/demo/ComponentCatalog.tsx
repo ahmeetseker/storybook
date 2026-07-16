@@ -204,6 +204,13 @@ const ENTRIES: CatalogEntry[] = [
     status: 'hazır',
     storyPath: '/story/components-glassheader--default',
   },
+  {
+    name: 'Footer',
+    description: "Site footer'ı — 5 varyant (columns/slim/cta/centered/newsletter), flat + hairline, sosyal ikon ve bülten slotları.",
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassfooter--default',
+  },
   // ── Overlay ─────────────────────────────────────────────────────────────
   {
     name: 'Dropdown / Menü',
@@ -262,6 +269,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glasstooltip--default',
   },
   // ── İçerik ──────────────────────────────────────────────────────────────
+  {
+    name: 'Hero',
+    description: 'Sayfa açılış bölümü — 4 varyant (search/split/showcase/centered), flat zemin, titleAs ile heading kontrolü, --lg-scrim overlay.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasshero--default',
+  },
   {
     name: 'Badge',
     description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
