@@ -19,7 +19,6 @@ export interface GlassHeroProps {
   align?: 'center' | 'start'
   /** Heading seviyesini sayfa belirler */
   titleAs?: 'h1' | 'h2' | 'div'
-  tone?: 'light' | 'dark' | 'auto'
 }
 
 export function GlassHero({

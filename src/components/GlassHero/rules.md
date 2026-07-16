@@ -44,7 +44,6 @@ Sayfa açılış (hero) bölümü — başlık, alt başlık ve slot'lar. Zemin 
 | variant | `'search'\|'split'\|'showcase'\|'centered'` | `'search'` |
 | align | `'center'\|'start'` | varyanta göre (search/centered→center) |
 | titleAs | `'h1'\|'h2'\|'div'` | `'h2'` |
-| tone | `'light'\|'dark'\|'auto'` | `'auto'` |
 
 ## 5. Seçenek eksenleri
 
@@ -101,4 +100,5 @@ VaryantKarsilastirma (4 varyant alt alta — seçim story'si). Temalar toolbar'd
 - ❌ `search` slotuna form dışı blok içerik koyma.
 
 **Açık kararlar:** `as`/rest props · giriş animasyonu preset'i (v2) ·
-`--lg-space-*` gelince boşluk borcu.
+`--lg-space-*` gelince boşluk borcu · `tone` ekseni bilinçli yok — flat zemin tema
+token'larından döner; ihtiyaç doğarsa v2.

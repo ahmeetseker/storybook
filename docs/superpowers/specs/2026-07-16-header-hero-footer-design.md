@@ -95,7 +95,6 @@ interface GlassHeroProps {
   align?: 'center' | 'start' // default: search→center, diğerleri→start
   /** Başlık elementi — heading seviyesini sayfa belirler */
   titleAs?: 'h1' | 'h2' | 'div'               // default 'h2'
-  tone?: 'light' | 'dark' | 'auto'
 }
 ```
 
