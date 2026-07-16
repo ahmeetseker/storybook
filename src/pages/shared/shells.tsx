@@ -43,6 +43,7 @@ export interface AccountNavItem {
 export const accountNav: AccountNavItem[] = [
   { id: 'ozet', label: 'Hesap Özeti' },
   { id: 'ilanlar', label: 'İlanlarım' },
+  { id: 'faturalar', label: 'Faturalarım' },
   { id: 'mesajlar', label: 'Mesajlar', badge: 2 },
   { id: 'kaydettiklerim', label: 'Kaydettiklerim' },
   { id: 'alarmlar', label: 'Arama Alarmları' },
