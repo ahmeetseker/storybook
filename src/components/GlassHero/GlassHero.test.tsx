@@ -59,6 +59,15 @@ describe('GlassHero', () => {
     expect(container.querySelector('[class*="kenburns"]')).toBeNull()
   })
 
+  it('bento slotu yalnız showcase dışındaki varyantlarda render olur', () => {
+    const { container, rerender } = render(
+      <GlassHero title="B" variant="search" bento={<div>vitrin</div>} />,
+    )
+    expect(container.querySelector('[data-hero-bento]')).not.toBeNull()
+    rerender(<GlassHero title="B" variant="showcase" media={<img alt="" src="x.png" />} bento={<div>vitrin</div>} />)
+    expect(container.querySelector('[data-hero-bento]')).toBeNull()
+  })
+
   it('variant data attribute olarak işaretlenir', () => {
     const { container } = render(<GlassHero title="B" variant="split" />)
     expect(container.querySelector('section')?.getAttribute('data-variant')).toBe('split')

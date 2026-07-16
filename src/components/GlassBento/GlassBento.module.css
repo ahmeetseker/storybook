@@ -1,0 +1,121 @@
+/* GlassBento — simetrik vitrin mozaiği. Flat zemin; cam yok. */
+.bento {
+  display: grid;
+  grid-auto-rows: 158px;
+  gap: 14px;
+  width: 100%;
+}
+.cols4 { grid-template-columns: repeat(4, 1fr); }
+.cols3 { grid-template-columns: repeat(3, 1fr); }
+
+.item { display: flex; min-width: 0; }
+.item > * { flex: 1; min-width: 0; }
+
+/* Öne çıkan 2×2 kart — görsel üstü gradyan gövde */
+.feature {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  background: var(--lg-surface);
+  padding: 0;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+@media (hover: hover) {
+  .feature:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--lg-label) 14%, transparent);
+  }
+}
+.feature:active { transform: scale(0.99); }
+.feature:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
+.featureImage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.featureBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  border: 1px solid var(--lg-hairline);
+  background: var(--lg-surface);
+  color: var(--lg-success);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.featureBody {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 40px 16px 15px;
+  background: linear-gradient(to top, var(--lg-scrim, rgba(10, 12, 16, 0.72)), transparent);
+  color: var(--lg-on-scrim, #ffffff);
+}
+.featurePrice {
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+.featureTitle {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.featureMeta { font-size: 12px; opacity: 0.78; font-variant-numeric: tabular-nums; }
+.featureCompact .featurePrice { font-size: 15.5px; }
+.featureCompact .featureBody { padding: 28px 13px 11px; }
+.featureCompact .featureTitle { font-size: 12.5px; }
+
+/* Veri/CTA hücreleri */
+.cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  background: var(--lg-surface);
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+.cellAccent {
+  background: var(--lg-accent);
+  border-color: transparent;
+  color: var(--lg-accent-contrast, #ffffff);
+}
+.statValue {
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.statLabel { font-size: 12.5px; color: var(--lg-label-secondary); line-height: 1.4; }
+.cellAccent .statLabel { color: inherit; opacity: 0.82; }
+
+/* Responsive: 860px altı 2 sütun, 500px altı tek sütun (span'lar daralır) */
+@media (max-width: 860px) {
+  .cols4, .cols3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 500px) {
+  .cols4, .cols3 { grid-template-columns: 1fr; }
+  .item { grid-column: span 1 !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature { transition: none; }
+}

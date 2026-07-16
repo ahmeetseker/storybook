@@ -18,6 +18,8 @@ export interface GlassHeroProps {
   search?: ReactNode
   /** Yalnız variant="search": arama altı hızlı linkler */
   quickLinks?: ReactNode
+  /** Metin bloğunun altında tam genişlik vitrin (örn. GlassBento) — girişte son blok olarak belirir */
+  bento?: ReactNode
   variant?: 'search' | 'split' | 'showcase' | 'centered'
   /** Default: search/centered → center, split/showcase → start */
   align?: 'center' | 'start'
@@ -45,6 +47,7 @@ export function GlassHero({
   media,
   search,
   quickLinks,
+  bento,
   variant = 'search',
   align,
   titleAs = 'h2',
@@ -79,6 +82,11 @@ export function GlassHero({
     variant === 'search' && quickLinks ? (
       <div key="quick" className={styles.quickLinks}>
         {quickLinks}
+      </div>
+    ) : null,
+    bento && variant !== 'showcase' ? (
+      <div key="bento" className={styles.bentoSlot} data-hero-bento>
+        {bento}
       </div>
     ) : null,
   ].filter(Boolean)

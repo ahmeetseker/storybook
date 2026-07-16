@@ -13,6 +13,7 @@
   text-align: inherit;
 }
 .block { display: flex; flex-direction: column; align-items: inherit; text-align: inherit; min-width: 0; }
+.bentoSlot { width: 100%; margin-top: 14px; text-align: start; }
 
 .inner {
   max-width: 1120px;

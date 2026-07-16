@@ -3,6 +3,7 @@ import { GlassHero } from './GlassHero'
 import { GlassButton } from '../GlassButton'
 import { placeholderImage } from '../../demo/placeholderImage'
 import { useTypewriter } from '../../motion/useTypewriter'
+import { GlassBento } from '../GlassBento'
 
 const ARAMA_ORNEKLERI = [
   'İzmir Urla imarlı arsa',
@@ -135,6 +136,62 @@ export const Centered: Story = {
         <GlassButton size="lg">Nasıl Çalışır?</GlassButton>
       </>
     ),
+  },
+}
+
+const MapPreview = () => (
+  <>
+    <svg viewBox="0 0 200 100" aria-hidden style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.55 }}>
+      <path d="M0 62 Q40 40 70 55 T130 48 T200 60" fill="none" stroke="var(--lg-label-secondary)" strokeWidth="1" />
+      <path d="M0 78 Q50 60 90 72 T200 74" fill="none" stroke="var(--lg-label-secondary)" strokeWidth="1" />
+      <circle cx="72" cy="52" r="5" fill="var(--lg-accent)" />
+      <circle cx="138" cy="47" r="4" fill="var(--lg-accent)" opacity="0.7" />
+      <circle cx="45" cy="70" r="3.5" fill="var(--lg-accent)" opacity="0.5" />
+    </svg>
+    <span style={{ position: 'relative', fontSize: 12.5, fontWeight: 700 }}>Haritada 214 ilan · İzmir</span>
+  </>
+)
+
+const DemoBento = () => (
+  <GlassBento>
+    <GlassBento.Feature
+      image={placeholderImage('Urla', '#3a6f5f', '#1f4a3a', 800, 640)}
+      price="4.250.000 TL"
+      title="İzmir Urla Denize 900 m — İmarlı Köşe Parsel"
+      meta="512 m² · Konut İmarlı · 8.301 TL/m²"
+      badge="✓ EİDS"
+    />
+    <GlassBento.Stat value="12.400+" label="EİDS doğrulamalı aktif ilan" />
+    <GlassBento.Cell>
+      <MapPreview />
+    </GlassBento.Cell>
+    <GlassBento.Feature
+      image={placeholderImage('Kaş', '#3a7a8a', '#1f4a5f', 480, 320)}
+      price="6.900.000 TL"
+      title="Kaş Manzaralı Arsa"
+      badge="✓ EİDS"
+      colSpan={1}
+      rowSpan={1}
+    />
+    <GlassBento.Stat value="%98" label="tapu eşleşme oranı — ilanını 3 dakikada doğrulat" tone="accent" />
+  </GlassBento>
+)
+
+export const BentoVitrin: Story = {
+  name: 'Bento Vitrin (Konsept E)',
+  args: {
+    variant: 'search',
+    search: <DemoSearch />,
+    bento: <DemoBento />,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Veri bento\'su: öne çıkan ilan (2×2) + istatistik hücresi + harita önizlemesi + ikinci ilan. ' +
+          'Kademeli girişin son bloğu olarak yükselir; 860px altında 2 sütun, 500px altında tek sütun.',
+      },
+    },
   },
 }
 

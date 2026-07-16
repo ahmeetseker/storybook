@@ -277,6 +277,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glasshero--default',
   },
   {
+    name: 'Bento Vitrin',
+    description: "Simetrik vitrin mozaiği — öne çıkan ilan kartı (2×2), istatistik/harita/CTA hücreleri; hero'nun bento slotuna girer.",
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassbento--default',
+  },
+  {
     name: 'Badge',
     description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
     category: 'İçerik',

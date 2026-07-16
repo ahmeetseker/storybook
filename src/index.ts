@@ -25,6 +25,14 @@ export { GlassLocationCard, type GlassLocationCardProps } from './components/Gla
 export { GlassListingCard, type GlassListingCardProps } from './components/GlassListingCard'
 export { GlassCarousel, type GlassCarouselProps } from './components/GlassCarousel'
 export { GlassHero, type GlassHeroProps } from './components/GlassHero'
+export {
+  GlassBento,
+  type GlassBentoProps,
+  type GlassBentoItemProps,
+  type GlassBentoFeatureProps,
+  type GlassBentoStatProps,
+  type GlassBentoCellProps,
+} from './components/GlassBento'
 export { GlassFooter, type GlassFooterProps, type GlassFooterColumn, type GlassFooterLinkItem } from './components/GlassFooter'
 export { GlassAlert, type GlassAlertProps } from './components/GlassAlert'
 export { GlassAvatar, type GlassAvatarProps } from './components/GlassAvatar'
