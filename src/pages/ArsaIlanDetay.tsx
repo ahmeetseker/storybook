@@ -11,9 +11,14 @@ import { GlassSellerCard } from '../components/GlassSellerCard'
 import { GlassLocationCard } from '../components/GlassLocationCard'
 import { GlassListingCard } from '../components/GlassListingCard'
 import { GlassCarousel } from '../components/GlassCarousel'
+import { GlassModal } from '../components/GlassModal'
+import { GlassRadioGroup } from '../components/GlassRadioGroup'
+import { GlassToastProvider, useGlassToast } from '../components/GlassToast'
+import { GlassBadge } from '../components/GlassBadge'
+import { GlassButton } from '../components/GlassButton'
 import { placeholderImage } from '../demo/placeholderImage'
 import { PublicShell } from './shared/shells'
-import { EidsBadge } from './shared/forms'
+import { EidsBadge, TextArea } from './shared/forms'
 import { ilanlar } from './shared/data'
 
 const noop = () => {}
@@ -27,6 +32,12 @@ const HeartIcon = () => (
 const ShareIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
     <path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+  </svg>
+)
+
+const FlagIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M5 21V4a1 1 0 0 1 1-1h11.6a.5.5 0 0 1 .4.8L15 8l3 4.2a.5.5 0 0 1-.4.8H6" />
   </svg>
 )
 
@@ -70,8 +81,32 @@ const imarTapuDetaylari = [
 const columnStyle: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 16 }
 
 export function ArsaIlanDetay() {
+  return (
+    <GlassToastProvider>
+      <ArsaIlanDetayIcerik />
+    </GlassToastProvider>
+  )
+}
+
+function ArsaIlanDetayIcerik() {
   const [favori, setFavori] = useState(false)
   const benzerler = ilanlar.filter((i) => i.id !== ilan.id)
+
+  const toast = useGlassToast()
+  const [bildirAcik, setBildirAcik] = useState(false)
+  const [bildirNeden, setBildirNeden] = useState<string | undefined>(undefined)
+  const [bildirAciklama, setBildirAciklama] = useState('')
+
+  const bildirGonder = () => {
+    setBildirAcik(false)
+    setBildirNeden(undefined)
+    setBildirAciklama('')
+    toast({
+      title: 'Şikâyetin alındı',
+      description: 'Moderasyon ekibi ilanı 24 saat içinde inceleyecek. Sonucu Şikâyetlerim sayfasından izleyebilirsin.',
+      severity: 'success',
+    })
+  }
 
   return (
     <PublicShell title="İlan Detayı" onBack={noop}>
@@ -85,9 +120,14 @@ export function ArsaIlanDetay() {
               { label: 'Urla' },
             ]}
           />
-          <GlassIconButton label="İlanı paylaş" onClick={noop}>
-            <ShareIcon />
-          </GlassIconButton>
+          <span style={{ display: 'flex', gap: 8 }}>
+            <GlassIconButton label="İlanı paylaş" onClick={noop}>
+              <ShareIcon />
+            </GlassIconButton>
+            <GlassIconButton label="İlanı bildir" onClick={() => setBildirAcik(true)}>
+              <FlagIcon />
+            </GlassIconButton>
+          </span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 16, alignItems: 'start' }}>
@@ -132,6 +172,32 @@ export function ArsaIlanDetay() {
                     />
                   ),
                 },
+                {
+                  id: 'fiyat-gecmisi',
+                  label: 'Fiyat Geçmişi',
+                  content: ilan.fiyatGecmisi?.length ? (
+                    <GlassSpecTable
+                      material="flat"
+                      items={ilan.fiyatGecmisi.map((k) => ({
+                        label: k.tarih,
+                        value: (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                            {k.fiyat}
+                            {k.degisim ? (
+                              <GlassBadge material="flat" tint={k.yon === 'artis' ? 'var(--lg-danger)' : 'var(--lg-success)'}>
+                                {k.degisim}
+                              </GlassBadge>
+                            ) : null}
+                          </span>
+                        ),
+                      }))}
+                    />
+                  ) : (
+                    <p style={{ margin: 0, color: 'var(--lg-label-secondary)' }}>
+                      Bu ilanda henüz fiyat değişikliği kaydı yok.
+                    </p>
+                  ),
+                },
               ]}
             />
             <GlassSpecTable title="Arsa Özellikleri" items={arsaOzellikleri} columns={2} material="flat" />
@@ -143,7 +209,7 @@ export function ArsaIlanDetay() {
               title={ilan.baslik}
               price={ilan.fiyat}
               priceTint="var(--lg-accent, #b45309)"
-              meta={`${ilan.konum} · ${ilan.m2} · ${ilan.m2Fiyat} · ${ilan.tarih} · İlan No: ${ilan.id}`}
+              meta={`${ilan.konum} · ${ilan.m2} · ${ilan.m2Fiyat} · ${ilan.tarih} · İlan No: ${ilan.id} · ${ilan.goruntulenme.toLocaleString('tr-TR')} görüntülenme`}
               badges={<EidsBadge dogrulandi={ilan.eidsDogrulandi} />}
               actions={
                 <GlassIconButton
@@ -191,6 +257,43 @@ export function ArsaIlanDetay() {
             ))}
           </GlassCarousel>
         </section>
+
+        <GlassModal
+          open={bildirAcik}
+          onClose={() => setBildirAcik(false)}
+          title="İlanı bildir"
+          description="Bildirimin moderasyon ekibine iletilir; ilan sahibi kimliğini göremez."
+          size="sm"
+          footer={
+            <>
+              <GlassButton onClick={() => setBildirAcik(false)}>Vazgeç</GlassButton>
+              <GlassButton prominent disabled={!bildirNeden} onClick={bildirGonder}>
+                Gönder
+              </GlassButton>
+            </>
+          }
+        >
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <GlassRadioGroup
+              label="Bildirim nedeni"
+              options={[
+                { value: 'yaniltici', label: 'Yanıltıcı bilgi', description: 'Fiyat, konum veya özellikler gerçeği yansıtmıyor' },
+                { value: 'sahte', label: 'Sahte ilan', description: 'İlan gerçek bir taşınmaza ait değil' },
+                { value: 'kategori', label: 'Yanlış kategori', description: 'İlan arsa kategorisine ait değil' },
+                { value: 'dolandiricilik', label: 'Dolandırıcılık şüphesi', description: 'Kapora talebi, harici ödeme yönlendirmesi vb.' },
+              ]}
+              value={bildirNeden}
+              onChange={setBildirNeden}
+            />
+            <TextArea
+              aria-label="Ek açıklama (isteğe bağlı)"
+              placeholder="Ek açıklama (isteğe bağlı)"
+              value={bildirAciklama}
+              onChange={(e) => setBildirAciklama(e.target.value)}
+              rows={3}
+            />
+          </div>
+        </GlassModal>
       </div>
     </PublicShell>
   )
