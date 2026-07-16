@@ -17,16 +17,27 @@ kullanıcı Storybook'taki karşılaştırma story'lerinden nihai deseni seçer.
 - **Desen başına ayrı component yok:** tek component + `variant` ekseni
   (`EksenlerVeDurumlar.mdx` felsefesi). Birleşik variant yasak; hover/focus/active
   asla prop olmaz.
+- **Cam zorunlu değil (kullanıcı kararı):** header dahil hiçbir alan cam olmak
+  zorunda değil — site ile uyumlu, ağırlıklı flat görünüm esastır. Header'da
+  `material?: 'glass' | 'flat'` ekseni sunulur, **default `flat`**; hero ve footer
+  her zaman flat. Cam yalnız istenirse ve yalnız header kapsayıcısında (1 yüzey).
+- **Zengin demo içerik (kullanıcı kararı):** karşılaştırma story'leri "içi dolu"
+  görünmeli — gerçek ArsaPazar markası, tam nav seti, dolu sütunlar, sosyal
+  linkler, rozetler. Boş/placeholder görünüm kabul edilmez.
 - **Araştırma referansları:** tek satır bar (Stripe/Linear), yüzen kapsül nav
-  (Apple.com), çift katlı utility+nav (IBM/SAP portal); marketplace arama hero'su,
-  SaaS split hero, medya showcase hero; çok sütunlu enterprise footer, slim app
-  footer, CTA bantlı pazarlama footer'ı.
+  (Apple.com), çift katlı utility+nav (IBM/SAP portal), iki katlı ortalanmış logo
+  (editorial/lüks marka), minimal landing header'ı; marketplace arama hero'su,
+  SaaS split hero, medya showcase hero, merkez CTA hero'su; çok sütunlu enterprise
+  footer, slim app footer, CTA bantlı pazarlama footer'ı, ortalanmış kurumsal
+  footer, bülten kayıtlı footer.
 
 ## Component sözleşmeleri
 
 ### 1. GlassHeader (`src/components/GlassHeader/`)
 
-Katman: **navigasyon → cam kullanabilir** (sayfada 1 cam yüzey harcar).
+Katman: navigasyon. **Default `material="flat"`** (yüzey: `--lg-surface` + hairline alt
+çizgi — site içeriğiyle uyumlu); `material="glass"` opsiyonel (o zaman sayfada 1 cam
+yüzey harcar).
 
 ```ts
 interface GlassHeaderLink {
@@ -41,7 +52,8 @@ interface GlassHeaderProps {
   links?: GlassHeaderLink[]
   actions?: ReactNode        // CTA butonları (GlassButton'ları çağıran verir)
   utility?: ReactNode        // yalnız variant="split": üst ince satır içeriği
-  variant?: 'bar' | 'capsule' | 'split'   // default 'bar'
+  variant?: 'bar' | 'centered' | 'split' | 'capsule' | 'minimal'   // default 'bar'
+  material?: 'glass' | 'flat'  // default 'flat'
   sticky?: boolean           // default true; position: sticky + scroll-edge
   tone?: 'light' | 'dark' | 'auto'
   /** Mobil menü başlığı — GlassDrawer'a geçer */
@@ -49,16 +61,23 @@ interface GlassHeaderProps {
 }
 ```
 
-- `bar` (default): tek cam şerit — logo sol, linkler orta, actions sağ.
-- `capsule`: sayfa içeriğinden boşlukla ayrık yüzen tek cam kapsül; logo, linkler ve
-  actions hepsi kapsülün içinde kompakt dizilir.
-- `split`: üstte ince **flat** utility satırı (`utility` slotu) + altta cam ana nav.
-- **Mobil:** dar viewport'ta (yetenek sorgusu: genişlik + `pointer: coarse`) linkler
-  hamburger butonuna çöker; menü mevcut `GlassDrawer` ile açılır (portal + focus trap +
-  kapanışta tetikleyiciye focus dönüşü sözleşmesi hazır gelir). Hamburger
-  `GlassIconButton` + zorunlu `label`.
+Beş varyant (yerleşim ekseni — material'den bağımsız):
+
+- `bar` (default): tek satır — logo sol, linkler orta, actions sağ (Stripe/Linear).
+- `centered`: iki katlı — üstte ortalanmış logo (yanlarda utility/actions), altında
+  ortalanmış nav satırı (editorial/lüks marka deseni).
+- `split`: üstte ince utility satırı (`utility` slotu, her zaman flat) + altta ana
+  nav (IBM/SAP portal deseni).
+- `capsule`: sayfa içeriğinden boşlukla ayrık yüzen tek kapsül; logo, linkler ve
+  actions kapsül içinde kompakt dizilir (Apple deseni; bu varyant material
+  ekseninden en çok glass'la yaşar ama flat'te de çalışır).
+- `minimal`: logo + actions + hamburger — linkler her genişlikte menüde
+  (landing/kampanya deseni).
+- **Mobil:** dar viewport'ta linkler hamburger butonuna çöker; menü mevcut
+  `GlassDrawer` ile açılır (portal + focus trap + kapanışta tetikleyiciye focus
+  dönüşü sözleşmesi hazır gelir). Hamburger `GlassIconButton` + zorunlu `label`.
 - Landmark: `<header>` + `<nav aria-label="Site">`; aktif linkte `aria-current="page"`.
-- Cam üstüne cam yok: linkler kapsül İÇİNDE düz buton/anchor; yalnız kapsayıcı camdır.
+- Cam üstüne cam yok: glass material'de linkler kapsayıcı İÇİNDE düz buton/anchor.
 
 ### 2. GlassHero (`src/components/GlassHero/`)
 
@@ -72,7 +91,7 @@ interface GlassHeroProps {
   media?: ReactNode          // split: yan panel; showcase: arka plan görseli
   search?: ReactNode         // arama slotu (ör. GlassSearchField kompozisyonu)
   quickLinks?: ReactNode     // search variantında başlık altı hızlı linkler
-  variant?: 'search' | 'split' | 'showcase'   // default 'search'
+  variant?: 'search' | 'split' | 'showcase' | 'centered'   // default 'search'
   align?: 'center' | 'start' // default: search→center, diğerleri→start
   /** Başlık elementi — heading seviyesini sayfa belirler */
   titleAs?: 'h1' | 'h2' | 'div'               // default 'h2'
@@ -86,6 +105,8 @@ interface GlassHeroProps {
 - `showcase`: tam genişlik `media` arka planı + gradyan overlay + üstte içerik.
   Overlay için `src/index.css`'e yeni `--lg-scrim` token'ı eklenir (Kağıt/Grafit
   değerleriyle; tek kaynak kuralı) — component CSS'i yalnız token'ı tüketir.
+- `centered`: merkez başlık + subtitle + iki CTA (klasik SaaS merkez hero'su);
+  `search` slotu yok, `actions` zorunlu görünümde.
 - Başlık elementi `titleAs` prop'u ile sayfa tarafından belirlenir (default `'h2'`).
 - Büyük yüzey: cam yok → tier/refraction endişesi yok. Animasyon yalnız
   transform/opacity/filter; `prefers-reduced-motion`'da kapalı.
@@ -101,17 +122,27 @@ interface GlassFooterColumn {
 }
 
 interface GlassFooterProps {
-  columns?: GlassFooterColumn[]   // columns/cta variantları
+  columns?: GlassFooterColumn[]   // columns/cta/newsletter variantları
   legal: ReactNode                // telif + yasal linkler satırı
   cta?: ReactNode                 // yalnız variant="cta": üst bant içeriği
-  variant?: 'columns' | 'slim' | 'cta'   // default 'columns'
+  brand?: ReactNode               // logo/marka alanı (centered'da zorunlu görünüm)
+  social?: ReactNode              // sosyal ikon linkleri satırı
+  newsletter?: ReactNode          // yalnız variant="newsletter": kayıt formu slotu
+  variant?: 'columns' | 'slim' | 'cta' | 'centered' | 'newsletter'   // default 'columns'
   tone?: 'light' | 'dark' | 'auto'
 }
 ```
 
-- `columns` (default): 3-5 sütun link grubu (`<nav aria-label="Alt bilgi">`) + legal satırı.
+Beş varyant:
+
+- `columns` (default): marka bloğu + 3-5 sütun link grubu
+  (`<nav aria-label="Alt bilgi">`) + sosyal satırı + legal satırı.
 - `slim`: tek satır — legal + birkaç link (PublicShell'in mevcut inline footer deseni).
 - `cta`: üstte vurgulu CTA bandı (flat, tint zemin) + columns içeriği + legal.
+- `centered`: ortalanmış marka + tek satır nav linkleri + sosyal ikonlar + legal
+  (kompakt kurumsal desen).
+- `newsletter`: üstte bülten kayıt bloğu (`newsletter` slotu — başlık + e-posta
+  girişi + buton, demo-grade) + columns içeriği + legal.
 - Landmark: `<footer>`; sütun başlıkları heading değil `<span>` + liste yapısı
   (`<ul>`), erişilebilir isimler nav aria-label'dan.
 
@@ -119,9 +150,12 @@ interface GlassFooterProps {
 
 Her component'te `title: 'Components/GlassX'`, autodocs ve şablonun zorunlu story'leri
 (Default, eksen başına bir story, durum örnekleri). Ek olarak **her dosyada bir
-"VaryantKarsilastirma" story'si**: üç variant alt alta, gerçek ArsaPazar içeriğiyle
-(logo "ArsaPazar", gerçek nav linkleri, hero'da arama alanı, footer'da gerçek link
-grupları) — kullanıcı nihai deseni bu story'den seçer.
+"VaryantKarsilastirma" story'si**: TÜM varyantlar alt alta (header 5, hero 4,
+footer 5), her biri etiketli ve **içi dolu** gerçek ArsaPazar içeriğiyle — logo
+"ArsaPazar", tam nav seti (Emlak · Vasıta değil; arsa platformu: İlanlar, Harita,
+Kurumsal, Yardım...), CTA'lar, hero'da çalışan arama alanı görünümü, footer'da dolu
+link sütunları (Kurumsal, Destek, Yasal, Keşfet), sosyal linkler ve EİDS/güven
+rozetleri. Kullanıcı nihai deseni bu story'lerden seçer.
 
 ## Testler (vitest + testing-library)
 
@@ -142,7 +176,8 @@ grupları) — kullanıcı nihai deseni bu story'den seçer.
 
 ## Tasarım sistemi bağları
 
-- Cam yalnız header'da (1 yüzey); hero/footer flat. Sayfa başına ≤ 6 cam korunur.
+- Ağırlıklı flat görünüm; cam yalnız header `material="glass"` seçilirse ve yalnız
+  header kapsayıcısında (1 yüzey). Hero/footer her zaman flat. Sayfa başına ≤ 6 cam korunur.
 - Component CSS'inde raw px/hex yasak (token fallback hariç); radius chip/media/card/
   capsule ölçeğinden; kontrol yükseklikleri `--lg-control-*`; hedefler ≥ 44px.
 - Focus halkası `outline: 2px solid var(--lg-accent)` yalnız `:focus-visible`.
