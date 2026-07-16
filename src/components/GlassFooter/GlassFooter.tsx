@@ -27,7 +27,6 @@ export interface GlassFooterProps {
   /** Yalnız variant="newsletter": kayıt formu slotu */
   newsletter?: ReactNode
   variant?: 'columns' | 'slim' | 'cta' | 'centered' | 'newsletter'
-  tone?: 'light' | 'dark' | 'auto'
 }
 
 function FootLink({ link }: { link: GlassFooterLinkItem }) {

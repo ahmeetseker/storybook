@@ -128,7 +128,6 @@ interface GlassFooterProps {
   social?: ReactNode              // sosyal ikon linkleri satırı
   newsletter?: ReactNode          // yalnız variant="newsletter": kayıt formu slotu
   variant?: 'columns' | 'slim' | 'cta' | 'centered' | 'newsletter'   // default 'columns'
-  tone?: 'light' | 'dark' | 'auto'
 }
 ```
 

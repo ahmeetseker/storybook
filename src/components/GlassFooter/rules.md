@@ -40,7 +40,6 @@ Her zaman flat + hairline üst çizgi; cam kullanılmaz (büyük içerik yüzeyi
 | legal | `ReactNode` | — (zorunlu) |
 | cta / brand / social / newsletter | `ReactNode` | — |
 | variant | `'columns'\|'slim'\|'cta'\|'centered'\|'newsletter'` | `'columns'` |
-| tone | `'light'\|'dark'\|'auto'` | `'auto'` |
 
 `...rest` yok.
 
@@ -62,7 +61,7 @@ Stateless. Link hover/focus CSS'te (`:focus-visible` halka, `hover: hover`).
 ## 8. İçerik
 
 - Sütun başlıkları tek kelime tercih (Kurumsal, Destek, Yasal, Keşfet).
-- Sosyal ikon linklerinde `aria-label` zorunlu (story'deki `SocialIcon` deseni).
+- Sosyal ikon linklerinde `aria-label` zorunlu (story'deki `SocialIcon` deseni, 44px dokunma hedefi).
 
 ## 9. Token eşlemesi
 
@@ -74,12 +73,17 @@ Stateless. Link hover/focus CSS'te (`:focus-visible` halka, `hover: hover`).
 | focus halkası | `--lg-accent` |
 
 **Borç (raw):** padding/gap değerleri, font-size 13/14/17px, 760px breakpoint,
-ikon kutusu 34px.
+ikon kutusu 44px.
 
 ## 10. Storybook kapsamı
 
 Default(columns), Playground, Slim, Cta, Centered, Newsletter,
-VaryantKarsilastirma (5 varyant alt alta — seçim story'si). Temalar toolbar'dan.
+VaryantKarsilastirma (5 varyant alt alta — seçim story'si), UzunIcerik,
+Erisilebilirlik. Temalar toolbar'dan.
+
+Responsive: ayrı story YOK (N/A) — kırılma viewport media query'sindedir
+(760px), container'a duyarlı değildir; doğrulama Storybook viewport
+toolbar'ıyla yapılır.
 
 ## 11. Test kabul kriterleri
 
@@ -99,4 +103,6 @@ VaryantKarsilastirma (5 varyant alt alta — seçim story'si). Temalar toolbar'd
 - ❌ Footer'a cam/backdrop-filter ekleme.
 - ❌ Sütun başlıklarını heading'e çevirme.
 
-**Açık kararlar:** app-store rozet slotu (v2) · dil seçici slotu (v2).
+**Açık kararlar:** app-store rozet slotu (v2) · dil seçici slotu (v2) ·
+`tone` ekseni bilinçli yok — flat zemin tema token'larından döner; ihtiyaç
+doğarsa v2.

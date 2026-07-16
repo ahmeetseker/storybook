@@ -21,7 +21,7 @@ const Brand = () => (
 )
 
 const SocialIcon = ({ label, d }: { label: string; d: string }) => (
-  <a href="#sosyal" aria-label={label} style={{ display: 'inline-grid', placeItems: 'center', width: 34, height: 34, borderRadius: 999, border: '1px solid var(--lg-hairline)', color: 'var(--lg-label-secondary)' }}>
+  <a href="#sosyal" aria-label={label} style={{ display: 'inline-grid', placeItems: 'center', width: 44, height: 44, borderRadius: 999, border: '1px solid var(--lg-hairline)', color: 'var(--lg-label-secondary)' }}>
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden>
       <path d={d} />
     </svg>
@@ -122,4 +122,35 @@ export const VaryantKarsilastirma: Story = {
       ))}
     </div>
   ),
+}
+
+export const UzunIcerik: Story = {
+  name: 'Uzun İçerik',
+  args: {
+    columns: [
+      ...columns,
+      {
+        title: 'Değerlendirilebilecekleriniz',
+        links: [
+          { label: 'Kişiselleştirilemeyenlerimizdenmişsinizcesine uzun etiket' },
+          { label: 'Elektroensefalografi cihazı ilanları' },
+          { label: 'Muvaffakiyetsizleştiricileştiriveremeyebileceklerimizden' },
+        ],
+      },
+    ],
+  },
+}
+
+export const Erisilebilirlik: Story = {
+  name: 'Erişilebilirlik',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Tab sırası: sütun linkleri (soldan sağa, yukarıdan aşağı) → sosyal ikonlar → legal linkleri. ' +
+          'Sütun başlıkları heading değildir; tek landmark çifti: contentinfo + "Alt bilgi" nav. ' +
+          'Klavyeyle gezinip :focus-visible halkasını doğrulayın.',
+      },
+    },
+  },
 }
