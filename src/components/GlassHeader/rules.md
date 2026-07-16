@@ -26,6 +26,8 @@ Beş yerleşim varyantı; default görünüm flat (site zeminiyle uyumlu), cam o
 - Linkler gerçek `<a>`; `href` yoksa `#` + `preventDefault` + `onClick`.
 - Aktif link `aria-current="page"`.
 - Hamburger `GlassIconButton` — `menuLabel` accessible name'idir (default 'Menü').
+  `material="glass"` iken hamburger düz `<button>` (cam-üstüne-cam yasağı); accessible
+  name yine `menuLabel` — `aria-label` ile korunur.
 - Logo `<span>`; heading değildir.
 
 ## 3. Anatomy
@@ -61,6 +63,7 @@ Beş yerleşim varyantı; default görünüm flat (site zeminiyle uyumlu), cam o
 | `utility` + variant ≠ split | Render edilmez |
 | `variant="minimal"` | Nav listesi hiçbir genişlikte görünmez; linkler yalnız menüde |
 | `material="glass"` | Sayfada 1 cam yüzey harcar; cam üstüne cam yasağı gereği linkler düz `<a>` |
+| `material="glass"` + `actions` | `actions`'a cam component (GlassButton/GlassIconButton) **verme**; düz buton/link ver — cam üstüne cam yasağı (kod düzeyinde denetlenemez, çağıran sorumluluğunda) |
 
 ## 6. State modeli
 
@@ -120,6 +123,7 @@ Temalar/tier toolbar'dan.
 - ✅ Sayfada tek GlassHeader kullan (tek banner landmark).
 - ❌ `material="glass"` + sayfada 5'ten fazla başka cam yüzey (≤6 kuralı).
 - ❌ Linklere ikon dışında blok element koyma.
+- ❌ `material="glass"` iken `actions`'a cam component (GlassButton/GlassIconButton) koyma.
 
 **Bilinen kısıtlar:** nav çökmesi viewport media query'siyledir; dar bir container
 içinde kullanılırsa çökme tetiklenmez. **Açık kararlar:** megamenü/dropdown (v2,

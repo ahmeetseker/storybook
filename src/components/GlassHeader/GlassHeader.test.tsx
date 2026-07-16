@@ -76,4 +76,15 @@ describe('GlassHeader', () => {
     expect(screen.queryByRole('navigation')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Menü' })).toBeNull()
   })
+
+  it('material="glass" iken hamburger cam değil düz butondur', () => {
+    renderHeader({ variant: 'minimal', material: 'glass' })
+    const burger = screen.getByRole('button', { name: 'Menü' })
+    // GlassSurface kökünü her zaman data-material="glass" ile işaretler (bkz.
+    // GlassSurface.tsx); düz buton bu attribute'u hiç taşımaz — GlassIconButton
+    // kullanılırsa burger elemanının kendisi GlassSurface kökü olurdu ve
+    // data-material="glass" taşırdı.
+    expect(burger.getAttribute('data-material')).not.toBe('glass')
+    expect(burger.className).toContain('burgerFlatBtn')
+  })
 })

@@ -40,6 +40,25 @@ const Actions = () => (
   </>
 )
 
+// material="glass" kapsülünde actions'a cam component verilmez (cam üstüne cam
+// yasağı) — düz, token stilli butonlar kullanılır. Bkz. rules.md §5, §12.
+const FlatActions = () => (
+  <>
+    <button
+      type="button"
+      style={{ border: 'none', background: 'none', color: 'inherit', font: 'inherit', fontSize: 14, fontWeight: 600, cursor: 'pointer', padding: '8px 12px', borderRadius: 999 }}
+    >
+      Giriş Yap
+    </button>
+    <button
+      type="button"
+      style={{ border: 'none', background: 'var(--lg-accent)', color: '#fff', font: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer', padding: '8px 14px', borderRadius: 999 }}
+    >
+      İlan Ver
+    </button>
+  </>
+)
+
 const Utility = () => (
   <>
     <span>0 (232) 456 78 90</span>
@@ -88,7 +107,7 @@ export const Minimal: Story = { args: { variant: 'minimal' } }
 
 export const CamMalzeme: Story = {
   name: 'Cam Malzeme (glass)',
-  args: { material: 'glass', variant: 'capsule' },
+  args: { material: 'glass', variant: 'capsule', actions: <FlatActions /> },
   render: (args) => (
     <div style={{ minHeight: 320, background: 'linear-gradient(135deg, #3a6f5f, #1f4a3a 55%, #8a6f3a)', paddingBottom: 40 }}>
       <GlassHeader {...args} />

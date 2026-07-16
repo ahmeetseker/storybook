@@ -56,34 +56,62 @@ export function GlassHeader({
     link.onClick?.()
   }
 
-  const navList = (extraClass?: string) =>
-    links.length > 0 && variant !== 'minimal' ? (
+  // glassWrap: yalnız bar/centered/split'te true — nav linklerini tek başına bir
+  // cam kapsüle sarar (linkler kapsayıcı İÇİNDE düz <a> kalır). capsule varyantında
+  // false geçilir çünkü nav zaten üst seviyede tek bir cam kapsülün içindedir —
+  // burada tekrar sarmak cam-üstüne-cam olurdu.
+  const navList = (extraClass?: string, glassWrap = false) => {
+    if (links.length === 0 || variant === 'minimal') return null
+    const list = (
+      <ul className={styles.linkList}>
+        {links.map((link) => (
+          <li key={link.label}>
+            <a
+              href={link.href ?? '#'}
+              onClick={linkClick(link)}
+              aria-current={link.active ? 'page' : undefined}
+              className={link.active ? `${styles.link} ${styles.linkActive}` : styles.link}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+    return (
       <nav aria-label="Site" className={[styles.nav, extraClass].filter(Boolean).join(' ')}>
-        <ul className={styles.linkList}>
-          {links.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href ?? '#'}
-                onClick={linkClick(link)}
-                aria-current={link.active ? 'page' : undefined}
-                className={link.active ? `${styles.link} ${styles.linkActive}` : styles.link}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        {glassWrap ? (
+          <GlassSurface shape="capsule" tone={tone} thickness={0.3} className={styles.navCapsule}>
+            {list}
+          </GlassSurface>
+        ) : (
+          list
+        )}
       </nav>
-    ) : null
+    )
+  }
 
   const actionArea = (
     <span className={styles.actions}>
       {actions}
       {links.length > 0 ? (
         <span className={variant === 'minimal' ? styles.burgerAlways : styles.burger}>
-          <GlassIconButton label={menuLabel} onClick={() => setMenuOpen(true)}>
-            <MenuIcon />
-          </GlassIconButton>
+          {material === 'glass' ? (
+            // Cam üstüne cam yasağı: material="glass" iken hamburger her varyantta
+            // (capsule dahil) düz buton — GlassIconButton kullanılmaz.
+            <button
+              type="button"
+              aria-label={menuLabel}
+              className={styles.burgerFlatBtn}
+              onClick={() => setMenuOpen(true)}
+            >
+              <MenuIcon />
+            </button>
+          ) : (
+            <GlassIconButton label={menuLabel} onClick={() => setMenuOpen(true)}>
+              <MenuIcon />
+            </GlassIconButton>
+          )}
         </span>
       ) : null}
     </span>
@@ -100,10 +128,13 @@ export function GlassHeader({
           {logoEl}
           {actionArea}
         </div>
-        {navList(styles.centeredNav)}
+        {navList(styles.centeredNav, material === 'glass')}
       </div>
     )
   } else if (variant === 'capsule') {
+    // capsule + glass: burada tek bir cam yüzey (aşağıdaki GlassSurface) tüm satırı
+    // sarar; bu yüzden navList'e glassWrap verilmez (cam-üstüne-cam olurdu) ve
+    // burger/actions zaten flat kalır (actionArea içinde ele alınır).
     const capsuleChildren = (
       <>
         {logoEl}
@@ -123,7 +154,7 @@ export function GlassHeader({
     content = (
       <div className={styles.inner}>
         {logoEl}
-        {navList(styles.grow) ?? <span className={styles.grow} aria-hidden />}
+        {navList(styles.grow, material === 'glass') ?? <span className={styles.grow} aria-hidden />}
         {actionArea}
       </div>
     )
@@ -144,13 +175,7 @@ export function GlassHeader({
           <div className={styles.utilityInner}>{utility}</div>
         </div>
       ) : null}
-      {material === 'glass' && variant !== 'capsule' ? (
-        <GlassSurface as="div" shape={0} tone={tone} thickness={0.3}>
-          {content}
-        </GlassSurface>
-      ) : (
-        content
-      )}
+      {content}
       {links.length > 0 ? (
         <GlassDrawer open={menuOpen} onClose={() => setMenuOpen(false)} title={menuLabel} side="right" size="sm">
           <ul className={styles.drawerList}>
