@@ -33,11 +33,19 @@ kullanıcı Storybook'taki karşılaştırma story'lerinden nihai deseni seçer.
 
 ## Component sözleşmeleri
 
-### 1. GlassHeader (`src/components/GlassHeader/`)
+### 1. GlassHeader v2 (`src/components/GlassHeader/`)
 
-Katman: navigasyon. **Default `material="flat"`** (yüzey: `--lg-surface` + hairline alt
-çizgi — site içeriğiyle uyumlu); `material="glass"` opsiyonel (o zaman sayfada 1 cam
-yüzey harcar).
+> **v2 revizyonu (2026-07-16, kullanıcı kararı):** v1'in beş varyantı "aynı
+> anatominin yeniden dizilişi, jenerik" bulundu ve TAMAMEN değiştirildi. v2 seti
+> web araştırması + Codex danışması sonucu seçilen, anatomileri gerçekten farklı
+> dört konsepttir. Cam artık bir `material` ekseni DEĞİL — her varyantta tek
+> küçük "liquid glass" state göstergesidir (seçili öğe vurgusu). `material` ve
+> `utility` prop'ları kaldırıldı; ikili CTA kalıbı (ghost+dolu) bilinçli terk
+> edildi: tek birincil `action` + sade metin `secondaryAction`.
+
+Katman: navigasyon. Yüzeyler flat/saydam; cam yalnız aktif-öğe göstergesinde
+(sidebar `layoutId` highlight deseninin cam versiyonu — `backdrop-filter: blur(8px)`
++ iç kenar ışıması, küçük alan).
 
 ```ts
 interface GlassHeaderLink {
@@ -48,36 +56,60 @@ interface GlassHeaderLink {
 }
 
 interface GlassHeaderProps {
-  logo: ReactNode            // marka alanı (metin veya görsel)
+  logo: ReactNode            // wordmark — harf-kutusu logo kalıbı kullanılmaz
   links?: GlassHeaderLink[]
-  actions?: ReactNode        // CTA butonları (GlassButton'ları çağıran verir)
-  utility?: ReactNode        // yalnız variant="split": üst ince satır içeriği
-  variant?: 'bar' | 'centered' | 'split' | 'capsule' | 'minimal'   // default 'bar'
-  material?: 'glass' | 'flat'  // default 'flat'
-  sticky?: boolean           // default true; position: sticky + scroll-edge
-  tone?: 'light' | 'dark' | 'auto'
-  /** Mobil menü başlığı — GlassDrawer'a geçer */
+  /** Tek birincil CTA (örn. "İlan Ver") */
+  action?: ReactNode
+  /** İkincil sade metin aksiyonu (örn. "Giriş Yap") — buton değil link görünümü */
+  secondaryAction?: ReactNode
+  /** masthead: wordmark karşısındaki otorite satırı (örn. "81 il · EİDS doğrulamalı") */
+  meta?: ReactNode
+  /** command: arama rayı slotu */
+  search?: ReactNode
+  /** command: scroll'da kapanmış özet içeriği (örn. "Urla · İmarlı · ≤3M") */
+  searchSummary?: ReactNode
+  variant?: 'islands' | 'command' | 'masthead' | 'overlay'   // default 'islands'
+  sticky?: boolean           // default true (masthead'de yalnız indeks rayı sticky)
+  tone?: 'light' | 'dark' | 'auto'   // overlay'de görsel üstü metin rengi için
   menuLabel?: string         // default 'Menü'
 }
 ```
 
-Beş varyant (yerleşim ekseni — material'den bağımsız):
+Dört varyant (anatomi ekseni):
 
-- `bar` (default): tek satır — logo sol, linkler orta, actions sağ (Stripe/Linear).
-- `centered`: iki katlı — üstte ortalanmış logo (yanlarda utility/actions), altında
-  ortalanmış nav satırı (editorial/lüks marka deseni).
-- `split`: üstte ince utility satırı (`utility` slotu, her zaman flat) + altta ana
-  nav (IBM/SAP portal deseni).
-- `capsule`: sayfa içeriğinden boşlukla ayrık yüzen tek kapsül; logo, linkler ve
-  actions kapsül içinde kompakt dizilir (Apple deseni; bu varyant material
-  ekseninden en çok glass'la yaşar ama flat'te de çalışır).
-- `minimal`: logo + actions + hamburger — linkler her genişlikte menüde
-  (landing/kampanya deseni).
-- **Mobil:** dar viewport'ta linkler hamburger butonuna çöker; menü mevcut
-  `GlassDrawer` ile açılır (portal + focus trap + kapanışta tetikleyiciye focus
-  dönüşü sözleşmesi hazır gelir). Hamburger `GlassIconButton` + zorunlu `label`.
-- Landmark: `<header>` + `<nav aria-label="Site">`; aktif linkte `aria-current="page"`.
-- Cam üstüne cam yok: glass material'de linkler kapsayıcı İÇİNDE düz buton/anchor.
+- `islands` (default) — **Üç Ada / Yüzen Lens** (Linear/Stripe): kutusuz wordmark
+  solda; YALNIZ nav ortada ince flat kapsülde (`--lg-surface` + hairline); sağda
+  `secondaryAction` (metin) + tek `action` + profil/menü. Cam dokunuşu: seçili
+  linkin arkasında link genişliğinde **kayan cam pill** (motion `layoutId`,
+  `presets.springs.sidebar`). Scroll'da (data-scrolled) dikey padding küçülür,
+  nav kapsülü hafif gölgelenir — "raya kenetlenme".
+- `command` — **Arama Omurgası** (Airbnb/Zillow): merkez menü değil `search`
+  slotu (Konum · İmar · Bütçe rayı); sağda aksiyonlar. Scroll'da ray
+  `searchSummary` özetine kapanır (CSS transition), `:focus-within` yeniden
+  açar. Cam dokunuşu: aktif arama segmentinin arkasında dar odak merceği
+  (slot içi — demo'da story gösterir; component yalnız kapanma mekaniğini verir).
+- `masthead` — **Kadastral Masthead** (The Modern House): sticky OLMAYAN kimlik
+  satırı (büyük tracking'li wordmark + karşıda `meta`) + altında yalnız kendisi
+  sticky 42px indeks nav rayı (üst+alt hairline). Cam dokunuşu: aktif bölümün
+  altında kayan 24px **refraktif çizgi** (layoutId, 3px yükseklik + blur).
+- `overlay` — **Galeri Eşiği** (Christie's): ilk fold'da yüzeysiz saydam şerit
+  (hero görselinin ÜZERİNE `position: absolute`; metinler `--lg-on-scrim`);
+  scroll eşiği geçilince yukarıdan süzülen kompakt opak ray (`position: fixed`,
+  transform/opacity geçişi). Cam dokunuşu: aktif linkin yanında küçük cam boncuk.
+  Not: Codex'in dikey köşe nav detayı v1 kapsamı dışında (rules.md Açık Kararlar).
+
+Ortak sözleşme:
+
+- Scroll durumu `useScrolled(threshold)` iç hook'u ile (passive scroll listener →
+  kök `data-scrolled` attribute; görsel geçişler CSS transition'da, JS ölçüm yok).
+- **Mobil:** dar viewport'ta linkler hamburger menüye çöker (GlassDrawer, v1
+  sözleşmesi aynen: href'liler link, href'sizler buton).
+- Landmark: `<header>` + `<nav aria-label="Site">`; aktif linkte
+  `aria-current="page"`; kayan cam gösterge `aria-hidden` + reduced-motion'da
+  `duration: 0`.
+- Tipografi: nav 14px/500 `-0.01em`; wordmark sıkı tracking; kompakt yükseklikler
+  (islands 52px ray, masthead indeksi 42px).
+- Tek vurgu: amber yalnız aktif metin/focus/CTA'da; gri aktif-pill kalıbı yok.
 
 ### 2. GlassHero (`src/components/GlassHero/`)
 
