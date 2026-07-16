@@ -42,7 +42,6 @@ export interface GlassHeaderProps {
   variant?: 'islands' | 'command' | 'masthead' | 'overlay'
   /** islands/command: kök sticky · masthead: yalnız indeks rayı sticky · overlay: kompakt ray */
   sticky?: boolean
-  tone?: 'light' | 'dark' | 'auto'
   /** Mobil menü başlığı ve hamburger'ın accessible name'i */
   menuLabel?: string
 }
@@ -131,11 +130,12 @@ export function GlassHeader({
     </span>
   ) : null
 
-  const actionsArea = (
+  // masthead menüye çökmez (indeks yatay kayar) — hamburger/drawer hiç render edilmez.
+  const actionsArea = (withBurger = true) => (
     <span className={styles.actions}>
       {secondaryAction ? <span className={styles.secondary}>{secondaryAction}</span> : null}
       {action}
-      {burger}
+      {withBurger ? burger : null}
     </span>
   )
 
@@ -147,7 +147,14 @@ export function GlassHeader({
     ) : null
 
   const drawer = hasLinks ? (
-    <GlassDrawer open={menuOpen} onClose={() => setMenuOpen(false)} title={menuLabel} side="right" size="sm">
+    <GlassDrawer
+      open={menuOpen}
+      onClose={() => setMenuOpen(false)}
+      title={menuLabel}
+      side="right"
+      size="sm"
+      footer={secondaryAction ? <span className={styles.drawerSecondary}>{secondaryAction}</span> : undefined}
+    >
       <ul className={styles.drawerList}>
         {links.map((link) => {
           const className = link.active ? `${styles.drawerLink} ${styles.drawerLinkActive}` : styles.drawerLink
@@ -195,7 +202,7 @@ export function GlassHeader({
               </div>
             ) : null}
           </div>
-          {actionsArea}
+          {actionsArea()}
         </div>
         {drawer}
       </header>
@@ -212,10 +219,9 @@ export function GlassHeader({
         <div className={[styles.mastheadIndex, sticky ? styles.stickyRow : ''].filter(Boolean).join(' ')}>
           <div className={styles.mastheadIndexInner}>
             {nav('line')}
-            {actionsArea}
+            {actionsArea(false)}
           </div>
         </div>
-        {drawer}
       </header>
     )
   }
@@ -227,7 +233,7 @@ export function GlassHeader({
           <div className={styles.overlayInner}>
             <span className={`${styles.wordmark} ${styles.onMedia}`}>{logo}</span>
             {nav('bead', styles.overlayNav)}
-            {actionsArea}
+            {actionsArea()}
           </div>
           {drawer}
         </header>
@@ -258,7 +264,7 @@ export function GlassHeader({
       <div className={styles.islandsInner}>
         <span className={styles.wordmark}>{logo}</span>
         {nav('pill', styles.navCapsule) ?? <span className={styles.grow} aria-hidden />}
-        {actionsArea}
+        {actionsArea()}
       </div>
       {drawer}
     </header>

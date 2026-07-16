@@ -139,6 +139,18 @@ describe('GlassHeader', () => {
     fireEvent.scroll(window)
   })
 
+  it('masthead hamburger/drawer render etmez — indeks yatay kayar', () => {
+    renderHeader({ variant: 'masthead', meta: 'x' })
+    expect(screen.queryByRole('button', { name: 'Menü' })).toBeNull()
+  })
+
+  it('secondaryAction mobil menünün footer alanında da sunulur', () => {
+    renderHeader({ secondaryAction: <button>Giriş Yap</button> })
+    fireEvent.click(screen.getByRole('button', { name: 'Menü' }))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByRole('button', { name: 'Giriş Yap' })).toBeDefined()
+  })
+
   it('links verilmezse nav ve hamburger render edilmez', () => {
     render(
       <GlassTierProvider tier="fallback">

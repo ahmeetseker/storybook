@@ -70,8 +70,7 @@ interface GlassHeaderProps {
   searchSummary?: ReactNode
   variant?: 'islands' | 'command' | 'masthead' | 'overlay'   // default 'islands'
   sticky?: boolean           // default true (masthead'de yalnız indeks rayı sticky)
-  tone?: 'light' | 'dark' | 'auto'   // overlay'de görsel üstü metin rengi için
-  menuLabel?: string         // default 'Menü'
+  menuLabel?: string         // default 'Menü'  (tone ekseni bilinçli yok — overlay metni --lg-on-scrim)
 }
 ```
 

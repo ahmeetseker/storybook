@@ -300,6 +300,22 @@
 @media (hover: hover) { .drawerLink:hover { background: color-mix(in srgb, var(--lg-label) 7%, transparent); } }
 .drawerLink:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
 .drawerLinkActive { font-weight: 700; color: var(--lg-accent); }
+.drawerSecondary { display: flex; width: 100%; }
+.drawerSecondary :is(a, button) {
+  flex: 1;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip, 10px);
+  background: none;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lg-label);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.drawerSecondary :is(a, button):focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
 
 /* Dar viewport: linkler menüye çöker. Container query pratik değil (kök sticky;
    containment sticky'i bozar) — gerekçe rules.md §7. */

@@ -54,7 +54,6 @@ kayan pill/çizgi/boncuğu). Yüzeyler flat/saydam.
 | action / secondaryAction / meta / search / searchSummary | `ReactNode` | — |
 | variant | `'islands'\|'command'\|'masthead'\|'overlay'` | `'islands'` |
 | sticky | `boolean` | `true` |
-| tone | `'light'\|'dark'\|'auto'` | `'auto'` |
 | menuLabel | `string` | `'Menü'` |
 
 `...rest` yok. Controlled/Ref: N/A — tek iç state mobil menü + scroll bayrağı.
@@ -138,6 +137,11 @@ Scroll davranışları story zeminleri 180vh olduğu için canlı denenebilir.
 - ✅ `overlay`'i yalnız güçlü görselli açılışta ve `position: relative` kapsayıcıda kullan.
 - ❌ `action`'a birden çok buton koyma — tek CTA sözleşmesi.
 - ❌ Nav linklerine/secondaryAction'a cam component koyma — cam yalnız göstergede.
+
+**Ek kararlar:** `tone` ekseni bilinçli yok — flat yüzeyler tema token'larından,
+overlay metni `--lg-on-scrim`'den döner; ihtiyaç doğarsa v2+. `secondaryAction`
+mobilde drawer footer'ına taşınır (kaybolmaz). masthead'de hamburger/drawer hiç
+render edilmez (indeks yatay kayar).
 
 **Bilinen kısıtlar:** overlay kompakt rayı `position: fixed` — Storybook docs
 iframe'inde viewport'a göre konumlanır. **Açık kararlar:** overlay dikey köşe
