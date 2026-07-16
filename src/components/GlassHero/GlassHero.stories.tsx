@@ -2,15 +2,25 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassHero } from './GlassHero'
 import { GlassButton } from '../GlassButton'
 import { placeholderImage } from '../../demo/placeholderImage'
+import { useTypewriter } from '../../motion/useTypewriter'
 
-const DemoSearch = () => (
+const ARAMA_ORNEKLERI = [
+  'İzmir Urla imarlı arsa',
+  'Deniz manzaralı tarla',
+  'Krediye uygun sanayi parseli',
+  'Gölbaşı yatırımlık arazi',
+]
+
+const DemoSearch = () => {
+  const oneri = useTypewriter(ARAMA_ORNEKLERI)
+  return (
   <form
     onSubmit={(e) => e.preventDefault()}
     style={{ display: 'flex', gap: 8, width: '100%' }}
   >
     <input
       aria-label="Arsa ara"
-      placeholder='"İzmir Urla imarlı arsa" yaz, gerisini bize bırak'
+      placeholder={oneri || 'Arsa ara'}
       style={{
         flex: 1,
         minHeight: 'var(--lg-control-lg, 48px)',
@@ -26,7 +36,8 @@ const DemoSearch = () => (
     />
     <GlassButton prominent size="lg" type="submit">Ara</GlassButton>
   </form>
-)
+  )
+}
 
 const QuickLinks = () => (
   <>
@@ -125,6 +136,27 @@ export const Centered: Story = {
       </>
     ),
   },
+}
+
+export const AmbientZemin: Story = {
+  name: 'Ambient Zemin',
+  args: {
+    variant: 'centered',
+    ambient: true,
+    title: 'İlanını 3 dakikada yayına al',
+    subtitle: 'EİDS doğrulaması, akıllı fiyat önerisi ve moderasyon — hepsi tek sihirbazda.',
+    actions: (
+      <>
+        <GlassButton prominent size="lg">İlan Ver</GlassButton>
+        <GlassButton size="lg">Nasıl Çalışır?</GlassButton>
+      </>
+    ),
+  },
+}
+
+export const GirisAnimasyonsuz: Story = {
+  name: 'Giriş Animasyonsuz (animate=false)',
+  args: { variant: 'centered', animate: false, actions: <GlassButton prominent>Başla</GlassButton> },
 }
 
 export const H1Baslik: Story = {

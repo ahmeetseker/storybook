@@ -3,6 +3,7 @@ export { GlassButton, type GlassButtonProps } from './components/GlassButton'
 export { GlassNavbar, GlassBackButton, type GlassNavbarProps, type GlassBackButtonProps } from './components/GlassNavbar'
 export { GlassHeader, type GlassHeaderProps, type GlassHeaderLink } from './components/GlassHeader'
 export { useGlassPress } from './motion/useGlassPress'
+export { useTypewriter, type UseTypewriterOptions } from './motion/useTypewriter'
 export { presets } from './motion/presets'
 export { detectTier, type GlassTier } from './core/tier'
 export {

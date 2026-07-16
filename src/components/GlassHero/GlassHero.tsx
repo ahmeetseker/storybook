@@ -1,6 +1,10 @@
 // İçerik katmanı hero'su — zemin flat; cam yalnız slot'lara konan kontrollerde.
 // Dört yerleşim varyantı: search (marketplace), split (SaaS), showcase (medya), centered (CTA).
+// Animasyon: kademeli giriş (stagger, motion) + showcase Ken Burns + opsiyonel ambient
+// aurora — hepsi yalnız transform/opacity, prefers-reduced-motion'da kapalı.
 import type { ElementType, ReactNode } from 'react'
+import { motion } from 'motion/react'
+import { prefersReducedMotion } from '../../core/tier'
 import styles from './GlassHero.module.css'
 
 export interface GlassHeroProps {
@@ -19,6 +23,19 @@ export interface GlassHeroProps {
   align?: 'center' | 'start'
   /** Heading seviyesini sayfa belirler */
   titleAs?: 'h1' | 'h2' | 'div'
+  /** Kademeli giriş (başlık→alt başlık→slotlar) + showcase Ken Burns; reduced-motion'da otomatik kapalı */
+  animate?: boolean
+  /** Zeminde yavaş süzülen aurora katmanı (showcase hariç; abartısız, düşük opaklık) */
+  ambient?: boolean
+}
+
+const rise = {
+  hidden: { opacity: 0, y: 14 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 260, damping: 30 } },
+}
+const stagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
 }
 
 export function GlassHero({
@@ -31,25 +48,73 @@ export function GlassHero({
   variant = 'search',
   align,
   titleAs = 'h2',
+  animate = true,
+  ambient = false,
 }: GlassHeroProps) {
   const Title = titleAs as ElementType
   const resolvedAlign = align ?? (variant === 'search' || variant === 'centered' ? 'center' : 'start')
   const centerClass = resolvedAlign === 'center' ? styles.alignCenter : ''
+  const reduced = prefersReducedMotion()
+  const entering = animate && !reduced
 
+  const blocks: ReactNode[] = [
+    <Title key="title" className={styles.title}>
+      {title}
+    </Title>,
+    subtitle ? (
+      <p key="subtitle" className={styles.subtitle}>
+        {subtitle}
+      </p>
+    ) : null,
+    variant === 'search' && search ? (
+      <div key="search" className={styles.searchSlot}>
+        {search}
+      </div>
+    ) : null,
+    actions ? (
+      <div key="actions" className={styles.actionsRow}>
+        {actions}
+      </div>
+    ) : null,
+    variant === 'search' && quickLinks ? (
+      <div key="quick" className={styles.quickLinks}>
+        {quickLinks}
+      </div>
+    ) : null,
+  ].filter(Boolean)
+
+  // Kademeli giriş: her blok kendi motion sarmalayıcısında yükselerek belirir.
+  // entering=false iken initial verilmez — animasyonsuz, doğrudan görünür render.
   const textBlock = (
-    <>
-      <Title className={styles.title}>{title}</Title>
-      {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
-      {variant === 'search' && search ? <div className={styles.searchSlot}>{search}</div> : null}
-      {actions ? <div className={styles.actionsRow}>{actions}</div> : null}
-      {variant === 'search' && quickLinks ? <div className={styles.quickLinks}>{quickLinks}</div> : null}
-    </>
+    <motion.div
+      className={styles.blockStack}
+      variants={stagger}
+      initial={entering ? 'hidden' : false}
+      animate="show"
+    >
+      {blocks.map((node, i) => (
+        <motion.div key={i} className={styles.block} variants={rise}>
+          {node}
+        </motion.div>
+      ))}
+    </motion.div>
   )
+
+  const ambientLayer =
+    ambient && variant !== 'showcase' ? (
+      <div className={styles.ambient} data-hero-ambient aria-hidden>
+        <span className={styles.blobA} />
+        <span className={styles.blobB} />
+      </div>
+    ) : null
 
   if (variant === 'showcase') {
     return (
       <section className={`${styles.root} ${styles.showcase}`} data-variant={variant}>
-        <div className={styles.showcaseMedia} aria-hidden>
+        <div
+          className={animate ? `${styles.showcaseMedia} ${styles.kenburns}` : styles.showcaseMedia}
+          aria-hidden
+        >
           {media}
         </div>
         <div className={styles.scrim} data-hero-scrim aria-hidden />
@@ -61,6 +126,7 @@ export function GlassHero({
   if (variant === 'split') {
     return (
       <section className={styles.root} data-variant={variant}>
+        {ambientLayer}
         <div className={`${styles.inner} ${styles.splitGrid}`}>
           <div className={`${styles.splitText} ${centerClass}`}>{textBlock}</div>
           {media ? <div className={styles.media}>{media}</div> : null}
@@ -71,6 +137,7 @@ export function GlassHero({
 
   return (
     <section className={styles.root} data-variant={variant}>
+      {ambientLayer}
       <div className={`${styles.inner} ${centerClass}`}>{textBlock}</div>
     </section>
   )

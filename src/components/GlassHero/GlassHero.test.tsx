@@ -41,6 +41,24 @@ describe('GlassHero', () => {
     expect(screen.getByRole('button', { name: 'Hemen Başla' })).toBeDefined()
   })
 
+  it('ambient katmanı yalnız istenince ve showcase dışında render olur', () => {
+    const { container, rerender } = render(<GlassHero title="B" variant="centered" ambient />)
+    expect(container.querySelector('[data-hero-ambient]')).not.toBeNull()
+    rerender(<GlassHero title="B" variant="centered" />)
+    expect(container.querySelector('[data-hero-ambient]')).toBeNull()
+    rerender(<GlassHero title="B" variant="showcase" ambient media={<img alt="" src="x.png" />} />)
+    expect(container.querySelector('[data-hero-ambient]')).toBeNull()
+  })
+
+  it('showcase medyası animate ile Ken Burns sınıfı alır, animate=false ile almaz', () => {
+    const { container, rerender } = render(
+      <GlassHero title="B" variant="showcase" media={<img alt="" src="x.png" />} />,
+    )
+    expect(container.querySelector('[class*="kenburns"]')).not.toBeNull()
+    rerender(<GlassHero title="B" variant="showcase" media={<img alt="" src="x.png" />} animate={false} />)
+    expect(container.querySelector('[class*="kenburns"]')).toBeNull()
+  })
+
   it('variant data attribute olarak işaretlenir', () => {
     const { container } = render(<GlassHero title="B" variant="split" />)
     expect(container.querySelector('section')?.getAttribute('data-variant')).toBe('split')

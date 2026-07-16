@@ -44,6 +44,8 @@ Sayfa açılış (hero) bölümü — başlık, alt başlık ve slot'lar. Zemin 
 | variant | `'search'\|'split'\|'showcase'\|'centered'` | `'search'` |
 | align | `'center'\|'start'` | varyanta göre (search/centered→center) |
 | titleAs | `'h1'\|'h2'\|'div'` | `'h2'` |
+| animate | `boolean` | `true` — kademeli giriş + showcase Ken Burns; reduced-motion'da otomatik kapalı |
+| ambient | `boolean` | `false` — zeminde süzülen aurora (showcase hariç) |
 
 ## 5. Seçenek eksenleri
 
@@ -58,7 +60,12 @@ Stateless sunum component'i. Hover/focus slot içeriğinin kendi kurallarındad�
 
 - Responsive: split grid `auto-fit + minmax(min(400px,100%),1fr)` — dar ekranda
   tek kolona düşer, 320px'te taşma yok.
-- Animasyon yok (v1) — eklenirse yalnız transform/opacity + reduced-motion koşulu.
+- **Animasyon:** kademeli giriş (motion stagger: başlık→alt başlık→slotlar, spring
+  260/30); showcase'te Ken Burns (22s scale/translate döngüsü, yalnız transform);
+  `ambient` aurora'sı 26-32s süzülme. Hepsi yalnız transform/opacity;
+  `prefers-reduced-motion`'da tümü kapalı (JS + CSS çifte koruma).
+  Daktilo arama önerisi component'in işi değil — `useTypewriter` hook'u
+  (`src/motion/useTypewriter.ts`) slot içeriğinde kullanılır (story örneği).
 
 ## 8. İçerik
 

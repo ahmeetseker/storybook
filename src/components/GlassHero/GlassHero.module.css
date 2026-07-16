@@ -1,6 +1,18 @@
 /* GlassHero — içerik katmanı hero'su. Zemin her zaman flat; cam yalnız
    çağıranın koyduğu kontrollerde (CTA/arama) olabilir. */
-.root { width: 100%; box-sizing: border-box; background: var(--lg-bg); }
+.root { position: relative; width: 100%; box-sizing: border-box; background: var(--lg-bg); overflow: hidden; }
+.inner, .showcaseContent, .splitGrid { position: relative; z-index: 1; }
+
+/* Kademeli giriş sarmalayıcıları — yerleşim üst kapsayıcıdan miras alınır */
+.blockStack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  align-items: inherit;
+  text-align: inherit;
+}
+.block { display: flex; flex-direction: column; align-items: inherit; text-align: inherit; min-width: 0; }
 
 .inner {
   max-width: 1120px;
@@ -67,3 +79,44 @@
 }
 .showcase .title { color: var(--lg-on-scrim, #ffffff); }
 .showcase .subtitle { color: var(--lg-on-scrim, #ffffff); opacity: 0.85; }
+
+
+/* ── Ken Burns (showcase + animate): çok yavaş zoom/pan — yalnız transform ── */
+@keyframes heroKenburns {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.08) translate3d(1.6%, -1.2%, 0); }
+}
+.kenburns > * {
+  animation: heroKenburns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ── Ambient aurora (opsiyonel): düşük opaklıkta süzülen renk lekeleri ── */
+.ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.blobA,
+.blobB {
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  filter: blur(90px);
+  opacity: 0.32;
+}
+.blobA {
+  top: -280px;
+  left: -160px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--lg-accent) 26%, transparent), transparent 70%);
+  animation: heroDriftA 26s ease-in-out infinite alternate;
+}
+.blobB {
+  bottom: -320px;
+  right: -120px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--lg-success) 16%, transparent), transparent 70%);
+  animation: heroDriftB 32s ease-in-out infinite alternate;
+}
+@keyframes heroDriftA { to { transform: translate3d(70px, 50px, 0) scale(1.12); } }
+@keyframes heroDriftB { to { transform: translate3d(-60px, -70px, 0) scale(1.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .kenburns > *, .blobA, .blobB { animation: none; }
+}
