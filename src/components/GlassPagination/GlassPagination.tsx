@@ -88,6 +88,9 @@ export function GlassPagination({
       className={[styles.pagination, styles[size], className].filter(Boolean).join(' ')}
       {...rest}
     >
+      {/* GlassSurface çocukları inline .content span'ine sarar; flex bağlamı
+          köke değil bu satıra kurulur — yoksa .pages (block) satır kırar. */}
+      <div className={styles.row}>
       <button
         type="button"
         className={styles.item}
@@ -135,6 +138,7 @@ export function GlassPagination({
       >
         <span aria-hidden>›</span>
       </button>
+      </div>
     </GlassSurface>
   )
 }

@@ -1,9 +1,15 @@
 .pagination {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
+  display: inline-block;
   padding: var(--lg-space-1);
   max-width: 100%;
+}
+
+/* Flex satırı köke değil buraya kurulur: GlassSurface çocukları inline
+   .content span'ine sarar, kökteki flex çocuklara ulaşmaz (satır kırılırdı). */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .pages {

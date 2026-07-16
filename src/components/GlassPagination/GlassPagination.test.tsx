@@ -66,6 +66,14 @@ describe('GlassPagination', () => {
     expect(screen.getByText('5 / 20')).toBeTruthy()
   })
 
+  it('kontroller tek flex satır kapsayıcısında yaşar — GlassSurface content sarmalayıcısı flex bağlamını kırmamalı', () => {
+    renderPagination()
+    const prev = screen.getByRole('button', { name: 'Önceki sayfa' })
+    const next = screen.getByRole('button', { name: 'Sonraki sayfa' })
+    expect(prev.parentElement).toBe(next.parentElement)
+    expect(prev.parentElement?.className).toContain('row')
+  })
+
   it('sayfa butonları klavye için gerçek <button> öğeleridir (native Enter/Space aktivasyonu)', () => {
     renderPagination()
     const btn = screen.getByRole('button', { name: 'Sayfa 6' })
