@@ -1,0 +1,215 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* — Sekme çubuğu (tabbed) — */
+
+.tablist {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tablist::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  min-height: var(--lg-control-md, 40px);
+  padding: 0 12px;
+  margin: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.6));
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--lg-label, rgba(0, 0, 0, 0.85));
+  }
+}
+.tabActive {
+  color: var(--lg-label, rgba(0, 0, 0, 0.85));
+  border-bottom-color: var(--lg-accent, #0a84ff);
+}
+
+.tabCount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* — Sahne — */
+
+.stageBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stage {
+  position: relative;
+  border-radius: var(--lg-radius-card, 20px);
+  background: var(--lg-surface, #fff);
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  overflow: hidden;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  animation: mediaFadeIn 160ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    animation: none;
+  }
+}
+@keyframes mediaFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.mediaImage {
+  object-fit: cover;
+}
+.mediaVideo {
+  object-fit: contain;
+}
+
+.counter {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 3px 10px;
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-scrim, rgba(10, 12, 16, 0.55));
+  color: var(--lg-on-scrim, #fff);
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.caption {
+  margin: 0;
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.6));
+}
+
+/* — Thumbnail şeridi — */
+
+.thumbs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.thumb {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  margin: 0;
+  border: 2px solid transparent;
+  border-radius: var(--lg-radius-media, 14px);
+  background: var(--lg-surface, #fff);
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (pointer: coarse) {
+  .thumb {
+    width: 72px;
+    height: 72px;
+  }
+}
+.thumb:focus-visible {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .thumb:hover {
+    border-color: var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  }
+}
+.thumbActive {
+  border-color: var(--lg-accent, #0a84ff);
+}
+
+.thumbImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  text-align: center;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.6));
+  background: var(--lg-hairline, rgba(0, 0, 0, 0.08));
+}
+
+.typeBadge {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 1px 6px;
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-scrim, rgba(10, 12, 16, 0.55));
+  color: var(--lg-on-scrim, #fff);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
