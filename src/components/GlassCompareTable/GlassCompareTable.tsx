@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from 'react'
+import { useEffect, useRef, type HTMLAttributes } from 'react'
 import styles from './GlassCompareTable.module.css'
 
 /** Karşılaştırılan tek özellik satırı — ilan verisindeki bir alana karşılık gelir. */
@@ -48,6 +48,25 @@ export interface GlassCompareTableProps extends Omit<HTMLAttributes<HTMLTableEle
 
 const MAX_LISTINGS = 4
 
+/** Yatay kaydırma kabının rol="region" için varsayılan (fallback) adı. */
+const DEFAULT_REGION_LABEL = 'İlan karşılaştırma tablosu'
+
+/**
+ * Bir hücre değerini karşılaştırılabilir sayıya çevirir: `number` doğrudan,
+ * `string` ise TR/uluslararası binlik ayraçları (`.`/`,`/boşluk) temizlenip
+ * ondalık virgülü noktaya çevrilerek parse edilir. Parse edilemezse `null`.
+ */
+function toComparableNumber(value: string | number | undefined): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (trimmed === '') return null
+  // Binlik ayraçlarını (nokta, boşluk, ince boşluk) at, ondalık virgülü noktaya çevir.
+  const normalized = trimmed.replace(/[.\s ]/g, '').replace(',', '.')
+  const parsed = Number(normalized)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
 /** Bir alanın tüm ilanlardaki değeri sayısalsa `en iyi` id kümesini döner; değilse `null`. */
 function computeBestIds(field: GlassCompareField, listings: GlassCompareListing[]): Set<string> | null {
   if (field.higherIsBetter === undefined) return null
@@ -62,9 +81,21 @@ function computeBestIds(field: GlassCompareField, listings: GlassCompareListing[
   return bestIds
 }
 
-/** Satırdaki ilanlar arasında değer farkı var mı (metinsel karşılaştırma). */
+/**
+ * Satırdaki ilanlar arasında değer farkı var mı. Tüm değerler sayıya
+ * parse edilebiliyorsa (locale ayraçları temizlenerek) sayısal karşılaştırma
+ * yapılır — ör. `1000` (number) ile `"1.000"` (string) aynı sayılır; aksi
+ * halde ham metin karşılaştırılır.
+ */
 function rowDiffers(field: GlassCompareField, listings: GlassCompareListing[]): boolean {
-  const asText = new Set(listings.map((listing) => String(listing.values[field.key] ?? '—')))
+  const rawValues = listings.map((listing) => listing.values[field.key])
+  const numericValues = rawValues.map((value) => toComparableNumber(value))
+  const allNumeric = numericValues.every((n) => n !== null)
+  if (allNumeric) {
+    const uniqueNumbers = new Set(numericValues as number[])
+    return uniqueNumbers.size > 1
+  }
+  const asText = new Set(rawValues.map((value) => String(value ?? '—')))
   return asText.size > 1
 }
 
@@ -86,8 +117,36 @@ export function GlassCompareTable({
   const clippedListings = listings.slice(0, MAX_LISTINGS)
   const classes = [styles.wrapper, className].filter(Boolean).join(' ')
 
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const removeButtonRefs = useRef(new Map<string, HTMLButtonElement>())
+  const pendingFocusRecoveryRef = useRef(false)
+
+  useEffect(() => {
+    // Artık render edilmeyen ilanların buton referanslarını temizle.
+    const currentIds = new Set(clippedListings.map((listing) => listing.id))
+    const staleIds: string[] = []
+    removeButtonRefs.current.forEach((_button, id) => {
+      if (!currentIds.has(id)) staleIds.push(id)
+    })
+    staleIds.forEach((id) => removeButtonRefs.current.delete(id))
+
+    if (!pendingFocusRecoveryRef.current) return
+    pendingFocusRecoveryRef.current = false
+    // `onRemove` az önce çağrıldı (kaldırma butonu tıklandı, ilgili buton
+    // artık DOM'da yok) — odağı kalan ilk kaldırma butonuna, o da yoksa kaba taşı.
+    const firstRemaining = clippedListings[0]
+    const target = firstRemaining ? removeButtonRefs.current.get(firstRemaining.id) : undefined
+    ;(target ?? wrapperRef.current)?.focus()
+  }, [clippedListings])
+
   return (
-    <div className={classes}>
+    <div
+      ref={wrapperRef}
+      className={classes}
+      tabIndex={0}
+      role="region"
+      aria-label={ariaLabel ?? DEFAULT_REGION_LABEL}
+    >
       <table className={styles.table} aria-label={ariaLabel} {...rest}>
         <thead>
           <tr>
@@ -101,8 +160,15 @@ export function GlassCompareTable({
                     <div className={styles.headerTopRow}>
                       <button
                         type="button"
+                        ref={(el) => {
+                          if (el) removeButtonRefs.current.set(listing.id, el)
+                          else removeButtonRefs.current.delete(listing.id)
+                        }}
                         className={styles.removeButton}
-                        onClick={() => onRemove(listing.id)}
+                        onClick={() => {
+                          pendingFocusRecoveryRef.current = true
+                          onRemove(listing.id)
+                        }}
                         aria-label={`Karşılaştırmadan çıkar: ${listing.title}`}
                       >
                         <span aria-hidden="true">×</span>

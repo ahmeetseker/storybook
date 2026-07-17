@@ -40,8 +40,12 @@ opsiyonel "Doğrulanmış görüşme" rozeti + opsiyonel "Faydalı" aksiyonu.
   yerine tıklanamaz düz metin (`<span>`) gösterilir.
 - "Doğrulanmış görüşme" rozeti bilgiyi **metinle** taşır (yalnız renkle
   değil) — `--lg-success` yalnız destekleyici vurgu.
-- Avatar: `GlassAvatar` — accessible name `author`'dan gelir
-  (`GlassAvatar`'ın kendi `name`/`alt` türetme mantığı).
+- Avatar: `GlassAvatar` — `name` yine `author`'dan geçilir (baş harf
+  fallback görseli için) ama sarmalayıcı `<span aria-hidden="true">`'dır:
+  `GlassAvatar`'ın kendi ürettiği `role="img"` + `aria-label={author}`
+  erişilebilirlik ağacına GİRMEZ — yazar adı zaten başlık metninde
+  (`.author`) duyurulduğu için avatar ikinci bir "Elif Kaya" duyurusu
+  üretmez (ekran okuyucu tek duyuru).
 - DOM değişmezi yok (tekil, listesiz statik yapı); `key` yönetimi
   çağıranın işidir (listede render edilirken).
 
@@ -172,6 +176,8 @@ repo konvansiyonu). Sizes: N/A (tek boyut ekseni yok, yalnız `variant`).
 - [x] aksiyonsuz durumda hiçbir aksiyon render edilmez (unit)
 - [x] `variant="compact"` → `data-variant` işareti (unit)
 - [x] `avatarSrc` verildiğinde `GlassAvatar` görseli render eder (unit)
+- [x] avatar sarmalayıcısı `aria-hidden` → yazar adı erişilebilirlik
+      ağacında yalnız bir kez duyurulur (unit)
 - [ ] `compact` metin 2 satırda görsel olarak kırpılır (visual, Chrome)
 - [ ] odak halkası `--lg-accent` ile görünür (visual)
 
@@ -201,3 +207,6 @@ i18n'i (şimdilik sabit Türkçe metin, `verified` yalnız boolean).
 **Changelog:** 2026-07-17 — İlk sürüm (dalga 1): `full`/`compact` varyantı,
 kendi yıldız göstergesi (GlassRating'e bağımlı değil), koşullu
 buton/düz-metin "Faydalı" aksiyonu.
+**Changelog:** 2026-07-17 — Codex review fix: avatar sarmalayıcısı
+`aria-hidden="true"` yapıldı (yazar adının ekran okuyucuda iki kez
+duyurulması giderildi); regresyon testi eklendi.

@@ -68,6 +68,20 @@ function ChevronIcon() {
   )
 }
 
+// Türetilmiş normalize: items'ta artık var olmayan id'leri düşürür; single
+// modda birden çok id kalırsa SON id'yi (kontrollü/defaultOpenIds ile doğrudan
+// verilen listede "en son açılan" olarak kabul edilir) tek başına tutar.
+// Her render'da hesaplanır — ayrı bir state/effect olarak SAKLANMAZ, tek
+// kaynak (openIds/iç state) bozulmadan kalır.
+function normalizeOpenIds(ids: string[], items: GlassAccordionItem[], mode: GlassAccordionMode): string[] {
+  const validIds = new Set(items.map((item) => item.id))
+  const filtered = ids.filter((id) => validIds.has(id))
+  if (mode === 'single' && filtered.length > 1) {
+    return [filtered[filtered.length - 1]]
+  }
+  return filtered
+}
+
 export function GlassAccordion({
   items,
   mode = 'single',
@@ -84,12 +98,14 @@ export function GlassAccordion({
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([])
 
   // Controlled tespiti YALNIZ openIds üzerinden yapılır (bkz. GlassTable selectedIds deseni).
-  const effectiveOpenIds = openIds ?? innerOpenIds
+  const rawOpenIds = openIds ?? innerOpenIds
+  const effectiveOpenIds = normalizeOpenIds(rawOpenIds, items, mode)
   const HeadingTag = headingAs as ElementType
 
   const emit = (next: string[]) => {
-    if (openIds === undefined) setInnerOpenIds(next)
-    onOpenIdsChange?.(next)
+    const normalized = normalizeOpenIds(next, items, mode)
+    if (openIds === undefined) setInnerOpenIds(normalized)
+    onOpenIdsChange?.(normalized)
   }
 
   const toggle = (id: string) => {
@@ -122,11 +138,19 @@ export function GlassAccordion({
       className={[styles.root, className].filter(Boolean).join(' ')}
       data-mode={mode}
       aria-label={ariaLabel}
+      // aria-label yalnız adlandırılabilir bir role üstünde AT'ye anlamlı gelir —
+      // generic <div> "isimsiz" kabul edilir. Bu yüzden role="group" YALNIZ
+      // aria-label verildiğinde eklenir (bkz. rules.md §2).
+      role={ariaLabel ? 'group' : undefined}
     >
       {items.map((item, index) => {
         const open = effectiveOpenIds.includes(item.id)
-        const triggerId = `${baseId}-trigger-${item.id}`
-        const panelId = `${baseId}-panel-${item.id}`
+        // DOM id'si ham item.id'den DEĞİL, useId önekiyle index'ten türetilir —
+        // item.id boşluk/özel karakter içerebilir (yalnız React key + openIds
+        // eşleştirmesi için serbesttir), ham haliyle DOM id'sine eklenirse ARIA
+        // IDREF (aria-controls) kırılır (bkz. rules.md §2).
+        const triggerId = `${baseId}-trigger-${index}`
+        const panelId = `${baseId}-panel-${index}`
         return (
           <div key={item.id} className={styles.item}>
             <HeadingTag className={styles.heading}>

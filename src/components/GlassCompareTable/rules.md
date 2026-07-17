@@ -28,7 +28,11 @@ component'idir — cam yok, gerçek `<table>` semantiği.
 ## 2. Semantik sözleşme
 
 - Kök: yatay kaydırma için `<div>` sarmalayıcı (`overflow-x: auto`) içinde
-  gerçek `<table>`. `aria-label` prop'u tabloyu adlandırır.
+  gerçek `<table>`. `aria-label` prop'u tabloyu adlandırır. Sarmalayıcı `div`
+  ayrıca `role="region"` + `tabIndex={0}` + `aria-label` (aynı `aria-label`
+  prop'undan türer, verilmezse `"İlan karşılaştırma tablosu"` varsayılanı)
+  taşır — taşan sütunlara `Tab` ile de erişilebilsin diye kaydırma kabının
+  kendisi klavye odağı alabilir (`:focus-visible` halkası görünür).
 - `<thead>` > `<tr>` > ilk hücre `<th scope="col">` ("Özellik" köşe
   etiketi) + her ilan için `<th scope="col">` (görsel + başlık +
   opsiyonel kaldırma butonu).
@@ -60,15 +64,17 @@ component'idir — cam yok, gerçek `<table>` semantiği.
 | fields | prop | `GlassCompareField[]` (`{key, label, higherIsBetter?}`) | — (zorunlu) | Satır sırası = dizi sırası |
 | listings | prop | `GlassCompareListing[]` (`{id, title, image?, values}`) | — (zorunlu) | Sütun sırası = dizi sırası; ilk 4'ü render edilir (bkz. §5) |
 | highlightDifferences | prop | `boolean` | `true` | Bir satırda ilanlar arasında değer farkı varsa satırı hafif vurgular |
-| onRemove | event | `(id: string) => void` | — | Verilirse her sütun başlığında kaldırma butonu görünür; tıklanınca `listing.id` ile çağrılır — component kendi `listings`'ini FİLTRELEMEZ, yeni diziyi vermek çağıranın işidir |
-| aria-label | prop | `string` | — | Tabloyu adlandırır |
+| onRemove | event | `(id: string) => void` | — | Verilirse her sütun başlığında kaldırma butonu görünür; tıklanınca `listing.id` ile çağrılır — component kendi `listings`'ini FİLTRELEMEZ, yeni diziyi vermek çağıranın işidir. Çağrı sonrası odak kalan ilk kaldırma butonuna, hiç kalmadıysa kaydırma kabına taşınır (bkz. §7) |
+| aria-label | prop | `string` | — | Tabloyu VE yatay kaydırma kabını (`role="region"`) adlandırır; verilmezse kap `"İlan karşılaştırma tablosu"` varsayılanını kullanır, `<table>`'ın kendi `aria-label`'ı boş kalır |
 | ...rest | — | `HTMLAttributes<HTMLTableElement>` (`onChange` hariç) | — | `<table>` elemanına geçer; `className` sarmalayıcı `div`'e uygulanır |
 
-Ref hedefi: yok (v1). Event sözleşmesi: `onRemove` yalnız kullanıcının
-butona tıklamasıyla tetiklenir; component state tutmaz, tamamen
-`fields`/`listings` prop'larından türetilmiş salt-okunur render'dır — bu
+Ref hedefi: yok (v1, dışa açık `ref` prop'u yok). Event sözleşmesi: `onRemove`
+yalnız kullanıcının butona tıklamasıyla tetiklenir; component görünür state
+tutmaz — render tamamen `fields`/`listings` prop'larından türetilir, bu
 yüzden `value`/`defaultValue`/`onXChange` üçlüsü N/A (controlled/uncontrolled
-eksen yok, çünkü içsel state yok).
+eksen yok). İstisna: odak kurtarma yalnızca DOM'a yazılmayan iç `ref`'lerle
+(kaldırma butonu haritası + "kurtarma bekliyor" bayrağı) yürütülen bir yan
+etkidir, render çıktısını etkilemez (bkz. §6).
 
 ## 5. Seçenek eksenleri
 
@@ -86,23 +92,46 @@ birer özellik anahtarı (prop), state değil.
 
 ## 6. State modeli
 
-N/A — component'in kendi state'i yoktur; her render tamamen `fields` +
-`listings` + `highlightDifferences` prop'larından türetilir ("en iyi değer"
-kümesi ve "satır farklı mı" bayrağı saf fonksiyonlarla hesaplanır, state'e
-yazılmaz). `onRemove` çağrısı sonrası `listings`'i güncellemek/filtrelemek
-tamamen çağıranın sorumluluğundadır (bkz. `Kaldirilabilir` story).
+Render açısından N/A — görünür/kontrollü hiçbir state yoktur; her render
+tamamen `fields` + `listings` + `highlightDifferences` prop'larından
+türetilir ("en iyi değer" kümesi ve "satır farklı mı" bayrağı saf
+fonksiyonlarla hesaplanır, state'e yazılmaz). `onRemove` çağrısı sonrası
+`listings`'i güncellemek/filtrelemek tamamen çağıranın sorumluluğundadır
+(bkz. `Kaldirilabilir` story).
+
+İstisna — odak kurtarma (yalnız yan etki, render'ı etkilemez): bir
+`removeButtonRefs` haritası (`listing.id` → buton DOM node'u) ve bir
+"kurtarma bekliyor" `ref` bayrağı iç olarak tutulur. Kaldırma butonuna
+tıklanınca bayrak `true` olur; bir sonraki commit'te (`listings` prop'u
+kısaldıktan sonra) `useEffect` bayrağı görüp odağı kalan ilk kaldırma
+butonuna (yoksa kaydırma kabına) taşır ve bayrağı sıfırlar. Bu mekanizma
+`useRef` ile yürütülür, `useState` DEĞİLDİR — bu yüzden ek bir render
+tetiklemez ve yukarıdaki "render tamamen prop'lardan türetilir" ilkesini
+bozmaz.
 
 ## 7. Davranış
 
 - **Pointer:** kaldırma butonuna tıklama `onRemove(id)` çağırır; başka
   etkileşim yok (satır/hücre tıklaması anlamsız).
-- **Klavye:** özel widget rolü YOK — bu gerçek bir `<table>`, klavye
-  gezinmesi tarayıcının doğal `Tab` sırasıyla çalışır (yalnız kaldırma
+- **Klavye:** özel widget rolü YOK — bu gerçek bir `<table>`, hücre içi
+  gezinme tarayıcının doğal `Tab` sırasıyla çalışır (yalnız kaldırma
   butonları odaklanabilir; `Enter`/`Space` native `<button>` davranışı).
   Roving tabindex/ok tuşu deseni yalnız `tablist`/`radiogroup` gibi ARIA
   widget rolü ÜSTLENEN component'lerde zorunludur (bkz.
   `GlassSegmentedControl`) — burada öyle bir rol üstlenilmediği için
-  uygulanmaz.
+  uygulanmaz. Ayrıca sarmalayıcı kaydırma kabının kendisi `tabIndex={0}` +
+  `role="region"` ile klavye odağı alabilir — taşan (viewport dışına kayan)
+  sütunlara `Tab` sırasında erişim, kaldırma butonu bulunmayan salt-okunur
+  kullanımda bile garanti edilir; `:focus-visible` halkası kap üzerinde
+  görünür (`outline-offset: -2px`, kırpılmasın diye içe doğru).
+- **Odak kurtarma (`onRemove` sonrası):** bir kaldırma butonuna tıklanıp
+  `onRemove` çağrıldıktan ve çağıran `listings`'i filtreleyip component'i
+  yeniden render ettikten sonra, component odağı OTOMATİK olarak kalan ilk
+  ilanın kaldırma butonuna taşır; hiç ilan kalmadıysa (son sütun da
+  kaldırıldıysa) odak kaydırma kabına (`div[role="region"]`) taşınır. Bu
+  sayede kaldırılan butonla birlikte odağın tarayıcı `<body>`'ye düşüp
+  kaybolması engellenir. Mekanizma tamamen `ref` tabanlıdır, `listings`
+  prop'u değişmezse (çağıran filtrelemezse) hiçbir görünür etkisi yoktur.
 - **Sticky ilk kolon:** `position: sticky; left: 0`; en yakın kaydıran ata
   (sarmalayıcı `div`) üzerinde çalışır, ek prop gerekmez. Sticky hücrelerin
   arka planı opak (`--lg-surface` bazlı) tutulur ki altından kayan diğer
@@ -120,6 +149,16 @@ tamamen çağıranın sorumluluğundadır (bkz. `Kaldirilabilir` story).
   `toLocaleString('tr-TR')` ile binlik ayraçlı gösterilir (ör. `4250000` →
   `"4.250.000"`); para birimi/ölçü birimi eki YOKTUR — bunu `field.label`
   içine ekle (ör. "Fiyat (TL)"). String değerler olduğu gibi gösterilir.
+- **Fark hesabında (`highlightDifferences`) sayısal normalizasyon:** bir
+  satırdaki TÜM ilan değerleri sayıya parse edilebiliyorsa (binlik/ondalık
+  ayraçları temizlenerek — `"1.000"` → `1000`, `"1.500,50"` → `1500.5`)
+  karşılaştırma SAYISAL yapılır; ör. `1000` (number) ile `"1.000"` (string)
+  aynı kabul edilir, `data-differs` YAZILMAZ. Herhangi bir değer sayıya
+  çevrilemiyorsa (ör. "Konut İmarlı") satırın tamamı ham METİN olarak
+  karşılaştırılır (önceki davranış). Bu normalizasyon yalnız "satır farklı
+  mı" bayrağı içindir — `higherIsBetter` "en iyi değer" hesabı hâlâ katı
+  `typeof value === 'number'` şartını arar (bkz. §5 tablosu), string
+  değerleri normalize ETMEZ.
 - **Responsive:** kapsayıcı `overflow-x: auto`; sayfa gövdesi hiçbir zaman
   yatay kaymaz. 700px altı için `GlassTable`'daki gibi ayrı bir "kart
   görünümü" modu YOKTUR — sticky ilk kolon zaten dar ekranda da çalışır
@@ -146,6 +185,7 @@ tamamen çağıranın sorumluluğundadır (bkz. `Kaldirilabilir` story).
 | en iyi hücre | renk | `--lg-success` | — |
 | kaldırma butonu | arka plan/renk | `color-mix(--lg-label 8%)` / `--lg-label-secondary` | hover: `color-mix(--lg-danger 16%)` + `--lg-danger` (yalnız `hover: hover`) |
 | kaldırma butonu focus | outline | `--lg-accent` | yalnız `:focus-visible` |
+| kaydırma kabı (region) focus | outline | `--lg-accent` (`outline-offset: -2px`) | yalnız `:focus-visible` |
 | görsel radius | `--lg-radius-chip` | — | — |
 | td/th padding, font | `--lg-space-*` / `--lg-text-*` | — | — |
 
@@ -187,6 +227,16 @@ yok).
 - [x] `onRemove` verilmediğinde hiçbir buton render edilmez (unit)
 - [x] 4'ten fazla ilan sessizce ilk 4'e kırpılır (unit)
 - [x] eksik değer "—" gösterir (unit)
+- [x] yatay kaydırma kabı `role="region"` + `aria-label` taşır ve
+      `tabIndex={0}` ile klavyeyle odaklanabilir; `aria-label` verilmezse
+      varsayılan "İlan karşılaştırma tablosu" adı kullanılır (unit)
+- [x] `onRemove` ile kaldırılan, odaklı butonun silinmesinin ardından odak
+      kalan ilk kaldırma butonuna geçer; hiç buton kalmadıysa kaydırma
+      kabına geçer (unit)
+- [x] bir satırda değerler farklı gösterimlerle (number `1000` / string
+      `"1.000"`) aynı sayıyı temsil ediyorsa `data-differs` YAZILMAZ; gerçek
+      sayısal fark varsa (locale biçiminden bağımsız) `data-differs` yazılır
+      (unit)
 - [ ] sticky ilk kolonun yatay kaydırmada gerçekten sabit kaldığı ve altta
       kayan hücrelerin görünmediği (visual, Chrome)
 - [ ] Kağıt/Grafit tema kontrastı, özellikle en iyi değer `--lg-success`
@@ -220,4 +270,9 @@ sabit; ikisi birlikte sticky olursa köşe hücresinin z-index/kesişim
 yönetimi gerekir) · para birimi/ölçü birimi için ayrı bir `field.unit`
 alanı eklenip eklenmeyeceği.
 
-**Changelog:** 2026-07-17 ilk sözleşme.
+**Changelog:** 2026-07-17 ilk sözleşme · 2026-07-17 (review fix) kaydırma
+kabına `role="region"` + `tabIndex={0}` + `aria-label` (varsayılan "İlan
+karşılaştırma tablosu") ve `:focus-visible` halkası eklendi; `onRemove`
+sonrası odak kurtarma (kalan ilk kaldırma butonuna, yoksa kaba) eklendi;
+`highlightDifferences` fark hesabı locale-farkındalıklı sayısal
+normalizasyonla düzeltildi (`1000` ile `"1.000"` artık aynı sayılır).

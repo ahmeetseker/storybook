@@ -104,4 +104,60 @@ describe('GlassNearbyPlaces', () => {
     const panel = screen.getByRole('tabpanel')
     expect(panel.getAttribute('aria-labelledby')).toBe(tab.id)
   })
+
+  it('ArrowUp/ArrowDown tablist üzerinde işlenmez — seçim değişmez ve preventDefault çağrılmaz', () => {
+    const onActiveCategoryIdChange = vi.fn()
+    renderPlaces({ variant: 'tabs', onActiveCategoryIdChange })
+    const tablist = screen.getByRole('tablist')
+    const downNotPrevented = fireEvent.keyDown(tablist, { key: 'ArrowDown' })
+    const upNotPrevented = fireEvent.keyDown(tablist, { key: 'ArrowUp' })
+    expect(onActiveCategoryIdChange).not.toHaveBeenCalled()
+    // fireEvent, event.preventDefault() çağrılmadıysa true döner (sayfa kaydırması serbest kalır)
+    expect(downNotPrevented).toBe(true)
+    expect(upNotPrevented).toBe(true)
+    expect(screen.getByRole('tab', { name: 'Ulaşım' }).getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('controlled modda ok tuşuyla geçiş isteği ebeveyn tarafından reddedilirse odak talep edilen sekmeye sapmaz', () => {
+    const onActiveCategoryIdChange = vi.fn()
+    // activeCategoryId sabit kalır — ebeveyn state güncellemediği (isteği reddettiği) senaryoyu simüle eder
+    renderPlaces({ variant: 'tabs', activeCategoryId: 'ulasim', onActiveCategoryIdChange })
+    const tablist = screen.getByRole('tablist')
+    const firstTab = screen.getByRole('tab', { name: 'Ulaşım' })
+    firstTab.focus()
+    expect(document.activeElement).toBe(firstTab)
+
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+
+    expect(onActiveCategoryIdChange).toHaveBeenCalledWith('egitim')
+    // prop değişmediği için seçili sekme ve panel Ulaşım'da kalır
+    expect(firstTab.getAttribute('aria-selected')).toBe('true')
+    expect(within(screen.getByRole('tabpanel')).getByText('Metrobüs Durağı')).toBeTruthy()
+    // odak, talep edilen (reddedilen) Eğitim sekmesine sapmaz — Ulaşım'da kalır
+    expect(document.activeElement).toBe(firstTab)
+  })
+
+  it('boşluklu kategori id\'si DOM id/ARIA IDREF eşleşmesini kırmaz', () => {
+    const spacedCategories: GlassNearbyCategory[] = [
+      { id: 'toplu tasima', label: 'Toplu Taşıma', places: [{ name: 'Metro', distance: '200 m' }] },
+      { id: 'saglik ocagi', label: 'Sağlık Ocağı', places: [{ name: 'Aile Sağlığı Merkezi', distance: '500 m' }] },
+    ]
+    const onActiveCategoryIdChange = vi.fn()
+    render(
+      <GlassNearbyPlaces
+        categories={spacedCategories}
+        variant="tabs"
+        onActiveCategoryIdChange={onActiveCategoryIdChange}
+      />,
+    )
+    const firstTab = screen.getByRole('tab', { name: 'Toplu Taşıma' })
+    const panel = screen.getByRole('tabpanel')
+    // Kategori id'sinde boşluk olsa da üretilen DOM id boşluk içermez
+    expect(firstTab.id).not.toMatch(/\s/)
+    expect(panel.getAttribute('aria-labelledby')).toBe(firstTab.id)
+
+    const tablist = screen.getByRole('tablist')
+    fireEvent.keyDown(tablist, { key: 'End' })
+    expect(onActiveCategoryIdChange).toHaveBeenCalledWith('saglik ocagi')
+  })
 })

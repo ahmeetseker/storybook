@@ -145,6 +145,22 @@ raw — ikon ölçeği için token yok (GlassSellerCard'daki `VerifiedIcon`
 borcuyla aynı gerekçe) · `viewListings` taban `min-height: 24px` raw
 (GlassFooter `.link` deseniyle tutarlı).
 
+**Kontrast kararı (code review, 2026-07-17):** `verifiedBadge`,
+`GlassBadge`'in `material="flat"` + `tint="var(--lg-success)"` varsayılanını
+(opak success zemin + sabit beyaz metin, `.tinted` kuralı) kullanmıyor —
+açık temada ~2.2:1 ölçülüp WCAG AA 4.5:1 hedefinin altında kaldı. Bunun
+yerine `.verifiedBadge` kendi zeminini nötr yüzeye (`--lg-surface` +
+`--lg-hairline`) çekiyor, metni `color-mix(in srgb, var(--lg-success) 55%,
+var(--lg-label))` ile koyulaştırıyor — hesaplanan kontrast açık temada
+~5.2:1, koyu temada ~10.7:1 (her iki tema da 4.5:1 hedefini rahat geçiyor;
+`checkIcon` `currentColor` kullandığından metinle aynı rengi otomatik alır).
+Override, `GlassBadge`'in `.tinted[data-material='flat']` kuralıyla eşit CSS
+özgüllüğü taşıdığı için `!important` ile yapılmak zorunda (bkz.
+`GlassAgencyCard.module.css` `.verifiedBadge` yorumu). Bu, otomatik test
+yazılamayan bir görsel/kontrast kararıdır — hesaplama elle (WCAG relative
+luminance formülü) doğrulandı, ekran görüntüsü/regresyon testi Storybook'ta
+manuel QA'ya bırakıldı.
+
 ## 10. Storybook kapsamı
 
 Var: Default, Playground, Varyantlar (panel/inline yan yana), Logolu,
@@ -195,3 +211,6 @@ varsayıldı).
 - 2026-07-17: İlk sürüm — panel/inline varyantları, GlassAvatar logo
   fallback'i, tabular stats satırı, telefon `tel:` linki, dinamik "N ilanı
   görüntüle" metni, tek prominent "Mesaj Gönder" CTA.
+- 2026-07-17: Code review fix — `verifiedBadge` kontrastı (bkz. §9 "Kontrast
+  kararı"): açık temada ~2.2:1'den ~5.2:1'e çıkarıldı, zemin nötr yüzeye
+  çekildi, metin koyulaştırılmış success karışımı oldu.

@@ -75,7 +75,7 @@ describe('GlassReviewCard', () => {
   })
 
   it('avatarSrc verildiğinde GlassAvatar görseli render eder', () => {
-    render(
+    const { container } = render(
       <GlassReviewCard
         author="Elif Kaya"
         avatarSrc="https://example.com/avatar.jpg"
@@ -84,7 +84,23 @@ describe('GlassReviewCard', () => {
         text="İlgiliydi."
       />,
     )
-    const img = screen.getByRole('img', { name: 'Elif Kaya' })
-    expect(img.tagName).toBe('IMG')
+    const img = container.querySelector('img')
+    expect(img).not.toBeNull()
+    expect(img?.getAttribute('src')).toBe('https://example.com/avatar.jpg')
+  })
+
+  it('avatar sarmalayıcısı aria-hidden olduğundan yazar adı erişilebilirlik ağacında yalnız bir kez duyurulur', () => {
+    const { container } = render(
+      <GlassReviewCard author="Elif Kaya" rating={4} date="12 Mayıs 2026" text="İlgiliydi." />,
+    )
+    // GlassAvatar (src verilmediğinde) baş harf fallback'ini role="img" +
+    // aria-label={author} olarak render eder — sarmalayıcı aria-hidden
+    // olmasaydı bu, başlıktaki "Elif Kaya" metniyle birlikte ikinci bir
+    // erişilebilir "Elif Kaya" duyurusu üretirdi.
+    expect(screen.queryByRole('img', { name: 'Elif Kaya' })).toBeNull()
+    expect(screen.getByText('Elif Kaya')).toBeDefined()
+    const avatarAccessibleNode = container.querySelector('[aria-label="Elif Kaya"]')
+    expect(avatarAccessibleNode).not.toBeNull()
+    expect(avatarAccessibleNode?.closest('[aria-hidden="true"]')).not.toBeNull()
   })
 })

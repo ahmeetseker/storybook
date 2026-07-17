@@ -58,8 +58,17 @@
   overflow-wrap: break-word;
 }
 
+/* GlassBadge'in flat+tint varsayılanı (opak `--lg-success` zemin + sabit beyaz
+   metin) açık temada ~2.2:1 kontrast veriyor — WCAG AA 4.5:1 hedefinin altında
+   (bkz. rules.md §9, code review bulgusu). Zemini nötr yüzey+hairline'a çekip
+   metni koyulaştırılmış success karışımıyla veriyoruz. `.tinted[data-material=
+   'flat']` ile eşit özgüllük taşıdığından `!important` şart (GlassButton.module.css
+   §"box-shadow" ile aynı gerekçe: cascade sırasına bağlı kalınmaz). */
 .verifiedBadge {
   flex: none;
+  background: var(--lg-surface) !important;
+  border-color: var(--lg-hairline) !important;
+  color: color-mix(in srgb, var(--lg-success) 55%, var(--lg-label)) !important;
 }
 .card[data-variant='panel'] .verifiedBadge {
   margin-left: auto;

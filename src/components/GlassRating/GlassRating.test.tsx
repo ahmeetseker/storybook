@@ -124,6 +124,60 @@ describe('GlassRating — input', () => {
     fireEvent.keyDown(screen.getByRole('radiogroup'), { key: 'ArrowRight' })
     expect(onValueChange).not.toHaveBeenCalled()
   })
+
+  it('value/defaultValue tamsayı olmayan veya [0,5] dışı olduğunda en yakın geçerli yıldıza normalize edilir (hiçbir seçenek tabIndex=-1\'de kilitli kalmaz)', () => {
+    const { unmount: unmount1 } = render(<GlassRating variant="input" label="Puanınız" defaultValue={6} />)
+    expect(screen.getByRole('radio', { name: '5 yıldız' }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('radio', { name: '5 yıldız' }).getAttribute('tabindex')).toBe('0')
+    unmount1()
+
+    const { unmount: unmount2 } = render(<GlassRating variant="input" label="Puanınız" defaultValue={2.5} />)
+    expect(screen.getByRole('radio', { name: '3 yıldız' }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('radio', { name: '3 yıldız' }).getAttribute('tabindex')).toBe('0')
+    unmount2()
+
+    render(<GlassRating variant="input" label="Puanınız" defaultValue={Infinity} />)
+    const radios = screen.getAllByRole('radio')
+    expect(radios.every((r) => r.getAttribute('aria-checked') === 'false')).toBe(true)
+    expect(screen.getByRole('radio', { name: '1 yıldız' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('controlled value normalize edilmemiş (6 / Infinity) geçildiğinde de geçerli bir radio checked ve roving hedef olur', () => {
+    const { rerender } = render(<GlassRating variant="input" label="Puanınız" value={6} />)
+    expect(screen.getByRole('radio', { name: '5 yıldız' }).getAttribute('aria-checked')).toBe('true')
+    expect(screen.getByRole('radio', { name: '5 yıldız' }).getAttribute('tabindex')).toBe('0')
+
+    rerender(<GlassRating variant="input" label="Puanınız" value={Infinity} />)
+    expect(screen.getAllByRole('radio').every((r) => r.getAttribute('aria-checked') === 'false')).toBe(true)
+    expect(screen.getByRole('radio', { name: '1 yıldız' }).getAttribute('tabindex')).toBe('0')
+  })
+
+  it('uncontrolled: ok tuşuyla taşınan seçim committed olduğundan DOM odağı da yeni yıldıza taşınır', () => {
+    render(<GlassRating variant="input" label="Puanınız" defaultValue={2} />)
+    fireEvent.keyDown(screen.getByRole('radiogroup'), { key: 'ArrowRight' })
+    expect(document.activeElement).toBe(screen.getByRole('radio', { name: '3 yıldız' }))
+  })
+
+  it('controlled reddinde (parent value prop\'unu güncellemezse) odak mevcut roving öğede kalır, tabIndex=-1 öğeye taşınmaz', () => {
+    const onValueChange = vi.fn()
+    render(<GlassRating variant="input" label="Puanınız" value={2} onValueChange={onValueChange} />)
+    const current = screen.getByRole('radio', { name: '2 yıldız' })
+    current.focus()
+    expect(document.activeElement).toBe(current)
+
+    fireEvent.keyDown(screen.getByRole('radiogroup'), { key: 'ArrowRight' })
+    expect(onValueChange).toHaveBeenCalledWith(3)
+    // value prop hiç değişmedi (controlled reddi simülasyonu) → odak DOM'da hiç
+    // taşınmadı, hâlâ 2. yıldızda ve tabIndex=0 orada kalıyor.
+    expect(document.activeElement).toBe(current)
+    expect(current.getAttribute('tabindex')).toBe('0')
+    expect(screen.getByRole('radio', { name: '3 yıldız' }).getAttribute('tabindex')).toBe('-1')
+  })
+
+  it('label verilmezse radiogroup isimsiz kalmaz, varsayılan erişilebilir ad \'Puan\' olur', () => {
+    render(<GlassRating variant="input" />)
+    expect(screen.getByRole('radiogroup', { name: 'Puan' })).toBeTruthy()
+  })
 })
 
 describe('GlassRating — module.css', () => {

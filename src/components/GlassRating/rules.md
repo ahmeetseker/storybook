@@ -33,9 +33,14 @@ yok (GlassScoreMeter ile aynı gerekçe).
   (+ `count` verilmişse ", 128 değerlendirme"). Yıldız SVG'leri ve görünür
   metin (`count` varsa) `aria-hidden` — bilgi zaten kökün `aria-label`'ında,
   çift okuma olmasın.
-- `input`: `<div role="radiogroup" aria-label={label}>` içinde 5×
-  `<button role="radio" aria-checked aria-label="N yıldız">`. Radiogroup
-  deseni `GlassSegmentedControl` ile birebir — roving tabindex, ok tuşu.
+- `input`: `<div role="radiogroup" aria-label={label ?? 'Puan'}>` içinde 5×
+  `<button role="radio" aria-checked aria-label="N yıldız">`. `label`
+  verilmezse radiogroup isimsiz kalmaz, varsayılan erişilebilir ad `'Puan'`
+  olur. `value`/`defaultValue` sonlu değilse (`NaN`/`Infinity`) önce 0'a
+  düşer, sonra en yakın tamsayıya yuvarlanıp [0,5]'e clamp edilir — yalnız
+  bu normalize edilmiş değer radio eşleşmesinde/roving hedefte kullanılır.
+  Radiogroup deseni `GlassSegmentedControl` ile birebir — roving tabindex,
+  ok tuşu.
 - `summary`: özel ARIA rolü yok; ortalama sayı + toplam adet **görünür metin**
   olarak render edilir (AT normal okuma sırasıyla alır). Dağılım satırları
   `<dl>`; `dt`="N yıldız", `dd`= çubuk (dekoratif, `aria-hidden`) + görünür
@@ -69,10 +74,10 @@ yok (GlassScoreMeter ile aynı gerekçe).
 
 | Ad | Type | Default | Controlled | Açıklama |
 |---|---|---|---|---|
-| value | `number` | — | ✅ | 1-5 controlled seçim; `0`/`undefined` → seçim yok |
-| defaultValue | `number` | `0` | — | Uncontrolled başlangıç |
+| value | `number` | — | ✅ | 1-5 controlled seçim; `0`/`undefined` → seçim yok; sonlu olmayan/tamsayı olmayan/[0,5] dışı değerler normalize edilir (bkz. §5) |
+| defaultValue | `number` | `0` | — | Uncontrolled başlangıç; aynı normalize kuralına tabi |
 | onValueChange | `(value: number) => void` | — | — | Seçim her tetiklendiğinde çağrılır (aynı yıldıza tekrar tıklamak dahil — SegmentedControl ile aynı karar) |
-| label | `string` | — | — | radiogroup `aria-label`; fiilen zorunlu |
+| label | `string` | `'Puan'` | — | radiogroup `aria-label`; verilmesi önerilir (görünür bağlam yoksa mutlaka ver), verilmezse `'Puan'`'a düşer |
 | disabled | `boolean` | `false` | — | Tüm kontrolü kapatır |
 
 **`summary`**:
@@ -101,8 +106,10 @@ yanlış kombinasyonu engeller, ör. `input`'a `distribution` geçilemez).
 
 | Yasak / türetilen | Davranış |
 |---|---|
-| `value` aralık dışı (`display`/`summary`) | [0,5]'e clamp, `NaN`/`Infinity` önce 0'a düşer |
-| `input` seçim yok (`value`/`defaultValue` verilmez) | Hiçbir radio `checked` değil, ilk yıldız roving hedefi |
+| `value` aralık dışı (`display`/`summary`) | [0,5]'e clamp, `NaN`/`Infinity` önce 0'a düşer (yarım yıldız korunur) |
+| `input` `value`/`defaultValue` sonlu değil veya tamsayı değil veya [0,5] dışı (`2.5`, `6`, `Infinity`) | Önce sonlu değilse 0, sonra `Math.round` + [0,5] clamp — normalize edilmiş değer her zaman 1-5 bir radio'ya (veya seçim-yok için 0'a) eşlenir, hiçbir seçenek kalıcı `tabIndex=-1` kilidine düşmez |
+| `input` seçim yok (`value`/`defaultValue` verilmez veya normalize sonrası 0) | Hiçbir radio `checked` değil, ilk yıldız roving hedefi |
+| `input` `label` verilmez | radiogroup `aria-label` `'Puan'`'a düşer, isimsiz radiogroup üretilmez |
 | `distribution` 5'ten kısa/negatif adet | Eksik index 0 sayılır, negatif adet 0'a clamp edilir — hata fırlatılmaz |
 | `distribution` toplamı 0 | Çubuklar %0 genişlikte render edilir, 0'a bölme olmaz |
 
@@ -111,7 +118,7 @@ yanlış kombinasyonu engeller, ör. `input`'a `distribution` geçilemez).
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
 | değer (display/summary) | `value` (+ clamp) | — | kökte `aria-label` / görünür metin |
-| seçim (input) | `value` (+ iç state) | — | `aria-checked`, roving `tabindex` |
+| seçim (input) | `value`/`defaultValue` (+ normalize + iç state) | — | `aria-checked`, roving `tabindex` |
 | disabled (input) | prop | hover, tıklama, klavye | native `disabled` + kök `pointer-events:none` |
 | focus-visible (input) | CSS | — | 2px `--lg-accent` halka, yalnız `:focus-visible` |
 
@@ -129,6 +136,14 @@ interaction (click/keyboard).
   (roving tabindex).
 - Controlled/uncontrolled: `value` verilirse iç state yazılmaz, yalnız
   `onValueChange` çağrılır (SegmentedControl'daki controlled karar aynen).
+- Odak yönetimi: ok tuşu handler'ı bir "pending focus" hedefi talep eder;
+  gerçek `.focus()` çağrısı yalnız committed değer (`currentValue`, yani
+  normalize edilmiş `value`/iç state) o hedefe ulaştığında yapılır. Uncontrolled
+  modda bu her zaman aynı render'da gerçekleşir (iç state anında güncellenir).
+  Controlled modda parent güncellemeyi reddederse (`value` prop'u değişmezse)
+  `currentValue` hiç değişmez, pending hedef hiç eşleşmez, DOM odağı hiç
+  taşınmaz — böylece odak asla `tabIndex=-1` bir öğede kilitli kalmaz; bir
+  sonraki ok tuşu her zaman GÖRÜNEN (`currentValue`/prop) değerden hesaplanır.
 - Responsive: `input` yıldız dokunma hedefi `@media (pointer: coarse)`'ta
   44×44px'e büyür; `summary` dağılım çubukları konteynerin %100 genişliğine
   uyar.
@@ -192,6 +207,11 @@ toolbar'la otomatik doğrulanır (GlassScoreMeter ile aynı karar).
 - [x] input: ok tuşları sarar, Home/End uçlara gider
 - [x] input: controlled dışarıdan yönetilir (`value` sabit kalır, callback çalışır)
 - [x] input: disabled hiçbir etkileşim almaz
+- [x] input: `value`/`defaultValue` sonlu değil/tamsayı değil/[0,5] dışı (`2.5`,
+  `6`, `Infinity`) → normalize edilir, roving hedef her zaman bir radio'ya eşlenir
+- [x] input: controlled reddinde (parent `value`'yu güncellemezse) DOM odağı
+  taşınmaz, mevcut (tabIndex=0) öğede kalır
+- [x] input: `label` verilmezse radiogroup'un erişilebilir adı `'Puan'`'a düşer
 - [x] summary: ortalama + toplam adet görünür metin
 - [x] summary: 5 satır, 5→1 sırayla adet
 - [x] summary: çubuk genişliği yüzdeyle birebir
@@ -218,5 +238,10 @@ sibling-highlight deseni karmaşıklık/RTL riskini artırdığından ertelendi)
 
 ## Changelog
 
+- 2026-07-17: Code review fix — `input`'ta `value`/`defaultValue` normalize
+  edilmiyordu (`2.5`/`6`/`Infinity` hiçbir radio'yla eşleşmiyordu); ok tuşu
+  odak taşıma controlled reddinde `tabIndex=-1` öğeye kilitleniyordu; `label`
+  verilmeden isimsiz radiogroup üretilebiliyordu. Üçü de düzeltildi + regresyon
+  testleri eklendi.
 - 2026-07-17: İlk sürüm — display/input/summary üç varyant, radiogroup +
   roving tabindex giriş deseni, yarım yıldız SVG clip-path dolgusu.

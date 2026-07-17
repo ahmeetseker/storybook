@@ -104,13 +104,24 @@ Katman sırası: `categories` verisi → controlled/uncontrolled çözümleme
 ## 7. Davranış
 
 - Pointer: sekmeye tıklama seçer (`tabs`); `chips`'te tıklanabilir öğe yok.
-- Klavye (yalnız `tabs`, tablist üzerinde): `→`/`↓` sonraki, `←`/`↑` önceki
-  (sarmalı), `Home` ilk, `End` son kategori — seçim odağı takip eder (roving
-  tabindex, `GlassFloorPlanViewer`/`GlassSegmentedControl` ile aynı desen).
-  Yalnız seçili sekme `tabIndex=0`, diğerleri `-1`.
-- Focus akışı: seçim değiştiğinde yeni seçili sekmeye programatik `focus()`
-  çağrılır (fare tıklamasında native focus zaten oradadır; klavye
-  gezinmesinde `document.getElementById` ile taşınır).
+- Klavye (yalnız `tabs`, tablist üzerinde): `→` sonraki, `←` önceki (sarmalı),
+  `Home` ilk, `End` son kategori — seçim odağı takip eder (roving tabindex,
+  `GlassFloorPlanViewer`/`GlassSegmentedControl` ile aynı desen). Yatay
+  tablist olduğundan `↑`/`↓` **işlenmez** — `preventDefault` çağrılmaz, sayfa
+  kaydırması engellenmez (WAI-ARIA APG yatay tablist deseni). Yalnız seçili
+  sekme `tabIndex=0`, diğerleri `-1`.
+- Focus akışı: yeni seçili sekmeye programatik `focus()` çağrısı **yalnız**
+  kullanıcının ok tuşu/`Home`/`End` ile tetiklediği geçişte, gerçekte render'a
+  yansıyan (resolved) aktif index'i izleyen bir `useEffect` üzerinden yapılır
+  (fare tıklamasında native focus zaten oradadır). Controlled modda ebeveyn
+  seçimi reddederse (`activeCategoryId` prop'u değişmezse) resolved index
+  değişmez, efekt tetiklenmez — odakta sapma oluşmaz (`GlassRating`
+  `InputRating`'te düzeltilen sınıfla aynı desen: `document.getElementById`
+  çağrısı seçim isteğinin hedefine değil, gerçekleşen sonuca göre yapılır).
+- DOM id'leri (`{baseId}-tab-{i}`, `{baseId}-label-{i}`) kategori `id`
+  alanının ham değerinden DEĞİL, kategori index'inden türetilir — `id` yalnız
+  veri anahtarı/controlled state değeri olarak kalır, boşluk/özel karakter
+  içerse bile ARIA IDREF (`aria-labelledby`/`aria-controls`) kırılmaz.
 - Controlled/uncontrolled: bkz. §4/§5.
 - Async yok, overlay yok.
 
@@ -177,6 +188,13 @@ toolbar'la otomatik doğrulanır (GlassScoreMeter ile aynı karar).
 - [x] roving tabindex: yalnız seçili sekme `tabIndex=0`
 - [x] ok tuşları sarmalı gezinir (`ArrowRight`/`ArrowLeft`)
 - [x] `Home`/`End` ilk/son kategoriye gider
+- [x] `ArrowUp`/`ArrowDown` tablist üzerinde işlenmez, `preventDefault`
+      çağrılmaz (sayfa kaydırması engellenmez)
+- [x] controlled modda ok tuşuyla geçiş isteği ebeveyn tarafından
+      reddedilirse (prop değişmezse) odak talep edilen sekmeye sapmaz,
+      mevcut aktif sekmede kalır
+- [x] kategori `id`'si boşluk içerdiğinde (`"toplu taşıma"` gibi) DOM
+      id'leri geçerli kalır, `tabpanel`/`aria-labelledby` eşleşmesi bozulmaz
 - [x] `tabpanel` aktif sekmeye `aria-labelledby` ile bağlı
 - [ ] `pointer: coarse`'ta tab 44px hedefi (visual/CSS, unit test kapsamı
       dışı — bkz. GlassFloorPlanViewer aynı borç)
@@ -207,3 +225,11 @@ string verir.
 - 2026-07-17: İlk sürüm — `chips`/`tabs` varyantları, WAI-ARIA tablist +
   roving tabindex deseni (`GlassFloorPlanViewer` ile aynı iskelet), boş
   kategori/boş liste güvenli davranışı.
+- 2026-07-17: Code review fix — (1) odak taşıma artık yalnız kullanıcının
+  ok tuşu/`Home`/`End` etkileşiminde ve resolved index'i izleyen bir
+  `useEffect` üzerinden yapılıyor, controlled reddi odakta sapma
+  yaratmıyor (`GlassRating` ile aynı bug sınıfı); (2) yatay tablist artık
+  yalnız `ArrowLeft`/`ArrowRight` + `Home`/`End` işliyor, `ArrowUp`/
+  `ArrowDown` sayfa kaydırmasını engellemiyor; (3) DOM id'leri kategori
+  `id`'sinin ham değeri yerine index'ten türetiliyor, boşluklu id'ler ARIA
+  IDREF'i kırmıyor.

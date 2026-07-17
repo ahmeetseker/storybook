@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { GlassCompareTable, type GlassCompareField, type GlassCompareListing } from './GlassCompareTable'
 
 const fields: GlassCompareField[] = [
@@ -117,5 +118,83 @@ describe('GlassCompareTable', () => {
     render(<GlassCompareTable fields={fields} listings={eksikListings} />)
     const imarRow = screen.getByRole('rowheader', { name: 'İmar Durumu' }).closest('tr')
     expect(within(imarRow as HTMLElement).getByText('—')).toBeDefined()
+  })
+
+  it('yatay kaydırma kabı role="region" + aria-label taşır ve klavyeyle (tabIndex) odaklanabilir', () => {
+    render(<GlassCompareTable fields={fields} listings={listings} aria-label="İlan karşılaştırması" />)
+    const region = screen.getByRole('region', { name: 'İlan karşılaştırması' })
+    expect(region.getAttribute('tabIndex')).toBe('0')
+    region.focus()
+    expect(document.activeElement).toBe(region)
+  })
+
+  it('aria-label verilmediğinde kaydırma kabı varsayılan "İlan karşılaştırma tablosu" adını kullanır', () => {
+    render(<GlassCompareTable fields={fields} listings={listings} />)
+    expect(screen.getByRole('region', { name: 'İlan karşılaştırma tablosu' })).toBeDefined()
+  })
+
+  it('kaldırılan sütunun odaklandığı buton silinince odak kalan ilk kaldır-butonuna geçer', () => {
+    function KaldirilabilirWrapper() {
+      const [current, setCurrent] = useState(listings)
+      return (
+        <GlassCompareTable
+          fields={fields}
+          listings={current}
+          aria-label="İlan karşılaştırması"
+          onRemove={(id) => setCurrent((prev) => prev.filter((l) => l.id !== id))}
+        />
+      )
+    }
+    render(<KaldirilabilirWrapper />)
+    const firstButton = screen.getByRole('button', { name: /İzmir Urla/ })
+    firstButton.focus()
+    expect(document.activeElement).toBe(firstButton)
+    fireEvent.click(firstButton)
+    // İlk sütun kaldırıldı; odak artık kalan ilk kaldırma butonunda (Bodrum) olmalı.
+    const nextRemaining = screen.getByRole('button', { name: /Muğla Bodrum/ })
+    expect(document.activeElement).toBe(nextRemaining)
+  })
+
+  it('son ilan da kaldırılınca (kalan kaldır-butonu yokken) odak kaydırma kabına taşınır', () => {
+    const tekListing = [listings[0]]
+    function KaldirilabilirWrapper() {
+      const [current, setCurrent] = useState(tekListing)
+      return (
+        <GlassCompareTable
+          fields={fields}
+          listings={current}
+          aria-label="İlan karşılaştırması"
+          onRemove={(id) => setCurrent((prev) => prev.filter((l) => l.id !== id))}
+        />
+      )
+    }
+    render(<KaldirilabilirWrapper />)
+    const region = screen.getByRole('region', { name: 'İlan karşılaştırması' })
+    const onlyButton = screen.getByRole('button', { name: /İzmir Urla/ })
+    onlyButton.focus()
+    fireEvent.click(onlyButton)
+    expect(document.activeElement).toBe(region)
+  })
+
+  it('bir alanda değerler farklı gösterimlerle (sayı ile locale biçimli metin) aynı sayıyı temsil ediyorsa satır "farklı" işaretlenmez', () => {
+    const sayisalFields: GlassCompareField[] = [{ key: 'aidat', label: 'Aidat (TL)' }]
+    const ayniDegerFarkliBicim: GlassCompareListing[] = [
+      { id: 'a', title: 'A İlanı', values: { aidat: 1000 } },
+      { id: 'b', title: 'B İlanı', values: { aidat: '1.000' } },
+    ]
+    const { container } = render(<GlassCompareTable fields={sayisalFields} listings={ayniDegerFarkliBicim} />)
+    const aidatRow = Array.from(container.querySelectorAll('tbody tr')).find((r) => r.textContent?.includes('Aidat'))
+    expect(aidatRow?.hasAttribute('data-differs')).toBe(false)
+  })
+
+  it('bir alanda sayısal değerler gerçekten farklıysa (locale biçimlerinden bağımsız) satır "farklı" işaretlenir', () => {
+    const sayisalFields: GlassCompareField[] = [{ key: 'aidat', label: 'Aidat (TL)' }]
+    const farkliDegerler: GlassCompareListing[] = [
+      { id: 'a', title: 'A İlanı', values: { aidat: 1000 } },
+      { id: 'b', title: 'B İlanı', values: { aidat: '1.500' } },
+    ]
+    const { container } = render(<GlassCompareTable fields={sayisalFields} listings={farkliDegerler} />)
+    const aidatRow = Array.from(container.querySelectorAll('tbody tr')).find((r) => r.textContent?.includes('Aidat'))
+    expect(aidatRow?.hasAttribute('data-differs')).toBe(true)
   })
 })

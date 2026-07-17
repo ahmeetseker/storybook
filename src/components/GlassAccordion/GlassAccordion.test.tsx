@@ -107,8 +107,49 @@ describe('GlassAccordion', () => {
     expect(screen.queryByRole('heading', { name: 'Birinci soru' })).toBeNull()
   })
 
-  it('kök aria-label ile adlandırılır', () => {
+  it('kök aria-label ile adlandırılır ve role="group" taşır', () => {
     const { container } = renderAccordion({ 'aria-label': 'Yardım merkezi' })
-    expect(container.querySelector('[aria-label="Yardım merkezi"]')).toBeTruthy()
+    const root = container.querySelector('[aria-label="Yardım merkezi"]')
+    expect(root).toBeTruthy()
+    expect(root?.getAttribute('role')).toBe('group')
+  })
+
+  it('aria-label verilmezse kök role taşımaz (adlandırılamayan generic div AT\'ye grup olarak sunulmaz)', () => {
+    const { container } = render(<GlassAccordion items={items} />)
+    expect(container.firstElementChild).toBeTruthy()
+    expect(container.firstElementChild?.hasAttribute('role')).toBe(false)
+  })
+
+  it('normalize: single modda defaultOpenIds birden çok geçerli id içerirse yalnız SON id açık kalır', () => {
+    renderAccordion({ defaultOpenIds: ['a', 'b'] })
+    expect(screen.getByRole('button', { name: 'Birinci soru' }).getAttribute('aria-expanded')).toBe('false')
+    expect(screen.getByRole('button', { name: 'İkinci soru' }).getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('normalize: items\'ta artık olmayan (silinmiş) id openIds\'ten düşer, callback\'e taşınmaz', () => {
+    const onOpenIdsChange = vi.fn()
+    renderAccordion({ mode: 'multiple', openIds: ['hayalet-id', 'a'], onOpenIdsChange })
+    // Silinmiş id normalize edilir; yalnız geçerli 'a' açık görünür.
+    expect(screen.getByRole('button', { name: 'Birinci soru' }).getAttribute('aria-expanded')).toBe('true')
+    fireEvent.click(screen.getByRole('button', { name: 'Üçüncü soru' }))
+    // Callback güncel + normalize edilmiş listeyle çağrılır — 'hayalet-id' taşınmaz.
+    expect(onOpenIdsChange).toHaveBeenCalledWith(['a', 'c'])
+  })
+
+  it('DOM id\'leri ham item.id\'den değil index\'ten türetilir — boşluklu id ARIA IDREF\'i kırmaz', () => {
+    const spacedItems: GlassAccordionItem[] = [
+      { id: 'ilan detay 1', title: 'Boşluklu birinci', content: <p>İçerik 1</p> },
+      { id: 'ilan detay 2', title: 'Boşluklu ikinci', content: <p>İçerik 2</p> },
+    ]
+    render(<GlassAccordion items={spacedItems} aria-label="Boşluklu test" />)
+    const button = screen.getByRole('button', { name: 'Boşluklu birinci' })
+    const panelId = button.getAttribute('aria-controls') as string
+    expect(panelId).toBeTruthy()
+    expect(panelId).not.toContain(' ')
+    expect(panelId).not.toContain('ilan detay')
+    const panel = document.getElementById(panelId)
+    expect(panel).toBeTruthy()
+    fireEvent.click(button)
+    expect(panel?.getAttribute('data-open')).toBe('true')
   })
 })

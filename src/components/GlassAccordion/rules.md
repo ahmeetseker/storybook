@@ -26,7 +26,11 @@ içerik açılır/kapanır".
 ## 2. Semantik sözleşme
 
 - Kök: sade `<div>`, `data-mode` (`single`/`multiple`), opsiyonel
-  `aria-label`.
+  `aria-label`. `aria-label` verildiğinde köke `role="group"` da eklenir —
+  isimsiz (adlandırılamayan) generic `<div>` AT'ye anlamlı bir grup olarak
+  sunulmaz, `aria-label` yalnız adlandırılabilir bir role üstünde etkilidir.
+  `aria-label` verilmezse `role` EKLENMEZ (gereksiz gürültü, tek accordion'lu
+  sayfada rol semantiği zorunlu değil).
 - Her başlık: `headingAs` (`'h3'|'h4'|'div'`, varsayılan `'h3'`) elementiyle
   sarılmış gerçek `<button type="button" aria-expanded aria-controls>`.
   Heading seviyesini seçmek ÇAĞIRANIN işidir — sayfa ana hattını component
@@ -34,6 +38,11 @@ içerik açılır/kapanır".
 - Panel: `role` TAŞIMAZ, yalnız `id` (button'ın `aria-controls`'u bununla
   eşleşir). Kapalıyken `inert` — DOM'dan silinmez (grid-rows geçişi için),
   klavye/AT gezinmesinden çıkarılır.
+- `trigger`/`panel` DOM `id`'leri (`aria-controls` eşleşmesi) `useId` önekiyle
+  ITEM INDEX'İNDEN türetilir — ham `item.id` DEĞİL. `item.id` yalnız React
+  `key` ve `openIds` eşleştirmesi için serbesttir (boşluk/özel karakter
+  içerebilir); ham haliyle DOM id'sine eklenirse ARIA IDREF (`aria-controls`)
+  kırılır.
 - Chevron ikonu `aria-hidden` — dönüş bilgisini `aria-expanded` taşır.
 - Portal YOK.
 
@@ -60,6 +69,17 @@ içerik açılır/kapanır".
 Controlled tespiti YALNIZ `openIds !== undefined` üzerinden yapılır (bkz.
 `GlassTable.selectedIds` deseni) — `defaultOpenIds` kontrollü modda yok
 sayılır. Ref: N/A — dışa ref açılmıyor (v1 kararı, bkz. §12).
+
+**Normalize (render'da türetilir, ayrı state olarak SAKLANMAZ):** kullanılan
+`openIds` (kontrollü prop veya iç state) her render'da `items` ve `mode` ile
+normalize edilir — `items`'ta artık var olmayan id'ler düşürülür; `mode`
+`'single'`iken normalize sonrası birden fazla id kalırsa yalnız SON id (listede
+en sonda olan — "en son açılan" kabul edilir) açık tutulur. `onOpenIdsChange`
+her zaman bu normalize edilmiş listeyle çağrılır — silinmiş id'ler veya
+`single` modda fazla id'ler çağırana asla taşınmaz. Bu, çağıranın `items`'ı
+component'ten bağımsız güncellediği (ör. bir madde silindiği) veya `mode`'u
+`'multiple'`'dan `'single'`'a değiştirdiği senaryolarda tutarlılığı garanti
+eder.
 
 ## 5. Seçenek eksenleri
 
@@ -140,7 +160,14 @@ kapsanıyor, mevcut proje konvansiyonu).
 - [x] controlled: `openIds` verilince iç state değişmez, yalnız `onOpenIdsChange` çağrılır
 - [x] klavye: `↓`/`↑` bitişik başlığa (sararak), `Home`/`End` ilk/son başlığa
 - [x] `headingAs`: `h3` (default) / `h4` / `div` doğru heading seviyesini üretir
-- [x] kök `aria-label` ile adlandırılır
+- [x] kök `aria-label` ile adlandırılır ve `role="group"` taşır; `aria-label`
+  yoksa `role` eklenmez
+- [x] normalize: `single` modda birden çok geçerli id verilirse yalnız SON id
+  açık kalır
+- [x] normalize: `items`'ta olmayan (silinmiş) id `openIds`'ten düşer, callback'e
+  taşınmaz
+- [x] DOM id'leri (`aria-controls`) ham `item.id`'den değil index'ten türetilir
+  — boşluklu id ARIA IDREF'i kırmaz
 - [ ] grid-template-rows geçişi + reduced-motion anlık geçiş (visual, Chrome)
 
 ## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
@@ -169,4 +196,7 @@ kapsanıyor, mevcut proje konvansiyonu).
 bırakıldı) · sürükle-bırak sıralama (kapsam dışı) · animasyon süresinin
 token'a bağlanması.
 
-**Changelog:** 2026-07-17 — İlk sürüm.
+**Changelog:** 2026-07-17 — İlk sürüm. 2026-07-17 — Codex review fix: `openIds`
+render'da `items`/`mode` ile normalize edilir (silinmiş id + `single` modda
+çoklu id sızıntısı giderildi); `aria-label` verilince köke `role="group"`
+eklendi; DOM id'leri (`aria-controls`) ham `item.id` yerine index'ten türetildi.

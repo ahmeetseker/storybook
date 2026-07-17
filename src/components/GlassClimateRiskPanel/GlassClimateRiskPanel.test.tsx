@@ -29,6 +29,13 @@ describe('GlassClimateRiskPanel', () => {
     expect(container.querySelector('section')?.getAttribute('aria-labelledby')).toBeNull()
   })
 
+  it('title verilmezse çağıranın ...rest ile geçtiği aria-labelledby korunur (undefined ile silinmez)', () => {
+    const { container } = render(
+      <GlassClimateRiskPanel hazards={hazards} aria-labelledby="disaridan-baslik" />,
+    )
+    expect(container.querySelector('section')?.getAttribute('aria-labelledby')).toBe('disaridan-baslik')
+  })
+
   it('badges varyantı: ikon dekoratiftir, etiket ve levelLabel metni görünür render edilir', () => {
     render(
       <GlassClimateRiskPanel

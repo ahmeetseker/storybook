@@ -136,7 +136,13 @@ export function GlassReviewCard({
   return (
     <article className={classes} data-variant={variant} {...rest}>
       <div className={styles.header}>
-        <GlassAvatar name={author} src={avatarSrc} size={variant === 'compact' ? 'sm' : 'md'} />
+        {/* Yazar adı zaten aşağıda metinle duyuruluyor; avatarın kendi accessible
+            name'i (author) ekran okuyucuda ikinci kez duyurulmasın diye
+            sarmalayıcı aria-hidden'dır. GlassAvatar'a name yine geçilir —
+            baş harf fallback'i bu değere bağlı. */}
+        <span aria-hidden="true">
+          <GlassAvatar name={author} src={avatarSrc} size={variant === 'compact' ? 'sm' : 'md'} />
+        </span>
         <div className={styles.identity}>
           {variant === 'compact' ? (
             <div className={styles.compactLine}>

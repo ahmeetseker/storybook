@@ -132,7 +132,8 @@ yok; roving tabindex/ok tuşu deseni bu yüzden geçerli değil (component
 | root | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-card` | — |
 | title/hazardLabel | color | `--lg-label` | — |
 | description/source | color | `--lg-label-secondary` | — |
-| levelChip/levelText/unitFilled | color/background | `--glass-climate-tone` ← `--lg-success`/`--lg-warning` (yoksa `--lg-accent`)/`--lg-danger` | `hazard.level`'dan otomatik |
+| levelChip/levelText metni | color | `--lg-label` / `--lg-label-secondary` | Ton rengi metne uygulanmaz — WCAG 1.4.3 (bkz. §12 Do/Don't) |
+| levelChip arka plan/kenarlık, unitFilled | color/background | `--glass-climate-tone` ← `--lg-success`/`--lg-warning` (yoksa `--lg-accent`)/`--lg-danger` | `hazard.level`'dan otomatik |
 | unitEmpty/detailedItem ayracı | background/border | `--lg-hairline` | — |
 | badgeItem/levelChip | radius | `--lg-radius-capsule` | — |
 | root/list boşluğu | gap/padding | `--lg-space-2..5` | — |
@@ -158,6 +159,7 @@ toolbar'la otomatik doğrulanır.
 - [x] `role="list"` + tehlike sayısı kadar `listitem`
 - [x] `title` verilince `h3` + section `aria-labelledby` eşleşir
 - [x] `title` verilmezse başlık yok, `aria-labelledby` yok
+- [x] `title` verilmezse çağıranın `...rest` ile geçtiği `aria-labelledby` korunur (koşulsuz `undefined` ile silinmez)
 - [x] `badges`: ikon `aria-hidden`, `label`/`levelLabel` metni görünür
 - [x] `badges`: `description`/`source` render edilmez
 - [x] `detailed`: `description`/`source` render edilir
@@ -179,6 +181,10 @@ toolbar'la otomatik doğrulanır.
 - ❌ `level`'ın rengini dışarıdan override etme — ScoreMeter'ın aksine bu
   component'te `tone` prop'u yok, risk seviyesi anlamı sabit kalmalı.
 - ❌ Cam yüzey/backdrop-filter ekleme — içerik katmanı kuralı (Dalga 1 §15).
+- ❌ `levelChip`/`levelText` metin rengine ham semantik tonu (`--glass-climate-tone`)
+  verme — açık temada küçük metin için WCAG 1.4.3'ün istediği 4.5:1 kontrastın
+  altına düşer; ton yalnız arka plan/kenarlık/ölçek birimi gibi grafik
+  öğelerde kalmalı, metin `--lg-label`/`--lg-label-secondary` kullanmalı.
 - ❌ Tıklanabilir/genişletilebilir satır davranışı ekleme — statik sunum
   sözleşmesini bozar; interaktif ihtiyaçta ayrı bir component düşünülmeli.
 
@@ -192,3 +198,8 @@ yanıltıcı olur) · `source` için link/tıklanabilir atıf desteği.
 - 2026-07-17: İlk sürüm — `badges`/`detailed` varyantları, 1-5 otomatik
   semantik renk eşiği, `role="list"`/`listitem` + `detailed`'de `role="img"`
   seviye ölçeği sözleşmesi.
+- 2026-07-17: Code review fix — `levelChip`/`levelText` metin rengi
+  `--glass-climate-tone`'dan `--lg-label`/`--lg-label-secondary`'ye taşındı
+  (açık temada 4.5:1 kontrast ihlali); `aria-labelledby` yalnız `title`
+  varken koşullu spread ile yazılır, artık `...rest`'ten gelen değeri
+  `undefined` ile silmiyor.

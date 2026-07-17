@@ -68,7 +68,7 @@ export function GlassClimateRiskPanel({
   return (
     <section
       {...rest}
-      aria-labelledby={title ? titleId : undefined}
+      {...(title ? { 'aria-labelledby': titleId } : null)}
       className={[styles.root, className].filter(Boolean).join(' ')}
     >
       {title ? (

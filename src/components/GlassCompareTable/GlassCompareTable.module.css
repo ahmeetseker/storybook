@@ -7,6 +7,14 @@
   border-radius: var(--lg-radius-media);
 }
 
+/* Kaydırma kabı klavyeyle (`tabIndex={0}`) odaklanabilir — taşan sütunlara
+   erişim `Tab` ile de mümkün olsun. `outline-offset` negatif: kap kendi
+   `overflow-x: auto`'suyla kaydırma bağlamı olduğundan halka kırpılmasın. */
+.wrapper:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: -2px;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;

@@ -1,4 +1,4 @@
-import { useId, useState, type HTMLAttributes, type KeyboardEvent } from 'react'
+import { useEffect, useId, useRef, useState, type HTMLAttributes, type KeyboardEvent } from 'react'
 import styles from './GlassRating.module.css'
 
 /** Tek bir 5 kollu yıldız SVG yolu (24×24 viewBox, Material yıldız geometrisi). */
@@ -20,6 +20,18 @@ function formatDecimal(n: number): string {
 /** Binlik ayraçlı adet metni ("1284" → "1.284"). */
 function formatCount(n: number): string {
   return Math.round(clamp(n, 0, Number.MAX_SAFE_INTEGER)).toLocaleString('tr-TR')
+}
+
+/**
+ * `input` varyantı için değeri normalize eder: sonlu olmayan (`NaN`/`Infinity`)
+ * değerler önce 0'a düşer, sonra en yakın tamsayıya yuvarlanıp [0,5]'e clamp
+ * edilir. `display`/`summary`'nin aksine burada yarım yıldık korunmaz — giriş
+ * yalnız 1-5 tamsayı radio'larla eşleşebilir (rules.md §12 "yarım yıldız
+ * seçtirme" yasağı).
+ */
+function normalizeInputValue(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return 0
+  return clamp(Math.round(value), 0, 5)
 }
 
 /** value'yu (0-5) en yakın yarım yıldıza yuvarlayıp her yıldız için dolum oranını (0 | 0.5 | 1) üretir. */
@@ -76,7 +88,10 @@ export interface GlassRatingInputProps extends Omit<GlassRatingBaseProps, 'aria-
   /** Uncontrolled başlangıç puanı. */
   defaultValue?: number
   onValueChange?: (value: number) => void
-  /** radiogroup aria-label kaynağı — görünür bağlam yoksa mutlaka ver. */
+  /**
+   * radiogroup aria-label kaynağı — görünür bağlam yoksa mutlaka ver.
+   * Verilmezse radiogroup isimsiz kalmasın diye varsayılan `'Puan'` kullanılır.
+   */
   label?: string
   disabled?: boolean
 }
@@ -135,8 +150,18 @@ function InputRating({
   ...rest
 }: Omit<GlassRatingInputProps, 'variant'>) {
   const baseId = useId()
-  const [inner, setInner] = useState(defaultValue ?? 0)
-  const currentValue = value ?? inner
+  // defaultValue/value NaN, ondalık veya [0,5] dışı olabilir (ör. 2.5, 6, Infinity) —
+  // normalize edilmezse hiçbir radio (1-5 tamsayı) eşleşmez ve tüm seçenekler
+  // tabIndex=-1 kalır. Yalnız `input`'ta normalize edilir; display/summary'de
+  // yarım yıldız görsel doluluğu korunur.
+  const [inner, setInner] = useState(() => normalizeInputValue(defaultValue))
+  const currentValue = value !== undefined ? normalizeInputValue(value) : inner
+
+  // Ok tuşuyla istenen odak hedefi yalnız GERÇEKTEN committed olduğunda (currentValue
+  // o değere ulaştığında) uygulanır — bkz. aşağıdaki effect. Controlled modda parent
+  // güncellemeyi reddederse currentValue hiç değişmez, pending eşleşmez, odak DOM'da
+  // hiç taşınmadığı için önceki (tabIndex=0 kalan) öğede sabit kalır.
+  const pendingFocusRef = useRef<number | null>(null)
 
   const select = (next: number) => {
     if (disabled) return
@@ -147,7 +172,18 @@ function InputRating({
   // Seçim yokken roving hedefi (odaklanabilir/DOM'da tabIndex=0 olan) her zaman
   // 1. yıldız — ok tuşu hesaplamasının referans noktası da bu olmalı, yoksa
   // "seçim yok" durumu -1 sentinel'e düşer ve ArrowLeft/ArrowUp yanlış sarar.
+  // currentValue her zaman normalize edildiğinden (yukarıda) rovingTarget de
+  // her zaman 1-5 arası bir radio'ya karşılık gelir.
   const rovingTarget = currentValue > 0 ? currentValue : 1
+
+  useEffect(() => {
+    const pending = pendingFocusRef.current
+    if (pending === null) return
+    pendingFocusRef.current = null
+    if (pending === currentValue) {
+      document.getElementById(`${baseId}-star-${pending}`)?.focus()
+    }
+  }, [currentValue, baseId])
 
   // Radiogroup deseni (GlassSegmentedControl ile birebir): roving tabindex,
   // seçim yoksa (0) ilk yıldız odak hedefi olur; ok tuşları sarar.
@@ -163,8 +199,12 @@ function InputRating({
     if (nextIndex === -1) return
     e.preventDefault()
     const next = stars[nextIndex]
+    // Odak taşımayı burada (kullanıcı etkileşimi anında) TALEP ediyoruz; gerçek
+    // .focus() çağrısı yalnız currentValue bu hedefe ulaştığında (yukarıdaki
+    // effect) yapılır — böylece controlled reddinde odak asla tabIndex=-1
+    // öğeye taşınmaz.
+    pendingFocusRef.current = next
     select(next)
-    document.getElementById(`${baseId}-star-${next}`)?.focus()
   }
 
   return (
@@ -172,7 +212,7 @@ function InputRating({
       {...rest}
       className={[styles.root, styles.input, disabled ? styles.disabled : '', className].filter(Boolean).join(' ')}
     >
-      <div role="radiogroup" aria-label={label} className={styles.stars} onKeyDown={onKeyDown}>
+      <div role="radiogroup" aria-label={label ?? 'Puan'} className={styles.stars} onKeyDown={onKeyDown}>
         {[1, 2, 3, 4, 5].map((star) => {
           const selected = star === currentValue
           return (
