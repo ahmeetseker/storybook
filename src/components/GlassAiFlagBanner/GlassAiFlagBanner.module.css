@@ -1,0 +1,298 @@
+/* Akış içi tam genişlik banner — FLAT içerik yüzeyi (Dalga 1 §15). Zemin
+   severity'ye göre color-mix(semantik %9, --lg-surface) — GlassAlert'in
+   transparent karışımından bilinçli farkı: burada zemin her zaman
+   --lg-surface üstüne biner (spec: "%8-10, surface"). Metin rengi HER ZAMAN
+   --lg-label/--lg-label-secondary'den gelir; semantik renk yalnız ikon +
+   zemin karışımını sürer (kontrast dersi). */
+.banner {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--lg-space-4);
+  border: 1px solid color-mix(in srgb, var(--flag-color, var(--lg-warning)) 28%, var(--lg-hairline));
+  border-radius: var(--lg-radius-media);
+  background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 9%, var(--lg-surface));
+  color: var(--lg-label);
+}
+
+/* Severity → semantik token eşlemesi (sabit 3 durum, runtime injection gerekmez). */
+.banner[data-severity='info'] { --flag-color: var(--lg-accent); }
+.banner[data-severity='warning'] { --flag-color: var(--lg-warning); }
+.banner[data-severity='danger'] { --flag-color: var(--lg-danger); }
+
+.icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--lg-control-sm);
+  height: var(--lg-control-sm);
+  margin-top: -2px;
+  border-radius: var(--lg-radius-capsule);
+  color: var(--flag-color, var(--lg-warning));
+  background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 16%, var(--lg-surface));
+}
+
+.content {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.headRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.title {
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--lg-label);
+}
+
+.description {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding-left: var(--lg-space-5);
+  list-style: disc;
+}
+
+.reasonItem {
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-4);
+  margin-top: 2px;
+}
+
+/* "Ayrıntılar" metin aksiyonu — GlassButton değil, düz metin linki (spec).
+   Renk her zaman --lg-label'dan gelir (kontrast dersi, rules.md §12
+   "❌ Metin rengini --flag-color'a bağlama") — semantik renk yalnız
+   ikon/zemin/kenarlığı sürer, metne asla sızmaz. */
+.detailsAction {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  min-height: 24px;
+}
+.detailsAction:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  border-radius: var(--lg-radius-chip);
+}
+@media (hover: hover) {
+  .detailsAction:hover {
+    color: var(--lg-label-secondary);
+  }
+}
+@media (pointer: coarse) {
+  .detailsAction {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
+   AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
+   radius capsule, 10.5px/700. Severity'den bağımsız — daima accent. ── */
+.aiMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+}
+.aiBadge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 3px var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.confidence {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── AI-first geri bildirim ── */
+.feedback {
+  display: flex;
+  gap: var(--lg-space-2);
+}
+.feedbackButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lg-control-sm);
+  min-height: var(--lg-control-sm);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    color 0.15s ease-out;
+}
+.feedbackButton[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: var(--lg-label);
+}
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .feedbackButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
+  }
+}
+@media (pointer: coarse) {
+  .feedbackButton {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+.thumbIcon[data-direction='down'] {
+  transform: scaleY(-1);
+}
+
+/* ── Kapatma butonu — spec: 44px coarse hedef (sabit zorunlu, opsiyonel
+   default büyütme değil). ── */
+.dismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -2px -2px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lg-label-secondary);
+  border-radius: var(--lg-radius-capsule);
+  cursor: pointer;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+}
+@media (hover: hover) {
+  .dismiss:hover {
+    background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 18%, transparent);
+    color: var(--lg-label);
+  }
+}
+.dismiss:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  .dismiss {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ── AI-first yükleme: parıltısız soluk placeholder, yalnız opacity nabzı ── */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+.placeholderBar {
+  display: block;
+  width: 55%;
+  height: 11px;
+  border-radius: var(--lg-radius-chip);
+  background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 22%, var(--lg-hairline));
+}
+.placeholderBarWide {
+  width: 85%;
+}
+.banner[aria-busy='true'] .placeholderBar {
+  animation: lg-flag-pulse 1.6s ease-in-out infinite;
+}
+@keyframes lg-flag-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner[aria-busy='true'] .placeholderBar {
+    animation: none;
+  }
+  .dismiss,
+  .feedbackButton,
+  .detailsAction {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    flex-wrap: wrap;
+    padding: var(--lg-space-3);
+  }
+  .dismiss {
+    order: -1;
+    margin-left: auto;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
