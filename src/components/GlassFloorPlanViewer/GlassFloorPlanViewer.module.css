@@ -1,0 +1,174 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  padding: 16px;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  appearance: none;
+  margin: 0;
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  border-radius: var(--lg-radius-chip, 10px);
+  background: transparent;
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  min-height: var(--lg-control-sm, 32px);
+  padding: 0 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out, border-color 0.16s ease-out;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .tab:hover:not(.tabActive) {
+    background-color: color-mix(in srgb, var(--lg-label, #24211b) 8%, transparent);
+  }
+}
+.tabActive {
+  background: var(--lg-accent, #b45309);
+  border-color: transparent;
+  color: var(--lg-accent-contrast, #ffffff);
+}
+/* Dokunmatikte minimum 44px hedef (görev gereksinimi) */
+@media (pointer: coarse) {
+  .tab {
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.viewport {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--lg-radius-media, 14px);
+  overflow: hidden;
+  background: var(--lg-hairline, rgba(0, 0, 0, 0.06));
+  touch-action: none;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+.viewport[data-dragging] {
+  cursor: grabbing;
+}
+
+.imageWrap {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+.dragging {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .imageWrap {
+    transition: none;
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hotspot {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  appearance: none;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--lg-on-scrim, #ffffff);
+  background: var(--lg-accent, #b45309);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 2;
+}
+.hotspot:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .hotspot:hover {
+    filter: brightness(1.1);
+  }
+}
+/* Dokunmatikte minimum 44px hedef; scale 1x'in altına inmediğinden bu daima geçerli kalır */
+@media (pointer: coarse) {
+  .hotspot {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 20px));
+  background: var(--lg-scrim, rgba(10, 12, 16, 0.85));
+  color: var(--lg-on-scrim, #ffffff);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: var(--lg-radius-chip, 10px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.zoomGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+}
+
+.zoomLevel {
+  min-width: 3.4em;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.65;
+}
