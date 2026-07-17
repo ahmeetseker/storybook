@@ -1,0 +1,194 @@
+/* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları (bkz. rules.md §5). */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4, 16px);
+  box-sizing: border-box;
+  padding: var(--lg-space-5, 20px);
+  background: var(--lg-surface, #ffffff);
+  border: 1px solid var(--lg-hairline, rgba(36, 33, 27, 0.09));
+  border-radius: var(--lg-radius-card, 20px);
+  color: var(--lg-label, #24211b);
+}
+
+.compact {
+  gap: var(--lg-space-2, 8px);
+  padding: var(--lg-space-4, 16px);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3, 12px);
+}
+
+.compact .header {
+  align-items: center;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1, 4px);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  flex-wrap: wrap;
+}
+
+.author {
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 600;
+  color: var(--lg-label, #24211b);
+  overflow-wrap: anywhere;
+}
+
+/* compact: tek satır özet dışına taşmasın diye isim kısaltılır (tooltip yerine title) */
+.compact .author {
+  flex: 0 1 auto;
+  max-width: 40%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--lg-text-body, 15px);
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  flex-wrap: wrap;
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.compactLine {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  flex-wrap: wrap;
+  min-width: 0;
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.date {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  flex: none;
+}
+
+.star {
+  display: block;
+  flex: none;
+}
+
+.starFillStop {
+  stop-color: var(--lg-accent, #b45309);
+}
+
+.starTrackStop {
+  stop-color: color-mix(in srgb, var(--lg-label-secondary, #79726a) 32%, transparent);
+}
+
+.verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--lg-space-2, 8px);
+  border-radius: var(--lg-radius-chip, 10px);
+  background: color-mix(in srgb, var(--lg-success, #34c759) 14%, transparent);
+  color: var(--lg-label, #24211b);
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.verifiedIcon {
+  flex: none;
+  color: var(--lg-success, #34c759);
+}
+
+.text {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  line-height: 1.55;
+  color: var(--lg-label, #24211b);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.compact .text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.actions {
+  display: flex;
+}
+
+.helpfulButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  min-height: var(--lg-control-md, 40px);
+  padding: 0 var(--lg-space-4, 16px);
+  margin: 0;
+  border: 1px solid var(--lg-hairline, rgba(36, 33, 27, 0.09));
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-surface, #ffffff);
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.helpfulButton:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .helpfulButton:hover {
+    background: color-mix(in srgb, var(--lg-label, #24211b) 6%, transparent);
+    border-color: color-mix(in srgb, var(--lg-label, #24211b) 16%, transparent);
+  }
+}
+
+.helpfulStatic {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lg-control-md, 40px);
+  padding: 0 var(--lg-space-4, 16px);
+  color: var(--lg-label-secondary, #79726a);
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.thumbIcon {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .helpfulButton {
+    transition: none;
+  }
+}
