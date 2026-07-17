@@ -34,6 +34,40 @@ export {
   type GlassBentoCellProps,
 } from './components/GlassBento'
 export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
+export { GlassCompareBar } from './components/GlassCompareBar'
+export type { GlassCompareBarProps, GlassCompareBarItem } from './components/GlassCompareBar'
+export { GlassTaxHistoryTable, type GlassTaxHistoryTableProps, type GlassTaxHistoryTableRow } from './components/GlassTaxHistoryTable'
+export { GlassTimeline } from './components/GlassTimeline'
+export type { GlassTimelineProps, GlassTimelineEvent, GlassTimelineTone } from './components/GlassTimeline'
+export { GlassInfiniteList, type GlassInfiniteListProps } from './components/GlassInfiniteList'
+export { GlassCommandPalette } from './components/GlassCommandPalette'
+export type { GlassCommandPaletteProps, GlassCommandPaletteCommand } from './components/GlassCommandPalette'
+export { GlassInsightNote } from './components/GlassInsightNote'
+export type { GlassInsightNoteProps } from './components/GlassInsightNote'
+export { GlassPersonalNote } from './components/GlassPersonalNote'
+export type { GlassPersonalNoteProps } from './components/GlassPersonalNote'
+export { GlassValuationDrivers } from './components/GlassValuationDrivers'
+export type { GlassValuationDriversProps, GlassValuationDriver } from './components/GlassValuationDrivers'
+export { GlassMatchBreakdown } from './components/GlassMatchBreakdown'
+export type {
+  GlassMatchBreakdownProps,
+  GlassMatchBreakdownGroup,
+  GlassMatchBreakdownDetail,
+  GlassMatchBreakdownTone,
+} from './components/GlassMatchBreakdown'
+export { GlassTourPlanner } from './components/GlassTourPlanner'
+export type { GlassTourPlannerProps, GlassTourPlannerStop } from './components/GlassTourPlanner'
+export { GlassPhotoFeatureOverlay } from './components/GlassPhotoFeatureOverlay'
+export type { GlassPhotoFeatureOverlayProps, GlassPhotoFeatureOverlayFeature } from './components/GlassPhotoFeatureOverlay'
+export { GlassVoiceBar, type GlassVoiceBarProps, type GlassVoiceBarState } from './components/GlassVoiceBar'
+export { GlassRoomClassifierTabs } from './components/GlassRoomClassifierTabs'
+export type { GlassRoomClassifierTabsProps, GlassRoomClassifierRoom } from './components/GlassRoomClassifierTabs'
+export { GlassAiFlagBanner } from './components/GlassAiFlagBanner'
+export type {
+  GlassAiFlagBannerProps,
+  GlassAiFlagBannerSeverity,
+  GlassAiFlagBannerFeedbackValue,
+} from './components/GlassAiFlagBanner'
 export { GlassAiSearchBar, type GlassAiSearchBarProps, type GlassAiSearchBarFilter } from './components/GlassAiSearchBar'
 export { GlassValuationCard } from './components/GlassValuationCard'
 export type { GlassValuationCardProps, GlassValuationFeedback } from './components/GlassValuationCard'
