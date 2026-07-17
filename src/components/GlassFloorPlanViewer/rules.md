@@ -99,13 +99,25 @@ interaction (hover/focus CSS state'i, hiçbiri prop değil).
 ## 7. Davranış
 
 - Pointer: görüntü alanında `pointerdown` (hotspot pin'i hariç — `closest('button')`
-  ile hariç tutulur) sürüklemeyi başlatır, `setPointerCapture` ile takip
-  edilir (jsdom'da yok, optional chaining bilinçli); `pointerup`/`pointercancel`
-  bırakır. Transform sırası `translate() scale()` — `translate` outer
-  olduğundan px teslimi zoom seviyesinden bağımsız 1:1'dir.
+  ile hariç tutulur) sürüklemeyi başlatır ve o pointer'ın `pointerId`'sini
+  `dragState` ref'inde tutar; `setPointerCapture` ile takip edilir (jsdom'da
+  yok, optional chaining bilinçli). Sürükleme aktifken ikinci bir pointer'ın
+  `pointerdown`'ı yoksayılır (tek pointer takibi); `pointermove`/`pointerup`/
+  `pointercancel` yalnız `dragState`'teki pointerId ile eşleşen event'lerde
+  işlenir. `lostpointercapture` (tarayıcı capture'ı bizden bağımsız geri
+  alırsa — sistem jesti, sekme değişimi vb.) aynı pointerId kontrolüyle
+  drag state'i temizler. Kat/plan değişiminde (`currentIndex` effect'i)
+  `dragState` ve `dragging` sıfırlanır — sürükleme ortasında kat
+  değiştirilirse state yeni katta sızmaz. Transform sırası
+  `translate() scale()` — `translate` outer olduğundan px teslimi zoom
+  seviyesinden bağımsız 1:1'dir.
 - Zoom: `+`/`-` butonları `0.5` adımla `1`–`4` aralığında kıskaçlanır;
-  `Ctrl` + wheel aynı adımı uygular (`preventDefault` yalnız `ctrlKey`
-  true iken — düz wheel sayfa kaydırmasına karışmaz).
+  `Ctrl` + wheel aynı adımı uygular. Wheel, React'ın sentetik (passive)
+  `onWheel`'i ile DEĞİL, `viewportRef` üzerine native
+  `addEventListener('wheel', h, { passive: false })` ile bağlanır (effect +
+  cleanup) — aksi halde `preventDefault` etkisiz kalır ve `Ctrl`+wheel
+  tarayıcının kendi sayfa zoom'unu da tetikler. `preventDefault` yalnız
+  `ctrlKey` true iken çağrılır — düz wheel sayfa kaydırmasına karışmaz.
 - Keyboard (kat sekmeleri, WAI-ARIA tabs deseni): ArrowRight/Down,
   ArrowLeft/Up sarmalı gezinir, Home/End uçlara gider; seçim focus'u izler.
 - Hotspot: tıklama balonu açar/kapar (toggle); aynı anda yalnız bir balon
@@ -123,6 +135,14 @@ interaction (hover/focus CSS state'i, hiçbiri prop değil).
   ayrı `alt` prop'u yok.
 - Boş `hotspots`: pin/balon hiç render edilmez, sahne yalnız pan/zoom'lu
   görsel olur.
+- **Kaynak oranı:** `.image` `object-fit: contain` kullanır (kat planı bir
+  çizimdir — `cover` kırpardı). Hotspot `x`/`y` oranları görselin kendisine
+  değil, `.imageWrap` kutusuna (sahnenin tamamı, `aspect-ratio: 4/3`) göre
+  hesaplanır. Kaynak görsel de `4:3` ise `imageWrap` == görüntülenen içerik
+  kutusu olur ve pin'ler tam isabetli konumlanır. Kaynak `4:3` değilse
+  `contain` letterbox (boşluk) bırakır ve pin koordinatları görüntülenen
+  içeriğe göre kayar — bu yüzden `src` görselini olabildiğince `4:3`
+  oranında sağlamak gerekir.
 
 ## 9. Token eşlemesi
 
@@ -166,6 +186,9 @@ N/A (eksen yok). Temalar dedike story değil, global toolbar'la kapsanır
 - [x] kat değişince zoom otomatik sıfırlanır (interaction)
 - [x] Ctrl+wheel yakınlaştırır, düz wheel etkisizdir (interaction)
 - [x] pointer sürükleme `translate` değerini değiştirir (interaction)
+- [x] farklı `pointerId`'li ikinci pointer'ın move/up'ı aktif sürüklemeyi etkilemez (interaction)
+- [x] `lostpointercapture` ve kat değişimi sürükleme state'ini temizler (interaction)
+- [x] kaynak görsel kırpılmasın diye `.image` `object-fit: contain` kullanır (statik/CSS)
 - [ ] klavye (ok tuşu/Home/End) sekme gezinmesi (interaction — henüz otomatik test yok, davranış GlassTabs ile birebir aynı desende)
 
 ## 12. Do / Don't
@@ -182,10 +205,19 @@ N/A (eksen yok). Temalar dedike story değil, global toolbar'la kapsanır
 **Bilinen kısıtlar:** pan sınırsız (görsel kadraj dışına taşınabilir, sınır
 klempi yok) · hotspot pin'i zoom ile birlikte büyür/küçülür (karşı-ölçekleme
 yok — 1x altına inilmediği için dokunma hedefi her zaman güvenli) · tek
-balon aynı anda açık kalır · klavye ile pan/zoom yok (yalnız buton/wheel).
+balon aynı anda açık kalır · klavye ile pan/zoom yok (yalnız buton/wheel) ·
+kaynak görsel `4:3` değilse `object-fit: contain` letterbox bırakır ve
+hotspot pin'leri (yüzde bazlı, `.imageWrap`'e göre) görüntülenen içerik
+kutusuna göre kayar — bkz. §8 Kaynak oranı.
 
 **Açık kararlar:** pan'e yumuşak sınır (image ölçüsüne göre) eklenmeli mi ·
 hotspot pin'i için karşı-ölçekleme (`scale(1/scale)`) gerekli mi ·
 `onZoomChange`/`onPanChange` gibi dışa event ihtiyacı.
 
-**Changelog:** 2026-07-17 ilk sözleşme.
+**Changelog:** 2026-07-17 ilk sözleşme. 2026-07-17 code review fix'leri:
+pointer drag artık `pointerId` ile takip edilir (`lostpointercapture` +
+kat değişimi cleanup'ı eklendi — drag state sızması giderildi); wheel
+zoom native `addEventListener({ passive: false })` ile bağlanıyor (React
+sentetik wheel'in etkisiz `preventDefault`'ı ve Ctrl+wheel sayfa zoom
+çakışması giderildi); `.image` `object-fit: cover` → `contain` (kat planı
+kırpılmasın, kaynak oranı notu eklendi).

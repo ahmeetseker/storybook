@@ -98,7 +98,7 @@ N/A — flat içerik kartı, tek görsel stil).
 | price | iç `useState` (seed: `defaultPrice`) | — | input value |
 | downPaymentPercent | iç `useState` | — | slider value + `aria-valuetext` |
 | termYears | iç `useState` | — | slider value + `aria-valuetext` |
-| monthlyRatePercent / rateText | iç `useState` (ikili: ham metin + sayı) | — | input value |
+| monthlyRatePercent / rateText | iç `useState` (ikili: sanitize edilmiş metin + sayı, `onChange`'de birlikte türetilir, `onBlur`'da `[0.01,10]` kıskaçla birlikte güncellenir) | — | input value |
 | result | `useMemo([price, downPaymentPercent, termYears, monthlyRatePercent])` | — | — |
 
 Katman sırası: girdi state'leri → `calculateLoan` (saf fonksiyon, yan etkisiz)
@@ -112,9 +112,16 @@ Katman sırası: girdi state'leri → `calculateLoan` (saf fonksiyon, yan etkisi
   (`parseDigits`), görünen değer tr-TR binlik ayraçlı yeniden biçimlenir
   (`toLocaleString('tr-TR')`) — **borç:** hızlı yazımda imleç konumu her
   tuşta başa/sona kayabilir (bkz. §12 Bilinen kısıtlar).
-- Faiz girişi: ham metin (`rateText`) virgülü korur; sayısal state'e
-  çevrilirken virgül noktaya çevrilir. Boş/geçersiz girişte oran `0` kabul
-  edilir (hata fırlatmaz).
+- Faiz girişi: her karakterde `sanitizeRateText` ile yalnız rakam + TEK
+  ondalık ayraç (virgül/nokta, virgüle normalize edilir) kalır — eksi işareti,
+  `e` gibi başka karakterler girilemez (anında elenir). Ekranda görünen metin
+  (`rateText`) ve hesaplama için kullanılan sayı (`monthlyRatePercent`) HER
+  ZAMAN aynı sanitize edilmiş metinden türer; aralarında sapma olamaz (örn.
+  "-2" yazılınca "2" görünür ve `2` hesaplanır — önceki hatalı davranışta
+  "-2" görünüp `+2` hesaplanıyordu). Alan odağını kaybedince (`onBlur`)
+  değer `[0.01, 10]` aralığına kıskaçlanır; `0` (kampanyalı sıfır faiz) ve
+  boş giriş kıskaç dışında bırakılır — bkz. `calculateLoan` r=0 dalı. Boş
+  girişte oran `0` kabul edilir (hata fırlatmaz).
 - Controlled/uncontrolled: tamamen uncontrolled — `value`/`onXChange` API'si
   yok, yalnız `defaultX` seed + `onChange` bildirim.
 - Async: yok.
@@ -172,6 +179,13 @@ Eksik: forced-focus görsel story (Chrome görsel QA borcu, genel proje notu).
 - [x] CTA tıklaması `onCtaClick` tetikler
 - [x] anapara/faiz çubuğu `role="img"` + metinsel özet taşır
 - [x] fiyat girişi tr-TR biçimlendirir ve kredi tutarını günceller
+- [x] faiz girişine eksi işareti yazılırsa elenir, görünen ve hesaplanan
+      değer birebir tutarlıdır
+- [x] faiz girişine "e" (bilimsel gösterim) yazılırsa elenir, görünen ve
+      hesaplanan sayı eşleşir
+- [x] faiz girişinde birden fazla ayraç tek ayraca indirgenir
+- [x] faiz girişi blur olunca `[0.01, 10]` aralığına kıskaçlanır (üst/alt
+      sınır), metin ve sayı birlikte güncellenir
 - [ ] görsel: dar container'da (320px) taşma yok (Chrome görsel QA)
 
 ## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
@@ -198,3 +212,9 @@ rakamlarda `paymentValue` görsel taşma testi · vade üst sınırının 15 yı
 
 **Changelog:** 2026-07-17 — İlk sürüm: anüite formülü, full/compact variant,
 tr-TR sayı biçimi, anapara/faiz oranı çubuğu.
+
+**Changelog:** 2026-07-17 — Code review fix: faiz girişinde görünen metin ile
+hesaplanan sayının sapabildiği hata giderildi (`-2` yazılınca `+2`, `1e2`
+yazılınca `12` hesaplanıyordu). Giriş artık `sanitizeRateText` ile yalnız
+rakam + tek ayraca indirgeniyor (eksi işareti/`e` girilemiyor), `onBlur`'da
+`[0.01, 10]` aralığına kıskaçlanıyor (0 kampanyalı sıfır faiz için istisna).

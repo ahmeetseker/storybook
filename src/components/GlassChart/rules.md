@@ -89,6 +89,8 @@ flat içerik kartı, tek görsel stil, kontrol değil).
 | `points.length===1` | Tek nokta ortalanır (`x` orta), aria özeti `"...: {değer}"` (`'den...'ye` yok) |
 | `points.length===0` | Grafik/tablo render edilmez, `<p>Veri yok</p>` |
 | `points.length<3` | X ekseni orta etiketi gösterilmez (yalnız ilk/son, çakışma önlenir) |
+| `type='bar'` taban | Y ekseni tabanı negatif değer yoksa `0`'a sabitlenir (yalnız veri aralığına — `yMin`e — değil); negatif değer varsa gerçek `yMin` kullanılır. Bu sayede eşit/az değişken serilerde sütunlar `yMin`e eşitlenip sıfır yükseklikte kaybolmaz. |
+| Dejenere aralık (`yMax===yMin`, tüm değerler eşit) | Yapay ±%5 (min ±1 birim) dikey aralık uygulanır: `line`/`area` çizgisi plot alanının ortasında durur, `bar` (taban 0 değilse, ör. tüm değerler 0) tabana yapışmaz. |
 
 ## 6. State modeli
 
@@ -99,6 +101,14 @@ flat içerik kartı, tek görsel stil, kontrol değil).
 Katman sırası: `points` (girdi) → geometri hesapları (saf fonksiyonlar,
 `xScale`/`yScale`) → statik render; `hoverIndex` yalnız kılavuz/balonun
 görünürlüğünü kontrol eder, veri/geometri hesaplarını etkilemez.
+
+**Stale index güvenliği:** hover açıkken (`hoverIndex` non-null) `points`
+prop'u dışarıdan kısaltılırsa eski index sınır dışına düşebilir. İki katmanlı
+korunur: (1) render'da türetilen `clampedHoverIndex = Math.min(hoverIndex,
+lastIndex)` — ilk boyamada bile `points[hoverIndex]` sınır dışı erişimini
+engeller; (2) `useEffect([hasData, lastIndex])` — state'in kendisini de
+`lastIndex`e (veya veri kalmadıysa `null`'a) düzeltir, sonraki render'lara
+stale değer taşınmaz.
 
 ## 7. Davranış
 
@@ -180,6 +190,12 @@ global'leriyle dolaylı kapsanır, component kendi tema prop'u almaz), States
 - [x] `pointerdown` (tap) aynı işi yapar
 - [x] `valueSuffix` özelleştirilebilir
 - [x] boş `points` dizisinde "Veri yok" gösterir
+- [x] hover açıkken `points` kısalırsa sınır dışı index TypeError atmadan
+      clamp edilir (regresyon: rerender ile daraltma)
+- [x] `type='bar'` tek değerli (eşit) seride sütunlar sıfır yükseklikte
+      kaybolmaz (taban 0'a sabit)
+- [x] `type='line'` tek değerli (eşit) seride çizgi dejenere olmadan plot
+      alanının ortasında durur
 - [ ] görsel: `preserveAspectRatio="none"` ölçeklemesinde son nokta
       dairesinin eliptikleşme derecesi (Chrome görsel QA)
 
@@ -210,3 +226,10 @@ olay güvenilir tetiklenmeyebilir — dış tıklamayla kapanma ihtiyacı olabil
 
 **Changelog:** 2026-07-17 — İlk sürüm: `line`/`area`/`bar`, son nokta
 vurgusu, pointer/tap kılavuz + balon, `role="img"` + sr-only veri tablosu.
+
+2026-07-17 — Code review fix'leri: (1) hover açıkken `points` kısaldığında
+oluşabilecek sınır dışı `hoverIndex` erişimi giderildi (render'da clamp +
+`useEffect` ile state düzeltme); (2) `type='bar'` tabanı negatif değer
+yoksa `0`'a sabitlendi (eşit değerli serilerde sütunların sıfır yükseklikte
+kaybolması giderildi) ve `line`/`area` için dejenere (`yMax===yMin`) aralıkta
+yapay ±%5 (min ±1) dikey boşluk eklendi.

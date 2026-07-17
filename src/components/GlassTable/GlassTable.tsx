@@ -24,11 +24,21 @@ export type GlassTableRow = { id: string } & Record<string, ReactNode>
 export interface GlassTableProps extends Omit<HTMLAttributes<HTMLTableElement>, 'onChange'> {
   columns: GlassTableColumn[]
   rows: GlassTableRow[]
-  /** Kontrollü aktif sıralama sütunu — verilirse component'i kontrol eder */
+  /**
+   * Kontrollü aktif sıralama sütunu — verilirse (key + direction) mantıksal
+   * çifti birlikte kontrollü sayılır: `sortDirection` de artık prop'tan okunur
+   * (verilmemişse 'asc' varsayılır), iç state'ten değil. `sortKey`/`sortDirection`
+   * birbirinden BAĞIMSIZ kontrol edilemez — controlled tespiti yalnız `sortKey`
+   * üzerinden yapılır (bkz. rules.md §6).
+   */
   sortKey?: string
   /** Kontrolsüz kullanımda başlangıç sıralama sütunu */
   defaultSortKey?: string
-  /** Kontrollü sıralama yönü */
+  /**
+   * Sıralama yönü — yalnız `sortKey` de verilmişse (yani çift kontrollüyken)
+   * etkilidir; `sortKey` verilmeden tek başına `sortDirection` vermek
+   * kontrolsüz modda YOK sayılır (bkz. rules.md §6).
+   */
   sortDirection?: GlassTableSortDirection
   /** Kontrolsüz kullanımda başlangıç yönü (default 'asc') */
   defaultSortDirection?: GlassTableSortDirection
@@ -98,16 +108,23 @@ export function GlassTable({
   const [innerSortDirection, setInnerSortDirection] = useState<GlassTableSortDirection>(defaultSortDirection)
   const [innerSelectedIds, setInnerSelectedIds] = useState<string[]>(defaultSelectedIds ?? [])
 
-  const effectiveSortKey = sortKey ?? innerSortKey
-  const effectiveSortDirection = sortDirection ?? innerSortDirection
+  // (sortKey, sortDirection) tek mantıksal state olarak ele alınır: controlled
+  // tespiti YALNIZ sortKey üzerinden yapılır — sortKey verilmişse direction da
+  // controlled sayılır (sortDirection prop'u eksikse 'asc' varsayılır), tek
+  // başına sortDirection vermek kontrolsüz modda etkisizdir.
+  const isSortControlled = sortKey !== undefined
+  const effectiveSortKey = isSortControlled ? sortKey : innerSortKey
+  const effectiveSortDirection = isSortControlled ? (sortDirection ?? 'asc') : innerSortDirection
   const effectiveSelectedIds = selectedIds ?? innerSelectedIds
 
   const handleSortClick = (colKey: string) => {
     // Aynı sütuna tekrar tıklama yönü tersine çevirir; farklı sütun her zaman 'asc' ile başlar
     const isSameColumn = effectiveSortKey === colKey
     const nextDirection: GlassTableSortDirection = isSameColumn && effectiveSortDirection === 'asc' ? 'desc' : 'asc'
-    if (sortKey === undefined) setInnerSortKey(colKey)
-    if (sortDirection === undefined) setInnerSortDirection(nextDirection)
+    if (!isSortControlled) {
+      setInnerSortKey(colKey)
+      setInnerSortDirection(nextDirection)
+    }
     onSortChange?.(colKey, nextDirection)
   }
 

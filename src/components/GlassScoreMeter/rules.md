@@ -88,6 +88,7 @@ Varsayılan kombinasyon: `variant=ring`, otomatik ton (value'dan).
 |---|---|
 | `description` + `variant="badge"` | Render edilmez, `aria-describedby` verilmez (sessizce yok sayılır, hata fırlatılmaz) |
 | `value` aralık dışı | [0, 100]'e clamp + `Math.round` — hata fırlatılmaz |
+| `value` `NaN`/`Infinity`/`-Infinity` | `Number.isFinite` değilse önce 0'a düşürülür, sonra [0, 100]'e clamp edilir — `aria-valuenow`/görsel sayı asla `NaN` olmaz |
 | `tone` verilmişse | Otomatik eşik hesaplanmaz, direkt kullanılır |
 
 ## 6. State modeli
@@ -154,6 +155,7 @@ otomatik doğrulanır (GlassProgress ile aynı karar).
 
 - [x] meter rolü + valuemin/valuemax/valuenow + `aria-labelledby` ile ad
 - [x] value clamp ([0,100], yuvarlama)
+- [x] value `NaN`/`Infinity` verilince 0'a düşer, `aria-valuenow`/görsel sayı `NaN` olmaz
 - [x] description varsa `aria-describedby` ile bağlanır (ring/bar)
 - [x] badge'de description ne görsel ne `aria-describedby`'de var
 - [x] otomatik ton eşiği (≥70/40-69/<40) `data-tone`'a yansır
@@ -186,3 +188,6 @@ bu component `material`/tema `tone` eksenini hiç kullanmadığından pratikte
 
 - 2026-07-17: İlk sürüm — ring/bar/badge varyantları, otomatik/override renk
   eşiği, `role="meter"` sözleşmesi, 4'lü grid kompozisyon story'si.
+- 2026-07-17: fix — `value` `NaN`/`Infinity` gelirse clamp öncesi 0'a
+  düşürülüyor (Codex review bulgusu: `aria-valuenow`/görsel sayı `NaN`
+  sızdırıyordu).

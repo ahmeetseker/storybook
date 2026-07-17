@@ -54,7 +54,10 @@ export function GlassScoreMeter({
 
   // Görünen ve aria-valuenow olarak raporlanan değer aynı tamsayı olmalı —
   // görsel sayı ile duyurulan değer arasında tutarsızlık olmasın.
-  const clamped = Math.round(Math.min(Math.max(value, 0), 100))
+  // value NaN/Infinity gelirse (örn. dışarıda 0'a bölme) 0'a düşürülür —
+  // aksi halde aria-valuenow ve görsel sayı "NaN" olarak sızardı.
+  const safeValue = Number.isFinite(value) ? value : 0
+  const clamped = Math.round(Math.min(Math.max(safeValue, 0), 100))
   const resolvedTone = resolveTone(clamped, tone)
   const showDescription = Boolean(description) && variant !== 'badge'
 

@@ -167,7 +167,8 @@
   gap: 8px;
   min-height: 28px;
 }
-.checklistItem[data-present='false'] {
+.checklistItem[data-present='false'],
+.checklistItem[data-present='unknown'] {
   opacity: 0.45;
 }
 .checklistIcon {
@@ -186,6 +187,17 @@
 .checklistItem[data-present='false'] .checklistIcon {
   color: var(--lg-label-secondary);
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+}
+/* value ve present ikisi de yokken: eksik veri "mevcut" gibi sunulmaz — ikon yok, soluk çizgi */
+.checklistIconNeutral {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--lg-label-secondary);
+  font-weight: 800;
+  line-height: 1;
 }
 .checklistLabel {
   min-width: 0;

@@ -5,7 +5,7 @@
 // Giriş animasyonu yoktur (reduced-motion sorgusuna gerek kalmadan varsayılan uyum) —
 // veri anında render edilir; yalnız pointer/tap ile beliren dikey kılavuz + değer
 // balonu vardır, o da anlık görünür/gizlenir (transition yok).
-import { useId, useRef, useState, type HTMLAttributes, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type HTMLAttributes, type PointerEvent as ReactPointerEvent } from 'react'
 import styles from './GlassChart.module.css'
 
 export interface GlassChartPoint {
@@ -75,14 +75,40 @@ export function GlassChart({
   const midIndex = points.length >= 3 ? Math.round((points.length - 1) / 2) : -1
   const showMid = midIndex > 0 && midIndex < lastIndex
 
+  // points kısalırken (rerender) eski hoverIndex sınır dışı kalabilir — state'i de
+  // düzelt ki bir sonraki render'a stale/geçersiz index taşınmasın.
+  useEffect(() => {
+    setHoverIndex((prev) => {
+      if (prev === null) return prev
+      if (!hasData) return null
+      return prev > lastIndex ? lastIndex : prev
+    })
+  }, [hasData, lastIndex])
+
+  // Render anında ek güvenlik: efekt henüz çalışmadan önceki ilk boyamada bile
+  // points[hoverIndex] sınır dışına taşmasın diye clamp edilmiş index kullanılır.
+  const clampedHoverIndex = hasData && hoverIndex !== null ? Math.min(hoverIndex, lastIndex) : null
+
   const plotTop = PAD_Y
   const plotBottom = Math.max(plotTop + 40, height - PAD_Y)
   const plotHeight = plotBottom - plotTop
 
   const values = hasData ? points.map((p) => p.y) : [0]
-  const yMax = Math.max(...values)
-  const yMin = Math.min(...values)
-  const yRange = yMax === yMin ? Math.max(Math.abs(yMax), 1) * 0.2 : yMax - yMin
+  const dataMax = Math.max(...values)
+  const dataMin = Math.min(...values)
+  const hasNegative = dataMin < 0
+  // 'bar' türünde taban her zaman 0 (negatif değer yoksa) — aksi halde eşit/az değişken
+  // serilerde tüm sütunlar yMin'e (kendi değerine) eşitlenip sıfır yükseklikte kayboluyordu.
+  const yMax = dataMax
+  let yMin = type === 'bar' ? (hasNegative ? dataMin : 0) : dataMin
+  let yRange = yMax - yMin
+  if (yRange === 0) {
+    // Dejenere durum (tüm değerler eşit): yapay ±%5 (min 1 birim) aralık uygula ki
+    // line/area ortada dursun, bar da tabana yapışıp kaybolmasın.
+    const pad = Math.max(Math.abs(yMax), 1) * 0.05
+    yMin -= pad
+    yRange = pad * 2
+  }
 
   const xScale = (i: number) => (points.length > 1 ? (i / (points.length - 1)) * VIEW_WIDTH : VIEW_WIDTH / 2)
   const yScale = (v: number) => plotTop + (1 - (v - yMin) / yRange) * plotHeight
@@ -123,7 +149,7 @@ export function GlassChart({
     : ''
   const barWidth = hasData ? Math.max(6, (VIEW_WIDTH / points.length) * 0.5) : 0
 
-  const hoveredPoint = hoverIndex !== null ? points[hoverIndex] : null
+  const hoveredPoint = clampedHoverIndex !== null ? points[clampedHoverIndex] : null
   const lastPoint = hasData ? points[lastIndex] : null
 
   const classes = [styles.root, className].filter(Boolean).join(' ')
@@ -217,12 +243,12 @@ export function GlassChart({
                 />
               ) : null}
 
-              {hoverIndex !== null ? (
+              {clampedHoverIndex !== null ? (
                 <g aria-hidden="true">
                   <line
                     data-part="guide"
-                    x1={xScale(hoverIndex)}
-                    x2={xScale(hoverIndex)}
+                    x1={xScale(clampedHoverIndex)}
+                    x2={xScale(clampedHoverIndex)}
                     y1={plotTop}
                     y2={plotBottom}
                     stroke={tint}
@@ -231,8 +257,8 @@ export function GlassChart({
                   />
                   <circle
                     data-part="guide-dot"
-                    cx={xScale(hoverIndex)}
-                    cy={yScale(points[hoverIndex].y)}
+                    cx={xScale(clampedHoverIndex)}
+                    cy={yScale(points[clampedHoverIndex].y)}
                     r={4}
                     fill={tint}
                   />
@@ -250,12 +276,12 @@ export function GlassChart({
               </span>
             ) : null}
 
-            {hoveredPoint && hoverIndex !== null ? (
+            {hoveredPoint && clampedHoverIndex !== null ? (
               <div
                 data-part="tooltip"
                 className={styles.tooltip}
                 aria-hidden="true"
-                style={{ left: `${clampPct((xScale(hoverIndex) / VIEW_WIDTH) * 100)}%` }}
+                style={{ left: `${clampPct((xScale(clampedHoverIndex) / VIEW_WIDTH) * 100)}%` }}
               >
                 <span className={styles.tooltipX}>{hoveredPoint.x}</span>
                 <span className={styles.tooltipY}>{formatValue(hoveredPoint.y)}</span>

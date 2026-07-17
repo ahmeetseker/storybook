@@ -33,8 +33,14 @@ export interface GlassTourSchedulerProps
   days: GlassTourDay[]
   /** Tur tipi seçenekleri — GlassSegmentedControl'e `{value,label}` olarak eşlenir */
   tourTypes?: string[]
-  /** "Randevu iste" tıklanınca çağrılır; sonrasında iç onay ekranına geçilir */
-  onRequest?: (request: GlassTourRequest) => void
+  /**
+   * "Randevu iste" tıklanınca çağrılır; sonrasında iç onay ekranına iyimser
+   * (optimistic) geçilir — zorunludur (bkz. rules.md §7: async/sunucu onayı
+   * bu component'in sorumluluğunda değildir, çağıran üstlenir).
+   */
+  onRequest: (request: GlassTourRequest) => void
+  /** "Takvime ekle" tıklanınca çağrılır; verilmezse buton hiç render edilmez */
+  onAddToCalendar?: () => void
   /** grid: çok kolonlu saat ızgarası (geniş panel) · compact: tek kolon, dar panel */
   variant?: 'grid' | 'compact'
   tone?: 'light' | 'dark' | 'auto'
@@ -63,12 +69,11 @@ function nextRovingKey<T>(
   return keyOf(enabled[nextIndex])
 }
 
-const noop = () => {}
-
 export function GlassTourScheduler({
   days,
   tourTypes = DEFAULT_TOUR_TYPES,
   onRequest,
+  onAddToCalendar,
   variant = 'grid',
   tone = 'auto',
   material,
@@ -76,13 +81,29 @@ export function GlassTourScheduler({
   ...rest
 }: GlassTourSchedulerProps) {
   const baseId = useId()
-  const [selectedDate, setSelectedDate] = useState<string | undefined>(days[0]?.date)
-  const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
-  const [selectedType, setSelectedType] = useState<string>(tourTypes[0] ?? '')
+  const [selectedDateState, setSelectedDate] = useState<string | undefined>(days[0]?.date)
+  const [selectedTimeState, setSelectedTime] = useState<string | undefined>(undefined)
+  const [selectedTypeState, setSelectedType] = useState<string>(tourTypes[0] ?? '')
   const [submitted, setSubmitted] = useState<GlassTourRequest | null>(null)
+
+  // Türetilmiş doğrulama: days/tourTypes prop'ları değişince eski seçim artık
+  // mevcut veride yoksa (gün silinmiş, slot artık available değil, tip
+  // kaldırılmış) güvenli değere düşülür — effect değil, render sırasında.
+  const selectedDate =
+    selectedDateState !== undefined && days.some((d) => d.date === selectedDateState)
+      ? selectedDateState
+      : days[0]?.date
 
   const currentDay = days.find((d) => d.date === selectedDate)
   const availableSlots = currentDay?.slots.filter((s) => s.available) ?? []
+
+  const selectedTime =
+    selectedTimeState !== undefined && currentDay?.slots.some((s) => s.time === selectedTimeState && s.available)
+      ? selectedTimeState
+      : undefined
+
+  const selectedType = tourTypes.includes(selectedTypeState) ? selectedTypeState : (tourTypes[0] ?? '')
+
   const canSubmit = Boolean(selectedDate && selectedTime)
 
   const typeOptions = useMemo(() => tourTypes.map((t) => ({ value: t, label: t })), [tourTypes])
@@ -115,7 +136,7 @@ export function GlassTourScheduler({
   const handleRequest = () => {
     if (!selectedDate || !selectedTime) return
     const request: GlassTourRequest = { date: selectedDate, time: selectedTime, type: selectedType }
-    onRequest?.(request)
+    onRequest(request)
     setSubmitted(request)
   }
 
@@ -143,9 +164,11 @@ export function GlassTourScheduler({
             {day?.label ?? submitted.date} · {submitted.time} · {submitted.type}
           </p>
           <div className={styles.confirmActions}>
-            <GlassButton tone={tone} onClick={noop}>
-              Takvime ekle
-            </GlassButton>
+            {onAddToCalendar ? (
+              <GlassButton tone={tone} onClick={onAddToCalendar}>
+                Takvime ekle
+              </GlassButton>
+            ) : null}
             <button type="button" className={styles.resetLink} onClick={() => setSubmitted(null)}>
               Yeni randevu planla
             </button>

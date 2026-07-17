@@ -37,6 +37,35 @@ describe('GlassMediaGallery', () => {
     expect(video?.getAttribute('poster')).toBe('data:image/svg+xml,poster')
   })
 
+  it('video: aria-label ile programatik olarak adlandırılır ve caption track render edilir', () => {
+    const withTracks: GlassMediaGalleryItem[] = [
+      {
+        type: 'video',
+        src: 'https://example.com/video.mp4',
+        poster: 'data:image/svg+xml,poster',
+        label: 'Tanıtım Videosu',
+        tracks: [{ src: 'https://example.com/video.tr.vtt', srclang: 'tr', label: 'Türkçe', kind: 'captions' }],
+      },
+    ]
+    render(<GlassMediaGallery items={withTracks} />)
+    const video = document.querySelector('video')
+    expect(video?.getAttribute('aria-label')).toBe('Tanıtım Videosu')
+    const track = video?.querySelector('track')
+    expect(track).not.toBeNull()
+    expect(track?.getAttribute('src')).toBe('https://example.com/video.tr.vtt')
+    expect(track?.getAttribute('srclang')).toBe('tr')
+    expect(track?.getAttribute('label')).toBe('Türkçe')
+    expect(track?.getAttribute('kind')).toBe('captions')
+  })
+
+  it('video: tracks verilmezse ve label yoksa aria-label alt sonra jenerik metne düşer', () => {
+    const noLabelVideo: GlassMediaGalleryItem[] = [{ type: 'video', src: 'https://example.com/video.mp4' }]
+    render(<GlassMediaGallery items={noLabelVideo} />)
+    const video = document.querySelector('video')
+    expect(video?.getAttribute('aria-label')).toBe('İlan videosu')
+    expect(video?.querySelector('track')).toBeNull()
+  })
+
   it('tour360: sandbox ve zorunlu title ile iframe render eder', () => {
     render(<GlassMediaGallery items={items} />)
     fireEvent.click(screen.getByRole('button', { name: '5. medyaya git: Sanal Tur' }))

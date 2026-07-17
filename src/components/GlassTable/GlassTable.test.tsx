@@ -86,6 +86,33 @@ describe('GlassTable', () => {
     expect(onSelectedIdsChange).toHaveBeenCalledWith(['F-1'])
   })
 
+  it('karışık kullanım — sortKey controlled ama sortDirection verilmemişse yön daima "asc" varsayılır ve tutarlı onSortChange üretir (eski kolon + yeni yön karışması regresyonu)', () => {
+    const onSortChange = vi.fn()
+    renderTable(<GlassTable columns={columns} rows={rows} sortKey="tarih" onSortChange={onSortChange} />)
+    const tarihHeader = screen.getByRole('columnheader', { name: /Tarih/ })
+    // sortDirection verilmediği için controlled çift, yönü 'asc' varsayar
+    expect(tarihHeader.getAttribute('aria-sort')).toBe('ascending')
+    fireEvent.click(screen.getByRole('button', { name: /Tarih/ }))
+    expect(onSortChange).toHaveBeenLastCalledWith('tarih', 'desc')
+    // Ebeveyn sortDirection'ı hâlâ göndermiyor — sortKey tek başına controlled
+    // kaldığı için yön daima prop'un varsayılanına ('asc') göre yeniden
+    // hesaplanır; eski (senkronize edilmemiş) iç state'e sızma OLMAZ.
+    fireEvent.click(screen.getByRole('button', { name: /Tarih/ }))
+    expect(onSortChange).toHaveBeenLastCalledWith('tarih', 'desc')
+    expect(tarihHeader.getAttribute('aria-sort')).toBe('ascending')
+  })
+
+  it('karışık kullanım — sortKey uncontrolled iken tek başına verilen sortDirection prop\'u yok sayılır (iç state kullanılır)', () => {
+    const onSortChange = vi.fn()
+    renderTable(<GlassTable columns={columns} rows={rows} sortDirection="desc" onSortChange={onSortChange} />)
+    // sortKey verilmediği için component tümüyle uncontrolled kalır; tek
+    // başına sortDirection="desc" prop'u yok sayılır, ilk tıklama 'asc' ile başlar.
+    fireEvent.click(screen.getByRole('button', { name: /Tarih/ }))
+    expect(onSortChange).toHaveBeenCalledWith('tarih', 'asc')
+    const tarihHeader = screen.getByRole('columnheader', { name: /Tarih/ })
+    expect(tarihHeader.getAttribute('aria-sort')).toBe('ascending')
+  })
+
   it('her satır bir <tr> ve her hücre data-label taşır (mobil kart görünümü için)', () => {
     renderTable(<GlassTable columns={columns} rows={rows} />)
     const table = screen.getByRole('table')

@@ -121,18 +121,31 @@ function ChecklistSection({ group }: { group: GlassFeatureGroupSection }) {
       <h3 className={styles.checklistTitle}>{group.title}</h3>
       {gridItems.length ? (
         <ul className={styles.checklistGrid}>
-          {gridItems.map((item, i) => (
-            <li key={`${item.label}-${i}`} className={styles.checklistItem} data-present={item.present}>
-              <span
-                className={styles.checklistIcon}
-                role="img"
-                aria-label={item.present === undefined ? undefined : item.present ? 'mevcut' : 'yok'}
+          {gridItems.map((item, i) => {
+            const hasPresence = item.present !== undefined
+            return (
+              <li
+                key={`${item.label}-${i}`}
+                className={styles.checklistItem}
+                data-present={hasPresence ? item.present : 'unknown'}
               >
-                {item.present === false ? '✕' : '✓'}
-              </span>
-              <span className={styles.checklistLabel}>{item.label}</span>
-            </li>
-          ))}
+                {hasPresence ? (
+                  <span
+                    className={styles.checklistIcon}
+                    role="img"
+                    aria-label={item.present ? 'mevcut' : 'yok'}
+                  >
+                    {item.present ? '✓' : '✕'}
+                  </span>
+                ) : (
+                  <span className={styles.checklistIconNeutral} aria-hidden="true">
+                    —
+                  </span>
+                )}
+                <span className={styles.checklistLabel}>{item.label}</span>
+              </li>
+            )
+          })}
         </ul>
       ) : null}
       {rowItems.length ? <FeatureRows items={rowItems} /> : null}
@@ -165,10 +178,10 @@ export function GlassFeatureGroup({ groups, variant = 'accordion', columns = 1, 
   return (
     <div className={classes} data-variant={variant} {...rest}>
       {variant === 'checklist'
-        ? groups.map((group, i) => <ChecklistSection key={`${group.title}-${i}`} group={group} />)
+        ? groups.map((group) => <ChecklistSection key={group.title} group={group} />)
         : variant === 'columns'
-          ? groups.map((group, i) => <ColumnsSection key={`${group.title}-${i}`} group={group} columns={columns} />)
-          : groups.map((group, i) => <AccordionSection key={`${group.title}-${i}`} group={group} defaultOpen={i === 0} />)}
+          ? groups.map((group) => <ColumnsSection key={group.title} group={group} columns={columns} />)
+          : groups.map((group, i) => <AccordionSection key={group.title} group={group} defaultOpen={i === 0} />)}
     </div>
   )
 }

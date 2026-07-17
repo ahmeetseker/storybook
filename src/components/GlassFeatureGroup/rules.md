@@ -105,11 +105,19 @@ türer, kullanıcı etkileşimiyle değişmez.
 - Boş `items` dizisi olan grup: accordion boş region render eder (başlık
   kalır), checklist ne grid ne satır göstermez (yalnız `h3`), columns boş
   `dl` gösterir — çağıran boş grubu listeye koymamalı.
-- Ne `value` ne `present` verilen item: satır düzeninde (accordion/columns)
-  `dd` boş kalır, checklist grid'inde nötr `•` benzeri işaretleyici yok —
-  ikon `role="img"` `aria-label`'sız render edilir (data eksikliği; çağıranın
-  sorumluluğu).
+- Ne `value` ne `present` verilen item: eksik veri asla "mevcut" gibi
+  sunulmaz. Satır düzeninde (accordion/columns) `dd` boş kalır — hiç ikon
+  render edilmez. Checklist grid'inde nötr soluk `—` işaretleyici gösterilir
+  (`aria-hidden`, `role="img"` DEĞİL — isimsiz/aria-label'sız `img` rolü
+  üretilmez); yalnız `present` tanımlıysa `role="img"` + `aria-label`
+  ("mevcut"/"yok") ile ✓/✕ ikonu üretilir (data eksikliği; çağıranın
+  sorumluluğu görsel olarak da ayırt edilir).
 - Değer biçimlendirme (binlik ayraç, birim, "TL") çağıranın işidir.
+- `groups[].title` render sırasında React `key` olarak kullanılır (yalnız
+  `title`, index değil) — sıralama değişse bile grup kimliği (ör. accordion
+  aç/kapa state'i) korunur. **Grup başlıkları aynı `groups` dizisi içinde
+  benzersiz olmalı**; tekrar eden başlık key çakışmasına ve state
+  karışmasına yol açar.
 
 ## 9. Token eşlemesi
 
@@ -146,6 +154,10 @@ manuel).
 - [x] checklist: `value` verilen item ayrıca satır olarak render olur (unit)
 - [x] columns: grup başlığı heading DEĞİL (a11y regresyon)
 - [x] columns: `columns=2` → `twoColumns` sınıfı (unit)
+- [x] checklist: ne `value` ne `present` verilen item ✓ çizmez, isimsiz
+  `role="img"` üretmez (regresyon)
+- [x] accordion: grup sırası değişince `title` bazlı key sayesinde aç/kapa
+  state'i korunur (regresyon)
 - [ ] checklist ızgara `auto-fill` kırılımı (visual)
 - [ ] accordion motion height geçişi + reduced-motion (visual)
 
@@ -166,9 +178,14 @@ grid) · dış `columns` prop'u yalnız `variant='columns'`'ta anlamlı, ikisini
 ayrı prop'lara bölmek (ör. `variant`'a özel alt-prop) değerlendirilmedi.
 
 **Açık kararlar:** accordion'da exclusive (tek grup açık) modu · checklist
-ikonunun SVG tik/çarpıya taşınması (şu an Unicode `✓`/`✕`) · `present`
-olmayan + `value` olmayan item için nötr görsel işaretleyici.
+ikonunun SVG tik/çarpıya taşınması (şu an Unicode `✓`/`✕`).
 
-**Changelog:** 2026-07-17 — İlk sürüm: üç variant (accordion/checklist/columns),
-dalga1 kontratı (`.superpowers/sdd/dalga1-kontrat.md`) uyarınca flat içerik
-katmanı, cam yok.
+**Changelog:**
+- 2026-07-17 — İlk sürüm: üç variant (accordion/checklist/columns),
+  dalga1 kontratı (`.superpowers/sdd/dalga1-kontrat.md`) uyarınca flat içerik
+  katmanı, cam yok.
+- 2026-07-17 — Code review fix: checklist grid'inde `value`+`present` ikisi
+  de eksikken artık ✓ çizilmiyor ve isimsiz `role="img"` üretilmiyor (nötr
+  soluk `—` işaretleyici); grup render key'i `${title}-${index}`'ten yalnız
+  `title`'a düşürüldü (sıralama değişiminde açık/kapalı state korunur, bkz.
+  §8 "Grup başlıkları benzersiz olmalı").

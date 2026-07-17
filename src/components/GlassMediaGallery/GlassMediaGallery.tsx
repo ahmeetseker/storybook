@@ -12,6 +12,9 @@ export interface GlassMediaGalleryItem {
   alt?: string
   /** Yalnız `video` — oynatılmadan önce gösterilecek kapak karesi. */
   poster?: string
+  /** Yalnız `video` — altyazı/caption track'leri (`<track>`). Sesli video için
+   * en az bir `kind: 'captions'` track sağlanması ÖNERİLİR (bkz. rules.md §8). */
+  tracks?: { src: string; srclang: string; label: string; kind?: 'captions' | 'subtitles' }[]
   /** Bu ÖĞENİN kısa açıklaması; thumbnail erişilebilir adında ve sahne altyazısında
    * kullanılır. `GlassMediaGalleryProps.label` (kök bölge adı) ile KARIŞTIRMAYIN —
    * ikisi aynı isimde ama farklı kapsamdadır (öğe vs. kök bileşen). */
@@ -41,8 +44,17 @@ function MediaFrame({ item }: { item: GlassMediaGalleryItem }) {
   switch (item.type) {
     case 'video':
       return (
-        <video className={`${styles.media} ${styles.mediaVideo}`} controls preload="metadata" poster={item.poster}>
+        <video
+          className={`${styles.media} ${styles.mediaVideo}`}
+          controls
+          preload="metadata"
+          poster={item.poster}
+          aria-label={item.alt ?? item.label ?? 'İlan videosu'}
+        >
           <source src={item.src} />
+          {item.tracks?.map((track) => (
+            <track key={track.src} src={track.src} srcLang={track.srclang} label={track.label} kind={track.kind ?? 'captions'} />
+          ))}
           Tarayıcınız video oynatmayı desteklemiyor.
         </video>
       )

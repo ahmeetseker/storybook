@@ -20,6 +20,16 @@ describe('GlassScoreMeter', () => {
     expect(screen.getByRole('meter').getAttribute('aria-valuenow')).toBe('0')
   })
 
+  it('value NaN/Infinity gelirse 0’a düşer, aria-valuenow ve görsel sayı NaN olmaz', () => {
+    const { unmount: u1 } = render(<GlassScoreMeter value={NaN} label="Bozuk" />)
+    expect(screen.getByRole('meter').getAttribute('aria-valuenow')).toBe('0')
+    expect(screen.getByText('0')).toBeTruthy()
+    u1()
+
+    render(<GlassScoreMeter value={Infinity} label="Sonsuz" />)
+    expect(screen.getByRole('meter').getAttribute('aria-valuenow')).toBe('0')
+  })
+
   it('description verilince ring/bar varyantında aria-describedby ile bağlanır', () => {
     render(
       <GlassScoreMeter value={80} label="Okullar" description="Yürüme mesafesinde 3 okul" variant="ring" />,

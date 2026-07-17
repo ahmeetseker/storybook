@@ -26,8 +26,14 @@ export interface GlassMapPrivacyCircle {
 
 export interface GlassMapProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   pins: GlassMapPin[]
-  /** Controlled seçili pin */
-  selectedId?: string
+  /**
+   * Controlled seçili pin. `undefined` → uncontrolled (iç state kullanılır);
+   * `null` → controlled BOŞ seçim; `string` → controlled seçili pin id'si.
+   * Prop verilip verilmediği (`undefined` mi değil mi) controlled tespiti
+   * için kullanılır — bir kez controlled başlayan harita boş seçimi `null`
+   * ile ifade etmelidir, `undefined`'a dönmek uncontrolled'a geri düşer.
+   */
+  selectedId?: string | null
   /** Uncontrolled başlangıç seçimi */
   defaultSelectedId?: string
   /** Seçim değişince çağrılır (aynı pine tekrar tıklama seçimi kaldırır → undefined) */
@@ -124,6 +130,16 @@ function generateStreetGrid(seed: number | string): StreetGrid {
   return { vLines, hLines, blocks }
 }
 
+// ── Normalize koordinat güvenliği ───────────────────────────────────────────
+// pin/privacyCircle koordinatları dışarıdan (API/consumer) gelir; finite
+// olmayan (NaN/Infinity) ya da 0-1 aralığı dışındaki değerler harita
+// kutusunun dışında — ama yine de tıklanabilir/etkileşimli — bir öğe
+// üretmesin diye 0-1'e kenetlenir. Finite olmayan değer render EDİLMEZ
+// (aşağıdaki render bu `null` dönüşünü "atla" olarak yorumlar).
+function clampUnit(value: number): number | null {
+  return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : null
+}
+
 const blockClass = [styles.block, styles.blockAlt, styles.blockGreen]
 
 const LAYERS: { value: 'yol' | 'uydu'; label: string }[] = [
@@ -165,20 +181,24 @@ export function GlassMap({
   const [innerLayer, setInnerLayer] = useState<'yol' | 'uydu'>(defaultLayer)
   const rootRef = useRef<HTMLDivElement>(null)
 
-  const currentSelected = selectedId ?? innerSelected
+  // `selectedId !== undefined` controlled tespiti: prop `null` (controlled boş
+  // seçim) verildiğinde de bu true'dur, böylece parent seçimi temizlediğinde
+  // eski iç seçim geri sızmaz (bkz. rules.md §4/§6).
+  const isSelectionControlled = selectedId !== undefined
+  const currentSelected = isSelectionControlled ? selectedId : innerSelected
   const currentLayer = layer ?? innerLayer
 
   const grid = useMemo(() => generateStreetGrid(seed), [seed])
 
   const selectPin = (pinId: string) => {
     const next = currentSelected === pinId ? undefined : pinId
-    if (selectedId === undefined) setInnerSelected(next)
+    if (!isSelectionControlled) setInnerSelected(next)
     onPinSelect?.(next)
   }
 
   const clearSelection = () => {
-    if (currentSelected === undefined) return
-    if (selectedId === undefined) setInnerSelected(undefined)
+    if (currentSelected == null) return
+    if (!isSelectionControlled) setInnerSelected(undefined)
     onPinSelect?.(undefined)
   }
 
@@ -258,14 +278,15 @@ export function GlassMap({
           {grid.vLines.map((x, i) => (
             <line key={`v${i}`} className={styles.road} x1={x} y1={0} x2={x} y2={100} />
           ))}
-          {privacyCircle ? (
-            <circle
-              className={styles.privacyCircle}
-              cx={privacyCircle.x * 100}
-              cy={privacyCircle.y * 100}
-              r={privacyCircle.r * 100}
-            />
-          ) : null}
+          {privacyCircle
+            ? (() => {
+                const cx = clampUnit(privacyCircle.x)
+                const cy = clampUnit(privacyCircle.y)
+                const r = clampUnit(privacyCircle.r)
+                if (cx === null || cy === null || r === null) return null
+                return <circle className={styles.privacyCircle} cx={cx * 100} cy={cy * 100} r={r * 100} />
+              })()
+            : null}
         </svg>
       </div>
 
@@ -290,6 +311,11 @@ export function GlassMap({
       </div>
 
       {pins.map((pin, index) => {
+        // finite olmayan/aralık dışı koordinat: harita dışında etkileşimli pin
+        // üretmemek için render EDİLMEZ (bkz. rules.md §7, clampUnit).
+        const clampedX = clampUnit(pin.x)
+        const clampedY = clampUnit(pin.y)
+        if (clampedX === null || clampedY === null) return null
         const selected = currentSelected === pin.id
         const isCluster = typeof pin.count === 'number'
         const pinId = `${baseId}-pin-${pin.id}`
@@ -297,7 +323,7 @@ export function GlassMap({
           <div
             key={pin.id}
             className={styles.pinWrap}
-            style={{ left: `${pin.x * 100}%`, top: `${pin.y * 100}%`, zIndex: selected ? 2 : 1 }}
+            style={{ left: `${clampedX * 100}%`, top: `${clampedY * 100}%`, zIndex: selected ? 2 : 1 }}
           >
             <button
               id={pinId}
@@ -315,8 +341,8 @@ export function GlassMap({
             {selected && popupContent ? (
               <div
                 className={styles.popup}
-                data-vertical={popupVertical(pin.y)}
-                data-align={popupAlign(pin.x)}
+                data-vertical={popupVertical(clampedY)}
+                data-align={popupAlign(clampedX)}
                 role="group"
                 aria-label={`${pin.price ?? pin.id} detayı`}
               >

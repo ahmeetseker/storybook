@@ -35,9 +35,11 @@ sekmeler: Fotoğraflar/Video/Kat Planı/Sanal Tur).
   tabs deseninin tam klavye deseni (roving `tabindex` + ok tuşu gezinmesi,
   `GlassFloorPlanViewer` ile aynı desen) uygulanır (bkz. §7).
 - Medya elementleri: `image`/`floorPlan` → `<img>`, `video` → `<video controls
-  preload="metadata">` (autoplay yok), `tour360` → sandbox'lı `<iframe>` ile
-  **zorunlu `title`** (`item.alt || item.label || '360° sanal tur'` — asla boş
-  kalmaz).
+  preload="metadata" aria-label={item.alt ?? item.label ?? 'İlan videosu'}>`
+  (autoplay yok, **programatik ad zorunlu** — asla boş kalmaz) +
+  `items[].tracks` sağlanmışsa her biri için bir `<track>` (altyazı/caption
+  API'si, bkz. §8), `tour360` → sandbox'lı `<iframe>` ile **zorunlu `title`**
+  (`item.alt || item.label || '360° sanal tur'` — asla boş kalmaz).
 - DOM değişmezi: her thumbnail gerçek `<button>`; aktif öğe `aria-current="true"`
   taşır (sekmede `aria-selected`).
 
@@ -49,6 +51,7 @@ sekmeler: Fotoğraflar/Video/Kat Planı/Sanal Tur).
 | items[].src | ✅ | string (URL) | img `src` / video `<source>` / iframe `src` |
 | items[].alt | — | string | img/floorPlan alt metni; tour360'ta iframe title'a düşer; yoksa img `alt=""` (dekoratif) |
 | items[].poster | — | string | Yalnız `video`; verilmezse thumbnail'de tür rozetiyle yer tutucu gösterilir |
+| items[].tracks | — | `{ src, srclang, label, kind? }[]` | Yalnız `video`; her biri bir `<track>` render eder (`kind` varsayılan `'captions'`) — sesli video için **önerilir** (bkz. §8) |
 | items[].label | — | string | Sahne altyazısı + thumbnail erişilebilir adı + (varsa) `alt`/`title` fallback'i |
 
 Thumbnail rozetleri (yalnız ilgili türde, `aria-hidden`): video `▶`,
@@ -100,7 +103,11 @@ Katman sırası: veri (items boş/tek) → seçim (aktif tür/sahne) → etkile�
   — `GlassFloorPlanViewer`'daki kat sekmesi deseniyle birebir aynı.
 - Sahne değişimi anlıktır; `.frame` üzerinde yalnız `opacity` (`mediaFadeIn`,
   160ms) — `prefers-reduced-motion: reduce`'ta tamamen kapanır.
-- `video`: `controls` + `preload="metadata"`; **autoplay yok**. `tour360`:
+- `video`: `controls` + `preload="metadata"` + `aria-label` (programatik ad,
+  `item.alt ?? item.label ?? 'İlan videosu'`); **autoplay yok**. `items[].tracks`
+  verilmişse her biri `<track kind srclang label src>` olarak render edilir —
+  sesli videolarda erişilebilirlik için en az bir `captions` track **önerilir**
+  (bkz. §8). `tour360`:
   `sandbox="allow-scripts"` ile kısıtlı (yalnız script çalıştırma izni;
   `allow-same-origin` **bilinçli olarak eklenmez** — `item.src` üçüncü
   taraf/kullanıcı girdisi olabileceğinden, `allow-scripts` + `allow-same-origin`
@@ -119,6 +126,12 @@ Katman sırası: veri (items boş/tek) → seçim (aktif tür/sahne) → etkile�
   taşıyorsa (ör. galeri dışında ayrı başlık varsa) bilinçli tercih edilebilir.
 - `poster` verilmeyen video thumbnail'i metin yer tutucuyla ("Video") gösterilir
   — üretimde poster **önerilir**.
+- **Sesli video için altyazı zorunluluğu:** `video` türündeki öğelerde ses
+  içeriği varsa `items[].tracks` ile en az bir `kind: 'captions'` track
+  sağlanmalıdır — component `<video>`'yu her zaman `aria-label` ile
+  programatik adlandırır, ancak konuşulan içeriğin metne dökülmesi yalnız
+  `tracks` ile mümkündür (WCAG 1.2.2). Sessiz/müziksiz kısa tanıtım klipleri
+  bu kuralın istisnasıdır.
 - Boş `items` component'i tamamen render etmez; çağıran boş durumu ayrı ele almalı.
 
 ## 9. Token eşlemesi
@@ -154,6 +167,8 @@ control gerekmiyor), Responsive'in ayrı story olarak izole edilmesi
 - [x] `region` adlandırması + ilk medya + sayaç (unit)
 - [x] thumbnail tıklaması sahneyi değiştirir + `aria-current` (unit)
 - [x] video: `controls` var, `autoplay` yok, `poster` doğru (unit)
+- [x] video: `aria-label` (`alt`→`label`→jenerik fallback sırası) + `tracks`
+  verilirse `<track>` render edilir (unit)
 - [x] tour360: `iframe` `sandbox` + zorunlu `title` (unit)
 - [x] floorPlan/image `<img>` render (unit)
 - [x] tabbed: yalnız dolu türler sekme olur (unit)
@@ -173,6 +188,8 @@ control gerekmiyor), Responsive'in ayrı story olarak izole edilmesi
   fallback'i son çare ("360° sanal tur") jenerik kalır.
 - ✅ Video için `poster` ver — thumbnail'de metin yer tutucu yerine gerçek kare
   görünür.
+- ✅ Sesli video öğelerine `tracks` ile en az bir `captions` track ekle —
+  `aria-label` yalnız videoyu adlandırır, konuşulan içeriği metne dökmez.
 - ❌ `GlassTabs`'ı bu component içine gömmeye çalışma — tablist/panel yapısı
   kasıtlı olarak bağımsızdır (bkz. §2).
 - ❌ Sahneye ok/gezinme butonu ekleme — spec kararı thumbnail'i yeterli sayar;
@@ -194,3 +211,8 @@ sekme çubuğuna roving `tabindex` + ok tuşu/`Home`/`End` gezinmesi eklendi
 (GlassFloorPlanViewer deseniyle tutarlı); `tour360` iframe sandbox'ından
 `allow-same-origin` çıkarıldı (güvenlik); thumbnail tür rozeti testleri
 eklendi; `label` prop'larının çakışan isimlendirmesi JSDoc'ta netleştirildi.
+2026-07-17 — Review düzeltmesi: `<video>` artık `aria-label` ile programatik
+olarak adlandırılıyor (`item.alt ?? item.label ?? 'İlan videosu'`);
+`items[].tracks` alanı eklendi ve her biri `<track>` olarak render ediliyor
+(altyazı/caption API'si); sesli video için altyazı zorunluluğu §8'e not
+edildi; regresyon testleri eklendi.

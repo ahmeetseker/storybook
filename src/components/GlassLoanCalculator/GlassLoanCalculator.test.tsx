@@ -124,4 +124,64 @@ describe('GlassLoanCalculator', () => {
     // P = 3.000.000 * 0.8 = 2.400.000
     expect(screen.getByText('2.400.000 TL')).toBeTruthy()
   })
+
+  it('faiz girişine eksi işareti yazılırsa görünen metin ve hesaplanan değer birbiriyle tutarlı olur (negatif giriş yasak)', () => {
+    renderCalc({ defaultPrice: 5000000, defaultDownPaymentPercent: 30, defaultTermYears: 5, defaultMonthlyRatePercent: 2.79 })
+    const rateInput = screen.getByLabelText('Aylık Faiz Oranı') as HTMLInputElement
+    fireEvent.change(rateInput, { target: { value: '-2' } })
+    // Eksi işareti elenir; ekranda görünen "2" ile hesap için kullanılan oran (2) aynı sayıdır.
+    expect(rateInput.value).toBe('2')
+    // P = 3.500.000, r = 0.02, n = 60
+    const r = 0.02
+    const n = 60
+    const P = 3500000
+    const factor = (1 + r) ** n
+    const expected = Math.round((P * r * factor) / (factor - 1))
+    expect(screen.getByText(`${expected.toLocaleString('tr-TR')} TL`)).toBeTruthy()
+  })
+
+  it('faiz girişine "e" (bilimsel gösterim) yazılırsa karakter elenir, görünen ve hesaplanan sayı eşleşir', () => {
+    renderCalc({ defaultPrice: 5000000, defaultDownPaymentPercent: 30, defaultTermYears: 5, defaultMonthlyRatePercent: 2.79 })
+    const rateInput = screen.getByLabelText('Aylık Faiz Oranı') as HTMLInputElement
+    fireEvent.change(rateInput, { target: { value: '1e2' } })
+    // "e" elenir; "1" ve "2" rakamları birleşip "12" olarak hem görünür hem hesaplanır (100 değil).
+    expect(rateInput.value).toBe('12')
+    // Blur'dan ÖNCE henüz kıskaçlanmaz: r = 0.12 ile hesaplanmalı (görünen değerle birebir tutarlı).
+    const r = 0.12
+    const n = 60
+    const P = 3500000
+    const factor = (1 + r) ** n
+    const expected = Math.round((P * r * factor) / (factor - 1))
+    expect(screen.getByText(`${expected.toLocaleString('tr-TR')} TL`)).toBeTruthy()
+  })
+
+  it('faiz girişi birden fazla ayraç/geçersiz karakter içerirse tek ayraca indirgenir', () => {
+    renderCalc({ defaultPrice: 5000000, defaultDownPaymentPercent: 30, defaultTermYears: 5, defaultMonthlyRatePercent: 2.79 })
+    const rateInput = screen.getByLabelText('Aylık Faiz Oranı') as HTMLInputElement
+    fireEvent.change(rateInput, { target: { value: '2,7.9abc' } })
+    expect(rateInput.value).toBe('2,79')
+  })
+
+  it('faiz girişi alan odağını kaybedince üst sınırın (10) üzerindeki değeri kıskaçlar ve metni günceller', () => {
+    renderCalc({ defaultPrice: 5000000, defaultDownPaymentPercent: 30, defaultTermYears: 5, defaultMonthlyRatePercent: 2.79 })
+    const rateInput = screen.getByLabelText('Aylık Faiz Oranı') as HTMLInputElement
+    fireEvent.change(rateInput, { target: { value: '15' } })
+    fireEvent.blur(rateInput)
+    expect(rateInput.value).toBe('10')
+    // r = 0.10 ile hesaplanmalı
+    const r = 0.1
+    const n = 60
+    const P = 3500000
+    const factor = (1 + r) ** n
+    const expected = Math.round((P * r * factor) / (factor - 1))
+    expect(screen.getByText(`${expected.toLocaleString('tr-TR')} TL`)).toBeTruthy()
+  })
+
+  it('faiz girişi alan odağını kaybedince alt sınırın (0.01) altındaki sıfır olmayan değeri kıskaçlar', () => {
+    renderCalc({ defaultPrice: 5000000, defaultDownPaymentPercent: 30, defaultTermYears: 5, defaultMonthlyRatePercent: 2.79 })
+    const rateInput = screen.getByLabelText('Aylık Faiz Oranı') as HTMLInputElement
+    fireEvent.change(rateInput, { target: { value: '0,001' } })
+    fireEvent.blur(rateInput)
+    expect(rateInput.value).toBe('0,01')
+  })
 })

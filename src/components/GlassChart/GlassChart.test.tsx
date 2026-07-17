@@ -121,4 +121,57 @@ describe('GlassChart', () => {
     expect(screen.getByText('Veri yok')).toBeTruthy()
     expect(screen.queryByRole('img')).toBeNull()
   })
+
+  it('hover açıkken points kısalırsa sınır dışı index TypeError atmadan clamp edilir', () => {
+    const { container, rerender } = renderChart()
+    const svg = screen.getByRole('img')
+    const plot = svg.parentElement as HTMLElement
+    mockPlotRect(plot)
+
+    // fraction 600/600 = 1 * 4 → index 4 (son nokta, dizinin son elemanı)
+    fireEvent.pointerMove(plot, { clientX: 600, pointerId: 1 })
+    const initialTooltip = container.querySelector('[data-part="tooltip"]') as HTMLElement
+    expect(within(initialTooltip).getByText('May 26')).toBeTruthy()
+
+    // points 2 elemana düşürülür — eski hoverIndex (4) artık sınır dışı; crash beklenmez.
+    const shortPoints = points.slice(0, 2)
+    expect(() =>
+      rerender(<GlassChart points={shortPoints} />),
+    ).not.toThrow()
+
+    // Clamp edilmiş index (yeni son eleman: idx1, 'Şub 26') ile tooltip/kılavuz tutarlı kalır.
+    const tooltip = container.querySelector('[data-part="tooltip"]') as HTMLElement
+    expect(tooltip).toBeTruthy()
+    expect(within(tooltip).getByText('Şub 26')).toBeTruthy()
+  })
+
+  it("type='bar' tek değerli (eşit) seride sütunlar sıfır yükseklikte kaybolmaz", () => {
+    const equalPoints = [
+      { x: 'Oca 26', y: 150000 },
+      { x: 'Şub 26', y: 150000 },
+      { x: 'Mar 26', y: 150000 },
+    ]
+    const { container } = renderChart({ type: 'bar', points: equalPoints })
+    const bars = container.querySelectorAll('[data-part="bar"]')
+    expect(bars).toHaveLength(3)
+    bars.forEach((bar) => {
+      const barHeight = Number(bar.getAttribute('height'))
+      expect(barHeight).toBeGreaterThan(0)
+    })
+  })
+
+  it("type='line' tek değerli (eşit) seride çizgi dejenere olmadan ortada durur", () => {
+    const equalPoints = [
+      { x: 'Oca 26', y: 150000 },
+      { x: 'Şub 26', y: 150000 },
+      { x: 'Mar 26', y: 150000 },
+    ]
+    const { container } = renderChart({ type: 'line', points: equalPoints })
+    const lastPoint = container.querySelector('[data-part="last-point"]')
+    // Dejenere durumda yapay aralık sayesinde nokta plot alanının üst/alt sınırına
+    // yapışmaz — plotTop(16) ile plotBottom(220-16=204) arasında bir yerde durur.
+    const cy = Number(lastPoint?.getAttribute('cy'))
+    expect(cy).toBeGreaterThan(16)
+    expect(cy).toBeLessThan(204)
+  })
 })

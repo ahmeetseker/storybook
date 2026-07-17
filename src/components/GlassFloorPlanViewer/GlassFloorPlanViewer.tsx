@@ -6,7 +6,6 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
 } from 'react'
 import { GlassSurface } from '../GlassSurface'
 import { GlassButton } from '../GlassButton'
@@ -78,14 +77,36 @@ export function GlassFloorPlanViewer({
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
   const [openHotspot, setOpenHotspot] = useState<number | null>(null)
-  const dragState = useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null)
+  // pointerId dahil — yalnız sürüklemeyi başlatan pointer'ın move/up/lostpointercapture'ı işlenir
+  const dragState = useRef<{ pointerId: number; startX: number; startY: number; panX: number; panY: number } | null>(
+    null,
+  )
+  const viewportRef = useRef<HTMLDivElement | null>(null)
 
-  // Kat değişince pan/zoom ve açık balon sıfırlanır — her kat kendi başlangıç görünümüyle açılır
+  // Kat değişince pan/zoom, açık balon VE sürükleme state'i sıfırlanır — kat/plan
+  // değişimi ortasında bırakılan pointer capture yeni katta state sızdırmasın
   useEffect(() => {
     setScale(MIN_SCALE)
     setPan({ x: 0, y: 0 })
     setOpenHotspot(null)
+    dragState.current = null
+    setDragging(false)
   }, [currentIndex])
+
+  // Ctrl+wheel zoom: native listener ile { passive: false } bağlanır — React'ın sentetik
+  // wheel'i passive olduğundan preventDefault etkisiz kalır ve Ctrl+wheel sayfa zoom'unu
+  // da tetiklerdi. scale fonksiyonel update ile okunduğundan effect yalnız mount'ta kurulur.
+  useEffect(() => {
+    const node = viewportRef.current
+    if (!node) return
+    const handleWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return
+      e.preventDefault()
+      setScale((prev) => clamp(prev + (e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP), MIN_SCALE, MAX_SCALE))
+    }
+    node.addEventListener('wheel', handleWheel, { passive: false })
+    return () => node.removeEventListener('wheel', handleWheel)
+  }, [])
 
   if (plans.length === 0) return null
   const current = plans[currentIndex]
@@ -120,7 +141,9 @@ export function GlassFloorPlanViewer({
   const onViewportPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     // Hotspot pin'i üzerinde sürükleme başlatma — tıklamayı ona bırak
     if ((e.target as HTMLElement).closest('button')) return
-    dragState.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y }
+    // Zaten aktif bir pointer sürüklüyorsa ikinci pointer'ı yoksay (tek pointer takip edilir)
+    if (dragState.current) return
+    dragState.current = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y }
     setDragging(true)
     // jsdom'da yok — optional chaining bilinçli (bkz. GlassSheet)
     e.currentTarget.setPointerCapture?.(e.pointerId)
@@ -128,22 +151,24 @@ export function GlassFloorPlanViewer({
 
   const onViewportPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const start = dragState.current
-    if (!start) return
+    // Yalnız sürüklemeyi başlatan pointer'ın move'u işlenir
+    if (!start || e.pointerId !== start.pointerId) return
     setPan({ x: start.panX + (e.clientX - start.startX), y: start.panY + (e.clientY - start.startY) })
   }
 
   const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!dragState.current || e.pointerId !== dragState.current.pointerId) return
     dragState.current = null
     setDragging(false)
     e.currentTarget.releasePointerCapture?.(e.pointerId)
   }
 
-  // Yalnız Ctrl+wheel yakınlaştırır (trackpad pinch tarayıcıda ctrlKey olarak gelir);
-  // düz wheel sayfa kaydırmasına karışmasın diye preventDefault edilmez.
-  const onWheel = (e: ReactWheelEvent<HTMLDivElement>) => {
-    if (!e.ctrlKey) return
-    e.preventDefault()
-    zoomTo(scale + (e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP))
+  // Tarayıcı capture'ı bizden bağımsız geri alırsa (ör. sistem jesti, sekme değişimi)
+  // drag state'i temizle — aksi halde sonraki pointerdown'a kadar sürükleme "takılı" kalır
+  const onLostPointerCapture = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!dragState.current || e.pointerId !== dragState.current.pointerId) return
+    dragState.current = null
+    setDragging(false)
   }
 
   const toggleHotspot = (index: number) => {
@@ -187,6 +212,7 @@ export function GlassFloorPlanViewer({
 
       <div className={styles.stage}>
         <div
+          ref={viewportRef}
           className={styles.viewport}
           role="tabpanel"
           id={`${baseId}-panel`}
@@ -196,7 +222,7 @@ export function GlassFloorPlanViewer({
           onPointerMove={onViewportPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
-          onWheel={onWheel}
+          onLostPointerCapture={onLostPointerCapture}
         >
           <div
             className={[styles.imageWrap, dragging ? styles.dragging : ''].filter(Boolean).join(' ')}

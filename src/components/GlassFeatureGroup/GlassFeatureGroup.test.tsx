@@ -44,6 +44,19 @@ describe('GlassFeatureGroup — accordion', () => {
     expect(second.getAttribute('aria-expanded')).toBe('false')
     await waitFor(() => expect(screen.queryByText('Asansör')).toBeNull())
   })
+
+  it('grup sırası değişince başlığa bağlı key sayesinde aç/kapa state\'i korunur', () => {
+    const { rerender } = render(<GlassFeatureGroup groups={groups} variant="accordion" />)
+    const second = screen.getByRole('button', { name: 'Dış Özellikler' })
+    fireEvent.click(second)
+    expect(second.getAttribute('aria-expanded')).toBe('true')
+
+    const reordered = [groups[1], groups[0]] as GlassFeatureGroupSection[]
+    rerender(<GlassFeatureGroup groups={reordered} variant="accordion" />)
+
+    const secondAfterReorder = screen.getByRole('button', { name: 'Dış Özellikler' })
+    expect(secondAfterReorder.getAttribute('aria-expanded')).toBe('true')
+  })
 })
 
 describe('GlassFeatureGroup — checklist', () => {
@@ -57,6 +70,21 @@ describe('GlassFeatureGroup — checklist', () => {
     render(<GlassFeatureGroup groups={groups} variant="checklist" />)
     expect(screen.getByText('Isıtma Tipi')).toBeTruthy()
     expect(screen.getByText('Kombi (Doğalgaz)')).toBeTruthy()
+  })
+
+  it('value ve present ikisi de yokken ✓ çizmez ve isimsiz role=img üretmez', () => {
+    const belirsizGroups: GlassFeatureGroupSection[] = [
+      {
+        title: 'Belirsiz Özellikler',
+        items: [{ label: 'Güvenlik Kamerası' }],
+      },
+    ]
+    render(<GlassFeatureGroup groups={belirsizGroups} variant="checklist" />)
+    expect(screen.getByText('Güvenlik Kamerası')).toBeTruthy()
+    expect(screen.queryByRole('img', { name: 'mevcut' })).toBeNull()
+    expect(screen.queryByRole('img', { name: 'yok' })).toBeNull()
+    // aria-label'sız / isimsiz role=img de üretilmemeli
+    expect(screen.queryByRole('img')).toBeNull()
   })
 })
 

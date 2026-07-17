@@ -91,6 +91,51 @@ describe('GlassMap', () => {
     expect(roadsA).toBeGreaterThan(0)
   })
 
+  it('controlled: selectedId null geçişi eski iç seçimi geri getirmez', () => {
+    const onPinSelect = vi.fn()
+    const { rerender } = render(
+      <GlassMap pins={pins} selectedId="p1" onPinSelect={onPinSelect} popupContent={(id) => `Detay: ${id}`} />,
+    )
+    const p1 = screen.getByRole('button', { name: '4.250.000 TL' })
+    expect(p1.getAttribute('aria-pressed')).toBe('true')
+    // parent seçimi temizler: selectedId=null (controlled BOŞ seçim)
+    rerender(<GlassMap pins={pins} selectedId={null} onPinSelect={onPinSelect} popupContent={(id) => `Detay: ${id}`} />)
+    expect(p1.getAttribute('aria-pressed')).toBe('false')
+    expect(screen.queryByText('Detay: p1')).toBeNull()
+    // p1'e tıklamak eski iç seçimi "geri getirmez" — hâlâ controlled, yalnız onPinSelect döner
+    fireEvent.click(p1)
+    expect(onPinSelect).toHaveBeenCalledWith('p1')
+    expect(p1.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('finite olmayan/aralık dışı pin koordinatları render edilmez (harita dışında etkileşimli pin üretilmez)', () => {
+    const badPins: GlassMapPin[] = [
+      { id: 'nan', x: Number.NaN, y: 0.5, price: '1.000.000 TL' },
+      { id: 'inf', x: 0.5, y: Number.POSITIVE_INFINITY, price: '2.000.000 TL' },
+      { id: 'ok', x: 0.5, y: 0.5, price: '3.000.000 TL' },
+    ]
+    render(<GlassMap pins={badPins} />)
+    expect(screen.queryByRole('button', { name: '1.000.000 TL' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '2.000.000 TL' })).toBeNull()
+    expect(screen.getByRole('button', { name: '3.000.000 TL' })).toBeDefined()
+  })
+
+  it('aralık dışı (0-1 dışı ama finite) pin koordinatları 0-1 aralığına kenetlenir', () => {
+    const clampPins: GlassMapPin[] = [{ id: 'over', x: 4, y: -2, price: '9.000.000 TL' }]
+    const { container } = render(<GlassMap pins={clampPins} />)
+    const wrap = container.querySelector('[style*="left"]') as HTMLElement | null
+    expect(wrap).not.toBeNull()
+    expect(wrap?.style.left).toBe('100%')
+    expect(wrap?.style.top).toBe('0%')
+  })
+
+  it('finite olmayan privacyCircle koordinatları render edilmez', () => {
+    const { container } = render(
+      <GlassMap pins={[]} privacyCircle={{ x: Number.NaN, y: 0.5, r: 0.2 }} />,
+    )
+    expect(container.querySelector('circle')).toBeNull()
+  })
+
   it('panel varyantı data-variant ile işaretlenir', () => {
     const { container } = render(<GlassMap pins={pins} variant="panel" />)
     expect(container.querySelector('[data-variant="panel"]')).not.toBeNull()

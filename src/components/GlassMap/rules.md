@@ -47,18 +47,18 @@ bağlamı verir.
 | Slot | Zorunlu | İçerik | Kurallar |
 |---|---|---|---|
 | pins[].id | ✅ | `string` | React key + popup/seçim kimliği |
-| pins[].x / y | ✅ | `number` (0-1) | Normalize konum; harita kutusuna göre |
+| pins[].x / y | ✅ | `number` (0-1) | Normalize konum; harita kutusuna göre. Finite değilse (NaN/Infinity) pin RENDER EDİLMEZ; finite ama 0-1 dışıysa 0-1'e kenetlenir (`clampUnit`) — harita dışında etkileşimli pin üretilmez |
 | pins[].price | — | `string` | Verilmezse ve `count` yoksa pin boş görünür (kullanıcı hatası) |
 | pins[].count | — | `number` | Verilirse cluster rozeti; `price` yok sayılır |
 | popupContent | — | `(pinId) => ReactNode` | Yalnız seçili pin için çağrılır |
-| privacyCircle | — | `{x,y,r}` | 0-1 normalize; yaklaşık konum |
+| privacyCircle | — | `{x,y,r}` | 0-1 normalize; yaklaşık konum. `x`/`y`/`r`'den biri finite değilse daire RENDER EDİLMEZ; finite ama 0-1 dışıysa kenetlenir |
 
 ## 4. Public API
 
 | Ad | Type | Default | Controlled | Açıklama |
 |---|---|---|---|---|
 | pins | `GlassMapPin[]` | — | — | Fiyat/cluster pinleri |
-| selectedId | `string` | — | ✅ | Controlled seçili pin |
+| selectedId | `string \| null` | — | ✅ | Controlled seçili pin — `undefined`=uncontrolled, `null`=controlled BOŞ seçim, `string`=controlled seçili id |
 | defaultSelectedId | `string` | — | — | Uncontrolled başlangıç |
 | onPinSelect | `(id: string \| undefined) => void` | — | — | Seçim değişince; aynı pine tekrar tıklama → `undefined` |
 | popupContent | `(pinId: string) => ReactNode` | — | — | Seçili pin üstü popup içeriği |
@@ -73,6 +73,14 @@ bağlamı verir.
 Ref hedefi yok. `onPinSelect`/`onLayerChange` yalnız kullanıcı etkileşiminde
 çalışır (prop değişikliği kendi kendine tetiklemez).
 
+`selectedId` controlled tespiti `selectedId !== undefined` ile yapılır — bu
+yüzden `null` ve bir `string` ikisi de controlled sayılır, yalnız prop hiç
+verilmemesi (veya açıkça `undefined` geçilmesi) uncontrolled'a düşer.
+Controlled bir haritada seçimi temizlemek isteyen tüketici `selectedId`'yi
+`undefined`'a DEĞİL `null`'a çekmelidir; aksi halde harita uncontrolled moda
+geri döner ve `defaultSelectedId`'den kalan/iç state'teki eski seçim tekrar
+görünür olabilir (bkz. §11 regresyon testi).
+
 ## 5. Seçenek eksenleri
 
 `material`/`tone`/`size` yok — flat içerik yüzeyi, tek ölçek. Eksenler:
@@ -83,7 +91,7 @@ variant yok. `seed` görsel bir eksen değil, üretim parametresidir.
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
-| selected pin | prop/iç state | — | `aria-pressed` |
+| selected pin | `selectedId !== undefined` ise prop (`null`=boş), aksi halde iç state | — | `aria-pressed` |
 | layer | prop/iç state | — | `aria-checked` (radio) |
 | focus-visible | CSS | — | 2px `--lg-accent` halka |
 | popup açık | `selected && popupContent` türetilmiş | — | `role="group"` |
@@ -114,6 +122,11 @@ Katman sırası: layer (zemin) → pins (üstte) → popup (en üstte, `z-index`
   yalnız prop güncellenince değişir (bkz. test: controlled senaryo).
 - Zemin üretimi saf fonksiyon: `seed` aynıysa `vLines/hLines/blocks` birebir
   aynıdır (memoize edilir, `Math.random` kullanılmaz).
+- Koordinat güvenliği: `pins[].x/y` ve `privacyCircle.x/y/r` `clampUnit` ile
+  işlenir — `Number.isFinite` değilse (NaN/Infinity, ör. API'den bozuk veri)
+  o pin/daire hiç render edilmez (butonun kendisi DOM'a yazılmaz, tıklanabilir
+  bir "harita dışı" öğe oluşmaz); finite ama 0-1 aralığı dışındaysa 0-1'e
+  kenetlenir (ör. `x=4` → `1`, `y=-2` → `0`).
 
 ## 8. İçerik kuralları
 
@@ -166,6 +179,12 @@ Sizes N/A — tek ölçek.
 - [x] katman toggle roving-tabindex + ok tuşu ile Yol/Uydu arası odak taşır
 - [x] üst/sol/sağ kenara yakın pinlerde popup yön/hizalama attribute'ları
       doğru hesaplanır (data-vertical/data-align)
+- [x] controlled: `selectedId` prop `null`'a çekilince eski iç/uncontrolled
+      seçim geri sızmaz, sonraki tıklama yalnız `onPinSelect` döner
+- [x] finite olmayan (`NaN`/`Infinity`) pin koordinatı render edilmez,
+      geçerli pinler etkilenmez
+- [x] finite ama 0-1 dışı pin koordinatı 0-1'e kenetlenir
+- [x] finite olmayan `privacyCircle` koordinatı/yarıçapı render edilmez
 - [ ] zemin dokusunun görsel yoğunluğu (visual, Chrome)
 - [ ] popup'ın gerçek DOM ölçümüyle (ör. ResizeObserver) tam kenar-güvenli
       konumlanması — v1 yalnız pin koordinatına göre eşiklenmiş tahmin
@@ -179,6 +198,9 @@ Sizes N/A — tek ölçek.
 - ❌ Harita yüzeyine cam/backdrop-filter verme — içerik katmanı flat kalır.
 - ❌ `popupContent` içine ikinci seviye interaktif harita kontrolü koyma
   (zoom/pan v1'de yok).
+- ❌ Controlled bir haritada seçimi kaldırmak için `selectedId`'yi
+  `undefined` yapma — bu, bileşeni uncontrolled moda düşürüp eski iç seçimi
+  geri getirebilir; `null` kullan.
 
 **Bilinen kısıtlar:** zoom/pan yok (v1 statik kutu); cluster'a tıklama
 "genişletme" değil, yalnız seçim/popup tetikler — gerçek gruplama v2'de.
@@ -202,3 +224,10 @@ aynı roving-tabindex + ok tuşu sözleşmesine taşındı; kökten
 SVG'sini kırpar), popup artık pin konumuna göre `data-vertical`/`data-align`
 ile yön/hizalama değiştirir ve kenara yakın pinlerde asla tamamen
 görünmezleşmez; `popupClose` `pointer: coarse`'ta 36px'e büyür.
+2026-07-17 — Code review düzeltmesi: `selectedId` tipi `string | null`
+oldu (`undefined`=uncontrolled, `null`=controlled boş seçim), controlled
+tespiti `selectedId !== undefined` ile yapılır — parent'ın seçimi
+temizlemesi artık eski iç/uncontrolled seçimi geri sızdırmaz; `pins[].x/y`
+ve `privacyCircle.x/y/r` `clampUnit` ile finite kontrolünden geçirilip
+0-1'e kenetlenir, finite olmayan değer render edilmez (harita dışında
+etkileşimli pin üretilmesi engellendi).

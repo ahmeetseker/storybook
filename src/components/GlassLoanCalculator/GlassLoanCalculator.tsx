@@ -61,6 +61,47 @@ const formatTL = (n: number) => `${Math.round(n).toLocaleString('tr-TR')} TL`
 const parseDigits = (raw: string) => Number(raw.replace(/[^0-9]/g, '')) || 0
 const formatDigits = (n: number) => (n > 0 ? n.toLocaleString('tr-TR') : '')
 
+const MIN_RATE_PERCENT = 0.01
+const MAX_RATE_PERCENT = 10
+
+// Faiz girişini yalnız rakam + TEK ondalık ayraçla (virgül/nokta, virgüle normalize edilir)
+// sınırlar; eksi işareti, "e" gibi başka her karakter burada elenir. Bu sayede ekranda
+// görünen metin HER ZAMAN kendi üzerinden birebir parse edilebilir — "-2" yazıp +2
+// hesaplanması ya da "1e2" yazıp 12 hesaplanması gibi görünen/hesaplanan sapması oluşamaz.
+const sanitizeRateText = (raw: string): string => {
+  let seenSeparator = false
+  let out = ''
+  for (const ch of raw) {
+    if (ch >= '0' && ch <= '9') {
+      out += ch
+    } else if ((ch === ',' || ch === '.') && !seenSeparator) {
+      seenSeparator = true
+      out += ','
+    }
+  }
+  return out
+}
+
+// sanitizeRateText çıktısı zaten yalnız rakam + tek virgül içerir; bu yüzden burada
+// negatif/bilimsel-gösterim/NaN riski hiç yoktur.
+const parseRateText = (text: string): number => {
+  if (text === '' || text === ',') return 0
+  return Number(text.replace(',', '.'))
+}
+
+// 0, "henüz faiz girilmedi / kampanyalı sıfır faiz" için bilinçli olarak sınır dışı
+// bırakılır (bkz. calculateLoan r=0 dalı); 0 < n < MIN olan değerler MIN'e, MAX üstü
+// değerler MAX'e kıskaçlanır.
+const clampRatePercent = (n: number): number => {
+  if (n <= 0) return 0
+  return Math.min(MAX_RATE_PERCENT, Math.max(MIN_RATE_PERCENT, n))
+}
+
+const formatRateText = (n: number): string => {
+  const rounded = Math.round(n * 100) / 100
+  return String(rounded).replace('.', ',')
+}
+
 function calculateLoan(
   price: number,
   downPaymentPercent: number,
@@ -140,10 +181,20 @@ export function GlassLoanCalculator({
   const handlePriceChange = (raw: string) => setPrice(parseDigits(raw))
 
   const handleRateChange = (raw: string) => {
-    setRateText(raw)
-    const normalized = raw.replace(',', '.').replace(/[^0-9.]/g, '')
-    const parsed = Number(normalized)
-    setMonthlyRatePercent(Number.isFinite(parsed) ? parsed : 0)
+    // Sanitize edilmiş metin hem ekranda görünür hem parse edilir — iki farklı kaynak yok,
+    // bu yüzden görünen ve hesaplanan değer her karakterde birebir aynı sayıyı temsil eder.
+    const sanitized = sanitizeRateText(raw)
+    setRateText(sanitized)
+    setMonthlyRatePercent(parseRateText(sanitized))
+  }
+
+  // Alan odağı kaybedince değeri geçerli aralığa (0.01-10) kıskaçlar; hem görünen metni hem
+  // hesaplanan sayıyı birlikte günceller — böylece ikisi arasında asla sapma kalmaz.
+  const handleRateBlur = () => {
+    if (rateText === '' || rateText === ',') return
+    const clamped = clampRatePercent(parseRateText(rateText))
+    setMonthlyRatePercent(clamped)
+    setRateText(formatRateText(clamped))
   }
 
   const principalPct = result.totalPayment > 0 ? (result.loanAmount / result.totalPayment) * 100 : 100
@@ -221,6 +272,7 @@ export function GlassLoanCalculator({
               inputMode="decimal"
               value={rateText}
               onChange={(e) => handleRateChange(e.target.value)}
+              onBlur={handleRateBlur}
               suffix="%"
               placeholder="0"
             />

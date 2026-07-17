@@ -55,10 +55,10 @@ yapısındaki veriler için. İçerik katmanı component'idir — cam yok.
 |---|---|---|---|---|---|
 | columns | prop | `GlassTableColumn[]` (`{key, label, sortable?, align?, width?}`) | — (zorunlu) | — | Sütun tanımı |
 | rows | prop | `GlassTableRow[]` (`{id: string} & Record<string, ReactNode>`) | — (zorunlu) | — | Zaten çağıran tarafından sıralanmış/filtrelenmiş veri |
-| sortKey | prop | `string` | — | ✅ (`defaultSortKey` ile birlikte kontrolsüz) | Aktif sıralama sütunu |
+| sortKey | prop | `string` | — | ✅ (`defaultSortKey` ile birlikte kontrolsüz) — controlled tespiti bu prop üzerinden yapılır, `sortDirection`'ın da controlled olup olmadığını belirler | Aktif sıralama sütunu |
 | defaultSortKey | prop | `string` | — | — | Kontrolsüz başlangıç değeri |
-| sortDirection | prop | `'asc'\|'desc'` | — | ✅ | Aktif yön |
-| defaultSortDirection | prop | `'asc'\|'desc'` | `'asc'` | — | Kontrolsüz başlangıç yönü |
+| sortDirection | prop | `'asc'\|'desc'` | — | ✅ ama YALNIZ `sortKey` de controlled ise (verilmemişse `'asc'` varsayılır); `sortKey` yokken tek başına verilirse YOK sayılır | Aktif yön |
+| defaultSortDirection | prop | `'asc'\|'desc'` | `'asc'` | — | Kontrolsüz başlangıç yönü (yalnız `sortKey` de uncontrolled iken kullanılır) |
 | onSortChange | event | `(key, direction) => void` | — | — | Sıralanabilir başlığa tıklanınca; **component satırları SIRALAMAZ**, yalnız göstergeyi (ok yönü + `aria-sort`) günceller — yeni `rows`'u sağlamak çağıranın işidir |
 | selectable | prop | `boolean` | `false` | — | Seçim sütununu açar |
 | selectedIds | prop | `string[]` | — | ✅ (`defaultSelectedIds` ile kontrolsüz) | Seçili satır id'leri |
@@ -113,11 +113,22 @@ callback'i tetikler).
 - **Controlled/uncontrolled:** `sortKey`/`selectedIds` verilmişse o kazanır
   (GlassCheckbox/GlassSelect kalıbı); verilmemişse `defaultSortKey`/
   `defaultSelectedIds`'den başlayan iç state kullanılır.
+- **Sıralama (key+direction) BİRLİKTE controlled/uncontrolled:** `sortKey` ve
+  `sortDirection` tek mantıksal state olarak ele alınır — controlled tespiti
+  **yalnız `sortKey`** üzerinden yapılır. `sortKey` verilmişse `sortDirection`
+  de controlled sayılır (prop eksikse `'asc'` varsayılır, iç state'e
+  düşülmez); `sortKey` verilmemişse ikisi de iç state'ten okunur ve tek
+  başına verilen `sortDirection` prop'u (sortKey olmadan) kontrolsüz modda
+  YOK sayılır. Bu, "yalnız biri controlled olunca eski kolon + yeni yön
+  karışması" hatasını engeller — bkz. `Sortable` story'sindeki desen (ikisi
+  birlikte controlled) tek desteklenen controlled kullanım şeklidir.
 - **Sticky header:** `th` `position: sticky; top: 0`; en yakın kaydıran
   ata (sarmalayıcı `div` veya sayfa) üzerinde çalışır — ek prop gerekmez.
-- **Responsive:** 700px altında `<thead>` görsel olarak gizlenir (sr-only,
-  DOM'da kalır), satırlar blok karta düşer, her `<td>` `data-label`
-  attribute'undan `::before` ile etiketini gösterir (bkz. §9 borç).
+- **Responsive:** 700px altında `<thead>` `display: none` ile tamamen
+  kaldırılır (DOM'da kalır ama render edilmez, erişilebilirlik ağacından ve
+  Tab sırasından çıkar), satırlar blok karta düşer, her `<td>` `data-label`
+  attribute'undan `::before` ile etiketini gösterir (bkz. §9 borç). Bilinen
+  kısıt: mobilde sort butonları da bu şekilde erişilemez olur — bkz. §12.
 
 ## 8. İçerik kuralları
 
@@ -171,7 +182,12 @@ yok, §12 açık karar).
 - [x] kısmi seçim → tümü-seç `indeterminate=true`, `checked=false` (unit)
 - [x] tekil satır seçimi id listesine ekler (unit)
 - [x] her hücre `data-label` taşır — mobil kart görünümü ön koşulu (unit)
+- [x] `sortKey` controlled + `sortDirection` verilmemişken yön `'asc'`
+      varsayılır ve tıklama iç state'e sızmadan tutarlı `onSortChange`
+      üretir — karışık controlled/uncontrolled regresyonu (unit)
 - [ ] 700px altı gerçek kart görünümü + sticky header (visual, Chrome)
+- [ ] mobilde `<thead>` `display:none` sonrası sort/tümünü-seç kontrollerinin
+      Tab sırasından gerçekten çıktığı (visual/manual, Chrome)
 - [ ] Kağıt/Grafit tema kontrastı (visual)
 
 ## 12. Do / Don't
@@ -187,10 +203,14 @@ yok, §12 açık karar).
 **Bilinen kısıtlar:** seçim yalnız o anki `rows` üzerinde çalışır — harici
 sayfalamada görünmeyen sayfaların seçimi bu component'in bilgisi dışındadır
 (çağıran `selectedIds`'i birleştirerek yönetmeli) · sıralama 2 durumlu
-(asc/desc) — "sıralamasız" üçüncü durum yok · mobilde (<700px) `<thead>`
-gizlendiği için sıralama başlık butonlarına dokunsal erişim kaybolur (satır
-sırası zaten üstte `rows` ile belirlendiğinden görsel olarak sorun değil,
-ama sort tetikleme mobilde ayrı bir kontrol gerektirebilir — v2 açık kararı).
+(asc/desc) — "sıralamasız" üçüncü durum yok · `sortKey`/`sortDirection`
+BİRLİKTE controlled veya BİRLİKTE uncontrolled olmalı — `sortKey` olmadan tek
+başına `sortDirection` vermek desteklenmez (yok sayılır, iç state kullanılır)
+· mobilde (<700px) `<thead>` `display: none` ile DOM'dan render dışı
+bırakıldığı için sıralama başlık butonları VE tümünü-seç checkbox'ı Tab
+sırasından ve erişilebilirlik ağacından tamamen kaybolur (satır sırası zaten
+üstte `rows` ile belirlendiğinden görsel olarak sorun değil, ama mobilde
+sort/tümünü-seç tetikleme ayrı bir kontrol gerektirir — v2 açık kararı).
 
 **Açık kararlar:** mobilde sıralama tetikleyicisi (ayrı `<select>` veya
 sheet) · sayfalama entegrasyonu (`selectedIds` birleştirme yardımcı fonksiyonu)
@@ -199,3 +219,8 @@ sheet) · sayfalama entegrasyonu (`selectedIds` birleştirme yardımcı fonksiyo
 **Changelog:** 2026-07-17 — İlk sürüm: sıralama göstergesi (comparator'sız,
 controlled) + çoklu seçim (indeterminate destekli) + 700px altı kart
 görünümü.
+2026-07-17 — Code review fix: `sortKey`/`sortDirection` artık tek mantıksal
+state (controlled tespiti yalnız `sortKey` üzerinden, karışık kullanımda eski
+kolon + yeni yön karışması giderildi); mobil kart modunda `<thead>` artık
+`display: none` (önceden sr-only clip ile DOM'da kalıp sort butonları/
+tümünü-seç Tab sırasında kalıyordu).
