@@ -1,0 +1,147 @@
+/* İçerik katmanı: FLAT — cam/backdrop-filter yok. Seviye rengi tek bir yerel
+   değişkenden (--glass-climate-tone) sürülür; resolveTone() bu değişkeni
+   doldurur, CSS yalnız tüketir. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  box-sizing: border-box;
+  padding: var(--lg-space-5);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  color: var(--lg-label);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── badges: kompakt çipler, sarmalı satır ── */
+.badges {
+  flex-flow: row wrap;
+  gap: var(--lg-space-3);
+}
+
+.badgeItem {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+}
+
+.levelChip {
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: var(--lg-radius-capsule);
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--glass-climate-tone);
+  background: color-mix(in srgb, var(--glass-climate-tone) 16%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--glass-climate-tone) 42%, transparent);
+}
+
+/* ── detailed: satır satır, seviye ölçeği + açıklama + kaynak ── */
+.detailed {
+  flex-direction: column;
+  gap: var(--lg-space-5);
+}
+
+.detailedItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  padding-bottom: var(--lg-space-4);
+  border-bottom: 1px solid var(--lg-hairline);
+}
+.detailedItem:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.detailedHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.levelText {
+  margin-left: auto;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--glass-climate-tone);
+}
+
+.scale {
+  display: flex;
+  gap: 4px;
+}
+
+/* Borç (raw): birim çubuğu 22×6px + 3px radius — GlassScoreMeter'ın ring
+   stroke-width borcuyla aynı gerekçe, gösterge kalınlığı için token yok. */
+.unitFilled,
+.unitEmpty {
+  display: block;
+  width: 22px;
+  height: 6px;
+  border-radius: 3px;
+}
+.unitFilled {
+  background: var(--glass-climate-tone);
+}
+.unitEmpty {
+  background: var(--lg-hairline);
+}
+
+.description {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  overflow-wrap: break-word;
+}
+
+.source {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+/* ── ortak ── */
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+  align-items: center;
+  justify-content: center;
+  color: var(--lg-label-secondary);
+}
+
+.hazardLabel {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  color: var(--lg-label);
+  overflow-wrap: break-word;
+}
+.badgeItem .hazardLabel {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
