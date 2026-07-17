@@ -1,0 +1,265 @@
+/* GlassPersonalNote — içerik katmanı FLAT: cam/backdrop-filter YOK. Yalnız
+   token'lar (--lg-*) + color-mix türevleri. Textarea min/max yüksekliği ve
+   ikon SVG viewBox ölçüleri raw px borcu — bkz. rules.md §9. */
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-2);
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── boş durum: "Not ekle" satırı ── */
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  height: var(--lg-control-md);
+  padding: 0 var(--lg-space-3);
+  border: 1px dashed var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: transparent;
+  color: var(--lg-label-secondary);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.addButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .addButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 5%, transparent);
+    color: var(--lg-label);
+    border-color: color-mix(in srgb, var(--lg-label) 25%, var(--lg-hairline));
+  }
+}
+
+@media (pointer: coarse) {
+  .addButton {
+    min-height: 44px;
+  }
+}
+
+/* ── kayıtlı not: metin + Düzenle ── */
+.noteBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-2);
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--lg-space-3);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+}
+
+.noteText {
+  margin: 0;
+  width: 100%;
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.editButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--lg-control-sm);
+  padding: 0 var(--lg-space-2);
+  border: 0;
+  border-radius: var(--lg-radius-chip);
+  background: transparent;
+  color: var(--lg-accent);
+  font: inherit;
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease-out;
+}
+
+.editButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .editButton:hover {
+    background: color-mix(in srgb, var(--lg-accent) 10%, transparent);
+  }
+}
+
+@media (pointer: coarse) {
+  .editButton {
+    min-height: 44px;
+    padding: 0 var(--lg-space-3);
+  }
+}
+
+/* ── düzenleme ── */
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  min-height: calc(var(--lg-control-md) * 2);
+  max-height: 240px;
+  padding: var(--lg-space-3);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  transition: border-color 0.15s ease-out;
+}
+
+.textarea::placeholder {
+  color: var(--lg-label-secondary);
+}
+
+.textarea:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 1px;
+}
+
+.editorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+}
+
+.counter {
+  padding: 2px 7px;
+  border-radius: var(--lg-radius-capsule);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Sınıra yaklaşınca (kalan <= eşik) yalnız renkle değil, sayının kendisiyle
+   de bilgi taşınıyor; renk yalnız zemin/metin karışımına uygulanıyor (küçük
+   metnin tamamı ham semantik renge boyanmıyor — kontrast riskini azaltmak
+   için AI rozetiyle aynı color-mix tekniği). */
+.counter[data-near-limit] {
+  background: color-mix(in srgb, var(--lg-warning) 16%, transparent);
+  color: color-mix(in srgb, var(--lg-warning) 65%, var(--lg-label));
+  font-weight: 700;
+}
+
+.editorActions {
+  display: flex;
+  gap: var(--lg-space-2);
+}
+
+.cancelButton,
+.saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--lg-control-sm);
+  padding: 0 var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease-out, background-color 0.15s ease-out, color 0.15s ease-out;
+}
+
+.cancelButton {
+  border: 1px solid var(--lg-hairline);
+  background: transparent;
+  color: var(--lg-label-secondary);
+}
+
+@media (hover: hover) {
+  .cancelButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, transparent);
+    color: var(--lg-label);
+  }
+}
+
+.saveButton {
+  border: 0;
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+@media (hover: hover) {
+  .saveButton:hover {
+    opacity: 0.92;
+  }
+}
+
+.cancelButton:focus-visible,
+.saveButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .cancelButton,
+  .saveButton {
+    min-height: 44px;
+  }
+}
+
+/* ── gizlilik satırı: üç durumda da sabit ── */
+.privacy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+.privacy svg {
+  flex: none;
+  color: var(--lg-label-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .addButton,
+  .editButton,
+  .textarea,
+  .cancelButton,
+  .saveButton {
+    transition: none;
+  }
+}
