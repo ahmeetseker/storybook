@@ -1,0 +1,189 @@
+/* GlassLoanCalculator — flat içerik kartı (cam yok); yalnız iç kontroller
+   (GlassInput/GlassSlider/GlassButton) kendi kontrol-katmanı camını taşır. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: var(--lg-space-5, 20px);
+  padding: var(--lg-space-6, 24px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  color: var(--lg-label);
+  font-family: var(--lg-font, inherit);
+  max-width: 420px;
+}
+
+.compact {
+  gap: var(--lg-space-4, 16px);
+  padding: var(--lg-space-5, 20px);
+  max-width: 360px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+  min-width: 0;
+}
+
+.fieldHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2, 8px);
+}
+
+.fieldLabel {
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+}
+
+.fieldValue {
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-3, 12px);
+  padding: var(--lg-space-2, 8px) 0;
+  border-bottom: 1px solid var(--lg-hairline);
+}
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowLabel {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  color: var(--lg-label-secondary);
+}
+
+.rowValue {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ratioBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+}
+
+.ratioBar {
+  display: flex;
+  width: 100%;
+  height: 10px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  overflow: hidden;
+  background: var(--lg-hairline);
+}
+
+/* Anapara: nötr (ikinci renk gerekmez — tek vurgu accent kuralına uyar) */
+.ratioPrincipal {
+  height: 100%;
+  background: color-mix(in srgb, var(--lg-label) 30%, transparent);
+}
+
+/* Faiz: tek vurgu rengi accent ile öne çıkar */
+.ratioInterest {
+  height: 100%;
+  background: var(--lg-accent);
+}
+
+.ratioLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-4, 16px);
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legendDotPrincipal,
+.legendDotInterest {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.legendDotPrincipal {
+  background: color-mix(in srgb, var(--lg-label) 30%, transparent);
+}
+.legendDotInterest {
+  background: var(--lg-accent);
+}
+
+.paymentBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1, 4px);
+  padding-top: var(--lg-space-4, 16px);
+  border-top: 1px solid var(--lg-hairline);
+}
+.compact .paymentBlock {
+  padding-top: 0;
+  border-top: none;
+}
+
+.paymentLabel {
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+}
+
+.paymentValue {
+  font-size: var(--lg-text-display, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-accent);
+}
+
+.paymentMeta {
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+}
+
+.cta {
+  width: 100%;
+}
+
+/* Dar container: kart genişliği daralır, iç boşluklar bir kademe düşer */
+@media (max-width: 420px) {
+  .card {
+    max-width: 100%;
+    padding: var(--lg-space-4, 16px);
+  }
+}
