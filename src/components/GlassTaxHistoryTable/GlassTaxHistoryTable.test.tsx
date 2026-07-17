@@ -93,4 +93,41 @@ describe('GlassTaxHistoryTable', () => {
     rerender(<GlassTaxHistoryTable rows={rows} />)
     expect(screen.queryByText('Kaynak: Belediye kayıtları')).toBeNull()
   })
+
+  it('children prop tip düzeyinde kabul edilmez ve JSX yayılımında sessizce yutulmaz (regresyon: children spread ile override edilen kök section)', () => {
+    // Props tipi artık HTMLAttributes'tan 'children'ı açıkça omit ediyor (bkz. rules.md §4);
+    // bu test, tip korumasını bypass edecek bir çağıranın bile (ör. any-cast) DOM'da
+    // beklenmedik bir children sızıntısı yaratmadığını doğruluyor — kök <section> JSX'te
+    // her zaman kendi sabit alt ağacını render eder, spread edilen {...rest} children'ı
+    // ezemez.
+    const props = { rows, children: 'Dışarıdan gelen metin sızmamalı' } as unknown as Parameters<typeof GlassTaxHistoryTable>[0]
+    render(<GlassTaxHistoryTable {...props} />)
+    expect(screen.queryByText('Dışarıdan gelen metin sızmamalı')).toBeNull()
+  })
+
+  it('ok ikonu (artış/azalış) ham semantik renk yerine --lg-label ile koyulaştırılmış color-mix kullanır (3:1 anlamlı-grafik kontrast regresyonu)', async () => {
+    // jsdom, vitest'te CSS modüllerini gerçekten uygulamaz (getComputedStyle güvenilir
+    // değil); bu yüzden regresyonu kaynak CSS'te statik olarak doğruluyoruz. Ham
+    // `color: var(--lg-success)` açık temada ~2.2:1 kontrastla WCAG non-text 3:1 eşiğini
+    // kaçırıyordu (bkz. Codex dalga4 raporu). Fix: her iki yön kuralı da
+    // `color-mix(in srgb, var(--lg-<tone>) …%, var(--lg-label))` kullanmalı.
+    const fs = await import('node:fs')
+    const path = await import('node:path')
+    const cssPath = path.join(__dirname, 'GlassTaxHistoryTable.module.css')
+    const css = fs.readFileSync(cssPath, 'utf-8')
+
+    for (const [direction, tone] of [
+      ['up', 'danger'],
+      ['down', 'success'],
+    ] as const) {
+      const rule = new RegExp(`\\.change\\[data-direction='${direction}'\\] \\.arrow\\s*\\{[^}]*\\}`)
+      const match = css.match(rule)?.[0] ?? ''
+      expect(match, `.change[data-direction='${direction}'] .arrow`).toMatch(
+        new RegExp(`color:\\s*color-mix\\(in srgb, var\\(--lg-${tone}\\)`),
+      )
+      expect(match, `.change[data-direction='${direction}'] .arrow ham renk regresyonu`).not.toMatch(
+        new RegExp(`color:\\s*var\\(--lg-${tone}\\)\\s*;`),
+      )
+    }
+  })
 })

@@ -27,7 +27,7 @@ export interface GlassTourPlannerStop {
   image?: string
 }
 
-export interface GlassTourPlannerProps extends HTMLAttributes<HTMLElement> {
+export interface GlassTourPlannerProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   /** Sıralı durak listesi — sıra numarası dizindeki konumdan türetilir (`stop.id` yalnız React key) */
   stops: GlassTourPlannerStop[]
   /** Plan tarihi/etiketi (ör. "Cmt 18 Tem") — başlığın accessible name kaynağı */
@@ -127,6 +127,7 @@ export function GlassTourPlanner({
 }: GlassTourPlannerProps) {
   const uid = useId()
   const titleId = `${uid}-title`
+  const feedbackPromptId = `${uid}-feedback-prompt`
 
   const resolvedConfidence = resolveConfidence(confidence)
   const [feedback, setFeedback] = useState<'up' | 'down' | undefined>(undefined)
@@ -149,13 +150,22 @@ export function GlassTourPlanner({
   }
 
   const showFeedback = !loading && Boolean(onFeedback) && stops.length > 0
-  const confirmDisabled = loading || !onConfirm
+  // `stops=[]` iken onaylanacak bir plan yok — `onConfirm` verilmiş olsa
+  // bile buton disabled kalır (boş plan callback'i asla tetiklenmez).
+  const confirmDisabled = loading || !onConfirm || stops.length === 0
 
   const handleFeedback = (direction: 'up' | 'down') => {
     // Aynı yöne tekrar tıklama seçimi geri alır (toggle); farklı yöne
     // tıklama karşılıklı dışlayarak seçimi değiştirir.
     setFeedback((prev) => (prev === direction ? undefined : direction))
     onFeedback?.(direction)
+  }
+
+  const handleConfirm = () => {
+    // Koruyucu boşluk kontrolü: `disabled` durumu tıklamayı zaten engeller,
+    // ama programatik tetiklemeye (ör. test/otomasyon) karşı ikinci katman.
+    if (stops.length === 0) return
+    onConfirm?.()
   }
 
   const classes = [styles.root, className].filter(Boolean).join(' ')
@@ -174,9 +184,11 @@ export function GlassTourPlanner({
         {!loading && totalNote ? <p className={styles.totalNote}>{totalNote}</p> : null}
         {/* aria-live bölgesi HER ZAMAN mount edilir — sonradan mount edilen canlı
             bölgeler ekran okuyucu tarafından duyurulmaz (bkz. Dalga kontratı,
-            GlassInfiniteList ile aynı desen). Yalnız metin içeriği koşullu. */}
+            GlassInfiniteList ile aynı desen). `loading` biterken de açık bir
+            "tamamlandı/hazır" mesajı yayınlanır — metni boşaltmak durum
+            geçişini güvenilir duyurmaz. */}
         <span role="status" className={styles.srOnly}>
-          {loading ? 'Tur planı hazırlanıyor' : ''}
+          {loading ? 'Tur planı hazırlanıyor' : stops.length > 0 ? 'Tur planı hazır' : 'Tur planında durak yok'}
         </span>
       </header>
 
@@ -224,8 +236,10 @@ export function GlassTourPlanner({
       <div className={styles.footer}>
         {showFeedback ? (
           <div className={styles.feedback}>
-            <span className={styles.feedbackPrompt}>Bu plan faydalı mıydı?</span>
-            <div className={styles.feedbackButtons}>
+            <span id={feedbackPromptId} className={styles.feedbackPrompt}>
+              Bu plan faydalı mıydı?
+            </span>
+            <div className={styles.feedbackButtons} role="group" aria-labelledby={feedbackPromptId}>
               <button
                 type="button"
                 className={styles.feedbackButton}
@@ -249,12 +263,7 @@ export function GlassTourPlanner({
             </div>
           </div>
         ) : null}
-        <button
-          type="button"
-          className={styles.confirmButton}
-          disabled={confirmDisabled}
-          onClick={() => onConfirm?.()}
-        >
+        <button type="button" className={styles.confirmButton} disabled={confirmDisabled} onClick={handleConfirm}>
           Planı Onayla
         </button>
       </div>

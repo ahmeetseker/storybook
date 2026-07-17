@@ -16,7 +16,8 @@ export type GlassAiFlagBannerSeverity = 'info' | 'warning' | 'danger'
 /** Geri bildirim yönü — 👍 `'up'`, 👎 `'down'`. */
 export type GlassAiFlagBannerFeedbackValue = 'up' | 'down'
 
-export interface GlassAiFlagBannerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface GlassAiFlagBannerProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   /** Bandın önem derecesi — zemin/ikon rengini ve rolü belirler (varsayılan `'warning'`) */
   severity?: GlassAiFlagBannerSeverity
   /** Kalın başlık satırı — her zaman render edilir */
@@ -157,12 +158,28 @@ export function GlassAiFlagBanner({
   // geri bildirim seçimi anlamsız kalır — eski aria-pressed yeni içeriğe
   // miras kalmamalı. GlassAiSummaryCard ile birebir aynı "prop değişince
   // state'i sıfırla" deseni (ref karşılaştırma, effect gerektirmez).
-  const contentSignature = `${title} ${description ?? ''} ${(reasons ?? []).join('')}`
+  // Ayraçsız string birleştirme (`${a} ${b}`) farklı alan kombinasyonlarının
+  // aynı imzaya çakışmasına yol açabilir (Codex bulgusu) — bu yüzden tüm
+  // kimlik alanları yapılandırılmış bir tuple olarak JSON.stringify'lanır.
+  const contentSignature = JSON.stringify([title, description ?? null, reasons ?? []])
   const prevContentSignature = useRef(contentSignature)
   if (prevContentSignature.current !== contentSignature) {
     prevContentSignature.current = contentSignature
     if (selected !== null) setSelected(null)
   }
+
+  // Yükleme geçişi duyurusu: yalnız "yükleniyor" metnini boşaltmak
+  // (Codex bulgusu) tamamlanma durumunu güvenilir duyurmaz — SR kullanıcısı
+  // sessizliği "hâlâ yükleniyor" ile ayırt edemez. Bu yüzden `loading`
+  // true'dan false'a geçtiğinde açık bir "tamamlandı" mesajı yayınlanır
+  // (aynı render-fazlı ref karşılaştırma deseni, contentSignature ile aynı).
+  const wasLoadingRef = useRef(loading)
+  const [completionAnnouncement, setCompletionAnnouncement] = useState('')
+  if (wasLoadingRef.current !== loading) {
+    wasLoadingRef.current = loading
+    setCompletionAnnouncement(loading ? '' : 'Yapay zekâ incelemesi tamamlandı')
+  }
+  const liveMessage = loading ? 'Yapay zekâ incelemesi yükleniyor' : completionAnnouncement
 
   const confidencePct = loading ? null : normalizeConfidence(confidence)
   const hasReasons = !loading && Boolean(reasons && reasons.length > 0)
@@ -208,9 +225,11 @@ export function GlassAiFlagBanner({
         </div>
 
         {/* Her zaman mount'lu canlı bölge: yalnız içerik değişince duyurulur
-            (Codex bulgusu — sonradan mount edilen aria-live SR'lerde kaçabilir). */}
+            (Codex bulgusu — sonradan mount edilen aria-live SR'lerde kaçabilir).
+            Hem "yükleniyor" hem "tamamlandı" durumu açık metinle duyurulur —
+            yükleme bitince bölgeyi sessizce boşaltmak geçişi kaçırır. */}
         <span className={styles.srOnly} aria-live="polite">
-          {loading ? 'Yapay zekâ incelemesi yükleniyor' : ''}
+          {liveMessage}
         </span>
 
         {loading ? (

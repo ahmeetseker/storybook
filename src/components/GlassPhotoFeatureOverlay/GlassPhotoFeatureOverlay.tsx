@@ -19,7 +19,8 @@ export interface GlassPhotoFeatureOverlayFeature {
   confidence?: number
 }
 
-export interface GlassPhotoFeatureOverlayProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface GlassPhotoFeatureOverlayProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   /** Üzerine özellik noktaları yerleştirilecek görsel */
   image: { src: string; alt: string }
   /** Tespit edilen özellik noktaları */

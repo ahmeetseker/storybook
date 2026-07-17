@@ -44,8 +44,13 @@ uygulanmaz çünkü kaynağı yapay zekâ değildir (bkz. §12 Do/Don't).
   `aria-hidden` OLMASAYDI, başlıktaki görünür "Elif Kaya" metniyle birlikte
   erişilebilirlik ağacında ikinci bir "Elif Kaya" duyurusu üretirdi
   (`GlassReviewCard` dersi, birebir aynı desen).
-- `role` yalnız görünür metin — ayrı bir ARIA gerekmez, zaten okunabilir
-  düz içerik (isimden sonra doğal okuma sırasında gelir).
+- `authorRole` yalnız görünür metin — ayrı bir ARIA gerekmez, zaten
+  okunabilir düz içerik (isimden sonra doğal okuma sırasında gelir). Prop
+  adı bilinçli olarak native `role` HTML özniteliğinden farklıdır: `role`
+  öznitelik olarak `HTMLAttributes<HTMLElement>`'ten `...rest` ile gelir ve
+  kök `<article>`e doğrudan geçer (ör. çağıran `role="note"` verebilir) —
+  görünür uzman etiketiyle (`authorRole`) hiçbir zaman çakışmaz/yutulmaz
+  (bkz. Codex denetimi §Önemli, dalga4).
 - "Yerinde inceledi" rozeti: gerçek görünür metin (yalnız ikon/renk değil)
   — durum bilgisi ekranokuyucuya normal metin akışıyla ulaşır, ek
   `aria-label` gerekmez (`GlassMatchScore`'un rozetindeki `aria-label`
@@ -64,7 +69,7 @@ uygulanmaz çünkü kaynağı yapay zekâ değildir (bkz. §12 Do/Don't).
 |---|---|---|---|
 | avatar | ✅ | `GlassAvatar` (`quote`: `md`, `inline`: `xs`) | Sarmalayıcı `aria-hidden` |
 | ad | ✅ | `author` | Accessible içerik kaynağı |
-| rol | — | `role` | Verilmezse hiç render edilmez |
+| rol | — | `authorRole` | Verilmezse hiç render edilmez; native `role` özniteliğiyle karıştırılmaz |
 | tarih | ✅ | `date` | Düz metin, `tabular-nums` |
 | doğrulama rozeti | — | "Yerinde inceledi" | Yalnız `verified=true` |
 | metin | ✅ | `text` | `quote`: tam metin sarar; `inline`: 2 satır clamp |
@@ -76,13 +81,13 @@ Children kabul edilmez — tamamen prop güdümlü.
 | Ad | Tür | Type | Default | Controlled | Açıklama |
 |---|---|---|---|---|---|
 | author | prop | `string` | — (zorunlu) | — | Başlık + avatar baş harfi kaynağı |
-| role | prop | `string` | — | — | Ör. "Bölge Danışmanı"; verilmezse render edilmez |
+| authorRole | prop | `string` | — | — | Ör. "Bölge Danışmanı"; verilmezse render edilmez. Native `role` özniteliğinden AYRI — ARIA rolü değildir, yalnız görünür etiket |
 | avatarSrc | prop | `string` | — | — | `GlassAvatar`'a geçilir; yüklenemezse baş harfe düşer |
 | date | prop | `string` | — (zorunlu) | — | Hazır biçimlendirilmiş metin, ayrıştırılmaz |
 | text | prop | `string` | — (zorunlu) | — | İçgörü metni |
 | verified | prop | `boolean` | `false` | — | "Yerinde inceledi" rozetini açar |
 | variant | prop | `'quote' \| 'inline'` | `'quote'` | — | `inline` kendi kart zemini taşımaz |
-| ...rest | — | `HTMLAttributes<HTMLElement>` (`children` hariç) | — | — | `className`/`style`/`data-*` birleştirilir/iletilir |
+| ...rest | — | `HTMLAttributes<HTMLElement>` (`children` hariç) | — | — | `className`/`style`/`data-*`/native `role` birleştirilir/iletilir — `role` kök `<article>`e doğrudan geçer |
 
 Ref hedefi yok. Callback/event yok — component tamamen sunum amaçlı, kendi
 state'ini tutmaz (`GlassMatchScore`/`GlassReviewCard`'ın aksine geri
@@ -101,20 +106,20 @@ Varsayılan kombinasyon: `variant='quote'`, `verified=false`.
 
 | Yasak / türetilen | Davranış |
 |---|---|
-| `inline` + uzun `role`/`author` | Ellipsis ile kısaltılır (dar tek satır korunur), tam metin `title` YOK (spec'te istenmedi — açık karar, bkz. §12) |
+| `inline` + uzun `authorRole`/`author` | Ellipsis ile kısaltılır (dar tek satır korunur), tam metin `title` YOK (spec'te istenmedi — açık karar, bkz. §12) |
 | `verified` olmayan varsayılan | Rozet hiç render edilmez (koşullu render, boş/gizli element bırakılmaz) |
-| `role` verilmemesi | Başlık satırında yalnız `author` kalır, boşluk/ayraç artığı bırakılmaz |
+| `authorRole` verilmemesi | Başlık satırında yalnız `author` kalır, boşluk/ayraç artığı bırakılmaz |
 
 ## 6. State modeli
 
 Component'in dahili state'i yoktur — tamamen prop'lardan türeyen saf
 render. Katman sırası: `variant` (avatar boyutu + metin clamp + kart
-zemini) → `role`/`verified` (koşullu slotlar) → render.
+zemini) → `authorRole`/`verified` (koşullu slotlar) → render.
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
 | avatar boyutu | `variant` (`quote`→`md`, `inline`→`xs`) | — | — |
-| rol satırı | `role` prop varlığı | — | — |
+| rol satırı | `authorRole` prop varlığı | — | — |
 | doğrulama rozeti | `verified` prop | — | görünür metin |
 | disabled/hover/focus/active | — | — | N/A — hiç etkileşimli element yok, hover/focus/active PROP DEĞİL zaten uygulanamaz |
 
@@ -123,14 +128,14 @@ zemini) → `role`/`verified` (koşullu slotlar) → render.
 - Statik sunum — pointer/touch/klavye etkileşimi, odak yönetimi, async
   durum yok. Tab sırasına giren hiçbir element yok (buton/link/kontrol
   render edilmez).
-- Sayı girdisi/normalize edilecek koordinat yok (`author`/`role`/`date`/
+- Sayı girdisi/normalize edilecek koordinat yok (`author`/`authorRole`/`date`/
   `text` serbest metin, `verified` boolean) — clamp/guard gerektiren bir
   prop bulunmuyor.
 - `escape`/IME/document-scoped dinleyici N/A — component hiçbir olay
   dinleyicisi kaydetmez.
 - Responsive: `quote` konteynerin genişliğine uyar (`nameRow`/`metaRow`
   `flex-wrap`), `text` `overflow-wrap: anywhere` ile sarar. `inline` satır
-  içi (`flex` row) — `author`/`role` dar alanda `text-overflow: ellipsis`
+  içi (`flex` row) — `author`/`authorRole` dar alanda `text-overflow: ellipsis`
   ile kısalır, `text` her koşulda 2 satırda `-webkit-line-clamp` ile
   kırpılır. Dokunmatik hedef yok (etkileşimli element bulunmadığından
   `pointer: coarse` 44px kuralı uygulanmaz — bkz. §12 açık karar).
@@ -140,7 +145,7 @@ zemini) → `role`/`verified` (koşullu slotlar) → render.
 - `author` kısa/gerçekçi tam ad; çok uzun adlarda `quote`'ta
   `overflow-wrap: anywhere` ile sarar, `inline`'da `text-overflow:
   ellipsis` ile kısalır (bkz. UzunIcerik story).
-- `role` kısa tutulmalı ("Bölge Danışmanı", "Kıdemli Danışman") — `inline`
+- `authorRole` kısa tutulmalı ("Bölge Danışmanı", "Kıdemli Danışman") — `inline`
   dar satırda `white-space: nowrap` + `ellipsis`.
 - `text` serbest uzunlukta; `quote` tamamını gösterir (`white-space:
   pre-line` ile satır sonlarını korur), `inline` her zaman 2 satıra
@@ -171,7 +176,7 @@ sistemi ölçeğinde tanımlı değil, component ailesi içinde tutarlı).
 ## 10. Storybook kapsamı
 
 Var: Default, Playground, Variants (`quote`/`inline`), Durumlar
-(`verified` var/yok, `role` var/yok), UzunIcerik, Responsive,
+(`verified` var/yok, `authorRole` var/yok), UzunIcerik, Responsive,
 Erişilebilirlik (docs description'lı).
 
 `Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (avatar boyutu
@@ -182,7 +187,7 @@ ile aynı karar).
 ## 11. Test kabul kriterleri
 
 - [x] `author`/`date`/`text` görünür metin olarak render edilir
-- [x] `role` verilirse görünür, verilmezse hiç render edilmez
+- [x] `authorRole` verilirse görünür, verilmezse hiç render edilmez
 - [x] `verified=true` iken "Yerinde inceledi" rozeti görünür; `false`/
       varsayılanda görünmez
 - [x] varsayılan `variant='quote'`, `data-variant="quote"` taşır
@@ -192,13 +197,16 @@ ile aynı karar).
 - [x] avatar sarmalayıcısı `aria-hidden` olduğundan `author` erişilebilirlik ağacında yalnız bir kez duyurulur (çift ad yok)
 - [x] `className` birleştirilir
 - [x] `...rest` (ör. `data-testid`) kök elemente iletilir
+- [x] native `role` özniteliği `...rest` üzerinden kök `<article>`e ulaşır ve
+      `authorRole` ile çakışmaz — ikisi bağımsız çalışır (regresyon testi,
+      Codex denetimi §Önemli, dalga4)
 - [ ] reduced-motion — N/A, component hiçbir animasyon/transition içermiyor (statik içerik)
 
 ## 12. Do / Don't
 
 - ✅ `text`'i yalnız adı geçen gerçek kişinin (danışman/uzman) kendi
   yazdığı/onayladığı içerikle doldur — insan yazımı olduğu için `author`/
-  `role` daima gerçek bir kişiye atfedilmelidir.
+  `authorRole` daima gerçek bir kişiye atfedilmelidir.
 - ✅ `verified`'ı yalnız uzman ilanı GERÇEKTEN yerinde incelediyse `true`
   yap — rozet bir doğrulama iddiasıdır.
 - ✅ `inline`'ı yalnız zaten çerçeveli bir liste/akış içinde kullan (kendi
@@ -223,6 +231,14 @@ ile aynı karar — çağıran hazır metin geçer).
 
 ## Changelog
 
+- 2026-07-17: `role` prop'u `authorRole` olarak yeniden adlandırıldı — eski
+  `role: string` prop'u native `role` HTML özniteliğiyle aynı isme sahip
+  olduğundan `HTMLAttributes<HTMLElement>`'ten gelen `role`'ü destructure
+  sırasında yutuyor, çağıranın `role="note"` gibi bir ARIA rolü kök
+  elemente hiç ulaşmadan görünür bir "note" etiketine dönüşme riski
+  taşıyordu (Codex denetimi, dalga4 §Önemli). `authorRole` artık yalnız
+  görünür uzman etiketi, native `role` `...rest` üzerinden serbestçe geçer.
+  Regresyon testi eklendi (native `role` + `authorRole` birlikte, çakışmaz).
 - 2026-07-17: İlk sürüm — `quote` (sol accent çizgili bağımsız kart) ve
   `inline` (kendi zemini olmayan kompakt tek satır + 2 satır metin clamp)
   varyantları, `GlassAvatar` entegrasyonu (aria-hidden sarmalayıcı), "Yerinde

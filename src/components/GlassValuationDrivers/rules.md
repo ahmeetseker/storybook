@@ -48,7 +48,11 @@ tarafından üretildiği için "✦ AI" rozeti zorunlu ve daima görünür.
 - `confidence` metni ("%N güven") görünür düz metin — ayrı ARIA gerekmez.
 - Geri bildirim: gerçek `<button aria-pressed>` (👍/👎), accessible name
   "Faydalı"/"Faydalı değil" — `role="radiogroup"` DEĞİL, iki bağımsız toggle
-  (bkz. `GlassMatchScore` §2 aynı gerekçe, roving tabindex gerekmez).
+  (bkz. `GlassMatchScore` §2 aynı gerekçe, roving tabindex gerekmez). Buton
+  çifti görünür soru metnine ("Bu değerlendirme faydalı mıydı?")
+  `role="group"` + `aria-labelledby` ile programatik bağlıdır — soru metni
+  `aria-label` olarak TEKRARLANMAZ (çift kaynak/çift okuma olmaz, tek görünür
+  metin tek gerçek kaynak kalır).
 - `loading=true`: liste/feedback render edilmez; tek duyuru noktası
   `role="status"` + görünür olmayan (`srOnly`) "{title} hesaplanıyor" metni —
   görsel placeholder tamamen `aria-hidden`, TEK istisna zorunlu "✦ AI" rozeti
@@ -59,7 +63,13 @@ tarafından üretildiği için "✦ AI" rozeti zorunlu ve daima görünür.
   okuyucularda güvenilir duyurulmaz). `loading` true→false geçtiğinde metin
   "{title} hazır" olarak güncellenir (sonuç hazır olduğuna dair duyuru);
   component ilk kez `loading=false` ile mount edildiğinde ise metin boş kalır
-  (sahte "hazır" duyurusu YOK — hiçbir şey gerçekten tamamlanmadı).
+  (sahte "hazır" duyurusu YOK — hiçbir şey gerçekten tamamlanmadı). Duyuru
+  metni `loading` YANINDA `title`'a da bağımlıdır: aynı `loading` değeri
+  korunurken `title` değişirse (ör. yükleniyorken ya da "hazır" duyurusundan
+  sonra farklı bir ilana geçildiğinde) metin güncel başlıkla yenilenir — TEK
+  istisna: hiç duyuru yapılmamış boş durumda (`statusText === ''`, henüz hiç
+  `loading` olmamış) yalnız `title` değişimi sahte bir "hazır" duyurusu
+  TETİKLEMEZ.
 - `drivers=[]`: liste (`role="list"`) hiç render edilmez, yerine görünür
   bilgilendirici bir paragraf ("Değerlemeyi etkileyen bir faktör bulunamadı.")
   gösterilir — hata fırlatılmaz, boş `<ul>` üretilmez.
@@ -80,7 +90,10 @@ tarafından üretildiği için "✦ AI" rozeti zorunlu ve daima görünür.
 | not | — (satır başına) | `note` | Yalnız verilirse render edilir |
 | geri bildirim | — | 👍/👎 | Yalnız `onFeedback` verilirse |
 
-Children kabul edilmez — tamamen prop güdümlü.
+Children kabul edilmez — tamamen prop güdümlü. `GlassValuationDriversProps`,
+`HTMLAttributes<HTMLDivElement>`'tan `'children'`ı da (`'title'`nin yanında)
+tip düzeyinde `Omit` eder — bu render-zamanı bir engelleme değil, geçersiz bir
+kullanımın derleme zamanında yakalanması içindir (bkz. §4).
 
 ## 4. Public API
 
@@ -92,7 +105,7 @@ Children kabul edilmez — tamamen prop güdümlü.
 | confidence | prop | `number` | — | — | [0,100]'e clamp; sonlu değilse gizlenir (rozet yine görünür) |
 | onFeedback | prop | `(value: 'up' \| 'down') => void` | — | — | Verilirse 👍/👎 butonları görünür |
 | loading | prop | `boolean` | `false` | — | true → flat skeleton + `role="status"` |
-| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title` hariç) | — | — | `className`/`style` birleştirilir |
+| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title`/`children` hariç) | — | — | `className`/`style` birleştirilir; `children` tip düzeyinde omit edilir (component'e içerik geçirilemez — render edilecek bir children yolu YOK) |
 
 Ref hedefi yok. `driver.id` yalnız React key ve içerik imzası (feedback
 sıfırlama) için kullanılır — hiçbir zaman DOM `id` alanına yazılmaz (satır
@@ -127,6 +140,7 @@ Varsayılan kombinasyon: tek görsel biçim — ayrı `variant`/`size` ekseni yo
 | güven | `confidence` (normalize) | — | görünür metin |
 | geri bildirim seçimi | dahili state (`feedback: 'up'\|'down'\|undefined`); aynı yöne tekrar tıklama toggle-off; `drivers`/`baseText` içerik imzası değişince render sırasında otomatik `undefined`'a sıfırlanır | — | `aria-pressed`, `data-selected` |
 | yükleme | `loading` prop | liste/feedback tamamen (AI rozeti HARİÇ — bkz. §2) | `role="status"` |
+| durum duyurusu (`statusText`) | dahili state; `loading` VE `title`'ın ikisine de bağımlı (ref'le karşılaştırılır) | — | `role="status"` `srOnly` metin |
 | disabled/hover/focus/active | — | — | hover/focus/active PROP DEĞİL; yalnız `:focus-visible`/`@media(hover:hover)` |
 
 **İçerik imzası (feedback sıfırlama):** `JSON.stringify({ drivers:
@@ -152,7 +166,9 @@ imzasının parçası) → render.
   `aria-pressed="true"` olur; diğer yön otomatik `false`'a döner (karşılıklı
   dışlama, iki bağımsız `<button>` — roving tabindex/`radiogroup` YOK). Zaten
   seçili olan yöne TEKRAR tıklama seçimi geri alır (toggle); `onFeedback` bu
-  tıklamada da çağrılır.
+  tıklamada da çağrılır. Buton grubu `role="group"` + `aria-labelledby` ile
+  görünür soru metnine ("Bu değerlendirme faydalı mıydı?") programatik olarak
+  bağlıdır — ekranokuyucu grup adını duyurur.
 - Geri bildirim seçimi `drivers`/`baseText` GERÇEKTEN değiştiğinde (içerik
   imzası — §6) otomatik sıfırlanır; aksi halde farklı bir ilana geçilse bile
   eski "faydalı" işareti ekranda asılı kalırdı.
@@ -160,7 +176,9 @@ imzasının parçası) → render.
   ekranokuyucuya tek seferlik "{title} hesaplanıyor" duyurur. Skeleton
   animasyonu yalnız `opacity` (shimmer/gradient yok, kendi flat placeholder'ı).
   Zorunlu "✦ AI" rozeti skeleton başlık satırının yanında normal
-  (aria-hidden OLMAYAN) şekilde render edilir.
+  (aria-hidden OLMAYAN) şekilde render edilir. `title` `loading` sırasında
+  (ya da "hazır" duyurusundan sonra) değişirse duyuru metni güncel başlığı
+  yansıtacak şekilde yeniden hesaplanır — bkz. §2 ve §6.
 - Odak taşıma yok — component hiçbir zaman kendiliğinden odak almaz/taşımaz;
   tek etkileşim yüzeyi (geri bildirim butonları) doğal Tab sırasında durur.
 - Responsive: grid satırı (`etiket | bar | impactText`) konteynerin
@@ -225,6 +243,9 @@ toolbar'la otomatik doğrulanır (`GlassMatchScore` ile aynı karar).
 - [x] `onFeedback` verilmezse buton hiç render edilmez
 - [x] geri bildirim seçimi `drivers`/`baseText` içerik imzası değişince otomatik sıfırlanır; içerik AYNIYSA (farklı referans dahi olsa) seçim korunur
 - [x] `loading=true` iken liste/feedback yerine `role="status"` durum metni render edilir; zorunlu "✦ AI" rozeti yine görünür kalır (güven metni gösterilmez)
+- [x] `children` tip düzeyinde omit edilir; zorla (tip korumasını atlayarak) geçirilse dahi render edilmez
+- [x] geri bildirim sorusu `role="group"` + `aria-labelledby` ile buton grubuna programatik bağlanır
+- [x] durum duyurusu `title`'a da bağımlıdır: aynı `loading` değerinde `title` değişince metin güncellenir; hiç duyuru yapılmamış boş durumda yalnız `title` değişimi sahte "hazır" duyurusu üretmez
 - [ ] reduced-motion'da bar/skeleton geçişlerinin kapanması (visual)
 
 ## 12. Do / Don't
@@ -251,3 +272,13 @@ karar).
 - 2026-07-17: İlk sürüm — tornado-benzeri yatay bar listesi (merkez çizgiden
   sağa pozitif/sola negatif), zorunlu AI rozeti + opsiyonel güven metni,
   👍/👎 geri bildirim, flat `loading` placeholder, boş `drivers` bilgi metni.
+- 2026-07-17: Codex konsolide QA raporu (Dalga 4) düzeltmeleri —
+  `GlassValuationDriversProps` `HTMLAttributes`'tan `'children'`ı da (tip
+  düzeyinde) omit eder; geri bildirim sorusu artık `role="group"` +
+  `aria-labelledby` ile buton grubuna programatik bağlı; `role="status"`
+  duyuru metni `loading` yanında `title` değişimine de tepki verir (aynı
+  `loading` değerinde başlık değişse dahi eski başlıkla asılı kalmaz, boş/hiç
+  duyurulmamış durumda ise sahte "hazır" duyurusu üretmez). İçerik imzası
+  (feedback sıfırlama, §6) zaten ilk sürümden beri yapılandırılmış
+  `JSON.stringify` tuple'ı kullanıyordu — raporun bu maddesi bu component için
+  ek değişiklik gerektirmedi.

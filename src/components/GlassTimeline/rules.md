@@ -62,7 +62,12 @@ veya düzenleme taşımaz.
 | description | Yalnız `variant="line"` ve `event.description` verilmişse | `event.description` | `variant="compact"`'ta render EDİLMEZ (spec: "yalnız tarih+başlık") |
 | emptyState | Yalnız `events.length === 0` | `emptyState` prop'u ya da varsayılan metin | Liste hiç render edilmez, `role="list"` yok |
 
-Children kabul edilmez — tamamen `events` prop'u güdümlü.
+Children kabul edilmez — tamamen `events` prop'u güdümlü. Bu, yalnız
+dokümantasyonel bir kural değil: `GlassTimelineProps`, `HTMLAttributes<HTMLDivElement>`'tan
+`'title' | 'children'` ikisini birden `Omit` eder — `children` tip
+seviyesinde public API'den çıkarılmıştır (aksi halde `{...rest}` spread'i
+`children`'ı div'e taşıyabilir ve JSX'in açık children'ı sessizce ezmesiyle
+veri kaybına yol açardı; bkz. §11 tip-only regresyon testi).
 
 ## 4. Public API
 
@@ -132,18 +137,33 @@ sırası: `events.length === 0` → emptyState; aksi halde her `event` için
 | Part | Property | Token | State override |
 |---|---|---|---|
 | kök yüzey | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-card` | — |
-| nokta (default) | background | `--lg-label-secondary` | `data-tone="success/warning/danger"` → `--lg-success`/`--lg-warning`/`--lg-danger` |
-| ikonlu marker zemin | background | `color-mix(in srgb, var(--lg-label-secondary) 14%, var(--lg-surface))` | ton bazlı `color-mix(... 16%, ...)` eşdeğeri |
+| nokta (default) | background | `--lg-label-secondary` | `data-tone="success/warning/danger"` → koyulaştırılmış `color-mix(in srgb, var(--lg-success/warning/danger) 68%, var(--lg-label))` |
+| ikonlu marker zemin | background | `color-mix(in srgb, var(--lg-label-secondary) 14%, var(--lg-surface))` | ton bazlı `color-mix(... 16%, ...)` eşdeğeri (dekoratif tint — anlamı ikon `color`'ı taşır) |
+| ikonlu marker ikon rengi | color | `--lg-label-secondary` | `data-tone="success/warning/danger"` → aynı `color-mix(... 68%, var(--lg-label))` formülü |
 | bağlantı çizgisi | background | `--lg-hairline` | — (ton rengi taşımaz, kasıtlı — bkz. §12) |
 | tarih | color | `--lg-label-secondary` | — |
 | başlık | color | `--lg-label` | — (semantik renk METNE uygulanmaz, yalnız nokta/zemin — kontrat notu) |
 | açıklama | color | `--lg-label-secondary` | — |
 | focus halkası | outline | N/A | bileşen hiçbir odaklanabilir eleman içermez |
 
+**Kontrast notu (ton noktaları):** ham `var(--lg-success/warning/danger)`
+zemin üzerinde WCAG "non-text contrast" ≥3:1 eşiğini açık temada kaçırıyordu
+(ölçülen: success ~2.22:1, warning ~2.20:1, danger ~3.55:1 — bkz. Codex
+dalga4 konsolide raporu). Fix: `color-mix(in srgb, var(--lg-<tone>) 68%,
+var(--lg-label))` — semantik rengin `--lg-label` ile karışımı. `--lg-label`
+temalar arası ters yönde uçlaştığı (açıkta koyu, koyuda açık) için TEK
+formül her iki temada da ≥3:1 sağlar: açık temada ölçülen sonuç success
+~3.95:1, warning ~3.90:1, danger ~5.88:1; koyu temada tümü ≥6.6:1. İkonlu
+marker'da aynı formül ikonun `color`'ına uygulanır (zemin tint'i dekoratif
+kaldığı için ham renkte bırakılabilir — kontrast hedefi anlam taşıyan
+grafiğe, yani ikonun kendisine bakar).
+
 **Borç (raw):** `.title` font-size `14px` (spec sabiti, `--lg-text-*`
 ölçeğinde 13/15 var ama 14 yok), nokta çapları `10px`/`8px`/`22px` ve
 bağlantı çizgisi genişliği `2px` (tasarım sistemi ölçek token'ı yok, spec
-görsel sabiti).
+görsel sabiti), ton koyulaştırma karışım oranı `68%` (spec görsel sabiti —
+`--lg-*` ölçeğinde bir "kontrast karışım oranı" token'ı yok, 65-70% aralığı
+kontrat notundan; bkz. yukarıdaki kontrast notu).
 
 ## 10. Storybook kapsamı
 
@@ -167,6 +187,8 @@ tüketir, tema-özel dallanma yok).
 - [x] boş `events` + özel `emptyState` prop'u özel içeriği gösterir
 - [x] `aria-label` liste accessible name'ini belirler
 - [x] `event.id` hiçbir DOM `id` özniteliğine yazılmaz
+- [x] `children` prop tipinden omit edilmiştir — tip-only regresyon testi (`@ts-expect-error`) derleme zamanı sözleşmesini doğrular
+- [x] Ton noktaları (`marker`/`compactDot`/ikonlu marker `color`) ham semantik renk yerine `color-mix(... 68%, var(--lg-label))` kullanır — kaynak CSS regresyon testiyle statik doğrulanır
 - [ ] Kağıt/Grafit temalarında nokta/hairline kontrastı (visual, Chrome)
 
 ## 12. Do / Don't
@@ -204,3 +226,13 @@ doğarsa `event.dateTime?: string` opsiyonel bir alan olarak eklenip
   (`default`/`success`/`warning`/`danger`) + sr-only durum metni,
   `role="list"`/`role="listitem"` açık liste semantiği, boş durum,
   ikon destekli ray marker'ı.
+- 2026-07-17: Codex dalga4 konsolide rapor fix'leri —
+  (1) `GlassTimelineProps`, `HTMLAttributes`'tan `children`'ı da `Omit` eder
+  (önceden yalnız `title` omit ediliyordu; `children` tip seviyesinde sızıp
+  `{...rest}` ile div'e geçebiliyordu — render yolu değil tip yolu tercih
+  edildi, bkz. §3);
+  (2) ton noktaları (`marker`/`compactDot`/ikonlu marker ikon rengi) ham
+  semantik renk yerine `color-mix(in srgb, var(--lg-<tone>) 68%,
+  var(--lg-label))` kullanır — açık temada ~2.2–3.6:1 olan kontrast
+  ~3.9–5.9:1'e çıkarılarak WCAG non-text ≥3:1 eşiği karşılandı (bkz. §9).
+  İki davranış fix'i için de regresyon testi eklendi (§11).

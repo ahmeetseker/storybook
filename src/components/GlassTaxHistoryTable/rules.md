@@ -54,7 +54,7 @@ içerik tablosu.
 | rows | prop | `GlassTaxHistoryTableRow[]` (`{year, amount, changePercent?}`) | — (zorunlu) | — | Zaten çağıran tarafından doğru yıl sırasına (en yeni → en eski) dizilmiş veri |
 | title | prop | `string` | `'Vergi ve Aidat Geçmişi'` | — | Kart başlığı, aynı zamanda tablonun erişilebilir adı |
 | caption | prop | `string` | — | — | Verilirse tablo altında kaynak/dipnot metni |
-| ...rest | — | `HTMLAttributes<HTMLElement>` (`title` hariç) | — | — | Kök `<section>` elemanına geçer |
+| ...rest | — | `HTMLAttributes<HTMLElement>` (`title` VE `children` hariç) | — | — | Kök `<section>` elemanına geçer; `children` tip düzeyinde omit edilmiştir (bkz. §12) |
 
 `GlassTaxHistoryTableRow`:
 
@@ -129,9 +129,20 @@ varyantı).
 | th | renk/tipografi | `--lg-label-secondary` / `--lg-text-footnote` | — |
 | tr | ayraç | `--lg-hairline` | en yeni yıl: `color-mix(--lg-accent 6%)` zemin + kalın metin |
 | değişim metni | renk | `--lg-label` (artış/azalış) / `--lg-label-secondary` (nötr/veri yok) | renk asla `--lg-danger`/`--lg-success` ile karıştırılmaz — bu tonlar YALNIZ ok ikonunda |
-| ok ikonu | renk | `--lg-danger` (artış) / `--lg-success` (azalış) | nötr/veri-yok durumunda render edilmez |
+| ok ikonu | renk | `color-mix(in srgb, var(--lg-danger) 65%, var(--lg-label))` (artış) / `color-mix(in srgb, var(--lg-success) 65%, var(--lg-label))` (azalış) | nötr/veri-yok durumunda render edilmez; ham semantik token YASAK — bkz. §9 kontrast notu |
 | "Güncel" etiketi | zemin/metin | `color-mix(--lg-accent 12%, --lg-surface)` / `color-mix(--lg-accent 70%, --lg-label)` / `--lg-radius-capsule` | AI rozetiyle aynı görsel tarif — kasıtlı kopya CSS (bkz. dalga1-kontrat.md §AI-first); burada AI içeriği DEĞİL, "en güncel yıl" durumu işaretlenir |
 | caption | tipografi | `--lg-text-caption` / `--lg-label-secondary` | — |
+
+**Kontrast notu (2026-07-17 fix):** ok ikonu rengi ham `var(--lg-danger)`/
+`var(--lg-success)` yerine `color-mix(in srgb, var(--lg-<tone>) 65%,
+var(--lg-label))` kullanır. Açık temada ham `--lg-success` beyaz zemine
+karşı ~2,2:1 kontrastta kalıp anlam taşıyan grafik için WCAG 3:1 eşiğini
+kaçırıyordu (ham `--lg-danger` ~3,55:1 ile sınırda geçiyordu, tutarlılık
+için o da aynı teknikle koyulaştırıldı). `--lg-label` token'ı temaya göre
+değiştiği için mix her iki temada da otomatik doğru yönde çalışır (açık
+temada koyulaşır, koyu temada zaten aydınlık olan label ile karışıp
+kontrastı daha da artırır) — aynı desen `GlassTimeline`'daki ton
+işaretlerinde de kullanılır, kasıtlı tekrar.
 
 **Borç (raw):** ok karakteri font-size `11px` · "Güncel" etiketi
 padding/font-size (`2px 8px` / `10.5px`) · mobil kart kırılım noktası
@@ -191,6 +202,14 @@ bulunamadı.") · satır etkileşimi (tıklama/detay açma) yok — salt görün
 tarafından hesaplanması (v1'de bilinçli olarak dışarıda bırakıldı — ham
 sayısal input daha öngörülebilir).
 
-**Changelog:** 2026-07-17 — İlk sürüm: yıl/tutar/değişim üç sütunlu düz
-tablo, dört durumlu değişim göstergesi (artış/azalış/nötr/veri yok — renk
-yalnız ikonda, metin nötr), en yeni yıl vurgusu, 480px altı kart görünümü.
+**Changelog:**
+- 2026-07-17 — İlk sürüm: yıl/tutar/değişim üç sütunlu düz tablo, dört
+  durumlu değişim göstergesi (artış/azalış/nötr/veri yok — renk yalnız
+  ikonda, metin nötr), en yeni yıl vurgusu, 480px altı kart görünümü.
+- 2026-07-17 — QA fix (Codex dalga4 raporu): (1) `children` prop tipten
+  açıkça omit edildi (`Omit<HTMLAttributes<HTMLElement>, 'title' |
+  'children'>`) — önceden tip children'a izin verip DOM'da sessizce
+  yutuyordu; (2) ok ikonu rengi açık temada 3:1 anlamlı-grafik eşiğini
+  kaçırdığı için `color-mix(in srgb, var(--lg-<tone>) 65%,
+  var(--lg-label))` ile koyulaştırıldı (bkz. §9 kontrast notu). Her iki
+  fix için regresyon testi eklendi.

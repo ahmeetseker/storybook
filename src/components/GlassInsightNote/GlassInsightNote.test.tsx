@@ -10,14 +10,37 @@ describe('GlassInsightNote', () => {
     expect(screen.getByText('Parsel yola sıfır.')).toBeDefined()
   })
 
-  it('role verildiğinde gösterir, verilmediğinde render etmez', () => {
+  it('authorRole verildiğinde gösterir, verilmediğinde render etmez', () => {
     const { rerender } = render(
-      <GlassInsightNote author="Elif Kaya" role="Bölge Danışmanı" date="14 Temmuz 2026" text="Not." />,
+      <GlassInsightNote author="Elif Kaya" authorRole="Bölge Danışmanı" date="14 Temmuz 2026" text="Not." />,
     )
     expect(screen.getByText('Bölge Danışmanı')).toBeDefined()
 
     rerender(<GlassInsightNote author="Elif Kaya" date="14 Temmuz 2026" text="Not." />)
     expect(screen.queryByText('Bölge Danışmanı')).toBeNull()
+  })
+
+  it('native role özniteliği ...rest üzerinden kök elemente ulaşır ve authorRole ile çakışmaz (regresyon)', () => {
+    render(
+      <GlassInsightNote
+        author="Elif Kaya"
+        authorRole="Bölge Danışmanı"
+        date="14 Temmuz 2026"
+        text="Not."
+        role="note"
+      />,
+    )
+    // Native role="note" DOM'a ulaşmalı — role="note" ARIA spesifikasyonunda
+    // erişilebilirlik ağacına yansımadığından (mapped to nothing/generic),
+    // doğrudan öznitelik üzerinden doğrulanır.
+    const article = screen.getByText('Not.').closest('article')
+    expect(article?.getAttribute('role')).toBe('note')
+    // authorRole hâlâ görünür etiket olarak render edilir — role prop'u
+    // authorRole'ü bastırmaz/yutmaz.
+    expect(screen.getByText('Bölge Danışmanı')).toBeDefined()
+    // "note" değeri görünür metin olarak sızmamalı (eski davranışta role
+    // prop'u uzman etiketiymiş gibi render edilirdi).
+    expect(screen.queryByText('note')).toBeNull()
   })
 
   it('verified=true iken "Yerinde inceledi" rozetini gösterir, false/varsayılanda göstermez', () => {

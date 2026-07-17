@@ -10,7 +10,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     author: 'Elif Kaya',
-    role: 'Bölge Danışmanı',
+    authorRole: 'Bölge Danışmanı',
     date: '14 Temmuz 2026',
     text:
       'Arsayı bizzat gezdim; güney cephesi düzlük ve yola sıfır, elektrik direği parsel sınırının hemen ' +
@@ -71,7 +71,7 @@ export const Variants: Story = {
 
 /**
  * `verified` durumu: doğrulanmış (Yerinde inceledi rozeti) / doğrulanmamış (rozetsiz) ·
- * `role` verilmediğinde başlık satırında yalnız ad kalır.
+ * `authorRole` verilmediğinde başlık satırında yalnız ad kalır.
  */
 export const Durumlar: Story = {
   name: 'Durumlar',
@@ -79,7 +79,7 @@ export const Durumlar: Story = {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
       <GlassInsightNote
         author="Mert Aydın"
-        role="Kıdemli Danışman"
+        authorRole="Kıdemli Danışman"
         avatarSrc={avatar('MA', '#3a6f5f', '#1f4a3a')}
         date="3 Nisan 2026"
         text="Parselin yol cephesi asfalt, tapuda herhangi bir şerh yok. Görüşme öncesi imar durumunu kontrol ettim."
@@ -92,7 +92,7 @@ export const Durumlar: Story = {
       />
       <GlassInsightNote
         author="Kerem Şahin"
-        role="Bölge Danışmanı"
+        authorRole="Bölge Danışmanı"
         date="15 Ocak 2026"
         text="Ölçümler ilanla birebir uyumlu, sınır taşları belirgin durumda."
         verified
@@ -108,7 +108,7 @@ export const UzunIcerik: Story = {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 460 }}>
       <GlassInsightNote
         author="Muhammed Emin Karahasanoğlu-Değirmencioğlu"
-        role="Bölgesel Gayrimenkul Değerleme Uzmanı"
+        authorRole="Bölgesel Gayrimenkul Değerleme Uzmanı"
         avatarSrc={avatar('MK', '#8a6f3a', '#5f4a1f')}
         date="6 Haziran 2026"
         text={
@@ -121,7 +121,7 @@ export const UzunIcerik: Story = {
       />
       <GlassInsightNote
         author="Muhammed Emin Karahasanoğlu-Değirmencioğlu"
-        role="Bölgesel Gayrimenkul Değerleme Uzmanı"
+        authorRole="Bölgesel Gayrimenkul Değerleme Uzmanı"
         date="6 Haziran 2026"
         text={
           'Parseli sabah erken saatte, güneşin doğuş açısını da görebilmek için bizzat gezdim. Toprak yapısı ' +
@@ -142,7 +142,7 @@ export const Responsive: Story = {
     <div style={{ maxWidth: 300, padding: 12, border: '1px solid var(--lg-hairline)', borderRadius: 'var(--lg-radius-card)' }}>
       <GlassInsightNote
         author="Zeynep Arslan"
-        role="Bölge Danışmanı"
+        authorRole="Bölge Danışmanı"
         avatarSrc={avatar('ZA', '#3a5f8a', '#1f3a5f')}
         date="20 Şubat 2026"
         text="Tarla yolu biraz bozuk ama satıcı ulaşım güzergahını önceden belirtmişti; kışın erişim zor olabilir."
@@ -165,7 +165,10 @@ export const Erisilebilirlik: Story = {
           'GlassReviewCard dersi). "Yerinde inceledi" rozeti görünür metinle taşınır (yalnız renkle/ikonla ' +
           'değil) — zemin `--lg-success` karışımı, ikon `--lg-success`, ancak METİN küçük punto/soluk zemin ' +
           'kontrastı için `--lg-label` (birincil etiket rengi) kullanır. Component tamamen statik/prop güdümlü ' +
-          'içeriktir; özel bir ARIA rolü üstlenmez, klavye etkileşimi/odak yönetimi taşımaz.',
+          'içeriktir; kendiliğinden özel bir ARIA rolü üstlenmez, klavye etkileşimi/odak yönetimi taşımaz. ' +
+          '`authorRole` (ör. "Bölge Danışmanı") yalnız görünür bir etikettir — native `role` HTML özniteliğiyle ' +
+          'karıştırılmaz; çağıran `...rest` üzerinden kök `<article>`e kendi `role` değerini (ör. `role="note"`) ' +
+          'serbestçe geçirebilir.',
       },
     },
   },

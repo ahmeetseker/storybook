@@ -259,8 +259,10 @@ export function GlassCommandPalette({
               />
             </div>
 
-            {/* Kontrat: aria-live bölgeleri HER ZAMAN mount edilir — panel her açıldığında
-                bu düğüm zaten DOM'da olur, sonradan eklenmez (bkz. dalga1-kontrat.md). */}
+            {/* Kontrat: aria-live bölgeleri sonradan DOM'a eklenmemeli — panel + status
+                TEK birim olarak `open` ile birlikte mount/unmount olur, bu düğüm panelin
+                geri kalanıyla AYNI ANDA render edilir, ayrı bir adımda eklenmez
+                (bkz. rules.md §2, dalga1-kontrat.md). */}
             <div role="status" className={styles.srOnly}>
               {flatItems.length} sonuç bulundu
             </div>

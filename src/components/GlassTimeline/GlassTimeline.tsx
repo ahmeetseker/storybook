@@ -27,7 +27,7 @@ export interface GlassTimelineEvent {
   icon?: ReactNode
 }
 
-export interface GlassTimelineProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface GlassTimelineProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   events: GlassTimelineEvent[]
   /**
    * `line`: sol rayda ton renkli noktalar + aralarında dikey çizgi, başlığın

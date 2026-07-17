@@ -5,6 +5,11 @@ status: hazır
 lastReviewed: 2026-07-17
 ---
 
+<!-- 2026-07-17: Codex konsolide raporu (dalga4) sonrası düzeltme geçişi —
+     bkz. dosya sonundaki Changelog girdisi: role="tablist"/"tab" →
+     role="radiogroup"/"radio" (panelsiz), focusPendingRef sızıntısı,
+     canlı bölge sürekli mount, countBadge kontrastı, children tip omit'i. -->
+
 # GlassRoomClassifierTabs Kuralları
 
 ## 1. Amaç
@@ -27,7 +32,7 @@ tamamen çağıranın kompozisyon sorumluluğundadır (bkz. §2).
 
 | İlgili | Farkı |
 |---|---|
-| GlassNearbyPlaces (`variant="tabs"`) | Aynı roving-tabindex tablist iskeletini paylaşır; NearbyPlaces kendi panelini render eder ve `aria-controls` verir, AI rozeti taşımaz — RoomClassifierTabs panelsiz + AI-first sözleşmeli |
+| GlassNearbyPlaces (`variant="tabs"`) | Aynı roving-tabindex iskeletini paylaşır; NearbyPlaces gerçek `tablist`/`tab` + panel render eder ve `aria-controls` verir (panelli), AI rozeti taşımaz — RoomClassifierTabs panelsiz olduğundan bilinçli olarak `radiogroup`/`radio` kullanır + AI-first sözleşmeli |
 | GlassMatchScore / GlassAiSummaryCard | Aynı "✦ AI" rozet + `confidence` + `loading` sözleşmesini paylaşır; onlar tekil bir sonucu (skor/özet) sunar, RoomClassifierTabs çok-yollu bir SEÇİM sunar |
 | GlassSegmentedControl | Genel amaçlı, AI kaynaklı olmayan sekme/switch; oda sınıflandırması gibi alana özel bir sözleşme taşımaz |
 
@@ -40,19 +45,26 @@ tamamen çağıranın kompozisyon sorumluluğundadır (bkz. §2).
   (`aria-label="Yapay zekâ üretimi"`) + varsa "%N güven" metni. Metin ve
   rozet **özelleştirilemez** — kontrat "ZORUNLU" ifadesini prop ile
   ezilebilir bir default değil, sabit bir görünürlük garantisi olarak okur.
-- Sekme şeridi: `role="tablist"` (sabit `aria-label="Oda filtresi"`) +
-  `role="tab"` düğümleri, WAI-ARIA yatay tablist deseni (roving tabindex, ok
-  tuşu gezinme) — `GlassNearbyPlaces`'teki kat/kategori sekmesi deseniyle
-  aynı iskelet.
-- **`aria-controls` HİÇ verilmez.** Bu component'in bilinçli tasarım kararı:
-  panel/galeri ızgarası bu component tarafından render edilmiyor, dolayısıyla
-  hangi DOM id'sinin panel olacağını bilemez. Var olmayan veya çağıranın
-  henüz oluşturmadığı bir id'ye `aria-controls` ile işaret etmek gerçek bir
-  ARIA IDREF ihlali (kırık referans) olurdu — `WAI-ARIA Authoring Practices`
-  `aria-controls`'un var olan, gerçek bir düğümü işaret etmesini şart koşar.
-  Panel eşlemesi tamamen çağıranın kompozisyon sorumluluğunda kalır (ör.
-  çağıran `activeRoomId`'yi kendi galeri bileşenine `key`/filtre olarak
-  geçirir); bu component `role="tabpanel"` da render etmez.
+- Sekme şeridi: `role="radiogroup"` (sabit `aria-label="Oda filtresi"`) +
+  `role="radio"` düğümleri (`aria-checked`) — **`tablist`/`tab` DEĞİL**.
+  Klavye/roving-tabindex mekaniği (ok tuşu gezinme) `GlassNearbyPlaces`'teki
+  kat/kategori sekmesi deseniyle aynı iskelet, yalnız ARIA rol adları
+  farklı (bkz. aşağıdaki karar gerekçesi).
+- **Neden `radiogroup`/`radio`, `tablist`/`tab` değil:** WAI-ARIA APG Tabs
+  deseni her `tab`'ın gerçek/var olan bir `tabpanel`'i `aria-controls` ile
+  kontrol etmesini şart koşar. Bu component panel/galeri ızgarasını hiç
+  render etmiyor ve hangi DOM id'sinin panel olacağını bilemiyor — var
+  olmayan bir id'ye `aria-controls` ile işaret etmek gerçek bir ARIA IDREF
+  ihlali (kırık referans) olurdu, ama `role="tab"` kullanıp hiç
+  `aria-controls`/`tabpanel` vermemek de kendi başına APG'nin şart koştuğu
+  tab↔panel ilişkisini kurmadan `tab` rolünü kullanmak anlamına gelirdi —
+  bu da bir sözleşme ihlali (Codex dalga4 bulgusu). Davranış zaten tek
+  seçimli bir FİLTRE olduğundan (§1) `radiogroup`/`radio` semantik olarak
+  doğru eşleme: bu desen panel ilişkisi gerektirmez, roving-tabindex + ok
+  tuşuyla seçimi taşıma mekaniği birebir aynı kalır. Panel eşlemesi tamamen
+  çağıranın kompozisyon sorumluluğunda kalır (ör. çağıran `activeRoomId`'yi
+  kendi galeri bileşenine `key`/filtre olarak geçirir); bu component
+  `role="tabpanel"` render etmez ve `aria-controls` HİÇ vermez.
 - "✦ AI" rozeti: `aria-label="Yapay zekâ üretimi"` — `GlassMatchScore`/
   `GlassAiSummaryCard` ile birebir aynı kontrat metni/CSS'i (kopya kabul,
   component bağımsızlığı için ortak component'e çıkarılmaz).
@@ -62,13 +74,25 @@ tamamen çağıranın kompozisyon sorumluluğundadır (bkz. §2).
   `aria-hidden` DEĞİL, doğrudan buton metninin parçası; ayrı bir "fotoğraf"
   birim metni (`srOnly` DEĞİL, görünmez ama okunur ek span) sayının yalnız
   bir rakam olarak belirsiz kalmasını önler.
-- `loading=true`: sekmeler hiç render edilmez (ne `role="tab"` ne iskelet
+- `loading=true`: sekmeler hiç render edilmez (ne `role="radio"` ne iskelet
   buton), yerine `aria-hidden` dekoratif skeleton çipleri + tek duyuru
-  noktası `role="status"` "Fotoğraflar odalara ayrılıyor" metni. Zorunlu "✦
-  AI" rozeti bu durumda da görünür kalır (AI-first standardı yükleme
-  durumunu istisna tutmaz).
+  noktası `role="status"`. Zorunlu "✦ AI" rozeti bu durumda da görünür kalır
+  (AI-first standardı yükleme durumunu istisna tutmaz).
+- **Canlı bölge (`role="status"`) her zaman mount kalır** (loading VE hazır
+  durumunda, aynı DOM konumunda) — yalnız metni değişir: `loading=true` iken
+  "Fotoğraflar odalara ayrılıyor", `loading=false` + `rooms` doluyken
+  "Fotoğraflar odalara ayrıldı, N oda bulundu". Node'u duruma göre tamamen
+  mount/unmount etmek (eski implementasyon — yalnız `loading` sırasında
+  vardı) ekran okuyucuların "tamamlandı" geçişini güvenilir duyurmasını
+  engelliyordu (Codex dalga4 bulgusu); sürekli mount + metin değişimi
+  `aria-live` bölgelerinin beklenen kullanım şeklidir. (`rooms` boşken
+  component `null` render ettiğinden bu durumda canlı bölge de yoktur —
+  §8'deki "boş rooms" kararıyla tutarlı, ayrı bir istisna değil.)
 - Portal yok, ref forwarding yok (statik/kontrollü sunum, diğer içerik
   katmanı component'leriyle tutarlı).
+- **`children` public API'de YOK** — `Omit<HTMLAttributes<HTMLElement>,
+  'onChange' | 'children'>` ile tip seviyesinde omit edilir (render etmeme
+  yolu değil, tip yolu — bkz. §3/§4).
 
 ## 3. Anatomy ve slotlar
 
@@ -77,11 +101,13 @@ tamamen çağıranın kompozisyon sorumluluğundadır (bkz. §2).
 | başlık metni | ✅ (her zaman) | "AI sınıflandırması" (sabit) | Özelleştirilemez, heading DEĞİL |
 | AI rozeti | ✅ (her zaman, `loading` dahil) | "✦ AI" | Kontrat sabit CSS'i — component'ler arası birebir aynı |
 | güven metni | — | "%N güven" | Yalnız `confidence` sonluysa; rozetin yanında |
-| tablist | ✅ (yalnız `loading=false` ve `rooms` doluyken) | oda sekmeleri | roving tabindex, `aria-controls` YOK |
-| sekme (`tab`) | ✅ (satır başına) | oda adı + fotoğraf adedi rozeti | Erişilebilir ad ikisini birlikte taşır |
-| yükleme placeholder'ı | — (yalnız `loading=true`) | dekoratif skeleton çipleri | `aria-hidden`, tek duyuru `role="status"` |
+| radiogroup | ✅ (yalnız `loading=false` ve `rooms` doluyken) | oda sekmeleri | roving tabindex, `aria-controls` YOK |
+| sekme (`radio`) | ✅ (satır başına) | oda adı + fotoğraf adedi rozeti | Erişilebilir ad ikisini birlikte taşır; `aria-checked` |
+| yükleme placeholder'ı | — (yalnız `loading=true`) | dekoratif skeleton çipleri | `aria-hidden` |
+| canlı bölge (`role="status"`) | ✅ (render edilen her durumda) | durum metni | Sürekli mount, aynı DOM konumu; `loading`'de "ayrılıyor", hazırda "N oda bulundu" (bkz. §2) |
 
-Children kabul edilmez — tamamen `rooms` prop'undan türetilir.
+Children kabul edilmez — tamamen `rooms` prop'undan türetilir; `children`
+tip seviyesinde omit edilir (bkz. §2/§4), verilse dahi render edilmez.
 
 ## 4. Public API
 
@@ -94,7 +120,7 @@ Children kabul edilmez — tamamen `rooms` prop'undan türetilir.
 | confidence | prop | `number` | — | — | [0,100]'e clamp; sonlu değilse (`NaN`/`Infinity`) rozet metni hiç render edilmez (rozet yine görünür) |
 | loading | prop | `boolean` | `false` | — | true → flat skeleton + `role="status"`; sekmeler render edilmez |
 | aria-label | prop | `string` | — | — | Kök `<section>` adı |
-| ...rest | — | `HTMLAttributes<HTMLElement>` (`onChange` hariç) | — | — | `className`/`style` birleştirilir |
+| ...rest | — | `HTMLAttributes<HTMLElement>` (`onChange`/`children` hariç) | — | — | `className`/`style` birleştirilir; `children` tip seviyesinde reddedilir (TS derleme hatası) |
 
 Ref hedefi yok. Controlled tespiti **yalnız** `activeRoomId !== undefined`
 üzerinden yapılır (`GlassNearbyPlaces` ile aynı desen): verilirse component
@@ -126,7 +152,7 @@ Varsayılan kombinasyon: controlled prop'lar verilmemiş (→ ilk oda aktif),
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
-| aktif oda | `activeRoomId` (controlled) veya dahili state (uncontrolled) | — | `aria-selected`, roving `tabindex` |
+| aktif oda | `activeRoomId` (controlled) veya dahili state (uncontrolled) | — | `aria-checked`, roving `tabindex` |
 | yükleme | `loading` prop | tüm sekmeleri (AI rozeti HARİÇ) | `role="status"` |
 | disabled/hover/focus/active | — | — | Prop olarak YOK; yalnız `:focus-visible`/`@media(hover:hover)` CSS'te |
 
@@ -137,18 +163,24 @@ odaya düşüş) → render.
 ## 7. Davranış
 
 - Pointer: sekmeye tıklama seçer.
-- Klavye (tablist üzerinde): `→` sonraki, `←` önceki (sarmalı), `Home` ilk,
-  `End` son oda — seçim odağı takip eder (roving tabindex). Yatay tablist
+- Klavye (radiogroup üzerinde): `→` sonraki, `←` önceki (sarmalı), `Home` ilk,
+  `End` son oda — seçim odağı takip eder (roving tabindex). Yatay dizilim
   olduğundan `↑`/`↓` **işlenmez** — `preventDefault` çağrılmaz, sayfa
-  kaydırması engellenmez (WAI-ARIA APG yatay tablist deseni). Yalnız seçili
-  sekme `tabIndex=0`, diğerleri `-1`.
+  kaydırması engellenmez. Yalnız seçili sekme `tabIndex=0`, diğerleri `-1`.
 - Focus akışı: yeni seçili sekmeye programatik `focus()` çağrısı **yalnız**
   kullanıcının ok tuşu/`Home`/`End` ile tetiklediği geçişte, gerçekte
   render'a yansıyan (resolved) aktif index'i izleyen bir `useEffect`
   üzerinden yapılır (fare tıklamasında native focus zaten oradadır).
-  Controlled modda ebeveyn seçimi reddederse (`activeRoomId` prop'u
-  değişmezse) resolved index değişmez, efekt tetiklenmez — odakta sapma
-  oluşmaz (`GlassNearbyPlaces`/`GlassRating` ile aynı desen).
+  Odak talebi çift ref ile taşınır: `focusPendingRef` (talep var mı) +
+  `focusRequestIdRef` (hangi oda talep edildi). Efekt bayrağı her koşulda
+  tüketip sıfırlar, `focus()` yalnız çözülen aktif oda gerçekten talep
+  edilen id ile eşleşiyorsa çağrılır. Böylece değişiklik üretmeyen/reddedilen
+  hiçbir seçim yolu bayrağı askıda bırakmaz (Codex dalga4 bulgusu):
+  - Controlled modda ebeveyn seçimi reddederse (`activeRoomId` değişmezse)
+    bayrak sonraki ilgisiz güncellemeye kadar askıda kalsa bile, o anki
+    resolved oda talep edilen id ile eşleşmediğinden odak sıçramaz.
+  - Zaten seçili sekmede `Home`/`End` (değişiklik üretmeyen yol) bayrağı
+    hiç set etmez, mevcut askıdaki talebi de temizler.
 - DOM id'leri (`{baseId}-tab-{i}`) oda `id` alanının ham değerinden DEĞİL,
   oda index'inden türetilir — `id` yalnız veri anahtarı/controlled state
   değeri olarak kalır, boşluk/özel karakter içerse bile DOM id'si geçerli
@@ -156,8 +188,10 @@ odaya düşüş) → render.
   yoktur, ama id yine öngörülebilir/stabil tutulur.
 - Controlled/uncontrolled: bkz. §4/§5.
 - `loading`: skeleton çipleri (`skeletonTab`) `aria-hidden`; `role="status"`
-  düğümü ekranokuyucuya tek seferlik "Fotoğraflar odalara ayrılıyor"
-  duyurur. Skeleton animasyonu yalnız `opacity` (shimmer/gradient yok, kendi
+  canlı bölgesi "Fotoğraflar odalara ayrılıyor" der ve **yükleme bitince de
+  mount kalıp** metnini "Fotoğraflar odalara ayrıldı, N oda bulundu" olarak
+  değiştirir (bkz. §2 — sürekli mount, geçiş duyurusunun güvencesi).
+  Skeleton animasyonu yalnız `opacity` (shimmer/gradient yok, kendi
   flat placeholder'ı — `GlassSkeleton`'a bağımlı değil). Zorunlu "✦ AI"
   rozeti skeleton'ın yanında normal (aria-hidden OLMAYAN) şekilde render
   edilir.
@@ -192,8 +226,8 @@ odaya düşüş) → render.
 | güven metni | color/font-size | `--lg-label-secondary` / `--lg-text-caption` | — |
 | sekme (tab) | border/radius/min-height | `--lg-hairline` / `--lg-radius-chip` / `--lg-control-sm` | seçili → `--lg-accent` zemin + `--lg-accent-contrast` metin |
 | sekme focus | outline | `--lg-accent` | yalnız `:focus-visible` |
-| fotoğraf adedi rozeti | background | `color-mix(in srgb, var(--lg-label) 10%, transparent)` | seçili → `color-mix(in srgb, var(--lg-accent-contrast) 24%, transparent)` |
-| fotoğraf adedi rozeti | color | `--lg-label-secondary` | seçili → `--lg-accent-contrast` |
+| fotoğraf adedi rozeti | background | `color-mix(in srgb, var(--lg-label) 10%, transparent)` | seçili → `color-mix(in srgb, var(--lg-accent-contrast) 4%, transparent)` — 24% karışım açık temada ~3,3:1'e düşüyordu, 4% her iki temada ≥4,5:1 (Codex dalga4 bulgusu) |
+| fotoğraf adedi rozeti | color | `--lg-label` — `--lg-label-secondary` bu zeminde açık temada ~3,9:1 kalıp 4,5:1 eşiğini kaçırıyordu (Codex dalga4 bulgusu) | seçili → `--lg-accent-contrast` |
 | skeleton çip | background | `color-mix(in srgb, var(--lg-label) 8%, var(--lg-surface))` | `loading` |
 | boşluklar | gap/padding | `--lg-space-1..5` | — |
 
@@ -209,7 +243,8 @@ satırlarındaki aynı gerekçe.
 Var: Default, Playground, Controlled (dışarıdan yönetilen `activeRoomId`),
 Durumlar (yüksek güven / güven verilmemiş / `loading`), UzunIcerik,
 Responsive (mobile1 + 320px konteyner, dokunmatik hedef), Erişilebilirlik
-(docs description'lı, `aria-controls` kararının gerekçesi dahil).
+(docs description'lı, `radiogroup`/`radio` seçimi + `aria-controls`
+kararının gerekçesi dahil).
 
 `Variants`/`Sizes`/`Temalar` ayrı story olarak yok: `variant`/`size` ekseni
 tanımlı değil (tek görsel biçim), tema toolbar'la otomatik doğrulanır
@@ -232,8 +267,17 @@ tanımlı değil (tek görsel biçim), tema toolbar'la otomatik doğrulanır
       çağrılmaz (sayfa kaydırması engellenmez)
 - [x] controlled modda ok tuşuyla geçiş isteği reddedilirse odak talep
       edilen sekmeye sapmaz, mevcut aktif sekmede kalır
-- [x] sekmeler `aria-controls` HİÇ taşımaz; `tabpanel` bu component
-      tarafından render edilmez
+- [x] reddedilen controlled seçim sonrası İLGİSİZ bir gerçek güncelleme
+      geldiğinde askıda kalan bayrak odağı yanlış sekmeye sıçratmaz
+- [x] zaten seçili sekmede `Home`/`End` sonrası ilgisiz bir controlled
+      güncelleme odağı çalmaz (bayrak hiç set edilmez/temizlenir)
+- [x] `radiogroup`/`radio` semantiği kullanılır (`aria-checked`);
+      `aria-controls` hiç taşınmaz, `tablist`/`tab`/`tabpanel` render edilmez
+- [x] `loading` tamamlanınca canlı bölge mount kalır ve hazır durumunu
+      "Fotoğraflar odalara ayrıldı, N oda bulundu" metniyle duyurur
+- [x] `loading` olmayan varsayılan durumda da `role="status"` mount edilir
+- [x] `children` prop tipte kabul edilmez (derleme zamanı sözleşmesi,
+      `@ts-expect-error` regresyonu) ve verilse dahi render edilmez
 - [x] oda `id`'si boşluk içerdiğinde (`"çamaşır odası"` gibi) DOM id'leri
       index tabanlı kalır, geçerlidir
 - [x] boş `rooms` dizisi hiçbir şey render etmez
@@ -268,6 +312,17 @@ istediği sırada verir (component sıralamayı değiştirmez).
 
 ## Changelog
 
+- 2026-07-17 (dalga4 düzeltme geçişi, Codex konsolide raporu): (1) ARIA
+  rolleri `tablist`/`tab` → `radiogroup`/`radio` (`aria-selected` →
+  `aria-checked`) — panelsiz `tab` kullanımı APG tab↔panel şartını ihlal
+  ediyordu, gerekçe §2; (2) `focusPendingRef` sızıntısı kapatıldı —
+  `focusRequestIdRef` ile talep edilen oda id'si eşleşmeden `focus()`
+  çağrılmaz, değişiklik üretmeyen `Home`/`End` yolu bayrağı temizler (§7);
+  (3) canlı bölge (`role="status"`) artık sürekli mount — yükleme bitişi
+  "N oda bulundu" metniyle duyurulur (§2/§7); (4) `countBadge` kontrastı:
+  metin `--lg-label`, seçili zemin karışımı %24 → %4 (küçük metin ≥4,5:1,
+  §9); (5) `children` tip seviyesinde omit edildi (§2/§4). Tümü için
+  regresyon testleri eklendi (§11).
 - 2026-07-17: İlk sürüm — WAI-ARIA yatay tablist + roving tabindex deseni
   (`GlassNearbyPlaces` ile aynı iskelet, panelsiz), zorunlu "AI
   sınıflandırması" başlığı + "✦ AI" rozeti (`GlassAiSummaryCard`/

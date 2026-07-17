@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { GlassPersonalNote } from './GlassPersonalNote'
@@ -134,5 +137,36 @@ describe('GlassPersonalNote — maxLength ve sayaç', () => {
     render(<GlassPersonalNote maxLength={-5} />)
     fireEvent.click(screen.getByRole('button', { name: /Not ekle/ }))
     expect(screen.getByText('500 karakter kaldı')).toBeTruthy()
+  })
+})
+
+describe('GlassPersonalNote — regresyon (Codex dalga4 bulguları)', () => {
+  it('regresyon: children prop tipinden açıkça omit edilir (public HTMLAttributes yüzeyi children taşımaz)', () => {
+    // Tip seviyesinde omit edildiği için normal kullanımda TS derlemesi
+    // `children` geçirilmesine izin vermez. Bir çağıran yine de zorla
+    // (`as any`) geçirirse component kendi sabit JSX ağacını render eder —
+    // dışarıdan gelen children sessizce yutulmaz, hiç kabul edilmediği
+    // için render sonucu tamamen component'in kendi içeriğidir.
+    render(
+      <GlassPersonalNote
+        defaultValue="Fiyat pazarlığa açık."
+        {...({ children: 'dışarıdan-children-metni' } as Record<string, unknown>)}
+      />,
+    )
+    expect(screen.queryByText('dışarıdan-children-metni')).toBeNull()
+    expect(screen.getByText('Fiyat pazarlığa açık.')).toBeTruthy()
+    expect(screen.getByText('Yalnız sen görürsün')).toBeTruthy()
+  })
+
+  it('regresyon: textarea placeholder opaklığı 1\'e kilitlenir (tarayıcı varsayılanı kontrastı ~2.1-2.8:1\'e düşürüyordu)', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassPersonalNote.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+    const blockMatch = css.match(/\.textarea::placeholder\s*\{([^}]*)\}/)
+    expect(blockMatch).not.toBeNull()
+    const block = blockMatch![1]
+    expect(block).toMatch(/opacity:\s*1/)
+    // Renk --lg-label-secondary'den geliyor: açık temada ~4.74:1, koyu
+    // temada ~6.3:1 — ikisi de ≥4.5:1 küçük metin eşiğini karşılar.
+    expect(block).toMatch(/color:\s*var\(--lg-label-secondary\)/)
   })
 })

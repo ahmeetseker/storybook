@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GlassCommandPalette, type GlassCommandPaletteCommand } from './GlassCommandPalette'
@@ -34,6 +37,14 @@ describe('GlassCommandPalette', () => {
   it('open=false iken hiçbir şey render edilmez (dialog yok)', () => {
     render(<GlassCommandPalette open={false} onClose={vi.fn()} commands={buildCommands()} />)
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  it('regresyon: role="status" panelle TEK birim olarak mount/unmount olur — kapalıyken de yoktur', () => {
+    render(<GlassCommandPalette open={false} onClose={vi.fn()} commands={buildCommands()} />)
+    expect(screen.queryByRole('status')).toBeNull()
+
+    render(<GlassCommandPalette open={true} onClose={vi.fn()} commands={buildCommands()} />)
+    expect(screen.getByRole('status')).toBeTruthy()
   })
 
   it('open=true olunca dialog render edilir, accessible name taşır ve arama input odak alır', () => {
@@ -155,5 +166,17 @@ describe('GlassCommandPalette', () => {
     const reopenedInput = screen.getByRole('textbox', { name: 'Komut ara' })
     expect((reopenedInput as HTMLInputElement).value).toBe('')
     expect(document.activeElement).toBe(reopenedInput)
+  })
+
+  it('regresyon: placeholder opaklığı 1e sabitlenir (tarayıcı varsayılanı efektif kontrastı ~2,1-2,8:1e düşürmesin)', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassCommandPalette.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+
+    const placeholderBlock = css.match(/\.input::placeholder\s*\{([^}]*)\}/)
+    expect(placeholderBlock).not.toBeNull()
+    expect(placeholderBlock![1]).toMatch(/opacity:\s*1;/)
+    // Renk token'ı --lg-label-secondary zaten açık temada ~4.74:1 sağlıyor —
+    // opaklık sabitlenmeden bu oran tarayıcı varsayılanıyla düşüyordu.
+    expect(placeholderBlock![1]).toMatch(/color:\s*var\(--lg-label-secondary\);/)
   })
 })

@@ -52,6 +52,10 @@
 }
 
 .input::placeholder {
+  /* Tarayıcı varsayılanı (ör. Firefox ~0.54 opacity) efektif kontrastı
+     düşürür — opaklık açıkça 1'e sabitlenir, renk token'ı zaten ≥4.5:1
+     sağlıyor (bkz. rules.md §9). */
+  opacity: 1;
   color: var(--lg-label-secondary);
 }
 

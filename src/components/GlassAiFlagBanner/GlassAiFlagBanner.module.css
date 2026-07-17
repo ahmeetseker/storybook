@@ -32,7 +32,10 @@
   height: var(--lg-control-sm);
   margin-top: -2px;
   border-radius: var(--lg-radius-capsule);
-  color: var(--flag-color, var(--lg-warning));
+  /* Raw --flag-color kendi %16 zemine karşı ~1.9-2.9:1 kontrasta düşüyordu
+     (Codex bulgusu, işaret grafiği ≥3:1 eşiğini kaçırıyordu). Diğer AI
+     component'lerindeki "semantik %70 + label" desenine uyularak koyulaştırıldı. */
+  color: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 70%, var(--lg-label));
   background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 16%, var(--lg-surface));
 }
 
@@ -58,11 +61,15 @@
   color: var(--lg-label);
 }
 
+/* --lg-label-secondary düz surface'e karşı ~4.7:1 iken, banner'ın %9 semantik
+   tonlu zemininde ~4.2-4.4:1'e düşüyordu (Codex bulgusu, küçük metin ≥4.5:1
+   eşiğini kaçırıyordu). Yalnız label token'ları karıştırılarak (semantik renk
+   metne SIZMADAN) koyulaştırıldı — tüm severity/temalarda ≥4.5:1 sağlar. */
 .description {
   margin: 0;
   font-size: var(--lg-text-footnote);
   line-height: 1.5;
-  color: var(--lg-label-secondary);
+  color: color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary));
   overflow-wrap: anywhere;
 }
 
@@ -78,7 +85,7 @@
 .reasonItem {
   font-size: var(--lg-text-footnote);
   line-height: 1.5;
-  color: var(--lg-label-secondary);
+  color: color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary));
   overflow-wrap: anywhere;
 }
 
@@ -147,7 +154,9 @@
   white-space: nowrap;
 }
 .confidence {
-  color: var(--lg-label-secondary);
+  /* .description/.reasonItem ile aynı kontrast düzeltmesi — aynı %9 tonlu
+     zemin üzerinde. */
+  color: color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary));
   font-size: var(--lg-text-footnote);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

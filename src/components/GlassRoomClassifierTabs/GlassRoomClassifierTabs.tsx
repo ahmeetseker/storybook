@@ -1,10 +1,15 @@
 // AI-first içerik katmanı component'i (Dalga kontratı §"AI-first standardı").
 // Galeri fotoğraflarını AI'nın odaya göre sınıflandırdığı bir SEÇİM kontrolüdür —
 // panel/görsel ızgara render ETMEZ (o galerinin sorumluluğu, çağıran kompoze eder).
-// Bu yüzden `aria-controls` HİÇ verilmez: bu component hangi panel DOM id'sinin
-// var olacağını bilemez, var olmayan/yanlış bir id'ye işaret etmek gerçek bir
-// ARIA IDREF ihlali olurdu (bkz. rules.md §2). Klavye/roving-tabindex iskeleti
-// GlassNearbyPlaces `variant="tabs"` ile birebir aynı desendir.
+// Bu yüzden ARIA rolü kasıtlı olarak `tablist`/`tab` DEĞİL, `radiogroup`/`radio`'dur:
+// WAI-ARIA APG Tabs deseni her `tab`'ın gerçek/var olan bir `tabpanel`'i
+// kontrol etmesini şart koşar; bu component paneli hiç render etmediğinden ve
+// panel DOM id'sini bilemediğinden `aria-controls` vermek kırık bir IDREF
+// olurdu (bkz. rules.md §2). Davranış zaten tek-seçimli bir FİLTRE olduğundan
+// (bkz. yukarı) `radiogroup`/`radio` semantik olarak doğru eşleme — panel
+// ilişkisi gerektirmez. Klavye/roving-tabindex iskeleti (ok tuşu ile
+// gezinme+seçim) `GlassNearbyPlaces` `variant="tabs"` ile aynı mekaniği
+// paylaşır, yalnız rol adları farklıdır.
 import { useEffect, useId, useRef, useState, type HTMLAttributes, type KeyboardEvent } from 'react'
 import styles from './GlassRoomClassifierTabs.module.css'
 
@@ -18,7 +23,8 @@ export interface GlassRoomClassifierRoom {
   count: number
 }
 
-export interface GlassRoomClassifierTabsProps extends Omit<HTMLAttributes<HTMLElement>, 'onChange'> {
+export interface GlassRoomClassifierTabsProps
+  extends Omit<HTMLAttributes<HTMLElement>, 'onChange' | 'children'> {
   /** AI sınıflandırmasının ürettiği oda grupları — boş dizi hiçbir şey render etmez */
   rooms: GlassRoomClassifierRoom[]
   /** Controlled aktif oda id'si */
@@ -40,7 +46,7 @@ export interface GlassRoomClassifierTabsProps extends Omit<HTMLAttributes<HTMLEl
    * tutmaz. `role="status"` metni ekranokuyucuya durumu iletir.
    */
   loading?: boolean
-  /** Tablist'in dışındaki `<section>` köküne verilir; sayfada birden çok örnek varsa önerilir */
+  /** Radiogroup'un dışındaki `<section>` köküne verilir; sayfada birden çok örnek varsa önerilir */
   'aria-label'?: string
 }
 
@@ -89,9 +95,11 @@ function Header({ confidence }: { confidence: number | null }) {
  * Galeri fotoğraflarını AI'nın odaya göre sınıflandırdığı yatay kaydırılabilir
  * sekme çipleri: her çip oda adı + fotoğraf adedi rozeti taşır. Yalnız SEÇİM
  * kontrolüdür — galeri ızgarasını/panelini render etmez, `aria-controls`
- * vermez (bkz. dosya başı not + rules.md §2). WAI-ARIA tablist + roving
- * tabindex + ok tuşu (yalnız yatay: `ArrowLeft`/`ArrowRight`/`Home`/`End`)
- * deseni `GlassNearbyPlaces` `variant="tabs"` ile birebir aynıdır.
+ * vermez (bkz. dosya başı not + rules.md §2). WAI-ARIA `radiogroup`/`radio` +
+ * roving tabindex + ok tuşu (yalnız yatay: `ArrowLeft`/`ArrowRight`/`Home`/
+ * `End`) deseni `GlassNearbyPlaces` `variant="tabs"` ile aynı iskelettir,
+ * yalnız rol adları farklıdır (panelsiz tek-seçim filtre → radio, gerçek
+ * panelli tab → tab).
  */
 export function GlassRoomClassifierTabs({
   rooms,
@@ -130,15 +138,44 @@ export function GlassRoomClassifierTabs({
   // efektle yapılır — controlled modda ebeveyn seçimi reddederse (prop
   // değişmezse) activeIndex değişmez, efekt tetiklenmez, odak sapması
   // oluşmaz (GlassNearbyPlaces/GlassRating ile aynı sınıf düzeltme).
+  //
+  // `focusPendingRef` YALNIZ "bir odak talebi var mı" bayrağı değil,
+  // `focusRequestIdRef` ile BİRLİKTE hangi oda talep edildiğini de taşır.
+  // Efekt, bayrağı her koşulda (eşleşse de eşleşmese de) tüketip sıfırlar;
+  // yalnız çözülen `activeRoom` gerçekten talep edilen id'yle eşleşiyorsa
+  // focus() çağrılır. Bu, iki farklı "reddedilen/değişiklik üretmeyen"
+  // yolunu da kapsar:
+  //  1) Controlled modda ebeveyn seçimi reddederse (prop değişmez) →
+  //     activeIndex değişmez, efekt bu döngüde hiç tetiklenmez; bayrak
+  //     bir SONRAKİ (tamamen ilgisiz bir sebeple activeIndex değiştiren)
+  //     render'a kadar askıda kalabilir — efekt o zaman çalıştığında
+  //     requestId artık çözülen odayla eşleşmediğinden focus() ÇAĞRILMAZ,
+  //     yalnız bayrak temizlenir (bkz. aşağıdaki "reddedilen seçim" testi).
+  //  2) Zaten seçili sekmede Home/End'e basılırsa (nextIndex === activeIndex,
+  //     değişiklik üretmez) → bayrak hiç set edilmez (aşağıda erken temizlik).
   const focusPendingRef = useRef(false)
+  const focusRequestIdRef = useRef<string | null>(null)
   useEffect(() => {
     if (!focusPendingRef.current) return
     focusPendingRef.current = false
-    document.getElementById(`${baseId}-tab-${activeIndex}`)?.focus()
-  }, [activeIndex, baseId])
+    const requestedId = focusRequestIdRef.current
+    focusRequestIdRef.current = null
+    if (requestedId !== null && requestedId === activeRoom?.id) {
+      document.getElementById(`${baseId}-tab-${activeIndex}`)?.focus()
+    }
+  }, [activeIndex, baseId, activeRoom])
 
   const resolvedConfidence = resolveConfidence(confidence)
   const classes = [styles.root, className].filter(Boolean).join(' ')
+
+  // Canlı bölge (`role="status"`) her iki durumda da (loading VE hazır)
+  // AYNI DOM konumunda, SÜREKLİ mount kalır — yalnız metni değişir. Yükleme
+  // bittiğinde node'u tamamen kaldırıp yerine farklı bir ağaç koymak (eski
+  // implementasyon) ekran okuyucuların "tamamlandı" geçişini güvenilir
+  // duyurmasını engelliyordu (bkz. rules.md §2 "durum geçişi duyurusu").
+  const statusMessage = loading
+    ? 'Fotoğraflar odalara ayrılıyor'
+    : `Fotoğraflar odalara ayrıldı, ${rooms.length} oda bulundu`
 
   if (loading) {
     return (
@@ -150,7 +187,7 @@ export function GlassRoomClassifierTabs({
           ))}
         </div>
         <span className={styles.srOnly} role="status">
-          Fotoğraflar odalara ayrılıyor
+          {statusMessage}
         </span>
       </section>
     )
@@ -158,10 +195,10 @@ export function GlassRoomClassifierTabs({
 
   if (rooms.length === 0) return null
 
-  // Tablist deseni: roving tabindex. Yatay tablist olduğundan yalnız
+  // Radiogroup deseni: roving tabindex. Yatay olduğundan yalnız
   // ArrowLeft/ArrowRight/Home/End işlenir; ArrowUp/ArrowDown WAI-ARIA APG
-  // yatay tablist deseninde tanımlı değildir ve sayfa kaydırmasını
-  // engellememesi için preventDefault edilmeden bırakılır.
+  // radiogroup deseninde yatay eksende tanımlı değildir ve sayfa
+  // kaydırmasını engellememesi için preventDefault edilmeden bırakılır.
   const onTabsKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const count = rooms.length
     let nextIndex = -1
@@ -171,14 +208,28 @@ export function GlassRoomClassifierTabs({
     else if (e.key === 'End') nextIndex = count - 1
     if (nextIndex === -1) return
     e.preventDefault()
+    if (nextIndex === activeIndex) {
+      // Zaten seçili sekmede Home/End: değişiklik üretmeyen bir seçim
+      // yolu — odak talebi YOK, bayrak hiç askıda bırakılmaz.
+      focusPendingRef.current = false
+      focusRequestIdRef.current = null
+      selectRoom(rooms[nextIndex].id)
+      return
+    }
     focusPendingRef.current = true
+    focusRequestIdRef.current = rooms[nextIndex].id
     selectRoom(rooms[nextIndex].id)
   }
 
   return (
     <section className={classes} aria-label={ariaLabel} {...rest}>
       <Header confidence={resolvedConfidence} />
-      <div role="tablist" aria-label="Oda filtresi" className={styles.tabs} onKeyDown={onTabsKeyDown}>
+      <div
+        role="radiogroup"
+        aria-label="Oda filtresi"
+        className={styles.tabs}
+        onKeyDown={onTabsKeyDown}
+      >
         {rooms.map((room, i) => {
           const selected = i === activeIndex
           const safeCount = resolveCount(room.count)
@@ -186,7 +237,7 @@ export function GlassRoomClassifierTabs({
             <button
               key={room.id}
               type="button"
-              role="tab"
+              role="radio"
               // DOM id, odanın ham `id` alanından değil index'ten türetilir:
               // `id` yalnız veri anahtarı/controlled state değeri olarak kalır
               // (boşluk/özel karakter içerebilir), bu component `aria-controls`
@@ -194,7 +245,7 @@ export function GlassRoomClassifierTabs({
               // component dışına açık bir DOM sözleşmesi taşıdığından
               // öngörülebilir tutulur.
               id={`${baseId}-tab-${i}`}
-              aria-selected={selected}
+              aria-checked={selected}
               tabIndex={selected ? 0 : -1}
               className={[styles.tab, selected ? styles.tabActive : ''].filter(Boolean).join(' ')}
               onClick={() => selectRoom(room.id)}
@@ -206,6 +257,9 @@ export function GlassRoomClassifierTabs({
           )
         })}
       </div>
+      <span className={styles.srOnly} role="status">
+        {statusMessage}
+      </span>
     </section>
   )
 }

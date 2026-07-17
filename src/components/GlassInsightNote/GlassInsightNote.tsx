@@ -5,8 +5,14 @@ import styles from './GlassInsightNote.module.css'
 export interface GlassInsightNoteProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
   /** Notu yazan uzman/danışmanın adı — başlık satırının ve avatar baş harfinin kaynağı */
   author: string
-  /** Yazarın uzmanlık/rol etiketi (ör. "Bölge Danışmanı") */
-  role?: string
+  /**
+   * Yazarın uzmanlık/rol etiketi (ör. "Bölge Danışmanı") — görünür metindir.
+   * Native `role` HTML özniteliğiyle KARIŞTIRILMAZ: bu prop yalnız görünür
+   * bir etikettir, kök elemente ARIA rolü olarak geçmez. Kök elemente ARIA
+   * rolü atamak isteyen çağıran `...rest` üzerinden native `role`'ü
+   * (`HTMLAttributes<HTMLElement>`'ten gelir) doğrudan kullanabilir.
+   */
+  authorRole?: string
   /** `GlassAvatar`'a geçilir; yüklenemez/verilmezse `author`'dan baş harf üretilir */
   avatarSrc?: string
   /** Hazır biçimlendirilmiş tarih metni (ör. "14 Temmuz 2026") — component tarih ayrıştırmaz */
@@ -70,7 +76,7 @@ function VerifiedBadge() {
  */
 export function GlassInsightNote({
   author,
-  role,
+  authorRole,
   avatarSrc,
   date,
   text,
@@ -96,7 +102,7 @@ export function GlassInsightNote({
           <>
             <div className={styles.nameRow}>
               <span className={styles.author}>{author}</span>
-              {role ? <span className={styles.role}>{role}</span> : null}
+              {authorRole ? <span className={styles.role}>{authorRole}</span> : null}
             </div>
             <div className={styles.metaRow}>
               <span className={styles.date}>{date}</span>
@@ -106,7 +112,7 @@ export function GlassInsightNote({
         ) : (
           <div className={styles.compactLine}>
             <span className={styles.author}>{author}</span>
-            {role ? <span className={styles.role}>{role}</span> : null}
+            {authorRole ? <span className={styles.role}>{authorRole}</span> : null}
             <span className={styles.date}>{date}</span>
             {verified ? <VerifiedBadge /> : null}
           </div>

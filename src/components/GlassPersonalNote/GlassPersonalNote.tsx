@@ -13,7 +13,7 @@ import {
 } from 'react'
 import styles from './GlassPersonalNote.module.css'
 
-export interface GlassPersonalNoteProps extends HTMLAttributes<HTMLDivElement> {
+export interface GlassPersonalNoteProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Controlled not metni — verilirse component controlled çalışır */
   value?: string
   /** Uncontrolled kullanımda başlangıç metni */

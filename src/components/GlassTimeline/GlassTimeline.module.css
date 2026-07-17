@@ -41,14 +41,19 @@
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
 }
+/* Ton noktaları anlam taşıyan grafiklerdir (WCAG "non-text contrast" ≥3:1) —
+   ham `--lg-success/warning/danger` yüzeye karşı bu eşiği kaçırdığı için
+   `--lg-label` ile koyulaştırılmış (açık temada) / açılmış (koyu temada)
+   color-mix türevi kullanılır; `--lg-label` tema başına ters yönde uçlaştığı
+   için tek formül iki temada da ≥3:1 sağlar (bkz. rules.md §9). */
 .marker[data-tone='success'] {
-  background: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));
 }
 .marker[data-tone='warning'] {
-  background: var(--lg-warning);
+  background: color-mix(in srgb, var(--lg-warning) 68%, var(--lg-label));
 }
 .marker[data-tone='danger'] {
-  background: var(--lg-danger);
+  background: color-mix(in srgb, var(--lg-danger) 68%, var(--lg-label));
 }
 /* İkonlu marker: büyür, ton rengi zemin karışımına döner — ikon rengi tone'u takip eder */
 .marker[data-has-icon] {
@@ -59,15 +64,15 @@
   background: color-mix(in srgb, var(--lg-label-secondary) 14%, var(--lg-surface));
 }
 .marker[data-has-icon][data-tone='success'] {
-  color: var(--lg-success);
+  color: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));
   background: color-mix(in srgb, var(--lg-success) 16%, var(--lg-surface));
 }
 .marker[data-has-icon][data-tone='warning'] {
-  color: var(--lg-warning);
+  color: color-mix(in srgb, var(--lg-warning) 68%, var(--lg-label));
   background: color-mix(in srgb, var(--lg-warning) 16%, var(--lg-surface));
 }
 .marker[data-has-icon][data-tone='danger'] {
-  color: var(--lg-danger);
+  color: color-mix(in srgb, var(--lg-danger) 68%, var(--lg-label));
   background: color-mix(in srgb, var(--lg-danger) 16%, var(--lg-surface));
 }
 .marker svg {
@@ -93,13 +98,13 @@
   background: var(--lg-label-secondary);
 }
 .compactDot[data-tone='success'] {
-  background: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));
 }
 .compactDot[data-tone='warning'] {
-  background: var(--lg-warning);
+  background: color-mix(in srgb, var(--lg-warning) 68%, var(--lg-label));
 }
 .compactDot[data-tone='danger'] {
-  background: var(--lg-danger);
+  background: color-mix(in srgb, var(--lg-danger) 68%, var(--lg-label));
 }
 
 /* ── ortak içerik gövdesi ── */

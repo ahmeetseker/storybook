@@ -32,87 +32,156 @@ describe('GlassRoomClassifierTabs', () => {
 
   it('ilk oda varsayılan seçilidir ve roving tabindex uygulanır', () => {
     renderTabs()
-    const firstTab = screen.getByRole('tab', { name: /Mutfak/ })
-    expect(firstTab.getAttribute('aria-selected')).toBe('true')
+    const firstTab = screen.getByRole('radio', { name: /Mutfak/ })
+    expect(firstTab.getAttribute('aria-checked')).toBe('true')
     expect(firstTab.getAttribute('tabindex')).toBe('0')
-    expect(screen.getByRole('tab', { name: /Salon/ }).getAttribute('tabindex')).toBe('-1')
+    expect(screen.getByRole('radio', { name: /Salon/ }).getAttribute('tabindex')).toBe('-1')
   })
 
   it('sekmeye tıklama seçimi değiştirir ve onActiveRoomIdChange doğru id ile çağrılır', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ onActiveRoomIdChange })
-    fireEvent.click(screen.getByRole('tab', { name: /Salon/ }))
+    fireEvent.click(screen.getByRole('radio', { name: /Salon/ }))
     expect(onActiveRoomIdChange).toHaveBeenCalledWith('salon')
-    expect(screen.getByRole('tab', { name: /Salon/ }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('radio', { name: /Salon/ }).getAttribute('aria-checked')).toBe('true')
   })
 
   it('controlled activeRoomId belirleyicidir — tıklama görünümü değiştirmez, yalnız callback çağrılır', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ activeRoomId: 'mutfak', onActiveRoomIdChange })
-    fireEvent.click(screen.getByRole('tab', { name: /Salon/ }))
+    fireEvent.click(screen.getByRole('radio', { name: /Salon/ }))
     expect(onActiveRoomIdChange).toHaveBeenCalledWith('salon')
-    expect(screen.getByRole('tab', { name: /Mutfak/ }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('radio', { name: /Mutfak/ }).getAttribute('aria-checked')).toBe('true')
   })
 
   it('ok tuşları roving tabindex ile sarmalı gezinir ve seçimi taşır', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ onActiveRoomIdChange })
-    const tablist = screen.getByRole('tablist')
-    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    const group = screen.getByRole('radiogroup')
+    fireEvent.keyDown(group, { key: 'ArrowRight' })
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('salon')
-    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    fireEvent.keyDown(group, { key: 'ArrowRight' })
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('yatak-odasi')
-    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    fireEvent.keyDown(group, { key: 'ArrowRight' })
     // sondan başa sarar
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('mutfak')
-    fireEvent.keyDown(tablist, { key: 'ArrowLeft' })
+    fireEvent.keyDown(group, { key: 'ArrowLeft' })
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('yatak-odasi')
   })
 
   it('Home/End ilk ve son odaya gider', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ defaultActiveRoomId: 'salon', onActiveRoomIdChange })
-    const tablist = screen.getByRole('tablist')
-    fireEvent.keyDown(tablist, { key: 'End' })
+    const group = screen.getByRole('radiogroup')
+    fireEvent.keyDown(group, { key: 'End' })
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('yatak-odasi')
-    fireEvent.keyDown(tablist, { key: 'Home' })
+    fireEvent.keyDown(group, { key: 'Home' })
     expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('mutfak')
   })
 
-  it('ArrowUp/ArrowDown tablist üzerinde işlenmez — seçim değişmez, preventDefault çağrılmaz', () => {
+  it('ArrowUp/ArrowDown radiogroup üzerinde işlenmez — seçim değişmez, preventDefault çağrılmaz', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ onActiveRoomIdChange })
-    const tablist = screen.getByRole('tablist')
-    const downNotPrevented = fireEvent.keyDown(tablist, { key: 'ArrowDown' })
-    const upNotPrevented = fireEvent.keyDown(tablist, { key: 'ArrowUp' })
+    const group = screen.getByRole('radiogroup')
+    const downNotPrevented = fireEvent.keyDown(group, { key: 'ArrowDown' })
+    const upNotPrevented = fireEvent.keyDown(group, { key: 'ArrowUp' })
     expect(onActiveRoomIdChange).not.toHaveBeenCalled()
     expect(downNotPrevented).toBe(true)
     expect(upNotPrevented).toBe(true)
-    expect(screen.getByRole('tab', { name: /Mutfak/ }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('radio', { name: /Mutfak/ }).getAttribute('aria-checked')).toBe('true')
   })
 
   it('controlled modda ok tuşuyla geçiş isteği reddedilirse odak talep edilen sekmeye sapmaz', () => {
     const onActiveRoomIdChange = vi.fn()
     renderTabs({ activeRoomId: 'mutfak', onActiveRoomIdChange })
-    const tablist = screen.getByRole('tablist')
-    const firstTab = screen.getByRole('tab', { name: /Mutfak/ })
+    const group = screen.getByRole('radiogroup')
+    const firstTab = screen.getByRole('radio', { name: /Mutfak/ })
     firstTab.focus()
     expect(document.activeElement).toBe(firstTab)
 
-    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    fireEvent.keyDown(group, { key: 'ArrowRight' })
 
     expect(onActiveRoomIdChange).toHaveBeenCalledWith('salon')
     // prop değişmediği için seçili sekme Mutfak'ta kalır
-    expect(firstTab.getAttribute('aria-selected')).toBe('true')
+    expect(firstTab.getAttribute('aria-checked')).toBe('true')
     // odak, talep edilen (reddedilen) Salon sekmesine sapmaz — Mutfak'ta kalır
     expect(document.activeElement).toBe(firstTab)
   })
 
-  it('sekmeler aria-controls hiç taşımaz — panel bu component tarafından render edilmez', () => {
+  it('reddedilen controlled seçim sonrası ilgisiz bir gerçek güncelleme geldiğinde odak yanlış sekmeye sıçramaz', () => {
+    const onActiveRoomIdChange = vi.fn()
+    const { rerender } = render(
+      <GlassRoomClassifierTabs rooms={rooms} activeRoomId="mutfak" onActiveRoomIdChange={onActiveRoomIdChange} />,
+    )
+    const firstTab = screen.getByRole('radio', { name: /Mutfak/ })
+    firstTab.focus()
+    const group = screen.getByRole('radiogroup')
+
+    // ArrowRight "salon" ister ama ebeveyn prop'u güncellemez (reddedilir) —
+    // bu talep boşa askıda kalan bir focusPendingRef bırakabilirdi.
+    fireEvent.keyDown(group, { key: 'ArrowRight' })
+    expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('salon')
+
+    // Kullanıcı odağı başka bir yere taşır (örn. sayfadaki farklı bir kontrol)
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+    outside.focus()
+    expect(document.activeElement).toBe(outside)
+
+    // Ebeveyn, klavye akışıyla TAMAMEN ilgisiz bir sebeple activeRoomId'yi
+    // günceller (reddedilmiş "salon" isteğiyle alakasız bir odaya geçiş).
+    rerender(
+      <GlassRoomClassifierTabs
+        rooms={rooms}
+        activeRoomId="yatak-odasi"
+        onActiveRoomIdChange={onActiveRoomIdChange}
+      />,
+    )
+
+    // Eski/reddedilmiş isteğin bıraktığı askıda bayrak yüzünden odak
+    // yanlışlıkla yeni aktif sekmeye sıçramamalı.
+    expect(document.activeElement).toBe(outside)
+    outside.remove()
+  })
+
+  it('zaten seçili sekmede Home/End sonrası ilgisiz bir controlled güncelleme odağı çalmaz', () => {
+    const onActiveRoomIdChange = vi.fn()
+    const { rerender } = render(
+      <GlassRoomClassifierTabs rooms={rooms} activeRoomId="mutfak" onActiveRoomIdChange={onActiveRoomIdChange} />,
+    )
+    const group = screen.getByRole('radiogroup')
+
+    // İlk sekme zaten aktif — Home yine ilk sekmeyi ister (değişiklik üretmez)
+    fireEvent.keyDown(group, { key: 'Home' })
+    expect(onActiveRoomIdChange).toHaveBeenLastCalledWith('mutfak')
+
+    const outside = document.createElement('button')
+    document.body.appendChild(outside)
+    outside.focus()
+    expect(document.activeElement).toBe(outside)
+
+    // Klavye akışıyla ilgisiz bir sebeple ebeveyn activeRoomId'yi günceller
+    rerender(
+      <GlassRoomClassifierTabs
+        rooms={rooms}
+        activeRoomId="yatak-odasi"
+        onActiveRoomIdChange={onActiveRoomIdChange}
+      />,
+    )
+
+    // Home no-op'unun bıraktığı bir bayrak yüzünden odak çalınmamalı
+    expect(document.activeElement).toBe(outside)
+    outside.remove()
+  })
+
+  it('radiogroup semantiği kullanılır, aria-controls hiç taşınmaz ve tablist/tab/tabpanel hiç render edilmez', () => {
     renderTabs()
-    for (const tab of screen.getAllByRole('tab')) {
-      expect(tab.hasAttribute('aria-controls')).toBe(false)
+    expect(screen.getByRole('radiogroup')).toBeTruthy()
+    for (const radio of screen.getAllByRole('radio')) {
+      expect(radio.hasAttribute('aria-controls')).toBe(false)
     }
+    expect(screen.queryByRole('tab')).toBeNull()
+    expect(screen.queryByRole('tablist')).toBeNull()
     expect(screen.queryByRole('tabpanel')).toBeNull()
   })
 
@@ -122,7 +191,7 @@ describe('GlassRoomClassifierTabs', () => {
       { id: 'ebeveyn banyosu', label: 'Ebeveyn Banyosu', count: 5 },
     ]
     render(<GlassRoomClassifierTabs rooms={spacedRooms} />)
-    const firstTab = screen.getByRole('tab', { name: /Çamaşır Odası/ })
+    const firstTab = screen.getByRole('radio', { name: /Çamaşır Odası/ })
     expect(firstTab.id).not.toMatch(/\s/)
   })
 
@@ -134,8 +203,22 @@ describe('GlassRoomClassifierTabs', () => {
   it('loading=true iken AI rozeti görünür kalır, sekmeler render edilmez ve durum duyurulur', () => {
     renderTabs({ loading: true })
     expect(screen.getByLabelText('Yapay zekâ üretimi')).toBeTruthy()
-    expect(screen.queryAllByRole('tab').length).toBe(0)
+    expect(screen.queryAllByRole('radio').length).toBe(0)
     expect(screen.getByRole('status').textContent).toBe('Fotoğraflar odalara ayrılıyor')
+  })
+
+  it('loading tamamlanınca canlı bölge mount kalır ve hazır durumunu farklı bir metinle duyurur', () => {
+    const { rerender } = render(<GlassRoomClassifierTabs rooms={rooms} loading />)
+    expect(screen.getByRole('status').textContent).toBe('Fotoğraflar odalara ayrılıyor')
+    rerender(<GlassRoomClassifierTabs rooms={rooms} loading={false} />)
+    const status = screen.getByRole('status')
+    expect(status.textContent).not.toBe('Fotoğraflar odalara ayrılıyor')
+    expect(status.textContent).toMatch(/oda/)
+  })
+
+  it('loading olmayan varsayılan durumda da role="status" mount edilir', () => {
+    renderTabs()
+    expect(screen.getByRole('status')).toBeTruthy()
   })
 
   it('geçersiz/negatif count 0\'a düşürülür ve fotoğraf adedi erişilebilir metinle iletilir', () => {
@@ -147,7 +230,14 @@ describe('GlassRoomClassifierTabs', () => {
         ]}
       />,
     )
-    expect(screen.getByRole('tab', { name: /Balkon 0 fotoğraf/ })).toBeTruthy()
-    expect(screen.getByRole('tab', { name: /Teras 0 fotoğraf/ })).toBeTruthy()
+    expect(screen.getByRole('radio', { name: /Balkon 0 fotoğraf/ })).toBeTruthy()
+    expect(screen.getByRole('radio', { name: /Teras 0 fotoğraf/ })).toBeTruthy()
+  })
+
+  it('children prop tipte kabul edilmez (derleme zamanı sözleşmesi) ve verilse dahi render edilmez', () => {
+    // @ts-expect-error children bu component'in public API'sinde yok — tip
+    // seviyesinde omit edilmiştir (Omit<HTMLAttributes<HTMLElement>, 'onChange' | 'children'>).
+    renderTabs({ children: <p>görünmemeli</p> })
+    expect(screen.queryByText('görünmemeli')).toBeNull()
   })
 })

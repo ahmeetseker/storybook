@@ -145,7 +145,7 @@ describe('GlassMatchBreakdown', () => {
     expect(screen.getByRole('status').textContent).toBe('Uyum hesaplanıyor')
   })
 
-  it('regresyon: loading=true iken zorunlu AI rozeti yine görünür kalır; loading=false olunca role=status metni boşalır', () => {
+  it('regresyon: loading=true iken zorunlu AI rozeti yine görünür kalır; loading=false olunca role=status "hazır" metnine döner (boşalmaz)', () => {
     const { rerender } = render(<GlassMatchBreakdown overall={70} title="Uyum" groups={groups} confidence={90} loading />)
     expect(screen.getByLabelText('Yapay zekâ üretimi')).toBeTruthy()
     expect(screen.queryByText(/güven/)).toBeNull()
@@ -153,10 +153,12 @@ describe('GlassMatchBreakdown', () => {
     expect(status.textContent).toBe('Uyum hesaplanıyor')
 
     rerender(<GlassMatchBreakdown overall={70} title="Uyum" groups={groups} confidence={90} />)
-    // Aynı düğüm mount kalmalı, yalnız metni boşalmalı — sonradan mount
-    // edilen bir canlı bölge bazı ekranokuyucularda hiç duyurulmaz.
+    // Aynı düğüm mount kalmalı; metin BOŞALMAZ, tamamlanma açıkça "hazır"
+    // metniyle duyurulur — yalnız "yükleniyor" duyurup tamamlanmayı hiç
+    // duyurmamak durum geçişini bazı ekranokuyucularda güvenilmez kılar
+    // (Codex bulgusu).
     expect(screen.getByRole('status')).toBe(status)
-    expect(status.textContent).toBe('')
+    expect(status.textContent).toBe('Uyum hazır')
   })
 
   it('groups boş dizi verilince grup listesi hiç render edilmez, genel satır yine görünür', () => {
@@ -183,5 +185,54 @@ describe('GlassMatchBreakdown', () => {
     expect(block).toMatch(/letter-spacing:\s*0\.02em/)
     expect(block).toMatch(/font-size:\s*10\.5px/)
     expect(block).toMatch(/font-weight:\s*700/)
+  })
+
+  it('regresyon: children prop tipinden açıkça omit edilir (public HTMLAttributes yüzeyi children taşımaz)', () => {
+    // Tip seviyesinde omit edildiği için normal kullanımda TS derlemesi
+    // `children` geçirilmesine izin vermez. Bir çağıran yine de zorla
+    // (`as any`) geçirirse component kendi sabit JSX ağacını render eder —
+    // dışarıdan gelen children sessizce yutulmaz, hiç kabul edilmediği
+    // için render sonucu tamamen component'in kendi içeriğidir.
+    render(
+      <GlassMatchBreakdown
+        overall={70}
+        groups={groups}
+        {...({ children: 'dışarıdan-children-metni' } as Record<string, unknown>)}
+      />,
+    )
+    expect(screen.queryByText('dışarıdan-children-metni')).toBeNull()
+    expect(screen.getByRole('meter', { name: 'Genel Uyum' })).toBeTruthy()
+  })
+
+  it('regresyon: grup ve detay listeleri role="list" taşır (Safari/VoiceOver list-style:none semantik kaybına karşı)', () => {
+    render(<GlassMatchBreakdown overall={70} groups={groups} />)
+    const lists = screen.getAllByRole('list')
+    // Konum grubunun detay listesi + grup listesinin kendisi → en az 2 liste
+    expect(lists.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('regresyon: geri bildirim buton grubu role="group" + aria-labelledby ile görünür soruya bağlanır', () => {
+    render(<GlassMatchBreakdown overall={70} groups={groups} onFeedback={vi.fn()} />)
+    const group = screen.getByRole('group', { name: 'Bu döküm faydalı mıydı?' })
+    expect(group.querySelectorAll('button').length).toBe(2)
+  })
+
+  it('regresyon: eşleşme işareti ve eşleşmeyen metin/işareti WCAG AA eşiklerini kaçıran ham token yerine koyulaştırılmış color-mix kullanır', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassMatchBreakdown.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+
+    // Eşleşen ikon: ham `--lg-success` (~2:1) yerine ≥3:1 sağlayan label ile
+    // koyulaştırılmış türev.
+    const matchedIconBlock = css.match(/\.detail\[data-matched='true'\] \.detailIcon\s*\{([^}]*)\}/)
+    expect(matchedIconBlock).not.toBeNull()
+    expect(matchedIconBlock![1]).toMatch(/color-mix\(in srgb, var\(--lg-success\) 68%, var\(--lg-label\)\)/)
+    expect(matchedIconBlock![1]).not.toMatch(/color:\s*var\(--lg-success\);/)
+
+    // Eşleşmeyen metin: ham `--lg-label-secondary` (~4.23:1) yerine ≥4.5:1
+    // sağlayan label ile koyulaştırılmış türev.
+    const unmatchedBlock = css.match(/\.detail\[data-matched='false'\]\s*\{([^}]*)\}/)
+    expect(unmatchedBlock).not.toBeNull()
+    expect(unmatchedBlock![1]).toMatch(/color-mix\(in srgb, var\(--lg-label-secondary\) 65%, var\(--lg-label\)\)/)
+    expect(unmatchedBlock![1]).not.toMatch(/color:\s*var\(--lg-label-secondary\);/)
   })
 })

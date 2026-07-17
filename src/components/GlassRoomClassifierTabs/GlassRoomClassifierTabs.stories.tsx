@@ -121,12 +121,15 @@ export const Erisilebilirlik: Story = {
     docs: {
       description: {
         story:
-          'Sekme çipleri `role="tablist"`/`role="tab"` ile WAI-ARIA tabs desenini izler — yalnız yatay ok ' +
-          'tuşları (`ArrowLeft`/`ArrowRight`, sarmalı) + `Home`/`End` gezinir, seçim odağı yalnız kullanıcı ' +
-          'etkileşiminde takip eder (roving tabindex). Bu component galeri panelini render ETMEZ — bu yüzden ' +
-          '`aria-controls` bilinçli olarak hiç verilmez (var olmayan bir panel id\'sine işaret etmek gerçek ' +
-          'bir ARIA IDREF ihlali olurdu; panel ile eşleme çağıranın kompozisyon sorumluluğundadır, bkz. ' +
-          'rules.md §2). "✦ AI" rozeti (`aria-label="Yapay zekâ üretimi"`) başlık satırında koşulsuz görünür, ' +
+          'Sekme çipleri `role="radiogroup"`/`role="radio"` ile WAI-ARIA radiogroup desenini izler (tab ' +
+          'DEĞİL — bu component galeri panelini hiç render etmediğinden `tab`/`tabpanel` ilişkisini ' +
+          'kuramaz; davranış zaten tek-seçimli bir filtre olduğundan radiogroup semantik olarak doğru ' +
+          'eşlemedir) — yalnız yatay ok tuşları (`ArrowLeft`/`ArrowRight`, sarmalı) + `Home`/`End` gezinir, ' +
+          'seçim odağı yalnız kullanıcı etkileşiminde takip eder (roving tabindex). Bu yüzden ' +
+          '`aria-controls` bilinçli olarak hiç verilmez (var olmayan bir panel id\'sine işaret etmek ' +
+          'gerçek bir ARIA IDREF ihlali olurdu; panel ile eşleme çağıranın kompozisyon sorumluluğundadır, ' +
+          'bkz. rules.md §2). "✦ AI" rozeti (`aria-label="Yapay zekâ üretimi"`) başlık satırında koşulsuz ' +
+          'görünür, ' +
           '`loading` sırasında da kaybolmaz; `confidence` verilirse yalnız renkle değil görünür "%N güven" ' +
           'metniyle de iletilir. Her sekmenin erişilebilir adı oda adı + fotoğraf adedini birlikte taşır (ör. ' +
           '"Mutfak 9 fotoğraf").',

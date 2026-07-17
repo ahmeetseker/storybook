@@ -43,8 +43,11 @@ bildirim/yükleme sözleşmesi `GlassScoreMeter`'da yok).
   bağlanır. Grup skoru (`groupScore`) `aria-hidden` — değer zaten
   `aria-valuenow`'da, AT'ye iki kez okutulmaz (genel skor satırıyla aynı
   karar).
-- Grup listesi `<ul><li>`; her `<li>` bir meter + (varsa) kendi detay
-  `<ul><li>` listesini kapsar (nested list, standart HTML).
+- Grup listesi `<ul role="list"><li>`; her `<li>` bir meter + (varsa) kendi
+  detay `<ul role="list"><li>` listesini kapsar (nested list, standart HTML).
+  `role="list"` her iki `<ul>`'a da AÇIKÇA eklenir — Safari/VoiceOver
+  `list-style: none` taşıyan `<ul>`'ları bazen liste semantiğinden çıkarır
+  (Codex bulgusu; bkz. §11 regresyon testi).
 - Detay chip'leri: ✓/✕ ikonları `aria-hidden` (dekoratif). Eşleşme durumu
   AT'ye görünür etiketin yanına eklenen görsel-gizli (`srOnly`, `aria-hidden`
   DEĞİL) "(eşleşti)"/"(eşleşmedi)" metniyle iletilir — `GlassMatchScore`
@@ -52,17 +55,28 @@ bildirim/yükleme sözleşmesi `GlassScoreMeter`'da yok).
 - "✦ AI" rozeti: `aria-label="Yapay zekâ üretimi"`.
 - `confidence` metni ("%N güven") görünür düz metin — ayrı ARIA gerekmez.
 - Geri bildirim: gerçek `<button aria-pressed>` (👍/👎), accessible name
-  "Faydalı"/"Faydalı değil". `role="radiogroup"` DEĞİL — ikisi bağımsız
-  toggle (roving tabindex gerekmez, doğal Tab sırası).
+  "Faydalı"/"Faydalı değil". Buton çifti `role="group"` + `aria-labelledby`
+  ile görünür "Bu döküm faydalı mıydı?" sorusuna bağlanır — soru yalnız
+  görsel bir metin kalırsa AT butonların neye dair olduğunu bağlamsız alır
+  (Codex bulgusu). `role="radiogroup"` DEĞİL — ikisi bağımsız toggle
+  (roving tabindex gerekmez, doğal Tab sırası).
 - `loading=true`: genel satır/grup listesi/geri bildirim yerine `aria-hidden`
   skeleton render edilir; TEK istisna zorunlu "✦ AI" rozeti (skeleton başlık
   satırının yanında normal görünür kalır). Durum, mount anından itibaren
   DOM'da bulunan **tek bir** `role="status"` düğümünün metni değiştirilerek
-  duyurulur — düğüm `loading=false`'ta da mount kalır, yalnız metni boşalır
-  (sonradan DOM'a eklenen bir canlı bölge bazı ekranokuyucularda hiç
-  duyurulmaz; bkz. §11 regresyon testi).
+  duyurulur — düğüm `loading=false`'ta da mount kalır. Metin ASLA boş
+  string'e dönmez: `loading=true` iken `"{title} hesaplanıyor"`,
+  `loading=false` iken `"{title} hazır"` — yalnız "yükleniyor" duyurup
+  tamamlanmayı hiç duyurmamak (boş bırakmak) durum geçişini bazı
+  ekranokuyucularda güvenilmez kılar (Codex bulgusu; bkz. §11 regresyon
+  testi).
 - Portal yok, ref forwarding yok (statik/kontrollü sunum kararı, diğer
   içerik katmanı component'leriyle tutarlı).
+- `children` public API YÜZEYİNDE YOK: `GlassMatchBreakdownProps`,
+  `HTMLAttributes<HTMLDivElement>`'ten hem `title` hem `children`'ı açıkça
+  `Omit` eder (render yoluyla yutma değil, TİP yoluyla reddetme — bir
+  önceki sürümde `children` tipte kabul edilip JSX'in kendi sabit alt
+  ağacı tarafından sessizce ezilebiliyordu; Codex bulgusu).
 
 ## 3. Anatomy ve slotlar
 
@@ -77,7 +91,8 @@ bildirim/yükleme sözleşmesi `GlassScoreMeter`'da yok).
 | detay chip'leri | — | `group.details[]` | Yalnız verilen grupta; ✓ (success ton) / ✕ (soluk) |
 | geri bildirim | — | 👍/👎 | Yalnız `onFeedback` verilirse |
 
-Children kabul edilmez — tamamen prop güdümlü.
+Children kabul edilmez — tamamen prop güdümlü (tip seviyesinde `Omit<...,
+'children'>` ile reddedilir, bkz. §2).
 
 ## 4. Public API
 
@@ -89,7 +104,7 @@ Children kabul edilmez — tamamen prop güdümlü.
 | confidence | prop | `number` | — | — | [0,100]'e clamp; sonlu değilse gizlenir (rozet yine görünür) |
 | onFeedback | prop | `(value: 'up' \| 'down') => void` | — | — | Verilirse 👍/👎 butonları görünür |
 | loading | prop | `boolean` | `false` | — | true → flat skeleton + `role="status"` metni |
-| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title` hariç) | — | — | `className`/`style` birleştirilir |
+| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title`/`children` hariç) | — | — | `className`/`style` birleştirilir |
 
 `GlassMatchBreakdownGroup`: `id: string` (yalnız React `key`, DOM `id`'sine
 YAZILMAZ — DOM id'leri her zaman `useId()` + grup index'inden türetilir),
@@ -130,7 +145,7 @@ değerinden).
 | grup skoru/ton | her `group.score`'dan bağımsız otomatik eşik | — | `aria-valuenow`, `data-tone` (grup başına) |
 | güven | `confidence` (normalize) | — | görünür metin |
 | geri bildirim seçimi | dahili state (`feedback: 'up'\|'down'\|undefined`); aynı yöne tekrar tıklama toggle-off; `overall`/`groups` içerik imzası değişince render sırasında otomatik `undefined`'a sıfırlanır | — | `aria-pressed`, `data-selected` |
-| yükleme | `loading` prop | genel satır/grup listesi/geri bildirim tamamen (AI rozeti HARİÇ — bkz. §2) | `role="status"` (her zaman mount, metin toggle) |
+| yükleme | `loading` prop | genel satır/grup listesi/geri bildirim tamamen (AI rozeti HARİÇ — bkz. §2) | `role="status"` (her zaman mount; metin `"hesaplanıyor"`↔`"hazır"` arası değişir, ASLA boşalmaz) |
 | disabled/hover/focus/active | — | — | hover/focus/active PROP DEĞİL; yalnız `:focus-visible`/`@media(hover:hover)` |
 
 **İçerik imzası (feedback sıfırlama):** `JSON.stringify({ overall:
@@ -161,10 +176,13 @@ içerik imzasının parçası, her grup bağımsız) → render.
   kare/effect turu üretmez.
 - `loading`: skeleton içeriği (`skeletonBlock`) `aria-hidden`; `role="status"`
   düğümü mount anından itibaren DOM'dadır — `loading` `true`↔`false` arası
-  geçişte yalnız METNİ değişir, düğüm sökülüp yeniden takılmaz. Skeleton
-  animasyonu yalnız `opacity` (shimmer/gradient yok). Zorunlu "✦ AI" rozeti
-  skeleton başlık satırının yanında normal (aria-hidden OLMAYAN) şekilde
-  render edilir.
+  geçişte yalnız METNİ değişir, düğüm sökülüp yeniden takılmaz. Metin
+  `loading=true`'da `"{title} hesaplanıyor"`, `loading=false`'ta
+  `"{title} hazır"` — ASLA boş string'e dönmez (yalnız yüklenmeyi duyurup
+  tamamlanmayı hiç duyurmamak geçişi bazı ekranokuyucularda güvenilmez
+  kılar). Skeleton animasyonu yalnız `opacity` (shimmer/gradient yok).
+  Zorunlu "✦ AI" rozeti skeleton başlık satırının yanında normal
+  (aria-hidden OLMAYAN) şekilde render edilir.
 - Odak taşıma yok — component hiçbir zaman kendiliğinden odak almaz/taşımaz;
   tek etkileşim yüzeyi (geri bildirim butonları) doğal Tab sırasında durur.
 - Responsive: kart konteynerin genişliğine uyar; grup başlığı/ağırlık/skor
@@ -195,8 +213,8 @@ içerik imzasının parçası, her grup bağımsız) → render.
 | grup ayırıcı | border-top | `--lg-hairline` | ilk grupta yok |
 | ağırlık etiketi | color | `--lg-label-secondary` | — |
 | AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassMatchScore.module.css`'teki `.aiBadge` bloğuyla birebir aynı |
-| detay chip (matched) | background/color | `color-mix(... var(--lg-success) ...)` / `--lg-success` (ikon) | `data-matched=true` |
-| detay chip (unmatched) | background/color | `color-mix(... var(--lg-label) ...)` / `--lg-label-secondary` | `data-matched=false` |
+| detay chip (matched) | background/color | `color-mix(... var(--lg-success) 14% ...)` zemin / `color-mix(in srgb, var(--lg-success) 68%, var(--lg-label))` ikon | `data-matched=true`; ham `--lg-success` ikonda ~2:1 kalıp anlam taşıyan grafik eşiğini (≥3:1) kaçırıyordu — koyulaştırılmış türev kullanılır |
+| detay chip (unmatched) | background/color | `color-mix(... var(--lg-label) 6% ...)` zemin / `color-mix(in srgb, var(--lg-label-secondary) 65%, var(--lg-label))` metin+ikon | `data-matched=false`; ham `--lg-label-secondary` metinde ~4.23:1 kalıp küçük metin eşiğini (≥4.5:1) kaçırıyordu — koyulaştırılmış türev kullanılır (açık temada hesaplanmıştır, bkz. §11) |
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | skeleton | background | `color-mix(... var(--lg-label) 8% ...)` | `loading` |
 
@@ -228,10 +246,14 @@ ekseni tanımlı değil (tek sabit anatomi), tema toolbar'la otomatik doğrulan�
 - [x] `onFeedback` verilmezse buton hiç render edilmez
 - [x] geri bildirim seçimi `overall`/`groups` içerik imzası değişince otomatik sıfırlanır; içerik AYNIYSA (farklı referans dahi olsa) seçim korunur
 - [x] `loading=true` iken meter/grup/feedback yerine skeleton + `role="status"` durum metni render edilir; zorunlu "✦ AI" rozeti yine görünür kalır
-- [x] `role="status"` düğümü `loading` `true`↔`false` geçişinde aynı düğüm olarak kalır (mount edilip sökülmez), yalnız metni değişir
+- [x] `role="status"` düğümü `loading` `true`↔`false` geçişinde aynı düğüm olarak kalır (mount edilip sökülmez); metin ASLA boşalmaz, `"hesaplanıyor"`↔`"hazır"` arası değişir
 - [x] `groups` boş dizi verilince grup listesi hiç render edilmez, genel satır yine görünür
 - [x] eşleşmeyen detay chip'inde metne element-genelinde opacity uygulanmaz (WCAG AA kontrast regresyonu)
 - [x] AI rozeti CSS bloğu `GlassMatchScore.module.css`'teki `.aiBadge` ile hizalı
+- [x] `children` prop tipinden açıkça omit edilir (`as any` ile zorlanırsa dahi render edilmez)
+- [x] grup listesi ve detay listeleri `role="list"` taşır (Safari/VoiceOver semantik kaybına karşı)
+- [x] geri bildirim buton grubu `role="group"` + `aria-labelledby` ile görünür soruya bağlanır
+- [x] eşleşme işareti (ikon) ve eşleşmeyen metin/işaret ham semantik/secondary token yerine koyulaştırılmış `color-mix` türevleri kullanır (küçük metin ≥4.5:1, anlam taşıyan grafik ≥3:1, açık temada)
 - [ ] reduced-motion'da bar/skeleton geçişlerinin kapanması (visual)
 
 ## 12. Do / Don't
@@ -246,9 +268,15 @@ ekseni tanımlı değil (tek sabit anatomi), tema toolbar'la otomatik doğrulan�
   değil (durum bilgisi zaten görünür sayı + `aria-valuenow`'da, yalnız
   renkle taşınmaz).
 - ✅ `role="status"` düğümünü koşullu mount/unmount ETME — her zaman DOM'da
-  tut, yalnız metnini değiştir.
+  tut, yalnız metnini değiştir; metni boş string'e döndürme, `"hazır"` gibi
+  açık bir tamamlanma metni kullan.
+- ✅ Anlam taşıyan ikon/işaretlerde ham `--lg-success/--lg-label-secondary`
+  yerine `--lg-label` ile koyulaştırılmış `color-mix` türevi kullan (küçük
+  metin ≥4.5:1, grafik ≥3:1 hedefiyle) — `GlassTimeline`'daki aynı desen.
 - ❌ `GlassScoreMeter`'ı import edip bar mantığını paylaşma — iki
   component'in ARIA/AI sözleşmesi kasıtlı olarak ayrı.
+- ❌ `children`'ı `HTMLAttributes` yüzeyinden omit etmeden bırakma — tip
+  izin verirse JSX'in kendi sabit alt ağacı tarafından sessizce ezilir.
 - ❌ `groups`/`onFeedback` API'sini `loading` sırasında render etmeye
   çalışma — yükleme durumu her şeyi bastırır.
 - ❌ Cam yüzey/backdrop-filter ekleme — içerik katmanı kuralı.
@@ -269,3 +297,14 @@ gruplar her zaman açık gösteriliyor).
   `loading` placeholder'ı ve her zaman mount edilmiş `role="status"` duyuru
   düğümü (önceki dalgalarda yakalanan "sonradan mount edilen canlı bölge
   duyurulmaz" bulgusuna karşı baştan tasarlandı).
+- 2026-07-17: Codex ekip raporu (Dalga 4 konsolide) düzeltmeleri —
+  `children` prop tipinden `Omit` ile açıkça çıkarıldı (önceden tip izin
+  veriyor ama JSX kendi sabit ağacı tarafından sessizce eziliyordu);
+  `role="status"` metni artık ASLA boşalmıyor, tamamlanma `"{title} hazır"`
+  ile açıkça duyuruluyor; geri bildirim buton grubu `role="group"` +
+  `aria-labelledby` ile görünür soruya bağlandı; grup/detay `<ul>`'larına
+  `role="list"` eklendi (Safari/VoiceOver semantik kaybı önlemi); eşleşme
+  ikonu ve eşleşmeyen metin/ikon rengi ham `--lg-success`/
+  `--lg-label-secondary` yerine `--lg-label` ile koyulaştırılmış `color-mix`
+  türevlerine geçirildi (WCAG AA: küçük metin ≥4.5:1, anlam taşıyan grafik
+  ≥3:1, açık temada doğrulandı).

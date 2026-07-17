@@ -131,4 +131,19 @@ describe('GlassPhotoFeatureOverlay', () => {
     render(<GlassPhotoFeatureOverlay image={image} features={features} />)
     expect(screen.getByText('2 özellik tespit edildi')).toBeTruthy()
   })
+
+  it('regresyon: children tip düzeyinde kabul edilmez — kaçak geçilse bile sessizce yutulmaz/render edilmez', () => {
+    // `children` prop tipinden açıkça omit edilmiştir (bkz. rules.md §2/§4); TS bunu derleme
+    // zamanında engeller. Burada tip kontrolünü bilinçli olarak atlayıp (`as any`) çalışma
+    // zamanı sözleşmesini doğruluyoruz: dışarıdan sızan children component'in kendi sabit
+    // anatomisini (sahne/rozet/araç çubuğu) BOZMAZ — sessiz içerik kaybı yerine, prop hiç
+    // etkili olmaz çünkü kök `<div>` her zaman kendi JSX çocuklarını render eder.
+    const props = { image, features, children: 'kaçak çocuk içerik' } as unknown as Parameters<
+      typeof GlassPhotoFeatureOverlay
+    >[0]
+    render(<GlassPhotoFeatureOverlay {...props} />)
+    expect(screen.queryByText('kaçak çocuk içerik')).toBeNull()
+    // Component kendi sabit anatomisini yine de render etmeye devam eder.
+    expect(screen.getByText('2 özellik tespit edildi')).toBeTruthy()
+  })
 })

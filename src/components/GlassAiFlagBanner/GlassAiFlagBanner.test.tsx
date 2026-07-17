@@ -198,4 +198,61 @@ describe('GlassAiFlagBanner', () => {
     )
     expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('true')
   })
+
+  it('regresyon: içerik imzası ayraçsız birleşmez — reasons.join(\'\') çakışması artık eski geri bildirimi taşımaz', () => {
+    // Naif `reasons.join('')` birleşiminde reasons=['AB'] ile
+    // reasons=['A','B'] AYNI "AB" stringine çakışırdı — iki farklı AI
+    // tespiti aynı imzaya sahip sayılıp geri bildirim yanlışlıkla korunurdu.
+    // JSON.stringify tuple alan/eleman sınırlarını korur, çakışmaz.
+    const onFeedback = vi.fn()
+    const { rerender } = render(<GlassAiFlagBanner title="X" reasons={['AB']} onFeedback={onFeedback} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Faydalı' }))
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('true')
+
+    rerender(<GlassAiFlagBanner title="X" reasons={['A', 'B']} onFeedback={onFeedback} />)
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('regresyon: children prop tipte kabul edilmez (Omit ile dışlanır) ve geçirilse bile render edilmez', () => {
+    // @ts-expect-error — children kasıtlı olarak public API'den tip düzeyinde çıkarılmıştır.
+    render(<GlassAiFlagBanner>Gizli çocuk içerik</GlassAiFlagBanner>)
+    expect(screen.queryByText('Gizli çocuk içerik')).toBeNull()
+  })
+
+  it('regresyon: loading true\'dan false\'a geçince canlı bölge "tamamlandı" mesajını duyurur (yalnız sessizliğe dönmez)', () => {
+    const { container, rerender } = render(<GlassAiFlagBanner loading />)
+    const liveRegion = container.querySelector('[aria-live="polite"]') as HTMLElement
+    expect(liveRegion.textContent).toBe('Yapay zekâ incelemesi yükleniyor')
+
+    rerender(<GlassAiFlagBanner loading={false} />)
+    expect(liveRegion.textContent).toBe('Yapay zekâ incelemesi tamamlandı')
+  })
+
+  it('regresyon: hiç yüklenmemiş bir banner mount olduğunda canlı bölge boş kalır (sahte tamamlanma duyurusu yok)', () => {
+    const { container } = render(<GlassAiFlagBanner loading={false} />)
+    const liveRegion = container.querySelector('[aria-live="polite"]') as HTMLElement
+    expect(liveRegion.textContent).toBe('')
+  })
+
+  it('regresyon: description/reasonItem/confidence metin rengi yalnız label token karışımı kullanır (semantik renk metne sızmaz, kontrast dersi)', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassAiFlagBanner.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+
+    for (const selector of ['.description', '.reasonItem', '.confidence']) {
+      const blockMatch = css.match(new RegExp(`\\${selector}\\s*\\{([^}]*)\\}`))
+      expect(blockMatch).not.toBeNull()
+      const block = blockMatch![1]
+      expect(block).toMatch(/color:\s*color-mix\(in srgb, var\(--lg-label\) 10%, var\(--lg-label-secondary\)\)/)
+      expect(block).not.toMatch(/--flag-color/)
+    }
+  })
+
+  it('regresyon: severity ikonu rengi koyulaştırılmış color-mix kullanır (raw --flag-color ~1.9-2.9:1 kontrasta düşüyordu)', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassAiFlagBanner.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+    const blockMatch = css.match(/\.icon\s*\{([^}]*)\}/)
+    expect(blockMatch).not.toBeNull()
+    const block = blockMatch![1]
+    expect(block).toMatch(/color:\s*color-mix\(in srgb, var\(--flag-color, var\(--lg-warning\)\) 70%, var\(--lg-label\)\)/)
+  })
 })

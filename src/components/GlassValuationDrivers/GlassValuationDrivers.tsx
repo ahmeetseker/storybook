@@ -22,7 +22,8 @@ export interface GlassValuationDriver {
 
 type GlassValuationDriverTone = 'success' | 'danger' | 'neutral'
 
-export interface GlassValuationDriversProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface GlassValuationDriversProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   /** Değerlemeyi etkileyen faktörler — bar genişliği aralarındaki max |impact|'e normalize edilir */
   drivers: GlassValuationDriver[]
   /** Kıyas referansı (ör. "Bölge medyanı: 5,1M") — başlığın altında görünür not */
@@ -173,6 +174,7 @@ export function GlassValuationDrivers({
   const uid = useId()
   const titleId = `${uid}-title`
   const baseTextId = `${uid}-base`
+  const feedbackPromptId = `${uid}-feedback-prompt`
 
   const [feedback, setFeedback] = useState<'up' | 'down' | undefined>(undefined)
 
@@ -203,9 +205,17 @@ export function GlassValuationDrivers({
   // "adjusting state during render" deseniyle (bkz. contentSignature yukarıda)
   // yakalayıp durum metnini güncelliyoruz.
   const [statusText, setStatusText] = useState(loading ? `${title} hesaplanıyor` : '')
-  const prevLoadingRef = useRef(loading)
-  if (prevLoadingRef.current !== loading) {
-    prevLoadingRef.current = loading
+  const prevStatusDepsRef = useRef({ loading, title })
+  // `title` da bağımlılığa dahil: aynı `loading` değeri korunurken `title`
+  // değişirse (ör. yükleniyorken ya da "hazır" duyurusundan sonra farklı bir
+  // ilana geçildiğinde) duyuru metni eski başlıkla asılı kalmamalı. İlk
+  // mount loading=false iken (statusText hâlâ '') sahte bir "hazır" duyurusu
+  // tetiklenmemesi için o durumda yalnız title değişimi güncelleme YAPMAZ.
+  const statusDepsChanged =
+    prevStatusDepsRef.current.loading !== loading ||
+    (prevStatusDepsRef.current.title !== title && (loading || statusText !== ''))
+  if (statusDepsChanged) {
+    prevStatusDepsRef.current = { loading, title }
     setStatusText(loading ? `${title} hesaplanıyor` : `${title} hazır`)
   }
 
@@ -257,8 +267,10 @@ export function GlassValuationDrivers({
 
           {showFeedback ? (
             <div className={styles.feedback}>
-              <span className={styles.feedbackPrompt}>Bu değerlendirme faydalı mıydı?</span>
-              <div className={styles.feedbackButtons}>
+              <span id={feedbackPromptId} className={styles.feedbackPrompt}>
+                Bu değerlendirme faydalı mıydı?
+              </span>
+              <div className={styles.feedbackButtons} role="group" aria-labelledby={feedbackPromptId}>
                 <button
                   type="button"
                   className={styles.feedbackButton}

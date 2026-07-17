@@ -39,7 +39,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -64,7 +64,9 @@
   top: var(--lg-space-2);
   right: var(--lg-space-2);
   z-index: 4;
-  filter: drop-shadow(0 1px 3px color-mix(in srgb, var(--lg-label) 30%, transparent));
+  /* Rozet yalnız görsel bir işaret — noktalar altında/yanında kalabilir,
+     tıklama/dokunma olaylarını asla yakalamaz (bkz. rules.md §2). */
+  pointer-events: none;
 }
 
 /* ── nokta işaretleri: gerçek buton, pulse YOK (statik) ── */
@@ -104,9 +106,15 @@
   transform: scale(1.2);
 }
 
+/* Çift katmanlı odak halkası: iç `--lg-surface` halkası + dış `--lg-accent`
+   halkası — değişken fotoğraf zeminlerinde tek renkli halka 3:1 kontrastı
+   garanti edemediği için (bkz. rules.md §2), her iki renk birlikte her
+   zeminde en az bir katmanla ayrışır. */
 .dot:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--lg-surface),
+    0 0 0 4px var(--lg-accent);
 }
 
 @media (hover: hover) {

@@ -57,7 +57,12 @@ kişisel bir metin alanı, cam malzemenin anlamı yok.
 | gizlilik satırı | ✅ (her zaman) | kilit ikonu + "Yalnız sen görürsün" | Sabit metin, prop ile özelleştirilemez (bkz. §12) |
 | kaydedildi onayı | ✅ (her zaman mount, görsel-gizli) | `role="status"` | İçerik yalnız Kaydet sonrası kısaca dolar |
 
-Children kabul edilmez — tamamen prop güdümlü.
+Children kabul edilmez — tamamen prop güdümlü. `...rest` tipi
+`Omit<HTMLAttributes<HTMLDivElement>, 'children'>` olduğundan bu tip
+seviyesinde zorlanır (spread ile kök `<div>`'e `children` geçirilse bile
+JSX'in kendi literal children'ı — component'in sabit görsel ağacı — her
+zaman kazanır, dışarıdan gelen içerik render edilmez; regresyon testi bkz.
+`.test.tsx`).
 
 ## 4. Public API
 
@@ -69,7 +74,7 @@ Children kabul edilmez — tamamen prop güdümlü.
 | onSave | prop | `(text: string) => void` | — | — | "Kaydet" tıklanınca trimlenmiş metinle çağrılır (kalıcılaştırma çağıranın sorumluluğunda) |
 | placeholder | prop | `string` | `'Bu ilan hakkında not al — yalnız sen görürsün'` | — | Yalnız textarea boşken görünür ipucu |
 | maxLength | prop | `number` | `500` | — | Sonlu değilse/`0` veya negatifse varsayılana düşer |
-| ...rest | — | `HTMLAttributes<HTMLDivElement>` | — | — | `className`/`style` köke birleştirilir |
+| ...rest | — | `Omit<HTMLAttributes<HTMLDivElement>, 'children'>` | — | — | `className`/`style` köke birleştirilir; `children` tip düzeyinde omit edilir (bkz. §3 "Children kabul edilmez") |
 
 Ref hedefi yok. `onValueChange` ve `onSave` HER İKİSİ de aynı anda, aynı
 trimlenmiş metinle çağrılır — ayrı amaçlar için ayrı callback'ler (state
@@ -160,6 +165,7 @@ seçimi) → `editing` (editor'ün üstüne binmesi) → render.
 | not metni | color | `--lg-label` | — |
 | "Düzenle" butonu | color | `--lg-accent` | hover → `color-mix(var(--lg-accent) 10%, transparent)` zemin |
 | textarea | background/border/radius/color | `--lg-surface` / `--lg-hairline` / `--lg-radius-chip` / `--lg-label` | focus-visible → `--lg-accent` outline |
+| textarea placeholder | color/opacity | `--lg-label-secondary` / `opacity: 1` | `opacity` açıkça `1`'e kilitlenir — tarayıcı varsayılan placeholder opaklığı efektif kontrastı ~2.1-2.8:1'e düşürebiliyordu; `--lg-label-secondary` kendi başına açık temada ~4.74:1, koyu temada ~6.3:1 sağlıyor (≥4.5:1 eşiği) |
 | sayaç | color | `--lg-label-secondary` | sınıra yaklaşınca (`data-near-limit`) → `color-mix(var(--lg-warning) 65%, var(--lg-label))` metin + `color-mix(var(--lg-warning) 16%, transparent)` zemin (AI rozeti tekniğiyle aynı: renk yalnız zemin/metin karışımına, ham semantik renk küçük metne doğrudan uygulanmaz) |
 | Vazgeç | border/color | `--lg-hairline` / `--lg-label-secondary` | hover → `--lg-label` metin |
 | Kaydet | background/color | `--lg-accent` / `--lg-accent-contrast` | hover → `opacity: 0.92` |
@@ -239,6 +245,14 @@ eklenebilir.
 
 ## Changelog
 
+- 2026-07-17: Codex dalga4 QA fix — `...rest` tipi
+  `Omit<HTMLAttributes<HTMLDivElement>, 'children'>`'a çevrildi (önceden
+  `children` tip seviyesinde kabul ediliyor ama JSX'in kendi literal
+  children'ı tarafından sessizce eziliyordu — spread edilen `children`
+  hiçbir zaman render edilmiyordu); `.textarea::placeholder` için
+  `opacity: 1` eklendi (tarayıcı varsayılan placeholder opaklığı efektif
+  kontrastı düşürüyordu, renk zaten `--lg-label-secondary` ile ≥4.5:1
+  sağlıyordu). İkisi için de regresyon testi eklendi.
 - 2026-07-17: İlk sürüm — boş/görüntüle/düzenle üç durumlu akış, controlled
   `value` + `onValueChange` + ayrı `onSave` kalıcılaştırma callback'i,
   textarea-scoped Escape (`stopPropagation` + IME guard, `GlassChatDock`

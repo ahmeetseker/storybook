@@ -56,10 +56,16 @@ karar — bkz. §9).
 - `loading=true`: `div[aria-busy="true"]`, gerçek açıklama/gerekçe/aksiyonlar
   yerine `aria-hidden` dekoratif placeholder render edilir. AI rozeti
   KAYBOLMAZ. Duyuru: her zaman mount'lu bir `aria-live="polite"` (`.srOnly`)
-  bölge — `loading=false` iken boş, `loading=true` iken "Yapay zekâ
-  incelemesi yükleniyor" metnini alır (sonradan mount edilen `aria-live`
-  bölgeler bazı ekran okuyucularda kaçabilir, bu yüzden koşulsuz mount).
-- Portal yok, ref forwarding yok — tamamen prop güdümlü/sunum.
+  bölge — hiç yüklenmemiş bir mount'ta boş, `loading=true` iken "Yapay zekâ
+  incelemesi yükleniyor", `loading` `true`→`false` geçişinde "Yapay zekâ
+  incelemesi tamamlandı" metnini alır (sonradan mount edilen `aria-live`
+  bölgeler bazı ekran okuyucularda kaçabilir, bu yüzden koşulsuz mount;
+  yalnız "yükleniyor"u boşaltıp sessiz kalmak tamamlanma geçişini de
+  kaçırır — Codex bulgusu, bkz. §11/Changelog).
+- Portal yok, ref forwarding yok — tamamen prop güdümlü/sunum. `children`
+  kabul edilmez: `HTMLAttributes<HTMLDivElement>`'ten `'title' | 'children'`
+  tip düzeyinde `Omit` edilir (render ETMEME değil, TİP düzeyinde dışlama —
+  yanlışlıkla `children` geçirilirse derleme zamanında hata verir).
 
 ## 3. Anatomy ve slotlar
 
@@ -75,9 +81,11 @@ karar — bkz. §9).
 | geri bildirim | yalnız `onFeedback` | 👍/👎 | `aria-pressed`, karşılıklı dışlar |
 | dismiss | yalnız `onDismiss` | × butonu | `aria-label="Kapat"`, 44px coarse hedef |
 | placeholder | yalnız `loading=true` | — | `aria-hidden`, flat/parıltısız, rozet hariç her şeyin yerine geçer |
-| loading duyurusu | her zaman mount'lu | — | `aria-live="polite"`, yalnız `loading=true` iken metin taşır |
+| loading duyurusu | her zaman mount'lu | — | `aria-live="polite"`; `loading=true`→"yükleniyor", `true`→`false` geçişinde "tamamlandı", hiç yüklenmemişse boş |
 
-Children kabul edilmez — tamamen prop güdümlü.
+Children kabul edilmez — tamamen prop güdümlü; `GlassAiFlagBannerProps`
+`HTMLAttributes<HTMLDivElement>`'ten `children`'ı tip düzeyinde `Omit` eder
+(yanlışlıkla geçirilirse derleme hatası verir, sessizce yutulmaz).
 
 ## 4. Public API
 
@@ -92,7 +100,7 @@ Children kabul edilmez — tamamen prop güdümlü.
 | onDismiss | event | `() => void` | — | — | Verilirse × butonu görünür; görünürlük yönetimi çağırana ait (component kendi kendine kapanmaz) |
 | onFeedback | event | `(value: 'up'\|'down') => void` | — | — | Verilirse 👍/👎 düğmeleri görünür |
 | loading | prop | `boolean` | `false` | — | AI-first yükleme placeholder'ı; rozet hariç gerçek içeriği bastırır |
-| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title` hariç) | — | — | `className` birleştirilir, kalanı köke geçer |
+| ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title`, `children` hariç) | — | — | `className` birleştirilir, kalanı köke geçer; `children` tip düzeyinde kabul edilmez |
 
 Ref hedefi yok. Geri bildirim seçili durumu component içinde tutulur
 (`useState`); dışarıya controlled bir `value` sözleşmesi açılmaz — yalnız
@@ -130,6 +138,16 @@ tarafından incelemeye alındı'`, `loading=false`.
 Katman sırası: severity (otomatik ton + rol) → render; `loading` gerçek
 içeriği bastırır (rozet hariç, üstte). Geri bildirim seçimi salt görsel/yerel
 state — dışarıya `value` olarak açılmaz.
+
+**İçerik-imzalı reset:** `title`/`description`/`reasons` üçlüsü
+`JSON.stringify([title, description ?? null, reasons ?? []])` ile
+yapılandırılmış bir imzaya dönüştürülür ve önceki render'ın imzasıyla
+(`useRef`, render-fazlı karşılaştırma) kıyaslanır; değişirse geri bildirim
+seçimi (`selected`) sıfırlanır. Ayraçsız string birleştirme (`${a} ${b}`)
+KULLANILMAZ — ör. `reasons=['AB']` ile `reasons=['A','B']` naif
+`reasons.join('')` birleşiminde aynı `"AB"` stringine çakışıp farklı bir AI
+tespitinin eski geri bildirimini miras alabilirdi (Codex bulgusu, bkz.
+Changelog); `JSON.stringify` tuple alan/eleman sınırlarını korur.
 
 ## 7. Davranış
 
@@ -179,8 +197,9 @@ state — dışarıya `value` olarak açılmaz.
 | root | background | `color-mix(in srgb, var(--flag-color) 9%, var(--lg-surface))` | `severity`'den otomatik (`--flag-color`) |
 | root | border | `color-mix(in srgb, var(--flag-color) 28%, var(--lg-hairline))` | — |
 | root | radius | `--lg-radius-media` | — |
-| title/description/reasons | color | `--lg-label` / `--lg-label-secondary` | Semantik renk metne SIZMAZ (kontrast dersi) — yalnız ikon/zemin/kenarlık `--flag-color` kullanır |
-| icon | color/background | `--flag-color` / `color-mix(in srgb, var(--flag-color) 16%, var(--lg-surface))` | `severity`'den otomatik |
+| title | color | `--lg-label` | — |
+| description/reasons/confidence metni | color | `color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary))` | Semantik renk metne SIZMAZ (kontrast dersi) — yalnız ikon/zemin/kenarlık `--flag-color` kullanır. Ham `--lg-label-secondary` banner'ın %9 tonlu zemininde ~4.2-4.4:1'e düşüyordu (Codex bulgusu); iki label token'ının karışımıyla tüm severity/temalarda ≥4.5:1'e koyulaştırıldı |
+| icon | color/background | `color-mix(in srgb, var(--flag-color) 70%, var(--lg-label))` / `color-mix(in srgb, var(--flag-color) 16%, var(--lg-surface))` | `severity`'den otomatik. Ham `--flag-color` kendi %16 zemine karşı ~1.9-2.9:1'e düşüyordu (Codex bulgusu, anlam taşıyan grafik ≥3:1 eşiğini kaçırıyordu); diğer AI component'lerindeki "semantik %70 + label" desenine uyuldu |
 | icon | boyut | `--lg-control-sm` | — |
 | **aiBadge** (AI-first, kopya CSS) | background/color | `color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface))` / `color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label))` | Sabit — tüm AI component'lerinde AYNI (GlassAiSummaryCard/GlassTrustSignalPanel ile birebir), `severity`'den bağımsız |
 | confidence metni | color | `--lg-label-secondary` | — |
@@ -227,7 +246,18 @@ component, tema toolbar'la otomatik doğrulanır.
 - [x] `loading=true`: `aria-busy="true"`, gerçek içerik/aksiyonlar gizli,
       AI rozeti kaybolmaz
 - [x] loading duyurusu her zaman mount'lu `aria-live="polite"` bölgede
-      taşınır
+      taşınır; hiç yüklenmemiş mount'ta boş kalır
+- [x] `loading` `true`→`false` geçişinde canlı bölge "Yapay zekâ incelemesi
+      tamamlandı" mesajını duyurur (yalnız sessizliğe dönmez)
+- [x] içerik imzası (`title`/`description`/`reasons`) `JSON.stringify`
+      tuple'dır; `reasons.join('')` tarzı ayraçsız birleşimlerin çakıştığı
+      girdilerde (ör. `['AB']` vs `['A','B']`) geri bildirim seçimi doğru
+      sıfırlanır
+- [x] `children` prop tip düzeyinde kabul edilmez (`Omit<..., 'children'>`);
+      geçirilse bile render edilmez
+- [x] description/reasonItem/confidence metin rengi ve severity ikon rengi
+      component CSS'inde belgelenen koyulaştırılmış color-mix token'larını
+      kullanır (kontrast regresyonu)
 - [ ] iki temada (Kağıt/Grafit) renk kontrastı (visual)
 - [ ] `loading` placeholder'ının reduced-motion'da animasyonsuz kalması
       (visual)
@@ -242,8 +272,13 @@ component, tema toolbar'la otomatik doğrulanır.
 - ❌ `severity`'nin rengini/rolünü dışarıdan override etme — moderasyon
   bulgusunun keyfi renklendirilmesi/rol değişimi yanıltıcı olur.
 - ❌ Metin rengini `--flag-color`'a bağlama — semantik renk yalnız ikon/
-  zemin/kenarlığı sürer, başlık/açıklama/gerekçe metni her zaman
-  `--lg-label`/`--lg-label-secondary` (kontrast dersi).
+  zemin/kenarlığı sürer, başlık/açıklama/gerekçe/confidence metni her zaman
+  `--lg-label` veya `color-mix(in srgb, var(--lg-label) 10%,
+  var(--lg-label-secondary))` (kontrast dersi — ham `--lg-label-secondary`
+  banner'ın tonlu zemininde 4.5:1 eşiğini kaçırıyordu).
+- ❌ Severity ikonunu ham `--flag-color` ile boyama — kendi %16 zemine karşı
+  3:1 eşiğini kaçırır; `color-mix(in srgb, var(--flag-color) 70%,
+  var(--lg-label))` kullan (diğer AI component'leriyle aynı desen).
 - ❌ `onFeedback`/`onDetails` içinde otomatik bir eylem tetikleme (ör. ilanı
   otomatik kaldırma) — component yalnız kullanıcı onaylı sinyal iletir, eylem
   çağıranın sorumluluğundadır.
@@ -258,6 +293,22 @@ açık isteği) · banner'ın kendi kendine kapanmaması (görünürlük her zam
 
 ## Changelog
 
+- 2026-07-17: Codex konsolide raporu düzeltmeleri —
+  (1) içerik-imzalı reset artık `JSON.stringify([title, description ?? null,
+  reasons ?? []])` tuple'ı kullanıyor (eski ayraçsız `${a} ${b}` birleşimi
+  `reasons.join('')` gibi alanlarda çakışabiliyordu);
+  (2) `children` `HTMLAttributes<HTMLDivElement>`'ten tip düzeyinde `Omit`
+  edildi (`'title' | 'children'`) — sessizce yutulan bir prop yerine derleme
+  zamanı hatası;
+  (3) description/reasonItem/confidence metin rengi
+  `color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary))`'a,
+  severity ikon rengi `color-mix(in srgb, var(--flag-color) 70%,
+  var(--lg-label))`'a koyulaştırıldı (açık temada ham değerler sırasıyla
+  ~4.2-4.4:1 ve ~1.9-2.9:1'e düşüyordu; yeni değerler tüm severity/temalarda
+  metin ≥4.5:1, ikon ≥3:1 sağlıyor);
+  (4) `loading` `true`→`false` geçişinde canlı bölge artık boşalmak yerine
+  "Yapay zekâ incelemesi tamamlandı" mesajı yayınlıyor (önceki davranış
+  yalnızca sessizliğe dönüyordu, tamamlanma SR'a güvenilir duyurulmuyordu).
 - 2026-07-17: İlk sürüm — `info/warning/danger` severity ekseni (yalnız
   `danger` `role="alert"`), tam genişlik flat bant, AI-first rozet/güven/
   geri bildirim/yükleme sözleşmesinin tam uygulanması (Dalga 1 kontratı

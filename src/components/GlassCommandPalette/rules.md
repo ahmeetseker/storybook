@@ -32,7 +32,11 @@ sözleşmesini TAŞIMAZ, kendi minimal overlay'ini kurar.
 
 - Kök: `open=false` iken **hiçbir DOM üretmez** (`AnimatePresence` içinde
   `null`) — uncontrolled/gizli bir "kapalı" görünümü yok, çağıran `open`'ı
-  kendi state'inde tutar.
+  kendi state'inde tutar. Bu, panel + arama + sonuç listesi + `role="status"`
+  düğümünü KAPSAR: hepsi TEK bir birim olarak `open` ile birlikte
+  mount/unmount olur — `status` panelden bağımsız, önceden veya sonradan
+  mount edilen ayrı bir düğüm DEĞİLDİR (bkz. aşağıdaki madde, tutarlı tek
+  lifecycle sözleşmesi).
 - `open=true`: `position: fixed` backdrop (`inset: 0`, `--lg-scrim` zemin) +
   içinde ortalanmış panel. **Portal YOK** — doğrudan çağrıldığı yerde React
   ağacına render edilir (spec kararı, `z-index: 80` ile öne çıkar).
@@ -50,8 +54,12 @@ sözleşmesini TAŞIMAZ, kendi minimal overlay'ini kurar.
 - Grup başlığı **heading DEĞİL** — `role="group"` + `aria-labelledby` ile
   bağlı `<p>` (`GlassNearbyPlaces` `.categoryLabel` ile aynı karar).
 - Sonuç sayısı `role="status"` (örtük `aria-live="polite"`) bölgesiyle
-  duyurulur; bu düğüm panel açıldığı anda ZATEN DOM'dadır, sonradan
-  eklenmez (kontrat: "aria-live bölgeleri HER ZAMAN mount edilir").
+  duyurulur; bu düğüm panelin GERİ KALANIYLA AYNI ANDA mount olur — panel
+  render edildiğinde `status` da zaten oradadır, `open=true` sonrası ayrı
+  bir adımda sonradan eklenmez (kontratın "aria-live bölgeleri sonradan
+  DOM'a eklenmemeli" ilkesi, panel + status TEK birim olarak açılıp
+  kapandığı için burada bu şekilde karşılanır — panel kapalıyken `status`
+  da DOM'da yoktur, bkz. §2 ilk madde).
 - Komutların ham `id` alanı hiçbir DOM `id`'sine yazılmaz — yalnız React
   `key`. DOM id'ler (`{uid}-cmd-{index}`, `{uid}-group-{index}`) `useId` +
   flat/bucket index'inden türetilir.
@@ -274,3 +282,10 @@ boolean (controlled zorunlu)".
   klavye deseni (`listbox`/`option` KULLANILMADI), koşulsuz açılış odağı,
   kapanışta odak yönetimi yok (çağıranın işi), IME/`document`-kapsam dışı
   Escape korumaları.
+- 2026-07-17 (Codex QA fix): `.input::placeholder` opaklığı `1`'e
+  sabitlendi (tarayıcı varsayılanı efektif kontrastı ~2,1-2,8:1'e
+  düşürüyordu; renk token'ı `--lg-label-secondary` zaten ~4,74:1
+  sağlıyordu). §2'deki `status`/panel lifecycle anlatımı tek, tutarlı bir
+  sözleşmeye indirildi (panel kapalıyken `status` de DOM'da yok — ikisi
+  TEK birim olarak açılıp kapanıyor, önceki metindeki "her zaman mount"
+  ifadesi "kapalıyken DOM yok" cümlesiyle çelişiyormuş gibi okunuyordu).

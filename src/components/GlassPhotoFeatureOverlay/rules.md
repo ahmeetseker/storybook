@@ -56,6 +56,20 @@ Koordinat clamp/finite-guard deseni `GlassMap`'ten bilinçli olarak taşınır
   değişir — bir "mute" butonuyla aynı desen).
 - Portal yok, ref forwarding yok (statik/kontrollü sunum, diğer içerik
   katmanı component'leriyle tutarlı).
+- `children` prop tipinden AÇIKÇA omit edilir (`Omit<HTMLAttributes<HTMLDivElement>,
+  'title' | 'children'>`) — component tamamen prop güdümlü sabit bir anatomi
+  render eder (sahne/rozet/araç çubuğu); tip yolu tercih edilir çünkü kök
+  `<div>` zaten kendi JSX çocuklarını render eder ve dışarıdan sızan bir
+  `children` prop'u (tip atlanırsa) sessizce hiçbir etki YAPMAZ — TS bunu
+  derleme zamanında engelleyerek yanıltıcı kullanım örneklerinin önüne geçer.
+- AI rozeti (`.badgeCorner`) `pointer-events: none` taşır — sağ üst köşeye
+  yakın (`x>0.82`, `y<0.22`) bir nokta rozetle görsel olarak çakışsa bile
+  tıklama/dokunma olayını rozet ASLA yakalamaz, altındaki nokta her zaman
+  erişilebilir kalır.
+- Nokta odak halkası ÇİFT katmanlı: iç `--lg-surface` halkası + dış
+  `--lg-accent` halkası (`box-shadow` ile). Tek renkli halka değişken fotoğraf
+  zemininde 3:1 kontrastı garanti edemediği için iki renk birlikte kullanılır
+  — en az biri her zeminle ayrışır.
 
 ## 3. Anatomy ve slotlar
 
@@ -153,6 +167,18 @@ Katman sırası: koordinat guard (`x`/`y` sonlu değilse nokta hiç yok) → glo
 - Responsive: kart konteynerin genişliğine uyar; sahne `aspect-ratio: 4/3`
   sabit oranda kalır. Dokunmatik: nokta butonları ve "Etiketleri göster"
   `pointer: coarse`'ta 44px hedefe büyür.
+- Görsel `object-fit: contain` ile render edilir (`cover` DEĞİL) — `feature.x`/
+  `feature.y` koordinatları görselin KENDİSİNE göre normalize edildiğinden,
+  `cover` kırpması koordinat/nokta eşleşmesini kaydırır (görselin kırpılan
+  kısmına düşen bir nokta yanlış yerde görünür). `contain` ile görsel HİÇ
+  kırpılmaz; koordinatlar güvenilir kalır. **Oran notu:** `image.src` fotoğrafı
+  sahnenin `4/3` oranına yakın verilmelidir — oran ne kadar yakınsa nokta
+  konumları o kadar isabetli görünür. Oran uyuşmazsa `contain` üstte/altta
+  veya yanlarda boşluk (letterbox, sahne zemin rengiyle dolar) bırakır; bu
+  boşluk alanına düşen normalize koordinatlar görselin dışında kalır (nokta
+  görsel kenarına yakın ama üstünde değilmiş gibi görünebilir) — bu, `cover`'ın
+  sessiz kırpma kaymasından tercih edilen, GÖRÜNÜR ve öngörülebilir bir
+  ödünleşimdir.
 
 ## 8. İçerik kuralları
 
@@ -173,16 +199,18 @@ Katman sırası: koordinat guard (`x`/`y` sonlu değilse nokta hiç yok) → glo
 | sahne zemini | background | `color-mix(... var(--lg-label) 4% ... var(--lg-bg))` | — |
 | sahne radius | border-radius | `--lg-radius-media` | — |
 | nokta | background/border | `var(--lg-accent)` / `var(--lg-surface)` (halka) | `aria-expanded=true` → `scale(1.2)` (transform, pulse YOK) |
+| nokta odak halkası | box-shadow (çift katman) | `var(--lg-surface)` (iç 2px) + `var(--lg-accent)` (dış 2px) | yalnız `:focus-visible` |
 | balon zemini | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-chip` | — |
 | balon güven eki | color | `color-mix(... var(--lg-accent) 75% ... var(--lg-label))` | — |
-| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassMatchScore.module.css`'teki `.aiBadge` ile birebir aynı |
+| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassMatchScore.module.css`'teki `.aiBadge` ile birebir aynı (ek gölge YOK — `.badgeCorner` sarmalayıcısı da diğer AI component'leriyle tutarlı olması için gölgesiz) |
 | toggle butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | özet metin | color | `--lg-label-secondary` | — |
 
 **Borç (raw):** sahne `aspect-ratio: 4/3` (fotoğraf oranı, token yok), nokta
 çapı 28px (44px coarse'ta) + iç halka 12px, balon `max-width: 200px`, AI
 rozeti font-size 10.5px/700 (kontrat sabiti) — `GlassMatchScore`'daki ring
-çapı/rozet borcuyla aynı gerekçe.
+çapı/rozet borcuyla aynı gerekçe. Görsel `object-fit: contain` (`cover`
+DEĞİL) — bkz. §7 oran notu.
 
 ## 10. Storybook kapsamı
 
@@ -208,7 +236,13 @@ Controlled, UzunIcerik (uzun etiket + NaN/kenetlenen koordinat), Responsive
 - [x] regresyon: global toggle değişince tekil sapmalar sıfırlanır
 - [x] odaklı noktada `Escape` açık balonu kapatır (kapsayıcı-scoped)
 - [x] özellik sayısı özet metni `features.length`'ten doğru türetilir
+- [x] regresyon: `children` tip düzeyinde omit edilir — kaçak geçilse (`as any`)
+  bile render edilmez, component sabit anatomisini korur
 - [ ] reduced-motion'da nokta/toggle geçişlerinin kapanması (visual)
+- [ ] `object-fit: contain` + çift katmanlı odak halkası + rozet `pointer-events:
+  none` (visual — CSS module gerçek stilleri jsdom'da uygulanmadığından bu
+  üçü yalnız görsel/manuel QA ile doğrulanır, bkz. Storybook Erişilebilirlik
+  story'si)
 
 ## 12. Do / Don't
 
@@ -221,6 +255,11 @@ Controlled, UzunIcerik (uzun etiket + NaN/kenetlenen koordinat), Responsive
 - ❌ Noktaları `radiogroup`/`tablist` gibi tek-seçimli bir ARIA rolüne sarma
   — her nokta bağımsız bir toggle, roving tabindex gerekmez.
 - ❌ Cam yüzey/backdrop-filter ekleme — içerik katmanı kuralı.
+- ❌ AI rozetine `pointer-events` geri verme (`auto`'ya çevirme) — köşedeki
+  bir nokta rozetle çakışırsa tıklanamaz hale gelir.
+- ❌ `image.src`'i sahnenin `4/3` oranından ÇOK uzak vermeme — `contain`
+  kırpmaz ama uzak oranlarda geniş letterbox alanı nokta yoğunluğunu
+  görsel olarak seyreltir (bkz. §7 oran notu).
 
 **Açık kararlar:** `feature.label` için maksimum karakter sınırı ·
 noktaların üst üste binmesi durumunda (çok yakın `x`/`y`) çakışma önleme
@@ -233,3 +272,14 @@ açabilir).
 - 2026-07-17: İlk sürüm — görsel üstü AI özellik noktaları, global
   "Etiketleri göster" toggle'ı + tekil nokta bazlı bağımsız açma/kapama,
   confidence eki, zorunlu "✦ AI" rozeti, kenar-duyarlı balon yönü/hizası.
+- 2026-07-17: Codex ekip incelemesi düzeltmeleri — `children` prop tipinden
+  omit edildi (`Omit<..., 'title' | 'children'>`, render yolu değil tip
+  yolu); görsel `object-fit: cover` → `contain` (kırpma kaynaklı hotspot
+  kayması giderildi, §7 oran notu eklendi); AI rozeti `.badgeCorner`'a
+  `pointer-events: none` eklendi (köşedeki nokta artık her koşulda
+  tıklanabilir) ve yerel `drop-shadow` kaldırıldı (diğer AI rozetleriyle
+  görsel tutarlılık); nokta odak halkası tek renkli `outline`'dan çift
+  katmanlı `box-shadow`'a (`--lg-surface` iç + `--lg-accent` dış) geçti
+  (değişken fotoğraf zemininde 3:1 kontrast garantisi). İçerik imzası
+  (`JSON.stringify` tuple, §6) incelemede zaten sözleşmeye uygun bulundu,
+  değişiklik gerekmedi.

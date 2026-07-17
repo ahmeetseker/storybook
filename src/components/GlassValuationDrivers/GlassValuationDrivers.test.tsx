@@ -154,4 +154,53 @@ describe('GlassValuationDrivers', () => {
     render(<GlassValuationDrivers title="Değerleme" drivers={drivers} />)
     expect(screen.getByRole('status').textContent).toBe('')
   })
+
+  it('regresyon: children prop tip düzeyinde omit edilir; yine de zorla geçirilirse (rest\'ten) sessizce yutulmaz — hiç render edilmez', () => {
+    // GlassValuationDriversProps, HTMLAttributes'tan 'children'ı da omit eder
+    // (tip yolu) — normal kullanımda TS derlemesi children geçirimini
+    // reddeder. Bir çağıran yine de `as any` ile zorlarsa (tip korumasını
+    // atlarsa) component'in JSX'inde açık children YER ALDIĞI için ...rest
+    // üzerinden gelen children hiçbir zaman DOM'a yansımaz — davranış
+    // sözleşmesi ("tamamen prop güdümlü", rules.md §3) korunur.
+    const props = { drivers, children: 'BEKLENMEYEN_ÇOCUK_İÇERİK' } as unknown as Parameters<
+      typeof GlassValuationDrivers
+    >[0]
+    const { container } = render(<GlassValuationDrivers {...props} />)
+    expect(container.textContent).not.toContain('BEKLENMEYEN_ÇOCUK_İÇERİK')
+  })
+
+  it('regresyon: geri bildirim sorusu role="group" + aria-labelledby ile buton grubuna programatik bağlanır', () => {
+    render(<GlassValuationDrivers drivers={drivers} onFeedback={vi.fn()} />)
+    const group = screen.getByRole('group', { name: 'Bu değerlendirme faydalı mıydı?' })
+    expect(group).toBeTruthy()
+    expect(within(group).getByRole('button', { name: 'Faydalı' })).toBeTruthy()
+    expect(within(group).getByRole('button', { name: 'Faydalı değil' })).toBeTruthy()
+  })
+
+  it('regresyon: aynı loading durumunda title değişirse canlı bölge metni güncel başlığı kullanır', () => {
+    const { rerender, getByRole } = render(
+      <GlassValuationDrivers title="İlan A" drivers={drivers} loading />,
+    )
+    expect(getByRole('status').textContent).toBe('İlan A hesaplanıyor')
+
+    // loading SABİT true, yalnız title değişiyor — eski başlık asılı kalmamalı
+    rerender(<GlassValuationDrivers title="İlan B" drivers={drivers} loading />)
+    expect(getByRole('status').textContent).toBe('İlan B hesaplanıyor')
+
+    // loading false'a döner: "hazır" duyurusu da güncel başlığı kullanmalı
+    rerender(<GlassValuationDrivers title="İlan B" drivers={drivers} />)
+    expect(getByRole('status').textContent).toBe('İlan B hazır')
+
+    // "hazır" duyurusundan SONRA title değişirse bu da güncellenmeli
+    rerender(<GlassValuationDrivers title="İlan C" drivers={drivers} />)
+    expect(getByRole('status').textContent).toBe('İlan C hazır')
+  })
+
+  it('regresyon: hiç yüklenmemiş (statusText hâlâ boş) durumda yalnız title değişimi sahte "hazır" duyurusu üretmez', () => {
+    const { rerender, getByRole } = render(<GlassValuationDrivers title="İlan A" drivers={drivers} />)
+    expect(getByRole('status').textContent).toBe('')
+
+    rerender(<GlassValuationDrivers title="İlan B" drivers={drivers} />)
+    expect(getByRole('status').textContent).toBe('')
+  })
 })

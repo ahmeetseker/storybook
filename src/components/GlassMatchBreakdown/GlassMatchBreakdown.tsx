@@ -31,7 +31,7 @@ export interface GlassMatchBreakdownGroup {
   details?: GlassMatchBreakdownDetail[]
 }
 
-export interface GlassMatchBreakdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface GlassMatchBreakdownProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   /** 0-100 arası genel uyum skoru; aralık dışı/`NaN`/`Infinity` değerler sessizce normalize edilir */
   overall: number
   /** Uyum dökümünü oluşturan grup listesi (ör. konum, bütçe, oda sayısı) */
@@ -130,6 +130,7 @@ export function GlassMatchBreakdown({
 }: GlassMatchBreakdownProps) {
   const uid = useId()
   const overallLabelId = `${uid}-overall-label`
+  const feedbackPromptId = `${uid}-feedback-prompt`
 
   const [feedback, setFeedback] = useState<'up' | 'down' | undefined>(undefined)
 
@@ -156,7 +157,11 @@ export function GlassMatchBreakdown({
 
   const showGroups = !loading && safeGroups.length > 0
   const showFeedback = !loading && Boolean(onFeedback)
-  const statusText = loading ? `${title} hesaplanıyor` : ''
+  // Durum metni ASLA boşalmaz (yalnız `loading` → `!loading` geçişinde
+  // "boş" bırakmak, tamamlanma anını duyurmadığı için geçişleri bazı
+  // ekranokuyucularda güvenilmez hale getirir — Codex bulgusu). Hem
+  // "yükleniyor" hem "hazır" durumu her zaman açık metinle duyurulur.
+  const statusText = loading ? `${title} hesaplanıyor` : `${title} hazır`
 
   const classes = [styles.root, className].filter(Boolean).join(' ')
 
@@ -209,7 +214,9 @@ export function GlassMatchBreakdown({
           </div>
 
           {showGroups ? (
-            <ul className={styles.groups}>
+            // `role="list"` açıkça eklenir — Safari/VoiceOver `list-style: none`
+            // taşıyan `<ul>`'ları bazen liste semantiğinden çıkarır.
+            <ul className={styles.groups} role="list">
               {safeGroups.map((group, index) => {
                 const groupScore = clampScore(group.score)
                 const groupTone = resolveTone(groupScore)
@@ -250,7 +257,8 @@ export function GlassMatchBreakdown({
                     </div>
 
                     {details.length > 0 ? (
-                      <ul className={styles.details}>
+                      // `role="list"` açıkça eklenir — bkz. yukarıdaki grup listesi notu.
+                      <ul className={styles.details} role="list">
                         {details.map((detail, detailIndex) => (
                           <li
                             key={`${group.id}-${detailIndex}-${detail.label}`}
@@ -278,8 +286,13 @@ export function GlassMatchBreakdown({
 
           {showFeedback ? (
             <div className={styles.feedback}>
-              <span className={styles.feedbackPrompt}>Bu döküm faydalı mıydı?</span>
-              <div className={styles.feedbackButtons}>
+              <span id={feedbackPromptId} className={styles.feedbackPrompt}>
+                Bu döküm faydalı mıydı?
+              </span>
+              {/* Görünür soru, `role="group"` + `aria-labelledby` ile buton
+                  grubuna bağlanır — AT'ye iki bağımsız butonun neye dair
+                  olduğu programatik olarak iletilir. */}
+              <div className={styles.feedbackButtons} role="group" aria-labelledby={feedbackPromptId}>
                 <button
                   type="button"
                   className={styles.feedbackButton}

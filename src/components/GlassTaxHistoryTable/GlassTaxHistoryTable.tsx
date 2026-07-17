@@ -15,7 +15,7 @@ export interface GlassTaxHistoryTableRow {
   changePercent?: number
 }
 
-export interface GlassTaxHistoryTableProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+export interface GlassTaxHistoryTableProps extends Omit<HTMLAttributes<HTMLElement>, 'title' | 'children'> {
   /** Satırlar — sıra = görünüm sırası; ilk satır en yeni yıl kabul edilip hafifçe vurgulanır (sıralama çağıranın işi) */
   rows: GlassTaxHistoryTableRow[]
   /** Kart başlığı */

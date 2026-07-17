@@ -92,10 +92,10 @@ describe('GlassTourPlanner', () => {
     expect(button.disabled).toBe(true)
   })
 
-  it('role="status" düğümü loading=false iken de mount edilir (boş metinle) — sonradan mount edilen canlı bölge ekran okuyucuda duyurulmaz', () => {
+  it('role="status" düğümü loading=false iken de mount edilir ve açık bir "hazır" mesajı taşır — sonradan mount edilen canlı bölge ekran okuyucuda duyurulmaz', () => {
     const { rerender } = render(<GlassTourPlanner stops={stops} date="Cmt 18 Tem" loading={false} />)
     const status = screen.getByRole('status')
-    expect(status.textContent).toBe('')
+    expect(status.textContent).toBe('Tur planı hazır')
 
     // Parent loading=true'ya geçtiğinde AYNI düğüm güncellenir, yeni bir
     // status düğümü DOM'a sonradan eklenmez.
@@ -103,9 +103,16 @@ describe('GlassTourPlanner', () => {
     expect(screen.getByRole('status')).toBe(status)
     expect(status.textContent).toBe('Tur planı hazırlanıyor')
 
+    // regresyon: loading biterken metin BOŞALTILMAZ — açık bir tamamlandı/
+    // hazır mesajı yayınlanır (aksi halde durum geçişi güvenilir duyurulmaz).
     rerender(<GlassTourPlanner stops={stops} date="Cmt 18 Tem" loading={false} />)
     expect(screen.getByRole('status')).toBe(status)
-    expect(status.textContent).toBe('')
+    expect(status.textContent).toBe('Tur planı hazır')
+  })
+
+  it('regresyon: stops=[] iken canlı bölge "durak yok" mesajı yayınlar (boş metin bırakılmaz)', () => {
+    render(<GlassTourPlanner stops={[]} date="Cmt 18 Tem" />)
+    expect(screen.getByRole('status').textContent).toBe('Tur planında durak yok')
   })
 
   it('geri bildirim butonları onFeedback verilince görünür, tıklanan yönle çağrılır ve aria-pressed görsel seçimi işaretler', () => {
@@ -129,6 +136,13 @@ describe('GlassTourPlanner', () => {
     render(<GlassTourPlanner stops={stops} date="Cmt 18 Tem" />)
     expect(screen.queryByRole('button', { name: 'Faydalı' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Faydalı değil' })).toBeNull()
+  })
+
+  it('regresyon: geri bildirim buton grubu görünür soruyla role="group" + aria-labelledby ile ilişkilendirilir', () => {
+    render(<GlassTourPlanner stops={stops} date="Cmt 18 Tem" onFeedback={vi.fn()} />)
+    const group = screen.getByRole('group', { name: 'Bu plan faydalı mıydı?' })
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    expect(group.contains(up)).toBe(true)
   })
 
   it('regresyon: aynı yöne tekrar tıklama seçimi geri alır (toggle)', () => {
@@ -158,5 +172,19 @@ describe('GlassTourPlanner', () => {
     render(<GlassTourPlanner stops={[]} date="Cmt 18 Tem" />)
     expect(screen.queryByRole('list')).toBeNull()
     expect(screen.getByText('Bu tur planında henüz durak eklenmemiş.')).toBeTruthy()
+  })
+
+  it('regresyon: stops=[] iken onConfirm verilmiş olsa bile "Planı Onayla" disabled kalır ve tıklama callback tetiklemez', () => {
+    const onConfirm = vi.fn()
+    render(<GlassTourPlanner stops={[]} date="Cmt 18 Tem" onConfirm={onConfirm} />)
+    const button = screen.getByRole('button', { name: 'Planı Onayla' }) as HTMLButtonElement
+    expect(button.disabled).toBe(true)
+    fireEvent.click(button)
+    expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it('regresyon: stops=[] iken onFeedback verilse bile geri bildirim butonları render edilmez', () => {
+    render(<GlassTourPlanner stops={[]} date="Cmt 18 Tem" onFeedback={vi.fn()} />)
+    expect(screen.queryByRole('button', { name: 'Faydalı' })).toBeNull()
   })
 })
