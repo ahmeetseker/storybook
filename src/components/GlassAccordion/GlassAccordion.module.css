@@ -1,0 +1,109 @@
+/* GlassAccordion — içerik katmanı FLAT panel (cam yok, backdrop-filter yok). */
+.root {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  overflow: hidden;
+}
+
+.item {
+  border-top: 1px solid var(--lg-hairline);
+}
+.item:first-child {
+  border-top: none;
+}
+
+.heading {
+  margin: 0;
+  font: inherit;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3, 12px);
+  width: 100%;
+  min-height: var(--lg-control-lg, 48px);
+  padding: 0 var(--lg-space-5, 20px);
+  border: none;
+  background: none;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.trigger:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .trigger:hover {
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+}
+
+/* Dokunmatik: tetikleyici zaten ≥44px hedefte; pointer:coarse'ta yükselt */
+@media (pointer: coarse) {
+  .trigger {
+    min-height: 48px;
+  }
+}
+
+.title {
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.chevronBox {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--lg-label-secondary);
+  transform: rotate(0deg);
+  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.chevronBox[data-open='true'] {
+  transform: rotate(-180deg);
+}
+.chevron {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── panel: grid-template-rows 0fr→1fr tekniği — height animasyonu YASAK.
+   .panelOuter tek satırlı grid container'dır; .panelInner overflow:hidden ile
+   0fr durumunda içeriği kırpar, display:none kullanılmadığı için transition
+   kesintisiz çalışır ve içerik `inert` iken de ölçülebilir kalır. ── */
+.panelOuter {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.panelOuter[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.panelInner {
+  overflow: hidden;
+  min-height: 0;
+}
+.panel {
+  padding: 0 var(--lg-space-5, 20px) var(--lg-space-4, 16px);
+  color: var(--lg-label-secondary);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevronBox,
+  .panelOuter {
+    transition: none;
+  }
+}
