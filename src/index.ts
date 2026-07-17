@@ -34,6 +34,31 @@ export {
   type GlassBentoCellProps,
 } from './components/GlassBento'
 export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
+export {
+  GlassCompareTable,
+  type GlassCompareTableProps,
+  type GlassCompareField,
+  type GlassCompareListing,
+} from './components/GlassCompareTable'
+export { GlassNearbyPlaces } from './components/GlassNearbyPlaces'
+export type { GlassNearbyPlacesProps, GlassNearbyCategory, GlassNearbyPlace } from './components/GlassNearbyPlaces'
+export { GlassRating } from './components/GlassRating'
+export type {
+  GlassRatingProps,
+  GlassRatingDisplayProps,
+  GlassRatingInputProps,
+  GlassRatingSummaryProps,
+} from './components/GlassRating'
+export { GlassReviewCard, type GlassReviewCardProps } from './components/GlassReviewCard'
+export { GlassAgencyCard, type GlassAgencyCardProps, type GlassAgencyCardStat } from './components/GlassAgencyCard'
+export { GlassClimateRiskPanel } from './components/GlassClimateRiskPanel'
+export type { GlassClimateRiskPanelProps, GlassClimateRiskHazard } from './components/GlassClimateRiskPanel'
+export {
+  GlassAccordion,
+  type GlassAccordionItem,
+  type GlassAccordionMode,
+  type GlassAccordionProps,
+} from './components/GlassAccordion'
 export { GlassMediaGallery } from './components/GlassMediaGallery'
 export type { GlassMediaGalleryProps, GlassMediaGalleryItem, GlassMediaGalleryItemType } from './components/GlassMediaGallery'
 export {
