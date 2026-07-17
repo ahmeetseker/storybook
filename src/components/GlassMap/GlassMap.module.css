@@ -1,0 +1,245 @@
+/* GlassMap — kütüphanesiz harita yüzeyi. İçerik katmanı FLAT: cam / backdrop-filter yok.
+   Zemin paleti data-layer ile değişir ('yol' | 'uydu'); tüm renkler --lg-* token türevidir. */
+
+.root {
+  position: relative;
+  /* overflow:hidden BİLEREK yok — yalnız .canvasClip zemini kırpar. Popup/pin kök
+     sınırının dışına taştığında görünmez olmak yerine üstte akar (bkz. .popup). */
+  width: 100%;
+  border-radius: var(--lg-radius-media, 14px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  isolation: isolate;
+}
+
+.inline {
+  aspect-ratio: 16 / 9;
+}
+
+.panel {
+  height: 100%;
+  min-height: 420px; /* borç: dikey dolu panel varsayılan yüksekliği */
+}
+
+.canvasClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── 'yol' paleti (varsayılan) ── */
+.ground { fill: color-mix(in srgb, var(--lg-label) 4%, var(--lg-bg)); }
+.road { stroke: var(--lg-hairline); stroke-width: 1.4; fill: none; vector-effect: non-scaling-stroke; }
+.block { fill: color-mix(in srgb, var(--lg-label) 7%, transparent); }
+.blockAlt { fill: color-mix(in srgb, var(--lg-label) 4%, transparent); }
+.blockGreen { fill: color-mix(in srgb, var(--lg-success) 12%, transparent); }
+
+/* ── 'uydu' paleti — aynı token'lardan türetilmiş terrain hissi ── */
+[data-layer='uydu'] .ground { fill: color-mix(in srgb, var(--lg-success) 26%, var(--lg-label) 14%); }
+[data-layer='uydu'] .road {
+  stroke: color-mix(in srgb, var(--lg-bg) 65%, transparent);
+  stroke-width: 1;
+  opacity: 0.55;
+}
+[data-layer='uydu'] .block { fill: color-mix(in srgb, var(--lg-success) 34%, var(--lg-label) 18%); }
+[data-layer='uydu'] .blockAlt { fill: color-mix(in srgb, var(--lg-accent) 28%, var(--lg-label) 20%); }
+[data-layer='uydu'] .blockGreen { fill: color-mix(in srgb, var(--lg-success) 52%, var(--lg-label) 6%); }
+
+.privacyCircle {
+  fill: color-mix(in srgb, var(--lg-accent) 18%, transparent);
+  stroke: var(--lg-accent);
+  stroke-width: 0.6;
+  stroke-dasharray: 2 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ── katman toggle (iç segmentli kontrol, flat) ── */
+.toggle {
+  position: absolute;
+  top: var(--lg-space-2, 8px);
+  left: var(--lg-space-2, 8px);
+  z-index: 3;
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-surface) 92%, transparent);
+  border: 1px solid var(--lg-hairline);
+}
+.toggleBtn {
+  margin: 0;
+  padding: 5px 11px;
+  border: none;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: none;
+  color: var(--lg-label-secondary);
+  font: inherit;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 650;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+.toggleBtnActive {
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+}
+@media (hover: hover) {
+  .toggleBtn:not(.toggleBtnActive):hover { color: var(--lg-label); }
+}
+@media (pointer: coarse) {
+  .toggleBtn { padding: 10px 13px; }
+}
+
+/* ── pinler: gerçek buton, konum yüzdeyle taşınır ── */
+.pinWrap {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.pin {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease;
+}
+.pin:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .pin:hover { transform: scale(1.06); }
+}
+
+.pinPrice {
+  min-height: 26px;
+  padding: 5px 10px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--lg-label) 28%, transparent);
+}
+.pinCluster {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--lg-label) 28%, transparent);
+}
+.pinSelected.pinPrice {
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  border-color: transparent;
+}
+.pinSelected.pinCluster {
+  background: var(--lg-label);
+  color: var(--lg-surface);
+}
+
+@media (pointer: coarse) {
+  .pinPrice { min-height: 44px; padding: 8px 14px; }
+  .pinCluster { min-width: 44px; height: 44px; }
+}
+
+/* ── popup ──
+   Konumlama (left/right/transform) ve giriş animasyonu ayrı katmanlara bölünmüştür:
+   `.popup` yalnız statik konumu taşır (data-vertical/data-align pin konumuna göre
+   JS'te hesaplanır), `.popupInner` animasyonu taşır — böylece animasyonun transform'u
+   yatay hizalamayı (translateX) ezmez. Kök artık overflow:hidden taşımadığından
+   (bkz. .root) kenara yakın pinlerde popup kırpılıp kaybolmaz; yön/hizalama yalnız
+   okunabilirlik için tercih edilir. */
+.popup {
+  position: absolute;
+  z-index: 4;
+  min-width: 168px;
+  max-width: 240px;
+  padding: var(--lg-space-3, 12px);
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--lg-label) 22%, transparent);
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote, 13px);
+  text-align: left;
+}
+.popup[data-vertical='above'] { bottom: calc(100% + 10px); }
+.popup[data-vertical='below'] { top: calc(100% + 10px); }
+.popup[data-align='center'] { left: 50%; transform: translateX(-50%); }
+.popup[data-align='start'] { left: 0; }
+.popup[data-align='end'] { right: 0; }
+
+.popupInner {
+  animation: lgMapPopupIn 0.16s ease-out;
+}
+.popup[data-vertical='below'] .popupInner {
+  animation-name: lgMapPopupInBelow;
+}
+
+.popupClose {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: none;
+  color: var(--lg-label-secondary);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+.popupClose:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .popupClose:hover { color: var(--lg-label); }
+}
+@media (pointer: coarse) {
+  .popupClose { width: 36px; height: 36px; font-size: 17px; }
+}
+
+@keyframes lgMapPopupIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes lgMapPopupInBelow {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin, .popupInner { transition: none; animation: none; }
+}
