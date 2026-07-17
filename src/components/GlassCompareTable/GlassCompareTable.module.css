@@ -1,0 +1,172 @@
+/* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları. */
+.wrapper {
+  box-sizing: border-box;
+  overflow-x: auto;
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label);
+}
+
+.th {
+  padding: var(--lg-space-3) var(--lg-space-4);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--lg-hairline);
+  box-sizing: border-box;
+}
+
+/* İlk kolon (özellik etiketleri): yatay kaydırmada sabit kalır. */
+.stickyCol {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--lg-surface);
+}
+
+.corner {
+  min-width: 140px;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 700;
+  color: var(--lg-label-secondary);
+}
+
+.rowHeader {
+  min-width: 140px;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  vertical-align: middle;
+}
+
+.listingHead {
+  min-width: 160px;
+  vertical-align: top;
+}
+
+.listingHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-2);
+}
+
+.headerTopRow {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--lg-radius-chip);
+}
+
+.listingTitle {
+  font-size: var(--lg-text-body, 15px);
+  font-weight: 700;
+  color: var(--lg-label);
+  text-align: left;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.removeButton {
+  appearance: none;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  color: var(--lg-label-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out;
+}
+
+@media (hover: hover) {
+  .removeButton:hover {
+    background: color-mix(in srgb, var(--lg-danger) 16%, transparent);
+    color: var(--lg-danger);
+  }
+}
+
+.removeButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+/* Dokunmatik: kaldırma hedefi 44px'e yükselir. */
+@media (pointer: coarse) {
+  .removeButton {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.tr .td,
+.tr .rowHeader {
+  border-bottom: 1px solid var(--lg-hairline);
+}
+.tr:last-child .td,
+.tr:last-child .rowHeader {
+  border-bottom: none;
+}
+
+.td {
+  padding: var(--lg-space-3) var(--lg-space-4);
+  font-size: var(--lg-text-body, 15px);
+  box-sizing: border-box;
+  vertical-align: middle;
+  text-align: left;
+}
+
+/* Satırda ilanlar arasında değer farkı varsa hafif vurgu — sticky kolon dahil
+   opak zemin (transparent değil `--lg-surface` bazlı) ki altından kayan
+   hücreler görünmesin. */
+.tr[data-differs] .td,
+.tr[data-differs] .rowHeader {
+  background: color-mix(in srgb, var(--lg-accent) 6%, var(--lg-surface));
+}
+
+.best {
+  color: var(--lg-success);
+  font-weight: 700;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .removeButton {
+    transition: none;
+  }
+}
