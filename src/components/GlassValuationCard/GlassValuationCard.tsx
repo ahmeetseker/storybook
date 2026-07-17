@@ -38,14 +38,23 @@ function formatTL(n: number): string {
   return `${Math.round(n).toLocaleString('tr-TR')} TL`
 }
 
-type Comparison = { pct: number; direction: 'ustunde' | 'altinda' | 'esit' }
+type Comparison = { pctLabel: string; direction: 'ustunde' | 'altinda' | 'esit' }
 
-/** Liste fiyatının tahmine göre gerçek yüzde farkını hesaplar; estimate <= 0 ise çağrılmaz. */
-function resolveComparison(estimate: number, listPrice: number): Comparison {
+/**
+ * Liste fiyatının tahmine göre gerçek yüzde farkını hesaplar; estimate <= 0
+ * ise çağrılmaz. Eşitlik kararı HAM değerle verilir (`estimate === listPrice`)
+ * — yuvarlanmış yüzdeyle değil, aksi halde %0,4 gibi küçük farklar "eşit"
+ * görünür. Yüzde 1 ondalıkla (tr-TR virgüllü) döner. Yüzde sonlu değilse
+ * (aşırı büyük/küçük sonlu girdilerde bölme taşabilir) veya %999'u aşarsa
+ * `null` döner — çağıran karşılaştırma satırını hiç render etmemeli.
+ */
+function resolveComparison(estimate: number, listPrice: number): Comparison | null {
+  if (estimate === listPrice) return { pctLabel: '0', direction: 'esit' }
   const diff = listPrice - estimate
-  const pct = Math.round(Math.abs((diff / estimate) * 100))
-  if (pct === 0) return { pct: 0, direction: 'esit' }
-  return { pct, direction: diff > 0 ? 'ustunde' : 'altinda' }
+  const pct = Math.abs((diff / estimate) * 100)
+  if (!Number.isFinite(pct) || pct > 999) return null
+  const pctLabel = pct.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  return { pctLabel, direction: diff > 0 ? 'ustunde' : 'altinda' }
 }
 
 /** [0,100] dışı ve sonlu olmayan (`NaN`/`Infinity`) değerleri gizlemek için `null` döner. */
@@ -72,10 +81,19 @@ function AiBadge({ confidence }: { confidence?: number }) {
   )
 }
 
+/**
+ * `key` prop'una çağıran tarafından içerik imzası (`estimate|low|high`)
+ * geçirilir — bu imza değiştiğinde React component'i tamamen unmount/mount
+ * eder, böylece önceki değerlemeye ait 👍/👎 seçimi yeni değerlemeye
+ * sızmaz (kardeş component'lerle aynı içerik-imzası + reset deseni).
+ */
 function FeedbackButtons({ onFeedback }: { onFeedback: (value: GlassValuationFeedback) => void }) {
   const [selected, setSelected] = useState<GlassValuationFeedback | null>(null)
 
   const handle = (value: GlassValuationFeedback) => {
+    // Zaten seçili yöne tekrar basmak no-op'tur (aynı bildirim tekrar
+    // gönderilmez) — GlassAiSummaryCard'daki toggle deseniyle aynı.
+    if (value === selected) return
     setSelected(value)
     onFeedback(value)
   }
@@ -145,13 +163,22 @@ export function GlassValuationCard({
 
   const classes = [styles.root, styles[variant], className].filter(Boolean).join(' ')
 
+  // Her zaman mount'lu canlı bölge: yalnız içerik değişince (boş → metin)
+  // duyurulur, bu yüzden `loading` geçişte span koşullu mount/unmount
+  // edilmez — SearchBar/GlassTrustSignalPanel'daki Codex fix'iyle aynı desen.
+  const loadingLiveRegion = (
+    <span className={styles.srOnly} aria-live="polite">
+      {loading ? 'Değerleme yükleniyor' : ''}
+    </span>
+  )
+
   if (loading) {
     return (
       <div {...rest} role="group" aria-label="AI değerleme" aria-busy="true" className={classes}>
         <div className={styles.header}>
           <AiBadge />
         </div>
-        <span className={styles.srOnly}>Değerleme yükleniyor</span>
+        {loadingLiveRegion}
         {variant === 'inline' ? <InlinePlaceholder /> : <PanelPlaceholder />}
       </div>
     )
@@ -163,6 +190,7 @@ export function GlassValuationCard({
         <div className={styles.header}>
           <AiBadge />
         </div>
+        {loadingLiveRegion}
         <p className={styles.emptyText}>Değerleme yok</p>
       </div>
     )
@@ -173,6 +201,8 @@ export function GlassValuationCard({
   const low = Math.min(rangeLow, rangeHigh)
   const high = Math.max(rangeLow, rangeHigh)
   const span = high - low
+  // Geri bildirim seçimi bu imzaya bağlı `key` ile temizlenir (§ FeedbackButtons).
+  const feedbackKey = `${estimate}|${low}|${high}`
 
   // Konum yüzdesi: değer aralığın dışında kalsa da (klavuz doğruluğu için)
   // ray üzerinde 0-100 aralığına clamp edilerek gösterilir; gerçek sayı metni
@@ -187,6 +217,7 @@ export function GlassValuationCard({
     return (
       <div {...rest} role="group" aria-label="AI değerleme" className={classes}>
         <AiBadge />
+        {loadingLiveRegion}
         <span className={styles.inlineText}>
           {formatTL(estimate)}{' '}
           <span className={styles.inlineRange}>
@@ -201,8 +232,9 @@ export function GlassValuationCard({
     <div {...rest} role="group" aria-label="AI değerleme" className={classes}>
       <div className={styles.header}>
         <AiBadge confidence={confidence} />
-        {onFeedback ? <FeedbackButtons onFeedback={onFeedback} /> : null}
+        {onFeedback ? <FeedbackButtons key={feedbackKey} onFeedback={onFeedback} /> : null}
       </div>
+      {loadingLiveRegion}
 
       <p className={styles.estimateValue}>{formatTL(estimate)}</p>
 
@@ -238,7 +270,7 @@ export function GlassValuationCard({
             <>Liste fiyatı tahmine <strong>eşit</strong>.</>
           ) : (
             <>
-              Liste fiyatı tahminin <strong>%{comparison.pct}</strong>{' '}
+              Liste fiyatı tahminin <strong>%{comparison.pctLabel}</strong>{' '}
               {comparison.direction === 'ustunde' ? 'üstünde' : 'altında'}.
             </>
           )}

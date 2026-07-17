@@ -226,9 +226,9 @@ export const Erisilebilirlik: Story = {
           '`aria-label="Doğal dilde arama"` taşır. Öneriler düz `<button>` dizisi — özel klavye deseni ' +
           'gerekmez, doğal Tab sırası ve Enter/Space yeterlidir. Yükleme sırasında input `disabled` olur ' +
           've `aria-describedby` ile "Düşünüyor…" `aria-live="polite"` bölgesine bağlanır. Her filtre ' +
-          'chip\'inin kaldır butonu `aria-label="Filtreyi kaldır: <Etiket>"` — jenerik "Kaldır" değil, ' +
-          'hangi filtrenin kaldırılacağı AT\'ye ayrı ayrı duyurulur. Geri bildirim butonları basılı ' +
-          'durumu `aria-pressed` ile taşır.',
+          'chip\'inin kaldır butonu `aria-label="Filtreyi kaldır: <Etiket>: <Değer>"` — jenerik "Kaldır" ' +
+          'değil, aynı etiketli filtreler dahil hangi filtrenin kaldırılacağı AT\'ye ayrı ayrı duyurulur. ' +
+          'Geri bildirim butonları basılı durumu `aria-pressed` ile taşır.',
       },
     },
   },

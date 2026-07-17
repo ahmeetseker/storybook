@@ -143,6 +143,40 @@
   display: inline-flex;
 }
 
+/* compact'te aiGenerated sinyaller ikonun köşesinde mini ✦ ile işaretlenir —
+   AI-first kopya CSS renk/zemin, ama boyutu köşe rozetine göre küçültülmüş
+   (kontratın kendisinde sabitlenmiş literal, aiBadge ile aynı gerekçe: borç). */
+.iconWrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.aiCorner {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  border: 1px solid var(--lg-surface);
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* compact özet satırının sonunda görünen kısa metinli rozet — panel'deki
+   satır başına aiBadge'in aksine tüm listeyi tek metinle özetler. */
+.aiSummaryBadge {
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-weight: 700;
+}
+
 /* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
    AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
    radius capsule, 10.5px/700. ── */

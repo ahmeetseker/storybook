@@ -46,17 +46,27 @@ sözleşmesi `GlassScoreMeter`'da yok, iki component farklı sözleşmeler taş�
   için yeterince açıklayıcı olmadığından geçersiz kılınır.
 - `confidence` metni ("%N güven") görünür düz metin — ayrı ARIA gerekmez,
   zaten okunabilir içerik.
-- Kriter chip'leri: `<ul><li>` — ✓/✕ ikonları `aria-hidden` (bilgi
-  `data-matched` + görünür etiket metniyle zaten taşınıyor; `GlassFeatureGroup`
-  checklist'inin aksine burada her chip'in kendi `role="img"` ihtiyacı yok
-  çünkü ikon dekoratif, asıl bilgi zaten liste metninde).
+- Kriter chip'leri: `<ul><li>` — ✓/✕ ikonları `aria-hidden` (dekoratif,
+  `GlassFeatureGroup` checklist'inin aksine burada her chip'in kendi
+  `role="img"` ihtiyacı yok). Eşleşme durumu AT'ye görünür etiketin yanına
+  eklenen görsel-gizli (`srOnly`, `aria-hidden` DEĞİL) "(eşleşti)"/
+  "(eşleşmedi)" metniyle iletilir — yalnız `data-matched`'e güvenmek AT
+  kullanıcısının kriterin eşleşip eşleşmediğini hiç öğrenememesine yol açardı
+  (review düzeltmesi, bkz. Changelog).
 - Geri bildirim: gerçek `<button aria-pressed>` (👍/👎), accessible name
   "Faydalı"/"Faydalı değil". `role="radiogroup"` DEĞİL — ikisi bağımsız
   toggle, seçim karşılıklı dışlanır ama tek bir "grup" semantiği taşımaz
   (roving tabindex gerekmez, ikisi de her zaman `tabIndex=0`/doğal Tab sırası).
+  Aynı butona tekrar tıklama seçimi geri alır (`aria-pressed` `false`'a
+  döner) — gerçek bir toggle, "tekrar basınca aynı yönde kilitlenmiş" bir
+  sahte buton değil.
 - `loading=true`: meter/kriter/geri bildirim render edilmez; tek duyuru
   noktası `role="status"` + görünür olmayan (`srOnly`) "{title} hesaplanıyor"
-  metni — görsel placeholder tamamen `aria-hidden`.
+  metni — görsel placeholder tamamen `aria-hidden`, TEK istisna zorunlu "✦
+  AI" rozeti: skeleton satırlarının yanında görünür/erişilebilir kalır (AI-
+  first standardı `loading` durumunu istisna tutmaz — veri henüz yokken bile
+  içeriğin AI kaynaklı olacağı önceden bildirilir). `confidence` metni ise
+  loading placeholder'ında hiç gösterilmez (skor henüz hesaplanmadı).
 - Portal yok, ref forwarding yok (statik/kontrollü sunum kararı, diğer içerik
   katmanı component'leriyle tutarlı).
 
@@ -89,8 +99,13 @@ Children kabul edilmez — tamamen prop güdümlü.
 | ...rest | — | `HTMLAttributes<HTMLDivElement>` (`title` hariç) | — | — | `className`/`style` birleştirilir |
 
 Ref hedefi yok. `onFeedback` her tıklamada çağrılır (aynı yöne tekrar tıklama
-da dahil) — component kendi "gönderildi" durumunu sunucuya iletmez, yalnız
-`aria-pressed`/`data-selected` ile görsel seçili durumu tutar.
+da dahil, toggle-off anında bile) — component kendi "gönderildi" durumunu
+sunucuya iletmez, yalnız `aria-pressed`/`data-selected` ile görsel seçili
+durumu tutar. Aynı yöne ikinci tıklama görsel seçimi geri alır (toggle);
+`onFeedback` yine de tıklanan yönle çağrılır (callback her zaman "hangi
+butona basıldı"nı bildirir, "şu an seçili mi" değil). `value`/`criteria`
+GERÇEKTEN değiştiğinde (içerik imzası — bkz. §6) geri bildirim seçimi otomatik
+sıfırlanır.
 
 ## 5. Seçenek eksenleri
 
@@ -116,12 +131,22 @@ Varsayılan kombinasyon: `variant=card`, otomatik ton (`value`'dan).
 |---|---|---|---|
 | skor/ton | `value` (otomatik eşik: ≥70 success, 40-69 accent, <40 danger) | — | `aria-valuenow`, `data-tone` |
 | güven | `confidence` (normalize) | — | görünür metin |
-| geri bildirim seçimi | dahili state (`feedback: 'up'\|'down'\|undefined`), `onFeedback` her tıklamada çağrılır | — | `aria-pressed`, `data-selected` |
-| yükleme | `loading` prop | meter/kriter/geri bildirim tamamen | `role="status"` |
+| geri bildirim seçimi | dahili state (`feedback: 'up'\|'down'\|undefined`); aynı yöne tekrar tıklama toggle-off; `value`/`criteria` içerik imzası değişince render sırasında otomatik `undefined`'a sıfırlanır (bkz. aşağıki not) | — | `aria-pressed`, `data-selected` |
+| yükleme | `loading` prop | meter/kriter/geri bildirim tamamen (AI rozeti HARİÇ — bkz. §2) | `role="status"` |
 | disabled/hover/focus/active | — | — | hover/focus/active PROP DEĞİL; yalnız `:focus-visible`/`@media(hover:hover)` |
 
-Katman sırası: `loading` (varsa her şeyi bastırır) → `value` (clamp/ton) →
-`variant` (`compact` ek içerikleri bastırır) → render.
+**İçerik imzası (feedback sıfırlama):** `JSON.stringify({ value: clampedValue,
+criteria: criteria?.map(c => [c.label, c.matched]) ?? null })` bir önceki
+render'ın imzasıyla (ref) karşılaştırılır; farklıysa geri bildirim seçimi
+render sırasında (ekstra effect turu olmadan) sıfırlanır — kullanıcı farklı
+bir ilana geçtiğinde önceki "faydalı"/"faydalı değil" seçimi görsel olarak
+yeni içerikte asılı kalmaz. Referans eşitliği değil İÇERİK eşitliği kontrol
+edilir: aynı içerikle yeni bir `criteria` dizisi referansı verilirse seçim
+KORUNUR.
+
+Katman sırası: `loading` (varsa AI rozeti hariç her şeyi bastırır) → `value`
+(clamp/ton, içerik imzasının parçası) → `criteria` (içerik imzasının parçası)
+→ `variant` (`compact` ek içerikleri bastırır) → render.
 
 ## 7. Davranış
 
@@ -132,11 +157,22 @@ Katman sırası: `loading` (varsa her şeyi bastırır) → `value` (clamp/ton) 
   (sahte buton üretilmez — `GlassReviewCard` ile aynı karar). Tıklamada
   `onFeedback(direction)` çağrılır ve tıklanan yön `aria-pressed="true"`
   olur; diğer yön otomatik `false`'a döner (karşılıklı dışlama, ama iki
-  bağımsız `<button>` — roving tabindex/`radiogroup` YOK).
-- `loading`: tüm görsel içerik (`ringBox`/skeleton çizgileri) `aria-hidden`;
+  bağımsız `<button>` — roving tabindex/`radiogroup` YOK). Zaten seçili olan
+  yöne TEKRAR tıklama seçimi geri alır (`aria-pressed="false"`, toggle);
+  `onFeedback` bu tıklamada da çağrılır — component yalnız görsel seçimi
+  yönetir, "gönderim" mantığı tamamen çağırana aittir.
+- Geri bildirim seçimi `value`/`criteria` GERÇEKTEN değiştiğinde (içerik
+  imzası — §6) otomatik sıfırlanır; aksi halde farklı bir ilana/skora geçilse
+  bile eski "faydalı" işareti ekranda asılı kalırdı. Sıfırlama render
+  sırasında (React'in "adjusting state during rendering" deseniyle) yapılır,
+  ekstra bir görünür kare/effect turu üretmez.
+- `loading`: skeleton içeriği (`ringBox`/skeleton çizgileri) `aria-hidden`;
   `role="status"` düğümü ekranokuyucuya tek seferlik "{title} hesaplanıyor"
   duyurur. Skeleton animasyonu yalnız `opacity` (shimmer/gradient yok, kendi
-  flat placeholder'ı — `GlassSkeleton`'a bağımlı değil).
+  flat placeholder'ı — `GlassSkeleton`'a bağımlı değil). Zorunlu "✦ AI"
+  rozeti skeleton başlık satırının yanında normal (aria-hidden OLMAYAN)
+  şekilde render edilir — AI-first standardı yükleme durumunu istisna
+  tutmaz.
 - Odak taşıma yok — component hiçbir zaman kendiliğinden odak almaz/taşımaz;
   tek etkileşim yüzeyi (geri bildirim butonları) doğal Tab sırasında durur.
 - Responsive: `card` konteynerin genişliğine uyar (kriter chip'leri
@@ -164,7 +200,7 @@ Katman sırası: `loading` (varsa her şeyi bastırır) → `value` (clamp/ton) 
 | kart zemini | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-card` | yalnız `card` |
 | başlık | color | `--lg-label` | — |
 | açıklama/güven metni | color | `--lg-label-secondary` | — |
-| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — component'ler arası birebir kopya |
+| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassAiSummaryCard.module.css`'teki `.badge` bloğuyla (padding `3px var(--lg-space-2)` dahil) birebir aynı, component'ler arası kopya |
 | kriter chip (matched) | background/color | `color-mix(... var(--lg-success) ...)` / `--lg-success` (ikon) | `data-matched=true` |
 | kriter chip (unmatched) | background/color | `color-mix(... var(--lg-label) ...)` / `--lg-label-secondary` | `data-matched=false` |
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
@@ -198,6 +234,11 @@ Erişilebilirlik (docs description'lı).
 - [x] `onFeedback` verilmezse buton hiç render edilmez
 - [x] `loading=true` iken meter/kriter/feedback yerine `role="status"` durum metni render edilir
 - [x] eşleşmeyen kriter chip'inde metne element-genelinde opacity uygulanmaz (WCAG AA kontrast regresyonu)
+- [x] kriter chip'lerinde eşleşme durumu görsel-gizli metinle AT'ye iletilir; yalnız ikon `aria-hidden`
+- [x] geri bildirim seçimi `value`/`criteria` içerik imzası değişince otomatik sıfırlanır; içerik AYNIYSA (farklı referans dahi olsa) seçim korunur
+- [x] aynı yöne tekrar tıklama seçimi geri alır (toggle); `onFeedback` yine de çağrılır
+- [x] `loading=true` iken zorunlu "✦ AI" rozeti yine görünür kalır (güven metni gösterilmez)
+- [x] AI rozeti CSS bloğu `GlassAiSummaryCard.module.css`'teki `.badge` ile hizalı (padding/letter-spacing/font kaynakta kilitli)
 - [ ] reduced-motion'da ring/skeleton geçişlerinin kapanması (visual)
 
 ## 12. Do / Don't
@@ -231,3 +272,17 @@ göstermeme (şu an component kendi başarı durumunu taşımıyor, tamamen
   metni birlikte solduruyordu). "Soluk" görünüm artık yalnız zeminden
   (`color-mix(... var(--lg-label) 6% ...)`) geliyor, metin rengi tam
   kontrastta kalıyor. Regresyon testi eklendi (§11).
+- 2026-07-17: Codex review düzeltmesi (4 bulgu) —
+  1) kriter chip'lerinde eşleşme durumu artık görsel-gizli "(eşleşti)"/
+     "(eşleşmedi)" metniyle de AT'ye iletiliyor (ikon dekoratif kalmaya
+     devam ediyor, yalnız `data-matched`'e güvenmek AT için yetersizdi);
+  2) geri bildirim seçimi artık `value`/`criteria` içerik imzası (ref +
+     render sırasında karşılaştırma) değiştiğinde otomatik sıfırlanıyor —
+     önceki "faydalı" işareti farklı bir ilana/skora geçince asılı
+     kalmıyordu; aynı yöne tekrar tıklama artık gerçek bir toggle (seçimi
+     geri alıyor), `onFeedback` yine her tıklamada çağrılıyor;
+  3) `loading=true` placeholder'ında kaybolan zorunlu "✦ AI" rozeti geri
+     eklendi (AI-first standardı yükleme durumunu istisna tutmuyor);
+  4) `.aiBadge` CSS bloğu `GlassAiSummaryCard.module.css`'teki `.badge`
+     bloğuyla birebir aynı hale getirildi (`padding: 3px var(--lg-space-2)`
+     + `flex: none`). Her bulgu için regresyon testi eklendi (§11).

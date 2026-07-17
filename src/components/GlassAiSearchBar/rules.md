@@ -28,10 +28,24 @@ chip'ler olarak geri gösterilir.
   sabit `aria-label="Doğal dilde arama"` (placeholder içerikten bağımsız).
 - Öneri listesi **listbox/combobox değildir** — her öneri düz `<button
   type="button">`, doğal Tab sırasında, özel klavye deseni yok (yalnız Escape
-  listeyi kapatır, değeri temizlemez).
+  listeyi kapatır, değeri temizlemez). Escape'i component işlediğinde (öneri
+  listesi açıkken) `stopPropagation()` çağrılır — üst katman (ör. dock/panel)
+  aynı Escape'i yakalayıp kendini kapatmasın diye; liste kapalıyken Escape'e
+  dokunulmaz, event olduğu gibi yukarı yayılır.
 - Gönder butonu `GlassButton` (`type="submit"`, ikon-tek, `aria-label="Ara"`).
-- Filtre kaldır butonları `aria-label="Filtreyi kaldır: <Etiket>"` — jenerik
-  "Kaldır" değil, filtreye özel (birden fazla filtre AT'de ayırt edilebilir).
+- Filtre kaldır butonları `aria-label="Filtreyi kaldır: <Etiket>: <Değer>"` —
+  jenerik "Kaldır" değil, filtreye özel; **değer** de ada dahildir çünkü aynı
+  etikete sahip birden fazla filtre (ör. iki "Oda Sayısı") yalnız etiketle AT'de
+  ayırt edilemez.
+- `loading` iken filtre chip'leri görsel olarak soluklaşır
+  (`data-disabled` + `opacity`) ve kaldır butonları `disabled` olur — AI yeni
+  bir sorgu işlerken eski filtreler kaldırılamaz/etkileşime kapalıdır.
+- "Düşünüyor…" `aria-live="polite"` kapsayıcısı **her zaman mount edilir**
+  (boşken `:empty` CSS'iyle katlanır, layout'a boşluk eklemez); yalnız
+  `loading` iken içine metin/nokta yazılır. Bu sayede ekran okuyucu, kapsayıcı
+  sonradan DOM'a eklenmiş bir bloğa değil, içeriği değişen zaten var olan bir
+  live-region'a bakar (geç mount + dolu içerik geçişi duyuru kaçırma riski
+  taşır).
 - Portal yok.
 
 ## 3. Anatomy ve slotlar
@@ -40,7 +54,7 @@ chip'ler olarak geri gösterilir.
 |---|---|---|---|
 | ray | ✅ | ✦ ikon + input + gönder butonu | Kapsül, düz yüzey + hairline |
 | öneri listesi | — | `suggestions` doluyken, input odaklı | Buton dizisi, odak dışında gizli |
-| "düşünüyor" göstergesi | — | `loading` iken | `aria-live="polite"`, input'a `aria-describedby` ile bağlı |
+| "düşünüyor" göstergesi | ✅ (her zaman mount, boşken görsel katlı) | `loading` iken içi dolu | `aria-live="polite"`, input'a `aria-describedby` ile hep bağlı |
 | AI filtre bloğu | — | `parsedFilters` doluyken | rozet başlık + kaldırılabilir chip listesi |
 | AI rozeti | filtre bloğu varsa ✅ | "✦ AI" | Kontrattaki sabit AI rozeti CSS'i |
 | güven etiketi | — | `confidence` verilirse | "%N güven" metni, rozetin yanında |
@@ -58,7 +72,7 @@ chip'ler olarak geri gösterilir.
 | suggestions | prop | `string[]` | — | — | Odaklıyken altında buton listesi |
 | parsedFilters | prop | `{id,label,value}[]` | — | — | AI çıktısı, kaldırılabilir |
 | onRemoveFilter | event | `(id: string) => void` | — | — | Verilmezse kaldır butonu yok |
-| loading | prop | `boolean` | `false` | — | Input disabled + "Düşünüyor…" |
+| loading | prop | `boolean` | `false` | — | Input disabled + "Düşünüyor…"; filtre chip'leri soluklaşır, kaldır butonları disabled |
 | confidence | prop | `number (0-100)` | — | — | Sonlu değilse/aralık dışıysa clamp; yoksa gizli |
 | onFeedback | event | `(v: 'up'\|'down') => void` | — | — | Verilmezse 👍/👎 render edilmez |
 
@@ -78,7 +92,7 @@ yok.
 |---|---|---|---|
 | controlled/uncontrolled değer | `value` varlığı | iç state | — |
 | öneri listesi açık | input focus + blur (relatedTarget dışı) | — | — |
-| loading | prop | öneri listesi (kapanır), input etkileşimi | input `disabled`, `aria-describedby` |
+| loading | prop | öneri listesi (kapanır), input etkileşimi, filtre kaldırma | input `disabled`, `aria-describedby`, filtre chip `data-disabled`, kaldır butonu `disabled` |
 | feedback seçimi | iç state (tıklama) | — | `aria-pressed` |
 
 Katman sırası: availability (loading → input/suggestions devre dışı) →
@@ -92,12 +106,16 @@ value (controlled > uncontrolled) → interaction (focus/blur → open).
   tetikleyen her zaman bir tıklama).
 - **Klavye:** Tab doğal sırada (input → öneriler varsa sırayla → gönder
   butonu → filtre kaldır butonları). Escape yalnız açık öneri listesini
-  kapatır, değeri temizlemez (listbox olmadığı için ok tuşu/roving yok).
+  kapatır, değeri temizlemez (listbox olmadığı için ok tuşu/roving yok);
+  bu durumda `stopPropagation()` çağrılır (üst katman dock/panel kapanmasın),
+  liste zaten kapalıysa Escape'e dokunulmaz.
 - **Focus akışı:** hiçbir durumda programatik `.focus()` çağrılmaz — odak
   yalnız kullanıcı etkileşimiyle (tıklama/Tab) değişir; controlled `value`
   dışarıdan değişse de odak taşınmaz.
 - **Async:** `loading=true` → input `disabled`, gönder butonu `disabled` +
-  `loading` (spinner, native submit de engellenir), açık öneri listesi kapanır.
+  `loading` (spinner, native submit de engellenir), açık öneri listesi kapanır,
+  var olan filtre chip'leri soluklaşır ve kaldır butonları `disabled` olur
+  (eski AI çıktısı, yeni sorgu işlenirken değiştirilemez).
 - **Overlay:** yok — öneri listesi absolute konumlu düz panel, portal değil.
 
 ## 8. İçerik kuralları
@@ -121,7 +139,7 @@ value (controlled > uncontrolled) → interaction (focus/blur → open).
 | öneri satırı | radius | `--lg-radius-chip` | hover: `color-mix(label 6%)` |
 | AI rozeti | background/color | `color-mix(accent 12%, surface)` / `color-mix(accent 70%, label)` | — (kontrat sabiti) |
 | güven metni | color | `--lg-label-secondary` | `tabular-nums` |
-| filtre chip | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-capsule` | — |
+| filtre chip | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-capsule` | `loading`: `opacity 0.6` (`data-disabled`) |
 | focus halkası | outline | `--lg-accent` (yalnız `:focus-visible`) | — |
 
 **Borç (raw):** AI rozeti font-size `10.5px`/`font-weight 700` (kontrat
@@ -146,10 +164,17 @@ desen, eksen yok.
 - [x] Öneriler yalnız odaklıyken görünür, düz buton (listbox yok)
 - [x] Öneri tıklaması değeri eşitler + `onSubmit` çağırır
 - [x] `loading`: input disabled, öneriler gizli, "Düşünüyor…" `aria-live`
-- [x] Filtre chip + filtreye özel kaldır `aria-label` + `onRemoveFilter(id)`
+- [x] Filtre chip + filtreye **ve değere** özel kaldır `aria-label` +
+      `onRemoveFilter(id)` (aynı etiketli farklı filtreler ayırt edilir)
 - [x] AI rozeti + `confidence` clamp/gizleme (NaN/aralık dışı)
 - [x] `onFeedback`: 👍/👎 `aria-pressed` + callback
 - [x] `onFeedback` yoksa geri bildirim butonları render edilmez
+- [x] Escape açık öneri listesini kapatır ve `stopPropagation()` çağrılır;
+      liste kapalıyken Escape işlenmez, event yukarı yayılır
+- [x] `loading` iken filtre chip'leri soluklaşır, kaldır butonları `disabled`
+      olur ve tıklansa da `onRemoveFilter` çağrılmaz
+- [x] "Düşünüyor…" `aria-live` kapsayıcısı `loading=false` iken de DOM'da
+      mount kalır (aynı düğüm), yalnız içeriği/görselliği değişir
 - [ ] Görsel: ray focus-within border rengi (visual, Chrome)
 - [ ] Görsel: öneri paneli gölgesi/konumu geniş/dar viewport (visual)
 
@@ -171,3 +196,6 @@ component'in kapsamı dışında, ayrı bir composition noktası.
 
 **Changelog:** 2026-07-17 — İlk sürüm (Dalga 3, AI-first standardı: AI
 rozeti + `confidence` + `onFeedback` + flat `loading` göstergesi).
+2026-07-17 — Code review fix'leri: Escape `stopPropagation()`, `loading`
+iken filtre chip'leri disabled/soluk, kaldır butonu accessible name'ine
+`value` eklendi, "Düşünüyor…" `aria-live` kapsayıcısı her zaman mount edilir.

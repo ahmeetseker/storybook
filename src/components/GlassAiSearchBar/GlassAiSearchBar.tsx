@@ -136,6 +136,7 @@ export function GlassAiSearchBar({
   const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape' && open) {
       e.preventDefault()
+      e.stopPropagation()
       setOpen(false)
     }
   }
@@ -180,7 +181,7 @@ export function GlassAiSearchBar({
             placeholder={placeholder}
             disabled={loading}
             aria-label="Doğal dilde arama"
-            aria-describedby={loading ? thinkingId : undefined}
+            aria-describedby={thinkingId}
             autoComplete="off"
           />
           <GlassButton
@@ -211,12 +212,14 @@ export function GlassAiSearchBar({
         ) : null}
       </div>
 
-      {loading ? (
-        <p id={thinkingId} className={styles.thinking} aria-live="polite">
-          <span className={styles.thinkingDot} aria-hidden="true" />
-          Düşünüyor…
-        </p>
-      ) : null}
+      <p id={thinkingId} className={styles.thinking} aria-live="polite">
+        {loading ? (
+          <>
+            <span className={styles.thinkingDot} aria-hidden="true" />
+            Düşünüyor…
+          </>
+        ) : null}
+      </p>
 
       {hasFilters ? (
         <div className={styles.filtersBlock} role="group" aria-label="Yapay zekânın ayrıştırdığı filtreler">
@@ -253,14 +256,15 @@ export function GlassAiSearchBar({
           <ul className={styles.filters}>
             {parsedFilters!.map((filter) => (
               <li key={filter.id} className={styles.filterItem}>
-                <span className={styles.filterChip}>
+                <span className={styles.filterChip} data-disabled={loading || undefined}>
                   <span className={styles.filterLabel}>{filter.label}:</span>{' '}
                   <span className={styles.filterValue}>{filter.value}</span>
                   {onRemoveFilter ? (
                     <button
                       type="button"
                       className={styles.filterRemove}
-                      aria-label={`Filtreyi kaldır: ${filter.label}`}
+                      aria-label={`Filtreyi kaldır: ${filter.label}: ${filter.value}`}
+                      disabled={loading}
                       onClick={() => onRemoveFilter(filter.id)}
                     >
                       <span aria-hidden="true">×</span>

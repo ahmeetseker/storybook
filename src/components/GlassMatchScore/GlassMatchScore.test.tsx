@@ -76,8 +76,25 @@ describe('GlassMatchScore', () => {
 
   it('criteria eşleşen/eşleşmeyen chip’leri data-matched ile render eder', () => {
     render(<GlassMatchScore value={70} title="Uyum" criteria={criteria} />)
-    expect(screen.getByText('3+1').closest('li')?.dataset.matched).toBe('true')
-    expect(screen.getByText('Asansörlü').closest('li')?.dataset.matched).toBe('false')
+    const items = screen.getAllByRole('listitem')
+    const matchedItem = items.find((li) => li.textContent?.includes('3+1'))
+    const unmatchedItem = items.find((li) => li.textContent?.includes('Asansörlü'))
+    expect(matchedItem?.dataset.matched).toBe('true')
+    expect(unmatchedItem?.dataset.matched).toBe('false')
+  })
+
+  it('regresyon: kriter eşleşme durumu görsel-gizli metinle AT’ye iletilir (yalnız ikon aria-hidden)', () => {
+    render(<GlassMatchScore value={70} title="Uyum" criteria={criteria} />)
+    const items = screen.getAllByRole('listitem')
+    const matchedItem = items.find((li) => li.textContent?.includes('3+1'))
+    const unmatchedItem = items.find((li) => li.textContent?.includes('Asansörlü'))
+
+    // Görünür ikon (✓/✕) dekoratif olduğu için aria-hidden kalmalı, ama
+    // eşleşme durumu metinle (AT ağacından gizlenmeyen) de taşınmalı.
+    expect(matchedItem?.textContent).toContain('(eşleşti)')
+    expect(unmatchedItem?.textContent).toContain('(eşleşmedi)')
+    expect(matchedItem?.querySelectorAll('[aria-hidden="true"]').length).toBe(1)
+    expect(unmatchedItem?.querySelectorAll('[aria-hidden="true"]').length).toBe(1)
   })
 
   it('AI rozeti daima render edilir; confidence geçerliyse metin eklenir, sonlu değilse gizlenir', () => {
@@ -113,6 +130,57 @@ describe('GlassMatchScore', () => {
     expect(screen.queryByRole('button')).toBeNull()
   })
 
+  it('regresyon: aynı yöne tekrar tıklama seçimi geri alır (toggle)', () => {
+    const onFeedback = vi.fn()
+    render(<GlassMatchScore value={70} title="Uyum" onFeedback={onFeedback} />)
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+    expect(onFeedback).toHaveBeenNthCalledWith(1, 'up')
+
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('false')
+    expect(onFeedback).toHaveBeenNthCalledWith(2, 'up')
+    expect(onFeedback).toHaveBeenCalledTimes(2)
+  })
+
+  it('regresyon: value değişince geri bildirim seçimi sıfırlanır', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(<GlassMatchScore value={70} title="Uyum" onFeedback={onFeedback} />)
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+
+    rerender(<GlassMatchScore value={85} title="Uyum" onFeedback={onFeedback} />)
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Faydalı değil' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('regresyon: criteria değişince geri bildirim seçimi sıfırlanır', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(<GlassMatchScore value={70} title="Uyum" criteria={criteria} onFeedback={onFeedback} />)
+    const down = screen.getByRole('button', { name: 'Faydalı değil' })
+    fireEvent.click(down)
+    expect(down.getAttribute('aria-pressed')).toBe('true')
+
+    const nextCriteria = [...criteria, { label: 'Bahçeli', matched: true }]
+    rerender(<GlassMatchScore value={70} title="Uyum" criteria={nextCriteria} onFeedback={onFeedback} />)
+    expect(screen.getByRole('button', { name: 'Faydalı değil' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('regresyon: aynı value/criteria ile yeniden render olunca geri bildirim seçimi korunur', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(<GlassMatchScore value={70} title="Uyum" criteria={criteria} onFeedback={onFeedback} />)
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+
+    // Aynı içerikle (yeni ama eşdeğer dizi referansı) tekrar render — seçim korunmalı
+    rerender(<GlassMatchScore value={70} title="Uyum" criteria={[...criteria]} onFeedback={onFeedback} />)
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('true')
+  })
+
   it('loading=true iken meter/criteria/feedback yerine durum metni render edilir', () => {
     render(
       <GlassMatchScore
@@ -129,6 +197,13 @@ describe('GlassMatchScore', () => {
     expect(screen.getByRole('status').textContent).toBe('Uyum hesaplanıyor')
   })
 
+  it('regresyon: loading=true iken zorunlu AI rozeti yine görünür kalır', () => {
+    render(<GlassMatchScore value={70} title="Uyum" confidence={90} loading />)
+    expect(screen.getByLabelText('Yapay zekâ üretimi')).toBeTruthy()
+    // Skor henüz hesaplanmadığı için güven metni placeholder'da gösterilmez
+    expect(screen.queryByText(/güven/)).toBeNull()
+  })
+
   it('regresyon: eşleşmeyen kriter chip metni element-genelinde opacity ile soldurulmaz (WCAG AA kontrast)', () => {
     // jsdom gerçek CSS kurallarını hesaplamadığı için kontrastı doğrudan
     // ölçemiyoruz; kaynak CSS'te `[data-matched='false']` bloğunun metni de
@@ -140,5 +215,17 @@ describe('GlassMatchScore', () => {
     const unmatchedBlockMatch = css.match(/\.criterion\[data-matched='false'\]\s*\{([^}]*)\}/)
     expect(unmatchedBlockMatch).not.toBeNull()
     expect(unmatchedBlockMatch![1]).not.toMatch(/opacity\s*:/)
+  })
+
+  it('regresyon: AI rozeti CSS bloğu kontrat ölçülerine (GlassAiSummaryCard .badge) hizalı', () => {
+    const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'GlassMatchScore.module.css')
+    const css = readFileSync(cssPath, 'utf-8')
+    const badgeBlockMatch = css.match(/\.aiBadge\s*\{([^}]*)\}/)
+    expect(badgeBlockMatch).not.toBeNull()
+    const block = badgeBlockMatch![1]
+    expect(block).toMatch(/padding:\s*3px var\(--lg-space-2\)/)
+    expect(block).toMatch(/letter-spacing:\s*0\.02em/)
+    expect(block).toMatch(/font-size:\s*10\.5px/)
+    expect(block).toMatch(/font-weight:\s*700/)
   })
 })

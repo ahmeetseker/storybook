@@ -80,7 +80,8 @@
 .aiBadge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
+  flex: none;
+  padding: 3px var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));

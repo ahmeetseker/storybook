@@ -1,7 +1,7 @@
 // GlassMatchScore — kişisel uyum skoru ("senin kriterlerine göre").
 // AI-first component: içerik katmanı FLAT (cam yok). Kendi mini SVG halkasını
 // çizer (GlassScoreMeter'dan bilinçli olarak İTHAL EDİLMEZ — bkz. rules.md §1).
-import { useId, useState, type HTMLAttributes } from 'react'
+import { useId, useRef, useState, type HTMLAttributes } from 'react'
 import styles from './GlassMatchScore.module.css'
 
 /** Tek bir kriterin eşleşme durumu (ör. "3+1", "Otoparklı"). */
@@ -131,7 +131,12 @@ function LoadingPlaceholder({ variant, title }: { variant: 'card' | 'compact'; t
     <div className={styles.header}>
       <span className={[styles.ringBox, styles.skeletonRing].join(' ')} data-size={size} aria-hidden="true" />
       <div className={styles.meta}>
-        <span className={[styles.skeletonLine, styles.skeletonTitle].join(' ')} aria-hidden="true" />
+        <div className={styles.titleRow}>
+          <span className={[styles.skeletonLine, styles.skeletonTitle].join(' ')} aria-hidden="true" />
+          {/* AI-first standardı: rozet loading sırasında da zorunlu — veri
+              henüz yokken bile içeriğin AI kaynaklı olacağı önceden bildirilir. */}
+          <AiBadge confidence={null} />
+        </div>
         {variant === 'card' ? <span className={[styles.skeletonLine, styles.skeletonBody].join(' ')} aria-hidden="true" /> : null}
       </div>
       {/* Görsel içerik tamamen aria-hidden — tek duyuru noktası bu canlı bölge */}
@@ -171,6 +176,25 @@ export function GlassMatchScore({
   const tone = resolveTone(clamped)
   const resolvedConfidence = resolveConfidence(confidence)
 
+  // İçerik imzası: `value`/`criteria` GERÇEKTEN değiştiğinde (ör. kullanıcı
+  // farklı bir ilana geçti) önceki geri bildirim seçimi anlamsız kalır —
+  // render sırasında karşılaştırıp sıfırlıyoruz (GlassAiSummaryCard'daki
+  // tekil `selected` state'inin aksine burada içerik ilan bazında değiştiği
+  // için ekstra bir effect turu yerine "render sırasında state ayarlama"
+  // deseni kullanılır — bkz. React docs "Adjusting state when a prop
+  // changes"). Bir sonraki render'a taşınmaz, ekstra boyama olmaz.
+  const contentSignature = JSON.stringify({
+    value: clamped,
+    criteria: criteria?.map((c) => [c.label, c.matched]) ?? null,
+  })
+  const prevContentSignatureRef = useRef(contentSignature)
+  if (prevContentSignatureRef.current !== contentSignature) {
+    prevContentSignatureRef.current = contentSignature
+    if (feedback !== undefined) {
+      setFeedback(undefined)
+    }
+  }
+
   const isCard = variant === 'card'
   const showExplanation = isCard && !loading && Boolean(explanation)
   const showCriteria = isCard && !loading && Boolean(criteria && criteria.length > 0)
@@ -179,7 +203,11 @@ export function GlassMatchScore({
   const classes = [styles.root, styles[variant], className].filter(Boolean).join(' ')
 
   const handleFeedback = (direction: 'up' | 'down') => {
-    setFeedback(direction)
+    // Aynı yöne tekrar tıklama seçimi geri alır (toggle); farklı yöne tıklama
+    // karşılıklı dışlayarak seçimi değiştirir. `onFeedback` her tıklamada —
+    // toggle-off dahil — tıklanan yönle çağrılır; component kendi "gönderildi"
+    // durumunu sunucuya iletmez, yalnız görsel seçili durumu tutar.
+    setFeedback((prev) => (prev === direction ? undefined : direction))
     onFeedback?.(direction)
   }
 
@@ -228,7 +256,12 @@ export function GlassMatchScore({
               <span className={styles.criterionIcon} aria-hidden="true">
                 {criterion.matched ? '✓' : '✕'}
               </span>
-              <span className={styles.criterionLabel}>{criterion.label}</span>
+              <span className={styles.criterionLabel}>
+                {criterion.label}
+                {/* İkon dekoratif (aria-hidden); eşleşme durumu AT'ye bu
+                    görsel-gizli metinle iletilir. */}
+                <span className={styles.srOnly}> {criterion.matched ? '(eşleşti)' : '(eşleşmedi)'}</span>
+              </span>
             </li>
           ))}
         </ul>

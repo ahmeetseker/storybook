@@ -118,6 +118,10 @@
   font-size: var(--lg-text-footnote, 13px);
   color: var(--lg-label-secondary, #79726a);
 }
+/* İçerik yokken (loading değil) alan kaplamasın — element AT için hep mount kalır, yalnız görsel olarak katlanır */
+.thinking:empty {
+  display: none;
+}
 .thinkingDot {
   width: 6px;
   height: 6px;
@@ -249,6 +253,10 @@
   }
 }
 
+.filterChip[data-disabled] {
+  opacity: 0.6;
+}
+
 .filterLabel {
   color: var(--lg-label-secondary, #79726a);
 }
@@ -287,6 +295,10 @@
 .filterRemove:focus-visible {
   outline: 2px solid var(--lg-accent, #b45309);
   outline-offset: 1px;
+}
+.filterRemove:disabled {
+  cursor: default;
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

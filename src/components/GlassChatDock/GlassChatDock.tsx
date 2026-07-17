@@ -86,6 +86,10 @@ function TypingIndicator() {
 
 function MessageRow({ message }: { message: GlassChatDockMessage }) {
   const isUser = message.role === 'user'
+  // Konuşmacı yalnız görsel hizalamayla (sağ/sol) ayırt ediliyor — role="log"
+  // bölgesini dinleyen ekran okuyucu için bu yeterli değil. Her mesaj
+  // metninin başına görsel-gizli "Siz: "/"Asistan: " öneki eklenir.
+  const speakerLabel = isUser ? 'Siz: ' : 'Asistan: '
   return (
     <div className={[styles.row, isUser ? styles.rowUser : styles.rowAi].join(' ')}>
       {!isUser ? (
@@ -94,7 +98,14 @@ function MessageRow({ message }: { message: GlassChatDockMessage }) {
         </span>
       ) : null}
       <div className={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAi].join(' ')}>
-        {message.pending ? <TypingIndicator /> : <span>{message.text}</span>}
+        {message.pending ? (
+          <TypingIndicator />
+        ) : (
+          <span>
+            <span className={styles.srOnly}>{speakerLabel}</span>
+            {message.text}
+          </span>
+        )}
       </div>
     </div>
   )
@@ -104,11 +115,14 @@ function MessageRow({ message }: { message: GlassChatDockMessage }) {
  * İlanla sohbet dock'u — sağ alt köşede sabit. Kapalıyken yüzen bir "Soru sor"
  * kapsülü, açıkken sohbet geçmişi + composer içeren küçük bir panel gösterir.
  * Modal DEĞİL: focus trap yok, arka plan her zaman etkileşimli kalır; yalnız
- * Escape ve kapat butonu paneli kapatır. Odak yalnız BU component'in kendi
- * tetiklediği (kullanıcı gerçekten launcher/kapat'a bastığı veya Escape'e
- * bastığı) açılış/kapanışlarda taşınır — controlled modda dışarıdan `open`
- * prop'u programatik değişirse (ör. ilk mount, sayfa geçişi) odak koşulsuz
- * çalınmaz (bkz. rules.md §7).
+ * Escape (panel kapsayıcısının onKeyDown'unda, panel içi hedeflerde) ve
+ * kapat butonu paneli kapatır. Açılışta odak yalnız BU component'in kendi
+ * tetiklediği (kullanıcı gerçekten launcher'a bastığı) geçişte input'a
+ * taşınır — controlled modda dışarıdan `open` prop'u programatik değişirse
+ * (ör. ilk mount, sayfa geçişi) odak koşulsuz çalınmaz. Kapanışta odak
+ * launcher'a taşınır — hem kullanıcı tetiklediyse (kapat/Escape) hem de
+ * controlled programatik bir kapanış anında odak hâlâ panel içindeyse
+ * (böylece odak asla body'ye düşmez) (bkz. rules.md §7).
  */
 export function GlassChatDock({
   messages,
@@ -132,6 +146,7 @@ export function GlassChatDock({
   const listRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const launcherRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   // Yalnız BU component'in kendi setOpen çağrısıyla tetiklenen geçişlerde true
   // olur; effect tükettikten sonra hemen sıfırlanır — bkz. üstteki JSDoc.
@@ -179,33 +194,54 @@ export function GlassChatDock({
     const userTriggered = userTriggeredRef.current
     userTriggeredRef.current = false
     clearUserTriggeredExpiry()
-    if (!userTriggered) return
+
     if (isOpen) {
-      inputRef.current?.focus()
-    } else {
+      if (userTriggered) inputRef.current?.focus()
+      return
+    }
+
+    // Kapanış: kullanıcı bu component'in kendi setOpen'ını tetiklediyse
+    // (launcher/kapat/panel-içi Escape) odak launcher'a taşınır — bu zaten
+    // eskiden beri var. Ek olarak (regresyon): controlled modda parent
+    // programatik olarak `open`'ı false yaparsa (kullanıcı tetiklemeden) ve
+    // odak o an panel içindeyse (ör. textarea'da yazarken), odak body'ye
+    // düşmemesi için yine launcher'a taşınır — bkz. rules.md §7.
+    const activeElement = document.activeElement
+    const focusWasInPanel = activeElement !== null && panelRef.current?.contains(activeElement) === true
+    if (userTriggered || focusWasInPanel) {
       launcherRef.current?.focus()
     }
   }, [isOpen])
 
-  // Escape her zaman kapatır — arka plan tıklaması KAPATMAZ (overlay değil, dock deseni)
-  useEffect(() => {
-    if (!isOpen) return
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-    // setOpen her render'da yeniden yaratılır ama davranışı stabil — deps'e almak gereksiz re-bind üretir
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen])
-
-  // Yeni mesajda liste dibe kayar — davranışsal (scrollTop ataması), smooth scroll DEĞİL
+  // Panel açılınca dibe kayar — koşulsuz, çünkü henüz okunmakta olan bir
+  // geçmiş yok (davranışsal scrollTop ataması, smooth scroll DEĞİL).
   useLayoutEffect(() => {
     if (!isOpen) return
     const el = listRef.current
     if (!el) return
     el.scrollTop = el.scrollHeight
-  }, [isOpen, messages])
+    // Yalnız açılış anında çalışır; mesaj değişimini aşağıdaki effect ayrı
+    // (koşullu) ele alır — messages'ı deps'e almak bilinçli olarak atlandı.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
+
+  // Mesaj listesi güncellendiğinde: kullanıcı zaten dipteyse (eşik: 48px)
+  // VEYA yeni eklenen son mesaj kullanıcıya aitse dibe kayar. Aksi halde
+  // (geçmişi yukarı kaydırıp okuyan bir kullanıcı) liste zıplatılmaz.
+  useLayoutEffect(() => {
+    if (!isOpen) return
+    const el = listRef.current
+    if (!el) return
+    const lastMessage = messages[messages.length - 1]
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    const isNearBottom = distanceFromBottom < 48
+    if (isNearBottom || lastMessage?.role === 'user') {
+      el.scrollTop = el.scrollHeight
+    }
+    // isOpen'ı deps'e almak gereksiz — yukarıdaki effect açılış anını zaten
+    // ele alıyor, burada yalnız mesaj değişimi tetiklenmeli.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages])
 
   const submit = () => {
     const trimmed = draft.trim()
@@ -217,6 +253,22 @@ export function GlassChatDock({
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     submit()
+  }
+
+  // Escape panel kapsayıcısının onKeyDown'unda yakalanır — document genelinde
+  // DEĞİL: böylece yalnız panel içi bir hedef (textarea, kapat butonu, …)
+  // odaktayken çalışır, üst katmanlarla (ör. sayfadaki bir arama kutusu)
+  // çakışıp odak çalmaz (bkz. rules.md §7). IME kompozisyonu sürerken Escape
+  // adayı iptal etmek için kullanılabildiğinden yok sayılır. Kapanışı
+  // işledikten sonra e.stopPropagation() çağrılır — olay daha üst
+  // katmanlara (ör. document üzerindeki başka bir Escape dinleyicisi)
+  // sızmaz.
+  const handlePanelKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.nativeEvent.isComposing || e.key === 'Process') return
+    if (e.key === 'Escape') {
+      e.stopPropagation()
+      setOpen(false)
+    }
   }
 
   const handleKeyDown = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
@@ -266,7 +318,14 @@ export function GlassChatDock({
 
       <AnimatePresence>
         {isOpen ? (
-          <motion.div role="dialog" aria-labelledby={titleId} className={styles.panel} {...panelMotion}>
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-labelledby={titleId}
+            className={styles.panel}
+            onKeyDown={handlePanelKeyDown}
+            {...panelMotion}
+          >
             <div className={styles.header}>
               <div className={styles.headerTitle}>
                 <span id={titleId} className={styles.title}>

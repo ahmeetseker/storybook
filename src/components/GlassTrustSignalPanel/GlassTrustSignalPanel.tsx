@@ -170,6 +170,7 @@ export function GlassTrustSignalPanel({
   const verifiedCount = signals.filter((s) => s.status === 'verified').length
   const failedCount = signals.filter((s) => s.status === 'failed').length
   const hasFailed = failedCount > 0
+  const hasAiGenerated = signals.some((s) => s.aiGenerated)
 
   const handleFeedback = (signalId: string, value: 'up' | 'down') => {
     setFeedback((prev) => ({ ...prev, [signalId]: value }))
@@ -188,15 +189,20 @@ export function GlassTrustSignalPanel({
         <h3 id={titleId} className={styles.title}>
           {title}
         </h3>
+        {/* Her zaman mount'lu canlı bölge: yalnız içerik değişince (boş → metin) duyurulur,
+            bu yüzden `loading` geçişte koşullu mount/unmount edilmez (Codex bulgusu). */}
+        <span className={styles.srOnly} aria-live="polite">
+          {loading ? 'Güven kontrolleri yükleniyor' : ''}
+        </span>
         {loading ? (
-          <>
-            <span className={[styles.placeholderBar, styles.placeholderBarSummary].join(' ')} aria-hidden />
-            <span className={styles.srOnly}>Güven kontrolleri yükleniyor</span>
-          </>
+          <span className={[styles.placeholderBar, styles.placeholderBarSummary].join(' ')} aria-hidden />
         ) : (
           <p className={styles.summary}>
             {verifiedCount}/{total} doğrulama geçti
             {hasFailed ? <span className={styles.alert}> · {failedCount} kontrol başarısız</span> : null}
+            {variant === 'compact' && hasAiGenerated ? (
+              <span className={styles.aiSummaryBadge}> · ✦ AI destekli</span>
+            ) : null}
           </p>
         )}
       </div>
@@ -207,13 +213,22 @@ export function GlassTrustSignalPanel({
         <ul role="list" className={styles.iconRow}>
           {signals.map((signal) => (
             <li key={signal.id} role="listitem" data-status={signal.status} className={styles.iconItem}>
-              <span
-                role="img"
-                aria-label={STATUS_LABEL[signal.status]}
-                className={styles.icon}
-                data-status={signal.status}
-              >
-                {STATUS_GLYPH[signal.status]}
+              <span className={styles.iconWrap}>
+                <span
+                  role="img"
+                  aria-label={STATUS_LABEL[signal.status]}
+                  className={styles.icon}
+                  data-status={signal.status}
+                >
+                  {STATUS_GLYPH[signal.status]}
+                </span>
+                {/* compact'te aiGenerated bilgisini tamamen atmamak için: köşede mini ✦ işareti
+                    (Codex bulgusu — AI sonucu insan doğrulaması gibi sunulmasın). */}
+                {signal.aiGenerated ? (
+                  <span className={styles.aiCorner} aria-label="Yapay zekâ üretimi">
+                    ✦
+                  </span>
+                ) : null}
               </span>
               <span className={styles.srOnly}>{signal.label}</span>
             </li>

@@ -43,9 +43,19 @@ rozeti başlıkta zorunlu ve daima görünür.
 - Portal YOK, focus trap YOK, scroll kilidi YOK — Modal/Drawer/Toast'ın
   paylaştığı overlay sözleşmesine kasıtlı olarak dahil değil (bkz. §7 ve
   kontrat notu). `position: fixed` doğrudan ana ağaçta render edilir.
+- Escape dinleyicisi `document` üzerinde DEĞİL, panel kapsayıcısının
+  (`role="dialog"` olan `<motion.div>`) `onKeyDown`'unda tanımlıdır — yalnız
+  panel içi bir hedef (textarea, kapat butonu, …) odaktayken tetiklenir.
+  Sayfadaki başka bir katmanın (ör. arama kutusu) kendi Escape dinleyicisiyle
+  çakışıp odak çalması böylece engellenir (bkz. §7).
 - "✦ AI" rozeti: `aria-label="Yapay zekâ üretimi"` — görünür "✦ AI" metni
   AT için yeterince açıklayıcı olmadığından geçersiz kılınır (kontrat: tüm
   AI component'lerinde birebir aynı, bkz. `GlassMatchScore`).
+- Her mesaj balonunun konuşmacısı yalnız görsel hizalamayla (sağ/sol) + mini
+  ✦ işaretiyle ayırt edilmez — `role="log"` bölgesini dinleyen ekran
+  okuyucu için de duyurulur: mesaj metninin başına görsel-gizli (`srOnly`)
+  "Siz: " (kullanıcı) / "Asistan: " (AI) öneki eklenir (regresyon, bkz. test
+  dosyası).
 - Mesaj id'leri (`message.id`) hiçbir DOM `id` özniteliğine yazılmaz —
   yalnız React `key` olarak kullanılır; dışarıdan gelen ham veri id'sinin
   DOM'a sızması (çakışma/geçersiz seçici riski) böylece engellenir.
@@ -98,7 +108,8 @@ component'te hiçbiri yok. İçerik katmanı tamamen flat, tek bir görsel biçi
 |---|---|---|---|
 | açık/kapalı | `open` (controlled) ?? iç state (`defaultOpen`) | launcher ⇄ panel | panel varlığı/yokluğu |
 | taslak metin (`draft`) | tamamen iç state, dışarı sızmaz | — | — |
-| odak hedefi | `userTriggeredRef` — yalnız BU component'in kendi `setOpen` çağrısı (launcher/kapat/Escape) tetiklerse açılışta input'a, kapanışta launcher'a taşınır; bayrak tüketilmeden bir görev turu (setTimeout 0) içinde kendiliğinden sona erer (bkz. §7) | dışarıdan programatik `open` değişimi (odak taşımaz), reddedilen bir isteğin DAHA SONRA ilgisiz bir nedenle kabul edilmesi (bayrak süresi dolduğu için odak taşımaz) | — |
+| odak hedefi | `userTriggeredRef` — yalnız BU component'in kendi `setOpen` çağrısı (launcher/kapat/panel-içi Escape) tetiklerse açılışta input'a taşınır; bayrak tüketilmeden bir görev turu (setTimeout 0) içinde kendiliğinden sona erer (bkz. §7) | açılışta: dışarıdan programatik `open` değişimi (odak taşımaz), reddedilen bir isteğin DAHA SONRA ilgisiz bir nedenle kabul edilmesi (bayrak süresi dolduğu için odak taşımaz) | — |
+| odak hedefi (kapanış) | kullanıcı tetiklediyse (`userTriggeredRef`) OTOMATIK, DEĞİLSE `panelRef.contains(document.activeElement)` — programatik (controlled) kapanış anında odak hâlâ panel içindeyse yine launcher'a taşınır | odak asla body'ye düşmez; panel dışına zaten odaklanmışsa (ör. sayfanın başka bir yerine tıklanmış) dokunulmaz | — |
 | mesaj pending | `message.pending` | `message.text` | `srOnly` "yazıyor" metni (`role="log"` bölgesinde duyurulur) |
 | disabled/hover/focus/active | — | — | hover/focus/active PROP DEĞİL; yalnız `:focus-visible`/`@media(hover:hover)` |
 
@@ -122,24 +133,46 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
   `true` başlaması, ya da ilgisiz bir state güncellemesi) kullanıcının
   yazmakta olduğu başka bir alandan odağı çalmamalı. Bunun yerine:
   `userTriggeredRef` yalnız bu component'in kendi `setOpen` çağrısı
-  (launcher tıklaması, kapat butonu, Escape) sırasında `true` olur ve
-  hemen ardından tüketilir; yalnız bu durumda açılışta `<textarea>`'ya,
-  kapanışta launcher butonuna odak taşınır. Controlled modda parent isteği
-  reddedip `open`'ı değiştirmezse bayrak tüketilecek bir `isOpen` değişimi
-  hiç olmaz — bu durumda bayrağın süresiz askıda kalıp DAHA SONRA gelen
-  tamamen ilgisiz bir `open` geçişinde yanlışlıkla tüketilmesini (ve
-  kullanıcının o an başka bir alanda yazdığı odağı çalmasını) önlemek için
-  bayrak, tüketilmeden bir görev turu içinde (`setTimeout(…, 0)`)
-  kendiliğinden sıfırlanır — normal senkron kabul/red akışını etkilemez,
-  yalnız gecikmiş/ilgisiz geç geçişlerde koruma sağlar. Bkz. test dosyası:
-  "controlled modda dışarıdan open=true/false→true ile odak taşınmaz" ve
-  "parent reddedip daha sonra ilgisiz bir nedenle open=true yaparsa odak
-  çalınmaz" senaryoları.
-- Escape her zaman kapatır (dismissible=false gibi bir kapıyı kapatma
-  seçeneği yok — spec'te istenmedi, her zaman kapatılabilir).
+  (launcher tıklaması, kapat butonu, panel-içi Escape) sırasında `true` olur
+  ve hemen ardından tüketilir; yalnız bu durumda açılışta `<textarea>`'ya
+  odak taşınır. Controlled modda parent isteği reddedip `open`'ı
+  değiştirmezse bayrak tüketilecek bir `isOpen` değişimi hiç olmaz — bu
+  durumda bayrağın süresiz askıda kalıp DAHA SONRA gelen tamamen ilgisiz bir
+  `open` geçişinde yanlışlıkla tüketilmesini (ve kullanıcının o an başka bir
+  alanda yazdığı odağı çalmasını) önlemek için bayrak, tüketilmeden bir görev
+  turu içinde (`setTimeout(…, 0)`) kendiliğinden sıfırlanır — normal senkron
+  kabul/red akışını etkilemez, yalnız gecikmiş/ilgisiz geç geçişlerde koruma
+  sağlar. Bkz. test dosyası: "controlled modda dışarıdan open=true/false→true
+  ile odak taşınmaz" ve "parent reddedip daha sonra ilgisiz bir nedenle
+  open=true yaparsa odak çalınmaz" senaryoları.
+  Kapanış tarafında ise davranış daha geniş: kullanıcı tetiklediyse (kapat/
+  panel-içi Escape) OTOMATIK olarak launcher'a odaklanır; kullanıcı
+  tetiklemese bile (controlled `open` prop'u parent tarafından programatik
+  olarak `false` yapılırsa) `document.activeElement` o an panel içindeyse
+  (ör. kullanıcı `<textarea>`'ya yazarken parent paneli kapatırsa) odak yine
+  launcher'a taşınır — odak asla body'ye "düşmez". Panel dışına zaten
+  odaklanmış durumdaysa (kullanıcı başka bir alana tıklamışsa) bu davranış
+  dokunmaz. Bkz. test: "controlled modda programatik kapanış anında odak
+  panel içindeyse launcher'a taşınır" senaryosu.
+- **Escape kapsamı (regresyon):** dinleyici `document` üzerinde DEĞİL, panel
+  kapsayıcısının `onKeyDown`'undadır — yalnız panel içi bir hedef odaktayken
+  tetiklenir; kapanışı işledikten sonra `e.stopPropagation()` çağrılır,
+  böylece olay üst katmanlara (ör. sayfadaki bir arama kutusunun kendi
+  Escape dinleyicisi) sızmaz. IME kompozisyonu sürerken (`isComposing`/
+  `key==='Process'`) Escape yok sayılır — kompozisyon adayını iptal etmek
+  için kullanılabildiğinden panel yanlışlıkla kapanmaz. Escape her zaman
+  kapatır (`dismissible=false` gibi bir kapıyı kapatma seçeneği yok —
+  spec'te istenmedi, panel içindeyken her zaman kapatılabilir).
 - Yeni mesaj eklendiğinde (`messages` referansı değiştiğinde) liste
-  `scrollTop = scrollHeight` ile dibe kayar — **davranışsal**, `scrollIntoView`
-  ya da `behavior: 'smooth'` KULLANILMAZ (spec: "smooth değil").
+  **koşullu** dibe kayar — **davranışsal**, `scrollIntoView` ya da
+  `behavior: 'smooth'` KULLANILMAZ (spec: "smooth değil"). Panel yeni
+  açıldığında koşulsuz dibe kayar (henüz okunan bir geçmiş yok). Sonraki her
+  `messages` değişiminde ise: `scrollHeight - scrollTop - clientHeight < 48`
+  (kullanıcı zaten dibe yakınsa) VEYA son mesajın `role`'ü `'user'`
+  (kullanıcının kendi gönderdiği mesaj her zaman görünür olmalı) ise dibe
+  kayar; aksi halde (geçmişi yukarı kaydırıp okuyan bir kullanıcı, yeni bir
+  AI mesajı geldiğinde) liste **zıplatılmaz** — konum korunur (regresyon,
+  bkz. test dosyası).
 - Composer: `Enter` → gönderir (`preventDefault` + `onSend` + alanı
   temizler); `Shift+Enter` → varsayılan davranış korunur (`preventDefault`
   çağrılmaz), textarea'ya yeni satır eklenir. Gönder butonu taslak boşken
@@ -158,6 +191,9 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
   düşer.
 - Mesaj metinleri uzun olabilir — balon `overflow-wrap: anywhere` ile sarar,
   liste dikey kaydırılabilir (bkz. UzunIcerik story).
+- Mesaj metni `white-space: pre-wrap` taşır — composer'da `Shift+Enter` ile
+  eklenen satır sonları balonda da korunur, tek satıra çökmez (regresyon,
+  bkz. `GlassChatDock.module.css` `.bubble`).
 - `disclaimer` her zaman görünür kalmalı — AI çıktısının bağlayıcı olmadığı
   uyarısı kaldırılamaz/gizlenemez (prop olarak metni özelleştirilebilir ama
   satırın kendisi koşulsuz render edilir).
@@ -181,7 +217,8 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
 sistemi ölçeğinde yok), `z-index: 60` (z token'ı yok, `GlassToast` ile aynı
 gerekçe/değer), `box-shadow` rgba değerleri (Modal/Drawer/Toast ile aynı
 borç), AI rozeti font-size 10.5px/700 (kontrat sabiti), typing dot boyutu
-5px, mini ✦ işaret çapı 20px.
+5px, mini ✦ işaret çapı 20px, "dipte sayılır" kaydırma eşiği `48px`
+(davranışsal sabit, token ölçeğinde yok — bkz. §7).
 
 ## 10. Storybook kapsamı
 
@@ -210,6 +247,13 @@ doğrulanır.
 - [x] Gönder butonu taslak boşken disabled, doluyken aktif
 - [x] Enter trimlenmiş metinle `onSend` çağırır ve alanı temizler; boş/yalnız boşlukta çağırmaz
 - [x] Shift+Enter `onSend` çağırmaz, varsayılan davranış (satır ekleme) korunur
+- [x] document genelinde Escape paneli KAPATMAZ; yalnız panel içi bir hedefte (ör. textarea) Escape kapatır
+- [x] panel içinde IME kompozisyonu sürerken Escape paneli kapatmaz
+- [x] Escape kapanışı `e.stopPropagation()` çağırır — dış `document` dinleyicileri olayı almaz
+- [x] controlled modda programatik kapanış anında odak panel içindeyse (ör. textarea) launcher'a taşınır, body'ye düşmez
+- [x] kullanıcı geçmişi okurken (dipte değilken) yeni AI mesajı gelirse liste zıplatılmaz
+- [x] kullanıcı dibe yakınken (48px eşiği altında) yeni mesaj gelirse liste dibe kaydırır
+- [x] mesaj metninin başında görsel-gizli "Siz:"/"Asistan:" öneki ekran okuyucuya duyurulur
 - [ ] mobil bottom-sheet kırılımı + reduced-motion'da statik "…" görünümü (visual, Chrome)
 
 ## 12. Do / Don't
@@ -258,3 +302,17 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
   odağı çalmıyor (bkz. §6, §7, regresyon testi). Ayrıca composer Enter
   işleyicisi IME kompozisyonu (`isComposing`/`keyCode 229`) sırasında
   `onSend` tetiklemiyor (bkz. §7).
+- 2026-07-17: Codex review düzeltmesi — (1) Escape dinleyicisi `document`'tan
+  panel kapsayıcısının `onKeyDown`'una taşındı (`e.stopPropagation()` ile
+  birlikte), yalnız panel içi hedeflerde çalışır ve IME kompozisyonunu yok
+  sayar; üst katmanlarla (ör. arama) artık çakışmıyor (bkz. §2, §7). (2)
+  Kapanış anında `document.activeElement` panel içindeyse (programatik
+  controlled kapanışlar dahil) odak launcher'a taşınıyor — artık body'ye
+  düşmüyor (bkz. §6, §7). (3) Mesaj listesi artık koşulsuz değil, koşullu
+  dibe kayıyor: kullanıcı zaten dipteyse (48px eşiği) VEYA son mesaj
+  kullanıcıya aitse kayar, aksi halde geçmişi okuyan kullanıcı
+  zıplatılmıyor (bkz. §7). (4) Her mesaj metninin başına görsel-gizli "Siz:
+  "/"Asistan: " öneki eklendi — konuşmacı artık ekran okuyucuya da
+  duyuruluyor (bkz. §2, §8). (5) Mesaj balonuna `white-space: pre-wrap`
+  eklendi — `Shift+Enter` ile eklenen satır sonları artık korunuyor (bkz.
+  §8). Tüm fix'ler için regresyon testleri eklendi.

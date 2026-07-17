@@ -91,6 +91,73 @@ describe('GlassAiSummaryCard', () => {
     expect(onFeedback).toHaveBeenCalledTimes(2)
   })
 
+  it('aynı yöne tekrar tıklama seçimi kaldırır (toggle) ve onFeedback yine çağrılır', () => {
+    const onFeedback = vi.fn()
+    render(<GlassAiSummaryCard summary={SUMMARY} onFeedback={onFeedback} />)
+
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+    expect(onFeedback).toHaveBeenCalledTimes(1)
+
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('false')
+    expect(onFeedback).toHaveBeenCalledTimes(2)
+    expect(onFeedback).toHaveBeenNthCalledWith(2, 'up')
+  })
+
+  it('summary değiştiğinde önceki geri bildirim seçimi sıfırlanır (yeni içerik eski aria-pressed\'i miras almaz)', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(
+      <GlassAiSummaryCard summary={SUMMARY} onFeedback={onFeedback} />,
+    )
+
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+
+    rerender(<GlassAiSummaryCard summary="Yepyeni bir özet metni." onFeedback={onFeedback} />)
+
+    const upAfter = screen.getByRole('button', { name: 'Faydalı' })
+    const downAfter = screen.getByRole('button', { name: 'Faydalı değil' })
+    expect(upAfter.getAttribute('aria-pressed')).toBe('false')
+    expect(downAfter.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('pros/cons değiştiğinde önceki geri bildirim seçimi sıfırlanır (summary aynı kalsa bile)', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(
+      <GlassAiSummaryCard summary={SUMMARY} pros={['Metroya yakın']} onFeedback={onFeedback} />,
+    )
+
+    const down = screen.getByRole('button', { name: 'Faydalı değil' })
+    fireEvent.click(down)
+    expect(down.getAttribute('aria-pressed')).toBe('true')
+
+    rerender(
+      <GlassAiSummaryCard summary={SUMMARY} pros={['Metroya yakın', 'Yeni yapı']} onFeedback={onFeedback} />,
+    )
+
+    const downAfter = screen.getByRole('button', { name: 'Faydalı değil' })
+    expect(downAfter.getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('aynı içerikle yeniden render edilmesi geri bildirim seçimini korur (gereksiz reset yok)', () => {
+    const onFeedback = vi.fn()
+    const { rerender } = render(
+      <GlassAiSummaryCard summary={SUMMARY} onFeedback={onFeedback} />,
+    )
+
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    fireEvent.click(up)
+    expect(up.getAttribute('aria-pressed')).toBe('true')
+
+    rerender(<GlassAiSummaryCard summary={SUMMARY} onFeedback={onFeedback} />)
+
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('true')
+  })
+
   it('onFeedback verilmezse geri bildirim butonları render edilmez', () => {
     render(<GlassAiSummaryCard summary={SUMMARY} />)
     expect(screen.queryByRole('button', { name: 'Faydalı' })).toBeNull()

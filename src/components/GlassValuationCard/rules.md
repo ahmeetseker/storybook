@@ -117,7 +117,7 @@ Varsayılan kombinasyon: `variant='panel'`, `listPrice`/`confidence`/
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
-| `loading` | prop | tüm gerçek içerik + boş-durum kontrolü | kök `aria-busy="true"`, `srOnly` "Değerleme yükleniyor" |
+| `loading` | prop | tüm gerçek içerik + boş-durum kontrolü | kök `aria-busy="true"`; her zaman mount'lu `srOnly` `aria-live="polite"` span, metni yalnız `loading` iken "Değerleme yükleniyor" |
 | boş durum | türetilen (`estimate`/`rangeLow`/`rangeHigh` geçersiz) | tahmin/ray/karşılaştırma/geri bildirim | yalnız "Değerleme yok" metni |
 | geri bildirim seçimi | iç state (tıklama) | önceki seçili yön | her butonun `aria-pressed` |
 | hover/focus/active | — | — | prop değil; yalnız CSS `:hover`/`:focus-visible` |
@@ -125,7 +125,20 @@ Varsayılan kombinasyon: `variant='panel'`, `listPrice`/`confidence`/
 Katman sırası: `loading` → boş-durum kontrolü (estimate/range) → aralık
 normalize (min/max takas) → `listPrice`/`confidence` geçerlilik → render.
 Geri bildirim seçimi yalnız kullanıcı tıklamasıyla değişir, hiçbir zaman
-prop/effect ile zorla taşınmaz.
+prop/effect ile zorla taşınmaz — bunun tek istisnası içerik değişimi:
+`FeedbackButtons` her render'da köke `key={estimate|low|high}` içerik
+imzasıyla geçirilir, imza değişince React component'i unmount/mount eder
+ve seçili yön (`selected`) otomatik sıfırlanır (Codex bulgusu — önceden
+`estimate`/aralık değişse de eski seçim ekranda kalıyordu). Aynı yöne
+tekrar basmak no-op'tur (GlassAiSummaryCard'daki toggle deseniyle aynı) —
+`onFeedback` tekrar tetiklenmez.
+
+`loading` canlı bölgesi (`srOnly` + `aria-live="polite"`) kartın tüm üç
+state'inde (`loading`/boş/içerik) aynı JSX konumunda render edilir ve
+metni koşullu (`loading ? 'Değerleme yükleniyor' : ''`) — span'ın kendisi
+hiçbir zaman koşullu mount/unmount edilmez (SearchBar/GlassTrustSignalPanel
+fix'iyle aynı desen); aksi halde ekran okuyucular loading'e giriş/çıkışı
+kaçırabilir.
 
 ## 7. Davranış
 
@@ -150,8 +163,17 @@ prop/effect ile zorla taşınmaz.
 - `asOf` hazır biçimli metin olarak geçilir (ör. "16 Temmuz 2026
   itibarıyla") — component tarih ayrıştırmaz, olduğu gibi basar.
 - Karşılaştırma cümlesi component tarafından hesaplanır
-  (`((listPrice - estimate) / estimate) * 100`, mutlak değer yuvarlanır);
-  çağıran yüzdeyi elle hesaplayıp string geçirmez.
+  (`((listPrice - estimate) / estimate) * 100`, mutlak değer); çağıran
+  yüzdeyi elle hesaplayıp string geçirmez.
+- **Eşitlik kararı HAM değerle verilir** (`estimate === listPrice`) —
+  yuvarlanmış yüzdeyle DEĞİL. Yüzde metni 1 ondalıkla (tr-TR virgüllü,
+  ör. "%0,4") gösterilir; böylece küçük gerçek farklar yanlışlıkla "eşit"
+  görünmez (Codex bulgusu — önceki `Math.round` tabanlı eşitlik kontrolü
+  %0,4 gibi farkları yutuyordu).
+- Yüzde hesabı sonlu çıkmazsa (`Number.isFinite` false — aşırı büyük/küçük
+  ama yine de sonlu `estimate`/`listPrice` çiftlerinde bölme/çarpma
+  taşabilir) veya `%999`'u aşarsa karşılaştırma satırı **hiç render
+  edilmez** (kartın geri kalanı etkilenmez).
 - AI çıktısı hiçbir zaman otomatik bir eylem tetiklemez (sayfa
   yönlendirme, form doldurma, ilan güncelleme vb.) — yalnız bilgilendirme +
   kullanıcı onaylı geri bildirim.
@@ -206,6 +228,16 @@ karar).
 - [x] `onFeedback` verilmezse geri bildirim butonları render edilmez
 - [x] `loading=true`: gerçek tahmin metni yok, `aria-busy="true"`, rozet
       görünür
+- [x] küçük gerçek yüzde farkı (%0,4) yuvarlanıp "eşit" görünmez; gerçek
+      yön + 1 ondalıklı yüzde gösterilir
+- [x] `estimate === listPrice` (ham değer) ise "eşit" metni gösterilir
+- [x] yüzde sonlu çıkmazsa (aşırı sonlu girdide taşma) veya `%999`'u
+      aşarsa karşılaştırma satırı hiç render edilmez
+- [x] `estimate`/aralık değişince geri bildirim seçimi sıfırlanır (yeni
+      `key` içerik imzası)
+- [x] aynı yöne tekrar basmak no-op'tur, `onFeedback` tekrar tetiklenmez
+- [x] `loading` canlı bölgesi her zaman mount'lu kalır — loading↔içerik
+      geçişinde aynı DOM düğümü sürer, yalnız metni güncellenir
 - [x] `inline` varyant tek satırda rozet + tahmin + aralık metni gösterir
 - [ ] iki temada (Kağıt/Grafit) rozet/nokta kontrastı (visual)
 - [ ] dar container'da ray/legend kırılması (visual)
@@ -246,3 +278,10 @@ localStorage/API senkronizasyonu sorumluluğu).
   rozeti, metinle duyurulan `confidence`, karşılıklı dışlayan geri bildirim
   butonları, flat/parıltısız `loading` placeholder'ı, `panel`/`inline`
   varyantları.
+- 2026-07-17: Codex review fix — (1) eşitlik kararı ham değerle
+  (`estimate === listPrice`), yüzde 1 ondalıkla gösterilir, sonlu
+  çıkmayan/`%999` üstü yüzdelerde karşılaştırma satırı gizlenir; (2)
+  `estimate`/aralık değişince geri bildirim seçimi `key` içerik imzasıyla
+  sıfırlanır, aynı yöne tekrar basmak no-op; (3) `loading` `srOnly`
+  canlı bölgesi tüm state'lerde her zaman mount'lu, yalnız metni koşullu.
+  6 yeni regresyon testi.

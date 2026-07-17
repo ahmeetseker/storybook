@@ -42,13 +42,22 @@ kontratı §15).
 - Durum ikonu bilgi taşır (dekoratif DEĞİL): `role="img"` + sabit `aria-label`
   (`'Doğrulandı'`/`'Uyarı'`/`'Başarısız'`/`'Bilgi'`) — durum asla yalnız renkle
   taşınmaz, ikon + görünür etiket/detay metni birlikte render edilir.
-- AI-first rozeti (`aiGenerated=true` sinyallerde): `<span aria-label="Yapay
-  zekâ üretimi">✦ AI</span>` — kontrattaki tanıma birebir, koşulsuz görünür.
+- AI-first rozeti (`aiGenerated=true` sinyallerde, `panel`): `<span
+  aria-label="Yapay zekâ üretimi">✦ AI</span>` — kontrattaki tanıma birebir,
+  koşulsuz görünür.
+- `compact`'te AI kaynaklı sinyaller tamamen atılmaz: her `aiGenerated=true`
+  sinyalin ikonunun köşesinde mini `✦` işareti (`aria-label="Yapay zekâ
+  üretimi"`) görünür; ayrıca listede en az bir `aiGenerated=true` sinyal varsa
+  özet satırının sonunda küçük "✦ AI destekli" metinli rozet görünür (AI
+  sonucu insan doğrulaması gibi sunulmasın diye — bkz. §5/§9).
 - Geri bildirim düğmeleri `role="group"` + `aria-label="Bu sinyal faydalı
   mıydı?"` içinde, her biri `aria-pressed` ile seçili durumunu duyurur.
 - `loading=true`: `section[aria-busy="true"]`, gerçek liste yerine
-  `aria-hidden` dekoratif placeholder + ekran okuyucuya yalnız görünür
-  (`.srOnly`) "Güven kontrolleri yükleniyor" metni.
+  `aria-hidden` dekoratif placeholder render edilir. Duyuru: header içinde
+  HER ZAMAN mount'lu bir `aria-live="polite"` (`.srOnly`) bölge bulunur —
+  `loading=false` iken boş, `loading=true` iken "Güven kontrolleri
+  yükleniyor" metnini alır. Bölge koşullu mount/unmount edilmez (yalnız
+  içerik değişir), aksi halde SR'ler mount anındaki metni kaçırabilir.
 - Portal yok, ref forwarding yok — tamamen statik/sunum (veri dışarıdan
   hesaplanır, component yalnız çizer + geri bildirim callback'i taşır).
 
@@ -63,8 +72,11 @@ kontratı §15).
 | signal.detail | — | `string` | Yalnız `panel`; `compact`'te render edilmez |
 | AI rozeti | yalnız `aiGenerated=true` + `panel` | `✦ AI` | Koşulsuz görünür, kopya CSS (bkz. §9) |
 | confidence etiketi | yalnız `aiGenerated=true` + finite `confidence` | `"%N güven"` | Rozetin yanında görünür metin |
+| AI köşe işareti | yalnız `aiGenerated=true` + `compact` | `✦` | İkonun köşesinde, `aria-label="Yapay zekâ üretimi"` |
+| AI özet rozeti | yalnız listede ≥1 `aiGenerated=true` + `compact` | `"✦ AI destekli"` | Özet satırının sonunda görünür metin |
 | geri bildirim | yalnız `aiGenerated=true` + `onFeedback` verilirse | 👍/👎 | `aria-pressed`, karşılıklı dışlar |
 | placeholder | yalnız `loading=true` | — | `aria-hidden`, flat/parıltısız |
+| loading duyurusu | her zaman mount'lu | — | `aria-live="polite"`, yalnız `loading=true` iken metin taşır |
 
 Children kabul edilmez — tamamen prop güdümlü (`signals` + `title` +
 `variant`).
@@ -104,7 +116,7 @@ Varsayılan kombinasyon: `variant=panel`, `title='Güven Kontrolleri'`,
 | Yasak / türetilen | Davranış |
 |---|---|
 | `detail` + `variant="compact"` | Render edilmez (sessizce yok sayılır, hata fırlatılmaz) |
-| AI rozeti + `variant="compact"` | Render edilmez — compact yalnız özet + ikon dizisi taşır, `aiGenerated` compact'te görsel olarak ayrışmaz |
+| Tam AI rozeti (`✦ AI` + confidence) + `variant="compact"` | Render edilmez — `panel`'e özgü satır rozeti; `compact`'te bunun yerine köşe `✦` işareti + özet "✦ AI destekli" rozeti görünür (aiGenerated bilgisi compact'te de kaybolmaz, bkz. §2/§9) |
 | `confidence` sonlu değil/aralık dışı | Sonlu değilse (`NaN`/`Infinity`) tamamen gizlenir; aralık dışıysa [0,100]'e clamp edilir |
 | `loading=true` | `signals` içeriği yok sayılır, sabit 3 satırlık placeholder render edilir |
 | `status` → renk | `verified`→`--lg-success`, `warning`→`--lg-warning` (yoksa `--lg-accent`), `failed`→`--lg-danger`, `info`→`--lg-label-secondary` — otomatik, override prop'u yok |
@@ -167,13 +179,17 @@ bastırır (üstte). Geri bildirim seçimi salt görsel/yerel state — dışar�
 | icon/aiBadge/feedbackButton | radius | `--lg-radius-capsule` | — |
 | **aiBadge** (AI-first, kopya CSS) | background/color | `color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface))` / `color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label))` | Sabit — tüm AI component'lerinde AYNI (GlassAiSummaryCard ile birebir) |
 | confidence metni | color | `--lg-label-secondary` | — |
+| **aiCorner** (compact köşe işareti) | background/color | `aiBadge` ile aynı `color-mix` çifti, `border: 1px solid var(--lg-surface)` (zemin ayrımı için) | — |
+| **aiSummaryBadge** (compact özet rozeti) | color | `color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label))` | — |
 | feedbackButton (seçili) | border/background/color | `color-mix(... var(--lg-accent) ...)` | `aria-pressed` |
 | placeholderBar/placeholderIcon | background | `--lg-hairline` | `aria-busy` altında opacity animasyonu |
 
 **Borç (raw):** durum ikonu 24×24 — GlassScoreMeter'ın ring stroke-width
 borcuyla aynı gerekçe: gösterge çapı için token yok. AI rozeti `font-size:
 10.5px` — kontratın kendisinde sabitlenmiş literal değer (token değil,
-tasarım sistemi kararı).
+tasarım sistemi kararı). `aiCorner` 12×12/`font-size: 8px` — aynı gerekçeyle
+köşe rozetine özgü küçültülmüş literal (aiBadge'in 24×24 ikona sığacak
+ölçeği).
 
 ## 10. Storybook kapsamı
 
@@ -201,7 +217,9 @@ doğrulanır.
 - [x] `onFeedback` verilirse `aiGenerated` satırında düğmeler görünür, tıklanınca `(id, value)` ile çağrılır, `aria-pressed` güncellenir
 - [x] `onFeedback` verilmezse/sinyal `aiGenerated` değilse düğme render edilmez
 - [x] `compact`: yalnız özet + ikon dizisi, `detail` render edilmez
+- [x] `compact`: `aiGenerated` sinyalin ikonunda köşe `✦` işareti + özet satırında "✦ AI destekli" rozeti görünür (yalnız aiGenerated sinyal(ler) için); aiGenerated yoksa hiçbiri render edilmez
 - [x] `loading=true`: `aria-busy="true"`, gerçek liste/özet gizli
+- [x] loading duyurusu her zaman mount'lu `aria-live="polite"` bölgede taşınır (aynı DOM node, `loading=false→true` arası yalnız metin değişir)
 - [x] boş `signals` dizisi hata fırlatmadan `"0/0 doğrulama geçti"` render eder
 - [ ] iki temada (Kağıt/Grafit) renk kontrastı (visual)
 - [ ] `loading` placeholder'ının reduced-motion'da animasyonsuz kalması (visual)
@@ -228,12 +246,18 @@ doğrulanır.
 geri bildirim "gönderildi" sayaç/tekrar kısıtlaması (şimdilik çağırana
 bırakıldı, GlassAiSummaryCard'ın "tekrar tıklama no-op" kararından bilinçli
 sapma — burada tekrar tıklama serbest) · `status` renginin override edilebilir
-olup olmaması (şimdilik kapalı, ClimateRiskPanel kararıyla tutarlı) ·
-`compact`'te AI rozetinin hiç görünmemesi (v2'de küçük bir ✦ nokta işareti
-eklenebilir).
+olup olmaması (şimdilik kapalı, ClimateRiskPanel kararıyla tutarlı).
 
 ## Changelog
 
+- 2026-07-17: Code review düzeltmeleri — `compact` varyantı artık `aiGenerated`
+  bilgisini hiç atmıyor: ikon köşesinde mini `✦` işareti (`aria-label="Yapay
+  zekâ üretimi"`) ve listede en az bir AI kaynaklı sinyal varsa özet satırının
+  sonunda "✦ AI destekli" metinli rozet görünür (AI sonucu artık compact'te de
+  insan doğrulaması gibi sunulmuyor). Yükleme duyurusu artık header içinde her
+  zaman mount'lu bir `aria-live="polite"` bölgede taşınıyor (önceden yalnız
+  `loading=true` iken mount ediliyordu, bu da geçişi bazı ekran okuyucularda
+  kaçırabiliyordu). İki regresyon testi eklendi.
 - 2026-07-17: İlk sürüm — `panel`/`compact` varyantları, 4 sabit durum
   (`verified/warning/failed/info`) + otomatik semantik renk, `role="list"`/
   `listitem` + durum ikonlarında `role="img"` sözleşmesi, AI-first rozet/

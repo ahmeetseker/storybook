@@ -213,6 +213,9 @@
   line-height: 1.45;
   overflow-wrap: anywhere;
   min-width: 0;
+  /* Shift+Enter ile eklenen satır sonları korunsun — composer çok satırlı
+     taslak yazmaya izin veriyor, mesaj balonunda da çökmemeli. */
+  white-space: pre-wrap;
 }
 
 .bubbleUser {

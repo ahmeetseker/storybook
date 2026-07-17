@@ -102,6 +102,76 @@ describe('GlassValuationCard', () => {
     expect(screen.getByLabelText('Yapay zekâ üretimi')).toBeTruthy()
   })
 
+  it('küçük yüzde farkı (%0,4) yuvarlanıp "eşit" görünmez, gerçek yön ve 1 ondalıklı yüzde gösterilir', () => {
+    render(
+      <GlassValuationCard estimate={5000000} rangeLow={4500000} rangeHigh={5500000} listPrice={5020000} />,
+    )
+    // (5.020.000 - 5.000.000) / 5.000.000 = %0,4 — eski davranışta Math.round ile %0 olup "eşit" görünürdü.
+    expect(screen.getByText(/%0,4/)).toBeTruthy()
+    expect(screen.getByText(/üstünde/)).toBeTruthy()
+    expect(screen.queryByText(/eşit/)).toBeNull()
+  })
+
+  it('listPrice tam olarak estimate\'e eşitse (ham değer) "eşit" metni gösterilir', () => {
+    render(<GlassValuationCard estimate={5000000} rangeLow={4500000} rangeHigh={5500000} listPrice={5000000} />)
+    expect(screen.getByText(/eşit/)).toBeTruthy()
+  })
+
+  it('aşırı sonlu değerlerde yüzde sonlu çıkmazsa (Infinity) karşılaştırma satırı hiç render edilmez', () => {
+    render(
+      <GlassValuationCard estimate={1e-300} rangeLow={0} rangeHigh={1e300} listPrice={1e300} />,
+    )
+    expect(screen.queryByText(/üstünde|altında|eşit/)).toBeNull()
+    // Kartın geri kalanı yine de render edilir — yalnız karşılaştırma satırı gizlenir.
+    expect(screen.getByLabelText('Yapay zekâ üretimi')).toBeTruthy()
+  })
+
+  it('yüzde %999\'u aşarsa (sonlu olsa dahi) karşılaştırma satırı gizlenir', () => {
+    render(<GlassValuationCard estimate={1000} rangeLow={900} rangeHigh={1100} listPrice={2000000} />)
+    expect(screen.queryByText(/üstünde|altında|eşit/)).toBeNull()
+  })
+
+  it('estimate/aralık değişince geri bildirim seçimi sıfırlanır', async () => {
+    const user = userEvent.setup()
+    const onFeedback = vi.fn()
+    const { rerender } = render(
+      <GlassValuationCard estimate={1000000} rangeLow={900000} rangeHigh={1100000} onFeedback={onFeedback} />,
+    )
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    await user.click(up)
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('true')
+
+    rerender(
+      <GlassValuationCard estimate={2000000} rangeLow={1800000} rangeHigh={2200000} onFeedback={onFeedback} />,
+    )
+    expect(screen.getByRole('button', { name: 'Faydalı' }).getAttribute('aria-pressed')).toBe('false')
+    expect(screen.getByRole('button', { name: 'Faydalı değil' }).getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('aynı yöne tekrar basmak no-op\'tur — callback tekrar tetiklenmez', async () => {
+    const user = userEvent.setup()
+    const onFeedback = vi.fn()
+    render(<GlassValuationCard estimate={1000000} rangeLow={900000} rangeHigh={1100000} onFeedback={onFeedback} />)
+    const up = screen.getByRole('button', { name: 'Faydalı' })
+    await user.click(up)
+    await user.click(up)
+    expect(onFeedback).toHaveBeenCalledTimes(1)
+  })
+
+  it('loading canlı bölgesi her zaman mount\'lu kalır — geçişte aynı DOM düğümü sürer, metni güncellenir', () => {
+    const { rerender, container } = render(
+      <GlassValuationCard estimate={1000000} rangeLow={900000} rangeHigh={1100000} loading />,
+    )
+    const liveRegion = container.querySelector('[aria-live="polite"]')
+    expect(liveRegion).toBeTruthy()
+    expect(liveRegion?.textContent).toBe('Değerleme yükleniyor')
+
+    rerender(<GlassValuationCard estimate={1000000} rangeLow={900000} rangeHigh={1100000} />)
+    const liveRegionAfter = container.querySelector('[aria-live="polite"]')
+    expect(liveRegionAfter).toBe(liveRegion)
+    expect(liveRegionAfter?.textContent).toBe('')
+  })
+
   it('inline varyant tek satırda rozet + tahmin + aralık metni gösterir', () => {
     render(
       <GlassValuationCard estimate={4850000} rangeLow={4400000} rangeHigh={5300000} variant="inline" />,

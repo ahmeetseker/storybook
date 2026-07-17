@@ -32,12 +32,53 @@ describe('GlassChatDock — kapalı/açık geçişi', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('Escape paneli kapatır ve odak launcher\'a geri döner', async () => {
+  it('Escape (panel içi bir hedefte, ör. textarea) paneli kapatır ve odak launcher\'a geri döner', async () => {
+    render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Soru sor' }))
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Mesajınız' }), { key: 'Escape' })
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Soru sor' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+  })
+
+  it('regresyon: document genelinde Escape paneli KAPATMAZ (yalnız panel içi hedeflerde çalışır, üst katmanla odak çakışmaz)', () => {
     render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: 'Soru sor' }))
     fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.getByRole('dialog')).toBeTruthy()
+  })
+
+  it('regresyon: panel içinde IME kompozisyonu sürerken Escape paneli kapatmaz', () => {
+    render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Soru sor' }))
+    fireEvent.keyDown(screen.getByRole('textbox', { name: 'Mesajınız' }), { key: 'Escape', isComposing: true })
+    expect(screen.getByRole('dialog')).toBeTruthy()
+  })
+
+  it('regresyon: Escape kapanışı e.stopPropagation() çağırır — dış document dinleyicileri olayı almaz', () => {
+    const outerSpy = vi.fn()
+    document.addEventListener('keydown', outerSpy)
+    try {
+      render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} />)
+      fireEvent.click(screen.getByRole('button', { name: 'Soru sor' }))
+      fireEvent.keyDown(screen.getByRole('textbox', { name: 'Mesajınız' }), { key: 'Escape' })
+      expect(outerSpy).not.toHaveBeenCalled()
+    } finally {
+      document.removeEventListener('keydown', outerSpy)
+    }
+  })
+
+  it('regresyon: controlled modda programatik kapanış anında odak panel içindeyse (ör. textarea) launcher\'a taşınır, body\'ye düşmez', () => {
+    const onOpenChange = vi.fn()
+    const { rerender } = render(
+      <GlassChatDock messages={baseMessages} onSend={vi.fn()} open onOpenChange={onOpenChange} />,
+    )
+    const textarea = screen.getByRole('textbox', { name: 'Mesajınız' })
+    textarea.focus()
+    expect(document.activeElement).toBe(textarea)
+
+    rerender(<GlassChatDock messages={baseMessages} onSend={vi.fn()} open={false} onOpenChange={onOpenChange} />)
+
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Soru sor' }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
   it('controlled: dışarıdan open=true ile ilk render\'de odak input\'a taşınmaz (yalnız kullanıcı etkileşimiyle taşınır)', () => {
@@ -147,6 +188,47 @@ describe('GlassChatDock — AI rozeti ve mesaj listesi', () => {
       />,
     )
     expect(log.scrollTop).toBe(800)
+  })
+
+  it('regresyon: kullanıcı geçmişi okurken (dipte değilken) yeni AI mesajı gelirse liste zıplatılmaz', () => {
+    const { rerender } = render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} defaultOpen />)
+    const log = screen.getByRole('log')
+    // scrollHeight - scrollTop - clientHeight = 1000 - 50 - 200 = 750 → eşiğin (48) çok üzerinde, dipte değil
+    Object.defineProperty(log, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(log, 'clientHeight', { value: 200, configurable: true })
+    Object.defineProperty(log, 'scrollTop', { value: 50, writable: true, configurable: true })
+    rerender(
+      <GlassChatDock
+        messages={[...baseMessages, { id: 'm3', role: 'ai', text: 'Ek bilgi: aidat 2500 TL.' }]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    expect(log.scrollTop).toBe(50)
+  })
+
+  it('regresyon: kullanıcı dibe yakınken (48px eşiği altında) yeni AI mesajı liste dibe kaydırır', () => {
+    const { rerender } = render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} defaultOpen />)
+    const log = screen.getByRole('log')
+    // scrollHeight - scrollTop - clientHeight = 1000 - 790 - 200 = 10 → eşiğin (48) altında, dipte sayılır
+    Object.defineProperty(log, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(log, 'clientHeight', { value: 200, configurable: true })
+    Object.defineProperty(log, 'scrollTop', { value: 790, writable: true, configurable: true })
+    rerender(
+      <GlassChatDock
+        messages={[...baseMessages, { id: 'm3', role: 'ai', text: 'Ek bilgi: aidat 2500 TL.' }]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    expect(log.scrollTop).toBe(1000)
+  })
+
+  it('regresyon: mesaj metninin başında görsel-gizli "Siz:"/"Asistan:" öneki ekran okuyucuya duyurulur', () => {
+    render(<GlassChatDock messages={baseMessages} onSend={vi.fn()} defaultOpen />)
+    const log = screen.getByRole('log')
+    expect(log.textContent).toContain('Siz: Bu daire kaçıncı katta?')
+    expect(log.textContent).toContain('Asistan: 7. katta, asansörlü binada.')
   })
 })
 

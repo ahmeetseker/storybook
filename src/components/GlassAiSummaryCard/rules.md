@@ -78,7 +78,9 @@ Ref hedefi yok. Geri bildirim seçili durumu (`selected: 'up'|'down'|null`)
 tamamen component içinde tutulur — dışarıya `value`/`defaultValue` sözleşmesi
 açılmaz; yalnız `onFeedback` callback'i ve görsel `aria-pressed` durumu
 gözlemlenebilir (kontrat: "Geri bildirim deseni" maddesi bir controlled value
-istemiyor, yalnız callback + görsel seçili durum istiyor).
+istemiyor, yalnız callback + görsel seçili durum istiyor). Aynı yöne tekrar
+tıklama `selected`'ı `null`'a döndürür (toggle); `summary`/`pros`/`cons`
+değişince de `selected` otomatik `null`'a sıfırlanır (bkz. §6).
 
 ## 5. Seçenek eksenleri
 
@@ -105,8 +107,26 @@ yalnız `summary` + `sourceNote` default'u.
 | hover/focus/active | — | — | prop değil; yalnız CSS `:hover`/`:focus-visible` |
 
 Katman sırası: `loading` → (özet/kolon/footer availability) → geri bildirim
-seçimi (yalnız kullanıcı tıklamasıyla değişir, hiçbir zaman prop/effect ile
-zorla taşınmaz).
+seçimi.
+
+Geri bildirim seçimi iki yoldan değişir:
+
+1. **Kullanıcı tıklaması** — aynı yöne tıklamak seçer (`aria-pressed=true`,
+   `onFeedback(value)` çağrılır); **aynı yöne tekrar tıklamak seçimi
+   kaldırır** (toggle — `selected` `null`'a döner, `aria-pressed=false`,
+   `onFeedback(value)` yine aynı `value` ile çağrılır — component "geri
+   alındı" bilgisini ayrı bir sinyal olarak taşımaz, çağıran tıklama
+   sırasını/sayacını kendi tarafında yorumlar).
+2. **İçerik değişimi** — `summary`/`pros`/`cons`'tan herhangi biri
+   önceki render'a göre değişirse (yeni bir özet geldiyse) `selected`
+   otomatik `null`'a sıfırlanır. Bu, effect ile değil, render sırasında bir
+   `ref`'te tutulan önceki içerik imzasıyla karşılaştırma yapılarak yapılır
+   (React "prop değişince state resetle" deseni) — amaç, yeni özetin eski
+   `aria-pressed` durumunu miras almasını önlemek. Aynı içerikle tekrar
+   render (örn. parent re-render) seçimi bozmaz.
+
+Hiçbir durumda `selected` bir prop veya effect ile zorla dışarıdan
+taşınmaz — yalnız yukarıdaki iki iç mekanizma değiştirir.
 
 ## 7. Davranış
 
@@ -171,6 +191,10 @@ tema toolbar'la otomatik doğrulanır (GlassClimateRiskPanel ile aynı karar).
 - [x] ne pros ne cons verilmezse yalnız özet render edilir (`<ul>` yok)
 - [x] sourceNote default değeri + override
 - [x] onFeedback: butonlar render edilir, tıklama çağırır, `aria-pressed` karşılıklı dışlar
+- [x] aynı yöne tekrar tıklama seçimi kaldırır (toggle), `onFeedback` yine çağrılır
+- [x] `summary` değişince önceki geri bildirim seçimi sıfırlanır
+- [x] `pros`/`cons` değişince (summary aynı kalsa da) önceki geri bildirim seçimi sıfırlanır
+- [x] aynı içerikle yeniden render geri bildirim seçimini korur (gereksiz reset yok)
 - [x] onFeedback verilmezse butonlar render edilmez
 - [x] `loading=true`: özet/kolon/geri bildirim gizli, rozet görünür, kök `aria-busy="true"`
 - [ ] iki temada (Kağıt/Grafit) rozet/marker kontrastı (visual)
@@ -203,6 +227,11 @@ gereği yeterli görüldü).
 
 ## Changelog
 
+- 2026-07-17: Code review düzeltmesi — geri bildirim seçimi artık
+  `summary`/`pros`/`cons` değiştiğinde otomatik sıfırlanıyor (yeni özet eski
+  `aria-pressed`'i miras almıyor); aynı yöne tekrar tıklama artık engellenmek
+  yerine seçimi kaldırıyor (toggle, `onFeedback` yine çağrılıyor). Regresyon
+  testleri eklendi.
 - 2026-07-17: İlk sürüm — AI-first standardının referans uygulaması:
   koşulsuz `aiGenerated` rozeti, metinle duyurulan `confidence`, karşılıklı
   dışlayan geri bildirim butonları, flat/parıltısız `loading` placeholder'ı.

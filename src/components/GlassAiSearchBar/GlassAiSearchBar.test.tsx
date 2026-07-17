@@ -75,15 +75,91 @@ describe('GlassAiSearchBar', () => {
     expect(input.getAttribute('aria-describedby')).toBeTruthy()
   })
 
-  it('parsedFilters chip olarak render olur; kaldır butonu accessible name filtreye özeldir ve id ile çağırır', () => {
+  it('aria-live kapsayıcısı loading olmasa da her zaman mount edilir; loading olunca içine metin yazılır', () => {
+    const { container, rerender } = render(
+      <GlassTierProvider tier="fallback">
+        <GlassAiSearchBar onSubmit={vi.fn()} />
+      </GlassTierProvider>,
+    )
+    const liveRegion = container.querySelector('[aria-live="polite"]')
+    expect(liveRegion).toBeTruthy()
+    expect(liveRegion?.textContent).toBe('')
+
+    rerender(
+      <GlassTierProvider tier="fallback">
+        <GlassAiSearchBar onSubmit={vi.fn()} loading />
+      </GlassTierProvider>,
+    )
+    const sameLiveRegion = container.querySelector('[aria-live="polite"]')
+    expect(sameLiveRegion).toBe(liveRegion)
+    expect(sameLiveRegion?.textContent).toContain('Düşünüyor…')
+  })
+
+  it('Escape ile öneri listesi kapanınca event propagation durdurulur (üst katman dock kapanmamalı)', () => {
+    const onOuterKeyDown = vi.fn()
+    render(
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+      <div onKeyDown={onOuterKeyDown}>
+        <GlassTierProvider tier="fallback">
+          <GlassAiSearchBar onSubmit={vi.fn()} suggestions={['Urla villa']} />
+        </GlassTierProvider>
+      </div>,
+    )
+    const input = screen.getByRole('searchbox')
+    fireEvent.focus(input)
+    expect(screen.getByRole('button', { name: 'Urla villa' })).toBeTruthy()
+    fireEvent.keyDown(input, { key: 'Escape' })
+    expect(screen.queryByRole('button', { name: 'Urla villa' })).toBeNull()
+    expect(onOuterKeyDown).not.toHaveBeenCalled()
+  })
+
+  it('öneri listesi kapalıyken Escape işlenmez, propagation durdurulmaz', () => {
+    const onOuterKeyDown = vi.fn()
+    render(
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+      <div onKeyDown={onOuterKeyDown}>
+        <GlassTierProvider tier="fallback">
+          <GlassAiSearchBar onSubmit={vi.fn()} suggestions={['Urla villa']} />
+        </GlassTierProvider>
+      </div>,
+    )
+    const input = screen.getByRole('searchbox')
+    fireEvent.keyDown(input, { key: 'Escape' })
+    expect(onOuterKeyDown).toHaveBeenCalledTimes(1)
+  })
+
+  it('loading iken filtre chip\'leri soluklaşır ve kaldır butonları devre dışı kalır', () => {
+    const onRemoveFilter = vi.fn()
+    renderBar({ parsedFilters: FILTERS, onRemoveFilter, loading: true })
+    const removeButton = screen.getByRole('button', {
+      name: 'Filtreyi kaldır: Konum: İzmir, Urla',
+    }) as HTMLButtonElement
+    expect(removeButton.disabled).toBe(true)
+    fireEvent.click(removeButton)
+    expect(onRemoveFilter).not.toHaveBeenCalled()
+  })
+
+  it('parsedFilters chip olarak render olur; kaldır butonu accessible name filtreye VE değere özeldir, id ile çağırır', () => {
     const onRemoveFilter = vi.fn()
     renderBar({ parsedFilters: FILTERS, onRemoveFilter })
     expect(screen.getByText('Konum:')).toBeTruthy()
     expect(screen.getByText('İzmir, Urla')).toBeTruthy()
-    const removeButton = screen.getByRole('button', { name: 'Filtreyi kaldır: Konum' })
+    const removeButton = screen.getByRole('button', { name: 'Filtreyi kaldır: Konum: İzmir, Urla' })
     fireEvent.click(removeButton)
     expect(onRemoveFilter).toHaveBeenCalledWith('konum')
-    expect(screen.getByRole('button', { name: 'Filtreyi kaldır: Oda Sayısı' })).toBeTruthy()
+    expect(
+      screen.getByRole('button', { name: 'Filtreyi kaldır: Oda Sayısı: 3+1' }),
+    ).toBeTruthy()
+  })
+
+  it('aynı etiketli farklı değerli filtreler ayırt edilebilir accessible name üretir', () => {
+    const sameLabelFilters: GlassAiSearchBarFilter[] = [
+      { id: 'oda-1', label: 'Oda Sayısı', value: '2+1' },
+      { id: 'oda-2', label: 'Oda Sayısı', value: '3+1' },
+    ]
+    renderBar({ parsedFilters: sameLabelFilters, onRemoveFilter: vi.fn() })
+    expect(screen.getByRole('button', { name: 'Filtreyi kaldır: Oda Sayısı: 2+1' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Filtreyi kaldır: Oda Sayısı: 3+1' })).toBeTruthy()
   })
 
   it('parsedFilters varken AI rozeti görünür; confidence [0,100] dışıysa/sonlu değilse gizlenir', () => {

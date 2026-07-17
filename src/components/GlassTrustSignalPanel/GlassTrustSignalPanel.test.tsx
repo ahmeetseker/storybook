@@ -122,4 +122,33 @@ describe('GlassTrustSignalPanel', () => {
     expect(screen.getByText('0/0 doğrulama geçti')).toBeTruthy()
     expect(screen.getByRole('list').children).toHaveLength(0)
   })
+
+  it('compact varyantı: aiGenerated sinyalin ikonunda köşe ✦ işareti ve özet satırında "✦ AI destekli" rozeti görünür', () => {
+    const { container } = render(<GlassTrustSignalPanel signals={signals} variant="compact" />)
+    const corner = screen.getByLabelText('Yapay zekâ üretimi')
+    expect(corner.textContent).toBe('✦')
+    // Yalnız aiGenerated=true olan tek sinyal (moderasyon) için bir köşe işareti üretilmeli
+    expect(screen.getAllByLabelText('Yapay zekâ üretimi')).toHaveLength(1)
+    expect(container.querySelector('[class*="aiSummaryBadge"]')).toBeTruthy()
+    expect(screen.getByText(/✦ AI destekli/)).toBeTruthy()
+  })
+
+  it('compact varyantı: hiçbir sinyal aiGenerated değilse köşe işareti ve özet rozeti render edilmez', () => {
+    const noAiSignals: GlassTrustSignal[] = signals.map((s) => ({ ...s, aiGenerated: false }))
+    const { container } = render(<GlassTrustSignalPanel signals={noAiSignals} variant="compact" />)
+    expect(screen.queryByLabelText('Yapay zekâ üretimi')).toBeNull()
+    expect(container.querySelector('[class*="aiSummaryBadge"]')).toBeNull()
+  })
+
+  it('loading duyurusu her zaman mount\'lu aria-live="polite" bölgede taşınır ve yalnız loading=true iken metin içerir', () => {
+    const { container, rerender } = render(<GlassTrustSignalPanel signals={signals} loading={false} />)
+    const liveRegion = container.querySelector('[aria-live="polite"]') as HTMLElement
+    expect(liveRegion).toBeTruthy()
+    expect(liveRegion.textContent).toBe('')
+
+    rerender(<GlassTrustSignalPanel signals={signals} loading />)
+    const sameLiveRegion = container.querySelector('[aria-live="polite"]') as HTMLElement
+    expect(sameLiveRegion).toBe(liveRegion)
+    expect(sameLiveRegion.textContent).toBe('Güven kontrolleri yükleniyor')
+  })
 })
