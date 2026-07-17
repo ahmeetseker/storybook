@@ -1,0 +1,318 @@
+/* GlassMatchScore — içerik katmanı FLAT: cam/backdrop-filter YOK.
+   Yalnız token'lar (--lg-*) + color-mix türevleri. Ring çapı/stroke-width ve
+   skeleton satır yükseklikleri raw px borcu — bkz. rules.md §9. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+}
+
+.card {
+  padding: var(--lg-space-5);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  color: var(--lg-label);
+}
+
+.compact {
+  display: inline-flex;
+  flex-direction: row;
+}
+
+/* ── header: halka + başlık/rozet/açıklama ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  min-width: 0;
+}
+
+.meter {
+  flex: none;
+  line-height: 0;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  color: var(--lg-label);
+  overflow-wrap: anywhere;
+}
+
+.compact .title {
+  font-size: var(--lg-text-footnote);
+}
+
+.explanation {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  overflow-wrap: break-word;
+}
+
+/* ── AI-first rozet: Dalga kontratının §"AI-first standardı" bölümünden
+   birebir kopya CSS — tüm AI component'lerinde aynı görünmeli. ── */
+.aiRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.aiBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.confidence {
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+}
+
+/* ── ring ── */
+.ringBox {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.ringSvg {
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  fill: none;
+  stroke: var(--lg-hairline);
+}
+
+.ringFill {
+  fill: none;
+  transition: stroke-dashoffset 0.3s ease-out;
+}
+
+.ringValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--lg-label);
+}
+
+.ringValue[data-size='card'] {
+  font-size: var(--lg-text-body);
+}
+
+.ringValue[data-size='compact'] {
+  font-size: var(--lg-text-caption);
+}
+
+/* ── kriter chip'leri ── */
+.criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.criterion {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px var(--lg-space-2) 3px 6px;
+  border-radius: var(--lg-radius-chip);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  min-width: 0;
+}
+
+.criterion[data-matched='true'] {
+  background: color-mix(in srgb, var(--lg-success) 14%, transparent);
+  color: var(--lg-label);
+}
+
+.criterion[data-matched='false'] {
+  /* "Soluk" görünüm yalnız zemine uygulanır — metne opacity verilmez
+     (element-genelinde opacity, zaten ikincil tonda olan metni WCAG AA
+     eşiğinin altına düşürüyordu). */
+  background: color-mix(in srgb, var(--lg-label) 6%, transparent);
+  color: var(--lg-label-secondary);
+}
+
+.criterionIcon {
+  flex: none;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.criterion[data-matched='true'] .criterionIcon {
+  color: var(--lg-success);
+}
+
+.criterion[data-matched='false'] .criterionIcon {
+  color: var(--lg-label-secondary);
+}
+
+.criterionLabel {
+  overflow-wrap: anywhere;
+}
+
+/* ── geri bildirim ── */
+.feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.feedbackPrompt {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.feedbackButtons {
+  display: flex;
+  gap: var(--lg-space-2);
+}
+
+.feedbackButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lg-control-sm);
+  min-height: var(--lg-control-sm);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+.feedbackButton[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 55%, var(--lg-hairline));
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+}
+
+@media (hover: hover) {
+  .feedbackButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
+  }
+}
+
+@media (pointer: coarse) {
+  .feedbackButton {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ── yükleme placeholder'ı: kendi flat skeleton'u, shimmer yok — yalnız opacity ── */
+.skeletonRing {
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  animation: lg-match-pulse 1.4s ease-in-out infinite;
+}
+
+.skeletonRing[data-size='card'] {
+  width: 72px;
+  height: 72px;
+}
+
+.skeletonRing[data-size='compact'] {
+  width: 40px;
+  height: 40px;
+}
+
+.skeletonLine {
+  display: block;
+  height: 0.9em;
+  border-radius: calc(var(--lg-radius-chip) / 2);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  animation: lg-match-pulse 1.4s ease-in-out infinite;
+}
+
+.skeletonTitle {
+  width: 55%;
+}
+
+.skeletonBody {
+  width: 80%;
+  margin-top: 6px;
+}
+
+@keyframes lg-match-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ringFill,
+  .feedbackButton {
+    transition: none;
+  }
+  .skeletonRing,
+  .skeletonLine {
+    animation: none;
+    opacity: 0.75;
+  }
+}
