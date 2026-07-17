@@ -34,6 +34,37 @@ export {
   type GlassBentoCellProps,
 } from './components/GlassBento'
 export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
+export { GlassMediaGallery } from './components/GlassMediaGallery'
+export type { GlassMediaGalleryProps, GlassMediaGalleryItem, GlassMediaGalleryItemType } from './components/GlassMediaGallery'
+export {
+  GlassMap,
+  type GlassMapProps,
+  type GlassMapPin,
+  type GlassMapPrivacyCircle,
+} from './components/GlassMap'
+export { GlassLoanCalculator } from './components/GlassLoanCalculator'
+export type { GlassLoanCalculatorProps, GlassLoanCalculatorResult } from './components/GlassLoanCalculator'
+export {
+  GlassTourScheduler,
+  type GlassTourSchedulerProps,
+  type GlassTourDay,
+  type GlassTourSlot,
+  type GlassTourRequest,
+} from './components/GlassTourScheduler'
+export { GlassFeatureGroup } from './components/GlassFeatureGroup'
+export type { GlassFeatureGroupProps, GlassFeatureGroupItem, GlassFeatureGroupSection } from './components/GlassFeatureGroup'
+export { GlassFloorPlanViewer } from './components/GlassFloorPlanViewer'
+export type { GlassFloorPlanViewerProps, GlassFloorPlanPlan, GlassFloorPlanHotspot } from './components/GlassFloorPlanViewer'
+export { GlassScoreMeter } from './components/GlassScoreMeter'
+export type { GlassScoreMeterProps, GlassScoreMeterTone } from './components/GlassScoreMeter'
+export {
+  GlassTable,
+  type GlassTableProps,
+  type GlassTableColumn,
+  type GlassTableRow,
+  type GlassTableSortDirection,
+} from './components/GlassTable'
+export { GlassChart, type GlassChartProps, type GlassChartPoint, type GlassChartType } from './components/GlassChart'
 export { GlassFooter, type GlassFooterProps, type GlassFooterColumn, type GlassFooterLinkItem } from './components/GlassFooter'
 export { GlassAlert, type GlassAlertProps } from './components/GlassAlert'
 export { GlassAvatar, type GlassAvatarProps } from './components/GlassAvatar'
