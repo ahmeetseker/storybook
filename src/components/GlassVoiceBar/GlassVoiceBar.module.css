@@ -1,0 +1,137 @@
+/* İçerik katmanı FLAT: yüzey + hairline, cam/backdrop-filter yok (kontrat). */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+  width: fit-content;
+  max-width: 100%;
+}
+
+/* Mikrofon butonu — idle: flat kapsül, listening: accent zemin, processing: soluk */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  min-height: var(--lg-control-lg, 48px);
+  padding-inline: var(--lg-space-4, 16px);
+  border-radius: var(--lg-radius-capsule, 999px);
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
+  background: var(--lg-surface, #fff);
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  font-size: var(--lg-text-body, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    color 0.16s ease-out,
+    opacity 0.16s ease-out;
+}
+
+.button[data-state='listening'] {
+  border-color: var(--lg-accent, #b45309);
+  background: var(--lg-accent, #b45309);
+  color: var(--lg-accent-contrast, #fff);
+}
+
+.button[data-state='processing'] {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .button[data-state='idle']:hover {
+    background-color: color-mix(in srgb, var(--lg-label, #24211b) 6%, var(--lg-surface, #fff));
+  }
+  .button[data-state='listening']:hover {
+    background-color: color-mix(in srgb, var(--lg-accent, #b45309) 88%, black);
+  }
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .button {
+    padding-inline: var(--lg-space-5, 20px);
+  }
+}
+
+.iconWrap {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.icon {
+  position: relative;
+  display: inline-flex;
+  z-index: 1;
+}
+
+.buttonText {
+  white-space: nowrap;
+}
+
+/* Nabız halkası — yalnız listening; transform/opacity, reduced-motion'da statik */
+.pulseRing {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--lg-accent-contrast, #fff) 75%, transparent);
+  opacity: 0;
+  animation: lg-voice-pulse 1.7s ease-out infinite;
+}
+
+.pulseRingDelay {
+  animation-delay: 0.55s;
+}
+
+@keyframes lg-voice-pulse {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulseRing {
+    animation: none;
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+
+/* Transkript/ipucu satırı — daima mount edilir (SearchBar dersi), boşken katlanır */
+.status {
+  margin: 0;
+  padding-inline: var(--lg-space-2, 8px);
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary, #79726a);
+  overflow-wrap: break-word;
+}
+.status:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
