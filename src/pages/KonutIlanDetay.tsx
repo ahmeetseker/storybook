@@ -14,6 +14,10 @@ import { GlassTourScheduler } from '../components/GlassTourScheduler'
 import { GlassScoreMeter } from '../components/GlassScoreMeter'
 import { GlassChart } from '../components/GlassChart'
 import { GlassSellerCard } from '../components/GlassSellerCard'
+import { GlassNearbyPlaces } from '../components/GlassNearbyPlaces'
+import { GlassClimateRiskPanel } from '../components/GlassClimateRiskPanel'
+import { GlassRating } from '../components/GlassRating'
+import { GlassReviewCard } from '../components/GlassReviewCard'
 import { GlassListingCard } from '../components/GlassListingCard'
 import { GlassCarousel } from '../components/GlassCarousel'
 import { placeholderImage } from '../demo/placeholderImage'
@@ -140,6 +144,36 @@ const skorlar = [
   { label: 'Sessizlik', value: 58, description: 'Ana cadde yakın' },
 ]
 
+const yakinCevre = [
+  { id: 'ulasim', label: 'Ulaşım', places: [
+    { name: 'Kozlu Dolmuş Durağı', distance: '350 m', note: '5 dk yürüme' },
+    { name: 'Zonguldak Garı', distance: '4,2 km', note: '9 dk araç' },
+    { name: 'Sahil Yolu Çıkışı', distance: '900 m' },
+  ] },
+  { id: 'egitim', label: 'Eğitim', places: [
+    { name: 'Fatih İlkokulu', distance: '450 m', note: '6 dk yürüme' },
+    { name: 'Kozlu Anadolu Lisesi', distance: '1,1 km' },
+    { name: 'BEÜ Merkez Kampüs', distance: '6,8 km' },
+  ] },
+  { id: 'yasam', label: 'Yaşam', places: [
+    { name: 'Migros', distance: '280 m', note: '4 dk yürüme' },
+    { name: 'Kozlu Devlet Hastanesi', distance: '1,9 km' },
+    { name: 'Sahil Yürüyüş Parkuru', distance: '750 m' },
+  ] },
+]
+
+const riskler = [
+  { id: 'deprem', label: 'Deprem', level: 3 as const, levelLabel: 'Orta', description: 'Bina 2020 yönetmeliğine uygun; zemin etüdü mevcut.', source: 'AFAD 2025' },
+  { id: 'sel', label: 'Sel / Taşkın', level: 2 as const, levelLabel: 'Düşük', description: 'Dere yatağına 1,4 km; tarihsel taşkın kaydı yok.', source: 'DSİ 2024' },
+  { id: 'yangin', label: 'Orman Yangını', level: 1 as const, levelLabel: 'Çok Düşük', description: 'Orman sınırına 3 km üzeri mesafe.', source: 'OGM 2025' },
+  { id: 'zemin', label: 'Zemin', level: 2 as const, levelLabel: 'Düşük', description: 'Kaya zemin; sıvılaşma riski düşük.', source: 'Zemin Etüdü 2020' },
+]
+
+const yorumlar = [
+  { author: 'Murat Kaya', rating: 5, date: '2 Temmuz 2026', text: 'Pelin Hanım gösterimde çok yardımcı oldu; daire ilandaki gibi, site sakin ve bakımlı.', verified: true, helpfulCount: 14 },
+  { author: 'Zeynep Arslan', rating: 4, date: '19 Haziran 2026', text: 'Konum ve kat planı harika. Otopark girişi biraz dar, onun dışında beklediğim gibiydi.', verified: true, helpfulCount: 6 },
+]
+
 export function KonutIlanDetay() {
   const [favori, setFavori] = useState(false)
 
@@ -212,6 +246,7 @@ export function KonutIlanDetay() {
                           <GlassScoreMeter key={s.label} value={s.value} label={s.label} description={s.description} variant="bar" />
                         ))}
                       </div>
+                      <GlassNearbyPlaces categories={yakinCevre} variant="tabs" aria-label="Yakın çevre" />
                     </div>
                   ),
                 },
@@ -252,6 +287,16 @@ export function KonutIlanDetay() {
                 onAddToCalendar={noop}
                 variant="grid"
               />
+            </section>
+
+            <GlassClimateRiskPanel hazards={riskler} variant="detailed" title="Bölge Risk Değerlendirmesi" />
+
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <h2 style={{ margin: 0, fontSize: 19, fontWeight: 700, letterSpacing: '-0.022em' }}>Satıcı Değerlendirmeleri</h2>
+              <GlassRating variant="summary" value={4.6} distribution={[18, 6, 2, 1, 0]} />
+              {yorumlar.map((y) => (
+                <GlassReviewCard key={y.author} {...y} onHelpful={noop} />
+              ))}
             </section>
           </div>
 
