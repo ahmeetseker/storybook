@@ -1,0 +1,182 @@
+/* İçerik katmanı FLAT: cam/backdrop-filter yok — yüzey + hairline token'ları. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+  box-sizing: border-box;
+  padding: var(--lg-space-5);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+}
+
+/* ── chips varyantı: kategori grupları ── */
+.categoryGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+.categoryGroup + .categoryGroup {
+  padding-top: var(--lg-space-4);
+  border-top: 1px solid var(--lg-hairline);
+}
+
+.categoryLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--lg-label-secondary);
+}
+
+.categoryIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--lg-label-secondary);
+}
+.categoryIcon svg {
+  width: 100%;
+  height: 100%;
+}
+/* tab içindeki ikon aktifken kontrast rengini takip eder */
+.tabActive .categoryIcon {
+  color: inherit;
+}
+
+/* ── yer listesi (her iki varyantta ortak) ── */
+.placeList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.placeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3) 0;
+  border-bottom: 1px solid var(--lg-hairline);
+  box-sizing: border-box;
+}
+.placeRow:last-child {
+  border-bottom: none;
+}
+
+.placeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.placeName {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  color: var(--lg-label);
+  overflow-wrap: anywhere;
+}
+
+.placeNote {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.distanceChip {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  background: color-mix(in srgb, var(--lg-label) 6%, transparent);
+  border-radius: var(--lg-radius-chip);
+  padding: var(--lg-space-1) var(--lg-space-3);
+  white-space: nowrap;
+}
+
+.emptyRow {
+  padding: var(--lg-space-3) 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── tabs varyantı ── */
+.tabs {
+  display: flex;
+  gap: var(--lg-space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  appearance: none;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: transparent;
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  white-space: nowrap;
+  min-height: var(--lg-control-sm);
+  padding: 0 var(--lg-space-4);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease-out, color 0.16s ease-out, border-color 0.16s ease-out;
+}
+.tab:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .tab:hover:not(.tabActive) {
+    background-color: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  }
+}
+.tabActive {
+  background: var(--lg-accent);
+  border-color: transparent;
+  color: var(--lg-accent-contrast);
+}
+/* Dokunmatikte minimum 44px hedef */
+@media (pointer: coarse) {
+  .tab {
+    min-height: 44px;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dar konteyner: satır yer adı üstte, mesafe çipi ayrı satıra düşebilir */
+@media (max-width: 360px) {
+  .placeRow {
+    flex-wrap: wrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}
