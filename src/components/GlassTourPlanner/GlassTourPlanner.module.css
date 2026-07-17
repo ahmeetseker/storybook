@@ -1,0 +1,364 @@
+/* GlassTourPlanner — içerik katmanı FLAT: cam/backdrop-filter YOK.
+   Yalnız token'lar (--lg-*) + color-mix türevleri. Rozet/rail/skeleton
+   ölçüleri raw px borcu — bkz. rules.md §9. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+  box-sizing: border-box;
+  padding: var(--lg-space-5);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  color: var(--lg-label);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── header: tarih + AI rozeti + toplam süre özeti ── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  color: var(--lg-label);
+  overflow-wrap: anywhere;
+}
+
+.totalNote {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── AI-first rozet: Dalga kontratının §"AI-first standardı" bölümünden
+   birebir kopya CSS — tüm AI component'lerinde aynı görünmeli. ── */
+.aiRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.aiBadge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 3px var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.confidence {
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+}
+
+/* ── rota listesi ── */
+.route {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stopItem {
+  display: block;
+}
+
+.row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--lg-space-3);
+}
+
+.railCol {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  width: 26px;
+}
+
+.badge {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+}
+
+.connector {
+  flex: 1 1 auto;
+  width: 2px;
+  min-height: var(--lg-space-4);
+  margin-top: var(--lg-space-1);
+  background: var(--lg-hairline);
+}
+
+.content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-bottom: var(--lg-space-4);
+}
+
+.stopItem:last-child .content {
+  padding-bottom: 0;
+}
+
+.travelNote {
+  margin: 0 0 var(--lg-space-2);
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+  overflow-wrap: anywhere;
+}
+
+.stopCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+}
+
+.stopImage {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--lg-radius-media);
+  object-fit: cover;
+}
+
+.stopBody {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.stopMeta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lg-space-2);
+}
+
+.stopTime {
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  color: var(--lg-label);
+}
+
+.stopDuration {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.stopTitle {
+  margin: 2px 0 0;
+  font-size: 14px; /* borç: token ölçeğinde yok, bkz. GlassTimeline .title ile aynı gerekçe */
+  font-weight: 600;
+  color: var(--lg-label);
+  overflow-wrap: anywhere;
+}
+
+.emptyState {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── yükleme placeholder'ı: kendi flat skeleton'u, shimmer yok — yalnız opacity ── */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+}
+
+.skeletonBadge {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  animation: lg-tourplanner-pulse 1.4s ease-in-out infinite;
+}
+
+.skeletonCard {
+  flex: 1 1 auto;
+  height: 56px;
+  border-radius: var(--lg-radius-card);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  animation: lg-tourplanner-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes lg-tourplanner-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── footer: geri bildirim + onay butonu ── */
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.feedback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.feedbackPrompt {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.feedbackButtons {
+  display: flex;
+  gap: var(--lg-space-2);
+}
+
+.feedbackButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lg-control-sm);
+  min-height: var(--lg-control-sm);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+.feedbackButton[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 55%, var(--lg-hairline));
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+}
+
+@media (hover: hover) {
+  .feedbackButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
+  }
+}
+
+.confirmButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-height: var(--lg-control-md);
+  padding: 0 var(--lg-space-5);
+  border: none;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease-out, background-color 0.15s ease-out;
+}
+
+.confirmButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.confirmButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .confirmButton:not(:disabled):hover {
+    background: color-mix(in srgb, var(--lg-accent) 88%, black);
+  }
+}
+
+@media (pointer: coarse) {
+  .feedbackButton,
+  .confirmButton {
+    min-height: 44px;
+  }
+
+  .feedbackButton {
+    min-width: 44px;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedbackButton,
+  .confirmButton {
+    transition: none;
+  }
+
+  .skeletonBadge,
+  .skeletonCard {
+    animation: none;
+    opacity: 0.75;
+  }
+}
