@@ -1,0 +1,188 @@
+/* İçerik katmanı: cam DEĞİL — düz yüzey mantığı (GlassScoreMeter ile tutarlı).
+   Tek vurgu rengi --lg-accent; boş yıldız --lg-label-secondary türevi. */
+.root {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── paylaşılan yıldız glifi ── */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.starCell {
+  position: relative;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.starTrack,
+.starFill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.starTrack {
+  fill: color-mix(in srgb, var(--lg-label-secondary) 32%, transparent);
+}
+.starFill {
+  fill: var(--lg-accent);
+}
+
+/* ── display ── */
+.display {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.text {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  color: var(--lg-label);
+  white-space: nowrap;
+}
+
+/* ── input ── */
+.input .stars {
+  gap: 2px;
+}
+.starButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  margin: 0;
+  background: none;
+  border-radius: var(--lg-radius-chip);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.starButton .starCell {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.15s ease-out;
+}
+.starButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+.starButton:disabled {
+  cursor: default;
+}
+@media (hover: hover) {
+  .starButton:not(:disabled):hover .starCell {
+    transform: scale(1.08);
+  }
+}
+.input.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  .starButton {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* ── summary ── */
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  width: 100%;
+  box-sizing: border-box;
+}
+.summaryHead {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-4);
+  flex-wrap: wrap;
+}
+.avgValue {
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--lg-label);
+}
+.summaryMeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  min-width: 0;
+}
+.totalText {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.distribution {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  margin: 0;
+  width: 100%;
+}
+.distRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  margin: 0;
+  min-width: 0;
+}
+.distLabel {
+  flex: 0 0 52px;
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+}
+.distValue {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--lg-space-3);
+  margin: 0;
+  min-width: 0;
+}
+.distBarTrack {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-hairline);
+}
+.distBarFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--lg-accent);
+  transition: width 0.3s ease-out;
+}
+.distCount {
+  flex: 0 0 auto;
+  min-width: 2.5em;
+  text-align: right;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .distBarFill {
+    transition: none;
+  }
+  .starButton .starCell {
+    transition: none;
+  }
+}
