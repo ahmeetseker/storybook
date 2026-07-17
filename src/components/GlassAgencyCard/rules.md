@@ -1,0 +1,197 @@
+---
+name: GlassAgencyCard
+category: içerik
+status: hazır
+lastReviewed: 2026-07-17
+---
+
+# GlassAgencyCard Kuralları
+
+## 1. Amaç
+
+Kurumsal emlak ofisi kimlik kartı — `GlassSellerCard`'ın kurumsal karşılığı.
+Logo/baş harf + kurum adı + doğrulanmış rozeti + tagline + tabular istatistik
+satırı (Aktif İlan/Danışman vb.) + telefon/ilan sade metin-link aksiyonları +
+tek birincil "Mesaj Gönder" aksiyonu. İçerik katmanı component'idir — cam
+DEĞİL, düz yüzey (`--lg-surface` + `--lg-hairline`).
+
+- **Kullan:** ilan detay sayfasında kurumsal satıcı yan kolonu (`panel`),
+  ofis dizini/liste sayfasında satır kartı (`inline`).
+- **Kullanma:** bireysel satıcı kimliği (→ `GlassSellerCard` — kişisel
+  telefon reveal deseni, avatar+isim odaklı, kurumsal istatistik taşımaz).
+
+| İlgili | Farkı |
+|---|---|
+| GlassSellerCard | Bireysel satıcı; maskeli telefon reveal deseni + tek avatar; istatistik satırı yok |
+| GlassSpecTable | Genel etiket/değer listesi (`<dl>`, dikey); AgencyCard'ın stats satırı yatay/tabular ve kartın yalnız bir bölümü |
+| GlassScoreMeter `badge` | Tekil sayısal skor + renk eşiği; AgencyCard'ın stats'ı çoklu, nötr, karşılaştırma amaçlı değil |
+
+## 2. Semantik sözleşme
+
+- Element: düz `<section>` — GlassSurface/backdrop-filter YOK (içerik katmanı
+  kuralı, bkz. `EksenlerVeDurumlar.mdx`).
+- Logo: `GlassAvatar` (`shape="rounded"`, `alt=""`) — dekoratif, kurum adı
+  zaten yanında görünür metin olarak var, tekrar okutulmaz. `logoSrc` yoksa
+  `GlassAvatar` kendi baş harf fallback'ine düşer (`name`'den türetilir).
+- Doğrulanmış rozet: `GlassBadge` içinde görünür metin "Doğrulanmış
+  Kurumsal" — accessible name children metninden gelir, ekstra `role`/
+  `aria-label` gerekmez (GlassSellerCard'daki ikon-tek `role="img"` rozetinin
+  aksine, burada metin zaten var).
+- İstatistikler: `<dl>` + her çift `<dt>`/`<dd>` (GlassSpecTable ile aynı
+  desen) — etiket/değer ilişkisi AT'ye native aktarılır.
+- Telefon: gerçek `<a href="tel:...">` (`GlassLink`, `variant="inline"`) —
+  Enter native aktive eder, orta tık/kopyala çalışır.
+- "N ilanı görüntüle": gerçek `<button type="button">` — callback tabanlı
+  (`onViewListings`), `href` yok, bu yüzden `GlassLink` değil yerel buton.
+- Portal yok, ref forwarding yok.
+
+## 3. Anatomy ve slotlar
+
+| Slot | Zorunlu | İçerik | Kurallar |
+|---|---|---|---|
+| logo | otomatik | `GlassAvatar` (img veya baş harf) | `logoSrc` yoksa `name`'den fallback; `panel`'de `lg` (56px), `inline`'da `md` (40px) |
+| name | ✅ | string | Kart genelinin de accessible bağlamı; truncation yok, sarar |
+| tagline | — | string | İsmin altında ikincil satır |
+| verifiedBadge | — | `GlassBadge` | Yalnız `verified` true iken; `--lg-success` tint, flat opak |
+| stats | — | `{label,value}[]` | `<dl>`, yatay, hairline ayraçlı; boşsa hiç render edilmez |
+| phone | — | `tel:` linki | Yalnız `phone` verilince |
+| viewListings | — | metin-link buton | Yalnız `onViewListings` verilince; metni stats'tan türer (bkz. §7) |
+| message | — | prominent `GlassButton` | Yalnız `onMessage` verilince; kart başına tek `prominent` aksiyon |
+
+## 4. Public API
+
+| Ad | Tür | Type | Default | Controlled | Açıklama |
+|---|---|---|---|---|---|
+| name | prop | `string` | — (zorunlu) | — | GlassAvatar baş harf fallback'i de buradan türer |
+| logoSrc | prop | `string` | — | — | Verilmezse `GlassAvatar` baş harf fallback'i |
+| tagline | prop | `string` | — | — | Serbest metin |
+| stats | prop | `{ label: string; value: string }[]` | — | — | Sayı formatı çağıranındır (`value` string) |
+| verified | prop | `boolean` | `false` | — | "Doğrulanmış Kurumsal" rozeti |
+| phone | prop | `string` | — | — | Biçimli numara; `tel:` href rakam-dışı karakterlerden arındırılır |
+| onMessage | prop | `() => void` | — | — | Verilmezse "Mesaj Gönder" hiç render edilmez |
+| onViewListings | prop | `() => void` | — | — | Verilmezse ilan linki hiç render edilmez |
+| variant | prop | `'panel'\|'inline'` | `'panel'` | — | Yerleşim ekseni — hover/focus/active gibi bir "durum" değil |
+| ...rest | — | `HTMLAttributes<HTMLElement>` | — | — | Köke geçer, `className` birleştirilir |
+
+Ref hedefi yok. Event sözleşmesi: `onMessage`/`onViewListings` yalnız kendi
+butonlarının tıklamasında çalışır; ikisi birbirinden bağımsızdır.
+
+## 5. Seçenek eksenleri
+
+Varsayılan kombinasyon: `variant=panel`, `verified=false`, aksiyonsuz.
+
+| Kural | Davranış |
+|---|---|
+| `stats` boş/yok | İstatistik satırı hiç render edilmez (`<dl>` DOM'da yok) |
+| `phone` yok | Telefon linki render edilmez |
+| `onViewListings` yok | İlan linki render edilmez |
+| `onMessage` yok | "Mesaj Gönder" render edilmez |
+| `logoSrc` + fallback | img kazanır; ikisi aynı anda çıkmaz (GlassAvatar sözleşmesi) |
+| Kart başına tek `prominent` | Yalnız "Mesaj Gönder"; telefon/ilan linki sade tipografi, buton chrome'u yok |
+
+`material`/`tone`/`thickness`/`prominent` ekseni: N/A — kök cam değil, içerik
+katmanı sabit flat yüzey (bkz. §1). İç kontroller (`GlassButton`) kendi
+malzeme eksenini korur.
+
+## 6. State modeli
+
+N/A — component tamamen prop güdümlü, kendi internal state'i yok (GlassButton/
+GlassAvatar'ın kendi hover/focus/error state'leri hariç, onlar kendi
+sözleşmelerine tabidir). "panel/inline" bir görünüm ekseni, hover/focus/active
+gibi bir durum değildir; her ikisi de sürekli, controlled olmayan bir prop.
+
+## 7. Davranış
+
+- Pointer/keyboard: telefon linki native `<a>` Tab sırasına girer; "N ilanı
+  görüntüle" ve "Mesaj Gönder" native `<button>` — Enter/Space aktive eder.
+- Focus akışı DOM sırası: logo (focus almaz) → telefon linki → ilan linki →
+  Mesaj Gönder.
+- "N ilanı görüntüle" metni `stats` içinde etiketinde (Türkçe büyük/küçük
+  harf duyarsız) "ilan" geçen ilk kaydın `value`'sunu kullanarak türer (ör.
+  `{ label: 'Aktif İlan', value: '48' }` → "48 ilanı görüntüle"); eşleşme
+  yoksa jenerik "İlanları görüntüle" metnine düşer. Türkçe `İ/I` çevrimi
+  hatalı sonuç vermesin diye `toLocaleLowerCase('tr')` kullanılır (`.toLowerCase()`
+  DEĞİL — `'İlan'.toLowerCase()` iki karakterli `'i̇lan'` üretir ve eşleşmeyi
+  bozar).
+- `prefers-reduced-motion: reduce`: ilan linkinin chevron kayma geçişi kapanır.
+- Responsive: `inline` varyant 420px altında dikey akışa düşer (bkz. §9);
+  `panel` her genişlikte aynı dikey akışı korur.
+
+## 8. İçerik kuralları
+
+- `name` uzun kurumsal unvanlarda sarar, truncation yok (bkz. UzunIcerik
+  story).
+- `stats` etiketleri kısa tutulmalı (`white-space: nowrap`); uzun etiket
+  satırı büyütür, kesilmez.
+- Buton/rozet metinleri hardcoded Türkçe: "Doğrulanmış Kurumsal", "Mesaj
+  Gönder", "İlanları görüntüle" — i18n borcu (GlassSellerCard ile aynı karar).
+
+## 9. Token eşlemesi
+
+| Part | Property | Token |
+|---|---|---|
+| root | background / border / radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-card` |
+| name | font-size | `--lg-text-headline` |
+| tagline / statLabel | color | `--lg-label-secondary` |
+| statValue | font-size / font-variant-numeric | `--lg-text-title` / `tabular-nums` |
+| verifiedBadge | tint | `var(--lg-success)` (`GlassBadge` `material="flat"`) |
+| viewListings | color / focus outline | `--lg-accent` |
+| viewListings (dokunmatik) | min-height | `44px` (`@media (pointer: coarse)`) |
+| messageButton | — | `GlassButton` kendi token'larını taşır (`prominent`) |
+
+Borç: `stat` ayraç aralığı (`--lg-space-5`) ve statLabel/statValue satır
+aralığı (`2px`) raw sabit · `checkIcon`/`chevronIcon` boyutları (13px/10px)
+raw — ikon ölçeği için token yok (GlassSellerCard'daki `VerifiedIcon`
+borcuyla aynı gerekçe) · `viewListings` taban `min-height: 24px` raw
+(GlassFooter `.link` deseniyle tutarlı).
+
+## 10. Storybook kapsamı
+
+Var: Default, Playground, Varyantlar (panel/inline yan yana), Logolu,
+Durumlar (minimal · yalnız telefon+ilan · yalnız mesaj), Uzun İçerik,
+Responsive (mobile1, `inline` dikey akışa düşüşü), Erişilebilirlik (docs
+description'lı). **Eksik:** Sizes (N/A — `size` ekseni tanımlı değil),
+Temalar (ayrı story yok — tema toolbar'la otomatik doğrulanır, GlassScoreMeter
+ile aynı karar).
+
+## 11. Test kabul kriterleri
+
+- [x] kurum adı + baş harf fallback'i render edilir (unit)
+- [x] `logoSrc` verilince img render, fallback yok (unit)
+- [x] `verified` true/false rozet render/yok kontrolü (unit)
+- [x] `stats` etiket/değer çiftleri render edilir (unit)
+- [x] `phone` → `tel:` href doğru üretilir (unit)
+- [x] `onViewListings` + "Aktif İlan" stat'ından dinamik metin türer, tıklamada çağrılır (interaction)
+- [x] `onViewListings` uygun stat yoksa jenerik metne düşer (unit)
+- [x] `onMessage` tıklamada çağrılır; verilmezse render edilmez (interaction)
+- [x] `variant` → `data-variant` attribute'üne yansır (unit)
+- [x] `tagline` var/yok render kontrolü (unit)
+- [ ] dokunmatikte "N ilanı görüntüle" 44px hedefine büyümesi (visual)
+- [ ] `inline` varyantın 420px altında dikey akışa düşmesi (visual)
+
+## 12. Do / Don't
+
+- ✅ `stats`'ta "ilan" geçen bir etiket verirsen (ör. "Aktif İlan") ilan linki
+  metni otomatik sayıyla zenginleşir — ayrıca bir sayı prop'u geçirme.
+- ✅ İçerik sayfasında kurumsal karşılaştırma listelerinde `inline`, ilan
+  detay yan kolonunda `panel` kullan.
+- ❌ Karta ikinci bir `prominent` aksiyon ekleme — telefon/ilan linki sade
+  tipografi kalmalı, buton chrome'u almamalı.
+- ❌ `GlassSellerCard`'a dokunma/birleştirme — bireysel ve kurumsal kimlik
+  kartları kasıtlı olarak ayrı component'ler (farklı istatistik/telefon
+  sözleşmeleri).
+
+**Bilinen kısıtlar:** `stats` sayı formatı doğrulanmaz (çağıran sorumluluğu)
+· ilan linki metni yalnız etiket eşleşmesiyle türer, açık bir `listingCount`
+prop'u yok · `name`/`tagline` metinleri i18n'siz. **Açık kararlar:** ayrı bir
+`listingCount` prop'unun eklenip eklenmeyeceği (şu an `stats` eşleşmesine
+bağlı) · `stats` öğe sayısı üst sınırı (şu an sınırsız, `flex-wrap` ile sarar)
+· telefon linkine `GlassSellerCard`'daki gibi maskeleme/reveal deseni
+eklenip eklenmeyeceği (kurumsal hatlarda gizlilik ihtiyacı genelde yok
+varsayıldı).
+
+## Changelog
+
+- 2026-07-17: İlk sürüm — panel/inline varyantları, GlassAvatar logo
+  fallback'i, tabular stats satırı, telefon `tel:` linki, dinamik "N ilanı
+  görüntüle" metni, tek prominent "Mesaj Gönder" CTA.
