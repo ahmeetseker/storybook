@@ -1,0 +1,281 @@
+/* İçerik katmanı: FLAT — cam/backdrop-filter yok. Durum rengi doğrudan
+   data-status attribute selector'larıyla (--lg-success/-warning/-danger +
+   info için nötr --lg-label-secondary) sürülür; runtime CSS değişkeni
+   enjeksiyonuna gerek yok çünkü sabit 4 durum var. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  box-sizing: border-box;
+  padding: var(--lg-space-5);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  color: var(--lg-label);
+  font-variant-numeric: tabular-nums;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+}
+
+/* Başarısız kontrol varsa uyarı metni --lg-danger vurgulu — durum burada da
+   yalnız renkle değil, "N kontrol başarısız" metniyle taşınır. */
+.alert {
+  font-weight: 700;
+  color: var(--lg-danger);
+}
+
+/* ── panel: satır listesi ── */
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3) 0;
+  border-bottom: 1px solid var(--lg-hairline);
+}
+.row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Borç (raw): ikon rozeti 24×24 — GlassScoreMeter'ın ring stroke-width
+   borcuyla aynı gerekçe, gösterge çapı için token yok. Radius token'dan
+   (capsule) — küçük karede tam yuvarlak üretir. */
+.icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+  border-radius: var(--lg-radius-capsule);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+.icon[data-status='verified'] {
+  color: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 16%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-success) 40%, transparent);
+}
+.icon[data-status='warning'] {
+  color: var(--lg-warning, var(--lg-accent));
+  background: color-mix(in srgb, var(--lg-warning, var(--lg-accent)) 16%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-warning, var(--lg-accent)) 40%, transparent);
+}
+.icon[data-status='failed'] {
+  color: var(--lg-danger);
+  background: color-mix(in srgb, var(--lg-danger) 16%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-danger) 40%, transparent);
+}
+.icon[data-status='info'] {
+  color: var(--lg-label-secondary);
+  background: var(--lg-hairline);
+  border: 1px solid transparent;
+}
+
+.rowBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.rowHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.label {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  color: var(--lg-label);
+  overflow-wrap: break-word;
+}
+
+.detail {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  overflow-wrap: break-word;
+}
+
+/* ── compact: yalnız özet satırı + ikon dizisi ── */
+.iconRow {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+  padding: 0;
+  gap: var(--lg-space-2);
+  list-style: none;
+}
+
+.iconItem {
+  display: inline-flex;
+}
+
+/* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
+   AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
+   radius capsule, 10.5px/700. ── */
+.aiMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+}
+.aiBadge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  padding: 3px var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.confidence {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── AI-first geri bildirim ── */
+.feedback {
+  display: flex;
+  gap: var(--lg-space-2);
+  margin-top: 2px;
+}
+.feedbackButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--lg-control-sm);
+  min-height: var(--lg-control-sm);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease-out,
+    border-color 0.15s ease-out,
+    color 0.15s ease-out;
+}
+.feedbackButton[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: var(--lg-label);
+}
+.feedbackButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .feedbackButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
+  }
+}
+@media (pointer: coarse) {
+  .feedbackButton {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ── AI-first yükleme: parıltısız soluk placeholder, yalnız opacity nabzı ── */
+.placeholderBar {
+  display: block;
+  width: 70%;
+  height: 12px;
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-hairline);
+}
+.placeholderBarWide {
+  width: 40%;
+  height: 14px;
+}
+.placeholderBarSummary {
+  width: 160px;
+  height: 12px;
+}
+.placeholderIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-hairline);
+}
+.placeholderIconRow {
+  display: flex;
+  gap: var(--lg-space-2);
+}
+.root[aria-busy='true'] .placeholderBar,
+.root[aria-busy='true'] .placeholderIcon {
+  animation: lg-trust-pulse 1.6s ease-in-out infinite;
+}
+@keyframes lg-trust-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root[aria-busy='true'] .placeholderBar,
+  .root[aria-busy='true'] .placeholderIcon {
+    animation: none;
+  }
+  .feedbackButton {
+    transition: none;
+  }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
