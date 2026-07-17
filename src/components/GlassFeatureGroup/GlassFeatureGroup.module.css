@@ -1,0 +1,217 @@
+/* GlassFeatureGroup — içerik katmanı FLAT panel (cam yok, backdrop-filter yok). */
+.root {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  overflow: hidden;
+}
+
+/* ── ortak: etiket/değer satırları (accordion region, checklist değerli item'lar, columns) ── */
+.rows {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 32px;
+  margin: 0;
+}
+.twoColumns {
+  grid-template-columns: 1fr 1fr;
+}
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--lg-control-sm, 32px);
+  padding: 7px 0;
+  border-bottom: 1px solid var(--lg-hairline);
+  box-sizing: border-box;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.twoColumns .row:nth-last-child(2):nth-child(odd) {
+  border-bottom: none;
+}
+.label {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+}
+.value {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Satır içi mevcut/yok ikonu (value verilmemiş + present belirtilmiş item'lar) */
+.presenceIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+.presenceIcon[data-present='true'] {
+  color: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 14%, transparent);
+}
+.presenceIcon[data-present='false'] {
+  color: var(--lg-label-secondary);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+}
+
+/* ── accordion ── */
+.accordionGroup {
+  border-top: 1px solid var(--lg-hairline);
+}
+.accordionGroup:first-child {
+  border-top: none;
+}
+.accordionHeading {
+  margin: 0;
+  font: inherit;
+}
+.accordionTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: var(--lg-control-lg, 48px);
+  padding: 0 20px;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.accordionTrigger:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .accordionTrigger:hover {
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+}
+.accordionTitle {
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.chevronBox {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+  opacity: 0.55;
+}
+.accordionRegionOuter {
+  overflow: hidden;
+}
+.accordionRegion {
+  padding: 0 20px 16px;
+}
+
+/* Dokunmatik: tetikleyici zaten ≥44px; pointer:coarse'ta yükselt */
+@media (pointer: coarse) {
+  .accordionTrigger {
+    min-height: 48px;
+  }
+}
+
+/* ── checklist ── */
+.checklistGroup {
+  padding: 20px;
+}
+.checklistGroup + .checklistGroup {
+  border-top: 1px solid var(--lg-hairline);
+}
+.checklistTitle {
+  margin: 0 0 14px;
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.checklistGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px 16px;
+}
+.checklistGroup .rows {
+  margin-top: 14px;
+}
+.checklistItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+.checklistItem[data-present='false'] {
+  opacity: 0.45;
+}
+.checklistIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: var(--lg-radius-capsule, 999px);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 14%, transparent);
+}
+.checklistItem[data-present='false'] .checklistIcon {
+  color: var(--lg-label-secondary);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+}
+.checklistLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ── columns ── */
+.columnsGroup {
+  padding: 16px 20px;
+}
+.columnsGroup + .columnsGroup {
+  border-top: 1px solid var(--lg-hairline);
+}
+/* Kasıtlı olarak heading DEĞİL — birden çok grup başlığı doküman ana hattını kirletmesin */
+.columnsKicker {
+  margin: 0 0 10px;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordionTrigger,
+  .chevronBox {
+    transition: none;
+  }
+}
