@@ -1,0 +1,117 @@
+/* GlassChart — içerik katmanı FLAT kart: cam/backdrop-filter yok, yalnız
+   `--lg-surface` + `--lg-hairline`. Giriş animasyonu yoktur: veri anında render
+   edilir; pointer/tap kılavuzu ve değer balonu da geçişsiz (anlık) görünür/gizlenir —
+   bu yüzden ayrı bir `prefers-reduced-motion` kuralına gerek yoktur. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3, 12px);
+  box-sizing: border-box;
+  padding: var(--lg-space-5, 20px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  color: var(--lg-label);
+  font-family: var(--lg-font, inherit);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.plot {
+  position: relative;
+  width: 100%;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+}
+
+/* Y max/min etiketleri — grid çizgisine hizalı, sayılar tabular */
+.yLabel {
+  position: absolute;
+  left: 0;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--lg-surface) 82%, transparent);
+  padding-right: 4px;
+}
+
+/* Son nokta değer etiketi — sağ kenara sabit, taşma olmaz */
+.lastLabel {
+  position: absolute;
+  right: 2px;
+  transform: translateY(-135%);
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 700;
+  color: var(--lg-accent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Pointer/tap balonu — tek örnek, flat chip (cam yok) */
+.tooltip {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 8px;
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-size: var(--lg-text-caption, 12px);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
+.tooltipX {
+  color: var(--lg-label-secondary);
+}
+.tooltipY {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* X ekseni — yalnız ilk/orta/son, seyrek */
+.xLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  color: var(--lg-label-secondary);
+}
+
+/* sr-only: görünmez ama ekran okuyucuya açık tam veri tablosu */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
