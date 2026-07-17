@@ -1,0 +1,236 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5, 20px);
+  box-sizing: border-box;
+  padding: var(--lg-space-5, 20px);
+  max-width: 460px;
+}
+
+.compact {
+  max-width: 300px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3, 12px);
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  opacity: 0.7;
+}
+
+/* ── Gün şeridi: yatay kaydırılabilir chip'ler ─────────────────────────── */
+
+.daysStrip {
+  display: flex;
+  gap: var(--lg-space-2, 8px);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.daysStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.dayChip {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: var(--lg-control-sm, 32px);
+  padding: 6px 14px;
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface, #fff);
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease-out, border-color 0.16s ease-out, color 0.16s ease-out;
+}
+.dayChipLabel {
+  font-size: 14px;
+  font-weight: 700;
+}
+.dayChipMeta {
+  font-size: 11.5px;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayChip:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .dayChip:hover {
+    border-color: var(--lg-accent, #b45309);
+  }
+}
+
+.dayChipActive {
+  background: var(--lg-accent, #b45309);
+  border-color: var(--lg-accent, #b45309);
+  color: var(--lg-accent-contrast, #fff);
+}
+.dayChipActive .dayChipMeta {
+  opacity: 0.85;
+}
+
+/* ── Saat ızgarası ──────────────────────────────────────────────────────── */
+
+.slotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: var(--lg-space-2, 8px);
+}
+
+.slotGridCompact {
+  grid-template-columns: 1fr;
+}
+
+.slot {
+  min-height: var(--lg-control-sm, 32px);
+  padding: 0 12px;
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface, #fff);
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.16s ease-out, border-color 0.16s ease-out, color 0.16s ease-out, opacity 0.16s ease-out;
+}
+.slot:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .slot:not(:disabled):hover {
+    border-color: var(--lg-accent, #b45309);
+  }
+}
+.slot:disabled {
+  opacity: 0.4;
+  cursor: default;
+  text-decoration: line-through;
+}
+.slotActive {
+  background: var(--lg-accent, #b45309);
+  border-color: var(--lg-accent, #b45309);
+  color: var(--lg-accent-contrast, #fff);
+  text-decoration: none;
+}
+
+.empty {
+  margin: 0;
+  font-size: 13.5px;
+  opacity: 0.65;
+}
+
+/* ── Gönder ─────────────────────────────────────────────────────────────── */
+
+.footer {
+  display: flex;
+}
+.footer > * {
+  flex: 1;
+}
+
+/* ── Onay ekranı ────────────────────────────────────────────────────────── */
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--lg-space-2, 8px);
+  padding: var(--lg-space-4, 16px) 0;
+}
+
+.checkIcon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--lg-success, #34c759);
+  color: var(--lg-on-scrim, #ffffff);
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.confirmTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.confirmSummary {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.confirmActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lg-space-3, 12px);
+  margin-top: var(--lg-space-2, 8px);
+  width: 100%;
+}
+.confirmActions > :first-child {
+  width: 100%;
+}
+
+.resetLink {
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lg-accent, #b45309);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.resetLink:focus-visible {
+  outline: 2px solid var(--lg-accent, #b45309);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .resetLink:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Flat malzemede chip zemini yüzeyle aynı — hairline ile ayrışır (raw white-alfa yok) */
+
+@media (pointer: coarse) {
+  .dayChip,
+  .slot,
+  .resetLink {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dayChip,
+  .slot {
+    transition: none;
+  }
+}
