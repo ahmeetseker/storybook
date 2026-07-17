@@ -146,6 +146,9 @@ export function KonutIlanDetay() {
   return (
     <PublicShell title="İlan Detayı" onBack={noop}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <h1 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)', whiteSpace: 'nowrap', margin: 0 }}>
+          Pelin'den Kozlu Fatih Sitesi'nde 3+1 Masrafsız Daire — 5.490.000 TL
+        </h1>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
           <GlassBreadcrumb
             items={[
@@ -160,9 +163,10 @@ export function KonutIlanDetay() {
           </GlassIconButton>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: 16, alignItems: 'start' }}>
+        {/* Dar ekranda sağ kolon alta düşer — sabit kolon yatay taşma yaratmasın */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-start' }}>
           {/* Sol kolon */}
-          <div style={columnStyle}>
+          <div style={{ ...columnStyle, flex: '10 1 560px', minWidth: 0 }}>
             <GlassMediaGallery items={medya} variant="stage" label="İlan medyası" />
 
             <GlassTabs
@@ -252,7 +256,7 @@ export function KonutIlanDetay() {
           </div>
 
           {/* Sağ kolon */}
-          <div style={columnStyle}>
+          <div style={{ ...columnStyle, flex: '1 1 320px', maxWidth: 480 }}>
             <GlassPriceHeader
               material="flat"
               title="Pelin'den Kozlu Fatih Sitesi'nde 3+1 Masrafsız Daire"
