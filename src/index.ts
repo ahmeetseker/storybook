@@ -33,6 +33,7 @@ export {
   type GlassBentoStatProps,
   type GlassBentoCellProps,
 } from './components/GlassBento'
+export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
 export { GlassFooter, type GlassFooterProps, type GlassFooterColumn, type GlassFooterLinkItem } from './components/GlassFooter'
 export { GlassAlert, type GlassAlertProps } from './components/GlassAlert'
 export { GlassAvatar, type GlassAvatarProps } from './components/GlassAvatar'

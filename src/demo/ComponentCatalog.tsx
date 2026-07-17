@@ -284,6 +284,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassbento--default',
   },
   {
+    name: 'Vitrin',
+    description: 'Yoğun ana sayfa vitrini — 5 varyant (micro/ruled/mosaic/list/banded), 50-60 ilan kapasitesi, mikro kart ölçeği.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassvitrin--default',
+  },
+  {
     name: 'Badge',
     description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
     category: 'İçerik',

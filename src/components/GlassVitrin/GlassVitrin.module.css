@@ -1,0 +1,239 @@
+/* GlassVitrin — yoğun vitrin ızgaraları. Flat içerik katmanı; cam yok.
+   Mikro ölçek: ~106×80 görsel hücreleri, 50-60 ilan kapasitesi. */
+
+/* Ortak görsel hücresi */
+.ph {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+}
+.ph img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.eids {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-surface);
+  color: var(--lg-success);
+  font-size: 9px;
+  font-weight: 800;
+}
+.price {
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label);
+  line-height: 1.25;
+}
+.name {
+  font-size: 10.5px;
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+  transition: color 0.18s ease;
+}
+.loc { font-size: 11px; color: var(--lg-label-secondary); }
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Buton sıfırlama — kartların tamamı tıklanabilir */
+.microCard,
+.ruledCard,
+.mosaicCard,
+.listRow,
+.bandCard {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+.microCard:focus-visible,
+.ruledCard:focus-visible,
+.mosaicCard:focus-visible,
+.listRow:focus-visible,
+.bandCard:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+/* ── micro (L): 4:3 mini kartlar ── */
+.microGrid { display: grid; gap: 12px 10px; }
+.cols7 { grid-template-columns: repeat(7, 1fr); }
+.cols8 { grid-template-columns: repeat(8, 1fr); }
+.cols9 { grid-template-columns: repeat(9, 1fr); }
+.cols10 { grid-template-columns: repeat(10, 1fr); }
+.microCard .ph { aspect-ratio: 4 / 3; border-radius: var(--lg-radius-chip, 10px); }
+@media (hover: hover) {
+  .microCard:hover .ph img { transform: scale(1.05); }
+  .microCard:hover .name { color: var(--lg-label); }
+}
+
+/* ── ruled (M): sıfır boşluk, hairline hücreler ── */
+.ruledGrid {
+  display: grid;
+  gap: 1px;
+  background: var(--lg-hairline);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media, 14px);
+  overflow: hidden;
+}
+.ruledCard {
+  background: var(--lg-surface);
+  padding: 6px 6px 7px;
+  gap: 6px;
+  transition: background-color 0.18s ease;
+}
+.ruledCard .ph { aspect-ratio: 1 / 1; border-radius: 6px; }
+.ruledCard .price { font-size: 11.5px; }
+.ruledCard .name { font-size: 10px; }
+@media (hover: hover) {
+  .ruledCard:hover { background: color-mix(in srgb, var(--lg-accent) 4%, var(--lg-surface)); }
+}
+
+/* ── mosaic (N): kare görsel duvarı, fiyat chip'te ── */
+.mosaicGrid { display: grid; gap: 6px; }
+.mosaicGrid.cols7 { grid-template-columns: repeat(8, 1fr); }
+.mosaicGrid.cols8 { grid-template-columns: repeat(9, 1fr); }
+.mosaicGrid.cols9 { grid-template-columns: repeat(10, 1fr); }
+.mosaicGrid.cols10 { grid-template-columns: repeat(11, 1fr); }
+.mosaicCard { position: relative; gap: 0; }
+.mosaicCard .ph { aspect-ratio: 1 / 1; border-radius: 9px; }
+.chip {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  z-index: 1;
+  padding: 1px 6px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-surface) 94%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label);
+}
+.hovName {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 26px 7px 22px;
+  background: linear-gradient(to top, var(--lg-scrim, rgba(8, 10, 12, 0.78)), transparent);
+  color: var(--lg-on-scrim, #ffffff);
+  font-size: 10.5px;
+  line-height: 1.3;
+  border-radius: 0 0 9px 9px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+@media (hover: hover) {
+  .mosaicCard:hover .hovName { opacity: 1; }
+  .mosaicCard:hover .ph img { transform: scale(1.06); }
+}
+.mosaicCard:focus-visible .hovName { opacity: 1; }
+
+/* ── list (O): çok kolonlu mikro satırlar ── */
+.listGrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 22px; }
+.listRow {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--lg-hairline);
+  transition: background-color 0.15s ease;
+}
+.listRow .ph { flex: none; width: 64px; aspect-ratio: 4 / 3; border-radius: 7px; }
+.listMid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.listRow .name { font-size: 11.5px; font-weight: 550; color: var(--lg-label); }
+.listRow .price { white-space: nowrap; }
+@media (hover: hover) {
+  .listRow:hover { background: color-mix(in srgb, var(--lg-label) 3%, transparent); }
+}
+
+/* ── banded (P): doping bandı + mikro ızgara ── */
+.band { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
+.bandCard { position: relative; border-radius: var(--lg-radius-chip, 12px); overflow: hidden; gap: 0; }
+.bandCard .ph { aspect-ratio: 16 / 11; }
+.bandRozet {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 1;
+  padding: 3px 8px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.bandCap {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  padding: 30px 10px 9px;
+  background: linear-gradient(to top, var(--lg-scrim, rgba(8, 10, 12, 0.75)), transparent);
+  color: var(--lg-on-scrim, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.bandCap .price { font-size: 14px; color: inherit; }
+.bandCap .name { font-size: 11px; color: inherit; opacity: 0.85; }
+@media (hover: hover) { .bandCard:hover .ph img { transform: scale(1.045); } }
+
+/* Responsive kademeler: 9-10 → 6-7 → 4-5 → 3 sütun */
+@media (max-width: 1000px) {
+  .microGrid, .ruledGrid { grid-template-columns: repeat(6, 1fr); }
+  .mosaicGrid { grid-template-columns: repeat(7, 1fr); }
+  .band { grid-template-columns: repeat(3, 1fr); }
+  .listGrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .microGrid, .ruledGrid { grid-template-columns: repeat(4, 1fr); }
+  .mosaicGrid { grid-template-columns: repeat(5, 1fr); }
+  .listGrid { grid-template-columns: 1fr; }
+  .band { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .microGrid, .ruledGrid { grid-template-columns: repeat(3, 1fr); }
+  .mosaicGrid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph img, .hovName, .ruledCard, .listRow, .name { transition: none; }
+}
