@@ -1,0 +1,206 @@
+/* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları. */
+.wrapper {
+  box-sizing: border-box;
+  overflow-x: auto;
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label);
+}
+
+.thead {
+  background: var(--lg-surface);
+}
+
+.th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--lg-surface);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  text-align: left;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 700;
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--lg-hairline);
+  box-sizing: border-box;
+}
+
+.alignEnd {
+  text-align: right;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: var(--lg-space-1) 0;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  cursor: pointer;
+}
+
+.alignEnd .sortButton {
+  flex-direction: row-reverse;
+}
+
+.sortButton:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  border-radius: var(--lg-radius-chip);
+}
+
+.sortIcon {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  fill: currentColor;
+  opacity: 0.35;
+}
+
+.sortIcon path:first-child {
+  opacity: 0.4;
+}
+.sortIcon path:last-child {
+  opacity: 0.4;
+}
+.sortIcon[data-active] {
+  opacity: 1;
+}
+.sortIcon[data-active][data-direction='asc'] path:first-child,
+.sortIcon[data-active][data-direction='desc'] path:last-child {
+  opacity: 1;
+}
+.sortIcon[data-active][data-direction='asc'] path:last-child,
+.sortIcon[data-active][data-direction='desc'] path:first-child {
+  opacity: 0.25;
+}
+
+.tr {
+  border-bottom: 1px solid var(--lg-hairline);
+}
+.tr:last-child {
+  border-bottom: none;
+}
+
+@media (hover: hover) {
+  .tr:hover {
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+}
+
+.tr[data-selected] {
+  background: color-mix(in srgb, var(--lg-accent) 10%, transparent);
+}
+
+.td {
+  padding: var(--lg-space-3) var(--lg-space-4);
+  font-size: var(--lg-text-body, 15px);
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+.selectCell {
+  width: 1%;
+  padding-right: 0;
+  box-sizing: border-box;
+}
+
+.emptyCell {
+  padding: var(--lg-space-6) var(--lg-space-4);
+  text-align: center;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-body, 15px);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Dokunmatik: sıralama butonu 44px hedefine yaklaşır */
+@media (pointer: coarse) {
+  .sortButton {
+    padding: var(--lg-space-2) 0;
+    min-height: 44px;
+  }
+}
+
+/* 700px altı: satırlar kart görünümüne düşer, her td kendi etiketiyle blok olur */
+@media (max-width: 700px) {
+  .thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .table,
+  .table tbody,
+  .tr,
+  .td {
+    display: block;
+    width: 100%;
+  }
+
+  .tr {
+    padding: var(--lg-space-2) 0;
+  }
+
+  .td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lg-space-3);
+    text-align: right;
+    border-bottom: none;
+    padding: var(--lg-space-1) var(--lg-space-4);
+  }
+
+  .td.alignEnd {
+    text-align: right;
+  }
+
+  .td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: var(--lg-text-footnote, 13px);
+    color: var(--lg-label-secondary);
+    text-align: left;
+    flex: none;
+  }
+
+  .selectCell.td {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sortButton,
+  .sortIcon {
+    transition: none;
+  }
+}
