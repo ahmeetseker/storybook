@@ -1,0 +1,181 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Codex Enterprise/00 Başlangıç/00 İnceleme Rehberi" />
+
+# Codex Enterprise kütüphanesi
+
+Bu alan tek tek demo kartlarından oluşan küçük bir varyant paketi değildir. Mevcut ürünün **96 component
+ailesini ve 28 gerçek sayfasını** kapsayan; marketplace, kurumsal operasyon ve açıklanabilir AI için
+üretim sözleşmesi tanımlayan ayrı bir tasarım sistemi ağacıdır.
+
+Katalogda her mevcut component; amacı, Codex karşılığı, varyantları, kullanım stratejisi ve bulunduğu
+Storybook grubuyla aranabilir. Kapsam şu anda **70 native Codex API + 26 ürün kompozisyonu** olarak
+belgelenir. Kompozisyon kararı “eksik component” anlamına gelmez: yalnız başına yeni API üretmek yerine
+semantik HTML ve mevcut primitive'lerle sayfa/pattern düzeyinde kurulması gereken aileyi ifade eder.
+
+## Hızlı inceleme rotası
+
+1. **00 Başlangıç / 01 Kapsam ve Katalog / Executive overview** — toplam kapsam ve kategori mimarisi.
+2. **00 Başlangıç / 01 Kapsam ve Katalog / Component inventory** — 96 ailenin aranabilir karar kaydı.
+3. **11 AI Ürün Vizyonu / 01 Doğal Dil Arama** — sorgudan açıklanabilir filtre ve kaynaklı sonuca tam akış.
+4. **11 AI Ürün Vizyonu / 02 İlan Intelligence** — görsel, tapu, imar, fiyat, konum ve güven kararı.
+5. **11 AI Ürün Vizyonu / 03 Portföy Copilot** — araç günlüğü ve açık insan onaylı kurumsal ajan.
+6. **10 Sayfalar** — 28 gerçek ürün sayfasının masaüstü, mobil, hata, boş ve doğrulama senaryoları.
+7. **12 Durumlar ve Erişilebilirlik** — focus, loading, invalid, reduced motion ve reflow kontrolü.
+8. **13 Mobil Sistem** — kompakt navigasyon, safe-area, bottom sheet ve görev odaklı mobil kompozisyonlar.
+
+## Storybook bilgi mimarisi
+
+| Sıra | Alan | İçerik |
+| --- | --- | --- |
+| 00 | Başlangıç | İnceleme rehberi, component ve sayfa envanteri, mobil kapsam |
+| 01 | Temeller | Paper/Mineral/Graphite, renk tokenları, tipografi, spacing, radius, elevation, ikon, motion |
+| 02 | Aksiyon ve Formlar | Button, icon button, badge, chip, input, select, checkbox, switch, tabs ve dokuz gelişmiş form kontrolü |
+| 03 | Navigasyon ve Komut | Breadcrumb, pagination, toolbar, sidebar, menu ve popover |
+| 04 | Overlay ve Geri Bildirim | Modal, drawer, toast, notice, progress ve empty/error hiyerarşisi |
+| 05 | İçerik ve Pazar Yeri | İlan kartları, fiyat, özellik, konum, değerleme, satıcı, mağaza, değerlendirme |
+| 06 | Veri ve Karşılaştırma | Data/spec/compare table, liste, timeline, skeleton, skor, metrik ve erişilebilir grafik |
+| 07 | Medya ve Harita | Galeri, karma medya, carousel, harita, kat planı, görsel annotation ve çevre |
+| 08 | AI ve Güven | Prompt, yanıt, dayanak, güven, akıllı filtre, risk, vision, agent activity, conversation, voice |
+| 09 | Pazar Yeri Kalıpları | Kayıtlı arama, ilan yönetimi, empty state ve marketplace operasyon örnekleri |
+| 10 | Sayfalar | Kamusal, alıcı, hesap, satıcı ve kurumsal sayfa kataloğu |
+| 11 | AI Ürün Vizyonu | Dört uçtan uca AI-native ürün deneyimi ve güvenli bozulma state'leri |
+| 12 | Durumlar ve Erişilebilirlik | Kontrol state matrisi, klavye yolculuğu, mobil touch ve içerik durumları |
+| 13 | Mobil Sistem | Bottom navigation, app bar, bottom sheet, action bar, kompakt filtre ve adaptive shell kompozisyonları |
+
+Numaralar Storybook sidebar'ında bağımlılık sırasını korur: önce dil ve kontroller, sonra navigasyon,
+içerik/veri/medya, ardından intelligence, ürün kalıpları ve tam sayfalar.
+
+## Tema ve yüzey sözleşmesi
+
+| Tema | Canvas | Accent | Ana kullanım |
+| --- | --- | --- | --- |
+| Paper | `#F7F7F5` | `#A44707` | Genel pazar yeri ve kullanıcı hesabı — önerilen varsayılan |
+| Mineral | `#F4F7F8` | `#0B5C78` | Analiz, editoryal keşif ve kurumsal güven |
+| Graphite | `#111214` | `#E29A4A` | Düşük ışık, veri yoğun operasyon ve moderasyon |
+
+Üç palet aynı semantik token, tipografi, spacing, radius, focus ve motion sözleşmesini paylaşır.
+Storybook araç çubuğundaki **Tasarım** seçicisinden tüm eski `Glass*` story'leri de bu temalar altında
+kontrol edilebilir. Bu köprü geriye uyumluluk sağlar; yeni native Codex API'leri ise `src/variants/codex`
+altında açıkça ayrıdır.
+
+Yüzey hiyerarşisi kasıtlı olarak sakindir:
+
+- İçerik kartları düz yüzey + hairline kullanır; geniş siyah gölge ve dekoratif blur kullanılmaz.
+- Cam yalnız header, toolbar, popover, modal ve medya üstü geçici chrome için ayrılmıştır.
+- Kontroller `10px`, medya `12px`, kart/panel `16px`; kapsül yalnız gerçek filtre/chip içindir.
+- Hover çoğunlukla renk veya en fazla `-1px`; active geri bildirimi `scale(.985)` ile sınırlıdır.
+
+## Component kapsamı
+
+### Temeller ve kontroller
+
+- `CodexTheme`, `CodexSurface`, `CodexBadge`, `CodexSkeleton`.
+- `CodexButton`, `CodexIconButton`, `CodexChip`, `CodexField`, `CodexInput`, `CodexSelect`,
+  `CodexCheckbox`, `CodexSwitch`, `CodexTabs`.
+- `CodexTextarea`, `CodexSearchField`, `CodexRadioGroup`, `CodexSegmentedControl`, `CodexSlider`,
+  `CodexStepper`, `CodexProgress`, `CodexFileUpload`, `CodexDatePicker`.
+- Varsayılan, hover, focus-visible, selected, mixed, loading, disabled, readonly ve invalid örnekleri.
+
+### Navigasyon, overlay ve feedback
+
+- `CodexBreadcrumb`, `CodexPagination`, `CodexToolbar` ve anlamlı toolbar grupları.
+- Expanded/rail/mobile-sheet davranışlı `CodexSidebar`.
+- Klavye menüsü, anchored popover, focus-trap modal, responsive drawer ve live-region toast.
+- Escape zinciri, açan kontrole focus dönüşü, body scroll lock ve nested overlay örnekleri.
+
+### Marketplace içeriği
+
+- Grid/row/featured `CodexListingCard`; statik kart false affordance üretmez.
+- `CodexPriceHeader`, `CodexFeatureGroup`, `CodexLocationCard`, `CodexValuationCard`.
+- Bireysel satıcı, doğrulanmış kurumsal mağaza, değerlendirme ve yanıt örnekleri.
+- Kimlik, ilan yetkisi, tapu, belge, fiyat ve iklim riskinin ayrı kanallarla açıklandığı güven panelleri.
+- Kayıtlı arama ve ilan yönetimi için active/paused/pending/rejected/empty state'leri.
+
+### Veri ve medya
+
+- Sort, selection, mixed select-all, loading, empty ve responsive davranışlı generic data table.
+- Teknik özellik, differences-only karşılaştırma, timeline, action list ve gerçek geometri skeleton'ları.
+- Skor ve confidence meter; SVG mini chart yanında ekran okuyucuya açık veri tablosu.
+- Fotoğraf/video/360/plan galerisi, klavye carousel'i, seçilebilir pin, privacy circle, kat planı hotspot'u,
+  fotoğraf annotation'ı ve yakın yer kategorileri.
+
+### AI ve güven
+
+- Doğal dil prompt composer; öneri, bağlam, dosya, ses, loading ve hassas veri hatası.
+- Kaynaklı AI yanıtı; streaming, confidence, resmî/piyasa/ilan dayanağı ve insan review state'i.
+- Sorgudan çıkarılan her filtre için neden, confidence, uygulama ve kaldırma kontrolü.
+- Vision bulguları için görsel marker + eşleşen metin listesi; belirsizlik ve insan inceleme kapısı.
+- Risk önem sırası, kanıt zinciri, çözüm kaydı ve yüksek risk çözülmeden kilitli onay.
+- Ajan araç günlüğü, running/queued/needs-approval/success/error durumları, izin verme, reddetme ve iptal.
+- Kaynaklı conversation ve idle/permission/listening/transcribing/error ses kontrolü.
+
+### Mobil sistem ve 96/96 kapsam
+
+Mobil teslim 96 componentin cihaz adına göre kopyalanması değildir. Aynı public sözleşmeler; dar container,
+coarse pointer, safe-area ve görev önceliğine göre aşağıdaki on adaptasyon stratejisinden biriyle sunulur.
+Bu matris **96/96 component ailesini** kapsar.
+
+| # | Mobil strateji | Aile sayısı | Ana davranış |
+| --- | --- | ---: | --- |
+| 1 | Aynı component / touch-scale | 9 | Fluid genişlik ve en az 44px dokunma hedefi |
+| 2 | Stacked form | 15 | Tek sütun, tam genişlik kontrol ve yazılım klavyesi güvenliği |
+| 3 | Adaptive navigation | 12 | App bar, bottom navigation, yatay scroll veya drawer |
+| 4 | Overlay ve feedback | 7 | Bottom sheet/full-screen sunum ve safe-area padding |
+| 5 | Marketplace card stack | 13 | Row/grid kartların tek sütuna ve alt aksiyona dönüşmesi |
+| 6 | Veriyi yeniden temsil etme | 18 | Tablo-kart, yatay karşılaştırma ve kompakt metrik düzeni |
+| 7 | List/disclosure/rail | 7 | Tam genişlik satır, progressive disclosure ve yatay kategori rail'i |
+| 8 | Immersive media | 7 | Full-bleed medya, snap, pan/zoom ve detay sheet'i |
+| 9 | Layout reflow | 4 | Hero, bento, vitrin ve footer'ın önem sırasıyla tek sütuna akması |
+| 10 | Task flow | 4 | Adım bazlı disclosure ve sticky birincil aksiyon |
+| **Toplam** |  | **96/96** | **Bütün mevcut component aileleri** |
+
+`13 Mobil Sistem` altında sunulan yeni public API'ler:
+
+- `CodexBottomNavigation` — 3–5 ana route için `nav` + `aria-current` sözleşmesi.
+- `CodexAppBar` — geri, başlık ve bağlamsal aksiyonları taşıyan kompakt üst chrome.
+- `CodexBottomSheet` — seçim, filtre ve kısa görevleri safe-area destekli alt yüzeyde açar.
+- `CodexActionBar` — karar akışındaki birincil/ikincil aksiyonları viewport altında erişilebilir tutar.
+- `CodexCompactFilterBar` — sonuç özeti, aktif filtreler ve filtre sheet tetikleyicisini birleştirir.
+- `CodexCompactShell` — app bar, içerik, bottom navigation ve action bar yerleşimini koordine eder.
+
+Bu API'lerde `mobile` veya `tablet` varyant prop'u yoktur; sunum container ve input yeteneğine göre uyarlanır.
+
+AI hiçbir yüksek etkili kararı gizlice vermez. Mesaj gönderme, toplu ilan güncelleme, yayınlama,
+reddetme veya yaptırım açık kullanıcı/yetkili onayı ister. Confidence hiçbir zaman doğruluk garantisi
+olarak sunulmaz; kaynak tarihi, model sınırı ve manuel geri dönüş aynı yüzeyde kalır.
+
+## Sayfa kapsamı
+
+Tam sayfa kataloğu beş hedef kitleye ayrılır:
+
+- **Kamusal (7):** Ana sayfa, giriş, kayıt, doğrulama, şifre sıfırlama, yardım ve yasal.
+- **Alıcı (6):** Arama, arsa/konut detay, karşılaştırma, kaydedilenler ve arama alarmları.
+- **Hesap (6):** Hesap özeti, ayarlar, mesajlar, bildirimler, faturalar ve şikâyet yönetimi.
+- **Satıcı (5):** İlan verme, 13 adımlı yeni ilan sihirbazı, ilanlarım, ilan yönetimi, doping/ödeme.
+- **Kurumsal (4):** Tanıtım, başvuru, doğrulama ve mağaza vitrini.
+
+Her sayfanın en az masaüstü ve mobil örneği vardır. Uygun akışlarda loading, empty, validation,
+error, degraded, success, rejected ve doğrulama state'leri ayrı story olarak açılır.
+
+## Erişilebilirlik ve kalite kabulü
+
+- Hedef WCAG 2.2 AA; normal metin en az `4.5:1`, büyük metin `3:1`.
+- Ana dokunmatik hedef `44px`; kompakt `32px` kontroller coarse pointer altında büyür.
+- Focus yalnız gölgeye bırakılmaz: 2px outline + halo ve görünür offset kullanılır.
+- Durum renk dışında ikon, metin veya konumla ikinci bir kanal taşır.
+- Native semantic rol korunur: button, link, checkbox, radio, switch, tab, table, dialog ve landmark.
+- Türkçe uzun içerik, yüzde 200 text zoom, mobil reflow, reduced motion ve reduced transparency örnekleri vardır.
+- Loading gerçek geometriyi korur; empty sonraki adımı öğretir; hata veri kaybetmeden güvenli geri dönüş verir.
+
+## Doğrulama komutları
+
+```bash
+npx vitest run src/variants/codex --maxWorkers=4
+npx tsc -p tsconfig.app.json --noEmit --pretty false
+npx oxlint src/variants/codex .storybook/preview.tsx src/components/GlassSidebar/GlassSidebar.stories.tsx
+npm run build-storybook
+```
+
+`DESIGN.md` görsel sözleşmenin, `rules.md` ise component ve Storybook kabul kriterlerinin normatif
+kaynağıdır. Aranabilir component/sayfa envanteri için **00 Başlangıç / 01 Kapsam ve Katalog** kullanılır.

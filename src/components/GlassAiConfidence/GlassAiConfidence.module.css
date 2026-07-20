@@ -1,0 +1,123 @@
+/* AI güven göstergesi: meter + seviye metni + etken listesi. İçerik katmanı,
+   cam yok. Seviye/etki yönü renk dışında metin kanalıyla da iletilir. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2);
+}
+
+.label {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  color: var(--lg-label);
+}
+
+.sm .label {
+  font-size: var(--lg-text-footnote);
+}
+
+.readout {
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  color: var(--glass-confidence-tone, var(--lg-label));
+}
+
+.meter {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-hairline);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--glass-confidence-tone, var(--lg-accent));
+  transition: inline-size 0.3s ease-out;
+}
+
+/* Seviye tonu — auto eşik. Metin zaten seviyeyi söyler; renk ikincil kanaldır. */
+.root[data-level='high'] {
+  --glass-confidence-tone: var(--lg-success);
+}
+.root[data-level='medium'] {
+  --glass-confidence-tone: var(--lg-accent);
+}
+.root[data-level='low'] {
+  --glass-confidence-tone: var(--lg-danger);
+}
+
+.unmeasured {
+  margin: 0;
+  padding: var(--lg-space-2) var(--lg-space-3);
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  background: color-mix(in srgb, var(--lg-warning) 8%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-warning) 24%, var(--lg-hairline));
+  border-radius: var(--lg-radius-media);
+}
+
+.factors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.factor {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lg-space-2);
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.impactGlyph {
+  flex: none;
+  font-size: 9px;
+}
+
+.factor[data-impact='positive'] .impactGlyph {
+  color: var(--lg-success);
+}
+.factor[data-impact='negative'] .impactGlyph {
+  color: var(--lg-danger);
+}
+
+.disclaimer {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

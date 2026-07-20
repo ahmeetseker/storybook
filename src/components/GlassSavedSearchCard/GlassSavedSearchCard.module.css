@@ -1,0 +1,138 @@
+/* Kayıtlı arama kartı: içerik katmanı, düz yüzey (cam değil). */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-4);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.headingBox {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  color: var(--lg-label);
+  overflow-wrap: anywhere;
+}
+
+.newBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 78%, var(--lg-label));
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 3px var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  background: color-mix(in srgb, var(--lg-label-secondary) 10%, var(--lg-surface));
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-1);
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  padding-top: var(--lg-space-2);
+  border-top: 1px solid var(--lg-hairline);
+}
+
+.primary,
+.secondary,
+.quiet {
+  min-height: var(--lg-control-md);
+  padding: 0 var(--lg-space-4);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  border-radius: var(--lg-radius-chip);
+  cursor: pointer;
+}
+
+.primary {
+  color: var(--lg-accent-contrast);
+  background: var(--lg-accent);
+  border: 1px solid transparent;
+}
+.primary:hover {
+  filter: brightness(0.95);
+}
+
+.secondary {
+  color: var(--lg-label);
+  background: transparent;
+  border: 1px solid var(--lg-hairline);
+}
+.secondary:hover {
+  border-color: var(--lg-label-secondary);
+}
+
+.quiet {
+  margin-inline-start: auto;
+  color: var(--lg-danger);
+  background: transparent;
+  border: none;
+}
+.quiet:hover {
+  background: color-mix(in srgb, var(--lg-danger) 10%, transparent);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.quiet:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

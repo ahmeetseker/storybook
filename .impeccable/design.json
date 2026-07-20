@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-17T17:00:00+03:00",
+  "title": "Design System: liquid-glass-ui",
+  "extensions": {
+    "colorMeta": {
+      "paper-accent": {
+        "role": "primary",
+        "displayName": "Fired Umber",
+        "canonical": "#A44707",
+        "tonalRamp": ["#2B1607", "#4A2307", "#6B3006", "#8A3B06", "#A44707", "#C56625", "#E8A06B", "#F9E6D4"]
+      },
+      "paper-canvas": {
+        "role": "neutral",
+        "displayName": "Neutral Paper",
+        "canonical": "#F7F7F5",
+        "tonalRamp": ["#23231F", "#41413B", "#62625B", "#85857E", "#AAA9A3", "#CDCCC7", "#E8E7E3", "#F7F7F5"]
+      },
+      "mineral-accent": {
+        "role": "primary",
+        "displayName": "Mineral Blue",
+        "canonical": "#0B5C78",
+        "tonalRamp": ["#071D25", "#08323F", "#09485C", "#0B5C78", "#237895", "#5AA0B8", "#A4CEDA", "#E0F0F4"]
+      },
+      "graphite-accent": {
+        "role": "primary",
+        "displayName": "Graphite Copper",
+        "canonical": "#E29A4A",
+        "tonalRamp": ["#2A1A0C", "#4B2E14", "#71451F", "#9B602D", "#C77E3C", "#E29A4A", "#F2C084", "#FAE8D1"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Product Display", "purpose": "Page-level headings only." },
+      "body": { "displayName": "Product Body", "purpose": "Readable UI copy capped at 65–75ch." },
+      "label": { "displayName": "Control Label", "purpose": "Sentence-case field labels and metadata." },
+      "control": { "displayName": "Control Text", "purpose": "Readable default button and direct-manipulation text." }
+    },
+    "shadows": [
+      { "name": "raised", "value": "0 1px 2px rgb(31 32 29 / 8%)", "purpose": "Compact floating controls without a border." },
+      { "name": "floating", "value": "0 4px 8px rgb(31 32 29 / 12%)", "purpose": "Menus and media controls above content." },
+      { "name": "dialog", "value": "0 16px 32px rgb(31 32 29 / 24%)", "purpose": "Modal surfaces without a decorative border." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "120ms cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Hover, press, and color feedback." },
+      { "name": "base", "value": "180ms cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Standard control state changes." },
+      { "name": "slow", "value": "240ms cubic-bezier(0.2, 0.8, 0.2, 1)", "purpose": "Panel state transitions." },
+      { "name": "reduced", "value": "1ms", "purpose": "State swap when reduced motion is requested." }
+    ],
+    "breakpoints": [
+      { "name": "compact", "value": "620px" },
+      { "name": "stack", "value": "860px" },
+      { "name": "wide", "value": "1120px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single filled action in a decision group.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">İlanı incele</button>",
+      "css": ".ds-btn-primary{min-height:40px;padding:0 16px;border:0;border-radius:10px;background:var(--cx-accent,#A44707);color:var(--cx-on-accent,#fff);font:600 15px/1.2 var(--cx-font-family,system-ui);transition:background-color 180ms cubic-bezier(.25,1,.5,1),transform 120ms cubic-bezier(.25,1,.5,1);cursor:pointer}.ds-btn-primary:hover{background:var(--cx-accent-hover,#883A06);transform:translateY(-1px)}.ds-btn-primary:active{transform:scale(.985)}.ds-btn-primary:focus-visible{outline:2px solid var(--cx-accent,#A44707);outline-offset:3px;box-shadow:0 0 0 3px var(--cx-focus-halo,rgba(164,71,7,.24))}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A bordered secondary action with no resting shadow.",
+      "html": "<button class=\"ds-btn-secondary\" type=\"button\">Kaydet</button>",
+      "css": ".ds-btn-secondary{min-height:40px;padding:0 16px;border:1px solid var(--cx-control-border,#8A8B86);border-radius:10px;background:var(--cx-surface,#fff);color:var(--cx-label,#1F201D);font:600 15px/1.2 var(--cx-font-family,system-ui);transition:background-color 180ms cubic-bezier(.25,1,.5,1),transform 120ms cubic-bezier(.25,1,.5,1);cursor:pointer}.ds-btn-secondary:hover{background:var(--cx-surface-subtle,#F0EFEB);transform:translateY(-1px)}.ds-btn-secondary:focus-visible{outline:2px solid var(--cx-accent,#A44707);outline-offset:3px}"
+    },
+    {
+      "name": "Soft Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-soft",
+      "description": "An informational soft square, visually distinct from filter pills.",
+      "html": "<span class=\"ds-badge-success\"><i></i>EİDS doğrulandı</span>",
+      "css": ".ds-badge-success{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:8px;background:var(--cx-success-soft,#E6F4EA);color:var(--cx-success-fg,#14733B);font:600 12px/1.25 var(--cx-font-family,system-ui)}.ds-badge-success i{width:7px;height:7px;border-radius:50%;background:currentColor}"
+    },
+    {
+      "name": "Selected Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip-selected",
+      "description": "A real pill reserved for removable and selectable filters.",
+      "html": "<button class=\"ds-chip-selected\" type=\"button\" aria-pressed=\"true\"><span>✓</span>Doğrulanmış</button>",
+      "css": ".ds-chip-selected{display:inline-flex;min-height:36px;align-items:center;gap:6px;padding:0 12px;border:1px solid var(--cx-accent,#A44707);border-radius:999px;background:var(--cx-accent-soft,#F4E6D8);color:var(--cx-accent,#A44707);font:600 13px/1.2 var(--cx-font-family,system-ui);cursor:pointer}.ds-chip-selected:focus-visible{outline:2px solid var(--cx-accent,#A44707);outline-offset:3px}"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "A labeled 10px-radius product input with strong boundary and focus.",
+      "html": "<label class=\"ds-field\">Konum<input type=\"text\" placeholder=\"İlçe veya mahalle\"></label>",
+      "css": ".ds-field{display:grid;gap:7px;color:var(--cx-label,#1F201D);font:600 13px/1.3 var(--cx-font-family,system-ui)}.ds-field input{box-sizing:border-box;width:100%;min-height:40px;padding:0 16px;border:1px solid var(--cx-control-border,#8A8B86);border-radius:10px;background:var(--cx-surface,#fff);color:var(--cx-label,#1F201D);font:400 15px/1.35 var(--cx-font-family,system-ui)}.ds-field input::placeholder{color:var(--cx-label-secondary,#62635E)}.ds-field input:focus-visible{outline:2px solid var(--cx-accent,#A44707);outline-offset:2px}"
+    },
+    {
+      "name": "Listing Card",
+      "kind": "card",
+      "refersTo": "card-listing",
+      "description": "A flat content card with nested media radius and tabular price.",
+      "html": "<article class=\"ds-listing\"><div class=\"ds-listing-media\"></div><p>İzmir, Urla</p><h3>Denize yakın, imarlı köşe parsel</h3><strong>4.250.000 TL</strong></article>",
+      "css": ".ds-listing{overflow:hidden;border:1px solid var(--cx-hairline,#D9D8D3);border-radius:16px;background:var(--cx-surface,#fff);color:var(--cx-label,#1F201D);padding:0 16px 16px;font-family:var(--cx-font-family,system-ui);transition:border-color 180ms cubic-bezier(.25,1,.5,1),transform 180ms cubic-bezier(.25,1,.5,1)}.ds-listing:hover{border-color:var(--cx-control-border,#8A8B86);transform:translateY(-1px)}.ds-listing-media{height:150px;margin:0 -16px 16px;background:linear-gradient(145deg,#4C6E59,#365241)}.ds-listing p{margin:0 0 4px;color:var(--cx-label-secondary,#62635E);font-size:12px}.ds-listing h3{margin:0 0 16px;font-size:15px;line-height:1.35}.ds-listing strong{font-size:22px;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "Information Notice",
+      "kind": "custom",
+      "refersTo": "notice-info",
+      "description": "A full soft surface with icon, direct title, and optional action.",
+      "html": "<div class=\"ds-notice\" role=\"status\"><strong>Aramanızdan 4 filtre çıkardık</strong><p>Konum, bütçe, imar ve alan sonuçlara uygulandı.</p></div>",
+      "css": ".ds-notice{padding:16px;border-radius:10px;background:color-mix(in srgb,var(--cx-info-fg,#1D5A93) 8%,var(--cx-surface,#fff));color:var(--cx-info-fg,#1D5A93);font-family:var(--cx-font-family,system-ui)}.ds-notice strong{font-size:13px}.ds-notice p{margin:4px 0 0;color:var(--cx-label,#1F201D);font-size:13px;line-height:1.45}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calibrated Instrument",
+    "overview": "The interface behaves like a well-made measuring tool: tactile where people act, quiet where they read, and exact where they compare data. The original Kağıt/Grafit Liquid Glass identity remains available, while the Codex layer supplies three controlled comparison palettes. Paper is the recommended product default; Mineral changes the color character without changing geometry; Graphite supports dense work in low ambient light.\n\nGlass is a functional material, not a page texture. It belongs to navigation, transient controls, and media chrome. Content cards, tables, notices, and reading surfaces stay flat. Motion communicates state within 120–240ms; it never stages a page-load performance.",
+    "keyCharacteristics": [
+      "One sans family with a compact, legible product scale.",
+      "Flat content and sparse Liquid Glass chrome.",
+      "4/8/10/12/16px geometry hierarchy; capsule only for true filters.",
+      "Complete default, hover, focus, active, disabled, loading, invalid, and selected states.",
+      "Paper, Mineral, and Graphite palettes sharing one interaction contract."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Accent color is used for primary action, selection, focus, and meaningful state only; it never decorates inactive space.", "section": "colors" },
+      { "name": "The Semantic Foreground Rule", "body": "A semantic foreground and a semantic solid background are separate roles. Never assume white is readable on warning, success, or danger.", "section": "colors" },
+      { "name": "The Product Scale Rule", "body": "UI typography uses fixed sizes; fluid display type is reserved for the Editorial page composition and never leaks into controls.", "section": "typography" },
+      { "name": "The One Edge Rule", "body": "A component uses hairline, tonal separation, or shadow as its primary edge treatment. Border plus wide soft shadow is forbidden.", "section": "elevation" },
+      { "name": "The Glass Budget Rule", "body": "Glass appears only where a control or navigation layer floats above content; content surfaces never use backdrop blur.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the Paper direction as the default candidate until review selects another palette.",
+      "Do use 10px for controls, 12px for media, and 16px for cards and panels.",
+      "Do keep main touch controls at least 44px on coarse-pointer devices.",
+      "Do verify 4.5:1 normal-text contrast and a visible 2px keyboard focus indicator.",
+      "Do show loading, empty, error, invalid, disabled, selected, and long-content states in Storybook.",
+      "Do keep Original stories and APIs intact; Codex work lives in its own namespace."
+    ],
+    "donts": [
+      "Don't use ‘her yüzeyi cam yapan ve içerik hiyerarşisini bulanıklaştıran dekoratif glassmorphism.’",
+      "Don't use ‘her öğeyi tam kapsül veya 20–40px radius yapan aşırı yuvarlak Codex görünümü.’",
+      "Don't combine ‘aynı öğede 1px border ile geniş, yumuşak gölgeyi birleştiren ghost card kalıbı.’",
+      "Don't use ‘mor-mavi AI gradyanları, rastgele neon vurgular ve birbirinden kopuk tema renkleri.’",
+      "Don't build ‘aynı boyda kart ızgaraları, kart içinde kart ve gereksiz modal katmanları.’",
+      "Don't add ‘durum iletmeyen hareket, %5 ve üzeri hover büyümeleri ve odak göstergesinin gölgede kaybolması.’",
+      "Don't allow ‘aynı işi yapan kontrollerin sayfadan sayfaya farklı görünmesi.’"
+    ]
+  }
+}

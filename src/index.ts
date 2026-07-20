@@ -182,3 +182,49 @@ export {
 } from './components/GlassToast'
 export { GlassToolbar, GlassToolbarGroup, type GlassToolbarProps, type GlassToolbarGroupProps } from './components/GlassToolbar'
 export { GlassTooltip, type GlassTooltipProps } from './components/GlassTooltip'
+
+// Dalga 5 — Codex enterprise varyantındaki boşlukları kapatan yeni Glass componentleri.
+export {
+  GlassMetricStrip,
+  type GlassMetricStripProps,
+  type GlassMetricStripItem,
+  type GlassMetricTrend,
+} from './components/GlassMetricStrip'
+export { GlassFilterPanel, type GlassFilterPanelProps } from './components/GlassFilterPanel'
+export {
+  GlassAiEvidenceList,
+  type GlassAiEvidenceListProps,
+  type GlassAiEvidenceItem,
+  type GlassAiEvidenceSource,
+} from './components/GlassAiEvidenceList'
+export {
+  GlassAiConfidence,
+  type GlassAiConfidenceProps,
+  type GlassAiConfidenceFactor,
+  type GlassAiConfidenceImpact,
+  type GlassAiConfidenceLevel,
+} from './components/GlassAiConfidence'
+export {
+  GlassAiRiskReview,
+  type GlassAiRiskReviewProps,
+  type GlassAiRiskItem,
+  type GlassAiRiskSeverity,
+  type GlassAiRiskStatus,
+  type GlassAiRiskDecision,
+} from './components/GlassAiRiskReview'
+export {
+  GlassAiAgentActivity,
+  type GlassAiAgentActivityProps,
+  type GlassAgentActivityEntry,
+  type GlassAgentActivityStatus,
+} from './components/GlassAiAgentActivity'
+export { GlassSavedSearchCard, type GlassSavedSearchCardProps } from './components/GlassSavedSearchCard'
+export {
+  GlassListingManagementCard,
+  type GlassListingManagementCardProps,
+  type GlassListingState,
+  type GlassListingStat,
+} from './components/GlassListingManagementCard'
+
+// Enterprise Codex tasarım sistemi. Mevcut Glass API'lerini geriye uyum için korur.
+export * from './variants/codex'

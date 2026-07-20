@@ -656,6 +656,63 @@ const ENTRIES: CatalogEntry[] = [
     status: 'hazır',
     storyPath: '/story/components-glasslistingcard--default',
   },
+  // ── Dalga 5: Codex boşluk kapatma ──────────────────────────────────────
+  {
+    name: 'Metric Strip',
+    description: 'KPI/metrik şeridi — dl/dt/dd semantiği; trend yönü renk dışında ok glifi + sr-only metinle iletilir.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassmetricstrip--default',
+  },
+  {
+    name: 'Filter Panel',
+    description: 'Arama daraltma paneli — adlandırılmış complementary landmark, aria-live sonuç sayısı, koşullu sıfırlama.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassfilterpanel--default',
+  },
+  {
+    name: 'AI Evidence List',
+    description: 'AI cevaplarının kaynak/dayanak listesi — numaralı kaynaklar, doğrulama durumu, ilgi oranı; güvenli boş durum.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassaievidencelist--default',
+  },
+  {
+    name: 'AI Confidence',
+    description: 'AI güven göstergesi — role="meter" + seviye metni + etken listesi; skor yoksa "ölçülmedi" fallback\'i.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassaiconfidence--default',
+  },
+  {
+    name: 'AI Risk Review',
+    description: 'Risk incelemesi + insan karar kapısı — ağır açık risk varken onay kilitlenir. AI karar vermez, önceliklendirir.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassairiskreview--default',
+  },
+  {
+    name: 'AI Agent Activity',
+    description: 'AI ajan denetim kaydı — role="log" canlı akış, needsApproval izin kapısı, kalıcı yetki notu.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassaiagentactivity--default',
+  },
+  {
+    name: 'Saved Search Card',
+    description: 'Kayıtlı arama/alarm kartı — article + heading, controlled alarm switch, bağlama duyarlı silme.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasssavedsearchcard--default',
+  },
+  {
+    name: 'Listing Management Card',
+    description: 'Satıcı ilan yönetim kartı — yaşam döngüsü durumu, "işlem gerekli" uyarısı, temsili medya; kart button değil.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasslistingmanagementcard--default',
+  },
   // ── Primitive ───────────────────────────────────────────────────────────
   {
     name: 'Surface',

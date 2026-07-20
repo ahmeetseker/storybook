@@ -1,0 +1,131 @@
+.page {
+  display: grid;
+  gap: 32px;
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.header {
+  display: grid;
+  gap: 8px;
+  max-width: 72ch;
+}
+
+.header h1,
+.header p,
+.section h2,
+.section > p {
+  margin: 0;
+}
+
+.header h1 {
+  font-size: var(--cx-text-display);
+  line-height: var(--cx-leading-tight);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.header p,
+.section > p {
+  color: var(--cx-text-muted);
+  line-height: var(--cx-leading-prose);
+  text-wrap: pretty;
+}
+
+.section {
+  display: grid;
+  gap: 16px;
+}
+
+.section h2 {
+  font-size: var(--cx-text-headline-lg);
+  letter-spacing: -0.02em;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbarGroup,
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.entity {
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+}
+
+.entity strong {
+  font-size: var(--cx-text-label);
+}
+
+.entity span,
+.muted {
+  color: var(--cx-text-muted);
+  font-size: var(--cx-text-caption);
+}
+
+.money {
+  font-weight: var(--cx-weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  padding: 20px;
+  border: 1px solid var(--cx-border);
+  border-radius: var(--cx-radius-card);
+  background: var(--cx-surface);
+}
+
+.scoreStack {
+  display: grid;
+  gap: 20px;
+}
+
+.avatar {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: var(--cx-radius-compact);
+  background: var(--cx-accent-soft);
+  color: var(--cx-accent-strong);
+  font-size: var(--cx-text-label);
+  font-weight: var(--cx-weight-bold);
+}
+
+.icon {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+}
+
+.icon svg { width: 100%; height: 100%; }
+
+@media (max-width: 620px) {
+  .page { gap: 24px; }
+  .header h1 { font-size: var(--cx-text-headline-lg); }
+  .panel { padding: 16px; }
+}
