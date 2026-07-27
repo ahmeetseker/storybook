@@ -368,12 +368,15 @@ export function GlassMap({
       ) : null}
 
       {pins.map((pin, index) => {
-        // basemap modunda konum projeksiyondan (px) gelir; klasik modda 0-1 normalize
-        // koordinattan (%) gelir. İki modda da geçersiz konumlu pin render EDİLMEZ.
+        // basemap modunda konum projeksiyondan (px) gelir; klasik modda (ya da basemap
+        // zemini yüklenemeyip projeksiyon yoksa) 0-1 normalize koordinattan (%) gelir.
+        // Projeksiyon yoksa x/y'ye düşülür — böylece yalnız lat/lng verilen pin'ler zemin
+        // hatasında sessizce kaybolmaz, ama x/y de verilmişse harita hiçbir zaman boş
+        // kutu olmaz (bkz. rules.md). Ne projeksiyon ne finite x/y varsa pin render EDİLMEZ.
         const projected = usingTiles ? positions[pin.id] : undefined
-        const clampedX = usingTiles ? null : clampUnit(pin.x ?? Number.NaN)
-        const clampedY = usingTiles ? null : clampUnit(pin.y ?? Number.NaN)
-        if (usingTiles ? !projected : clampedX === null || clampedY === null) return null
+        const clampedX = projected ? null : clampUnit(pin.x ?? Number.NaN)
+        const clampedY = projected ? null : clampUnit(pin.y ?? Number.NaN)
+        if (!projected && (clampedX === null || clampedY === null)) return null
         const selected = currentSelected === pin.id
         const isCluster = typeof pin.count === 'number'
         const pinId = `${baseId}-pin-${pin.id}`

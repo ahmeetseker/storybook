@@ -127,6 +127,15 @@ Katman sırası: layer (zemin) → pins (üstte) → popup (en üstte, `z-index`
   o pin/daire hiç render edilmez (butonun kendisi DOM'a yazılmaz, tıklanabilir
   bir "harita dışı" öğe oluşmaz); finite ama 0-1 aralığı dışındaysa 0-1'e
   kenetlenir (ör. `x=4` → `1`, `y=-2` → `0`).
+- Zemin (`basemap`) modunda zarif düşüş: `basemap` verilip gerçek tile zemini
+  kurulamazsa (`status==='error'`) harita seed'li SVG dokusuna döner ve pin
+  konumu artık lat/lng projeksiyonundan gelmez. Bu anda pin'e `x`/`y` de
+  verilmişse pin yüzde koordinatla render edilmeye DEVAM EDER (harita hiçbir
+  zaman boş kutu olmaz); yalnız `lat`/`lng` verilmiş, `x`/`y` verilmemiş
+  pin'ler zemin hatasında render edilmez. Bu yüzden `basemap` kullanan
+  tüketicilerin pin'lere mümkünse kaba `x`/`y` de vermesi önerilir — bu,
+  zemin servisi (ağ/CSP/adblock) çökse bile ilanların kaba konumla görünür
+  kalmasını sağlar.
 
 ## 8. İçerik kuralları
 
@@ -247,3 +256,8 @@ temizlemesi artık eski iç/uncontrolled seçimi geri sızdırmaz; `pins[].x/y`
 ve `privacyCircle.x/y/r` `clampUnit` ile finite kontrolünden geçirilip
 0-1'e kenetlenir, finite olmayan değer render edilmez (harita dışında
 etkileşimli pin üretilmesi engellendi).
+2026-07-27 — Review düzeltmesi: `basemap` zemini kurulamadığında (`status
+==='error'`) pin dallanması artık yalnız `usingTiles`'a değil, projeksiyon
+sonucunun varlığına bakıyor — projeksiyon yoksa ve pin'de `x`/`y` varsa pin
+yüzde koordinatla render edilmeye devam ediyor (önceden yalnız `lat`/`lng`
+verilen pin'ler zemin hatasında sessizce kayboluyordu).

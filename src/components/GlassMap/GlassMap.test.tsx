@@ -13,12 +13,16 @@ const basemapInstance = {
   latLngToContainerPoint: vi.fn((coords: [number, number]) => ({ x: coords[1], y: coords[0] })),
 }
 
+// Ayrı bir değişkende tutulur ki regresyon testi zemin kurulumunu (`L.map`)
+// bir kerelik throw ettirip `useBasemap`'in error dalını tetikleyebilsin.
+const leafletMapMock = vi.fn(() => {
+  basemapInstance.setView.mockReturnValue(basemapInstance)
+  return basemapInstance
+})
+
 vi.mock('leaflet', () => ({
   default: {
-    map: vi.fn(() => {
-      basemapInstance.setView.mockReturnValue(basemapInstance)
-      return basemapInstance
-    }),
+    map: leafletMapMock,
     tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
   },
 }))
@@ -265,5 +269,35 @@ describe('GlassMap', () => {
     expect(basemapInstance.zoomIn).toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Uzaklaştır' }))
     expect(basemapInstance.zoomOut).toHaveBeenCalled()
+  })
+
+  it('zemin yüklenemezse ve pinde x/y de varsa, pin yüzde konumla render edilmeye devam eder', async () => {
+    leafletMapMock.mockImplementationOnce(() => {
+      throw new Error('Leaflet başlatılamadı')
+    })
+    render(
+      <GlassMap
+        pins={[{ id: 'urla', lat: 38.3, lng: 26.7, x: 0.2, y: 0.3, price: '4.250.000 TL' }]}
+        basemap={basemap}
+      />,
+    )
+    const pin = await screen.findByRole('button', { name: '4.250.000 TL' })
+    const wrap = pin.parentElement as HTMLElement
+    await waitFor(() => expect(wrap.style.left).toBe('20%'))
+    expect(wrap.style.top).toBe('30%')
+  })
+
+  it('zemin yüklenemezse ve pinde yalnız lat/lng varsa (x/y yok), pin render edilmez', async () => {
+    leafletMapMock.mockImplementationOnce(() => {
+      throw new Error('Leaflet başlatılamadı')
+    })
+    render(
+      <GlassMap
+        pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]}
+        basemap={basemap}
+      />,
+    )
+    await waitFor(() => expect(screen.getByRole('status')).toBeDefined())
+    expect(screen.queryByRole('button', { name: '4.250.000 TL' })).toBeNull()
   })
 })
