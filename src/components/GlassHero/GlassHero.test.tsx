@@ -13,13 +13,26 @@ describe('GlassHero', () => {
     expect(screen.getByRole('heading', { level: 1 })).toBeDefined()
   })
 
-  it('search slotu yalnız search varyantında render olur', () => {
+  it('search slotu centered varyantında render olmaz', () => {
     const { rerender } = render(
       <GlassHero title="B" variant="search" search={<input aria-label="Arsa ara" />} />,
     )
     expect(screen.getByLabelText('Arsa ara')).toBeDefined()
     rerender(<GlassHero title="B" variant="centered" search={<input aria-label="Arsa ara" />} />)
     expect(screen.queryByLabelText('Arsa ara')).toBeNull()
+  })
+
+  it('eyebrow slotu başlığın önünde render olur', () => {
+    render(<GlassHero title="Başlık" eyebrow={<span data-testid="eyebrow">Arsa</span>} />)
+    const eyebrow = screen.getByTestId('eyebrow')
+    const heading = screen.getByRole('heading', { level: 2 })
+    // DOM sırası: eyebrow başlıktan önce gelir
+    expect(eyebrow.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('search slotu split varyantında da render olur', () => {
+    render(<GlassHero title="B" variant="split" search={<input aria-label="Arsa ara" />} />)
+    expect(screen.getByLabelText('Arsa ara')).toBeDefined()
   })
 
   it('split varyantında media paneli render olur', () => {

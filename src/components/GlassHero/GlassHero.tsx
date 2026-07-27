@@ -8,6 +8,8 @@ import { prefersReducedMotion } from '../../core/tier'
 import styles from './GlassHero.module.css'
 
 export interface GlassHeroProps {
+  /** Başlığın üstünde duran küçük slot — sekme şeridi, etiket veya kırıntı yolu */
+  eyebrow?: ReactNode
   title: ReactNode
   subtitle?: ReactNode
   /** CTA butonları — GlassButton'ları çağıran verir */
@@ -41,6 +43,7 @@ const stagger = {
 }
 
 export function GlassHero({
+  eyebrow,
   title,
   subtitle,
   actions,
@@ -61,6 +64,11 @@ export function GlassHero({
   const entering = animate && !reduced
 
   const blocks: ReactNode[] = [
+    eyebrow ? (
+      <div key="eyebrow" className={styles.eyebrow}>
+        {eyebrow}
+      </div>
+    ) : null,
     <Title key="title" className={styles.title}>
       {title}
     </Title>,
@@ -69,7 +77,7 @@ export function GlassHero({
         {subtitle}
       </p>
     ) : null,
-    variant === 'search' && search ? (
+    (variant === 'search' || variant === 'split') && search ? (
       <div key="search" className={styles.searchSlot}>
         {search}
       </div>

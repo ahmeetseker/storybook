@@ -4,6 +4,8 @@ import { GlassButton } from '../GlassButton'
 import { placeholderImage } from '../../demo/placeholderImage'
 import { useTypewriter } from '../../motion/useTypewriter'
 import { GlassBento } from '../GlassBento'
+import { GlassSegmentedControl } from '../GlassSegmentedControl'
+import { GlassInput } from '../GlassInput'
 
 const ARAMA_ORNEKLERI = [
   'İzmir Urla imarlı arsa',
@@ -112,6 +114,35 @@ export const Split: Story = {
       </>
     ),
     media: <StatPanel />,
+  },
+}
+
+/** Sekme şeridi eyebrow slotunda, arama split varyantının search slotunda. */
+export const SplitEyebrowVeArama: Story = {
+  args: {
+    variant: 'split',
+    titleAs: 'h2',
+    eyebrow: (
+      <GlassSegmentedControl
+        label="İlan türü"
+        options={[
+          { value: 'arsa', label: 'Arsa' },
+          { value: 'konut', label: 'Konut' },
+        ]}
+      />
+    ),
+    title: 'Önce haritada gör, sonra karar ver',
+    subtitle: 'Bölgeyi seç, doğrulanmış ilanlara konum üzerinden ulaş.',
+    search: <GlassInput aria-label="Arsa ara" placeholder="Bölge, bütçe veya imar tercihini yaz" />,
+    media: (
+      <div
+        style={{
+          aspectRatio: '4 / 3',
+          background: 'color-mix(in srgb, var(--lg-label) 6%, transparent)',
+          borderRadius: 'var(--lg-radius-media)',
+        }}
+      />
+    ),
   },
 }
 

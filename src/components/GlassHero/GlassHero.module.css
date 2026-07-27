@@ -69,6 +69,7 @@
 }
 .actionsRow { display: flex; flex-wrap: wrap; gap: var(--actions-gap); }
 .searchSlot { width: 100%; max-width: var(--search-max-w); }
+.eyebrow { display: flex; flex-wrap: wrap; gap: var(--lg-space-2); align-items: center; }
 .quickLinks { display: flex; flex-wrap: wrap; gap: var(--lg-space-2) var(--quicklink-gap); font-size: var(--text-sm); }
 
 /* split */

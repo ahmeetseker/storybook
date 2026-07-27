@@ -2,7 +2,7 @@
 name: GlassHero
 category: içerik
 status: hazır
-lastReviewed: 2026-07-24
+lastReviewed: 2026-07-27
 ---
 
 # GlassHero Kuralları
@@ -27,9 +27,10 @@ Sayfa açılış (hero) bölümü — başlık, alt başlık ve slot'lar. Zemin 
 
 | Slot | Zorunlu | Kurallar |
 |---|---|---|
+| eyebrow | — | Başlığın üstünde; sekme şeridi/etiket/kırıntı yolu; kademeli girişte ilk blok |
 | title | ✅ | Tek cümle; 760px max genişlik |
 | subtitle | — | 1-2 cümle; `--lg-label-secondary` |
-| search | — | Yalnız `variant="search"` |
+| search | — | Yalnız `variant="search"` ve `variant="split"` |
 | quickLinks | — | Yalnız `variant="search"`; kısa link seti |
 | actions | — | Tüm varyantlarda; GlassButton önerilir |
 | media | — | split: yan panel · showcase: tam arka plan |
@@ -38,6 +39,7 @@ Sayfa açılış (hero) bölümü — başlık, alt başlık ve slot'lar. Zemin 
 
 | Ad | Type | Default |
 |---|---|---|
+| eyebrow | `ReactNode` | — |
 | title | `ReactNode` | — |
 | subtitle | `ReactNode` | — |
 | actions / media / search / quickLinks | `ReactNode` | — |
@@ -49,8 +51,9 @@ Sayfa açılış (hero) bölümü — başlık, alt başlık ve slot'lar. Zemin 
 
 ## 5. Seçenek eksenleri
 
-`material` yok — hero içerik katmanıdır, hep flat. `search`/`quickLinks` diğer
-varyantlarda sessizce render edilmez (yasak kombinasyon yerine no-op).
+`material` yok — hero içerik katmanıdır, hep flat. `search` yalnız `search` ve
+`split` varyantlarında render edilir; `quickLinks` yalnız `search` varyantında.
+Diğer varyantlarda sessizce render edilmez (yasak kombinasyon yerine no-op).
 
 ## 6. State modeli
 
@@ -103,13 +106,15 @@ Animasyon süreleri/easing (22/26/32s, ease-in-out) token'sız raw kalır.
 
 ## 10. Storybook kapsamı
 
-Default(search), Playground, Split, Showcase, Centered, H1Baslik,
-VaryantKarsilastirma (4 varyant alt alta — seçim story'si). Temalar toolbar'dan.
+Default(search), Playground, Split, SplitEyebrowVeArama (eyebrow + split'te search),
+Showcase, Centered, H1Baslik, VaryantKarsilastirma (4 varyant alt alta — seçim
+story'si). Temalar toolbar'dan.
 
 ## 11. Test kabul kriterleri
 
 - [x] default h2 / titleAs h1
-- [x] search slotu yalnız search varyantında
+- [x] eyebrow slotu başlığın önünde render olur
+- [x] search slotu search ve split varyantlarında render olur, centered'da olmaz
 - [x] split media paneli
 - [x] showcase scrim + aria-hidden medya
 - [x] actions render
@@ -130,6 +135,7 @@ VaryantKarsilastirma (4 varyant alt alta — seçim story'si). Temalar toolbar'd
 oturtulması v2 tasarım kararı · `tone` ekseni bilinçli yok — flat zemin tema
 token'larından döner; ihtiyaç doğarsa v2.
 
-**Changelog:** 2026-07-24 — Kök taşma kırpması kaldırıldı; slot içindeki bağlı
-paneller hero dışına çıkabilir. Showcase ve ambient kırpması kendi katmanlarında
-korundu.
+**Changelog:** 2026-07-27 — `eyebrow` slotu eklendi (başlığın üstünde, kademeli
+girişte ilk blok); `search` slotu artık `split` varyantında da render edilir.
+2026-07-24 — Kök taşma kırpması kaldırıldı; slot içindeki bağlı paneller hero
+dışına çıkabilir. Showcase ve ambient kırpması kendi katmanlarında korundu.
