@@ -1,26 +1,35 @@
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   GlassAgencyCard,
   GlassAiSearchBar,
   GlassButton,
+  GlassChip,
   GlassHero,
+  GlassMap,
   GlassMetricStrip,
+  GlassSegmentedControl,
   GlassVitrin,
 } from "@repo/ui";
-import { LeafletListingMap, type LeafletListingPoint } from "./LeafletListingMap";
 import { agencyFixtures, homeVitrinItems } from "../fixtures";
+import { HERO_TABS, heroTab, type HeroTabId, type HeroParsedFilter } from "./heroTabs";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
 import { HomeFooter } from "../shared/HomeFooter";
 import styles from "./MapFirstHome.module.css";
 
-const mapPins: LeafletListingPoint[] = [
-  { id: "1084526631", lat: 38.322, lng: 26.764, label: "Urla", popup: "Urla · 4.250.000 TL" },
-  { id: "1084526634", lat: 36.20, lng: 29.64, label: "Kaş", popup: "Kaş · 6.900.000 TL" },
-  { id: "1084526632", lat: 39.92, lng: 32.85, label: "Gölbaşı", popup: "Gölbaşı · 1.850.000 TL" },
-  { id: "ege-cluster", lat: 37.04, lng: 27.43, label: "Bodrum", popup: "Bodrum · 18 ilan" },
-  { id: "1084526633", lat: 38.74, lng: 26.18, label: "Çeşme", popup: "Çeşme · 3.100.000 TL" },
-  { id: "marmara-cluster", lat: 40.35, lng: 29.06, label: "Bursa", popup: "Bursa · 9 ilan" },
-];
+// Zemin sabit referans: her render'da yeni nesne üretilirse harita yeniden kurulur.
+const HERO_BASEMAP = {
+  tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  attribution: (
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+      © OpenStreetMap katkıcıları
+    </a>
+  ),
+  center: [39, 35.2] as [number, number],
+  zoom: 5.5,
+  maxZoom: 19,
+  tone: "quiet" as const,
+};
 
 const regions = [
   {
@@ -75,12 +84,34 @@ const regions = [
 
 export interface MapFirstHomeProps {
   showConceptNavigation?: boolean;
+  /** Controlled sekme */
+  tab?: HeroTabId;
+  /** Uncontrolled başlangıç sekmesi */
+  defaultTab?: HeroTabId;
+  onTabChange?: (tab: HeroTabId) => void;
 }
 
 export function MapFirstHome({
   showConceptNavigation = true,
+  tab,
+  defaultTab = "arsa",
+  onTabChange,
 }: MapFirstHomeProps) {
   const navigate = useNavigate();
+  const [innerTab, setInnerTab] = useState<HeroTabId>(defaultTab);
+  const activeTabId = tab ?? innerTab;
+  const active = heroTab(activeTabId);
+  const [removedFilters, setRemovedFilters] = useState<string[]>([]);
+  const parsedFilters: HeroParsedFilter[] = active.parsedFilters.filter(
+    (filter) => !removedFilters.includes(`${active.id}:${filter.id}`),
+  );
+
+  const selectTab = (next: string) => {
+    if (next !== "arsa" && next !== "konut" && next !== "proje") return;
+    if (tab === undefined) setInnerTab(next);
+    onTabChange?.(next);
+  };
+
   const goToSearch = () => {
     void navigate({ to: "/arsa-ara" });
   };
@@ -111,31 +142,65 @@ export function MapFirstHome({
         <GlassHero
           variant="split"
           titleAs="h1"
-          title="Arsayı önce haritada gör"
-          subtitle="Bölgeyi seç, fiyat kümelerini incele ve doğrulanmış ilanlara konum üzerinden ulaş."
-          animate={false}
-          actions={
+          eyebrow={
+            <GlassSegmentedControl
+              label="İlan türü"
+              options={HERO_TABS.map((item) => ({ value: item.id, label: item.label }))}
+              value={activeTabId}
+              onChange={selectTab}
+            />
+          }
+          title={active.title}
+          subtitle={active.subtitle}
+          search={
             <div className={styles.heroSearch}>
               <GlassAiSearchBar
-                placeholder="Bölge, bütçe veya imar tercihini yaz"
-                suggestions={[
-                  "Urla konut imarlı arsa",
-                  "Kaş deniz manzaralı arsa",
-                  "Gölbaşı yol cepheli tarla",
-                ]}
+                placeholder={active.placeholder}
+                suggestions={active.suggestions}
+                parsedFilters={parsedFilters}
+                confidence={active.confidence}
+                onRemoveFilter={(id) => setRemovedFilters((prev) => [...prev, `${active.id}:${id}`])}
                 onSubmit={goToSearch}
+                aria-label="İlanları yapay zekâ ile ara"
               />
             </div>
           }
+          actions={
+            <div className={styles.quickFilters}>
+              {active.quickFilters.map((filter) => (
+                <GlassChip key={filter} size="sm">
+                  {filter}
+                </GlassChip>
+              ))}
+            </div>
+          }
           media={
-            <section
-              className={styles.mapRegion}
-              aria-label="Bölgesel arsa haritası"
-            >
-              <LeafletListingMap points={mapPins} />
-            </section>
+            <div className={styles.mapRegion}>
+              <GlassMap
+                className={styles.heroMap}
+                variant="panel"
+                label={`${active.label} haritası`}
+                pins={active.pins}
+                basemap={HERO_BASEMAP}
+                popupContent={(id) => {
+                  const pin = active.pins.find((item) => item.id === id);
+                  return pin ? <strong>{pin.price ?? `${pin.count} ilan`}</strong> : null;
+                }}
+              />
+            </div>
           }
         />
+        <div className={styles.trustBand}>
+          <GlassMetricStrip
+            size="sm"
+            label="Doğrulama göstergeleri"
+            items={[
+              { id: "verified", label: "Doğrulanmış", value: active.verifiedCount, hint: active.verifiedLabel },
+              { id: "today", label: "Bugün doğrulanan", value: "12", hint: "EİDS tapu eşleşmesi" },
+              { id: "cities", label: "İl", value: "81", hint: "Türkiye geneli" },
+            ]}
+          />
+        </div>
       </div>
 
       <section
