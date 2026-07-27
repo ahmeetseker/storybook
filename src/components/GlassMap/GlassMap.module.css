@@ -24,6 +24,7 @@
   --map-zoom-radius: 10px;
   --map-attr-pad: 2px 7px;
   --map-corner-surface-max-w: calc(50% - var(--lg-space-2) * 1.5);
+  --map-pin-edge-inset: 10px;
   position: relative;
   /* overflow:hidden BİLEREK yok — yalnız .canvasClip zemini kırpar. Popup/pin kök
      sınırının dışına taştığında görünmez olmak yerine üstte akar (bkz. .popup). */
@@ -127,10 +128,19 @@
 }
 
 /* ── pinler: gerçek buton, konum yüzdeyle taşınır ── */
+/* Pin normalde çapasının üstünde ortalanır. Panel kenarına yaklaşınca etiket
+   dışarı sarkmasın diye hizalama içeri çevrilir — kök `overflow:hidden` almadığı
+   için (popup taşabilmeli) sarkan etiket sayfa içeriğinin üstüne binerdi. */
 .pinWrap {
   position: absolute;
-  transform: translate(-50%, -50%);
+  --pin-shift-x: -50%;
+  --pin-shift-y: -50%;
+  transform: translate(var(--pin-shift-x), var(--pin-shift-y));
 }
+.pinWrap[data-edge-x='start'] { --pin-shift-x: calc(-1 * var(--map-pin-edge-inset)); }
+.pinWrap[data-edge-x='end'] { --pin-shift-x: calc(-100% + var(--map-pin-edge-inset)); }
+.pinWrap[data-edge-y='start'] { --pin-shift-y: calc(-1 * var(--map-pin-edge-inset)); }
+.pinWrap[data-edge-y='end'] { --pin-shift-y: calc(-100% + var(--map-pin-edge-inset)); }
 .pin {
   position: relative;
   display: inline-flex;
@@ -282,8 +292,12 @@
 
 /* Ton, tile sağlayıcısından bağımsız olarak burada verilir. Amaç zemini sitenin
    sıcak nötrlerine yaklaştırmak; renk kaynağı tile olduğu için filtre kullanılır. */
+/* Sıra önemli: önce doygunluk kırılır, sonra sepia zemini tek bir sıcak aileye
+   toplar, hue-rotate kalan yeşil/mavi kaymasını amber tarafına çeker. Yalnız
+   doygunluk düşürmek yetmiyordu — zemin soğuk gri-mavi kalıp fildişi sayfanın
+   yanında yabancı duruyordu. */
 .tiles[data-tone='quiet'] {
-  filter: saturate(0.34) sepia(0.16) brightness(1.03) contrast(0.96);
+  filter: saturate(0.2) sepia(0.52) hue-rotate(-6deg) brightness(1.06) contrast(0.9);
 }
 
 .tiles[data-tone='raw'] {
@@ -297,7 +311,7 @@
 @media (prefers-color-scheme: dark) {
   /* Koyu temada ters çevirme YOK — etiketler okunaklı kalsın diye yalnız karartma. */
   .tiles[data-tone='quiet'] {
-    filter: saturate(0.24) brightness(0.58) contrast(1.08);
+    filter: saturate(0.18) sepia(0.4) hue-rotate(-6deg) brightness(0.56) contrast(1.06);
   }
 
   .tiles[data-tone='satellite'] {

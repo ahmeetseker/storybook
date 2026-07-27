@@ -400,14 +400,29 @@ export function GlassMap({
         const wrapStyle = projected
           ? { left: `${projected.left}px`, top: `${projected.top}px`, zIndex: selected ? 2 : 1 }
           : { left: `${(clampedX as number) * 100}%`, top: `${(clampedY as number) * 100}%`, zIndex: selected ? 2 : 1 }
+        const panelWidth = tilesRef.current?.clientWidth ?? 0
+        const panelHeight = tilesRef.current?.clientHeight ?? 0
         const normX = projected && tilesRef.current
-          ? projected.left / Math.max(1, tilesRef.current.clientWidth)
+          ? projected.left / Math.max(1, panelWidth)
           : (clampedX as number)
         const normY = projected && tilesRef.current
-          ? projected.top / Math.max(1, tilesRef.current.clientHeight)
+          ? projected.top / Math.max(1, panelHeight)
           : (clampedY as number)
+        // Kenara yakın pin, etiketi panel dışına sarkmasın diye içeri hizalanır.
+        // Eşik piksel tabanlı: etiket genişliği sabit olduğundan dar panelde
+        // oransal bir eşik yetersiz kalır (mobilde fiyat etiketi taşardı).
+        const edgeMarginX = panelWidth > 0 ? Math.min(0.45, 62 / panelWidth) : 0.07
+        const edgeMarginY = panelHeight > 0 ? Math.min(0.45, 26 / panelHeight) : 0.09
+        const edgeX = normX < edgeMarginX ? 'start' : normX > 1 - edgeMarginX ? 'end' : undefined
+        const edgeY = normY < edgeMarginY ? 'start' : normY > 1 - edgeMarginY ? 'end' : undefined
         return (
-          <div key={pin.id} className={styles.pinWrap} style={wrapStyle}>
+          <div
+            key={pin.id}
+            className={styles.pinWrap}
+            style={wrapStyle}
+            data-edge-x={edgeX}
+            data-edge-y={edgeY}
+          >
             <button
               id={pinId}
               type="button"

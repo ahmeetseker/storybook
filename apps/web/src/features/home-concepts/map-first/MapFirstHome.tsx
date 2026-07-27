@@ -26,8 +26,10 @@ const HERO_BASEMAP = {
       © OpenStreetMap katkıcıları
     </a>
   ),
-  center: [39, 35.2] as [number, number],
-  zoom: 5.35,
+  // Kadraj Türkiye'ye kilitlenir: merkez ülke ağırlık noktasında, zoom panelin
+  // 16:10 oranıyla birlikte komşu ülke payını en aza indirecek şekilde seçildi.
+  center: [39.1, 35.3] as [number, number],
+  zoom: 5.6,
   maxZoom: 19,
   tone: "quiet" as const,
 };

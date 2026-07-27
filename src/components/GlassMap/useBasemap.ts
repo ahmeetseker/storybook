@@ -91,14 +91,24 @@ export function useBasemap(
   const project = useCallback(() => {
     const map = mapRef.current
     if (!map) return
+    // Görünür alan dışındaki pin hiç çizilmez. Kök `overflow:hidden` ALMAZ
+    // (popup panel kenarından taşabilmeli), bu yüzden kırpma yerine kaynağında
+    // eleme yapılır — aksi halde harita sürüklenirken fiyat etiketleri panelin
+    // dışına, sayfa içeriğinin üstüne akar. Boyut okunamıyorsa (SSR/jsdom,
+    // ilk yerleşim öncesi) eleme atlanır, yoksa tüm pinler kaybolurdu.
+    const container = containerRef.current
+    const width = container?.clientWidth ?? 0
+    const height = container?.clientHeight ?? 0
+    const cull = width > 0 && height > 0
     const next: Record<string, { left: number; top: number }> = {}
     for (const point of pointsRef.current) {
       if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) continue
       const pixel = map.latLngToContainerPoint([point.lat as number, point.lng as number])
+      if (cull && (pixel.x < 0 || pixel.y < 0 || pixel.x > width || pixel.y > height)) continue
       next[point.id] = { left: pixel.x, top: pixel.y }
     }
     setPositions(next)
-  }, [])
+  }, [containerRef])
 
   // Zemin kurulumu — yalnız istemcide, yalnız basemap verildiğinde.
   const tileUrl = basemap?.tileUrl

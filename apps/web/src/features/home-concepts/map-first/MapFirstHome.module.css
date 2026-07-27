@@ -23,15 +23,18 @@
   min-width: 0;
 }
 
+/* Türkiye kabaca 3:1 yatık bir dikdörtgen; panel kareye yaklaştıkça ülkeyi
+   sığdırmak için uzaklaşmak gerekir ve kadraj komşu ülkelerle dolar. Bu yüzden
+   panel bilinçli olarak yatay tutulur ve zoom yükseltilir. */
 .mapRegion {
   min-width: 0;
-  height: 100%;
-  min-height: 21.875rem;
+  aspect-ratio: 16 / 10;
+  min-height: 20rem;
 }
 
 .heroMap {
   height: 100%;
-  min-height: inherit;
+  min-height: 0;
   border-radius: var(--lg-radius-card);
   box-shadow: var(--lg-shadow-sm);
 }

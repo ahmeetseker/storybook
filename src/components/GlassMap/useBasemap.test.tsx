@@ -54,6 +54,23 @@ function useHarness(
   return useBasemap(ref, map, points, layer)
 }
 
+/** jsdom'da 0 dönen clientWidth/Height'i sabitler — görünür alan elemesini test etmek için. */
+function sizedElement(width: number, height: number): HTMLDivElement {
+  const element = document.createElement('div')
+  Object.defineProperty(element, 'clientWidth', { value: width, configurable: true })
+  Object.defineProperty(element, 'clientHeight', { value: height, configurable: true })
+  return element
+}
+
+function useSizedHarness(
+  map: GlassMapBasemap | undefined,
+  points: { id: string; lat?: number; lng?: number }[],
+  size: { width: number; height: number },
+) {
+  const ref = useRef<HTMLDivElement | null>(sizedElement(size.width, size.height))
+  return useBasemap(ref, map, points, 'yol')
+}
+
 describe('useBasemap', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -165,5 +182,36 @@ describe('useBasemap', () => {
     tileLayerInstance.setUrl.mockClear()
     rerender({ layer: 'uydu' })
     await waitFor(() => expect(tileLayerInstance.setUrl).toHaveBeenCalledWith(basemap.tileUrl))
+  })
+
+  // Harita sürüklenirken panel dışına çıkan pinler çizilmemeli: kök overflow:hidden
+  // almadığı için (popup taşabilmeli) elenmezlerse etiketler sayfa içeriğinin üstüne akar.
+  it('görünür alan dışına çıkan pin projeksiyona girmez', async () => {
+    const points = [
+      { id: 'icerde', lat: 20, lng: 30 },
+      { id: 'sagda', lat: 20, lng: 260 },
+      { id: 'altta', lat: 190, lng: 30 },
+      { id: 'solda', lat: 20, lng: -5 },
+      { id: 'ustte', lat: -5, lng: 30 },
+    ]
+    const { result } = renderHook(() =>
+      useSizedHarness(basemap, points, { width: 200, height: 150 }),
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    await waitFor(() => expect(result.current.positions.icerde).toEqual({ left: 30, top: 20 }))
+    expect(result.current.positions.sagda).toBeUndefined()
+    expect(result.current.positions.altta).toBeUndefined()
+    expect(result.current.positions.solda).toBeUndefined()
+    expect(result.current.positions.ustte).toBeUndefined()
+  })
+
+  // Boyut okunamadığında (SSR/jsdom, ilk yerleşim öncesi) eleme atlanmalı,
+  // yoksa tüm pinler kaybolurdu.
+  it('kapsayıcı boyutu okunamıyorsa eleme yapılmaz', async () => {
+    const { result } = renderHook(() =>
+      useHarness(basemap, [{ id: 'uzak', lat: 20, lng: 9999 }]),
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    await waitFor(() => expect(result.current.positions.uzak).toBeDefined())
   })
 })
