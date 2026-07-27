@@ -23,6 +23,7 @@
   --map-zoom-btn-size: 30px;
   --map-zoom-radius: 10px;
   --map-attr-pad: 2px 7px;
+  --map-corner-surface-max-w: calc(50% - var(--lg-space-2) * 1.5);
   position: relative;
   /* overflow:hidden BİLEREK yok — yalnız .canvasClip zemini kırpar. Popup/pin kök
      sınırının dışına taştığında görünmez olmak yerine üstte akar (bkz. .popup). */
@@ -351,11 +352,15 @@
   z-index: 3;
   bottom: var(--lg-space-2);
   left: var(--lg-space-2);
+  max-width: var(--map-corner-surface-max-w);
   padding: var(--map-attr-pad);
+  overflow: hidden;
   border-radius: var(--lg-radius-chip);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-badge);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .attribution a {
@@ -367,12 +372,17 @@
   z-index: 3;
   right: var(--lg-space-2);
   bottom: var(--lg-space-2);
+  max-width: var(--map-corner-surface-max-w);
   margin: 0;
   padding: var(--map-attr-pad);
+  overflow: hidden;
   border-radius: var(--lg-radius-chip);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-badge);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
 }
 
 @media (hover: hover) {
