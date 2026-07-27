@@ -1,4 +1,6 @@
-// Kütüphanesiz harita yüzeyi v1 — gerçek MapLibre adaptörü v2 (bkz. rules.md Açık Kararlar).
+// Kütüphanesiz harita yüzeyi v1 + gerçek zemin v2 (bkz. rules.md Kapatılan Kararlar) —
+// gerçek zemin `basemap` prop'uyla Leaflet üzerinden sağlanır (yalnız projeksiyon/tile
+// motoru olarak; bkz. useBasemap.ts).
 // İçerik katmanı FLAT: cam yok, backdrop-filter yok. Zemin seed'li deterministik SVG
 // sokak dokusuyla üretilir (Math.random YASAK — seeded PRNG kullanılır).
 import { useId, useMemo, useRef, useState, type HTMLAttributes, type KeyboardEvent, type ReactNode } from 'react'

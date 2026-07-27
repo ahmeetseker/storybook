@@ -58,7 +58,7 @@ bağlamı verir.
 |---|---|---|---|
 | pins[].id | ✅ | `string` | React key + popup/seçim kimliği |
 | pins[].x / y | ⚠️ | `number` (0-1) | `basemap` YOKKEN zorunlu. Normalize konum; harita kutusuna göre. Finite değilse (NaN/Infinity) pin RENDER EDİLMEZ; finite ama 0-1 dışıysa 0-1'e kenetlenir (`clampUnit`) — harita dışında etkileşimli pin üretilmez |
-| pins[].lat / lng | ⚠️ | `number` | `basemap` VARKEN kullanılır; Leaflet projeksiyonuyla piksele çevrilir. Moda uymayan pin (ör. `basemap` varken yalnız `x`/`y` verilmiş, `basemap` yokken yalnız `lat`/`lng` verilmiş) sessizce atlanır — hata fırlatılmaz (bkz. §7 zarif düşüş) |
+| pins[].lat / lng | ⚠️ | `number` | `basemap` VARKEN kullanılır; Leaflet projeksiyonuyla piksele çevrilir. Render pin başına mevcut geçerli koordinata düşer: önce projeksiyon denenir, o pin için yoksa (bu pin'in `lat`/`lng`'si eksik/finite değil veya zemin `status==='error'`) `x`/`y` varsa ona düşülür (`GlassMap.tsx` pin render bloğu, satır ~376-379); yalnız ikisi de yoksa pin atlanır. ⚠️ Bu düşüş "pin kaybolur" değil **"pin yanlış konumda görünür"** riski taşır — `x`/`y` bir yüzde konumu olarak yorumlanır, bu yüzden `basemap` ile birlikte `x`/`y` de veriliyorsa bunlar rastgele/varsayılan bir değer değil, ilanın coğrafi konumunun kaba bir yüzde karşılığı olmalıdır (bkz. §6, §7) |
 | pins[].price | — | `string` | Verilmezse ve `count` yoksa pin boş görünür (kullanıcı hatası) |
 | pins[].count | — | `number` | Verilirse cluster rozeti; `price` yok sayılır |
 | popupContent | — | `(pinId) => ReactNode` | Yalnız seçili pin için çağrılır |
@@ -110,10 +110,22 @@ variant yok. `seed` görsel bir eksen değil, üretim parametresidir.
 | basemap durumu | `useBasemap` iç state'i (`idle/loading/ready/error`) — prop değil | pin konum kaynağını (projeksiyon ↔ `x`/`y`) belirler | `error` iken `role="status"` bildirim |
 
 Katman sırası: layer (zemin) → pins (üstte) → popup (en üstte, `z-index`).
-Pin konumu `basemap` yokken her zaman `x`/`y` (0-1 normalize) üzerinden,
-`basemap` varken Leaflet projeksiyonundan (piksel) gelir; ilgili moda uymayan
-alanlar (basemap yokken `lat`/`lng`, basemap varken yalnız `x`/`y` YOKSA)
-sessizce atlanır — bkz. §3, §7.
+Pin konumu `basemap` yokken her zaman `x`/`y` (0-1 normalize) üzerinden gelir.
+`basemap` varken önce Leaflet projeksiyonu (o pinin `lat`/`lng`'sinden
+hesaplanan piksel) denenir; **bu pin için** projeksiyon yoksa (ör. bu pinde
+`lat`/`lng` eksik/finite değil, ya da zemin `status==='error'`) ve pin'de
+`x`/`y` varsa render ona düşer — pin ATLANMAZ, yüzde konumuyla render
+edilmeye devam eder. Pin yalnız her iki kaynak da (projeksiyon VE geçerli
+`x`/`y`) yoksa atlanır; bu koşul `basemap`'in genel `status`'undan bağımsız,
+pin başına değerlendirilir — yani `basemap` sağlıklı (`ready`) olsa bile
+yalnız `x`/`y` verilmiş (lat/lng'si olmayan) bir pin, x/y yüzde konumunda
+render edilmeye devam eder, atlanmaz. Bu davranış "pin kaybolmasın" diye
+bilinçli tasarlandı ama bir risk taşır: `x`/`y` gerçek coğrafi konumla
+ilgisizse (ör. tutarsız/rastgele bir yüzde), pin harita üzerinde coğrafi
+olarak yanlış bir yerde görünür — bu, hiç render edilmemekten daha
+yanıltıcı olabilir. Bu yüzden `basemap` kullanan tüketicilerin `x`/`y`
+sağladığında bunun konumun kaba bir yüzde karşılığı olmasına özen göstermesi
+gerekir (bkz. §3, §7).
 
 ## 7. Davranış
 
@@ -205,8 +217,10 @@ SVG `stroke-width`/`stroke-dasharray` vektör gereği raw; süre/easing
 iç boşluğu), `--map-corner-surface-max-w` (`calc(50% - var(--lg-space-2) *
 1.5)` — atıf ve hata bildirimi aynı satırda yan yana durduğunda çakışmasınlar
 diye her biri genişliğin yarısından biraz azını alır). `tone` filtre
-değerlerinin (`saturate`/`sepia`/`brightness`/`contrast` katsayıları, `quiet`/
-`raw`/`satellite` + koyu tema varyantları) token karşılığı yok — bunlar tile
+değerlerinin (`saturate`/`sepia`/`brightness`/`contrast` katsayıları; `quiet`/
+`raw`/`satellite` + yalnız `quiet` ve `satellite` için ayrı koyu tema
+varyantları — `raw`'ın `filter: none`'u koyu temada da değişmez, bilinçli
+olarak filtresiz bırakılır) token karşılığı yok — bunlar tile
 sağlayıcısının (OSM) kendi paletini sitenin sıcak nötrlerine yaklaştırmak için
 ampirik olarak ayarlanmış, tasarım tokenlarına bilinçli bağlanmamış değerler.
 `.zoomBtn:hover` arka planı için `--lg-fill-quaternary` token'ı projede
@@ -254,13 +268,21 @@ Eksik: Sizes N/A — tek ölçek.
 - ✅ Kesin konum gerekmiyorsa `privacyCircle` ile yaklaşık alanı göster.
 - ❌ Harita yüzeyine cam/backdrop-filter verme — içerik katmanı flat kalır.
 - ❌ `popupContent` içine ikinci seviye interaktif harita kontrolü koyma
-  (zoom/pan v1'de yok).
+  (sentetik/`basemap`'siz modda zoom/pan hiç yok; `basemap` modunda da
+  Leaflet'in zoom/pan'i GlassMap'in kendi zoom butonları/atıf yüzeyiyle
+  birlikte zaten yönetiliyor — `popupContent` bunun üstüne ikinci bir
+  kontrol eklememeli).
 - ❌ Controlled bir haritada seçimi kaldırmak için `selectedId`'yi
   `undefined` yapma — bu, bileşeni uncontrolled moda düşürüp eski iç seçimi
   geri getirebilir; `null` kullan.
 
-**Bilinen kısıtlar:** zoom/pan yok (v1 statik kutu); cluster'a tıklama
-"genişletme" değil, yalnız seçim/popup tetikler — gerçek gruplama v2'de.
+**Bilinen kısıtlar:** sentetik modda (`basemap` verilmemişse) zoom/pan yok —
+seed'li SVG statik bir kutudur. `basemap` modunda ise Leaflet'in kendi
+sürükleme (pan) ve zoom'u (zoom butonları + çift tıklama/klavye) aktiftir;
+yalnız fare tekerleğiyle yakınlaştırma (`scrollWheelZoom`) bilinçli olarak
+kapatıldı — sayfa kaydırılırken haritanın istemsizce yakınlaşmasını
+önlemek için (`useBasemap.ts`). Cluster'a tıklama "genişletme" değil, yalnız
+seçim/popup tetikler — gerçek gruplama v2'de.
 
 **Açık kararlar:** katman etiketlerinin ("Yol"/"Uydu") i18n'i · cluster
 tıklamasının alt-pinleri açması (v2) · `privacyCircle`'ın sürüklenebilir/
