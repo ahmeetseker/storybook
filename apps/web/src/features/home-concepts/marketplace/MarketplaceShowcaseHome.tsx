@@ -6,6 +6,7 @@ import {
   GlassSavedSearchCard,
   GlassVitrin,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import { homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
 import { HomeFooter } from "../shared/HomeFooter";
@@ -63,7 +64,7 @@ export function MarketplaceShowcaseHome() {
         <h2 id="marketplace-categories-title">Hızlı kategoriler</h2>
         <nav className={styles.categoryRail} aria-label="Arsa kategorileri">
           {categories.map((category) => (
-            <a key={category.label} href={category.href}>
+            <a key={category.label} href={withBase(category.href)}>
               {category.label}
             </a>
           ))}
@@ -106,7 +107,7 @@ export function MarketplaceShowcaseHome() {
           className={styles.ruledCatalog}
           items={[...interactiveVitrinItems].reverse()}
         />
-        <a className={styles.compareLink} href="/karsilastir">
+        <a className={styles.compareLink} href={withBase("/karsilastir")}>
           Seçtiklerini karşılaştır
         </a>
       </section>

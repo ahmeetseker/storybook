@@ -15,6 +15,7 @@ import {
   headerRouteKeys,
   type AppRouteHref,
 } from '@/config/routes'
+import { stripBase, withBase } from '@/config/base-path'
 import { NavigationIcon } from './NavigationIcon'
 
 type ViewportTier = keyof typeof dockRouteKeys
@@ -75,7 +76,9 @@ export function MarketplaceShell({
 
   const routeTo = useCallback(
     (href: string) => {
-      void router.navigate({ to: href as AppRouteHref })
+      // Navigasyon verisi `withBase` ile öneklendiği için router'a verilmeden
+      // önce önek sökülür; basepath'i router kendisi uygular.
+      void router.navigate({ to: stripBase(href) as AppRouteHref })
     },
     [router],
   )
@@ -95,7 +98,7 @@ export function MarketplaceShell({
         return {
           key: route.key,
           label: route.key === 'offices' ? 'Ofisler' : route.label,
-          href: route.href,
+          href: withBase(route.href),
           icon: <NavigationIcon name={route.icon} size={22} />,
         }
       }),
@@ -115,7 +118,7 @@ export function MarketplaceShell({
         return {
           key: route.key,
           label,
-          href: route.href,
+          href: withBase(route.href),
           icon: <NavigationIcon name={route.icon} size={20} />,
           active: route.key === currentRoute.key,
         }
@@ -216,7 +219,7 @@ export function MarketplaceShell({
         <GlassIslandHeader
           brandIcon={<NavigationIcon name="sparkles" size={25} />}
           brandLabel="arsam.net"
-          brandHref="/"
+          brandHref={withBase('/')}
           pages={headerPages}
           activeKey={currentRoute.key}
           statusTrail={currentRoute.statusTrail}

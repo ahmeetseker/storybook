@@ -13,6 +13,7 @@ import {
   type GlassAiEvidenceItem,
   type GlassAiSearchBarFilter,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import { homeListings, homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
 import { HomeFooter } from "../shared/HomeFooter";
@@ -247,7 +248,7 @@ export function AiAdvisorHome() {
             yerine sen yap.
           </p>
         </div>
-        <a className={styles.compareLink} href="/karsilastir">
+        <a className={styles.compareLink} href={withBase("/karsilastir")}>
           Önerileri karşılaştır
         </a>
       </section>

@@ -1,4 +1,4 @@
-name: Deploy Storybook to GitHub Pages
+name: Deploy Storybook and web app to GitHub Pages
 
 on:
   push:
@@ -32,10 +32,28 @@ jobs:
         run: npm ci
 
       - name: Configure GitHub Pages
+        id: pages
         uses: actions/configure-pages@v5
 
       - name: Build Storybook
         run: npm run build-storybook
+
+      # Web uygulaması alt yolda servis edildiği için Vite `base`'i ve router
+      # basepath'i `${{ steps.pages.outputs.base_path }}/web` ile hizalanır.
+      - name: Build web app (statik)
+        env:
+          WEB_STATIC: '1'
+          WEB_BASE_PATH: ${{ steps.pages.outputs.base_path }}/web/
+        run: npm run build:web
+
+      - name: Assemble Pages site
+        run: |
+          cp -R apps/web/.output/public storybook-static/web
+          # GitHub Pages bilinmeyen yollarda yalnızca kök 404.html'i servis eder;
+          # web'in SPA kabuğu buraya konarak routing'i client devralır.
+          cp apps/web/.output/public/404.html storybook-static/404.html
+          # Alt çizgiyle başlayan dosyaların Jekyll tarafından elenmesini engeller.
+          touch storybook-static/.nojekyll
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v4

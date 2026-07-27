@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { withBase } from '@/config/base-path'
 import {
   createListingAdapters,
   type ListingAdapterScenario,
@@ -534,7 +535,7 @@ export function ListingCreateWorkspace({
               doğrulama kaydı oluşturulmadı.
             </p>
             <div className={styles.publishedActions}>
-              <a className={styles.primaryFlatAction} href="/">Ana sayfaya dön</a>
+              <a className={styles.primaryFlatAction} href={withBase('/')}>Ana sayfaya dön</a>
               <button
                 type="button"
                 className={styles.secondaryAction}

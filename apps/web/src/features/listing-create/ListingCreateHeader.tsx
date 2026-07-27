@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import { withBase } from '@/config/base-path'
 import styles from './ListingCreateWorkspace.module.css'
 import type { ListingDraftMeta } from './listing-create-domain'
 
@@ -24,7 +25,7 @@ export function ListingCreateHeader({ meta }: ListingCreateHeaderProps) {
     <header className={styles.topbar}>
       <a
         className={styles.brandButton}
-        href="/"
+        href={withBase('/')}
         aria-disabled={exitLocked || undefined}
         onClick={guardUnsavedExit}
       >
@@ -47,7 +48,7 @@ export function ListingCreateHeader({ meta }: ListingCreateHeaderProps) {
         </span>
         <a
           className={styles.exitButton}
-          href="/"
+          href={withBase('/')}
           aria-disabled={exitLocked || undefined}
           onClick={guardUnsavedExit}
           title={exitLocked ? 'Taslak kaydı tamamlandığında çıkabilirsiniz' : undefined}

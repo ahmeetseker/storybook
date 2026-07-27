@@ -10,6 +10,7 @@ import {
   GlassTrustSignalPanel,
   type GlassAiEvidenceItem,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import {
   agencyFixtures,
   homeListings,
@@ -94,7 +95,7 @@ export function TrustFirstHome() {
                   kontrol et.
                 </p>
               </div>
-              <a href="/ilan-ver">Doğrulanmış ilan ver</a>
+              <a href={withBase("/ilan-ver")}>Doğrulanmış ilan ver</a>
             </section>
           }
         />
@@ -106,7 +107,7 @@ export function TrustFirstHome() {
         title="Arsa kararında kanıtı öne al"
         subtitle="EİDS, tapu, imar ve AI kaynaklarını ilanla birlikte gör; doğrulanmamış bilgiyi açıkça ayır."
         actions={
-          <a className={styles.heroAction} href="/arsa-ara?eids=true">
+          <a className={styles.heroAction} href={withBase("/arsa-ara?eids=true")}>
             Doğrulanmış ilanları ara
           </a>
         }

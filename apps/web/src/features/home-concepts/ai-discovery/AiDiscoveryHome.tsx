@@ -9,6 +9,7 @@ import {
   GlassVitrin,
   type GlassAiSearchBarFilter,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import { agencyFixtures, homeListings, homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
 import { HomeFooter } from "../shared/HomeFooter";
@@ -80,7 +81,7 @@ export function AiDiscoveryHome() {
             onClick={goToSearch}
           />
           <GlassBento.Cell>
-            <a className={styles.regionLink} href="/bolgeler">
+            <a className={styles.regionLink} href={withBase("/bolgeler")}>
               <strong>Bölge görünümü</strong>
               <span>
                 Urla çevresindeki demo ilanlarını konumla birlikte aç.
@@ -133,7 +134,7 @@ export function AiDiscoveryHome() {
                 { label: "Denize yürüme mesafesi", matched: false },
               ]}
             />
-            <a className={styles.compareLink} href="/karsilastir">
+            <a className={styles.compareLink} href={withBase("/karsilastir")}>
               Önerileri karşılaştır
             </a>
           </div>

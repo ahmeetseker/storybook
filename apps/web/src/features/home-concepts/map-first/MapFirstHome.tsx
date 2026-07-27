@@ -11,6 +11,7 @@ import {
   GlassSegmentedControl,
   GlassVitrin,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import { agencyFixtures, homeVitrinItems } from "../fixtures";
 import { HERO_TABS, heroTab, type HeroTabId, type HeroParsedFilter } from "./heroTabs";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
@@ -229,7 +230,7 @@ export function MapFirstHome({
             <a
               key={region.name}
               className={styles.regionLink}
-              href={region.href}
+              href={withBase(region.href)}
             >
               <span>
                 <strong>{region.name}</strong>

@@ -15,6 +15,9 @@ export function getRouter() {
 
   return createRouter({
     routeTree,
+    // Vite `base`'i ile aynı kaynaktan beslenir; alt yolda servis edilen
+    // statik dağıtımlarda (GitHub Pages) linkler bu önekle üretilir.
+    basepath: import.meta.env.BASE_URL,
     context: { queryClient },
     defaultPreload: 'intent',
     scrollRestoration: true,

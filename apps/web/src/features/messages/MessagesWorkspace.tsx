@@ -14,6 +14,7 @@ import {
   type QueryClient,
 } from '@tanstack/react-query'
 
+import { withBase } from '@/config/base-path'
 import { ConversationRail } from './components/ConversationRail'
 import type { ComposerSubmission } from './components/MessageComposer'
 import {
@@ -918,7 +919,7 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
                 ) : conversations.length === 0 && filter === 'all' ? (
                   <div className={styles.emptyState}>
                     <p>Henüz konuşmanız yok</p>
-                    <a href="/emlak">İlanları keşfet</a>
+                    <a href={withBase('/emlak')}>İlanları keşfet</a>
                   </div>
                 ) : conversations.length === 0 ? (
                   <div className={styles.emptyState}>

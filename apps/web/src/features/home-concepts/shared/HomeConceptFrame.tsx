@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { withBase } from "@/config/base-path";
 import { homeConcepts, type HomeConceptId } from "../concepts";
 import styles from "./HomeConceptFrame.module.css";
 
@@ -49,7 +50,7 @@ export function HomeConceptFrame({
                         ]
                           .filter(Boolean)
                           .join(" ")}
-                        href={concept.href}
+                        href={withBase(concept.href)}
                         aria-current={isActive ? "page" : undefined}
                       >
                         {concept.title}

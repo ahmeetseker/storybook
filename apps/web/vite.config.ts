@@ -8,7 +8,17 @@ import { defineConfig } from 'vite'
 const appDirectory = fileURLToPath(new URL('.', import.meta.url))
 const workspaceRoot = path.resolve(appDirectory, '../..')
 
+/**
+ * Statik dağıtımlarda (GitHub Pages) uygulama alt yolda servis edilir.
+ * `WEB_BASE_PATH` verilmezse kök yoldan çalışan normal davranış korunur.
+ */
+const basePath = process.env.WEB_BASE_PATH ?? '/'
+
+/** Statik dağıtım modunda tüm route'lar build sırasında HTML'e dökülür. */
+const staticBuild = process.env.WEB_STATIC === '1'
+
 export default defineConfig({
+  base: basePath,
   server: {
     port: 3000,
     strictPort: true,
@@ -33,5 +43,29 @@ export default defineConfig({
     ],
     dedupe: ['react', 'react-dom', 'motion'],
   },
-  plugins: [tanstackStart(), nitro(), viteReact()],
+  plugins: [
+    tanstackStart({
+      // Statik dağıtımda her route için HTML üretilir. Crawler'ın bulduğu
+      // ama HTML dosyası gerektirmeyen adresler burada elenir:
+      // `/health` sunucu handler'ı, query varyantları client'ta çözülür,
+      // `/ilan/:id` ise henüz route olarak tanımlı değil.
+      prerender: {
+        enabled: staticBuild,
+        crawlLinks: true,
+        failOnError: false,
+        filter: ({ path: pagePath }) =>
+          !pagePath.includes('?') &&
+          !pagePath.endsWith('/health') &&
+          !pagePath.includes('/ilan/'),
+      },
+      // Prerender edilmemiş adresler için router state'i taşımayan kabuk;
+      // GitHub Pages bunu 404 yanıtı olarak servis eder ve routing client'ta sürer.
+      spa: {
+        enabled: staticBuild,
+        prerender: { outputPath: '/404.html' },
+      },
+    }),
+    nitro(),
+    viteReact(),
+  ],
 })

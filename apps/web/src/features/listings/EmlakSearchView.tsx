@@ -13,6 +13,7 @@ import {
   GlassSelect,
   GlassSkeleton,
 } from '@repo/ui'
+import { withBase } from '@/config/base-path'
 import type {
   AiFilterProposal,
   ListingSearchResponse,
@@ -463,7 +464,7 @@ function ListingCard({
       onMouseEnter={onSelect}
       onFocusCapture={onSelect}
     >
-      <a href={`/ilan/${item.id}`} className={styles.media}>
+      <a href={withBase(`/ilan/${item.id}`)} className={styles.media}>
         <img src={item.image.src} alt={item.image.alt} />
         <span>{item.imageCount} fotoğraf</span>
       </a>
@@ -479,7 +480,7 @@ function ListingCard({
             <span className={styles.unverified}>Doğrulama bekliyor</span>
           )}
         </div>
-        <a href={`/ilan/${item.id}`} className={styles.listingTitle}>
+        <a href={withBase(`/ilan/${item.id}`)} className={styles.listingTitle}>
           {item.title}
         </a>
         <p className={styles.location}>

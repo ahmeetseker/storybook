@@ -3,6 +3,7 @@ import {
   type GlassFooterColumn,
   type GlassFooterProps,
 } from "@repo/ui";
+import { withBase } from "@/config/base-path";
 import styles from "./HomeFooter.module.css";
 
 const conceptLink = {
@@ -73,13 +74,19 @@ export function HomeFooter({
   showConceptLink = true,
 }: HomeFooterProps) {
   const baseColumns = variant === "slim" ? slimColumns : footerColumns;
-  const columns = showConceptLink
+  const withConceptLink = showConceptLink
     ? baseColumns.map((column, index) =>
         index === baseColumns.length - 1
           ? { ...column, links: [...column.links, conceptLink] }
           : column,
       )
     : baseColumns;
+  const columns = withConceptLink.map((column) => ({
+    ...column,
+    links: column.links.map((link) =>
+      link.href ? { ...link, href: withBase(link.href) } : link,
+    ),
+  }));
 
   return (
     <GlassFooter
@@ -87,7 +94,7 @@ export function HomeFooter({
       columns={columns}
       brand={
         <span className={styles.brandBlock}>
-          <a className={styles.brandLink} href="/">
+          <a className={styles.brandLink} href={withBase("/")}>
             arsam.net
           </a>
           <span className={styles.brandDescription}>
