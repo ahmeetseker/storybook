@@ -115,6 +115,15 @@ export function useBasemap(
           attributionControl: false,
           // Hero'da sayfa kaydırırken harita yakınlaşmasın.
           scrollWheelZoom: false,
+          // Leaflet'in kendi klavye tutamacı kapatılır: varsayılan açıkken
+          // konteyner kendi `tabindex=0`'ını alıp Tab sırasına, tasarım
+          // sistemi dışı bir odak halkasıyla (mavi outline) giriyor ve ok
+          // tuşlarını GlassMap'in pin gezinme sözleşmesiyle (onPinKeyDown)
+          // çakışacak şekilde harita kaydırmaya bağlıyordu — Tab, zoom/katman
+          // kontrollerinden sonra doğrudan pinlere ulaşamıyordu (bkz.
+          // task-9-report.md). GlassMap'in kendi zoom butonları ve pin roving
+          // tabindex'i zaten aynı işlevi tasarım diliyle sağlıyor.
+          keyboard: false,
           zoomAnimation: !reduced,
           fadeAnimation: !reduced,
           markerZoomAnimation: false,

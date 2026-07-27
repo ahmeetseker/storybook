@@ -26,7 +26,7 @@ const HERO_BASEMAP = {
     </a>
   ),
   center: [39, 35.2] as [number, number],
-  zoom: 5.5,
+  zoom: 5.35,
   maxZoom: 19,
   tone: "quiet" as const,
 };

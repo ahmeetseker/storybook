@@ -271,6 +271,15 @@ describe('GlassMap', () => {
     expect(basemapInstance.zoomOut).toHaveBeenCalled()
   })
 
+  it('Leaflet kurulumunda kendi klavye tutamacı kapalıdır (GlassMap kendi pin gezinmesini kullanır)', async () => {
+    render(<GlassMap pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]} basemap={basemap} />)
+    await screen.findByRole('button', { name: '4.250.000 TL' })
+    expect(leafletMapMock).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ keyboard: false }),
+    )
+  })
+
   it('zemin yüklenemezse ve pinde x/y de varsa, pin yüzde konumla render edilmeye devam eder', async () => {
     leafletMapMock.mockImplementationOnce(() => {
       throw new Error('Leaflet başlatılamadı')

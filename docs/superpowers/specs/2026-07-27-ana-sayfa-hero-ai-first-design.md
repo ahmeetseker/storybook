@@ -2,7 +2,7 @@
 
 **Tarih:** 2026-07-27
 **Kapsam:** `apps/web` ana sayfa hero'su (`MapFirstHome`) + kütüphane tarafında `GlassMap` ve `GlassHero`
-**Durum:** Tasarım onaylandı, uygulama planı bekleniyor
+**Durum:** Uygulandı — docs/superpowers/plans/2026-07-27-ana-sayfa-hero-ai-first.md
 
 ## 1. Amaç
 

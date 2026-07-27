@@ -114,6 +114,7 @@ export {
   type GlassMapProps,
   type GlassMapPin,
   type GlassMapPrivacyCircle,
+  type GlassMapBasemap,
 } from './components/GlassMap'
 export { GlassLoanCalculator } from './components/GlassLoanCalculator'
 export type { GlassLoanCalculatorProps, GlassLoanCalculatorResult } from './components/GlassLoanCalculator'

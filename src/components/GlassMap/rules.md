@@ -278,10 +278,17 @@ Eksik: Sizes N/A — tek ölçek.
 
 **Bilinen kısıtlar:** sentetik modda (`basemap` verilmemişse) zoom/pan yok —
 seed'li SVG statik bir kutudur. `basemap` modunda ise Leaflet'in kendi
-sürükleme (pan) ve zoom'u (zoom butonları + çift tıklama/klavye) aktiftir;
-yalnız fare tekerleğiyle yakınlaştırma (`scrollWheelZoom`) bilinçli olarak
-kapatıldı — sayfa kaydırılırken haritanın istemsizce yakınlaşmasını
-önlemek için (`useBasemap.ts`). Cluster'a tıklama "genişletme" değil, yalnız
+sürükleme (pan) ve çift tıklamayla zoom'u aktiftir; yalnız fare
+tekerleğiyle yakınlaştırma (`scrollWheelZoom`) bilinçli olarak kapatıldı —
+sayfa kaydırılırken haritanın istemsizce yakınlaşmasını önlemek için
+(`useBasemap.ts`). Leaflet'in kendi klavye tutamacı (`keyboard`) da kapalı:
+açıkken konteyner kendi `tabindex=0`'ını alıp Tab sırasına tasarım sistemi
+dışı bir odak halkasıyla (mavi outline) giriyor ve ok tuşlarını GlassMap'in
+pin gezinme sözleşmesiyle (`onPinKeyDown`) çakışacak şekilde haritayı
+kaydırmaya bağlıyordu — Tab, zoom/katman kontrollerinden sonra pinlere değil
+bu görünmez konteynere ulaşıyordu (Task 9 Chrome/Playwright QA'sında
+bulundu, bkz. task-9-report.md). Zoom yalnız GlassMap'in kendi butonları ve
+çift tıklamayla yapılabilir. Cluster'a tıklama "genişletme" değil, yalnız
 seçim/popup tetikler — gerçek gruplama v2'de.
 
 **Açık kararlar:** katman etiketlerinin ("Yol"/"Uydu") i18n'i · cluster
@@ -334,3 +341,11 @@ cam yüzeyde (Leaflet kutusu yok), atıf sol altta tek/linkli, koyu temada
 zemin kararıyor ama etiketler okunur kalıyor, dar viewport'ta atıf ellipsis
 alıyor ve zorlanmış hata durumunda atıf ile hata bildirimi çakışmıyor, popup
 okunaklı ve doğru konumlanıyor (ayrıntılar için task-4-report.md).
+2026-07-27 — Task 9 uçtan uca Chrome/Playwright QA'sında bulunan düzeltme:
+`useBasemap.ts`'te Leaflet kurulumuna `keyboard: false` eklendi — açıkken
+Leaflet konteyneri kendi `tabindex=0`'ını alıp Tab sırasına tasarım sistemi
+dışı bir odak halkasıyla giriyor, ok tuşlarını GlassMap'in pin gezinme
+sözleşmesiyle çakışacak şekilde haritayı kaydırmaya bağlıyor ve Tab'ın
+zoom/katman kontrollerinden sonra doğrudan pinlere ulaşmasını engelliyordu.
+Regresyon testi eklendi (`GlassMap.test.tsx`: "Leaflet kurulumunda kendi
+klavye tutamacı kapalıdır").
