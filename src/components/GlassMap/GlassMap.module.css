@@ -20,6 +20,9 @@
   --map-popup-offset: 10px;
   --map-popup-in-shift: 4px;
   --map-panel-min-h: 420px;
+  --map-zoom-btn-size: 30px;
+  --map-zoom-radius: 10px;
+  --map-attr-pad: 2px 7px;
   position: relative;
   /* overflow:hidden BİLEREK yok — yalnız .canvasClip zemini kırpar. Popup/pin kök
      sınırının dışına taştığında görünmez olmak yerine üstte akar (bkz. .popup). */
@@ -265,4 +268,123 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pin, .popupInner { transition: none; animation: none; }
+}
+
+/* ── Gerçek tile zemini (basemap) ─────────────────────────────────────────
+   Leaflet konteyneri .canvasClip içinde kırpılır; kök overflow:hidden almaz,
+   popup taşması korunur (bkz. .root yorumu). */
+.tiles {
+  position: absolute;
+  inset: 0;
+  background: var(--lg-bg);
+}
+
+/* Ton, tile sağlayıcısından bağımsız olarak burada verilir. Amaç zemini sitenin
+   sıcak nötrlerine yaklaştırmak; renk kaynağı tile olduğu için filtre kullanılır. */
+.tiles[data-tone='quiet'] {
+  filter: saturate(0.34) sepia(0.16) brightness(1.03) contrast(0.96);
+}
+
+.tiles[data-tone='raw'] {
+  filter: none;
+}
+
+.tiles[data-tone='satellite'] {
+  filter: saturate(0.86) contrast(1.06) brightness(0.94);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Koyu temada ters çevirme YOK — etiketler okunaklı kalsın diye yalnız karartma. */
+  .tiles[data-tone='quiet'] {
+    filter: saturate(0.24) brightness(0.58) contrast(1.08);
+  }
+
+  .tiles[data-tone='satellite'] {
+    filter: saturate(0.8) brightness(0.78) contrast(1.1);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .tiles {
+    filter: none;
+  }
+}
+
+.zoomCtl {
+  position: absolute;
+  z-index: 3;
+  top: var(--lg-space-2);
+  right: var(--lg-space-2);
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--map-zoom-radius);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-sm);
+}
+
+.zoomBtn {
+  display: grid;
+  width: var(--map-zoom-btn-size);
+  height: var(--map-zoom-btn-size);
+  border: 0;
+  background: transparent;
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  place-items: center;
+}
+
+.zoomBtn + .zoomBtn {
+  border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
+}
+
+.zoomBtn:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: calc(var(--lg-focus-ring-offset, 2px) * -1);
+}
+
+.attribution {
+  position: absolute;
+  z-index: 3;
+  bottom: var(--lg-space-2);
+  left: var(--lg-space-2);
+  padding: var(--map-attr-pad);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+}
+
+.attribution a {
+  color: inherit;
+}
+
+.basemapNotice {
+  position: absolute;
+  z-index: 3;
+  right: var(--lg-space-2);
+  bottom: var(--lg-space-2);
+  margin: 0;
+  padding: var(--map-attr-pad);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+}
+
+@media (hover: hover) {
+  .zoomBtn:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, transparent);
+    color: var(--lg-label);
+  }
+}
+
+@media (pointer: coarse) {
+  .zoomBtn {
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
+  }
 }
