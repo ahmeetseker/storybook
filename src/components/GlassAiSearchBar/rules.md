@@ -2,7 +2,7 @@
 name: GlassAiSearchBar
 category: kontroller
 status: hazır
-lastReviewed: 2026-07-17
+lastReviewed: 2026-07-26
 ---
 
 # GlassAiSearchBar Kuralları
@@ -33,6 +33,8 @@ chip'ler olarak geri gösterilir.
   aynı Escape'i yakalayıp kendini kapatmasın diye; liste kapalıyken Escape'e
   dokunulmaz, event olduğu gibi yukarı yayılır.
 - Gönder butonu `GlassButton` (`type="submit"`, ikon-tek, `aria-label="Ara"`).
+  Dış kutusu kontrol tokenıyla kare/dairedir; ikon ve loading göstergesi iki
+  eksende optik merkezdedir. Yatay padding eklenmez.
 - Filtre kaldır butonları `aria-label="Filtreyi kaldır: <Etiket>: <Değer>"` —
   jenerik "Kaldır" değil, filtreye özel; **değer** de ada dahildir çünkü aynı
   etikete sahip birden fazla filtre (ör. iki "Oda Sayısı") yalnız etiketle AT'de
@@ -40,12 +42,13 @@ chip'ler olarak geri gösterilir.
 - `loading` iken filtre chip'leri görsel olarak soluklaşır
   (`data-disabled` + `opacity`) ve kaldır butonları `disabled` olur — AI yeni
   bir sorgu işlerken eski filtreler kaldırılamaz/etkileşime kapalıdır.
-- "Düşünüyor…" `aria-live="polite"` kapsayıcısı **her zaman mount edilir**
-  (boşken `:empty` CSS'iyle katlanır, layout'a boşluk eklemez); yalnız
-  `loading` iken içine metin/nokta yazılır. Bu sayede ekran okuyucu, kapsayıcı
-  sonradan DOM'a eklenmiş bir bloğa değil, içeriği değişen zaten var olan bir
-  live-region'a bakar (geç mount + dolu içerik geçişi duyuru kaçırma riski
-  taşır).
+- "Düşünüyor…" kapsayıcısı **her zaman mount edilir** (boşken `:empty`
+  CSS'iyle katlanır, layout'a boşluk eklemez); yalnız `loading` iken içine
+  metin/nokta yazılır. Varsayılan `announcementMode="internal"` modunda
+  kapsayıcı `aria-live="polite"` taşır. Composition sahibi parent zaten tek
+  bir canlı durum bölgesi yönetiyorsa `announcementMode="external"` kullanır:
+  görsel metin ve inputun `aria-describedby` bağlantısı korunur, yalnız iç
+  `aria-live` niteliği kaldırılır.
 - Portal yok.
 
 ## 3. Anatomy ve slotlar
@@ -54,7 +57,7 @@ chip'ler olarak geri gösterilir.
 |---|---|---|---|
 | ray | ✅ | ✦ ikon + input + gönder butonu | Kapsül, düz yüzey + hairline |
 | öneri listesi | — | `suggestions` doluyken, input odaklı | Buton dizisi, odak dışında gizli |
-| "düşünüyor" göstergesi | ✅ (her zaman mount, boşken görsel katlı) | `loading` iken içi dolu | `aria-live="polite"`, input'a `aria-describedby` ile hep bağlı |
+| "düşünüyor" göstergesi | ✅ (her zaman mount, boşken görsel katlı) | `loading` iken içi dolu | input'a `aria-describedby` ile hep bağlı; `internal` modda `aria-live="polite"` |
 | AI filtre bloğu | — | `parsedFilters` doluyken | rozet başlık + kaldırılabilir chip listesi |
 | AI rozeti | filtre bloğu varsa ✅ | "✦ AI" | Kontrattaki sabit AI rozeti CSS'i |
 | güven etiketi | — | `confidence` verilirse | "%N güven" metni, rozetin yanında |
@@ -73,6 +76,7 @@ chip'ler olarak geri gösterilir.
 | parsedFilters | prop | `{id,label,value}[]` | — | — | AI çıktısı, kaldırılabilir |
 | onRemoveFilter | event | `(id: string) => void` | — | — | Verilmezse kaldır butonu yok |
 | loading | prop | `boolean` | `false` | — | Input disabled + "Düşünüyor…"; filtre chip'leri soluklaşır, kaldır butonları disabled |
+| announcementMode | prop | `'internal' \| 'external'` | `'internal'` | — | Canlı duyuruyu component veya composition parent'ının üstlenmesini seçer |
 | confidence | prop | `number (0-100)` | — | — | Sonlu değilse/aralık dışıysa clamp; yoksa gizli |
 | onFeedback | event | `(v: 'up'\|'down') => void` | — | — | Verilmezse 👍/👎 render edilmez |
 
@@ -93,6 +97,7 @@ yok.
 | controlled/uncontrolled değer | `value` varlığı | iç state | — |
 | öneri listesi açık | input focus + blur (relatedTarget dışı) | — | — |
 | loading | prop | öneri listesi (kapanır), input etkileşimi, filtre kaldırma | input `disabled`, `aria-describedby`, filtre chip `data-disabled`, kaldır butonu `disabled` |
+| duyuru sahipliği | `announcementMode` | iç live-region semantiği | `internal`: `aria-live="polite"`; `external`: live niteliği yok |
 | feedback seçimi | iç state (tıklama) | — | `aria-pressed` |
 
 Katman sırası: availability (loading → input/suggestions devre dışı) →
@@ -111,7 +116,11 @@ value (controlled > uncontrolled) → interaction (focus/blur → open).
   liste zaten kapalıysa Escape'e dokunulmaz.
 - **Focus akışı:** hiçbir durumda programatik `.focus()` çağrılmaz — odak
   yalnız kullanıcı etkileşimiyle (tıklama/Tab) değişir; controlled `value`
-  dışarıdan değişse de odak taşınmaz.
+  dışarıdan değişse de odak taşınmaz. Input `:focus-visible` olduğunda odak
+  göstergesi `.ray:has(> .input:focus-visible)` üzerinden algılanan birleşik
+  kontrolün tamamında tek kapsül halka olarak çizilir; gönder butonu kendi
+  bağımsız `:focus-visible` halkasını korur. `:has()` desteklemeyen eski
+  tarayıcılarda erişilebilir fallback halka input üzerinde kalır.
 - **Async:** `loading=true` → input `disabled`, gönder butonu `disabled` +
   `loading` (spinner, native submit de engellenir), açık öneri listesi kapanır,
   var olan filtre chip'leri soluklaşır ve kaldır butonları `disabled` olur
@@ -131,29 +140,42 @@ value (controlled > uncontrolled) → interaction (focus/blur → open).
 
 | Part | Property | Token | State override |
 |---|---|---|---|
-| ray | background/border | `--lg-surface` / `--lg-hairline` | focus-within: accent karışımlı border |
+| ray | background/border | `--lg-surface` / `--lg-hairline` | — |
 | ray | radius | `--lg-radius-capsule` | — |
 | ray | yükseklik | `--lg-control-xl` | — |
+| gönder aksiyonu | genişlik/yükseklik | `--lg-control-sm` (`pointer: coarse`: `--lg-control-md`) | her durumda kare |
 | input metin | color | `--lg-label` / `--lg-label-secondary` (placeholder) | disabled: opacity |
 | öneri paneli | radius/border | `--lg-radius-card` / `--lg-hairline` | — |
 | öneri satırı | radius | `--lg-radius-chip` | hover: `color-mix(label 6%)` |
 | AI rozeti | background/color | `color-mix(accent 12%, surface)` / `color-mix(accent 70%, label)` | — (kontrat sabiti) |
 | güven metni | color | `--lg-label-secondary` | `tabular-nums` |
 | filtre chip | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-capsule` | `loading`: `opacity 0.6` (`data-disabled`) |
-| focus halkası | outline | `--lg-accent` (yalnız `:focus-visible`) | — |
+| input focus halkası | outline | `--lg-focus-ring-width` + `--lg-focus-ring-offset` + `--lg-accent` | modern tarayıcıda `.ray:has(> .input:focus-visible)` üzerinde tek kapsül halka ve input outline rengi şeffaf; `:has()` yoksa input halkası fallback |
+| ray / öneri paneli | box-shadow | `--lg-shadow-xs` / `--lg-shadow-md` | — |
 
-**Borç (raw):** AI rozeti font-size `10.5px`/`font-weight 700` (kontrat
-sabiti — tüm AI component'lerinde birebir kopya, token'a bağlanmaz);
-öneri/feedback/filtre-kaldır dokunma hedefleri `pointer: coarse`'ta 36-44px
-raw (GlassChip'in kabul edilmiş "kompakt chip" ödünüyle aynı gerekçe);
-`.thinkingDot` 6px nabız noktası raw.
+AI rozeti font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması). Dairesel parçalarda `border-radius: 50%` yerine
+`--lg-radius-capsule` kullanılır. Filtre chip taban yüksekliği
+`--lg-control-sm` (coarse'ta token kendisi 36px'e çıkar — ayrı override yok).
+
+**Borç (mikro-geometri):** token karşılığı olmayan değerler component kökünde
+yerel değişken olarak toplandı — `.root { --dot-size: 6px; --feedback-size: 28px;
+--remove-size: 20px; --remove-size-coarse: 28px; --chip-gap: 6px;
+--gap-tight: 2px; --suggestion-height: 36px; }`. `pointer: coarse` hedefleri
+token'a bağlandı: öneri satırı `min-height: var(--lg-control-md)` (coarse'ta
+token 44px), feedback butonu `var(--lg-control-sm)` (coarse'ta 36px) —
+coarse'ta büyüme tasarımın istediği davranıştır. Filtre-kaldır coarse hedefi
+28px kontrol ölçeğinde olmadığından `--remove-size-coarse` yerel değişkeninde
+(GlassChip'in kabul edilmiş "kompakt chip" ödünüyle aynı gerekçe); geçiş
+süreleri/easing (`0.16s ease-out`, nabız `1.2s ease-in-out`) süre token'ı
+olmadığından raw.
 
 ## 10. Storybook kapsamı
 
 Default, Playground, Öneri Listesi, AI Çıkarılan Filtreler, Güven / Geri
 Bildirim Yok, Controlled, Durumlar (States — boş/dolu/loading/düşük güven),
-Uzun İçerik, Responsive, Erişilebilirlik (docs). Variants/Sizes: N/A — tek
-desen, eksen yok.
+Harici Duyuru Sahipliği, Uzun İçerik, Responsive, Erişilebilirlik (docs).
+Variants/Sizes: N/A — tek desen, eksen yok.
 
 ## 11. Test kabul kriterleri
 
@@ -175,8 +197,14 @@ desen, eksen yok.
       olur ve tıklansa da `onRemoveFilter` çağrılmaz
 - [x] "Düşünüyor…" `aria-live` kapsayıcısı `loading=false` iken de DOM'da
       mount kalır (aynı düğüm), yalnız içeriği/görselliği değişir
-- [ ] Görsel: ray focus-within border rengi (visual, Chrome)
-- [ ] Görsel: öneri paneli gölgesi/konumu geniş/dar viewport (visual)
+- [x] `announcementMode="external"` görsel düşünme metnini ve
+      `aria-describedby` bağlantısını korur, ikinci `aria-live` bölgesi
+      oluşturmaz; varsayılan `internal` davranış değişmez
+- [x] Gönder düğmesi kare geometri ve merkezlenmiş ikon kullanır; coarse
+      pointer'da iki eksen birlikte `--lg-control-md` boyutuna çıkar
+- [x] Görsel/E2E: input odakta görünür iç halka yok; ray tek 2px kapsül halka alır
+- [x] Görsel/E2E: öneri panelinin hero dışına taşan alt kenarı görünür ve
+      hit-test/tıklama alır
 
 ## 12. Do / Don't
 
@@ -199,3 +227,9 @@ rozeti + `confidence` + `onFeedback` + flat `loading` göstergesi).
 2026-07-17 — Code review fix'leri: Escape `stopPropagation()`, `loading`
 iken filtre chip'leri disabled/soluk, kaldır butonu accessible name'ine
 `value` eklendi, "Düşünüyor…" `aria-live` kapsayıcısı her zaman mount edilir.
+2026-07-24 — Gönder aksiyonu gerçek daireye çevrildi; ikon/loader baseline
+sapması ortak `GlassButton` etiket akışında giderildi.
+2026-07-24 — Input içindeki ikinci focus çerçevesi kaldırıldı; odak halkası
+`:has(> .input:focus-visible)` ile algılanan kapsül kontrolün tamamına taşındı.
+2026-07-26 — Composition içinde yinelenen canlı duyuruları önlemek için
+varsayılanı geriye uyumlu `announcementMode` sahiplik ekseni eklendi.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { GlassFeatureGroup, type GlassFeatureGroupSection } from './GlassFeatureGroup'
 
 const groups: GlassFeatureGroupSection[] = [
@@ -21,28 +21,35 @@ const groups: GlassFeatureGroupSection[] = [
 ]
 
 describe('GlassFeatureGroup — accordion', () => {
-  it('ilk grup varsayılan açık, diğerleri kapalı render olur', () => {
+  it('ilk grup varsayılan açık, diğerleri kapalı (inert) render olur', () => {
     render(<GlassFeatureGroup groups={groups} variant="accordion" />)
     const first = screen.getByRole('button', { name: 'İç Özellikler' })
     const second = screen.getByRole('button', { name: 'Dış Özellikler' })
     expect(first.getAttribute('aria-expanded')).toBe('true')
     expect(second.getAttribute('aria-expanded')).toBe('false')
     expect(screen.getByText('Kombi (Doğalgaz)')).toBeTruthy()
-    expect(screen.queryByText('Asansör')).toBeNull()
+    // İçerik DOM'da kalır (grid-template-rows geçişi için gerekli) ama
+    // kapalı region inert'tir — klavye/AT gezinmesinden çıkarılır.
+    const closedRegion = document.getElementById(second.getAttribute('aria-controls')!)!
+    expect(closedRegion.hasAttribute('inert')).toBe(true)
+    expect(closedRegion.getAttribute('data-open')).toBe('false')
   })
 
-  it('başlığa tıklayınca aç/kapa olur ve region aria-labelledby ile eşlenir', async () => {
+  it('başlığa tıklayınca aç/kapa olur ve region aria-labelledby ile eşlenir', () => {
     render(<GlassFeatureGroup groups={groups} variant="accordion" />)
     const second = screen.getByRole('button', { name: 'Dış Özellikler' })
     fireEvent.click(second)
     expect(second.getAttribute('aria-expanded')).toBe('true')
-    await waitFor(() => expect(screen.getByText('Asansör')).toBeTruthy())
+    expect(screen.getByText('Asansör')).toBeTruthy()
     const region = screen.getByRole('region', { name: 'Dış Özellikler' })
     expect(region.id).toBe(second.getAttribute('aria-controls'))
+    expect(region.hasAttribute('inert')).toBe(false)
+    expect(region.getAttribute('data-open')).toBe('true')
 
     fireEvent.click(second)
     expect(second.getAttribute('aria-expanded')).toBe('false')
-    await waitFor(() => expect(screen.queryByText('Asansör')).toBeNull())
+    expect(region.hasAttribute('inert')).toBe(true)
+    expect(region.getAttribute('data-open')).toBe('false')
   })
 
   it('grup sırası değişince başlığa bağlı key sayesinde aç/kapa state\'i korunur', () => {

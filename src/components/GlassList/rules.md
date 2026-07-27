@@ -134,8 +134,14 @@ grubunda en alta koy (iOS kalıbı).
 | focus | outline | `--lg-accent` |
 | padding/gap | — | `--lg-space-2/3/4` |
 
-Borç: satır min-height 44px ve ikon kolonu 28px raw — kontrol token'ları
-kontrollere ait, liste satırı için ayrı token yok.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan değerler component
+kökünde yerel değişkene toplandı — `.root { --icon-col: 28px;
+--row-min-height: 44px; --chevron-size: 8px; --chevron-stroke: 2px;
+--chevron-nudge: 2px; }`. `--row-min-height` 44px her pointer'da sabit dokunma
+hedefidir — `--lg-control-md`'ye bağlanamaz (ince pointer'da token 40px'e
+düşer, görsel değişiklik olurdu); kontrol token'ları kontrollere ait, liste
+satırı için ayrı token yok. Geçiş süresi (`0.12s ease-out`) süre token'ı
+olmadığından raw; `.body` içi `gap: 1px` hairline istisnası.
 
 ## 10. Storybook kapsamı
 

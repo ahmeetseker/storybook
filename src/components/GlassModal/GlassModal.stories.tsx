@@ -5,7 +5,7 @@ import { GlassModal } from './GlassModal'
 import { GlassButton } from '../GlassButton'
 
 const meta = {
-  title: 'Components/GlassModal',
+  title: 'Bileşenler/Katmanlar/GlassModal',
   component: GlassModal,
   tags: ['autodocs'],
   args: { open: false, onClose: fn(), title: 'Başlık', children: 'İçerik' },

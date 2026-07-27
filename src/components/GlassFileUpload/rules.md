@@ -104,7 +104,14 @@ Dosya adı kırpılır (ellipsis), boyut `tabular-nums`.
 | focus | outline | `--lg-accent` |
 
 Borç: `accept` drop'ta doğrulanmıyor (yalnız dosya seçiciyi filtreler) —
-MIME kontrolü eklenmesi değerlendirilecek. Kaldır butonu 28px raw (coarse'ta 36px).
+MIME kontrolü eklenmesi değerlendirilecek.
+
+**Borç (raw / mikro-geometri):** kaldır butonu taban boyutu (28px) ve zone
+kesikli çerçeve kalınlığı (1.5px) token karşılığı olmadığından component
+kökünde yerel değişkene toplandı (`.root { --zone-border-w: 1.5px;
+--remove-size: 28px; }`); dokunmatikte kaldır `--lg-control-sm`'e bağlandı
+(coarse'ta token 36px — büyüme tasarımın istediği davranıştır); geçiş
+süresi/easing (`0.16s ease-out`) süre token'ı olmadığından raw.
 
 ## 10. Storybook kapsamı
 

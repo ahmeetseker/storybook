@@ -181,9 +181,11 @@ describe('GlassMatchBreakdown', () => {
     const badgeBlockMatch = css.match(/\.aiBadge\s*\{([^}]*)\}/)
     expect(badgeBlockMatch).not.toBeNull()
     const block = badgeBlockMatch![1]
-    expect(block).toMatch(/padding:\s*3px var\(--lg-space-2\)/)
+    // Kontrat ölçüleri token/yerel değişken üzerinden ifade edilir:
+    // dikey padding mikro-geometri değişkeni (3px), font boyutu badge token'ı.
+    expect(block).toMatch(/padding:\s*var\(--bd-badge-pad-block\) var\(--lg-space-2\)/)
     expect(block).toMatch(/letter-spacing:\s*0\.02em/)
-    expect(block).toMatch(/font-size:\s*10\.5px/)
+    expect(block).toMatch(/font-size:\s*var\(--lg-text-badge\)/)
     expect(block).toMatch(/font-weight:\s*700/)
   })
 

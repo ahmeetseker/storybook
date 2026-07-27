@@ -15,7 +15,7 @@ const carSpecs = [
 ]
 
 const meta = {
-  title: 'Components/GlassSpecTable',
+  title: 'Bileşenler/Veri Gösterimi/GlassSpecTable',
   component: GlassSpecTable,
   tags: ['autodocs'],
   argTypes: {

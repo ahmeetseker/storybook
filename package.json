@@ -3,11 +3,26 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22 <26"
+  },
   "scripts": {
-    "dev": "storybook dev -p 6006",
-    "build": "tsc -b && storybook build",
+    "dev": "concurrently -k -n WEB,STORYBOOK -c cyan,magenta \"npm:dev:web\" \"npm:dev:storybook\"",
+    "dev:web": "npm run dev --workspace @arsam/web",
+    "dev:storybook": "storybook dev -p 6006",
+    "build": "npm run typecheck && npm run build:web && npm run build:storybook",
+    "build:web": "npm run build --workspace @arsam/web",
+    "build:storybook": "storybook build",
+    "start:web": "npm run start --workspace @arsam/web",
+    "typecheck": "tsc -b && npm run typecheck:web",
+    "typecheck:web": "npm run typecheck --workspace @arsam/web",
     "lint": "oxlint",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots=all",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -19,6 +34,8 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@playwright/test": "1.61.1",
     "@storybook/addon-docs": "^10.5.0",
     "@storybook/react-vite": "^10.5.0",
     "@testing-library/dom": "^10.4.1",
@@ -27,6 +44,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
+    "concurrently": "9.2.4",
     "jsdom": "^29.1.1",
     "oxlint": "^1.71.0",
     "storybook": "^10.5.0",

@@ -1,26 +1,42 @@
 /* İçerik katmanı FLAT: cam/backdrop-filter yok, yalnız yüzey + hairline +
-   gölge token'ları. `position: fixed` konumlama ve `box-shadow` raw px/rgba
-   borcu (z-index token'ı yok — bkz. rules.md §9). Yatay ortalama `left/right`
+   gölge token'ları (gölge `--lg-shadow-md`; z-index token'ı yok — bkz.
+   rules.md §9). Yatay ortalama `left/right`
    + `margin-inline: auto` ile yapılır; `transform: translateX` KULLANILMAZ —
    motion animasyonu panelin kendi `y` transform'unu yönetiyor (GlassSheet ile
    aynı gerekçe). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9): mini kart
+     küçük resmi, öğe/başlık genişlik sınırları, kaldır butonu ve ipucu
+     noktası ölçüleri, bar maks. genişliği, alt çizgi ofseti. */
+  --glass-comparebar-thumb: 32px;
+  --glass-comparebar-item-max: 200px;
+  --glass-comparebar-title-max: 108px;
+  --glass-comparebar-remove-size: 22px;
+  --glass-comparebar-remove-font: 15px;
+  --glass-comparebar-dot: 6px;
+  --glass-comparebar-max-w: 720px;
+  --glass-comparebar-underline-offset: 2px;
   box-sizing: border-box;
   position: fixed;
   left: var(--lg-space-4);
   right: var(--lg-space-4);
-  bottom: var(--lg-space-5);
+  /* MarketplaceShell dock'u için alt güvenli alanı korur; shell dışında
+     kullanılan bar'lar mevcut kısa offset'e geri döner. */
+  bottom: calc(
+    var(--lg-shell-dock-offset, var(--lg-space-5)) +
+      env(safe-area-inset-bottom, 0px)
+  );
   z-index: 40;
   display: flex;
   align-items: center;
   gap: var(--lg-space-4);
-  width: min(720px, calc(100vw - var(--lg-space-4) * 2));
+  width: min(var(--glass-comparebar-max-w), calc(100vw - var(--lg-space-4) * 2));
   margin-inline: auto;
   padding: var(--lg-space-3) var(--lg-space-3) var(--lg-space-3) var(--lg-space-4);
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--lg-shadow-md);
   color: var(--lg-label);
 }
 
@@ -43,7 +59,7 @@
   display: flex;
   align-items: center;
   gap: var(--lg-space-2);
-  max-width: 200px;
+  max-width: var(--glass-comparebar-item-max);
   padding: var(--lg-space-1);
   padding-right: var(--lg-space-2);
   background: color-mix(in srgb, var(--lg-label) 4%, var(--lg-surface));
@@ -53,16 +69,16 @@
 
 .thumb {
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: var(--glass-comparebar-thumb);
+  height: var(--glass-comparebar-thumb);
   border-radius: var(--lg-radius-chip);
   object-fit: cover;
 }
 
 .thumbFallback {
   flex: none;
-  width: 32px;
-  height: 32px;
+  width: var(--glass-comparebar-thumb);
+  height: var(--glass-comparebar-thumb);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -73,7 +89,7 @@
 
 .itemTitle {
   min-width: 0;
-  max-width: 108px;
+  max-width: var(--glass-comparebar-title-max);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -85,21 +101,20 @@
 .remove {
   appearance: none;
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: var(--glass-comparebar-remove-size);
+  height: var(--glass-comparebar-remove-size);
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--lg-radius-capsule);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
   color: var(--lg-label-secondary);
-  font-size: 15px;
+  font-size: var(--glass-comparebar-remove-font);
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.16s ease-out, color 0.16s ease-out;
 }
 
 @media (hover: hover) {
@@ -114,11 +129,11 @@
   outline-offset: 2px;
 }
 
-/* Dokunmatik: kaldırma hedefi 44px'e yükselir. */
+/* Dokunmatik: kaldırma hedefi 44px'e yükselir — coarse'ta --lg-control-md = 44px (birebir). */
 @media (pointer: coarse) {
   .remove {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
   }
 }
 
@@ -139,12 +154,11 @@
   font-size: var(--lg-text-footnote);
   font-weight: 700;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: var(--glass-comparebar-underline-offset);
   cursor: pointer;
   padding: var(--lg-space-2);
   margin: calc(var(--lg-space-2) * -1);
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s ease-out;
 }
 
 @media (hover: hover) {
@@ -189,33 +203,12 @@
 
 .hintDot {
   flex: none;
-  inline-size: 6px;
-  block-size: 6px;
-  border-radius: 50%;
+  inline-size: var(--glass-comparebar-dot);
+  block-size: var(--glass-comparebar-dot);
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-warning);
 }
 
-/* ── responsive: dar viewport'ta tepsi iki satıra ayrılır ── */
-@media (max-width: 560px) {
-  .root {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--lg-space-3);
-    left: var(--lg-space-3);
-    right: var(--lg-space-3);
-    bottom: var(--lg-space-3);
-    width: calc(100vw - var(--lg-space-3) * 2);
-    padding: var(--lg-space-3);
-  }
-
-  .actions {
-    justify-content: space-between;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .remove,
-  .clear {
-    transition: none;
-  }
-}
+/* Responsive: breakpoint yok — dar viewport'ta mini kart listesi kendi
+   `overflow-x: auto` şeridinde yatay kaydırılır, eylem grubu `flex: none`
+   ile sağda sabit kalır (içsel akış). */

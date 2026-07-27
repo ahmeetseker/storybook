@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassProgress } from './GlassProgress'
 
 const meta = {
-  title: 'Components/GlassProgress',
+  title: 'Bileşenler/Veri Gösterimi/GlassProgress',
   component: GlassProgress,
   tags: ['autodocs'],
   args: { label: 'İlan tamamlanma durumu' },
@@ -67,16 +67,18 @@ export const Tinted: Story = {
   ),
 }
 
+const AnimatedDemo = () => {
+  const [value, setValue] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setValue((v) => (v >= 100 ? 0 : v + 10)), 600)
+    return () => clearInterval(t)
+  }, [])
+  return <GlassProgress value={value} showValue label="Fotoğraflar yükleniyor" />
+}
+
 /** Kontrollü örnek: yükleme simülasyonu. */
 export const Animated: Story = {
-  render: () => {
-    const [value, setValue] = useState(0)
-    useEffect(() => {
-      const t = setInterval(() => setValue((v) => (v >= 100 ? 0 : v + 10)), 600)
-      return () => clearInterval(t)
-    }, [])
-    return <GlassProgress value={value} showValue label="Fotoğraflar yükleniyor" />
-  },
+  render: () => <AnimatedDemo />,
 }
 
 /** Responsive: bar her genişlikte %100 — dar ekranda konteynerine uyar,

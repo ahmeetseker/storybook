@@ -1,0 +1,177 @@
+.page {
+  min-height: 100dvh;
+}
+
+.layout {
+  display: flex;
+  width: min(100%, calc(var(--lg-space-7) * 32));
+  margin-inline: auto;
+  flex-direction: column;
+  gap: var(--lg-space-7);
+  container-name: concept-index;
+  container-type: inline-size;
+}
+
+.intro {
+  display: flex;
+  max-width: 72ch;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.context,
+.title,
+.description {
+  margin: 0;
+}
+
+.context {
+  color: var(--lg-accent);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.title {
+  max-width: 24ch;
+  color: var(--lg-label);
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.description {
+  max-width: 68ch;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-body);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.conceptList {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  list-style: none;
+}
+
+.conceptItem + .conceptItem {
+  border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
+}
+
+.conceptLink {
+  display: grid;
+  min-height: calc(var(--lg-control-xl) + var(--lg-space-7));
+  padding: var(--lg-space-5);
+  align-items: center;
+  gap: var(--lg-space-5);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.35fr)
+    minmax(0, max-content);
+  color: var(--lg-label);
+  text-decoration: none;
+  transition:
+    background-color 160ms ease-out,
+    color 160ms ease-out;
+}
+
+.conceptLink:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-space-1));
+}
+
+.identity,
+.titleLine,
+.destination {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.titleLine {
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.conceptTitle {
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.summary {
+  min-width: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-body);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.destination {
+  justify-content: flex-end;
+  gap: var(--lg-space-3);
+  color: var(--lg-label-secondary);
+}
+
+.route {
+  max-width: 100%;
+  color: inherit;
+  font-family: var(--lg-font);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.arrow {
+  display: inline-block;
+  flex: none;
+  color: var(--lg-accent);
+  font-size: var(--lg-text-headline);
+  line-height: 1;
+  transition: transform 160ms ease-out;
+}
+
+@media (hover: hover) {
+  .conceptLink:hover {
+    background: color-mix(in srgb, var(--lg-accent) 5%, var(--lg-surface));
+  }
+
+  .conceptLink:hover .conceptTitle {
+    color: var(--lg-accent);
+  }
+
+  .conceptLink:hover .arrow {
+    transform: translateX(var(--lg-space-1));
+  }
+}
+
+@container concept-index (max-width: 48rem) {
+  .conceptLink {
+    gap: var(--lg-space-3);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .destination {
+    justify-content: space-between;
+    padding-top: var(--lg-space-1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conceptLink,
+  .arrow {
+    transition: none;
+  }
+
+  .conceptLink:hover .arrow {
+    transform: none;
+  }
+}

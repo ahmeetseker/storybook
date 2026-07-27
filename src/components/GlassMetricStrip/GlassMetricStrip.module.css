@@ -2,6 +2,9 @@
    dar ekranda (flex-wrap) alt alta düşer. Trend rengi yalnız ikincil kanaldır;
    asıl anlam sr-only metin + ok glifiyle taşınır. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --strip-change-gap: 2px;
+  --strip-item-basis: 140px;
   display: flex;
   flex-wrap: wrap;
   gap: var(--lg-space-5);
@@ -12,7 +15,7 @@
 .item {
   display: flex;
   min-width: 0;
-  flex: 1 1 140px;
+  flex: 1 1 var(--strip-item-basis);
   flex-direction: column;
   gap: var(--lg-space-1);
 }
@@ -44,7 +47,7 @@
 .change {
   display: inline-flex;
   align-items: baseline;
-  gap: 2px;
+  gap: var(--strip-change-gap);
   font-size: var(--lg-text-footnote);
   font-weight: 600;
   color: var(--lg-label-secondary);

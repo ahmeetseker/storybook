@@ -16,7 +16,7 @@ const IkonBina = ikon('M3 14.5V2.5h6v12 M9 6h4v8.5 M5 5h2 M5 7.5h2 M5 10h2 M2 14
 const IkonArac = ikon('M2.5 9.5 4 5.5h8l1.5 4v3.5h-2v-1.5h-7v1.5h-2V9.5Z M2.5 9.5h11')
 
 const meta = {
-  title: 'Components/GlassList',
+  title: 'Bileşenler/Veri Gösterimi/GlassList',
   component: GlassList,
   tags: ['autodocs'],
   args: {

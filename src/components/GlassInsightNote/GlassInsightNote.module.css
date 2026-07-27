@@ -2,6 +2,9 @@
    token'lar (--lg-*) + color-mix türevleri. Sol accent çizgi kalınlığı, rozet
    ikon boyutu ve satır aralığı raw px borcu — bkz. rules.md §9. */
 .card {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --note-verified-pad-block: 2px;
+  --note-strip-w: 3px;
   display: flex;
   align-items: flex-start;
   gap: var(--lg-space-3);
@@ -15,7 +18,7 @@
   padding: var(--lg-space-5);
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
-  border-left: 3px solid var(--lg-accent);
+  border-left: var(--note-strip-w) solid var(--lg-accent);
   /* Sol kenar düz kalır (accent çizgisi); yalnız sağ köşeler yuvarlanır. */
   border-radius: 0 var(--lg-radius-card) var(--lg-radius-card) 0;
 }
@@ -107,8 +110,8 @@
 .verified {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px var(--lg-space-2);
+  gap: var(--lg-space-1);
+  padding: var(--note-verified-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-chip);
   background: color-mix(in srgb, var(--lg-success) 14%, transparent);
   color: var(--lg-label);

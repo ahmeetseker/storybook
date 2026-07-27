@@ -1,6 +1,13 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --root-pad: 3px;    /* iç çerçeve payı — segment yüksekliği bundan türetilir */
+  --list-gap: 2px;    /* segmentler arası mikro boşluk */
+  --segment-gap: 6px; /* ikon-etiket arası — 6px ölçekte yok */
+  --pad-x-sm: 14px;   /* segment yatay padding'leri — 14/18px ölçekte yok */
+  --pad-x-md: 18px;
+  --font-md: 14px;    /* footnote(13) ile body(15) arası — ölçek dışı */
   display: inline-flex;
-  padding: 3px;
+  padding: var(--root-pad);
   max-width: 100%;
 }
 .root.disabled {
@@ -10,7 +17,7 @@
 
 .list {
   display: flex;
-  gap: 2px;
+  gap: var(--list-gap);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -21,7 +28,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--segment-gap);
   border: none;
   background: none;
   margin: 0;
@@ -36,7 +43,9 @@
   transition: opacity 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.segment:hover { opacity: 1; }
+@media (hover: hover) {
+  .segment:hover { opacity: 1; }
+}
 .segment:focus-visible {
   outline: 2px solid var(--lg-accent, #b45309);
   outline-offset: 1px;
@@ -50,14 +59,14 @@
 
 /* Boyut ekseni: kontrol yüksekliği token'dan; kök padding'i (3px×2) düşülür */
 .sm .segment {
-  height: calc(var(--lg-control-sm, 32px) - 6px);
-  padding: 0 14px;
+  height: calc(var(--lg-control-sm, 32px) - var(--root-pad) * 2);
+  padding: 0 var(--pad-x-sm);
   font-size: var(--lg-text-footnote, 13px);
 }
 .md .segment {
-  height: calc(var(--lg-control-md, 40px) - 6px);
-  padding: 0 18px;
-  font-size: 14px;
+  height: calc(var(--lg-control-md, 40px) - var(--root-pad) * 2);
+  padding: 0 var(--pad-x-md);
+  font-size: var(--font-md);
 }
 
 /* Seçim damlası — segmentler arasında FLIP ile süzülen cam katman */
@@ -65,8 +74,10 @@
   position: absolute;
   inset: 0;
   border-radius: var(--lg-radius-capsule, 999px);
-  background: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+  /* Gölgesiz damla: seçim, tema yüzeyinden türeyen dolgu + rim ile okunur (bkz. rules.md §7).
+     Sabit beyaz yerine yüzey token'ı → Grafit temada da etiket kontrastı korunur. */
+  background: color-mix(in srgb, var(--lg-surface, #fff) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
 }
 
 .icon,

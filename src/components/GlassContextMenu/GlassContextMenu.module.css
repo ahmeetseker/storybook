@@ -1,4 +1,6 @@
 .area {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --menu-min-width: 200px;
   display: block; /* sağ tıklanabilir alan; genişliği çağıran belirler */
 }
 
@@ -11,9 +13,11 @@
 }
 
 .menu {
+  /* Yüzen katman: taban yüzeyin gölge kanalını besler */
+  --lg-surface-shadow: var(--lg-shadow-md);
   display: block;
-  min-width: 200px;
-  max-width: calc(100vw - 16px);
+  min-width: var(--menu-min-width);
+  max-width: calc(100vw - var(--lg-space-4));
   padding: var(--lg-space-2);
 }
 

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassBreadcrumb } from './GlassBreadcrumb'
 
 const meta = {
-  title: 'Components/GlassBreadcrumb',
+  title: 'Bileşenler/Navigasyon/GlassBreadcrumb',
   component: GlassBreadcrumb,
   tags: ['autodocs'],
   argTypes: {

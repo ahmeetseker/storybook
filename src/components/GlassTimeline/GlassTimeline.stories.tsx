@@ -76,7 +76,7 @@ const binaGecmisiEvents: GlassTimelineEvent[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassTimeline',
+  title: 'Bileşenler/Veri Gösterimi/GlassTimeline',
   component: GlassTimeline,
   tags: ['autodocs'],
   args: { events: ilanSureciEvents, variant: 'line' },

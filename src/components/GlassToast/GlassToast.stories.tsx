@@ -3,7 +3,7 @@ import { GlassToastProvider, useGlassToast, type GlassToastOptions } from './Gla
 import { GlassButton } from '../GlassButton'
 
 const meta = {
-  title: 'Components/GlassToast',
+  title: 'Bileşenler/Katmanlar/GlassToast',
   component: GlassToastProvider,
   tags: ['autodocs'],
   argTypes: {

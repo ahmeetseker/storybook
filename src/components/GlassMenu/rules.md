@@ -124,8 +124,13 @@ Varsayılan kombinasyon: `placement=bottom-start`, `tone=auto`.
 | destructive | color | `--lg-danger` |
 | separator | background | `--lg-hairline` |
 
-Borç: hover zemini `rgba(255,255,255,.28)` raw (GlassTabs paritesi),
-z-index 30 raw (z ölçeği token'ı yok), bp-sm sonrası `min-width: 200px` raw.
+**Borç (raw / mikro-geometri):** hover zemini ve panel min genişliği component
+kökünde yerel değişkende toplandı (`.root { --panel-min-width: 200px;
+--item-hover-bg: rgba(255,255,255,.28); }`) — hover zemini beyaz-alfa cam
+malzeme etkisidir (GlassTabs paritesi), değer değiştirilmedi; `200px`'in token
+karşılığı yok. Bilinçli bırakılan: z-index 30 (z ölçeği token'ı yok), geçiş
+süresi `0.16s ease` (süre/easing token'ı yok). Öğe dokunmatik hedefi
+pointer:coarse'ta `--lg-control-md` token'ından (coarse'ta 44px).
 
 ## 10. Storybook kapsamı
 

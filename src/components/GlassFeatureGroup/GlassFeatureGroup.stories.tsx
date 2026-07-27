@@ -53,7 +53,7 @@ const aracGroups: GlassFeatureGroupSection[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassFeatureGroup',
+  title: 'Bileşenler/Vitrin ve Yerleşim/GlassFeatureGroup',
   component: GlassFeatureGroup,
   tags: ['autodocs'],
   argTypes: {

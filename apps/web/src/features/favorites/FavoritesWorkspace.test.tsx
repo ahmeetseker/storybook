@@ -1,0 +1,4 @@
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { FavoritesWorkspace } from './FavoritesWorkspace'
+describe('FavoritesWorkspace',()=>{it('renders saved listings and portfolio summary',()=>{render(<FavoritesWorkspace/>);expect(screen.getByRole('heading',{name:'Favorilerinizi karar listesine dönüştürün.'})).toBeTruthy();expect(screen.getByText('toplam favori')).toBeTruthy();expect(screen.getByRole('region',{name:'Favori ilanlar'})).toBeTruthy()});it('filters price drops and opens listing detail',()=>{render(<FavoritesWorkspace/>);fireEvent.click(screen.getByRole('button',{name:'Fiyatı değişen'}));expect(screen.getAllByText('Fiyat düştü').length).toBeGreaterThan(0);fireEvent.click(screen.getAllByRole('button',{name:/Urla’da/})[0]);expect(screen.getByRole('heading',{name:'Favori ilan detayı'})).toBeTruthy()})})

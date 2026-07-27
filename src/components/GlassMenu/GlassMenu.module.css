@@ -1,4 +1,7 @@
 .root {
+  /* Mikro-geometri + malzeme (token karşılığı yok — bkz. rules.md §9 borç) */
+  --panel-min-width: 200px;
+  --item-hover-bg: rgba(255, 255, 255, 0.28); /* beyaz-alfa cam malzemesi (GlassTabs paritesi) */
   position: relative;
   display: inline-block;
 }
@@ -16,7 +19,7 @@
 }
 /* bp-sm */
 @media (min-width: 640px) {
-  .panelWrap { min-width: 200px; }
+  .panelWrap { min-width: var(--panel-min-width); }
 }
 
 .bottomStart { top: calc(100% + var(--lg-space-2)); left: 0; transform-origin: top left; }
@@ -25,6 +28,8 @@
 .topEnd { bottom: calc(100% + var(--lg-space-2)); right: 0; transform-origin: bottom right; }
 
 .panel {
+  /* Yüzen katman: taban yüzeyin gölge kanalını besler */
+  --lg-surface-shadow: var(--lg-shadow-md);
   display: block;
   width: 100%;
 }
@@ -63,7 +68,7 @@
 }
 
 @media (hover: hover) {
-  .item:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.28); }
+  .item:hover:not(:disabled) { background-color: var(--item-hover-bg); }
   .destructive:hover:not(:disabled) {
     background-color: color-mix(in srgb, var(--lg-danger) 16%, transparent);
   }

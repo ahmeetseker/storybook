@@ -1,4 +1,7 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --zone-border-w: 1.5px;
+  --remove-size: 28px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-3);
@@ -21,7 +24,7 @@
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  border: 1.5px dashed var(--lg-hairline);
+  border: var(--zone-border-w) dashed var(--lg-hairline);
   transition: border-color 0.16s ease-out, scale 0.16s ease-out;
 }
 /* GlassSurface içeriği .content span'inde sarılıdır (her zaman son çocuk) —
@@ -119,8 +122,8 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: var(--remove-size);
+  height: var(--remove-size);
   padding: 0;
   border: none;
   border-radius: var(--lg-radius-chip);
@@ -130,7 +133,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 @media (pointer: coarse) {
-  .remove { width: 36px; height: 36px; }
+  .remove { width: var(--lg-control-sm); height: var(--lg-control-sm); } /* coarse'ta token 36px */
 }
 @media (hover: hover) {
   .remove:hover {

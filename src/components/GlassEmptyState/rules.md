@@ -100,7 +100,11 @@ detay içermez. Aksiyon etiketi eylem dilinde ("Tekrar Dene", "İlanlara Göz At
 | title | font | `--lg-text-headline` → bp-sm md: `--lg-text-title` |
 | description | font / color | `--lg-text-footnote→body` / `--lg-label-secondary` |
 
-Borç: ikon daire çapları (36/44/56px) raw — boyut token'ı yok.
+**Borç (raw / mikro-geometri):** ikon daire çapları (36/44/56px) boyut
+token'ı olmadığından boyut sınıflarında yerel değişkende toplandı
+(`.md { --icon-size: 44px; }` / `.sm { --icon-size: 36px; }` / bp-sm'de
+`.md { --icon-size: 56px; }`) — dekoratif daire, kontrol değil; control
+token'ı bilinçli verilmedi. bp-sm (640px) breakpoint'i yorumla işaretli.
 
 ## 10. Storybook kapsamı
 

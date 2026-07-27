@@ -1,4 +1,6 @@
 .field {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --required-gap: 2px;
   display: flex;
   flex-direction: column;
   /* Form alanları default blok akışında tam genişlik — grid/flex ile daraltmak çağıranın işi */
@@ -17,7 +19,7 @@
 
 .required {
   color: var(--lg-danger, #ff3b30);
-  margin-left: 2px;
+  margin-left: var(--required-gap);
 }
 
 .description {

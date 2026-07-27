@@ -1,19 +1,24 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --root-gap: 14px;
+  --list-gap: 2px;
+  --tab-pad-inline: 18px;
+  --tab-font-size: 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--root-gap);
 }
 
 .bar {
   display: inline-flex;
   align-self: flex-start;
-  padding: 4px;
+  padding: var(--lg-space-1);
   max-width: 100%;
 }
 
 .list {
   display: flex;
-  gap: 2px;
+  gap: var(--list-gap);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -23,20 +28,22 @@
   border: none;
   background: none;
   margin: 0;
-  padding: 8px 18px;
+  padding: var(--lg-space-2) var(--tab-pad-inline);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--tab-font-size);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: inherit;
   opacity: 0.7;
-  border-radius: 999px;
+  border-radius: var(--lg-radius-capsule);
   cursor: pointer;
   white-space: nowrap;
   transition: background-color 0.18s ease, opacity 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.tab:hover { opacity: 1; }
+@media (hover: hover) {
+  .tab:hover { opacity: 1; }
+}
 .tab:focus-visible {
   outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 1px;
@@ -50,7 +57,7 @@
 .panel {
   display: block;
   box-sizing: border-box;
-  padding: 20px;
-  font-size: 15px;
+  padding: var(--lg-space-5);
+  font-size: var(--lg-text-body);
   line-height: 1.55;
 }

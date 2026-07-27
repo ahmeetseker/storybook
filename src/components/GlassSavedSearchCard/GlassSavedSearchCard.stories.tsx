@@ -4,7 +4,7 @@ import { GlassSavedSearchCard } from './GlassSavedSearchCard'
 const criteria = ['İzmir · Urla', '3+1', 'Bahçeli', '5–8 milyon ₺']
 
 const meta = {
-  title: 'Components/GlassSavedSearchCard',
+  title: 'Bileşenler/Pazar Yeri/GlassSavedSearchCard',
   component: GlassSavedSearchCard,
   tags: ['autodocs'],
   args: {

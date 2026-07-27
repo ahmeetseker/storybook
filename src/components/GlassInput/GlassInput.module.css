@@ -1,4 +1,8 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --pad-x-sm: 10px;   /* sm yatay padding — 10px ölçekte yok (space-2=8/space-3=12) */
+  --clear-size: 22px; /* temizle butonu kutusu */
+  --ios-min-font: 16px; /* iOS Safari zoom eşiği — platform sabiti */
   display: block;
   /* Form kontrolleri default blok akışında tam genişlik */
   width: 100%;
@@ -26,11 +30,9 @@
   outline-offset: 2px;
 }
 
-/* GlassSurface gölgeyi inline style ile verdiği için !important şart (GlassButton emsali) */
+/* Hata durumu yüzeyin hairline ring'ini danger ring'iyle değiştirir (gölge eklemez) */
 .invalid {
-  box-shadow:
-    inset 0 0 0 1.5px var(--lg-danger, #ff3b30),
-    0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: inset 0 0 0 1.5px var(--lg-danger, #ff3b30);
 }
 
 .disabled {
@@ -65,13 +67,13 @@
 }
 
 /* Yükseklikler kontrol token'larından (dokunmatikte otomatik 44px+) */
-.sm .inner { min-height: var(--lg-control-sm, 32px); padding: 0 10px; }
-.md .inner { min-height: var(--lg-control-md, 40px); padding: 0 12px; }
-.lg .inner { min-height: var(--lg-control-lg, 48px); padding: 0 16px; }
+.sm .inner { min-height: var(--lg-control-sm, 32px); padding: 0 var(--pad-x-sm); }
+.md .inner { min-height: var(--lg-control-md, 40px); padding: 0 var(--lg-space-3); }
+.lg .inner { min-height: var(--lg-control-lg, 48px); padding: 0 var(--lg-space-4); }
 
 /* iOS Safari, font-size < 16px olan input'a odaklanınca sayfaya zoom yapar.
    bp-sm altında tüm boyutlarda 16px kalır; ≥640px'te tipografi token ölçeğine iner. */
-.input { font-size: 16px; }
+.input { font-size: var(--ios-min-font); }
 /* bp-sm */
 @media (min-width: 640px) {
   .sm .input { font-size: var(--lg-text-footnote, 13px); }
@@ -93,8 +95,8 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: var(--clear-size);
+  height: var(--clear-size);
   padding: 0;
   border: none;
   border-radius: 50%;

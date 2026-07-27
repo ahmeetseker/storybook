@@ -1,5 +1,9 @@
 /* İçerik katmanı FLAT: yüzey + hairline, cam/backdrop-filter yok (kontrat). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --icon-box: 20px;
+  --pulse-inset: -7px;
+  --pulse-border: 1.5px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-2, 8px);
@@ -70,8 +74,8 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: var(--icon-box);
+  height: var(--icon-box);
 }
 
 .icon {
@@ -87,9 +91,9 @@
 /* Nabız halkası — yalnız listening; transform/opacity, reduced-motion'da statik */
 .pulseRing {
   position: absolute;
-  inset: -7px;
+  inset: var(--pulse-inset);
   border-radius: 50%;
-  border: 1.5px solid color-mix(in srgb, var(--lg-accent-contrast, #fff) 75%, transparent);
+  border: var(--pulse-border) solid color-mix(in srgb, var(--lg-accent-contrast, #fff) 75%, transparent);
   opacity: 0;
   animation: lg-voice-pulse 1.7s ease-out infinite;
 }

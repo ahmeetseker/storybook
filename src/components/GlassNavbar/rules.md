@@ -106,12 +106,22 @@ kapatılacaksa çağıran action'ı render etmez).
 | Part | Property | Token |
 |---|---|---|
 | geri pill / action grubu | malzeme | GlassSurface (`thickness 0.35`, capsule) |
-| — | — | Bu dosyanın CSS'inde token kullanımı yok |
+| bar | gap / padding | `--lg-space-3` / `--lg-space-3` + `--lg-space-4` |
+| başlık | font-size | `--lg-text-headline` |
+| action grubu | padding / iç gap | `--lg-space-1` |
+| action buton/link | padding / radius | `--lg-space-2` + `--lg-space-3` / `--lg-radius-capsule` |
 
-**Borç (tümü raw):** bar padding `12px 16px` ve gap `12px` (→ `--lg-space-3/4`),
-başlık `17px/700` (→ `--lg-text-headline`, ağırlık kuralı 600'ü aşıyor),
-scrollEdge blur `14px`, spacer `44px` (dokunma hedefi sabiti), action hover
-`rgba(255,255,255,.18)`, action padding `8px 12px`, chevron ölçüleri.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler `.bar`
+kökünde yerel değişkenlerde toplandı: `--nav-edge-bleed` (-28px, scroll edge
+alt taşması), `--nav-edge-blur` (14px — blur token'ı yok),
+`--nav-chevron-box` (10px), `--nav-chevron-stroke` (2.5px),
+`--nav-chevron-gap` (2px), `--nav-spacer` (44px — dokunma hedefi sabiti;
+geri pill'i / action grubu yokken başlığı ortalayan simetri boşluğu, kontrol
+olmadığından `--lg-control-*` bağlanmadı). Bilinçli bırakılan: action hover
+zemini `rgba(255,255,255,.18)` — cam capsule üstünde beyaz-alfa malzeme
+etkisi, birebir token yok, `color-mix`'e çevrilmedi; başlık ağırlığı `700`
+(headline token'ı yalnız boyut tanımlar, ağırlık kuralı 600'ü aşıyor —
+mevcut karar); scrollEdge mask gradyan yüzdesi (%55) spec sabiti.
 
 ## 10. Storybook kapsamı
 
@@ -141,5 +151,5 @@ Action hover/focus CSS state'idir — control/story yapılmaz (bkz. GlassButton 
 
 **Bilinen kısıtlar:** scrollEdge, `backdrop-filter` desteklemeyen ortamda
 görünmezdir (içerik kesilmeden akar). **Açık kararlar:** `nav`'a `aria-label`
-için rest props açılmalı mı · başlığın `--lg-text-headline` token'ına bağlanması ·
-'Geri' fallback'inin i18n'i.
+için rest props açılmalı mı · 'Geri' fallback'inin i18n'i.
+(Başlığın `--lg-text-headline`'a bağlanması yapıldı — bkz. §9.)

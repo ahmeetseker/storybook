@@ -111,16 +111,14 @@ export function GlassTaxHistoryTable({ rows, title = defaultTitle, caption, clas
                 const isLatest = index === 0
                 return (
                   <tr key={`${row.year}-${index}`} className={styles.tr} data-latest={isLatest || undefined}>
-                    <td className={styles.td} data-label="Yıl">
+                    <td className={styles.td}>
                       <span className={styles.yearCell}>
                         {row.year}
                         {isLatest ? <span className={styles.latestTag}>Güncel</span> : null}
                       </span>
                     </td>
-                    <td className={[styles.td, styles.alignEnd].join(' ')} data-label="Tutar">
-                      {row.amount}
-                    </td>
-                    <td className={[styles.td, styles.alignEnd].join(' ')} data-label="Değişim">
+                    <td className={[styles.td, styles.alignEnd].join(' ')}>{row.amount}</td>
+                    <td className={[styles.td, styles.alignEnd].join(' ')}>
                       <ChangeCell changePercent={row.changePercent} />
                     </td>
                   </tr>

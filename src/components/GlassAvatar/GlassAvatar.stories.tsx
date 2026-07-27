@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassAvatar } from './GlassAvatar'
 
 const meta = {
-  title: 'Components/GlassAvatar',
+  title: 'Bileşenler/Veri Gösterimi/GlassAvatar',
   component: GlassAvatar,
   tags: ['autodocs'],
   argTypes: {

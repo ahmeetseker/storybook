@@ -33,8 +33,10 @@ sayfayla yeniden vermek çağıranın sorumluluğundadır.
 
 - Kök element: `<div>` (`children`'ın kendi listesi — `<ul>`, grid vb. —
   zaten kendi semantiğini taşır; kök'e ekstra rol eklenmez).
-- "Daha fazla yükle": gerçek `<button type="button">`, accessible name
-  görünür metinden ("Daha fazla yükle").
+- "Daha fazla yükle": `GlassButton` compose eder (default görünüm, `md`) —
+  altta gerçek `<button type="button">` üretir, accessible name görünür
+  metinden ("Daha fazla yükle"). `loading` iken `disabled` + `aria-busy`
+  (GlassButton `loading` ekseni) birlikte verilir.
 - Gözlem noktası (sentinel): dekoratif `<div aria-hidden="true">` —
   erişilebilir ağaçta hiç görünmez, yalnız `IntersectionObserver` hedefi.
 - Durum satırı: `<p role="status" aria-live="polite">` — **HER ZAMAN**
@@ -47,7 +49,7 @@ sayfayla yeniden vermek çağıranın sorumluluğundadır.
 |---|---|---|---|
 | children (liste) | ✅ | `ReactNode` | Component'in kendisi render etmez, olduğu gibi üstte basılır |
 | sentinel | otomatik (yalnız `hasMore`) | — | `aria-hidden`, `IntersectionObserver` hedefi, boyut 1×1px |
-| "Daha fazla yükle" butonu | otomatik (yalnız `hasMore`) | sabit metin | Klavye/AT erişimi için HER ZAMAN render edilir — observer yalnız otomatikleştirir, yerini almaz |
+| "Daha fazla yükle" butonu | otomatik (yalnız `hasMore`) | sabit metin | `GlassButton` (default, `md`) compose eder; klavye/AT erişimi için HER ZAMAN render edilir — observer yalnız otomatikleştirir, yerini almaz |
 | durum satırı | ✅ | `loadingText` / `endText` / boş | `role="status" aria-live="polite"`, koşulsuz mount |
 
 ## 4. Public API
@@ -90,9 +92,9 @@ Varsayılan kombinasyon: `hasMore=true`, `loading=false`, `threshold=400`.
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
-| yükleniyor mu | `loading` prop (dışarıdan) | sentinel/buton tetikleyicisi guard'ı, buton `disabled` | durum satırı `loadingText` |
+| yükleniyor mu | `loading` prop (dışarıdan) | sentinel/buton tetikleyicisi guard'ı, buton `disabled` | durum satırı `loadingText` + buton `aria-busy` (GlassButton `loading` ekseni) |
 | daha fazla var mı | `hasMore` prop (dışarıdan) | sentinel + buton render'ı | durum satırı `endText` (yalnız `loading=false` iken) |
-| disabled/hover/focus/active | — | — | Prop olarak YOK; `:focus-visible`/`:hover` yalnız CSS'te buton üzerinde |
+| disabled/hover/focus/active | — | — | Prop olarak YOK; hover/focus/press görünümleri GlassButton'a devredilir |
 
 Katman sırası (durum satırı metni): `loading` ÖNCE kontrol edilir → `true`
 ise `loadingText`; değilse `!hasMore` kontrol edilir → `true` ise `endText`;
@@ -148,23 +150,15 @@ mesajını görür, "bitti" mesajı isteğin sonucunu beklemeden erken görünme
 
 | Part | Property | Token | State override |
 |---|---|---|---|
-| buton | background/border | `--lg-surface` / `--lg-hairline` | hover → `color-mix(... var(--lg-label) 6%, var(--lg-surface))` |
-| buton | radius/min-height | `--lg-radius-capsule` / `--lg-control-md` | `pointer: coarse` → 44px |
-| buton | padding | `--lg-space-6` | — |
-| buton focus | outline | `--lg-accent` | yalnız `:focus-visible` |
-| buton disabled | opacity | `0.55` (borç, bkz. altı) | — |
+| buton | tümü | GlassButton'a devredildi (default, `md`) — bu component buton görünümüne stil YAZMAZ | hover/focus/disabled/loading GlassButton sözleşmesinde |
 | durum satırı | color/font-size | `--lg-label-secondary` / `--lg-text-footnote` | — |
-| boşluklar | gap/padding | `--lg-space-3,5,6` | — |
+| boşluklar | gap/padding | `--lg-space-3,5` | — |
 
 Raw değer kullanılmadı — tüm renk/radius/boşluk token'lardan.
 
-**Borç (raw):** `.loadMoreButton:disabled` opacity `0.55` sabit sayı —
-proje genelinde disabled opaklığı için ayrı bir token yok (GlassButton
-`.button:disabled { opacity: 0.45 }` ile aynı sınıf borç, farklı sayı
-çünkü flat yüzeyde daha yüksek opaklık okunabilirliği koruyor) · sentinel
-`1px` sabit ölçek — IntersectionObserver hedefi için token yok (0
-yükseklikli elemanlarda intersection hesaplaması bazı tarayıcılarda
-kararsız olduğundan bilinçli minimum boyut).
+**Borç (raw):** sentinel `1px` sabit ölçek — IntersectionObserver hedefi
+için token yok (0 yükseklikli elemanlarda intersection hesaplaması bazı
+tarayıcılarda kararsız olduğundan bilinçli minimum boyut).
 
 ## 10. Storybook kapsamı
 
@@ -225,6 +219,11 @@ güvenmeyi tercih ediyor · `loading`+`!hasMore` aynı anda verildiğinde
 
 ## Changelog
 
+- 2026-07-24: "Daha fazla yükle" butonu `GlassButton` (default, `md`)
+  kompozisyonuna geçirildi — davranış birebir (`disabled={loading}` +
+  guard korunur), GlassButton `loading` ekseni spinner + `aria-busy`
+  ekler; `.loadMoreButton` sınıfı ve disabled-opacity `0.55` borcu
+  kaldırıldı.
 - 2026-07-17: İlk sürüm — `IntersectionObserver` destekliyse otomatik
   tetikleme + her zaman render edilen "Daha fazla yükle" butonu (klavye/AT
   erişimi), `aria-live="polite"` durum satırı (her zaman mount'lu),

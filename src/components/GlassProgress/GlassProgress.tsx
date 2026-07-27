@@ -56,7 +56,7 @@ export function GlassProgress({
       {variant === 'bar' ? (
         <>
           <span className={styles.track}>
-            <span className={styles.fill} style={indeterminate ? undefined : { width: `${pct}%` }} />
+            <span className={styles.fill} style={indeterminate ? undefined : { transform: `scaleX(${pct / 100})` }} />
           </span>
           {showValue && !indeterminate ? (
             <span className={styles.value} aria-hidden>

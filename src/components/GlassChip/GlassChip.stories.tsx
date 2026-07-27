@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassChip } from './GlassChip'
 
 const meta = {
-  title: 'Components/GlassChip',
+  title: 'Bileşenler/Eylemler/GlassChip',
   component: GlassChip,
   tags: ['autodocs'],
   argTypes: {

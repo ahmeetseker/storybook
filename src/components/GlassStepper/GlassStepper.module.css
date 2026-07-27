@@ -1,4 +1,9 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --glyph-sm: 14px;
+  --glyph-md: 16px;
+  --glyph-lg: 18px;
+  --value-pad-block: 2px;
   display: inline-flex;
   align-items: center;
   gap: var(--lg-space-2, 8px);
@@ -49,9 +54,9 @@
   stroke-width: 1.8;
   stroke-linecap: round;
 }
-.sm .glyph { width: 14px; height: 14px; }
-.md .glyph { width: 16px; height: 16px; }
-.lg .glyph { width: 18px; height: 18px; }
+.sm .glyph { width: var(--glyph-sm); height: var(--glyph-sm); }
+.md .glyph { width: var(--glyph-md); height: var(--glyph-md); }
+.lg .glyph { width: var(--glyph-lg); height: var(--glyph-lg); }
 
 .value {
   min-width: 2.5em;
@@ -59,7 +64,7 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   border-radius: var(--lg-radius-chip, 10px);
-  padding: 2px 4px;
+  padding: var(--value-pad-block) var(--lg-space-1);
   user-select: none;
 }
 .sm .value { font-size: var(--lg-text-footnote, 13px); }

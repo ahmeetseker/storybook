@@ -1,28 +1,44 @@
 /* GlassCommandPalette — içerik katmanı FLAT: cam/backdrop-filter YOK. Yalnız
-   token'lar (--lg-*) + color-mix türevleri. z-index ve box-shadow rgba
-   değerleri raw borç — bkz. rules.md §9. */
+   token'lar (--lg-*) + color-mix türevleri. z-index ve mikro-geometri
+   yerel değişkenleri raw borç — bkz. rules.md §9. */
 
 .backdrop {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9): kısayol
+     ipucu çipinin iç boşluğu + panelin içsel-akış ölçüleri (eski @media
+     breakpoint değerlerinin birebir karşılığı olan sabitler). */
+  --glass-palette-hint-pad-block: 2px;
+  --glass-palette-hint-pad-inline: 7px;
+  --glass-palette-w: 560px; /* panel maks. genişliği */
+  --glass-palette-pad-flow: 464px; /* üst boşluk akış eşiği (100vw - bu) */
+  --glass-palette-narrow-vw: 480px; /* dar viewport eşiği */
+  --glass-palette-max-h-wide: 480px; /* geniş viewport'ta yükseklik payı */
+  --glass-palette-max-h-narrow: 560px; /* dar viewport'ta yükseklik payı */
   position: fixed;
   inset: 0;
   z-index: 80;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 12vh var(--lg-space-4) var(--lg-space-4);
+  /* İçsel akış (breakpoint yok): üst boşluk geniş viewport'ta 12vh, viewport
+     560px'in altına daraldıkça space-4'e akar (uçlarda eski @media
+     değerleriyle birebir aynı sonuç). */
+  padding: min(12vh, max(var(--lg-space-4), calc(100vw - var(--glass-palette-pad-flow)))) var(--lg-space-4) var(--lg-space-4);
   background: var(--lg-scrim);
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  width: min(560px, 100%);
-  max-height: min(60vh, 480px);
+  width: min(var(--glass-palette-w), 100%);
+  /* İçsel akış: geniş viewport'ta min(60vh, 480px); viewport 480px'in
+     altına daraldıkça pay min(70vh, 560px)'e akar (eski @media davranışının
+     breakpoint'siz karşılığı). */
+  max-height: min(70vh, calc(60vh + max(0px, var(--glass-palette-narrow-vw) - 100vw)), var(--glass-palette-max-h-narrow), calc(var(--glass-palette-max-h-wide) + max(0px, var(--glass-palette-narrow-vw) - 100vw)));
   background: var(--lg-surface);
   color: var(--lg-label);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.32);
+  box-shadow: var(--lg-shadow-lg);
   overflow: hidden;
   outline: none;
 }
@@ -121,7 +137,6 @@
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.12s ease-out;
 }
 
 .command[data-active] {
@@ -152,7 +167,7 @@
 
 .commandHint {
   flex: none;
-  padding: 2px 7px;
+  padding: var(--glass-palette-hint-pad-block) var(--glass-palette-hint-pad-inline);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip);
   color: var(--lg-label-secondary);
@@ -163,24 +178,7 @@
 
 @media (pointer: coarse) {
   .command {
-    min-height: 44px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .command {
-    transition: none;
-  }
-}
-
-/* Küçük viewport: backdrop üst boşluğu daralır, panel tam genişliğe yakın yayılır */
-@media (max-width: 480px) {
-  .backdrop {
-    padding: var(--lg-space-4);
-    align-items: flex-start;
-  }
-
-  .panel {
-    max-height: min(70vh, 560px);
+    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi */
+    min-height: var(--lg-control-md);
   }
 }

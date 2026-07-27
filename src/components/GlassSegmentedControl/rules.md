@@ -87,8 +87,16 @@ yatay scroll'a düşer (scrollbar gizli). Boş `options` render etmez (radiogrou
 | damla, segment | border-radius | `--lg-radius-capsule` |
 | focus | outline | `--lg-accent` |
 
-Borç: damla dolgusu `rgba(255,255,255,.28)` raw — GlassTabs `tabActive` ile
-aynı değer; cam-üstü highlight token'ı açık karar (bkz. Tokenlar.mdx).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler kökte yerel
+değişkenlerde toplandı: `--root-pad` (3px iç çerçeve — segment yüksekliği
+`calc(--lg-control-* − --root-pad × 2)` bundan türetilir), `--list-gap`
+(2px), `--segment-gap` (6px ikon-etiket arası), `--pad-x-sm/md` (14/18px
+segment yatay padding'leri), `--font-md` (14px — footnote 13 ile body 15
+arası, ölçek dışı). Bilinçli bırakılan: damla dolgusu `rgba(255,255,255,.28)`
+raw — GlassTabs `tabActive` ile aynı değer; cam-üstü highlight token'ı açık
+karar (bkz. Tokenlar.mdx); damla gölgesi `0 1px 4px rgba(0,0,0,.12),
+0 0 1px rgba(0,0,0,.08)` shadow token'larıyla birebir eşleşmiyor. Süre/easing
+(`0.18s ease`) raw — token yok.
 
 ## 10. Storybook kapsamı
 

@@ -1,65 +1,135 @@
 /* GlassFooter — içerik katmanı footer'ı. Her zaman flat + hairline üst çizgi. */
-.root { border-top: 1px solid var(--lg-hairline); background: var(--lg-surface); color: var(--lg-label); }
+.root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --content-max: 1120px;
+  --pad-top: 44px;
+  --section-gap: 28px;
+  --row-gap: 18px;
+  --item-gap: 10px;
+  --band-pad: 26px 28px;
+  --brand-col-min: 220px;
+  --text-sm: 14px;
+  --link-min-h: 24px;
+  container-type: inline-size;
+  border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+}
 
 .inner {
-  max-width: 1120px;
+  max-width: var(--content-max);
   margin: 0 auto;
-  padding: 44px 20px 24px;
+  padding: var(--pad-top) var(--lg-space-5) var(--lg-space-6);
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: var(--section-gap);
   box-sizing: border-box;
 }
 
-.top { display: grid; grid-template-columns: minmax(220px, 1.2fr) 3fr; gap: 32px; align-items: start; }
-.brandBlock { display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--lg-label-secondary); }
-.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.022em; color: var(--lg-label); }
-
-.columnsNav { min-width: 0; }
-.columnsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; }
-.column { display: flex; flex-direction: column; gap: 10px; }
-.columnTitle {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--lg-label-secondary);
+.top {
+  display: grid;
+  grid-template-columns: minmax(var(--brand-col-min), 1.2fr) 3fr;
+  gap: var(--lg-space-7);
+  align-items: start;
 }
-.columnList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.brandBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--item-gap);
+  color: var(--lg-label-secondary);
+  font-size: var(--text-sm);
+}
+.brand {
+  color: var(--lg-label);
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+
+.columnsNav {
+  min-width: 0;
+}
+.columnsNav:only-child {
+  grid-column: 1 / -1;
+}
+.columnsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--lg-space-6);
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--item-gap);
+}
+.columnTitle {
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.columnList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
 
 .link {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
+  min-height: var(--link-min-h);
   border-radius: var(--lg-radius-chip, 10px);
   color: var(--lg-label-secondary);
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
 }
-@media (hover: hover) { .link:hover { color: var(--lg-label); } }
-.link:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
-@media (pointer: coarse) { .link { min-height: 44px; } }
+@media (hover: hover) {
+  .link:hover {
+    color: var(--lg-label);
+  }
+}
+.link:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+/* coarse bağlamda --lg-control-md birebir 44px — dokunma hedefi büyümesi tasarımın istediği davranış */
+@media (pointer: coarse) {
+  .link {
+    min-height: var(--lg-control-md);
+  }
+}
 
 .legalRow {
-  border-top: 1px solid var(--lg-hairline);
-  padding-top: 18px;
+  border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  padding-top: var(--row-gap);
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: var(--lg-space-3) var(--lg-space-5);
   justify-content: space-between;
   align-items: center;
 }
-.legal { font-size: 13px; color: var(--lg-label-secondary); }
-.social { display: inline-flex; align-items: center; gap: 12px; }
+.legal {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+.social {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+}
 
 /* slim */
 .slimInner {
-  padding: 18px 20px;
+  padding: var(--row-gap) var(--lg-space-5);
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px 20px;
+  gap: var(--item-gap) var(--lg-space-5);
 }
 .inlineList {
   list-style: none;
@@ -67,38 +137,66 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 18px;
+  gap: var(--lg-space-1) var(--row-gap);
   justify-content: center;
 }
 
 /* centered */
-.centeredInner { align-items: center; text-align: center; gap: 18px; }
+.centeredInner {
+  align-items: center;
+  text-align: center;
+  gap: var(--row-gap);
+}
 
 /* cta / newsletter bantları */
 .ctaBand {
   background: color-mix(in srgb, var(--lg-accent) 10%, var(--lg-surface));
-  border: 1px solid color-mix(in srgb, var(--lg-accent) 22%, transparent);
+  border: var(--lg-border-width, 1px) solid
+    color-mix(in srgb, var(--lg-accent) 22%, transparent);
   border-radius: var(--lg-radius-card, 20px);
-  padding: 26px 28px;
+  padding: var(--band-pad);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px 24px;
+  gap: var(--lg-space-4) var(--lg-space-6);
 }
 .newsletterBand {
   background: var(--lg-bg);
-  border: 1px solid var(--lg-hairline);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
   border-radius: var(--lg-radius-card, 20px);
-  padding: 26px 28px;
+  padding: var(--band-pad);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px 24px;
+  gap: var(--lg-space-4) var(--lg-space-6);
 }
 
-@media (max-width: 760px) {
-  .top { grid-template-columns: 1fr; }
-  .legalRow { justify-content: center; text-align: center; }
+/* Component kendi kapsayıcısına göre 4 → 2 → 1 sütuna akar. */
+@container (max-width: 64rem) {
+  .top {
+    grid-template-columns: 1fr;
+  }
+  .columnsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 32rem) {
+  .columnsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .legalRow {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .slimInner {
+    align-items: flex-start;
+  }
+  .inlineList {
+    justify-content: flex-start;
+  }
 }

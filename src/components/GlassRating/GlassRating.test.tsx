@@ -205,12 +205,12 @@ describe('GlassRating — summary', () => {
     expect(screen.getByText('2')).toBeTruthy()
   })
 
-  it('dağılım barı genişliği toplam içindeki yüzdeyle birebir örtüşür', () => {
+  it('dağılım barı oranı toplam içindeki yüzdeyle birebir örtüşür (scaleX)', () => {
     const { container } = render(
       <GlassRating variant="summary" value={4} distribution={[50, 25, 15, 5, 5]} />,
     )
     const fills = container.querySelectorAll('[class*="distBarFill"]') as NodeListOf<HTMLElement>
-    expect(fills[0].style.width).toBe('50%')
-    expect(fills[4].style.width).toBe('5%')
+    expect(fills[0].style.transform).toBe('scaleX(0.5)')
+    expect(fills[4].style.transform).toBe('scaleX(0.05)')
   })
 })

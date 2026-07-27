@@ -15,7 +15,7 @@ const cars = [
 ]
 
 const meta = {
-  title: 'Components/GlassCarousel',
+  title: 'Bileşenler/Medya ve Harita/GlassCarousel',
   component: GlassCarousel,
   tags: ['autodocs'],
 } satisfies Meta<typeof GlassCarousel>

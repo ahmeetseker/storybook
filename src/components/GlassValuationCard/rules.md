@@ -195,11 +195,18 @@ kaçırabilir.
 | boşluk | gap/padding | `--lg-space-1..5` | — |
 | yazı | font-size | `--lg-text-caption/footnote/body/display` | — |
 
-**Borç (raw):** rozet font 10.5px/700 (kontrat "AI-first standardı"nda tam
-olarak bu değerler sabit istendi — token'a bağlanamaz, tüm AI
-component'lerinde birebir kopyalanır); ray yüksekliği 8px, estimate/list
-nokta çapı 14px/10px — GlassScoreMeter'in ring/bar kalınlık borcuyla aynı
-gerekçe: gösterge ölçeği için token yok.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan gösterge ölçüleri
+component kökünde yerel değişken olarak toplanır (görsel değer değişmedi):
+`--vc-track-h: 8px` (ray + placeholder ray) · `--vc-point-size: 14px` ·
+`--vc-listpoint-size: 10px` · `--vc-point-ring: 2px` · `--vc-dot-size: 8px`
+(legend) · `--vc-ai-pad-block: 3px` · `--vc-inline-ph-w: 160px` —
+GlassScoreMeter'in ring/bar kalınlık borcuyla aynı gerekçe: gösterge ölçeği
+için token yok. 2026-07-24: AI rozeti font-size borcu `--lg-text-badge`'e
+(10.5→11px) taşınarak kapandı; `estimateValue` font-weight 800→700,
+feedbackButton font-size → `--lg-text-body`, nokta/legend `border-radius:
+50%` → `--lg-radius-capsule`. feedbackButton dokunmatik hedefi
+pointer:coarse'ta `--lg-control-md` token'ından gelir (coarse'ta 44px —
+birebir eski raw değer).
 
 ## 10. Storybook kapsamı
 
@@ -285,3 +292,8 @@ localStorage/API senkronizasyonu sorumluluğu).
   sıfırlanır, aynı yöne tekrar basmak no-op; (3) `loading` `srOnly`
   canlı bölgesi tüm state'lerde her zaman mount'lu, yalnız metni koşullu.
   6 yeni regresyon testi.
+- 2026-07-24: Tasarım sistemi uyum düzeltmesi — AI rozeti →
+  `--lg-text-badge`; `estimateValue` font-weight 800→700; feedbackButton →
+  `--lg-text-body`; nokta/legend `border-radius: 50%` →
+  `--lg-radius-capsule`; ray/nokta/placeholder mikro-geometrisi kök
+  `--vc-*` değişkenlerinde toplandı (görsel değer değişmedi, bkz. §9).

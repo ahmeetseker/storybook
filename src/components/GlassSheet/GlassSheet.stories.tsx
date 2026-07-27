@@ -6,7 +6,7 @@ import { GlassButton } from '../GlassButton'
 import { GlassList, GlassListItem } from '../GlassList'
 
 const meta = {
-  title: 'Components/GlassSheet',
+  title: 'Bileşenler/Katmanlar/GlassSheet',
   component: GlassSheet,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
@@ -67,27 +67,29 @@ export const OpensLarge: Story = {
   render: () => <SheetHarness defaultDetent={1} />,
 }
 
+const NonDismissibleDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ minHeight: 480, display: 'grid', placeItems: 'center' }}>
+      <GlassButton onClick={() => setOpen(true)}>Zorunlu Adımı Aç</GlassButton>
+      <GlassSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Telefonunu doğrula"
+        dismissible={false}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <p style={{ margin: 0 }}>İlan verebilmek için telefon doğrulaması gerekli.</p>
+          <GlassButton prominent onClick={() => setOpen(false)}>Doğrula ve Kapat</GlassButton>
+        </div>
+      </GlassSheet>
+    </div>
+  )
+}
+
 /** dismissible=false: backdrop, Escape ve aşağı çekme kapatmaz. */
 export const NonDismissible: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false)
-    return (
-      <div style={{ minHeight: 480, display: 'grid', placeItems: 'center' }}>
-        <GlassButton onClick={() => setOpen(true)}>Zorunlu Adımı Aç</GlassButton>
-        <GlassSheet
-          open={open}
-          onClose={() => setOpen(false)}
-          title="Telefonunu doğrula"
-          dismissible={false}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <p style={{ margin: 0 }}>İlan verebilmek için telefon doğrulaması gerekli.</p>
-            <GlassButton prominent onClick={() => setOpen(false)}>Doğrula ve Kapat</GlassButton>
-          </div>
-        </GlassSheet>
-      </div>
-    )
-  },
+  render: () => <NonDismissibleDemo />,
 }
 
 /** Responsive: dar ekranda kenardan kenara; ≥640px'te 560px genişlikte ortalanır. */

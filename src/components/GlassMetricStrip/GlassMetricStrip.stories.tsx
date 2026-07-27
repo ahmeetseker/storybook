@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassMetricStrip } from './GlassMetricStrip'
 
 const meta = {
-  title: 'Components/GlassMetricStrip',
+  title: 'Bileşenler/Veri Gösterimi/GlassMetricStrip',
   component: GlassMetricStrip,
   tags: ['autodocs'],
   args: {

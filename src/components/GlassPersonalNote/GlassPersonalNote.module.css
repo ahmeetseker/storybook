@@ -1,7 +1,13 @@
-/* GlassPersonalNote — içerik katmanı FLAT: cam/backdrop-filter YOK. Yalnız
-   token'lar (--lg-*) + color-mix türevleri. Textarea min/max yüksekliği ve
-   ikon SVG viewBox ölçüleri raw px borcu — bkz. rules.md §9. */
+/* GlassPersonalNote — içerik katmanı FLAT: cam/backdrop-filter YOK (yalnız
+   Kaydet/Vazgeç eylem kontrolleri GlassButton compose eder, kontrol katmanı).
+   Yalnız token'lar (--lg-*) + color-mix türevleri. Textarea min/max yüksekliği
+   ve ikon SVG viewBox ölçüleri raw px borcu — bkz. rules.md §9. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --gpn-inline-gap: 6px;
+  --gpn-textarea-max-height: 240px;
+  --gpn-counter-padding-block: 2px;
+  --gpn-counter-padding-inline: 7px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -56,7 +62,7 @@
 
 @media (pointer: coarse) {
   .addButton {
-    min-height: 44px;
+    min-height: var(--lg-control-md); /* coarse'ta token 44px */
   }
 }
 
@@ -87,7 +93,7 @@
 .editButton {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gpn-inline-gap);
   height: var(--lg-control-sm);
   padding: 0 var(--lg-space-2);
   border: 0;
@@ -115,7 +121,7 @@
 
 @media (pointer: coarse) {
   .editButton {
-    min-height: 44px;
+    min-height: var(--lg-control-md); /* coarse'ta token 44px */
     padding: 0 var(--lg-space-3);
   }
 }
@@ -134,7 +140,7 @@
   width: 100%;
   resize: vertical;
   min-height: calc(var(--lg-control-md) * 2);
-  max-height: 240px;
+  max-height: var(--gpn-textarea-max-height);
   padding: var(--lg-space-3);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip);
@@ -169,7 +175,7 @@
 }
 
 .counter {
-  padding: 2px 7px;
+  padding: var(--gpn-counter-padding-block) var(--gpn-counter-padding-inline);
   border-radius: var(--lg-radius-capsule);
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
@@ -185,70 +191,18 @@
   font-weight: 700;
 }
 
+/* Kaydet/Vazgeç aksiyonları GlassButton compose eder — görsel stilleri
+   GlassButton'dan gelir, burada yalnız yerleşim sarmalayıcısı tutulur. */
 .editorActions {
   display: flex;
   gap: var(--lg-space-2);
-}
-
-.cancelButton,
-.saveButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--lg-control-sm);
-  padding: 0 var(--lg-space-3);
-  border-radius: var(--lg-radius-chip);
-  font: inherit;
-  font-size: var(--lg-text-footnote);
-  font-weight: 700;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.15s ease-out, background-color 0.15s ease-out, color 0.15s ease-out;
-}
-
-.cancelButton {
-  border: 1px solid var(--lg-hairline);
-  background: transparent;
-  color: var(--lg-label-secondary);
-}
-
-@media (hover: hover) {
-  .cancelButton:hover {
-    background: color-mix(in srgb, var(--lg-label) 6%, transparent);
-    color: var(--lg-label);
-  }
-}
-
-.saveButton {
-  border: 0;
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
-}
-
-@media (hover: hover) {
-  .saveButton:hover {
-    opacity: 0.92;
-  }
-}
-
-.cancelButton:focus-visible,
-.saveButton:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
-}
-
-@media (pointer: coarse) {
-  .cancelButton,
-  .saveButton {
-    min-height: 44px;
-  }
 }
 
 /* ── gizlilik satırı: üç durumda da sabit ── */
 .privacy {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--gpn-inline-gap);
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
@@ -262,9 +216,7 @@
 @media (prefers-reduced-motion: reduce) {
   .addButton,
   .editButton,
-  .textarea,
-  .cancelButton,
-  .saveButton {
+  .textarea {
     transition: none;
   }
 }

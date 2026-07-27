@@ -1,0 +1,6 @@
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { RegionDirectoryView } from './RegionDirectoryView'
+import { REGIONS } from './data/region-adapter'
+import { DEFAULT_REGION_SEARCH_STATE } from './domain/region-search-state'
+describe('RegionDirectoryView', () => { it('renders AI workspace and region cards', () => { render(<RegionDirectoryView state={DEFAULT_REGION_SEARCH_STATE} items={REGIONS} status="success" compareIds={[]} onStateChange={vi.fn()} onAiSearch={vi.fn()} onSelect={vi.fn()} onToggleCompare={vi.fn()} onApplyProposal={vi.fn()} onDismissProposal={vi.fn()}/>); expect(screen.getByRole('heading',{name:'Türkiye’yi bölge bölge anlayın.'})).toBeTruthy(); expect(screen.getByText('Urla')).toBeTruthy() }); it('selects a region from card', () => { const onSelect=vi.fn(); render(<RegionDirectoryView state={DEFAULT_REGION_SEARCH_STATE} items={REGIONS} status="success" compareIds={[]} onStateChange={vi.fn()} onAiSearch={vi.fn()} onSelect={onSelect} onToggleCompare={vi.fn()} onApplyProposal={vi.fn()} onDismissProposal={vi.fn()}/>); fireEvent.click(screen.getAllByRole('button',{name:'Bölgeyi incele'})[0]); expect(onSelect).toHaveBeenCalledWith('izmir-urla') }) })

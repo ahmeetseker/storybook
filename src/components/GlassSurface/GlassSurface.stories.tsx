@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassSurface } from './GlassSurface'
 
 const meta = {
-  title: 'Primitives/GlassSurface',
+  title: 'Çekirdek/GlassSurface',
   component: GlassSurface,
   tags: ['autodocs'],
   argTypes: {

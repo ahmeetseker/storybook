@@ -66,10 +66,11 @@ Koordinat clamp/finite-guard deseni `GlassMap`'ten bilinçli olarak taşınır
   yakın (`x>0.82`, `y<0.22`) bir nokta rozetle görsel olarak çakışsa bile
   tıklama/dokunma olayını rozet ASLA yakalamaz, altındaki nokta her zaman
   erişilebilir kalır.
-- Nokta odak halkası ÇİFT katmanlı: iç `--lg-surface` halkası + dış
-  `--lg-accent` halkası (`box-shadow` ile). Tek renkli halka değişken fotoğraf
-  zemininde 3:1 kontrastı garanti edemediği için iki renk birlikte kullanılır
-  — en az biri her zeminle ayrışır.
+- Nokta odak halkası STANDART desen: `outline: 2px solid var(--lg-accent)` +
+  `outline-offset: 2px`, yalnız `:focus-visible`. Değişken fotoğraf zemininde
+  tek renkli halka 3:1 kontrastı garanti edemediği için outline'ın ALTINA
+  `box-shadow: 0 0 0 2px var(--lg-surface)` kontrast katmanı eklenir — outline
+  korunur, katman yalnız zeminle ayrışmayı garanti eder.
 
 ## 3. Anatomy ve slotlar
 
@@ -199,18 +200,29 @@ Katman sırası: koordinat guard (`x`/`y` sonlu değilse nokta hiç yok) → glo
 | sahne zemini | background | `color-mix(... var(--lg-label) 4% ... var(--lg-bg))` | — |
 | sahne radius | border-radius | `--lg-radius-media` | — |
 | nokta | background/border | `var(--lg-accent)` / `var(--lg-surface)` (halka) | `aria-expanded=true` → `scale(1.2)` (transform, pulse YOK) |
-| nokta odak halkası | box-shadow (çift katman) | `var(--lg-surface)` (iç 2px) + `var(--lg-accent)` (dış 2px) | yalnız `:focus-visible` |
+| nokta odak halkası | outline + kontrast katmanı | `outline: 2px solid var(--lg-accent)` (standart) + altında `box-shadow: 0 0 0 2px var(--lg-surface)` | yalnız `:focus-visible` |
 | balon zemini | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-chip` | — |
 | balon güven eki | color | `color-mix(... var(--lg-accent) 75% ... var(--lg-label))` | — |
 | AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassMatchScore.module.css`'teki `.aiBadge` ile birebir aynı (ek gölge YOK — `.badgeCorner` sarmalayıcısı da diğer AI component'leriyle tutarlı olması için gölgesiz) |
 | toggle butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | özet metin | color | `--lg-label-secondary` | — |
 
-**Borç (raw):** sahne `aspect-ratio: 4/3` (fotoğraf oranı, token yok), nokta
-çapı 28px (44px coarse'ta) + iç halka 12px, balon `max-width: 200px`, AI
-rozeti font-size 10.5px/700 (kontrat sabiti) — `GlassMatchScore`'daki ring
-çapı/rozet borcuyla aynı gerekçe. Görsel `object-fit: contain` (`cover`
-DEĞİL) — bkz. §7 oran notu.
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--gpfo-dot-hit: 28px` — nokta buton hedefi (coarse'ta `--lg-control-md`
+  ile 44px'e yükselir — birebir; toggle butonu coarse minimumu da aynı token).
+- `--gpfo-dot-size: 12px` / `--gpfo-dot-ring: 2px` — görünür nokta + halkası.
+- `--gpfo-focus-ring: 2px` — odak halkası altındaki `--lg-surface` kontrast
+  katmanının kalınlığı (box-shadow spread'i).
+- `--gpfo-dot-shadow` — noktanın zeminden ayrışma gölgesi (`0 1px 3px`
+  label-mix; `--lg-shadow-xs`'ten belirgin koyu, token karşılığı yok).
+- `--gpfo-badge-padding-block: 3px` — AI rozeti dikey dolgusu (kontrat sabiti).
+- `--gpfo-balloon-max-width: 200px` — balon genişlik sınırı.
+
+**Borç (raw, değişkene alınmayan):** sahne `aspect-ratio: 4/3` (fotoğraf
+oranı, token yok); AI rozeti tipografisi artık token'lı
+(`--lg-text-badge`/700 — kontrat sabiti). Balon gölgesi `--lg-shadow-sm`
+token'ına taşındı. Görsel `object-fit: contain` (`cover` DEĞİL) — bkz. §7
+oran notu.
 
 ## 10. Storybook kapsamı
 
@@ -239,7 +251,8 @@ Controlled, UzunIcerik (uzun etiket + NaN/kenetlenen koordinat), Responsive
 - [x] regresyon: `children` tip düzeyinde omit edilir — kaçak geçilse (`as any`)
   bile render edilmez, component sabit anatomisini korur
 - [ ] reduced-motion'da nokta/toggle geçişlerinin kapanması (visual)
-- [ ] `object-fit: contain` + çift katmanlı odak halkası + rozet `pointer-events:
+- [ ] `object-fit: contain` + standart outline halka (altındaki kontrast
+  katmanıyla) + rozet `pointer-events:
   none` (visual — CSS module gerçek stilleri jsdom'da uygulanmadığından bu
   üçü yalnız görsel/manuel QA ile doğrulanır, bkz. Storybook Erişilebilirlik
   story'si)
@@ -269,6 +282,15 @@ açabilir).
 
 ## Changelog
 
+- 2026-07-24: Uyum düzeltmesi — nokta odak halkası çift katmanlı
+  `box-shadow`'dan STANDART desene döndü: `outline: 2px solid var(--lg-accent)`
+  + `outline-offset: 2px`, fotoğraf kontrastı için `--lg-surface` katmanı
+  outline'ın ALTINDA `box-shadow` olarak korunuyor (§2 istisna notu
+  kaldırıldı). AI rozeti `--lg-text-badge` token'ına, balon gölgesi
+  `--lg-shadow-sm` token'ına geçti; `border-radius: 50%` →
+  `--lg-radius-capsule`; font-weight 650→600, 750→700; balon gap/padding/
+  offset `--lg-space-1/2`; nokta/balon mikro-geometrisi `.root` üzerinde
+  yerel değişkenlere toplandı (§9).
 - 2026-07-17: İlk sürüm — görsel üstü AI özellik noktaları, global
   "Etiketleri göster" toggle'ı + tekil nokta bazlı bağımsız açma/kapama,
   confidence eki, zorunlu "✦ AI" rozeti, kenar-duyarlı balon yönü/hizası.

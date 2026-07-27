@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassSearchField } from './GlassSearchField'
 
 const meta = {
-  title: 'Components/GlassSearchField',
+  title: 'Bileşenler/Form/GlassSearchField',
   component: GlassSearchField,
   tags: ['autodocs'],
   args: { 'aria-label': 'İlan ara', onSearch: fn() },
@@ -47,25 +47,27 @@ export const States: Story = {
   ),
 }
 
+const ControlledDemo = () => {
+  const [query, setQuery] = useState('')
+  const [submitted, setSubmitted] = useState<string | null>(null)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+      <GlassSearchField
+        aria-label="İlan ara"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onSearch={setSubmitted}
+      />
+      <span style={{ fontSize: 13, opacity: 0.7 }}>
+        {submitted ? `Arandı: "${submitted}"` : 'Enter ile ara, Esc ile temizle'}
+      </span>
+    </div>
+  )
+}
+
 /** Controlled kullanım + Enter'da arama, Esc metni temizler. */
 export const Controlled: Story = {
-  render: () => {
-    const [query, setQuery] = useState('')
-    const [submitted, setSubmitted] = useState<string | null>(null)
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
-        <GlassSearchField
-          aria-label="İlan ara"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onSearch={setSubmitted}
-        />
-        <span style={{ fontSize: 13, opacity: 0.7 }}>
-          {submitted ? `Arandı: "${submitted}"` : 'Enter ile ara, Esc ile temizle'}
-        </span>
-      </div>
-    )
-  },
+  render: () => <ControlledDemo />,
 }
 
 /** Genişleme davranışı dar container'da taşmaz (max-width sınırı). */

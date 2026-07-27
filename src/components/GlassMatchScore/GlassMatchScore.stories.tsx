@@ -19,7 +19,7 @@ const dusukUyumKriterleri: GlassMatchScoreCriterion[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassMatchScore',
+  title: 'Bileşenler/AI/GlassMatchScore',
   component: GlassMatchScore,
   tags: ['autodocs'],
   args: {

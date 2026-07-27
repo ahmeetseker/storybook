@@ -4,6 +4,7 @@
 // sarmalar, dibe bir sentinel + her zaman görünür "Daha fazla yükle" butonu +
 // aria-live durum satırı ekler (bkz. rules.md §2).
 import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react'
+import { GlassButton } from '../GlassButton'
 import styles from './GlassInfiniteList.module.css'
 
 export interface GlassInfiniteListProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -116,14 +117,13 @@ export function GlassInfiniteList({
         <div className={styles.loadMoreRow}>
           {/* Dipteki gözlem noktası — dekoratif, erişilebilir bir ada ihtiyacı yok. */}
           <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true" />
-          <button
-            type="button"
-            className={styles.loadMoreButton}
-            onClick={handleLoadMoreClick}
-            disabled={loading}
-          >
+          {/* GlassButton (default, md) — `disabled` davranışı eski butonla birebir
+              korunur; `loading` ekseni yalnız spinner + `aria-busy`'yi ekler.
+              Durum satırı (`role="status"`) yükleme duyurusunu zaten yapar,
+              buton üstündeki `aria-busy` onunla çakışmaz — tamamlayıcıdır. */}
+          <GlassButton onClick={handleLoadMoreClick} disabled={loading} loading={loading}>
             Daha fazla yükle
-          </button>
+          </GlassButton>
         </div>
       ) : null}
       {/* aria-live bölgesi HER ZAMAN mount edilir — sonradan mount edilen canlı

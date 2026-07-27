@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassDivider } from './GlassDivider'
 
 const meta = {
-  title: 'Components/GlassDivider',
+  title: 'Bileşenler/Vitrin ve Yerleşim/GlassDivider',
   component: GlassDivider,
   tags: ['autodocs'],
   argTypes: {

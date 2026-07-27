@@ -94,6 +94,13 @@ Başlık varsa cümle düzeni, nokta yok.
 | body | font-size | `--lg-text-body` |
 | focus | outline | `--lg-accent` |
 
+**Borç (raw / mikro-geometri):** panel genişlik sınırları token karşılığı
+olmadığından component kökünde yerel değişkende toplandı
+(`.root { --panel-min-width: 220px; --panel-max-width: 320px; }`); mobil
+viewport taşma marjı `calc(100vw - var(--lg-space-7))` token'a bağlandı
+(birebir 32px). `@media (min-width: 640px)` bp-sm breakpoint istisnası;
+`line-height: 1.45` oransal, token yok.
+
 ## 10. Storybook kapsamı
 
 Var: Default, WithoutTitle, Placements (4 yön matrisi), Controlled,

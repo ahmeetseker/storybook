@@ -91,7 +91,7 @@ export function GlassAiConfidence({
           aria-valuenow={normalized}
           aria-valuetext={`${LEVEL_LABELS[level]}, yüzde ${normalized}`}
         >
-          <span className={styles.fill} style={{ inlineSize: `${normalized}%` }} />
+          <span className={styles.fill} style={{ transform: `scaleX(${normalized / 100})` }} />
         </div>
       ) : (
         <p className={styles.unmeasured} role="note">

@@ -123,15 +123,24 @@ Katman sırası: value (selected highlight .18) → interaction (hover .08).
 | item/groupHeader | font | miras (`font: inherit`) | — |
 | highlight/disclosure geçişi | spring / easing | `presets.springs.sidebar` | reduced-motion → 0 |
 
-**Borç (raw değerler):** genişlik `300px` · `shape={24}` sayısal (radius
-ölçeğinde yok; card=20) · title `28px/800` — **ağırlık 800 tipografi kuralını
-(400/600/700) aşıyor** · item `15.5px/500` — ölçek ve ağırlık kuralı dışı ·
-groupHeader `17px/700` (≈`--lg-text-headline` ama raw, ağırlık farklı) ·
-highlight `rgba(255,255,255,.18)`, hover `.08`/`.06` · item radius `14px`
-(değer `--lg-radius-media`'ya eşit ama token'dan okunmuyor) · `min-height: 44px`
-raw (kontrol token'ı yerine) · boşluklar (`padding: 20px 12px`, `gap: 14px`,
-`margin-top: 18px`) `--lg-space-*` ölçeğinden okunmuyor · **focus-visible
-halkası `--lg-accent`'e bağlanmamış**.
+**Borç (raw / mikro-geometri):** Token'a bağlananlar: boşluklar
+(`--lg-space-1/2/3/5`), title `--lg-text-display` (28px), groupHeader
+`--lg-text-headline` (17px), item/highlight radius `--lg-radius-media` (14px),
+groupHeader radius `--lg-radius-chip` (10px). Token karşılığı olmayanlar
+component kökünde yerel değişkene toplandı: `--sidebar-width: 300px` ·
+`--subtitle-size: 14px` + `--subtitle-gap: 2px` · `--item-font: 15.5px` ·
+`--item-gap: 14px` · `--touch-target: 44px` (item min-height; 44 kontrol
+ölçeğinde yok, dokunma hedefi kuralından gelir) · `--group-gap: 18px` ·
+`--group-pad-y: 6px` · ikon hücresi `--icon-box: 22px` / `--icon-size: 18px` ·
+chevron `--chevron-box: 16px` / `--chevron-size: 8px` / `--chevron-stroke: 2px`.
+Beyaz-alfa cam katmanları bilinçli malzeme etkisi olarak korunup yerel
+değişkene toplandı: `--selected-bg rgba(255,255,255,.18)` ·
+`--hover-bg .08` · `--group-hover-bg .06` (tema token'ı yok; color-mix'e
+çevrilmedi). Kalan borçlar: `shape={24}` sayısal (radius ölçeğinde yok;
+card=20 — tsx kapsam dışı) · title `800` / item `500` ağırlıkları tipografi
+kuralı (400/600/700) dışı · **focus-visible halkası `--lg-accent`'e
+bağlanmamış** (davranış değişikliği gerektirir, bu temizlikte dokunulmadı) ·
+disclosure süre/easing `presets.springs.sidebar`'da (CSS'te raw süre yok).
 
 ## 10. Storybook kapsamı
 

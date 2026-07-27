@@ -114,12 +114,25 @@ Varsayılan kombinasyon: `aspectRatio='4 / 3'`, `material` verilmez (cam), `tone
 | stage | malzeme/gölge | GlassSurface (`thickness 0.4`) |
 | stage / thumb | focus outline | `--lg-accent` (fallback `#0a84ff`) |
 | oklar, kapat | tüm görünüm | GlassIconButton token'ları |
+| sayaç / lightbox sayacı | font-size | `--lg-text-caption` / `--lg-text-footnote` |
+| sayaç pilleri | radius / metin | `--lg-radius-capsule` / `--lg-on-scrim` (iki temada da `#ffffff`) |
+| thumbs gap, lightbox ofsetleri | boşluk | `--lg-space-2` (8px) / `--lg-space-5` (20px, kapat) / `--lg-space-6` (24px, ok+sayaç) |
 
-**Borç:** `shape={20}` sayı olarak raw (değer `--lg-radius-card` ile örtüşür ama
-bağlı değil) · sahne iç radius `15px`, thumb `12px`, lightbox görsel `16px` raw ·
-thumb ölçüsü `72×54px` · sayaç `12px/600` ve lightbox sayacı `13px/600` (→
-`--lg-text-caption/footnote`) · overlay `rgba(0,0,0,.82)` + `blur(18px)` +
-`z-index: 1000` raw · boşluklar (`gap: 10px/8px`, ofsetler 14/20/24px) raw.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçü ve renkler
+component kökünde yerel değişkende toplandı (`.gallery { --stack-gap: 10px;
+--stage-pad: 6px; --stage-radius: 15px; --stage-inset: 14px; --thumb-w: 72px;
+--thumb-h: 54px; --thumb-radius: 12px; --thumb-ring: 2px; --thumb-active-border:
+rgba(255,255,255,.9); --media-placeholder: rgba(0,0,0,.2); --counter-bg:
+rgba(0,0,0,.55); --counter-pad: 3px 10px; }`). Sayaç zemini `rgba(0,0,0,.55)`
+alfa olarak `--lg-scrim` ile aynı görünse de scrim `rgba(10,12,16,.55)` — birebir
+örtüşmediğinden token'a bağlanmadı. Lightbox portal'da render edildiğinden kendi
+değişkenlerini `.lightbox` üzerinde taşır (`--overlay-bg: rgba(0,0,0,.82)` +
+`--overlay-blur: 18px` — scrim token'ından bilinçli daha koyu overlay malzemesi;
+`--image-radius: 16px`; `--image-max-w: 1200px`; `--pill-bg:
+rgba(255,255,255,.14)` beyaz-alfa malzeme; `--pill-pad: 4px 14px`). Lightbox
+görsel gölgesi `0 24px 80px rgba(0,0,0,.5)` hiçbir `--lg-shadow-*` ile birebir
+örtüşmez — yerinde raw bırakıldı. Geçiş süresi `0.18s ease` (süre token'ı yok),
+`z-index: 2/1000` ve `shape={20}` sayısal prop'u raw kalır.
 
 ## 10. Storybook kapsamı
 

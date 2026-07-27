@@ -12,7 +12,8 @@ lastReviewed: 2026-07-17
 Kullanıcının bir ilana özel yazdığı gizli not — ilan sahibine veya başka
 kullanıcılara ASLA gösterilmez, yalnız notu yazan kullanıcı görür. İçerik
 katmanı component'idir — bilinçli olarak cam DEĞİL: sürekli okunan/düzenlenen
-kişisel bir metin alanı, cam malzemenin anlamı yok.
+kişisel bir metin alanı, cam malzemenin anlamı yok. Tek istisna kontrol
+katmanı: editor'deki Kaydet/Vazgeç eylemleri `GlassButton` compose eder.
 
 - **Kullan:** ilan detay sayfasında "kendine not al" bölümü — kısa, tekil,
   gizli bir metin alanı gerektiğinde.
@@ -36,7 +37,9 @@ kişisel bir metin alanı, cam malzemenin anlamı yok.
 - Görüntüle durumu: not metni düz `<p>`; yanında gerçek `<button>` —
   accessible name "Düzenle" metninden gelir.
 - Düzenleme durumu: `<textarea aria-label="Not metni">` + "Kaydet"/"Vazgeç"
-  `<button>`'ları. `<label htmlFor>` KULLANILMAZ — accessible name doğrudan
+  butonları — her ikisi `GlassButton` compose eder (Kaydet:
+  `prominent size="sm"`, Vazgeç: `size="sm"`); accessible name buton
+  metninden gelir. `<label htmlFor>` KULLANILMAZ — accessible name doğrudan
   `aria-label` ile verilir (spec: "Textarea aria-label").
 - "Not kaydedildi" onayı `role="status" aria-live="polite"` bölgesiyle
   duyurulur — bölge state'ten BAĞIMSIZ HER RENDER'DA mount edilir (boşken
@@ -53,7 +56,7 @@ kişisel bir metin alanı, cam malzemenin anlamı yok.
 |---|---|---|---|
 | "Not ekle" satırı | ✅ (yalnız not boşken) | kalem ikonu + "Not ekle" | Gerçek `<button>`, flat kesikli çerçeve |
 | not metni + "Düzenle" | ✅ (yalnız kayıtlı not varken) | `<p>` metin + kalem ikonu + "Düzenle" `<button>` | Not metni `white-space: pre-wrap` (çok satırlı) |
-| editor | ✅ (yalnız düzenlenirken) | `<textarea>` + sayaç + Kaydet/Vazgeç | Sayaç `editorFooter` içinde textarea'nın altında |
+| editor | ✅ (yalnız düzenlenirken) | `<textarea>` + sayaç + Kaydet/Vazgeç | Sayaç `editorFooter` içinde textarea'nın altında; Kaydet/Vazgeç `GlassButton` compose eder, yerleşim `editorActions` flex sarmalayıcısında |
 | gizlilik satırı | ✅ (her zaman) | kilit ikonu + "Yalnız sen görürsün" | Sabit metin, prop ile özelleştirilemez (bkz. §12) |
 | kaydedildi onayı | ✅ (her zaman mount, görsel-gizli) | `role="status"` | İçerik yalnız Kaydet sonrası kısaca dolar |
 
@@ -139,8 +142,11 @@ seçimi) → `editing` (editor'ün üstüne binmesi) → render.
   düşmez.
 - Controlled/uncontrolled: yalnız `value`/`onValueChange` ekseninde —
   `editing`/`draft` her zaman iç state (bkz. §6).
-- Dokunmatik: "Not ekle"/"Düzenle"/"Kaydet"/"Vazgeç" `pointer: coarse`'ta
-  ≥44px hedefe yükselir.
+- Dokunmatik: "Not ekle"/"Düzenle" `pointer: coarse`'ta ≥44px hedefe
+  yükselir (`--lg-control-md`). "Kaydet"/"Vazgeç" `GlassButton size="sm"`
+  compose ettiğinden kendi token'ını izler (`--lg-control-sm`, coarse'ta
+  36px) — GlassButton'a height override yazmak yasak, hedef büyütme
+  gerekirse GlassButton sözleşmesi düzeyinde çözülür.
 - Async/overlay yok.
 
 ## 8. İçerik kuralları
@@ -167,16 +173,28 @@ seçimi) → `editing` (editor'ün üstüne binmesi) → render.
 | textarea | background/border/radius/color | `--lg-surface` / `--lg-hairline` / `--lg-radius-chip` / `--lg-label` | focus-visible → `--lg-accent` outline |
 | textarea placeholder | color/opacity | `--lg-label-secondary` / `opacity: 1` | `opacity` açıkça `1`'e kilitlenir — tarayıcı varsayılan placeholder opaklığı efektif kontrastı ~2.1-2.8:1'e düşürebiliyordu; `--lg-label-secondary` kendi başına açık temada ~4.74:1, koyu temada ~6.3:1 sağlıyor (≥4.5:1 eşiği) |
 | sayaç | color | `--lg-label-secondary` | sınıra yaklaşınca (`data-near-limit`) → `color-mix(var(--lg-warning) 65%, var(--lg-label))` metin + `color-mix(var(--lg-warning) 16%, transparent)` zemin (AI rozeti tekniğiyle aynı: renk yalnız zemin/metin karışımına, ham semantik renk küçük metne doğrudan uygulanmaz) |
-| Vazgeç | border/color | `--lg-hairline` / `--lg-label-secondary` | hover → `--lg-label` metin |
-| Kaydet | background/color | `--lg-accent` / `--lg-accent-contrast` | hover → `opacity: 0.92` |
+| Vazgeç | — | `GlassButton size="sm"` compose eder — görsel token'lar GlassButton sözleşmesinden | GlassButton state'leri |
+| Kaydet | — | `GlassButton prominent size="sm"` compose eder — görsel token'lar GlassButton sözleşmesinden | GlassButton state'leri |
 | gizlilik satırı | color | `--lg-label-secondary` | — |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
 
-**Borç (raw):** textarea `min-height: calc(--lg-control-md * 2)`/
-`max-height: 240px` (spec sabiti, tasarım sistemi ölçeğinde yok, `GlassChatDock`
-composer'ıyla aynı borç sınıfı), ikon SVG `viewBox`/stroke ölçüleri (px,
-diğer tüm component ikonlarıyla aynı borç), sayaç yaklaşma eşiği `20`
-karakter (davranışsal sabit, token ölçeğinde yok).
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--gpn-inline-gap: 6px` — Düzenle butonu ve gizlilik satırı ikon/metin
+  arası; `--lg-space-1` (4px) ile `--lg-space-2` (8px) arasında ara değer.
+- `--gpn-textarea-max-height: 240px` — textarea büyüme sınırı (spec sabiti,
+  tasarım sistemi ölçeğinde yok, `GlassChatDock` composer'ıyla aynı borç
+  sınıfı; `min-height` token'lı: `calc(--lg-control-md * 2)`).
+- `--gpn-counter-padding-block: 2px` / `--gpn-counter-padding-inline: 7px` —
+  sayaç kapsül dolgusu, token ölçeğinde ara değer.
+
+**Borç (raw, değişkene alınmayan):** ikon SVG `viewBox`/stroke ölçüleri (px,
+diğer tüm component ikonlarıyla aynı borç — vektör boyutu, layout değeri
+değil), sayaç yaklaşma eşiği `20` karakter (davranışsal sabit, token
+ölçeğinde yok), geçiş süresi/easing (`0.15s ease-out` — süre token'ı yok).
+Dokunmatik `min-height` hedefleri (`addButton`/`editButton`,
+`pointer: coarse`) `--lg-control-md`'ye bağlandı — coarse'ta token 44px,
+büyüme tasarımın istediği davranıştır; raw 44px kalmadı. Kaydet/Vazgeç
+`GlassButton` compose ettiğinden bu borcu taşımaz.
 
 ## 10. Storybook kapsamı
 
@@ -245,6 +263,19 @@ eklenebilir.
 
 ## Changelog
 
+- 2026-07-24: Buton kompozisyon düzeltmesi — editor'deki elle çizilmiş
+  "Kaydet"/"Vazgeç" butonları `GlassButton` kompozisyonuna çevrildi
+  (Kaydet: `prominent size="sm"`, Vazgeç: `size="sm"`); ölü
+  `.saveButton`/`.cancelButton` CSS sınıfları silindi, yerleşim
+  `editorActions` sarmalayıcısında kaldı. Davranış (onClick, odak dönüşü,
+  role/isim tabanlı erişilebilir adlar) değişmedi. Not: coarse pointer'da
+  bu iki buton artık GlassButton `sm` token'ını izler (36px) — önceki yerel
+  44px büyütme GlassButton sözleşmesine devredildi. "Not ekle"/"Düzenle"
+  elle çizilmiş kaldı (sınırda vakalar, ayrı karar bekliyor).
+- 2026-07-24: Uyum düzeltmesi — mikro-geometri değerleri (`6px` inline gap,
+  `240px` textarea max-height, `2px 7px` sayaç dolgusu) `.root` üzerinde
+  yerel CSS değişkenlerine toplandı; §9 borç notu güncellendi. Görsel
+  değişiklik yok.
 - 2026-07-17: Codex dalga4 QA fix — `...rest` tipi
   `Omit<HTMLAttributes<HTMLDivElement>, 'children'>`'a çevrildi (önceden
   `children` tip seviyesinde kabul ediliyor ama JSX'in kendi literal

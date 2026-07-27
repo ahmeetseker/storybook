@@ -1,0 +1,82 @@
+.primary,
+.secondary,
+.text {
+  align-items: center;
+  color: var(--lg-label);
+  display: inline-flex;
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  justify-content: center;
+  min-block-size: var(--lg-control-md);
+  text-decoration: none;
+  transition: background-color 160ms ease-out, color 160ms ease-out;
+}
+
+.primary {
+  color: var(--lg-accent-contrast);
+  min-block-size: var(--lg-control-lg);
+  padding-inline: var(--lg-space-5);
+}
+
+.secondary {
+  background-color: var(--lg-surface);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  padding-inline: var(--lg-space-4);
+}
+
+.text {
+  color: var(--lg-accent);
+  min-block-size: auto;
+}
+
+.primarySurface {
+  background-color: var(--lg-accent);
+}
+
+.primary:focus-visible,
+.secondary:focus-visible,
+.text:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (pointer: coarse) {
+  .primary,
+  .secondary,
+  .text {
+    min-block-size: var(--lg-control-md);
+  }
+
+  .primary {
+    min-block-size: var(--lg-control-lg);
+  }
+}
+
+@media (hover: hover) {
+  .primary:hover {
+    background-color: color-mix(in srgb, var(--lg-accent) 84%, var(--lg-surface));
+  }
+
+  .secondary:hover {
+    background-color: color-mix(in srgb, var(--lg-surface) 82%, var(--lg-label));
+  }
+
+  .text:hover {
+    color: color-mix(in srgb, var(--lg-accent) 72%, var(--lg-label));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary,
+  .secondary,
+  .text {
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .primarySurface {
+    background-color: var(--lg-surface);
+  }
+}

@@ -84,10 +84,14 @@ function resolveMaxAbsImpact(drivers: GlassValuationDriver[]): number {
   return max > 0 ? max : 1
 }
 
-/** Bar genişliği yüzdesi — |impact| / maxAbsImpact, [0,100]'e clamp. */
-function barWidthPercent(impact: number, maxAbsImpact: number): number {
+/**
+ * Bar doluluk oranı — |impact| / maxAbsImpact, [0,1]'e clamp. Bar CSS'te %100
+ * genişlikte çizilir, oran `transform: scaleX(oran)` ile uygulanır (genişlik
+ * animasyonu yasak — animasyon yalnız transform/opacity/filter).
+ */
+function barScaleRatio(impact: number, maxAbsImpact: number): number {
   const safe = Math.abs(safeImpact(impact))
-  return Math.min(100, (safe / maxAbsImpact) * 100)
+  return Math.min(1, safe / maxAbsImpact)
 }
 
 /**
@@ -108,20 +112,20 @@ function AiBadge({ confidence }: { confidence: number | null }) {
 
 function DriverRow({ driver, maxAbsImpact }: { driver: GlassValuationDriver; maxAbsImpact: number }) {
   const tone = resolveTone(driver.impact)
-  const width = barWidthPercent(driver.impact, maxAbsImpact)
-  const negativeWidth = tone === 'danger' ? width : 0
-  const positiveWidth = tone === 'success' ? width : 0
+  const ratio = barScaleRatio(driver.impact, maxAbsImpact)
+  const negativeScale = tone === 'danger' ? ratio : 0
+  const positiveScale = tone === 'success' ? ratio : 0
 
   return (
     <li className={styles.row}>
       <span className={styles.label}>{driver.label}</span>
       <span className={styles.track} aria-hidden="true">
         <span className={styles.half} data-side="negative">
-          <span className={styles.bar} data-tone="danger" style={{ width: `${negativeWidth}%` }} />
+          <span className={styles.bar} data-tone="danger" style={{ transform: `scaleX(${negativeScale})` }} />
         </span>
         <span className={styles.centerLine} />
         <span className={styles.half} data-side="positive">
-          <span className={styles.bar} data-tone="success" style={{ width: `${positiveWidth}%` }} />
+          <span className={styles.bar} data-tone="success" style={{ transform: `scaleX(${positiveScale})` }} />
         </span>
       </span>
       <span className={styles.impactText} data-tone={tone}>

@@ -26,14 +26,36 @@ describe('GlassAgencyCard', () => {
     expect(screen.queryByText('KG')).toBeNull()
   })
 
-  it('verified true iken "Doğrulanmış Kurumsal" rozeti görünür metin olarak render edilir', () => {
+  it('verified true iken kompakt doğrulama işareti görünür, büyük metin rozeti render edilmez', () => {
     renderCard({ verified: true })
-    expect(screen.getByText('Doğrulanmış Kurumsal')).toBeDefined()
+    expect(
+      screen.getByLabelText('Doğrulanmış kurumsal ofis'),
+    ).toBeDefined()
+    expect(screen.queryByText('Doğrulanmış Kurumsal')).toBeNull()
   })
 
-  it('verified false iken rozet hiç render edilmez', () => {
-    renderCard({ verified: false })
-    expect(screen.queryByText('Doğrulanmış Kurumsal')).toBeNull()
+  it('verifiedBy verilince bilgi düğmesi kaynak tooltip’ini focus ile açar', () => {
+    renderCard({ verified: true, verifiedBy: 'arsam.net' })
+    const detail = screen.getByRole('button', {
+      name: 'Doğrulama ayrıntısı: Kurumsal kimlik arsam.net tarafından doğrulandı.',
+    })
+    expect(detail.getAttribute('title')).toBe(
+      'Kurumsal kimlik arsam.net tarafından doğrulandı.',
+    )
+    fireEvent.focus(detail)
+    expect(screen.getByRole('tooltip').textContent).toBe(
+      'Kurumsal kimlik arsam.net tarafından doğrulandı.',
+    )
+  })
+
+  it('verified false iken doğrulama işareti ve ayrıntı düğmesi render edilmez', () => {
+    renderCard({ verified: false, verifiedBy: 'arsam.net' })
+    expect(
+      screen.queryByLabelText('Doğrulanmış kurumsal ofis'),
+    ).toBeNull()
+    expect(
+      screen.queryByRole('button', { name: /Doğrulama ayrıntısı/ }),
+    ).toBeNull()
   })
 
   it('stats verilince etiket + değer çiftlerini tabular gösterir', () => {
@@ -107,6 +129,20 @@ describe('GlassAgencyCard', () => {
 
     const { container: panelContainer } = renderCard({ variant: 'panel' })
     expect(panelContainer.querySelector('[data-variant="panel"]')).not.toBeNull()
+  })
+
+  it('inline düzen kimlik, metrik ve aksiyon alanları için sabit data-part kancaları sunar', () => {
+    const { container } = renderCard({
+      variant: 'inline',
+      verified: true,
+      verifiedBy: 'arsam.net',
+      stats: [{ label: 'Aktif İlan', value: '48' }],
+      phone: '0 (216) 348 22 11',
+    })
+
+    for (const part of ['identity', 'verification', 'stats', 'actions']) {
+      expect(container.querySelector(`[data-part="${part}"]`)).not.toBeNull()
+    }
   })
 
   it('tagline verilince görünür, verilmezse render edilmez', () => {

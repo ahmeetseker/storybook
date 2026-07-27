@@ -1,14 +1,26 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9): kök/sekme/sahne/küme
+     boşlukları, hotspot ve tooltip ölçüleri, dokunmatik hedef sabiti. */
+  --glass-floorplan-root-gap: 14px;
+  --glass-floorplan-tab-gap: 6px;
+  --glass-floorplan-tab-pad: 14px;
+  --glass-floorplan-stage-gap: 10px;
+  --glass-floorplan-cluster-gap: 10px;
+  --glass-floorplan-hotspot-size: 26px;
+  --glass-floorplan-hotspot-ring: 2px;
+  --glass-floorplan-tooltip-pad-block: 6px;
+  --glass-floorplan-tooltip-pad-inline: 10px;
+  --glass-floorplan-touch-target: 44px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--glass-floorplan-root-gap);
   box-sizing: border-box;
-  padding: 16px;
+  padding: var(--lg-space-4, 16px);
 }
 
 .tabs {
   display: flex;
-  gap: 6px;
+  gap: var(--glass-floorplan-tab-gap);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -25,11 +37,11 @@
   background: transparent;
   color: var(--lg-label, #24211b);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--lg-text-footnote);
   font-weight: 600;
   white-space: nowrap;
   min-height: var(--lg-control-sm, 32px);
-  padding: 0 14px;
+  padding: 0 var(--glass-floorplan-tab-pad);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background-color 0.16s ease-out, color 0.16s ease-out, border-color 0.16s ease-out;
@@ -51,7 +63,7 @@
 /* Dokunmatikte minimum 44px hedef (görev gereksinimi) */
 @media (pointer: coarse) {
   .tab {
-    min-height: 44px;
+    min-height: var(--glass-floorplan-touch-target);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -63,7 +75,7 @@
 .stage {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--glass-floorplan-stage-gap);
 }
 
 .viewport {
@@ -112,13 +124,13 @@
 
 .hotspot {
   position: absolute;
-  width: 26px;
-  height: 26px;
+  width: var(--glass-floorplan-hotspot-size);
+  height: var(--glass-floorplan-hotspot-size);
   transform: translate(-50%, -50%);
   appearance: none;
   padding: 0;
   border-radius: 50%;
-  border: 2px solid var(--lg-on-scrim, #ffffff);
+  border: var(--glass-floorplan-hotspot-ring) solid var(--lg-on-scrim, #ffffff);
   background: var(--lg-accent, #b45309);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   cursor: pointer;
@@ -136,20 +148,20 @@
 /* Dokunmatikte minimum 44px hedef; scale 1x'in altına inmediğinden bu daima geçerli kalır */
 @media (pointer: coarse) {
   .hotspot {
-    width: 44px;
-    height: 44px;
+    width: var(--glass-floorplan-touch-target);
+    height: var(--glass-floorplan-touch-target);
   }
 }
 
 .tooltip {
   position: absolute;
-  transform: translate(-50%, calc(-100% - 20px));
+  transform: translate(-50%, calc(-100% - var(--lg-space-5)));
   background: var(--lg-scrim, rgba(10, 12, 16, 0.85));
   color: var(--lg-on-scrim, #ffffff);
-  font-size: 12px;
+  font-size: var(--lg-text-caption);
   font-weight: 600;
   white-space: nowrap;
-  padding: 6px 10px;
+  padding: var(--glass-floorplan-tooltip-pad-block) var(--glass-floorplan-tooltip-pad-inline);
   border-radius: var(--lg-radius-chip, 10px);
   pointer-events: none;
   z-index: 3;
@@ -159,20 +171,20 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--glass-floorplan-cluster-gap);
 }
 
 .zoomGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--lg-space-2);
   margin-inline-start: auto;
 }
 
 .zoomLevel {
   min-width: 3.4em;
   text-align: center;
-  font-size: 12px;
+  font-size: var(--lg-text-caption);
   font-variant-numeric: tabular-nums;
   opacity: 0.65;
 }

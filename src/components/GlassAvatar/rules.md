@@ -109,8 +109,13 @@ başlayan isimlerde ilk code unit gösterilir; çağıran anlamlı `name` verir.
 | status renkleri | background | `--lg-success` / `--lg-label-secondary` / `--lg-danger` |
 | font (sm–xl) | font-size | `--lg-text-caption/body/title/display` |
 
-Borç: boyut px'leri (24–72) ve `xs` font'u (10px) raw — boyut ölçeği token'ı
-yok. Pastel üstü metin `rgba(0,0,0,.62)` raw (pastel L %74 sabit → kontrast
+**Borç (raw / mikro-geometri):** boyut ölçeği (24/32/40/56/72px) ve `xs`
+font'u (10px — caption altı, tipografi ölçeği dışı) token karşılığı
+olmadığından kökte yerel değişkenlerde toplandı (`.avatar { --size-xs..xl;
+--font-xs; }`), ayrıca `--status-ring` (2px durum halkası). Control
+token'ları bilinçli KULLANILMADI: `pointer: coarse`'ta büyürler, avatar
+boyutu ise sabittir (kimlik simgesi — responsive değil). Bilinçli bırakılan:
+pastel üstü metin `rgba(0,0,0,.62)` raw (pastel L %74 sabit → kontrast
 garanti); koyu `tint` verilirse kontrast çağıranın sorumluluğunda.
 
 ## 10. Storybook kapsamı

@@ -1,4 +1,13 @@
 .avatar {
+  /* Mikro-geometri: sabit kimlik ölçeği (token karşılığı yok — bkz. rules.md §9).
+     Control token'ları bilinçli KULLANILMADI: coarse'ta büyürler, avatar sabittir. */
+  --size-xs: 24px;
+  --size-sm: 32px;
+  --size-md: 40px;
+  --size-lg: 56px;
+  --size-xl: 72px;
+  --font-xs: 10px;    /* caption'dan küçük, tipografi ölçeği dışı */
+  --status-ring: 2px; /* durum noktası ayırıcı halka */
   position: relative;
   display: inline-flex;
   flex: none;
@@ -9,11 +18,11 @@
 /* Boyutlar SABİTTİR — responsive değil (bkz. rules.md): avatar bir kimlik simgesidir,
    breakpoint ile büyüyüp küçülmez; bağlam değişirse çağıran farklı `size` seçer.
    Font-size'lar boyutun ~%40'ı; token'a denk gelenler token'dan. */
-.xs { width: 24px; height: 24px; font-size: 10px; } /* 10px raw — caption'dan küçük, ölçek dışı */
-.sm { width: 32px; height: 32px; font-size: var(--lg-text-caption, 12px); }
-.md { width: 40px; height: 40px; font-size: var(--lg-text-body, 15px); }
-.lg { width: 56px; height: 56px; font-size: var(--lg-text-title, 22px); }
-.xl { width: 72px; height: 72px; font-size: var(--lg-text-display, 28px); }
+.xs { width: var(--size-xs); height: var(--size-xs); font-size: var(--font-xs); }
+.sm { width: var(--size-sm); height: var(--size-sm); font-size: var(--lg-text-caption, 12px); }
+.md { width: var(--size-md); height: var(--size-md); font-size: var(--lg-text-body, 15px); }
+.lg { width: var(--size-lg); height: var(--size-lg); font-size: var(--lg-text-title, 22px); }
+.xl { width: var(--size-xl); height: var(--size-xl); font-size: var(--lg-text-display, 28px); }
 
 /* Radius kökte tanımlı; görsel/baş-harf katmanı inherit eder — durum noktası kırpılmaz */
 .circle { border-radius: 50%; }
@@ -52,7 +61,7 @@
   width: 26%;
   height: 26%;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--lg-bg, #faf8f4);
+  box-shadow: 0 0 0 var(--status-ring) var(--lg-bg, #faf8f4);
 }
 .online { background-color: var(--lg-success, #34c759); }
 .offline { background-color: var(--lg-label-secondary, #79726a); }

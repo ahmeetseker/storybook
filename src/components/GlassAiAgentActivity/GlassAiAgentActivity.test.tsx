@@ -16,6 +16,8 @@ describe('GlassAiAgentActivity', () => {
     expect(screen.getByText('✦ AI')).toBeTruthy()
     const log = screen.getByRole('log', { name: 'Ajan işlem günlüğü' })
     expect(log.getAttribute('aria-live')).toBe('polite')
+    expect(log.tagName).toBe('DIV')
+    expect(screen.getByText('İlan verileri tarandı').closest('li')?.parentElement?.tagName).toBe('OL')
   })
 
   it('durum renk dışında metinle iletilir', () => {

@@ -2,7 +2,7 @@
 name: GlassHero
 category: içerik
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-07-24
 ---
 
 # GlassHero Kuralları
@@ -60,6 +60,10 @@ Stateless sunum component'i. Hover/focus slot içeriğinin kendi kurallarındad�
 
 - Responsive: split grid `auto-fit + minmax(min(400px,100%),1fr)` — dar ekranda
   tek kolona düşer, 320px'te taşma yok.
+- Kök taşmayı kırpmaz (`overflow: visible`): `search`/`actions` slotuna bağlı
+  öneri ve popover panelleri hero sınırının dışında da görünür ve etkileşim alır.
+  Görsel kırpma yalnız kendi sınırını yöneten `.showcase` ve `.ambient`
+  katmanlarında yapılır.
 - **Animasyon:** kademeli giriş (motion stagger: başlık→alt başlık→slotlar, spring
   260/30); showcase'te Ken Burns (22s scale/translate döngüsü, yalnız transform);
   `ambient` aurora'sı 26-32s süzülme. Hepsi yalnız transform/opacity;
@@ -80,9 +84,22 @@ Stateless sunum component'i. Hover/focus slot içeriğinin kendi kurallarındad�
 | başlık/alt başlık | `--lg-label` / `--lg-label-secondary` |
 | showcase overlay | `--lg-scrim` (yeni) |
 | showcase metin | `--lg-on-scrim` (yeni) |
+| alt başlık font-size | `--lg-text-headline` (17px) |
+| yatay padding / quickLinks satır gap | `--lg-space-5` (20px) / `--lg-space-2` (8px) |
+| blob radius | `--lg-radius-capsule` |
 
-**Borç (raw):** padding 56/150px, clamp font aralığı 30-46px, gap değerleri,
-max-width 640/660/760px.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
+kökünde yerel değişkende toplandı (`.root { --content-max: 1120px; --pad-y:
+56px; --showcase-pad-top: 150px; --stack-gap: 18px; --actions-gap: 10px;
+--bento-offset: 14px; --quicklink-gap: 14px; --text-sm: 14px; --title-max-w:
+760px; --subtitle-max-w: 640px; --search-max-w: 660px; --split-min: 400px;
+--split-gap: 36px; --blob-size: 640px; --blob-blur: 90px; }`). 56px dikey
+padding kontrol geometrisi olmadığından `--lg-control-xl`'e bilinçli
+bağlanmadı. Başlık `clamp(30px, 4.5vw, 46px)` akışkan tip — token ölçeğinde
+karşılığı yok, yerinde bırakıldı. Aurora blob konumları (−280/−160/−320/−120px)
+ve keyframe sürüklenme mesafeleri (70/50/−60/−70px) dekoratif animasyon
+geometrisi — keyframe içinde `var()` güvenilir çalışmadığından raw bırakıldı.
+Animasyon süreleri/easing (22/26/32s, ease-in-out) token'sız raw kalır.
 
 ## 10. Storybook kapsamı
 
@@ -97,6 +114,8 @@ VaryantKarsilastirma (4 varyant alt alta — seçim story'si). Temalar toolbar'd
 - [x] showcase scrim + aria-hidden medya
 - [x] actions render
 - [x] data-variant işareti
+- [x] search/split/centered slot taşmaları kırpılmaz; showcase kendi medyasını
+      kırpmaya devam eder
 - [ ] showcase kontrastı (visual, Chrome)
 
 ## 12. Do / Don't
@@ -107,5 +126,10 @@ VaryantKarsilastirma (4 varyant alt alta — seçim story'si). Temalar toolbar'd
 - ❌ `search` slotuna form dışı blok içerik koyma.
 
 **Açık kararlar:** `as`/rest props · giriş animasyonu preset'i (v2) ·
-`--lg-space-*` gelince boşluk borcu · `tone` ekseni bilinçli yok — flat zemin tema
+ölçek dışı boşluklar (18/14/10/36px) yerel değişkende — token ölçeğine
+oturtulması v2 tasarım kararı · `tone` ekseni bilinçli yok — flat zemin tema
 token'larından döner; ihtiyaç doğarsa v2.
+
+**Changelog:** 2026-07-24 — Kök taşma kırpması kaldırıldı; slot içindeki bağlı
+paneller hero dışına çıkabilir. Showcase ve ambient kırpması kendi katmanlarında
+korundu.

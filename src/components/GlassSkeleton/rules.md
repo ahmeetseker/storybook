@@ -105,8 +105,11 @@ seçilir (1–4 tipik); 8+ satır iskeleti gürültüdür — bloklara bölünü
 | rect radius | border-radius | `--lg-radius-media` |
 | grup | gap | `--lg-space-2` |
 
-Borç: circle 40px ve rect 96px default'ları raw (avatar-md / medya placeholder
-karşılıkları; prop ile ezilir). Shimmer süresi 1.4s raw — motion preset'ine
+**Borç (raw / mikro-geometri):** circle 40px ve rect 96px default'ları component
+kökünde yerel değişkende toplandı (`.skeleton { --avatar-size: 40px;
+--media-height: 96px; }`) — avatar-md / medya placeholder karşılıkları; iskelet
+kontrol olmadığından 40px `--lg-control-md`'ye bağlanmadı; her ikisi de
+width/height prop'larıyla ezilir. Shimmer süresi 1.4s raw — motion preset'ine
 bağlanması açık karar.
 
 ## 10. Storybook kapsamı

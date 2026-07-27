@@ -14,7 +14,7 @@ const avatarDataUri =
   )
 
 const meta = {
-  title: 'Components/GlassSellerCard',
+  title: 'Bileşenler/Pazar Yeri/GlassSellerCard',
   component: GlassSellerCard,
   tags: ['autodocs'],
   args: { onPhoneReveal: fn(), onMessage: fn() },

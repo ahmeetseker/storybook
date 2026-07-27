@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassDatePicker } from './GlassDatePicker'
 
 const meta = {
-  title: 'Components/GlassDatePicker',
+  title: 'Bileşenler/Form/GlassDatePicker',
   component: GlassDatePicker,
   tags: ['autodocs'],
   args: { onChange: fn() },

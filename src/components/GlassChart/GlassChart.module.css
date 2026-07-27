@@ -4,6 +4,10 @@
    bu yüzden ayrı bir `prefers-reduced-motion` kuralına gerek yoktur. */
 
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9):
+     kenar iç ofseti (2px) ve tooltip satır arası (1px). */
+  --glass-chart-edge-inset: 2px;
+  --glass-chart-tooltip-gap: 1px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-3, 12px);
@@ -46,13 +50,13 @@
   white-space: nowrap;
   pointer-events: none;
   background: color-mix(in srgb, var(--lg-surface) 82%, transparent);
-  padding-right: 4px;
+  padding-right: var(--lg-space-1, 4px);
 }
 
 /* Son nokta değer etiketi — sağ kenara sabit, taşma olmaz */
 .lastLabel {
   position: absolute;
-  right: 2px;
+  right: var(--glass-chart-edge-inset);
   transform: translateY(-135%);
   font-size: var(--lg-text-footnote, 13px);
   font-weight: 700;
@@ -65,17 +69,17 @@
 /* Pointer/tap balonu — tek örnek, flat chip (cam yok) */
 .tooltip {
   position: absolute;
-  top: 4px;
+  top: var(--lg-space-1, 4px);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
-  padding: 4px 8px;
+  gap: var(--glass-chart-tooltip-gap);
+  padding: var(--lg-space-1, 4px) var(--lg-space-2, 8px);
   border-radius: var(--lg-radius-chip, 10px);
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--lg-shadow-sm);
   font-size: var(--lg-text-caption, 12px);
   pointer-events: none;
   white-space: nowrap;

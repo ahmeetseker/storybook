@@ -1,0 +1,1 @@
+export { FavoritesWorkspace } from './FavoritesWorkspace'

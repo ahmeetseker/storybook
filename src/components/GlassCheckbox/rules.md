@@ -89,8 +89,13 @@ Etiket kısa ve olumlu yazılır ("Garantili ilanlar", "Bildirimleri kapat" değ
 | aralık | gap | `--lg-space-2` |
 | focus | outline | `--lg-accent` |
 
-Borç: kutu boyutları (18/22px) raw — kontrol token'ı checkbox ölçeğine uymadığı
-için bilinçli.
+**Borç (raw / mikro-geometri):** kutu ve işaret boyutları kontrol token
+ölçeğine uymadığından size sınıflarında yerel değişkene toplandı —
+`.sm { --box-size: 18px; --mark-size: 12px; }` / `.md { --box-size: 22px;
+--mark-size: 14px; }`, coarse'ta `--box-size` 22/26px'e büyür. Coarse satır
+hedefi `min-height: 44px` → `--lg-control-md`'ye bağlandı (`pointer: coarse`
+bloğunda token birebir 44px — dokunma hedefi büyümesi tasarımın istediği
+davranış). Geçiş süresi `0.16s ease-out` raw — süre/easing token'ı yok.
 
 ## 10. Storybook kapsamı
 

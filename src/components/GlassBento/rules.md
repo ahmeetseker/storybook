@@ -80,8 +80,21 @@ Stateless. Feature hover'da yükselir (`translateY(-3px)` + gölge), basışta
 | accent hücre | `--lg-accent` + `--lg-accent-contrast` |
 | rozet | `--lg-success` |
 
-**Borç (raw):** satır yüksekliği 158px, gap 14px, font-size'lar, 860/500px
-breakpoint'ler, hover gölge değerleri.
+**Borç (raw / mikro-geometri):** Token'a bağlananlar: rozet konumu ve dikey
+padding'i (`--lg-space-3`/`--lg-space-1`), rozet fontu `--lg-text-badge`
+(11px), meta `--lg-text-caption` (12px), gövde/hücre yatay-dikey 16px'ler
+`--lg-space-4`. Token karşılığı olmayanlar component kökünde yerel değişkene
+toplandı: `--row-size: 158px` · `--grid-gap: 14px` · `--hover-lift: -3px` ·
+rozet `--badge-gap: 5px` / `--badge-pad-x: 10px` · gövde
+`--body-pad-top: 40px` / `--body-pad-bottom: 15px` / `--body-gap: 3px` ·
+tipografi ölçeği dışı boyutlar `--price-size: 21px` / `--title-size: 14px` /
+`--stat-size: 26px` / `--stat-label-size: 12.5px` · hücre `--cell-gap: 2px` /
+`--cell-pad-x: 18px`; kompakt varyant aynı değişkenleri `.featureCompact`
+üzerinde ezer (15.5/12.5px, 28/13/11px). Bilinçli bırakılanlar: hover gölgesi
+`0 14px 34px color-mix(…)` — `--lg-shadow-*` desenlerinin hiçbiriyle birebir
+eşleşmediğinden dokunulmadı · geçiş süresi/easing `0.22s ease` (süre token'ı
+yok) · 860/500px breakpoint'leri bento'ya özgü, standart bp ölçeği
+(sm 640 / md 768) dışında — @media istisnası, yorumla işaretlendi.
 
 ## 10. Storybook kapsamı
 

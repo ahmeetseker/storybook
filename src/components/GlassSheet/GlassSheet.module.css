@@ -1,5 +1,12 @@
 /* Overlay kökü — panel alta absolute yerleşir */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --backdrop-blur: 8px;
+  --grabber-min-h: 28px;
+  --grabber-bar-w: 36px;
+  --grabber-bar-h: 5px;
+  --sheet-max-w: 560px;
+  --sheet-side-inset: 48px;
   position: fixed;
   inset: 0;
   z-index: 1000; /* z token'ı yok — overlay katmanı için raw (GlassDrawer ile aynı borç) */
@@ -8,9 +15,10 @@
 .backdrop {
   position: absolute;
   inset: 0;
+  /* Bilinçli raw: --lg-scrim (alfa .55) ile birebir değil — overlay scrim token'ı bekliyor */
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--backdrop-blur));
 }
 
 /* Panel: yarım sayfa CAM yüzey — yukarı çekildikçe --sheet-t (0..1) ile
@@ -56,7 +64,7 @@
   justify-content: center;
   flex: none;
   width: 100%;
-  min-height: 28px;
+  min-height: var(--grabber-min-h);
   margin: 0;
   padding: var(--lg-space-2, 8px) 0;
   border: none;
@@ -73,8 +81,8 @@
 }
 
 .grabberBar {
-  width: 36px;
-  height: 5px;
+  width: var(--grabber-bar-w);
+  height: var(--grabber-bar-h);
   border-radius: var(--lg-radius-capsule, 999px);
   background: color-mix(in srgb, var(--lg-label, #24211b) 25%, transparent);
 }
@@ -105,7 +113,7 @@
    translateX kullanılmaz — motion panelin transform'unu (y) yönetiyor. */
 @media (min-width: 640px) {
   .panel {
-    width: min(560px, calc(100vw - 48px));
+    width: min(var(--sheet-max-w), calc(100vw - var(--sheet-side-inset)));
     margin-inline: auto;
     padding: 0 var(--lg-space-6, 24px) var(--lg-space-6, 24px);
   }

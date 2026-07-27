@@ -22,7 +22,7 @@ const konakDairesi: GlassMediaGalleryItem[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassMediaGallery',
+  title: 'Bileşenler/Medya ve Harita/GlassMediaGallery',
   component: GlassMediaGallery,
   tags: ['autodocs'],
   parameters: {

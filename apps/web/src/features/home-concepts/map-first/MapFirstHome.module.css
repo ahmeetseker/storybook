@@ -1,0 +1,265 @@
+.page {
+  --home-content-gap: clamp(1.75rem, 3vw, 2.5rem);
+  --home-shell-gap: clamp(1.5rem, 2.5vw, 2.25rem);
+  background: var(--lg-bg);
+  container-type: inline-size;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.hero > section {
+  --pad-y: clamp(1.25rem, 2.4vw, 2rem);
+  --split-gap: clamp(1.5rem, 3vw, 2.25rem);
+  --split-min: 19rem;
+  --stack-gap: 1rem;
+}
+
+.heroSearch {
+  width: 100%;
+  min-width: 0;
+}
+
+.mapRegion {
+  min-width: 0;
+  height: 100%;
+}
+
+.mapRegion .heroMap {
+  --map-panel-min-h: 21.875rem;
+}
+
+.mapPopup {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.mapPopup strong {
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.35;
+}
+
+.mapPopup span {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+.section {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.sectionHeader {
+  display: grid;
+  max-width: 44rem;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.sectionHeader h2,
+.compareBand h2 {
+  margin: 0;
+  color: var(--lg-label);
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.sectionHeader p,
+.compareBand p {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.regionGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--lg-space-3);
+}
+
+.regionLink {
+  display: flex;
+  min-width: 0;
+  min-height: 5.25rem;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-4);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  text-decoration: none;
+}
+
+.regionLink > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.regionLink strong {
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.regionLink small {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.regionLink b {
+  color: var(--lg-accent);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.metricSection {
+  padding-block: var(--lg-space-1);
+}
+
+.metricPanel {
+  padding-block: var(--lg-space-5);
+  border-block: var(--lg-border-width, 1px) solid var(--lg-hairline);
+}
+
+.newListings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--lg-space-6);
+}
+
+.compareBand {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--lg-space-5);
+  padding: var(--lg-space-5);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: color-mix(
+    in srgb,
+    var(--lg-accent) 8%,
+    var(--lg-surface)
+  );
+}
+
+.compareBand > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.compareBand .compareCta {
+  min-width: 10.5rem;
+  justify-self: end;
+}
+
+.agencyGrid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--lg-space-3);
+}
+
+.agencyCta {
+  align-self: flex-start;
+}
+
+.regionLink:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (hover: hover) {
+  .page button:hover:not(:disabled) {
+    scale: 1;
+  }
+
+  .regionLink:hover {
+    border-color: var(--lg-accent);
+  }
+
+}
+
+@container (max-width: 64rem) {
+  .regionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 48rem) {
+  .compareBand {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .newListings {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compareBand .compareCta {
+    justify-self: start;
+  }
+}
+
+@container (max-width: 32rem) {
+  .hero > section {
+    --pad-y: var(--lg-space-4);
+    --split-min: 100%;
+  }
+
+  .mapRegion .heroMap {
+    --map-panel-min-h: 17.5rem;
+  }
+
+  .regionGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .regionLink {
+    min-height: 5.5rem;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--lg-space-1);
+    padding: var(--lg-space-3);
+  }
+
+  .regionLink b {
+    white-space: normal;
+  }
+
+  .compareBand .compareCta {
+    width: 100%;
+  }
+
+  .agencyCta {
+    width: 100%;
+  }
+}
+
+@media (pointer: coarse) {
+  .regionLink {
+    min-height: var(--lg-control-lg);
+  }
+}

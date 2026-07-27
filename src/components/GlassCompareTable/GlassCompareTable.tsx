@@ -1,4 +1,4 @@
-import { useEffect, useRef, type HTMLAttributes } from 'react'
+import { useEffect, useRef, useState, type HTMLAttributes } from 'react'
 import styles from './GlassCompareTable.module.css'
 
 /** Karşılaştırılan tek özellik satırı — ilan verisindeki bir alana karşılık gelir. */
@@ -22,6 +22,11 @@ export interface GlassCompareListing {
   title: string
   /** Dekoratif kapak görseli — verilmezse sütun başlığı yalnız başlık metni içerir */
   image?: string
+  /**
+   * `image` yüklenemezse bir kez denenecek dekoratif ilan görseli.
+   * Aynı fallback de hata verirse kaynak sabit tutulur ve yeniden değiştirilmez.
+   */
+  imageFallback?: string
   /** `field.key` → değer; eksik anahtarlar tabloda "—" gösterilir */
   values: Record<string, string | number>
 }
@@ -105,6 +110,39 @@ function formatValue(value: string | number | undefined): string {
   return value
 }
 
+interface CompareListingImageProps {
+  image: string
+  imageFallback?: string
+}
+
+function CompareListingImage({
+  image,
+  imageFallback,
+}: CompareListingImageProps) {
+  const [failedImage, setFailedImage] = useState<{
+    image: string
+    imageFallback: string
+  } | null>(null)
+  const usesFallback =
+    imageFallback !== undefined &&
+    failedImage?.image === image &&
+    failedImage.imageFallback === imageFallback
+  const imageSrc = usesFallback ? imageFallback : image
+
+  return (
+    <img
+      src={imageSrc}
+      alt=""
+      className={styles.image}
+      onError={() => {
+        if (!usesFallback && imageFallback && imageFallback !== image) {
+          setFailedImage({ image, imageFallback })
+        }
+      }}
+    />
+  )
+}
+
 export function GlassCompareTable({
   fields,
   listings,
@@ -175,7 +213,12 @@ export function GlassCompareTable({
                       </button>
                     </div>
                   ) : null}
-                  {listing.image ? <img src={listing.image} alt="" className={styles.image} /> : null}
+                  {listing.image ? (
+                    <CompareListingImage
+                      image={listing.image}
+                      imageFallback={listing.imageFallback}
+                    />
+                  ) : null}
                   <span className={styles.listingTitle}>{listing.title}</span>
                 </div>
               </th>

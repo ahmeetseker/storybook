@@ -152,18 +152,30 @@ interaction (hover/focus CSS state'i, hiçbiri prop değil).
 | root | radius | `shape={20}` — `--lg-radius-card` değeriyle aynı, sayısal |
 | viewport | radius | `--lg-radius-media` |
 | tab | radius | `--lg-radius-chip` |
-| tab | yükseklik | `--lg-control-sm` (+ `pointer:coarse`'ta 44px raw) |
+| tab | yükseklik | `--lg-control-sm` (+ `pointer:coarse`'ta `--glass-floorplan-touch-target`) |
+| tab / balon / zoom yüzdesi | font-size | `--lg-text-footnote` / `--lg-text-caption` |
 | tab (seçili) | zemin/metin | `--lg-accent` / `--lg-accent-contrast` |
 | tab / hotspot | focus outline | `--lg-accent` (yalnız `:focus-visible`) |
 | hotspot | zemin/kenarlık | `--lg-accent` / `--lg-on-scrim` |
 | balon | zemin/metin | `--lg-scrim` / `--lg-on-scrim` |
 | Sıfırla / zoom butonları | tüm görünüm | `GlassButton`/`GlassIconButton` token'ları |
 
-**Borç (raw değerler):** kök `padding: 16px`, `gap: 14px` · tab `font-size:
-13px`, `padding: 0 14px` · hotspot boyutu `26px` (`pointer:coarse`'ta `44px`)
-— `--lg-radius-*` ölçeğinde karşılığı yok, kasıtlı küçük pin · balon
-`padding: 6px 10px`, `font-size: 12px` · zoom adımı (`0.5`) ve sınırları
-(`1`–`4`) token değil, spec sabiti.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
+kökünde yerel değişkenlerde toplandı: `--glass-floorplan-root-gap` (14px),
+`--glass-floorplan-tab-gap` (6px), `--glass-floorplan-tab-pad` (14px),
+`--glass-floorplan-stage-gap` / `--glass-floorplan-cluster-gap` (10px),
+`--glass-floorplan-hotspot-size` (26px — kasıtlı küçük pin),
+`--glass-floorplan-hotspot-ring` (2px),
+`--glass-floorplan-tooltip-pad-block/-inline` (6/10px),
+`--glass-floorplan-touch-target` (44px — dokunmatik hedef sabiti; sekme ince
+pointer'da `--lg-control-sm` kullandığından coarse 44px'i control token'ına
+bağlanmadı). Token'a bağlananlar: tab 13px → `--lg-text-footnote`, balon ve
+zoom yüzdesi 12px → `--lg-text-caption`, balon dikey ofseti 20px →
+`--lg-space-5`, zoom grubu `gap` 8px → `--lg-space-2`. Bilinçli bırakılan:
+hotspot gölgesi `0 2px 6px rgba(0,0,0,0.3)` — hiçbir `--lg-shadow-*` deseniyle
+birebir eşleşmiyor; geçiş süreleri/easing (`0.16s`/`0.2s ease-out`) süre
+token'ı olmadığından raw; zoom adımı (`0.5`) ve sınırları (`1`–`4`) token
+değil, spec sabiti.
 
 ## 10. Storybook kapsamı
 

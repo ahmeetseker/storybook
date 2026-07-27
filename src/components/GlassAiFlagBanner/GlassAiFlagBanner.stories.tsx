@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassAiFlagBanner } from './GlassAiFlagBanner'
 
 const meta = {
-  title: 'Components/GlassAiFlagBanner',
+  title: 'Bileşenler/AI/GlassAiFlagBanner',
   component: GlassAiFlagBanner,
   tags: ['autodocs'],
   parameters: {

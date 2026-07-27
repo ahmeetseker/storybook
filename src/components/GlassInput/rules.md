@@ -99,9 +99,17 @@ Placeholder yardım metni değildir (kaybolur) — kalıcı yardım GlassField
 | root | invalid çerçeve | `--lg-danger` |
 | input | font-size (≥sm) | `--lg-text-footnote/body/headline` |
 | placeholder, adornment | color | `--lg-label-secondary` |
-| inner | gap/padding | `--lg-space-2` + boyuta özel raw px |
+| inner | gap/padding | `--lg-space-2` gap; md/lg padding `--lg-space-3/4` |
 
-Borç: boyut padding'leri raw px (GlassButton ile aynı borç).
+**Borç (raw / mikro-geometri):** md/lg yatay padding'ler birebir
+`--lg-space-3/4`'e bağlandı; token karşılığı olmayanlar kökte yerel
+değişkenlerde toplandı: `--pad-x-sm` (10px — space-2/3 arası), `--clear-size`
+(22px temizle butonu kutusu), `--ios-min-font` (16px — iOS Safari zoom eşiği,
+platform sabiti, <bp-sm tüm boyutlarda geçerli). Bilinçli bırakılan: invalid
+gölge deseni `inset 0 0 0 1.5px var(--lg-danger) + 0 4px 16px rgba(0,0,0,.12)`
+shadow token'larıyla birebir eşleşmediğinden raw kaldı (`!important`
+GlassSurface inline gölgesini ezmek için). Süre/easing (`0.16s ease-out`)
+raw — token yok.
 
 ## 10. Storybook kapsamı
 

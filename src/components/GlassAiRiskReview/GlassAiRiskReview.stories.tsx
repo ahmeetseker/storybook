@@ -9,7 +9,7 @@ const sample: GlassAiRiskItem[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassAiRiskReview',
+  title: 'Bileşenler/AI/GlassAiRiskReview',
   component: GlassAiRiskReview,
   tags: ['autodocs'],
   args: {

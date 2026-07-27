@@ -180,10 +180,19 @@ interaction (click/keyboard).
 | focus halkası | outline | `var(--lg-accent)` |
 | boşluklar | gap/padding | `var(--lg-space-*)` |
 
-**Borç (raw):** yıldız glif hücresi 18px (display/summary) / 22px (input
-buton içi), input buton kutusu 32px (coarse'ta 44px), dağılım çubuğu
-yüksekliği 8px — GlassScoreMeter'daki ring/bar ölçek borcuyla aynı gerekçe:
-gösterge boyutu için özel token yok.
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--grt-star-gap: 2px` — yıldızlar arası mikro boşluk.
+- `--grt-star-size: 18px` / `--grt-star-size-input: 22px` — yıldız glif
+  hücresi (display/summary ve input buton içi).
+- `--grt-dist-label-width: 52px` — dağılım satırı etiket sütunu.
+- `--grt-dist-bar-height: 8px` — dağılım çubuğu kalınlığı.
+
+GlassScoreMeter'daki ring/bar ölçek borcuyla aynı gerekçe: gösterge boyutu
+için özel token yok. Input yıldız butonu kutusu `--lg-control-sm`;
+pointer:coarse'ta `--lg-control-md` token'ına yükselir (coarse'ta 44px —
+birebir eski raw değer, dokunmatik hedef). Dağılım çubuğu dolgusu genişlik animasyonu yerine %100
+genişlik + `transform: scaleX(oran)` (`transform-origin: inline-start`,
+track `overflow: hidden`) — animasyon yalnız transform/opacity/filter kuralı.
 
 ## 10. Storybook kapsamı
 
@@ -238,6 +247,12 @@ sibling-highlight deseni karmaşıklık/RTL riskini artırdığından ertelendi)
 
 ## Changelog
 
+- 2026-07-24: Uyum düzeltmesi — dağılım çubuğu dolgusu `transition: width` +
+  inline `width` yerine %100 genişlik + `transform: scaleX(oran)` tekniğine
+  taşındı (paint-only animasyon; `transform-origin: inline-start`, fallback
+  `left center`); input yıldız butonu 32px → `--lg-control-sm`; mikro-geometri
+  (2px gap, 18/22px glif, 52px etiket sütunu, 8px bar) `.root` üzerinde yerel
+  değişkenlere toplandı (§9). Bar genişlik testi scaleX'e göre güncellendi.
 - 2026-07-17: Code review fix — `input`'ta `value`/`defaultValue` normalize
   edilmiyordu (`2.5`/`6`/`Infinity` hiçbir radio'yla eşleşmiyordu); ok tuşu
   odak taşıma controlled reddinde `tabIndex=-1` öğeye kilitleniyordu; `label`

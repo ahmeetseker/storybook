@@ -83,7 +83,15 @@ Etkileşimsiz. Durum yalnız `score`/`factors` verisiyle belirlenir.
 | unmeasured | background/border | `color-mix(--lg-warning ...)` |
 | disclaimer | color | `--lg-label-secondary` |
 
-Raw px: meter yüksekliği 8px + etken glifi 9px — GlassScoreMeter bar borcuyla aynı.
+Etken glifi `--lg-text-badge` token'ına bağlandı (9→11px, denetim kararı).
+
+Borç (mikro-geometri): meter yüksekliği component kökünde yerel değişken —
+`.root { --meter-height: 8px; }` (GlassScoreMeter bar borcuyla aynı).
+
+**Animasyon tekniği:** dolgu genişlik animasyonu YASAK — `.fill` her zaman
+%100 genişliktedir, oran inline `transform: scaleX(oran)` ile verilir
+(`transform-origin: left`, RTL'de `right`; track `overflow: hidden`).
+Geçiş yalnız `transform` üzerindedir, reduced-motion'da kapanır.
 
 ## 10. Storybook kapsamı
 

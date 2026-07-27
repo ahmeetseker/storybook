@@ -10,7 +10,7 @@ const mixed: GlassAgentActivityEntry[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassAiAgentActivity',
+  title: 'Bileşenler/AI/GlassAiAgentActivity',
   component: GlassAiAgentActivity,
   tags: ['autodocs'],
   args: {

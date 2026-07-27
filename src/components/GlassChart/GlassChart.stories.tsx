@@ -25,7 +25,7 @@ const m2Trendi: GlassChartPoint[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassChart',
+  title: 'Bileşenler/Veri Gösterimi/GlassChart',
   component: GlassChart,
   tags: ['autodocs'],
   argTypes: {

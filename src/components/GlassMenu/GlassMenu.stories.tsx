@@ -16,7 +16,7 @@ const IkonBaglanti = ikon('M6.5 9.5 9.5 6.5 M5 11 3.5 12.5a2.1 2.1 0 0 1-3-3L4 6
 const IkonCop = ikon('M2.5 4h11 M5.5 4V2.5h5V4 M4 4l.7 10h6.6L12 4 M6.5 7v4 M9.5 7v4')
 
 const meta = {
-  title: 'Components/GlassMenu',
+  title: 'Bileşenler/Navigasyon/GlassMenu',
   component: GlassMenu,
   tags: ['autodocs'],
   args: {

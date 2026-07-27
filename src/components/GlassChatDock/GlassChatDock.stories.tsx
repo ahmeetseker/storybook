@@ -44,7 +44,7 @@ function ChatDockDemo(props: Omit<GlassChatDockProps, 'messages' | 'onSend'> & {
 }
 
 const meta = {
-  title: 'Components/GlassChatDock',
+  title: 'Bileşenler/AI/GlassChatDock',
   component: GlassChatDock,
   tags: ['autodocs'],
   args: {
@@ -149,7 +149,7 @@ export const UzunIcerik: Story = {
   },
 }
 
-/** Dar/mobil viewport: panel tam genişlik alınır, viewport'un alt yarısını kaplayan bottom-sheet olur. */
+/** Dar/mobil viewport: panel `min()` sınırıyla kenar boşluklarını koruyarak kendiliğinden daralır (breakpoint yok). */
 export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   args: { defaultOpen: true, messages: seedMessages },

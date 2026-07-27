@@ -134,9 +134,10 @@ ek render tetiklemez.
   `items.length === 0`'a düşünce aynı yolla süzülerek çıkar ve unmount olur.
   `prefers-reduced-motion: reduce` iken geçiş TAMAMEN anlıktır (`duration: 0`,
   `y` sabit `0`) — ne süzülme ne opacity fade'i vardır.
-- **Responsive:** kart listesi kendi `overflow-x: auto` kabında kayar (sayfa
-  gövdesi asla yatay kaymaz); 560px altında tepsi dikey iki bloğa ayrılır
-  (üstte liste, altta eylem grubu).
+- **Responsive:** breakpoint yok — kart listesi kendi `overflow-x: auto`
+  kabında kayar (sayfa gövdesi asla yatay kaymaz); dar viewport'ta liste
+  yatay kaydırma şeridine dönüşür, eylem grubu `flex: none` ile sağda sabit
+  kalır (içsel akış).
 
 ## 8. İçerik kuralları
 
@@ -159,7 +160,7 @@ ek render tetiklemez.
 | Part | Property | Token | State override |
 |---|---|---|---|
 | root | background/border/radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-card` | — |
-| root | gölge | raw `box-shadow: 0 20px 48px rgba(0,0,0,.18)` | — (borç, bkz. altta) |
+| root | gölge | `--lg-shadow-md` | — |
 | kart (item) | zemin/border/radius | `color-mix(--lg-label 4%, --lg-surface)` / `--lg-hairline` / `--lg-radius-capsule` | — |
 | thumb/thumbFallback | radius | `--lg-radius-chip` | — |
 | itemTitle | renk/boyut | `--lg-label` / `--lg-text-footnote` | — |
@@ -170,12 +171,17 @@ ek render tetiklemez.
 | ipucu `.hintDot` (`maxItems` aşımı) | zemin | `--lg-warning` | dekoratif 6px nokta, `aria-hidden`; durum metinle zaten iletilir |
 | padding/gap/font | `--lg-space-*` / `--lg-text-*` | — | — |
 
-**Borç (raw):** `box-shadow` değerleri (token yok — GlassChatDock/GlassSheet
-ile aynı borç) · `z-index: 40` (z token'ı yok, overlay katmanlarından
+**Borç (raw):** `z-index: 40` (z token'ı yok, overlay katmanlarından
 [Toast/Drawer 1000, ChatDock 60] daha düşük tutuldu — CompareBar sayfa
-içeriğiyle aynı düzlemde, hiçbir overlay'in üstüne çıkmaz) · kart
-`max-width: 200px` / `itemTitle max-width: 108px` / thumb `32px` raw ölçüler
-(container query yok) · `96px` giriş/çıkış `translateY` mesafesi raw.
+içeriğiyle aynı düzlemde, hiçbir overlay'in üstüne çıkmaz) · mikro-geometri
+kökte yerel değişkenlerde toplandı: `--glass-comparebar-thumb` (32px),
+`--glass-comparebar-item-max` (200px), `--glass-comparebar-title-max`
+(108px), `--glass-comparebar-remove-size/font` (22px/15px),
+`--glass-comparebar-dot` (6px), `--glass-comparebar-max-w` (720px, bar maks.
+genişliği), `--glass-comparebar-underline-offset` (2px, Temizle alt çizgisi)
+— token karşılığı yok (container query yok) · `pointer: coarse` kaldırma
+hedefi `--lg-control-md`'ye bağlandı (coarse'ta 44px — birebir) · `96px`
+giriş/çıkış `translateY` mesafesi raw.
 
 ## 10. Storybook kapsamı
 

@@ -214,11 +214,16 @@ imzasının parçası) → render.
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | skeleton | background | `color-mix(... var(--lg-label) 8% ...)` | `loading` |
 
-**Borç (raw):** bar/track yükseklikleri 18px (track)/8px (bar) — çok küçük
-ölçekli görsel öğeler tasarım sistemi ölçeğinde yok, `GlassMatchScore`'daki
-ring çapı borcuyla aynı gerekçe; AI rozeti font-size 10.5px/700 (kontrat
-sabiti); `centerLine` 1px genişlik (kart hairline border'ıyla aynı 1px
-konvansiyonu).
+**Borç (raw):** mikro-geometri kökte yerel değişkenlerde: bar/track
+yükseklikleri (`--vd-track-h: 18px` / `--vd-bar-h: 8px` — çok küçük ölçekli
+görsel öğeler tasarım sistemi ölçeğinde yok, `GlassMatchScore`'daki ring çapı
+borcuyla aynı gerekçe), `--vd-centerline-w: 1px` (hairline konvansiyonu),
+`--vd-ai-gap: 6px` / `--vd-ai-pad-block: 3px` (AI rozeti kontrat sabitleri),
+`--vd-row-gap: 2px`, sürücü satırı grid kolon tabanları
+(`--vd-col-label-min: 76px` / `--vd-col-track-min: 96px` /
+`--vd-col-impact-min: 64px`). `pointer: coarse` geri bildirim butonu hedefi
+`--lg-control-md`'ye bağlandı (coarse'ta 44px — birebir). Bar geçişi
+`0.3s ease-out` ve skeleton `1.4s` süresi raw (süre token'ı yok).
 
 ## 10. Storybook kapsamı
 

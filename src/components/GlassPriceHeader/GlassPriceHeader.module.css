@@ -1,34 +1,40 @@
 .card {
+  /* Mikro-geometri / tipografi (token karşılığı yok — bkz. rules.md §9 borç
+     notu): başlık 20px (headline 17 ile title 22 arası), fiyat 30px (display
+     28'den büyük), sıkı 6px gap (space-1/2 arası). */
+  --ph-title-size: 20px;
+  --ph-price-size: 30px;
+  --ph-gap-tight: 6px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--lg-space-3);
   box-sizing: border-box;
-  padding: 20px;
+  padding: var(--lg-space-5);
 }
 
 .top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--lg-space-3);
 }
 
 .heading {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--ph-gap-tight);
   min-width: 0;
 }
 
 .badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--ph-gap-tight);
 }
 
 .title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--ph-title-size);
   font-weight: 700;
   letter-spacing: -0.022em;
   line-height: 1.25;
@@ -37,19 +43,19 @@
 
 .meta {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--lg-text-footnote);
   opacity: 0.65;
 }
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--lg-space-2);
   flex: none;
 }
 
 .price {
   margin: 0;
-  font-size: 30px;
+  font-size: var(--ph-price-size);
   font-weight: 800;
   letter-spacing: -0.03em; /* SF display tracking */
   line-height: 1;

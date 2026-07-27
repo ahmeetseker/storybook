@@ -99,6 +99,12 @@ gruplama gerekiyorsa `separatorBefore`. Yıkıcı öğe en sonda, ayraçla ayrı
 | separator | background | `--lg-hairline` |
 | focus | outline | `--lg-accent` (iç, -2px offset) |
 
+**Borç (mikro-geometri):** panel `min-width` (200px) token karşılığı
+olmadığından component kökünde yerel değişkende toplandı
+(`.area { --menu-min-width: 200px; }` — `.positioner` portal'sız `.area`
+çocuğu olduğundan miras işler); viewport taşma marjı
+`calc(100vw - var(--lg-space-4))` token'a bağlandı (birebir 16px).
+
 ## 10. Storybook kapsamı
 
 Var: Default, ItemStates (disabled/destructive/separator), WithoutIcons,

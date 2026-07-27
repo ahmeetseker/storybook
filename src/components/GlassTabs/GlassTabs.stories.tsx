@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassTabs, type GlassTabItem } from './GlassTabs'
 
 const meta = {
-  title: 'Components/GlassTabs',
+  title: 'Bileşenler/Navigasyon/GlassTabs',
   component: GlassTabs,
   tags: ['autodocs'],
   args: { onTabChange: fn() },

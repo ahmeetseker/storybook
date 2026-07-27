@@ -1,5 +1,9 @@
 /* İçerik katmanı FLAT: cam/backdrop-filter yok — yalnız token'lar (bkz. rules.md §9). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --grct-ai-row-gap: 6px;
+  --grct-badge-padding-block: 3px;
+  --grct-count-padding-block: 1px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-3);
@@ -25,7 +29,7 @@
 .aiRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--grct-ai-row-gap);
   flex-wrap: wrap;
 }
 
@@ -33,11 +37,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--grct-badge-padding-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -109,7 +113,7 @@
   font-size: var(--lg-text-caption);
   font-weight: 700;
   border-radius: var(--lg-radius-capsule);
-  padding: 1px var(--lg-space-2);
+  padding: var(--grct-count-padding-block) var(--lg-space-2);
   /* Renkli küçük metin kontrastı yalnız zeminden gelir, metin rengi her
      durumda okunaklı bir label token'ından — semantik renk (accent) yalnız
      zemin karışımına uygulanır. `--lg-label-secondary` bu zeminde (açık
@@ -126,10 +130,10 @@
   color: var(--lg-accent-contrast);
 }
 
-/* Dokunmatikte minimum 44px hedef */
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44px) */
 @media (pointer: coarse) {
   .tab {
-    min-height: 44px;
+    min-height: var(--lg-control-md);
   }
 }
 

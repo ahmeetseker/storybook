@@ -1,20 +1,29 @@
 .bar {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
+     scroll edge taşma/blur ölçüleri, chevron geometrisi, 44px spacer
+     (dokunma hedefi sabiti — geri pill'i / action grubu genişliğiyle simetri). */
+  --nav-edge-bleed: -28px;
+  --nav-edge-blur: 14px;
+  --nav-chevron-box: 10px;
+  --nav-chevron-stroke: 2.5px;
+  --nav-chevron-gap: 2px;
+  --nav-spacer: 44px;
   position: sticky;
   top: 0;
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3) var(--lg-space-4);
 }
 
 /* Soft scroll edge effect: bar bölgesinde içerik kademeli blur ile arka plana erir (Apple kuralı: çizgi yok) */
 .scrollEdge {
   position: absolute;
-  inset: 0 0 -28px 0;
+  inset: 0 0 var(--nav-edge-bleed) 0;
   pointer-events: none;
-  backdrop-filter: blur(14px) saturate(150%);
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(var(--nav-edge-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--nav-edge-blur)) saturate(150%);
   -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
   z-index: -1;
@@ -24,7 +33,7 @@
   flex: 1;
   text-align: center;
   font-weight: 700;
-  font-size: 17px;
+  font-size: var(--lg-text-headline);
   letter-spacing: -0.022em; /* SF tracking: 17px'te negatif */
   overflow: hidden;
   text-overflow: ellipsis;
@@ -34,11 +43,13 @@
 .actionGroup {
   display: inline-flex;
   align-items: center;
-  padding: 4px;
+  padding: var(--lg-space-1);
 }
-.actionGroup > * { display: inline-flex; align-items: center; gap: 4px; }
-.actionGroup button, .actionGroup a { border: none; background: none; font: inherit; color: inherit; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
-.actionGroup button:hover, .actionGroup a:hover { background: rgba(255, 255, 255, 0.18); }
+.actionGroup > * { display: inline-flex; align-items: center; gap: var(--lg-space-1); }
+.actionGroup button, .actionGroup a { border: none; background: none; font: inherit; color: inherit; padding: var(--lg-space-2) var(--lg-space-3); border-radius: var(--lg-radius-capsule); cursor: pointer; }
+@media (hover: hover) {
+  .actionGroup button:hover, .actionGroup a:hover { background: rgba(255, 255, 255, 0.18); }
+}
 
-.chevron { width: 10px; height: 10px; border-left: 2.5px solid currentColor; border-bottom: 2.5px solid currentColor; transform: rotate(45deg); margin-right: 2px; }
-.spacer { width: 44px; }
+.chevron { width: var(--nav-chevron-box); height: var(--nav-chevron-box); border-left: var(--nav-chevron-stroke) solid currentColor; border-bottom: var(--nav-chevron-stroke) solid currentColor; transform: rotate(45deg); margin-right: var(--nav-chevron-gap); }
+.spacer { width: var(--nav-spacer); }

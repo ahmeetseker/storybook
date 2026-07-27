@@ -1,8 +1,20 @@
 /* GlassChatDock — içerik katmanı FLAT: cam/backdrop-filter YOK. Yalnız
-   token'lar (--lg-*) + color-mix türevleri. Panel ölçüsü (360×480), z-index,
-   box-shadow ve dot boyutları raw px/rgba borcu — bkz. rules.md §9. */
+   token'lar (--lg-*) + color-mix türevleri. Mikro-geometri (token karşılığı
+   olmayan bilinçli ölçüler) kökte yerel değişkenlerde toplanır — bkz.
+   rules.md §9. Custom property'ler display:contents üzerinden kalıtır. */
 .root {
   display: contents;
+  --glass-chatdock-panel-width: 360px;
+  --glass-chatdock-panel-height: 480px;
+  --glass-chatdock-launcher-icon: 15px;
+  --glass-chatdock-aimark-size: 20px;
+  --glass-chatdock-aimark-offset: 2px;
+  --glass-chatdock-badge-pad-block: 2px;
+  --glass-chatdock-badge-pad-inline: 7px;
+  --glass-chatdock-bubble-corner: 4px;
+  --glass-chatdock-textarea-max: 96px;
+  --glass-chatdock-dot-size: 5px;
+  --glass-chatdock-dot-pad: 2px;
 }
 
 /* ── kapalı: yüzen kapsül buton ── */
@@ -24,9 +36,9 @@
   font-size: var(--lg-text-body);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--lg-shadow-md);
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out;
+  transition: transform 0.16s ease-out;
 }
 
 .launcher:focus-visible {
@@ -36,20 +48,20 @@
 
 .launcherIcon {
   color: var(--lg-accent);
-  font-size: 15px;
+  font-size: var(--glass-chatdock-launcher-icon);
   line-height: 1;
 }
 
 @media (hover: hover) {
   .launcher:hover {
     transform: translateY(-1px) scale(1.02);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
   }
 }
 
+/* coarse'ta --lg-control-md = 44px (dokunmatik hedef) */
 @media (pointer: coarse) {
   .launcher {
-    min-height: 44px;
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -61,31 +73,17 @@
   z-index: 60;
   display: flex;
   flex-direction: column;
-  width: 360px;
-  height: 480px;
-  max-width: calc(100vw - (var(--lg-space-6) * 2));
-  max-height: calc(100dvh - (var(--lg-space-6) * 2));
+  /* İçsel akışkan sınır (breakpoint'siz): panel dar viewport'ta kenar
+     boşluklarını koruyarak kendiliğinden daralır/kısalır. */
+  width: min(var(--glass-chatdock-panel-width), calc(100vw - (var(--lg-space-6) * 2)));
+  height: min(var(--glass-chatdock-panel-height), calc(100dvh - (var(--lg-space-6) * 2)));
   background: var(--lg-surface);
   color: var(--lg-label);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--lg-shadow-lg);
   overflow: hidden;
   outline: none;
-}
-
-/* Mobil: tam genişlik, viewport'un alt yarısı — bottom-sheet */
-@media (max-width: 480px) {
-  .panel {
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    max-width: 100%;
-    height: 58dvh;
-    max-height: 58dvh;
-    border-radius: var(--lg-radius-card) var(--lg-radius-card) 0 0;
-  }
 }
 
 /* ── başlık satırı ── */
@@ -121,11 +119,11 @@
 .aiBadge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
+  padding: var(--glass-chatdock-badge-pad-block) var(--glass-chatdock-badge-pad-inline);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -144,7 +142,6 @@
   color: var(--lg-label-secondary);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.15s ease-out, color 0.15s ease-out;
 }
 
 .close:focus-visible {
@@ -159,10 +156,11 @@
   }
 }
 
+/* coarse'ta --lg-control-md = 44px (dokunmatik hedef) */
 @media (pointer: coarse) {
   .close {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
   }
 }
 
@@ -194,16 +192,16 @@
 
 .aiMark {
   flex: none;
-  width: 20px;
-  height: 20px;
+  width: var(--glass-chatdock-aimark-size);
+  height: var(--glass-chatdock-aimark-size);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface));
   color: var(--lg-accent);
-  font-size: 11px;
-  margin-bottom: 2px;
+  font-size: var(--lg-text-badge);
+  margin-bottom: var(--glass-chatdock-aimark-offset);
 }
 
 .bubble {
@@ -221,14 +219,14 @@
 .bubbleUser {
   background: color-mix(in srgb, var(--lg-accent) 18%, var(--lg-surface));
   color: var(--lg-label);
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: var(--glass-chatdock-bubble-corner);
 }
 
 .bubbleAi {
   background: color-mix(in srgb, var(--lg-label) 5%, var(--lg-surface));
   border: 1px solid var(--lg-hairline);
   color: var(--lg-label);
-  border-bottom-left-radius: 4px;
+  border-bottom-left-radius: var(--glass-chatdock-bubble-corner);
 }
 
 /* ── "yazıyor" göstergesi: yalnız opacity animasyonu ── */
@@ -240,14 +238,14 @@
 .typingDots {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 2px;
+  gap: var(--lg-space-1);
+  padding: var(--glass-chatdock-dot-pad);
 }
 
 .typingDot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  width: var(--glass-chatdock-dot-size);
+  height: var(--glass-chatdock-dot-size);
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
   opacity: 0.3;
   animation: lg-chatdock-typing 1.2s ease-in-out infinite;
@@ -330,7 +328,7 @@
   flex: 1 1 auto;
   resize: none;
   min-height: var(--lg-control-md);
-  max-height: 96px;
+  max-height: var(--glass-chatdock-textarea-max);
   padding: var(--lg-space-2) var(--lg-space-3);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-media);
@@ -339,7 +337,6 @@
   font: inherit;
   font-size: var(--lg-text-footnote);
   line-height: 1.4;
-  transition: border-color 0.15s ease-out;
 }
 
 .textarea::placeholder {
@@ -383,20 +380,19 @@
   }
 }
 
+/* coarse'ta --lg-control-md = 44px (dokunmatik hedef) */
 @media (pointer: coarse) {
   .send {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
   }
   .textarea {
-    min-height: 44px;
+    min-height: var(--lg-control-md);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .launcher,
-  .close,
-  .textarea,
   .send {
     transition: none;
   }

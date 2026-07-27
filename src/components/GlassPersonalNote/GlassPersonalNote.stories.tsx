@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassPersonalNote } from './GlassPersonalNote'
 
 const meta = {
-  title: 'Components/GlassPersonalNote',
+  title: 'Bileşenler/Pazar Yeri/GlassPersonalNote',
   component: GlassPersonalNote,
   tags: ['autodocs'],
   args: {
@@ -24,7 +24,7 @@ const meta = {
       description: {
         component:
           'Kullanıcının bir ilana özel yazdığı gizli not — ilan sahibine veya başka kullanıcılara ASLA ' +
-          'gösterilmez. Not yokken kalem ikonlu "Not ekle" satırı, düzenlenirken flat textarea + Kaydet/Vazgeç, ' +
+          'gösterilmez. Not yokken kalem ikonlu "Not ekle" satırı, düzenlenirken flat textarea + GlassButton Kaydet/Vazgeç, ' +
           'kayıtlı not varken metin + "Düzenle" aksiyonu render edilir. "Yalnız sen görürsün" gizlilik satırı ' +
           'üç durumda da sabit görünür.',
       },

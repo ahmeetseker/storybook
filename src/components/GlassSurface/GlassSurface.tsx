@@ -15,7 +15,10 @@ export interface GlassSurfaceProps extends HTMLAttributes<HTMLElement> {
    * 'flat': opak, filtresiz yüzey — içerik katmanı için (compositor maliyeti yok).
    */
   material?: 'glass' | 'flat'
-  /** 0–1: gölge derinliği, lensing gücü ve blur'u birlikte ölçekler (Apple'ın kalınlık kuralı) */
+  /**
+   * 0–1: lensing gücünü ve backdrop blur'unu birlikte ölçekler (Apple'ın kalınlık kuralı).
+   * Dış gölge bu eksene bağlı değildir; yükselti `--lg-surface-shadow` ile verilir.
+   */
   thickness?: number
   shape?: number | 'capsule'
   tone?: 'light' | 'dark' | 'auto'
@@ -99,7 +102,6 @@ export function GlassSurface({
       ? {
           backdropFilter: backdrop,
           WebkitBackdropFilter: backdrop,
-          boxShadow: `0 ${4 + thickness * 12}px ${16 + thickness * 24}px rgba(0,0,0,${0.12 + thickness * 0.14}), inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(255,255,255,0.12)`,
         }
       : null),
     cursor: interactive ? 'pointer' : undefined,

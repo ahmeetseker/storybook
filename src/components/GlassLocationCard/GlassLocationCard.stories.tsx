@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassLocationCard } from './GlassLocationCard'
 
 const meta = {
-  title: 'Components/GlassLocationCard',
+  title: 'Bileşenler/Medya ve Harita/GlassLocationCard',
   component: GlassLocationCard,
   tags: ['autodocs'],
 } satisfies Meta<typeof GlassLocationCard>

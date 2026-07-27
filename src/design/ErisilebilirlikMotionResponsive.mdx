@@ -5,7 +5,8 @@ import { Meta } from '@storybook/addon-docs/blocks'
 # Erişilebilirlik
 
 - **Focus halkası** tüm etkileşimli öğelerde aynıdır:
-  `outline: 2px solid var(--lg-accent)` + `outline-offset`, yalnız `:focus-visible`.
+  `outline: var(--lg-focus-ring-width) solid var(--lg-accent)` +
+  `outline-offset: var(--lg-focus-ring-offset)`, yalnız `:focus-visible`.
 - İkon-tek butonlarda `label` prop'u zorunludur (`aria-label` + `title`).
 - Kalıcı durumlar ARIA'ya yansır: `aria-pressed`, `aria-selected`, `aria-current`,
   `aria-expanded`, `role="tablist|tab|tabpanel"`, lightbox `role="dialog"` + `aria-modal`.

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassContextMenu, type GlassContextMenuItem } from './GlassContextMenu'
 
 const meta = {
-  title: 'Components/GlassContextMenu',
+  title: 'Bileşenler/Navigasyon/GlassContextMenu',
   component: GlassContextMenu,
   tags: ['autodocs'],
   argTypes: {

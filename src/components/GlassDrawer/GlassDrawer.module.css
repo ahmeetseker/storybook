@@ -1,5 +1,10 @@
 /* Overlay kökü — panel kenara absolute yerleşir */
 .root {
+  /* Overlay mikro-geometrisi (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --backdrop-blur: 8px;
+  --panel-w-sm: 320px;
+  --panel-w-md: 400px;
+  --panel-w-lg: 560px;
   position: fixed;
   inset: 0;
   z-index: 1000; /* z token'ı yok — overlay katmanı için raw (bkz. rules.md Borç) */
@@ -8,9 +13,9 @@
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.4); /* --lg-scrim'den farklı bilinçli değer — bkz. rules.md Borç */
+  backdrop-filter: blur(var(--backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--backdrop-blur));
 }
 
 /* Panel: içerik katmanı — flat yüzey, cam değil */
@@ -50,9 +55,9 @@
 /* bp-sm */
 @media (min-width: 640px) {
   .panel { padding: var(--lg-space-6, 24px); }
-  .left.sm, .right.sm { width: 320px; }
-  .left.md, .right.md { width: 400px; }
-  .left.lg, .right.lg { width: 560px; }
+  .left.sm, .right.sm { width: var(--panel-w-sm); }
+  .left.md, .right.md { width: var(--panel-w-md); }
+  .left.lg, .right.lg { width: var(--panel-w-lg); }
   /* İç kenar yuvarlanır — panel dış kenara yapışık kalır */
   .left { border-radius: 0 var(--lg-radius-card, 20px) var(--lg-radius-card, 20px) 0; }
   .right { border-radius: var(--lg-radius-card, 20px) 0 0 var(--lg-radius-card, 20px); }

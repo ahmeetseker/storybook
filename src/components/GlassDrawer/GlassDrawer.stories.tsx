@@ -5,7 +5,7 @@ import { GlassDrawer } from './GlassDrawer'
 import { GlassButton } from '../GlassButton'
 
 const meta = {
-  title: 'Components/GlassDrawer',
+  title: 'Bileşenler/Katmanlar/GlassDrawer',
   component: GlassDrawer,
   tags: ['autodocs'],
   args: { open: false, onClose: fn(), title: 'Başlık', children: 'İçerik' },

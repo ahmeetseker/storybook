@@ -20,7 +20,7 @@ const icons = {
 }
 
 const meta = {
-  title: 'Components/GlassToolbar',
+  title: 'Bileşenler/Navigasyon/GlassToolbar',
   component: GlassToolbar,
   tags: ['autodocs'],
   args: { label: 'İlan araçları' },

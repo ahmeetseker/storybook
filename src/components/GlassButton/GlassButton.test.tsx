@@ -35,6 +35,11 @@ describe('GlassButton', () => {
     expect(screen.getByRole('button').className).toMatch(/xl/)
   })
 
+  it('prominent renkte kontrastı inline olarak korur', () => {
+    renderBtn({ prominent: true })
+    expect(screen.getByRole('button').style.color).toBe('var(--lg-accent-contrast)')
+  })
+
   it('type varsayılanı button olur (form içinde kazara submit engellenir)', () => {
     renderBtn()
     expect(screen.getByRole('button').getAttribute('type')).toBe('button')

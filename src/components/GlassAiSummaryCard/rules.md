@@ -167,9 +167,21 @@ taşınmaz — yalnız yukarıdaki iki iç mekanizma değiştirir.
 | boşluk | gap/padding | `--lg-space-1..5` | — |
 | yazı | font-size | `--lg-text-caption/footnote/body/headline` | — |
 
-**Borç (raw):** rozet font 10.5px/700 (kontrat "AI-first standardı"nda
-tam olarak bu değerler sabit istendi — token'a bağlanamaz, tüm AI
-component'lerinde birebir kopyalanacak); skeleton çubuğu yüksekliği 13px.
+Rozet font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması — kontrat literal'i token'a devredildi, tüm AI
+component'lerinde aynı).
+
+**Borç (mikro-geometri):** token karşılığı olmayan değerler component
+kökünde yerel değişken olarak toplandı — `.card { --skeleton-line: 13px;
+--column-min: 220px; --badge-pad-y: 3px; }` (skeleton çubuğu yüksekliği,
+kolon sarma eşiği, rozet dikey padding'i — 3px `--lg-space-1`'in [4px]
+birebir karşılığı değil, yuvarlanmadı). `pointer: coarse` geri bildirim
+hedefi (44px) `--lg-control-md`'ye bağlandı — coarse'ta birebir 44px,
+dokunmatikte büyüme tasarımın istediği davranıştır.
+
+**Responsive:** `@media (max-width: …)` KULLANILMAZ — `.columns`
+`repeat(auto-fit, minmax(min(var(--column-min), 100%), 1fr))` içsel akışı:
+dar konteynerde artı/eksi ızgarası kendiliğinden tek kolona düşer.
 
 ## 10. Storybook kapsamı
 

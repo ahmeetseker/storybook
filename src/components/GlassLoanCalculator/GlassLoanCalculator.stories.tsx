@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassLoanCalculator } from './GlassLoanCalculator'
 
 const meta = {
-  title: 'Components/GlassLoanCalculator',
+  title: 'Bileşenler/Pazar Yeri/GlassLoanCalculator',
   component: GlassLoanCalculator,
   tags: ['autodocs'],
   args: { onChange: fn(), onCtaClick: fn() },

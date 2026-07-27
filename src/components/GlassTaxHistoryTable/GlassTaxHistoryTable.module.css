@@ -1,5 +1,7 @@
 /* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları. */
 .wrapper {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --tax-latest-pad-block: 2px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -77,11 +79,11 @@
 .latestTag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: var(--tax-latest-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge, 11px);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -105,7 +107,7 @@
 }
 
 .arrow {
-  font-size: 11px;
+  font-size: var(--lg-text-badge, 11px);
   line-height: 1;
 }
 
@@ -142,48 +144,6 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* 480px altı: satırlar kart görünümüne düşer, her td kendi etiketiyle blok olur. */
-@media (max-width: 480px) {
-  .table thead {
-    display: none;
-  }
-
-  .table,
-  .table tbody,
-  .tr,
-  .td {
-    display: block;
-    width: 100%;
-  }
-
-  .tr {
-    padding: var(--lg-space-2) 0;
-  }
-
-  .td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--lg-space-3);
-    text-align: right;
-    border-bottom: none;
-    padding: var(--lg-space-1) var(--lg-space-3);
-  }
-
-  .td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    font-size: var(--lg-text-footnote, 13px);
-    color: var(--lg-label-secondary);
-    text-align: left;
-    flex: none;
-  }
-
-  .tr[data-latest] .td::before {
-    font-weight: 600;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -78,10 +78,10 @@ describe('GlassScoreMeter', () => {
     expect(screen.getByText('50')).toBeTruthy()
   })
 
-  it('bar varyantı dolgu genişliğini value yüzdesiyle çizer', () => {
+  it('bar varyantı dolgu oranını value yüzdesiyle çizer (scaleX)', () => {
     const { container } = render(<GlassScoreMeter value={35} label="Ulaşım" variant="bar" />)
     const fill = container.querySelector('[class*="barFill"]') as HTMLElement
-    expect(fill.style.width).toBe('35%')
+    expect(fill.style.transform).toBe('scaleX(0.35)')
   })
 
   it('badge varyantı sayı ve etiketi tek satırda render eder', () => {

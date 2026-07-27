@@ -29,9 +29,10 @@ etiket:değer çiftleri ve/veya mevcut-yok (present) işaretli özellik listesi.
 - Kök: `<div data-variant>` — flat panel (`--lg-surface` + `--lg-hairline`
   çerçeve), cam/backdrop-filter YOK.
 - `accordion`: her grup başlığı `<h3>` içinde gerçek `<button aria-expanded
-  aria-controls>`; açık gövde `role="region" aria-labelledby={buttonId}`.
-  Kapalıyken region DOM'dan kaldırılır (AnimatePresence unmount — GlassSidebar
-  `Group` ile aynı desen).
+  aria-controls>`; gövde `role="region" aria-labelledby={buttonId}`.
+  Kapalıyken region DOM'da KALIR (grid-template-rows geçişi için gerekli)
+  ama `inert` taşır — klavye/AT gezinmesinden çıkarılır (GlassAccordion
+  ile aynı desen).
 - `checklist`: grup başlığı `<h3>`; ikon grid'i `<ul><li>`; ikon
   `role="img" aria-label="mevcut"|"yok"` — durumu yalnız renk/opaklıkla
   bırakmaz.
@@ -81,7 +82,7 @@ Yasak kombinasyon yok — üç variant birbirini dışlar (birleşik variant yok
 
 | State | Kaynak | Bastırdığı | ARIA |
 |---|---|---|---|
-| accordion açık/kapalı | dahili `useState` (grup başına) | — | `aria-expanded` (buton), `role="region"` (gövde, yalnız açıkken DOM'da) |
+| accordion açık/kapalı | dahili `useState` (grup başına) | — | `aria-expanded` (buton), `role="region"` (gövde hep DOM'da; kapalıyken `inert` + `data-open='false'`) |
 
 Checklist/columns: N/A — tamamen statik, hover/focus/active/disabled/selected
 yok. `present` boole'u state değil veri türevi — ikon rengi/etiketi ondan
@@ -89,9 +90,12 @@ türer, kullanıcı etkileşimiyle değişmez.
 
 ## 7. Davranış
 
-- Accordion: buton tıklaması `setOpen` toggle'lar; `motion` height/opacity
-  geçişi (`prefers-reduced-motion: reduce`'ta anında). Klavye: buton native
-  `<button>` — Enter/Space ile aç/kapa, Tab sırası DOM sırasıdır.
+- Accordion: buton tıklaması `setOpen` toggle'lar; açılış CSS
+  `grid-template-rows: 0fr→1fr` geçişiyle animasyonludur (height animasyonu
+  YASAK — GlassAccordion tekniği; `prefers-reduced-motion: reduce`'ta
+  transition kapalı, anında). Chevron yalnız `transform: rotate` ile döner.
+  Klavye: buton native `<button>` — Enter/Space ile aç/kapa, Tab sırası DOM
+  sırasıdır.
 - Checklist/columns: etkileşimsiz; focus yalnız `value` içine konan
   odaklanabilir öğelere gider.
 - Responsive: `checklistGrid` `auto-fill minmax(150px,1fr)` ile kendiliğinden
@@ -133,9 +137,22 @@ türer, kullanıcı etkileşimiyle değişmez.
 | ikon/rozet radius | border-radius | `--lg-radius-capsule` |
 | focus halkası | outline | `--lg-accent` |
 
-Borç: chevron ikonu 8×8px + 2px kenarlık raw (GlassSidebar chevron'uyla aynı
-kabul edilen mikro-ölçek deseni) · checklist grid `minmax(150px,1fr)` ve
-`gap` değerleri raw · `presenceIcon`/`checklistIcon` 18-20px boyutları raw.
+| boşluklar | gap / padding / column-gap | `--lg-space-2..5`, `--lg-space-7` |
+| ikon font-size | font-size | `--lg-text-caption` |
+
+Borç (mikro-geometri): kökte yerel değişkenlerde toplandı —
+`--glass-feature-row-pad` (7px satır dikey iç boşluğu),
+`--glass-feature-presence-icon` (18px) / `--glass-feature-icon` (20px)
+ikon kutuları, `--glass-feature-chevron-box/size/stroke/nudge`
+(16px/8px/2px/1px — GlassSidebar chevron'uyla aynı kabul edilen mikro-ölçek
+deseni), `--glass-feature-title-gap` (14px başlık altı),
+`--glass-feature-kicker-gap` (10px kicker altı), `--glass-feature-grid-min`
+(150px checklist grid min kolonu), `--glass-feature-item-min` (28px
+checklist satır min yüksekliği). Token karşılığı yok; görsel değerler
+değişmedi. Accordion tetikleyicisinin min-height'ı her yerde
+`--lg-control-lg` token'ından gelir; sabit 48px pointer:coarse override'ı
+kaldırıldı — token coarse'ta 48→50px büyür, kontrol token'ının coarse
+büyümesi tasarımın istediği davranıştır.
 
 ## 10. Storybook kapsamı
 
@@ -159,7 +176,7 @@ manuel).
 - [x] accordion: grup sırası değişince `title` bazlı key sayesinde aç/kapa
   state'i korunur (regresyon)
 - [ ] checklist ızgara `auto-fill` kırılımı (visual)
-- [ ] accordion motion height geçişi + reduced-motion (visual)
+- [ ] accordion grid-template-rows 0fr→1fr geçişi + reduced-motion (visual)
 
 ## 12. Do / Don't
 

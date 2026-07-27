@@ -101,11 +101,13 @@ function AiBadge({ confidence }: { confidence: number | null }) {
   )
 }
 
-/** Dekoratif dolum çubuğu — değer zaten kapsayan `role="meter"` üzerinde. */
+/** Dekoratif dolum çubuğu — değer zaten kapsayan `role="meter"` üzerinde.
+ *  Dolum %100 genişlikte render edilir; oran `scaleX` transform'uyla uygulanır
+ *  (genişlik animasyonu layout tetiklerdi — yalnız transform/opacity/filter kuralı). */
 function ScoreBar({ value, tone }: { value: number; tone: GlassMatchBreakdownTone }) {
   return (
     <span className={styles.barTrack} aria-hidden="true">
-      <span className={styles.barFill} style={{ width: `${value}%`, background: TONE_VAR[tone] }} />
+      <span className={styles.barFill} style={{ transform: `scaleX(${value / 100})`, background: TONE_VAR[tone] }} />
     </span>
   )
 }

@@ -181,8 +181,9 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
   erken/eksik gönderilmesini önler.
 - Dokunmatik: launcher/kapat/gönder `pointer: coarse`'ta ≥44px hedefe
   yükselir.
-- Responsive: ≥481px sabit 360×480 panel; ≤480px tam genişlik, viewport'un
-  alt %58'i, yalnız üst köşeler yuvarlak (bottom-sheet).
+- Responsive: breakpoint yok — panel `min(360px, 100vw - 2·space-6)` ×
+  `min(480px, 100dvh - 2·space-6)` içsel akışkan sınırla dar viewport'ta
+  kenar boşluklarını koruyarak kendiliğinden daralır/kısalır.
 
 ## 8. İçerik kuralları
 
@@ -211,14 +212,24 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
 | user balonu | background | `color-mix(in srgb, var(--lg-accent) 18%, var(--lg-surface))` | metin yine `--lg-label` (kontrast: renkli metin değil, label token'ı) |
 | ai balonu | background/border | `color-mix(in srgb, var(--lg-label) 5%, var(--lg-surface))` / `--lg-hairline` | — |
 | gönder butonu | background/color | `--lg-accent` / `--lg-accent-contrast` | `:disabled` → opacity 0.4 |
+| launcher/panel gölgesi | box-shadow | `--lg-shadow-md` (launcher) / `--lg-shadow-lg` (panel) | — |
+| AI rozeti font-size | font-size | `--lg-text-badge` | kontrat: tüm AI rozetleri aynı token |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
 
-**Borç (raw):** panel ölçüsü 360×480px + mobil `58dvh` (spec sabiti, tasarım
-sistemi ölçeğinde yok), `z-index: 60` (z token'ı yok, `GlassToast` ile aynı
-gerekçe/değer), `box-shadow` rgba değerleri (Modal/Drawer/Toast ile aynı
-borç), AI rozeti font-size 10.5px/700 (kontrat sabiti), typing dot boyutu
-5px, mini ✦ işaret çapı 20px, "dipte sayılır" kaydırma eşiği `48px`
-(davranışsal sabit, token ölçeğinde yok — bkz. §7).
+**Borç (raw):** mikro-geometri kökte yerel değişkenlerde toplandı
+(`display:contents` üzerinden kalıtır): `--glass-chatdock-panel-width/height`
+(360×480 spec sabiti — dar viewport'ta `min()` ile içsel akışkan sınır,
+breakpoint yok), `--glass-chatdock-launcher-icon` (15px),
+`--glass-chatdock-aimark-size/offset` (20px/2px ✦ işareti),
+`--glass-chatdock-badge-pad-block/inline` (2px/7px rozet içi — kontrat
+sabiti), `--glass-chatdock-bubble-corner` (4px konuşma balonu köşesi),
+`--glass-chatdock-textarea-max` (96px), `--glass-chatdock-dot-size/pad`
+(5px/2px typing noktaları). Ayrıca `z-index: 60` (z token'ı yok,
+`GlassToast` ile aynı gerekçe/değer) ve "dipte sayılır" kaydırma eşiği
+`48px` (davranışsal sabit, token ölçeğinde yok — bkz. §7). Dokunmatik 44px
+hedefleri (launcher min-height, close, send, textarea min-height)
+`pointer: coarse` bloklarında `--lg-control-md`'ye bağlandı — coarse'ta
+token birebir 44px'tir, raw 44 kalmadı.
 
 ## 10. Storybook kapsamı
 
@@ -254,7 +265,7 @@ doğrulanır.
 - [x] kullanıcı geçmişi okurken (dipte değilken) yeni AI mesajı gelirse liste zıplatılmaz
 - [x] kullanıcı dibe yakınken (48px eşiği altında) yeni mesaj gelirse liste dibe kaydırır
 - [x] mesaj metninin başında görsel-gizli "Siz:"/"Asistan:" öneki ekran okuyucuya duyurulur
-- [ ] mobil bottom-sheet kırılımı + reduced-motion'da statik "…" görünümü (visual, Chrome)
+- [ ] mobil akışkan panel daralması + reduced-motion'da statik "…" görünümü (visual, Chrome)
 
 ## 12. Do / Don't
 

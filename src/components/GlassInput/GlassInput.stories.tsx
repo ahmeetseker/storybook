@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassInput } from './GlassInput'
 
 const meta = {
-  title: 'Components/GlassInput',
+  title: 'Bileşenler/Form/GlassInput',
   component: GlassInput,
   tags: ['autodocs'],
   args: { onChange: fn(), 'aria-label': 'Arama' },

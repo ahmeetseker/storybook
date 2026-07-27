@@ -1,5 +1,8 @@
 /* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları (bkz. rules.md §5). */
 .card {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --grc-star-gap: 1px;
+  --grc-verified-padding-block: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4, 16px);
@@ -85,7 +88,7 @@
 .stars {
   display: inline-flex;
   align-items: center;
-  gap: 1px;
+  gap: var(--grc-star-gap);
   flex: none;
 }
 
@@ -105,8 +108,8 @@
 .verified {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px var(--lg-space-2, 8px);
+  gap: var(--lg-space-1, 4px);
+  padding: var(--grc-verified-padding-block) var(--lg-space-2, 8px);
   border-radius: var(--lg-radius-chip, 10px);
   background: color-mix(in srgb, var(--lg-success, #34c759) 14%, transparent);
   color: var(--lg-label, #24211b);

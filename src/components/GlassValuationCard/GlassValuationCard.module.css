@@ -2,6 +2,14 @@
    AI rozeti (aiBadge) tüm AI component'lerinde birebir aynı CSS'i kullanır
    (kopya kabul — dalga1 kontratı §"AI-first standardı"). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --vc-ai-pad-block: 3px;
+  --vc-track-h: 8px;
+  --vc-point-size: 14px;
+  --vc-listpoint-size: 10px;
+  --vc-point-ring: 2px;
+  --vc-dot-size: 8px;
+  --vc-inline-ph-w: 160px;
   box-sizing: border-box;
   font-variant-numeric: tabular-nums;
 }
@@ -38,7 +46,7 @@
 
 /* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
    AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
-   radius capsule, 10.5px/700 (bkz. GlassTrustSignalPanel.module.css). ── */
+   radius capsule, --lg-text-badge/700 (bkz. GlassTrustSignalPanel.module.css). ── */
 .aiMeta {
   display: inline-flex;
   align-items: center;
@@ -48,11 +56,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--vc-ai-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge, 11px);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -90,7 +98,7 @@
   border-radius: var(--lg-radius-chip);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
-  font-size: 14px;
+  font-size: var(--lg-text-body);
   line-height: 1;
   cursor: pointer;
 }
@@ -108,10 +116,11 @@
     border-color: color-mix(in srgb, var(--lg-accent) 40%, var(--lg-hairline));
   }
 }
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44px) */
 @media (pointer: coarse) {
   .feedbackButton {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
   }
 }
 
@@ -119,7 +128,7 @@
 .estimateValue {
   margin: 0;
   font-size: var(--lg-text-display);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--lg-label);
   line-height: 1.1;
@@ -133,29 +142,29 @@
 }
 .rangeTrack {
   position: relative;
-  height: 8px;
+  height: var(--vc-track-h);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 16%, var(--lg-hairline));
 }
 .estimatePoint {
   position: absolute;
   top: 50%;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  width: var(--vc-point-size);
+  height: var(--vc-point-size);
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-accent);
-  border: 2px solid var(--lg-surface);
+  border: var(--vc-point-ring) solid var(--lg-surface);
   box-shadow: 0 0 0 1px var(--lg-hairline);
   transform: translate(-50%, -50%);
 }
 .listPoint {
   position: absolute;
   top: 50%;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  width: var(--vc-listpoint-size);
+  height: var(--vc-listpoint-size);
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
-  border: 2px solid var(--lg-surface);
+  border: var(--vc-point-ring) solid var(--lg-surface);
   transform: translate(-50%, -50%);
 }
 .rangeLabels {
@@ -180,9 +189,9 @@
   color: var(--lg-label-secondary);
 }
 .legendDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: var(--vc-dot-size);
+  height: var(--vc-dot-size);
+  border-radius: var(--lg-radius-capsule);
   flex: none;
 }
 .legendDotEstimate {
@@ -246,7 +255,7 @@
   }
 }
 .inlinePlaceholder {
-  width: 160px;
+  width: var(--vc-inline-ph-w);
   height: 1.1em;
 }
 .panelPlaceholder {
@@ -260,7 +269,7 @@
 }
 .placeholderTrack {
   width: 100%;
-  height: 8px;
+  height: var(--vc-track-h);
   border-radius: var(--lg-radius-capsule);
 }
 .placeholderLine {

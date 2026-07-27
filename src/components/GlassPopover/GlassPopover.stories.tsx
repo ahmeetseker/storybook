@@ -5,7 +5,7 @@ import { GlassPopover } from './GlassPopover'
 import { GlassButton } from '../GlassButton'
 
 const meta = {
-  title: 'Components/GlassPopover',
+  title: 'Bileşenler/Katmanlar/GlassPopover',
   component: GlassPopover,
   tags: ['autodocs'],
   args: { onOpenChange: fn() },
@@ -71,25 +71,27 @@ export const Placements: Story = {
   ),
 }
 
+const ControlledDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <GlassPopover
+        open={open}
+        onOpenChange={setOpen}
+        title="Satıcıya Sor"
+        trigger={<GlassButton size="sm">Satıcıya Sor</GlassButton>}
+      >
+        <span>Görüşme talebiniz satıcıya iletilir; yanıt ortalama 2 saat.</span>
+      </GlassPopover>
+      <span style={{ color: 'var(--lg-label-secondary)' }}>Durum: {open ? 'açık' : 'kapalı'}</span>
+    </div>
+  )
+}
+
 /** Controlled kullanım: open + onOpenChange dışarıdan yönetilir. */
 export const Controlled: Story = {
   args: { trigger: null },
-  render: () => {
-    const [open, setOpen] = useState(false)
-    return (
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-        <GlassPopover
-          open={open}
-          onOpenChange={setOpen}
-          title="Satıcıya Sor"
-          trigger={<GlassButton size="sm">Satıcıya Sor</GlassButton>}
-        >
-          <span>Görüşme talebiniz satıcıya iletilir; yanıt ortalama 2 saat.</span>
-        </GlassPopover>
-        <span style={{ color: 'var(--lg-label-secondary)' }}>Durum: {open ? 'açık' : 'kapalı'}</span>
-      </div>
-    )
-  },
+  render: () => <ControlledDemo />,
 }
 
 /** Responsive: mobilde panel max-width calc(100vw - 32px) ile viewport'a sığar. */

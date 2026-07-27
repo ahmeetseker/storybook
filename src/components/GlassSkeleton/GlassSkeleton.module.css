@@ -1,4 +1,8 @@
 .skeleton {
+  /* Varyant default ölçüleri (token karşılığı yok, kontrol değil — bkz. rules.md §9 borç);
+     width/height prop'ları inline style ile ezer */
+  --avatar-size: 40px;
+  --media-height: 96px;
   display: block;
   /* Zemin: label'ın %8'i — açık/koyu temada otomatik doğru kontrast */
   background-color: color-mix(in srgb, var(--lg-label, #24211b) 8%, transparent);
@@ -37,13 +41,13 @@
   border-radius: calc(var(--lg-radius-chip, 10px) / 2);
 }
 .circle {
-  width: 40px;  /* avatar md default'u; prop ile ezilir */
-  height: 40px;
+  width: var(--avatar-size);  /* avatar md default'u; prop ile ezilir */
+  height: var(--avatar-size);
   border-radius: 50%;
 }
 .rect {
   width: 100%;
-  height: 96px; /* medya placeholder default'u — bilinçli raw, prop ile ezilir */
+  height: var(--media-height); /* medya placeholder default'u; prop ile ezilir */
   border-radius: var(--lg-radius-media, 14px);
 }
 

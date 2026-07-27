@@ -98,8 +98,16 @@ Footer'da en fazla bir `prominent` buton; yıkıcı aksiyon `tint=--lg-danger`.
 | description | color / font-size | `--lg-label-secondary` / `--lg-text-footnote` |
 | footer | gap | `--lg-space-2` |
 
-Borç: backdrop `rgba(0,0,0,.4)+blur(8px)`, panel gölgeleri ve `z-index: 1000` raw —
-overlay token seti (z-scale, scrim) tanımlanınca bağlanacak.
+**Borç (raw / mikro-geometri):** backdrop blur'u ve boyut genişlikleri token
+karşılığı olmadığından component kökünde yerel değişkene toplandı
+(`.root { --backdrop-blur: 8px; --panel-max-w-sm/md/lg: 400/560/760px; }`).
+Bilinçli bırakılanlar: backdrop `rgba(0,0,0,.4)` (--lg-scrim alfa .55 ile
+birebir değil — overlay scrim token'ı tanımlanınca bağlanacak); panel
+gölgeleri raw (mobil `0 -8px 40px rgba(0,0,0,.25)` hiçbir token deseniyle
+eşleşmiyor; masaüstü bileşik gölgenin ilk katmanı `0 24px 64px rgba(0,0,0,.35)`
+--lg-shadow-lg'den alfa farkıyla ayrışıyor (.32), ikinci katman tek başına
+--lg-shadow-sm ile birebir olsa da bileşik desen bütün olarak token değil —
+dokunulmadı); `z-index: 1000` raw (z-scale token'ı yok).
 
 ## 10. Storybook kapsamı
 

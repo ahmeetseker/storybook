@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { GlassStepper } from './GlassStepper'
 
 const meta = {
-  title: 'Components/GlassStepper',
+  title: 'Bileşenler/Form/GlassStepper',
   component: GlassStepper,
   tags: ['autodocs'],
   args: { label: 'Adet', onChange: fn() },
@@ -52,17 +52,19 @@ export const Sizes: Story = {
   ),
 }
 
+const ControlledRoomCountDemo = (args: ComponentProps<typeof GlassStepper>) => {
+  const [rooms, setRooms] = useState(3)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <span style={{ fontSize: 15, fontWeight: 600 }}>Oda sayısı</span>
+      <GlassStepper {...args} label="Oda sayısı" min={1} max={10} value={rooms} onChange={setRooms} formatValue={(v) => `${v}+1`} />
+    </div>
+  )
+}
+
 /** Controlled kullanım: oda sayısı filtresi. */
 export const ControlledRoomCount: Story = {
-  render: (args) => {
-    const [rooms, setRooms] = useState(3)
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>Oda sayısı</span>
-        <GlassStepper {...args} label="Oda sayısı" min={1} max={10} value={rooms} onChange={setRooms} formatValue={(v) => `${v}+1`} />
-      </div>
-    )
-  },
+  render: (args) => <ControlledRoomCountDemo {...args} />,
 }
 
 /** Responsive: coarse pointer'da butonlar kontrol token'ıyla büyür (md → 44px). */

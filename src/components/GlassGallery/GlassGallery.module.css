@@ -1,12 +1,26 @@
 .gallery {
+  /* Mikro-geometri + malzeme değerleri (token karşılığı yok — bkz. rules.md §9 borç notu).
+     Lightbox portal'a render edildiğinden onun değişkenleri .lightbox üzerindedir. */
+  --stack-gap: 10px;
+  --stage-pad: 6px;
+  --stage-radius: 15px;
+  --stage-inset: 14px;
+  --thumb-w: 72px;
+  --thumb-h: 54px;
+  --thumb-radius: 12px;
+  --thumb-ring: 2px;
+  --thumb-active-border: rgba(255, 255, 255, 0.9);
+  --media-placeholder: rgba(0, 0, 0, 0.2);
+  --counter-bg: rgba(0, 0, 0, 0.55);
+  --counter-pad: 3px 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--stack-gap);
 }
 
 .stage {
   display: block;
-  padding: 6px;
+  padding: var(--stage-pad);
 }
 
 .stageButton {
@@ -15,8 +29,8 @@
   padding: 0;
   margin: 0;
   border: none;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 15px;
+  background: var(--media-placeholder);
+  border-radius: var(--stage-radius);
   overflow: hidden;
   cursor: zoom-in;
 }
@@ -38,46 +52,48 @@
   transform: translateY(-50%);
   z-index: 2;
 }
-.navLeft { left: 14px; }
-.navRight { right: 14px; }
+.navLeft { left: var(--stage-inset); }
+.navRight { right: var(--stage-inset); }
 
 .counter {
   position: absolute;
-  right: 14px;
-  bottom: 14px;
+  right: var(--stage-inset);
+  bottom: var(--stage-inset);
   z-index: 2;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: 12px;
+  padding: var(--counter-pad);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--counter-bg);
+  color: var(--lg-on-scrim);
+  font-size: var(--lg-text-caption);
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
 .thumbs {
   display: flex;
-  gap: 8px;
+  gap: var(--lg-space-2);
   overflow-x: auto;
-  padding: 2px;
+  padding: var(--thumb-ring);
   scrollbar-width: none;
 }
 .thumbs::-webkit-scrollbar { display: none; }
 
 .thumb {
   flex: none;
-  width: 72px;
-  height: 54px;
+  width: var(--thumb-w);
+  height: var(--thumb-h);
   padding: 0;
-  border: 2px solid transparent;
-  border-radius: 12px;
+  border: var(--thumb-ring) solid transparent;
+  border-radius: var(--thumb-radius);
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--media-placeholder);
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity 0.18s ease, border-color 0.18s ease;
+  transition: opacity 0.18s ease, border-color 0.18s ease; /* süre token'ı yok — borç notu */
 }
-.thumb:hover { opacity: 1; }
+@media (hover: hover) {
+  .thumb:hover { opacity: 1; }
+}
 .thumb:focus-visible {
   outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 1px;
@@ -85,7 +101,7 @@
 
 .thumbActive {
   opacity: 1;
-  border-color: rgba(255, 255, 255, 0.9);
+  border-color: var(--thumb-active-border);
 }
 
 .thumbImage {
@@ -95,32 +111,40 @@
   object-fit: cover;
 }
 
-/* Lightbox */
+/* Lightbox — portal (document.body): .gallery'deki yerel değişkenler buraya ulaşmaz */
 .lightbox {
+  /* Overlay malzemesi + mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu).
+     --overlay-bg, --lg-scrim (rgba(10,12,16,.55)) ile birebir örtüşmez — bilinçli daha koyu. */
+  --overlay-bg: rgba(0, 0, 0, 0.82);
+  --overlay-blur: 18px;
+  --image-radius: 16px;
+  --image-max-w: 1200px;
+  --pill-bg: rgba(255, 255, 255, 0.14);
+  --pill-pad: 4px 14px;
   position: fixed;
   inset: 0;
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.82);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  background: var(--overlay-bg);
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
+  backdrop-filter: blur(var(--overlay-blur));
 }
 .lightbox:focus { outline: none; }
 
 .lightboxImage {
-  max-width: min(92vw, 1200px);
+  max-width: min(92vw, var(--image-max-w));
   max-height: 88vh;
-  border-radius: 16px;
+  border-radius: var(--image-radius);
   object-fit: contain;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5); /* hiçbir --lg-shadow-* ile birebir örtüşmez — borç notu */
 }
 
 .lightboxClose {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: var(--lg-space-5);
+  right: var(--lg-space-5);
 }
 
 .lightboxNav {
@@ -128,18 +152,18 @@
   top: 50%;
   transform: translateY(-50%);
 }
-.lightboxNav.navLeft { left: 24px; }
-.lightboxNav.navRight { right: 24px; }
+.lightboxNav.navLeft { left: var(--lg-space-6); }
+.lightboxNav.navRight { right: var(--lg-space-6); }
 
 .lightboxCounter {
   position: absolute;
-  bottom: 24px;
+  bottom: var(--lg-space-6);
   left: 50%;
   transform: translateX(-50%);
-  padding: 4px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-size: 13px;
+  padding: var(--pill-pad);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--pill-bg);
+  color: var(--lg-on-scrim);
+  font-size: var(--lg-text-footnote);
   font-weight: 600;
 }

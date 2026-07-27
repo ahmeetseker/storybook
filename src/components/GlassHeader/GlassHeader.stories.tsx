@@ -88,7 +88,7 @@ const PageBody = ({ lines = 14 }: { lines?: number }) => (
 )
 
 const meta = {
-  title: 'Components/GlassHeader',
+  title: 'Bileşenler/Navigasyon/GlassHeader',
   component: GlassHeader,
   parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],

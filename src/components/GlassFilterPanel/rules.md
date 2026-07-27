@@ -86,8 +86,12 @@ Panelin kendisi durum tutmaz — filtre state'i children kontrollerinde ve
 | title | font-size | `--lg-text-headline` |
 | reset | color | `--lg-accent` |
 | reset | min-height | `--lg-control-sm` → `--lg-control-md` (coarse) |
+| reset hover zemini | background | `color-mix(--lg-accent 10%)` — yalnız `@media (hover: hover)` |
 
-Raw px: yok.
+Raw px: yok. Borç (yerel değişkenler, kökte): `--glass-filterpanel-blur`
+(20px) + `--glass-filterpanel-saturate` (1.6) — cam malzeme parametreleri
+(token'laşmamış backdrop-filter reçetesi), `--glass-filterpanel-heading-gap`
+(2px başlık/sonuç satırı arası mikro boşluk). Görsel değerler değişmedi.
 
 ## 10. Storybook kapsamı
 

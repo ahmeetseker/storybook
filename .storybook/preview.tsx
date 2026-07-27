@@ -2,15 +2,8 @@ import type { Preview } from '@storybook/react-vite'
 import { DemoBackground } from './DemoBackground'
 import { GlassTierProvider } from '../src/components/GlassSurface/GlassTierContext'
 import { detectTier, type GlassTier } from '../src/core/tier'
-import { CodexTheme, type CodexThemeName } from '../src/variants/codex/theme'
 import '@fontsource-variable/manrope'
 import '../src/index.css'
-
-const CODEX_THEME_BY_GLOBAL: Record<string, CodexThemeName> = {
-  'codex-paper': 'paper',
-  'codex-mineral': 'mineral',
-  'codex-graphite': 'graphite',
-}
 
 const PRODUCT_VIEWPORTS = {
   mobile1: { name: 'Küçük telefon · 320×568', styles: { width: '320px', height: '568px' }, type: 'mobile' },
@@ -35,49 +28,12 @@ const preview: Preview = {
       description: 'Cam katmanını zorla',
       toolbar: { title: 'Tier', icon: 'beaker', items: ['auto', 'refraction', 'fallback'], dynamicTitle: true },
     },
-    designTheme: {
-      description: 'Tasarım sistemi varyantı',
-      toolbar: {
-        title: 'Tasarım',
-        icon: 'paintbrush',
-        items: [
-          { value: 'original', title: 'Original' },
-          { value: 'codex-paper', title: 'Codex · Paper' },
-          { value: 'codex-mineral', title: 'Codex · Mineral' },
-          { value: 'codex-graphite', title: 'Codex · Graphite' },
-        ],
-        dynamicTitle: true,
-      },
-    },
   },
-  initialGlobals: { backgroundKey: 'light', forceTier: 'auto', designTheme: 'original' },
+  initialGlobals: { backgroundKey: 'light', forceTier: 'auto' },
   decorators: [
     (Story, ctx) => {
       const forced = ctx.globals.forceTier as string
       const tier: GlassTier = forced === 'auto' ? detectTier() : (forced as GlassTier)
-      const designTheme = String(ctx.globals.designTheme ?? 'original')
-      const defaultCodexTheme = ctx.parameters.codex?.defaultTheme as CodexThemeName | undefined
-      const codexTheme = CODEX_THEME_BY_GLOBAL[designTheme]
-        ?? (designTheme === 'original' ? defaultCodexTheme : undefined)
-      const fullCanvas = Boolean(ctx.parameters.codex?.fullCanvas ?? ctx.parameters.codexFullCanvas)
-
-      if (codexTheme) {
-        return (
-          <GlassTierProvider tier={tier}>
-            <CodexTheme theme={codexTheme} canvas={fullCanvas ? 'full' : 'padded'}>
-              <Story />
-            </CodexTheme>
-          </GlassTierProvider>
-        )
-      }
-
-      if (fullCanvas) {
-        return (
-          <GlassTierProvider tier={tier}>
-            <Story />
-          </GlassTierProvider>
-        )
-      }
 
       return (
         <GlassTierProvider tier={tier}>
@@ -91,6 +47,20 @@ const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     viewport: { options: PRODUCT_VIEWPORTS },
+    options: {
+      // Kenar çubuğu mantıksal sırası — alfabetik değil (bkz. docs taksonomisi)
+      storySort: {
+        order: [
+          'Tasarım Sistemi',
+          ['Genel Bakış', "Token'lar", 'Eksenler ve Durumlar', 'Erişilebilirlik · Motion · Responsive', 'Component Şablonu'],
+          'Çekirdek',
+          'Bileşenler',
+          ['Eylemler', 'Form', 'Navigasyon', 'Katmanlar', 'Veri Gösterimi', 'Medya ve Harita', 'Vitrin ve Yerleşim', 'AI', 'Pazar Yeri'],
+          'Sayfalar',
+          ['Public', 'Hesabım', 'Demo'],
+        ],
+      },
+    },
   },
 }
 export default preview

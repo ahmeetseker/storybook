@@ -4,7 +4,7 @@ import { GlassCheckbox } from '../GlassCheckbox'
 import { GlassChip } from '../GlassChip'
 
 const meta = {
-  title: 'Components/GlassFilterPanel',
+  title: 'Bileşenler/Pazar Yeri/GlassFilterPanel',
   component: GlassFilterPanel,
   tags: ['autodocs'],
   args: {

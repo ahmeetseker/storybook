@@ -91,7 +91,7 @@ function IlanListesi({ ilanlar }: { ilanlar: IlanOzeti[] }) {
 }
 
 const meta = {
-  title: 'Components/GlassInfiniteList',
+  title: 'Bileşenler/Veri Gösterimi/GlassInfiniteList',
   component: GlassInfiniteList,
   tags: ['autodocs'],
   args: {

@@ -139,9 +139,12 @@ yok; roving tabindex/ok tuşu deseni bu yüzden geçerli değil (component
 | root/list boşluğu | gap/padding | `--lg-space-2..5` | — |
 | hazardLabel/levelText | font-size | `--lg-text-body` / `--lg-text-footnote` | — |
 
-**Borç (raw):** seviye ölçeği birim çubuğu 22×6px + 3px radius —
-GlassScoreMeter'ın ring stroke-width borcuyla aynı gerekçe: gösterge
-kalınlığı/genişliği için token yok.
+**Borç (mikro-geometri):** kökte yerel değişkenlerde toplandı:
+`--glass-climate-unit-width/height/radius` (22×6px + 3px seviye ölçeği
+birim çubuğu — GlassScoreMeter'ın ring stroke-width borcuyla aynı gerekçe:
+gösterge kalınlığı/genişliği için token yok) ve
+`--glass-climate-chip-pad-block/inline` (2px/10px seviye çipi iç boşluğu —
+kapsül çip metriği, space ölçeğine oturmuyor). Görsel değerler değişmedi.
 
 ## 10. Storybook kapsamı
 

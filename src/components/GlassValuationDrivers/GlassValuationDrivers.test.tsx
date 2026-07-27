@@ -60,11 +60,13 @@ describe('GlassValuationDrivers', () => {
     ]
     const { container } = render(<GlassValuationDrivers drivers={mixed} />)
     const bars = container.querySelectorAll(`[data-tone="success"], [data-tone="danger"]`)
-    // A: pozitif, max'e göre %100; B: negatif, %50; C: NaN → 0 genişlikte iki taraf da
-    const widths = Array.from(bars).map((el) => (el as HTMLElement).style.width)
-    expect(widths).toContain('100%')
-    expect(widths).toContain('50%')
-    expect(widths.filter((w) => w === '0%').length).toBeGreaterThanOrEqual(1)
+    // Bar %100 genişlikte çizilir, doluluk oranı scaleX ile uygulanır (genişlik
+    // animasyonu yasak). A: pozitif, max'e göre scaleX(1); B: negatif,
+    // scaleX(0.5); C: NaN → scaleX(0) iki taraf da
+    const transforms = Array.from(bars).map((el) => (el as HTMLElement).style.transform)
+    expect(transforms).toContain('scaleX(1)')
+    expect(transforms).toContain('scaleX(0.5)')
+    expect(transforms.filter((t) => t === 'scaleX(0)').length).toBeGreaterThanOrEqual(1)
   })
 
   it('drivers boş dizi bilgilendirici metinle gösterir, hata fırlatmaz', () => {

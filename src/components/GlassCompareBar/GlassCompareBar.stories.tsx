@@ -54,7 +54,7 @@ function CompareBarDemo({ initialItems }: { initialItems: GlassCompareBarItem[] 
 }
 
 const meta = {
-  title: 'Components/GlassCompareBar',
+  title: 'Bileşenler/Pazar Yeri/GlassCompareBar',
   component: GlassCompareBar,
   tags: ['autodocs'],
   args: {
@@ -168,7 +168,7 @@ export const Responsive: Story = {
     viewport: { defaultViewport: 'mobile1' },
     docs: {
       description: {
-        story: 'Dar viewport\'ta tepsi iki satıra ayrılır: üstte kaydırılabilir kart listesi, altta eylem grubu.',
+        story: 'Dar viewport\'ta kart listesi yatay kaydırma şeridine dönüşür, eylem grubu sağda sabit kalır (breakpoint yok — içsel akış).',
       },
     },
   },

@@ -29,7 +29,7 @@ describe('GlassProgress', () => {
   it('value max’a göre yüzdelenir ve sınırlar dışına taşamaz', () => {
     const { container, unmount } = renderProgress({ value: 30, max: 60 })
     const fill = container.querySelector('[class*="fill"]') as HTMLElement
-    expect(fill.style.width).toBe('50%')
+    expect(fill.style.transform).toBe('scaleX(0.5)')
     unmount()
 
     renderProgress({ value: 150, max: 100 })

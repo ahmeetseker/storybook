@@ -95,13 +95,17 @@ fiil ("Süreyi Uzat").
 | root | background | `color-mix(severity 12%, transparent)` ← `--lg-accent/success/warning/danger` |
 | root | radius | `--lg-radius-media` |
 | root | padding | `--lg-space-3` (mobil) / `--lg-space-4` (≥sm) |
-| şerit | background | severity token'ı (3px raw genişlik) |
+| şerit | background | severity token'ı (genişlik `--stripe-width` yerel değişkeni) |
 | title | font-size | `--lg-text-body` |
 | message | font-size | `--lg-text-footnote` |
 | dismiss | radius | `--lg-radius-capsule` |
 
-Borç: şerit genişliği (3px) ve dismiss boyutu (28/36px) raw — kontrol token'ı
-kapsamı dışında bilinçli bırakıldı.
+**Borç (raw / mikro-geometri):** şerit genişliği, dismiss taban boyutu ve
+optik hizalama payı token karşılığı olmadığından component kökünde yerel
+değişken olarak toplandı (`.alert { --stripe-width: 3px; --dismiss-size: 28px;
+--dismiss-nudge: -2px; }`); dokunmatikte dismiss `--lg-control-sm`'e bağlandı
+(coarse'ta token 36px — büyüme tasarımın istediği davranıştır); geçiş
+süresi/easing (`0.15s ease-out`) süre token'ı olmadığından raw.
 
 ## 10. Storybook kapsamı
 

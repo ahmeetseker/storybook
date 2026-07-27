@@ -1,0 +1,243 @@
+.page {
+  container-type: inline-size;
+  min-block-size: 100%;
+  background-color: var(--lg-bg);
+  color: var(--lg-label);
+}
+
+.frame {
+  display: grid;
+  inline-size: min(100%, 92rem);
+  min-inline-size: 0;
+  margin-inline: auto;
+  padding: var(--lg-space-7);
+  padding-block-end:
+    calc(var(--lg-shell-dock-offset, var(--lg-control-xl)) + var(--lg-space-7) + env(safe-area-inset-bottom, 0rem));
+  gap: var(--lg-space-5);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  min-inline-size: 0;
+  gap: var(--lg-space-5);
+}
+
+.pageHeader > div {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+}
+
+.page h1,
+.page h2,
+.page p {
+  margin: 0;
+}
+
+.page h1 {
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pageHeader > div > p,
+.connectionStatus {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.connectionStatus {
+  flex: none;
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background-color: var(--lg-surface);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(18rem, 2fr) minmax(0, 5fr);
+  /* Sabit çerçeve: ray kendi içinde kaydırır, composer daima görünür kalır */
+  grid-template-rows: minmax(0, 1fr);
+  block-size: min(70rem, 72dvh);
+  overflow: hidden;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
+}
+
+.railPane,
+.threadPane {
+  min-inline-size: 0;
+  min-block-size: 0;
+  background-color: var(--lg-surface);
+}
+
+.railPane {
+  border-inline-end:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.threadPane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+/* Eylem şeridi render edilmese de konuşma paneli daima esneyen satırı doldurur */
+.threadPane > :last-child {
+  grid-row: 2;
+  min-block-size: 0;
+}
+
+.localState,
+.emptyState,
+.accessState {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--lg-space-4);
+}
+
+.localState,
+.emptyState {
+  padding: var(--lg-space-5);
+}
+
+.localState h2 {
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+}
+
+.localState p,
+.emptyState p {
+  color: var(--lg-label-secondary);
+}
+
+.emptyState {
+  border-block-start:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.accessState {
+  max-inline-size: 44rem;
+  padding: var(--lg-space-7);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
+}
+
+.accessState p {
+  color: var(--lg-label-secondary);
+}
+
+.capabilityActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-3) var(--lg-space-5);
+  border-block-end:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.page button,
+.page a {
+  font: inherit;
+}
+
+.localState button,
+.emptyState button,
+.emptyState a,
+.capabilityActions button {
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+  text-decoration: none;
+}
+
+.page :is(a, button, input, textarea):focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Cam kabuklu alanlar halkayı kabuğun kendisinde çizer; iç halka çift çerçeve üretir */
+.page [data-material] :is(input, textarea):focus-visible {
+  outline: none;
+}
+
+@container (inline-size <= 52rem) {
+  .frame {
+    padding: var(--lg-space-4);
+    padding-block-end:
+      calc(var(--lg-shell-dock-offset, var(--lg-control-xl)) + var(--lg-space-5) + env(safe-area-inset-bottom, 0rem));
+    gap: var(--lg-space-4);
+  }
+
+  .pageHeader {
+    align-items: start;
+    flex-direction: column;
+    gap: var(--lg-space-3);
+  }
+
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    block-size: 68dvh;
+  }
+
+  .railPane {
+    border-inline-end: 0;
+  }
+
+  .workspace[data-active-conversation='true'] .railPane {
+    display: none;
+  }
+
+  .workspace:not([data-active-conversation='true']) .threadPane {
+    display: none;
+  }
+
+  .accessState {
+    padding: var(--lg-space-5);
+  }
+}
+
+@media (hover: hover) {
+  .localState button:hover,
+  .emptyState button:hover,
+  .emptyState a:hover,
+  .capabilityActions button:hover {
+    border-color: var(--lg-accent);
+    color: var(--lg-accent);
+  }
+}
+
+@media (pointer: coarse) {
+  .localState button,
+  .emptyState button,
+  .emptyState a,
+  .capabilityActions button {
+    min-block-size: var(--lg-control-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .page [data-material='glass'] {
+    background-color: var(--lg-surface);
+    backdrop-filter: none;
+  }
+}

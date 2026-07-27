@@ -1,4 +1,6 @@
 .wrapper {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --panel-max-width: 240px;
   position: relative;
   display: inline-flex;
 }
@@ -9,7 +11,7 @@
   position: absolute;
   z-index: 10;
   width: max-content;
-  max-width: 240px;
+  max-width: var(--panel-max-width);
   padding: var(--lg-space-1) var(--lg-space-2);
   border-radius: var(--lg-radius-chip);
   background: var(--lg-label);
@@ -19,6 +21,7 @@
   line-height: 1.35;
   /* Panel etkileşim hedefi değildir; altındaki öğenin hover'ını bozmasın */
   pointer-events: none;
+  /* Gölge token ölçeğinde birebir karşılıksız (sm: 0 2px 8px .12) — bilinçli borç, bkz. rules.md §9 */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 

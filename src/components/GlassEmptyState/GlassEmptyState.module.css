@@ -11,24 +11,24 @@
   font-family: var(--lg-font);
 }
 
-/* Mobile-first: <640px'de padding dar, ikon küçük */
-.md { padding: var(--lg-space-6) var(--lg-space-4); }
-.sm { padding: var(--lg-space-4) var(--lg-space-3); }
+/* Mobile-first: <640px'de padding dar, ikon küçük. İkon daire çapı dekoratif
+   mikro-geometri (kontrol değil — control token'ı verilmez); yerel değişken,
+   bkz. rules.md §9 borç notu. */
+.md { --icon-size: 44px; padding: var(--lg-space-6) var(--lg-space-4); }
+.sm { --icon-size: 36px; padding: var(--lg-space-4) var(--lg-space-3); }
 
 .icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   margin-bottom: var(--lg-space-3);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-label) 6%, transparent);
   color: var(--lg-label-secondary);
 }
 .sm .icon {
-  width: 36px;
-  height: 36px;
   margin-bottom: var(--lg-space-2);
 }
 
@@ -55,10 +55,9 @@
 .action { margin-top: var(--lg-space-4); }
 .sm .action { margin-top: var(--lg-space-3); }
 
-/* bp-sm */
+/* bp-sm 640px */
 @media (min-width: 640px) {
-  .md { padding: var(--lg-space-7) var(--lg-space-6); }
-  .md .icon { width: 56px; height: 56px; }
+  .md { --icon-size: 56px; padding: var(--lg-space-7) var(--lg-space-6); }
   .md .title { font-size: var(--lg-text-title); }
   .md .description { font-size: var(--lg-text-body); }
 }

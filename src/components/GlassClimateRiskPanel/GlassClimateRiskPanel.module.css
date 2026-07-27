@@ -2,6 +2,13 @@
    değişkenden (--glass-climate-tone) sürülür; resolveTone() bu değişkeni
    doldurur, CSS yalnız tüketir. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9): seviye ölçeği
+     birim çubuğu ölçüleri ve seviye çipi iç boşluğu. */
+  --glass-climate-unit-width: 22px;
+  --glass-climate-unit-height: 6px;
+  --glass-climate-unit-radius: 3px;
+  --glass-climate-chip-pad-block: 2px;
+  --glass-climate-chip-pad-inline: 10px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -50,7 +57,7 @@
    WCAG 1.4.3'ün istediği 4.5:1 kontrastın altına düşüyordu (bkz. rules.md §9). */
 .levelChip {
   flex-shrink: 0;
-  padding: 2px 10px;
+  padding: var(--glass-climate-chip-pad-block) var(--glass-climate-chip-pad-inline);
   border-radius: var(--lg-radius-capsule);
   font-size: var(--lg-text-caption);
   font-weight: 700;
@@ -96,17 +103,18 @@
 
 .scale {
   display: flex;
-  gap: 4px;
+  gap: var(--lg-space-1);
 }
 
-/* Borç (raw): birim çubuğu 22×6px + 3px radius — GlassScoreMeter'ın ring
-   stroke-width borcuyla aynı gerekçe, gösterge kalınlığı için token yok. */
+/* Borç (mikro-geometri, kökteki yerel değişkenler): birim çubuğu 22×6px +
+   3px radius — GlassScoreMeter'ın ring stroke-width borcuyla aynı gerekçe,
+   gösterge kalınlığı için token yok. */
 .unitFilled,
 .unitEmpty {
   display: block;
-  width: 22px;
-  height: 6px;
-  border-radius: 3px;
+  width: var(--glass-climate-unit-width);
+  height: var(--glass-climate-unit-height);
+  border-radius: var(--glass-climate-unit-radius);
 }
 .unitFilled {
   background: var(--glass-climate-tone);

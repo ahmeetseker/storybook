@@ -1,0 +1,14 @@
+.git
+.github
+.agents
+.superpowers
+.DS_Store
+node_modules
+storybook-static
+dist
+dist-ssr
+apps/web/.output
+apps/web/.tanstack
+playwright-report
+test-results
+*.log

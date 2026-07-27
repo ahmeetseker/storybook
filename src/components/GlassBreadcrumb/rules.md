@@ -101,9 +101,14 @@ yapışık hover kalabilir (borç).
 | link | focus outline | `--lg-accent` |
 | root | font | miras (`font: inherit` link'te) |
 
-Borç: kök padding `6px 16px`, liste `font-size: 13px` (= `--lg-text-footnote`
-değeri ama token'a bağlı değil), link hover zemini `rgba(255,255,255,.14)`,
-link radius `8px` (radius ölçeğinde yok!), opacity değerleri (.75/.45) raw.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan değerler component
+kökünde yerel değişken olarak toplandı — `.breadcrumb { --bar-pad-block: 6px;
+--gap-tight: 2px; --item-pad: 2px 6px; --link-radius: 8px; }`; `--link-radius`
+8px radius ölçeğinde yok (chip 10px'e yuvarlamak görsel değişiklik olurdu).
+Bağlananlar: kök yatay padding 16px → `--lg-space-4`, liste font'u 13px →
+`--lg-text-footnote`. Link hover zemini `rgba(255,255,255,.14)` bilinçli
+beyaz-alfa malzeme etkisi — token'a bağlanmadı; opacity değerleri (.75/.45)
+raw.
 
 ## 10. Storybook kapsamı
 

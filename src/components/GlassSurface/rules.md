@@ -110,13 +110,17 @@ metin içermez.
 | flat | border | `--lg-hairline` |
 | flat | color | `--lg-label` |
 | rim | angle | `--glass-light-angle` (default 120deg) |
+| flat | box-shadow | `--lg-shadow-xs` (Grafit'te token koyulaşır — istenen) |
 
-Borç (raw): cam zemini `rgba(255,255,255,.06)` · gölge/blur/saturation
-formülleri (`0 (4+12t)px (16+24t)px …`) · rim gradyan beyazları ·
-`toneLight/toneDark` metin renkleri · dimming `rgba(0,0,0,.35)` ·
-`.flat.toneLight` zemini `#1b1c20` (`--lg-surface`'ın Grafit değeri elle
-kopyalanmış). Formüller bilinçli olarak koda gömülü; renkler token'a
-bağlanmaları değerlendirilecek.
+**Borç (raw / bilinçli malzeme sabitleri):** cam zemini `rgba(255,255,255,.06)`,
+cam box-shadow katmanları (`0 6px 24px …` + inset beyazlar), rim gradyan
+beyazları, `toneLight/toneDark` metin renkleri, dimming `rgba(0,0,0,.35)`
+(Apple clear varyant kuralı) — bunlar temadan bağımsız cam malzeme
+REÇETESİdir, token'a bağlanmaz (tema token'ları içerik katmanına aittir).
+Gölge/blur/saturation formülleri (`0 (4+12t)px (16+24t)px …`) bilinçli olarak
+koda gömülü. `.flat.toneLight` zemini `#1b1c20` — tema ne olursa olsun koyu
+kart zorunluluğu; `--lg-surface`'a bağlanamaz (tema ile değişirdi), Grafit
+değeriyle senkron tutulur.
 
 ## 10. Storybook kapsamı
 

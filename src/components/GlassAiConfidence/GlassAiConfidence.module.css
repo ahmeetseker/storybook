@@ -1,6 +1,8 @@
 /* AI güven göstergesi: meter + seviye metni + etken listesi. İçerik katmanı,
    cam yok. Seviye/etki yönü renk dışında metin kanalıyla da iletilir. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --meter-height: 8px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-2);
@@ -34,18 +36,25 @@
   position: relative;
   display: block;
   width: 100%;
-  height: 8px;
+  height: var(--meter-height);
   overflow: hidden;
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
 
+/* Dolgu %100 genişlikte durur; oran transform: scaleX ile verilir (inline style),
+   track overflow:hidden kırpar — genişlik animasyonu yerine yalnız transform. */
 .fill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
   background: var(--glass-confidence-tone, var(--lg-accent));
-  transition: inline-size 0.3s ease-out;
+  transform-origin: left center;
+  transition: transform 0.3s ease-out;
+}
+[dir='rtl'] .fill {
+  transform-origin: right center;
 }
 
 /* Seviye tonu — auto eşik. Metin zaten seviyeyi söyler; renk ikincil kanaldır. */
@@ -88,7 +97,7 @@
 
 .impactGlyph {
   flex: none;
-  font-size: 9px;
+  font-size: var(--lg-text-badge);
 }
 
 .factor[data-impact='positive'] .impactGlyph {

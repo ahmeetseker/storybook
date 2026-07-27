@@ -3,6 +3,9 @@
    Skor rengi tek CSS değişkeninden (--glass-score-tone) sürülür; auto eşik
    ya da tone prop'u bu değişkeni doldurur. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --gsm-meta-gap: 2px;
+  --gsm-bar-height: 8px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -31,6 +34,9 @@
   stroke: var(--glass-score-tone, var(--lg-accent));
   stroke-width: 8;
   stroke-linecap: round;
+  /* Bilinçli istisna: SVG stroke-dashoffset geçişi paint-only'dir (layout
+     tetiklemez) — transform/opacity/filter kuralının SVG karşılığı olarak
+     KALIR, bkz. rules.md §9. */
   transition: stroke-dashoffset 0.3s ease-out;
 }
 .ringValue {
@@ -46,7 +52,7 @@
 .ring .meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--gsm-meta-gap);
   min-width: 0;
 }
 .ring .label {
@@ -88,17 +94,22 @@
   position: relative;
   display: block;
   width: 100%;
-  height: 8px;
+  height: var(--gsm-bar-height);
   overflow: hidden;
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
+/* Dolgu %100 genişlikte; oran `transform: scaleX()` ile verilir (inline style)
+   — genişlik animasyonu yerine paint-only transform (tasarım sistemi kuralı). */
 .barFill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
   background: var(--glass-score-tone, var(--lg-accent));
-  transition: width 0.3s ease-out;
+  transform-origin: left center; /* fallback: logical keyword desteklemeyen motorlar */
+  transform-origin: inline-start;
+  transition: transform 0.3s ease-out;
 }
 .bar .description {
   font-size: var(--lg-text-footnote);

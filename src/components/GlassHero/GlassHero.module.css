@@ -1,27 +1,51 @@
 /* GlassHero — içerik katmanı hero'su. Zemin her zaman flat; cam yalnız
    çağıranın koyduğu kontrollerde (CTA/arama) olabilir. */
-.root { position: relative; width: 100%; box-sizing: border-box; background: var(--lg-bg); overflow: hidden; }
+.root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --content-max: 1120px;
+  --pad-y: 56px;
+  --showcase-pad-top: 150px;
+  --stack-gap: 18px;
+  --actions-gap: 10px;
+  --bento-offset: 14px;
+  --quicklink-gap: 14px;
+  --text-sm: 14px;
+  --title-max-w: 760px;
+  --subtitle-max-w: 640px;
+  --search-max-w: 660px;
+  --split-min: 400px;
+  --split-gap: 36px;
+  --blob-size: 640px;
+  --blob-blur: 90px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--lg-bg);
+  /* Slot içindeki öneri/popover gibi bağlı paneller hero sınırında kırpılmaz.
+     Showcase medyası ve ambient dekorasyon kendi katmanlarında kırpılır. */
+  overflow: visible;
+}
 .inner, .showcaseContent, .splitGrid { position: relative; z-index: 1; }
 
 /* Kademeli giriş sarmalayıcıları — yerleşim üst kapsayıcıdan miras alınır */
 .blockStack {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--stack-gap);
   width: 100%;
   align-items: inherit;
   text-align: inherit;
 }
 .block { display: flex; flex-direction: column; align-items: inherit; text-align: inherit; min-width: 0; }
-.bentoSlot { width: 100%; margin-top: 14px; text-align: start; }
+.bentoSlot { width: 100%; margin-top: var(--bento-offset); text-align: start; }
 
 .inner {
-  max-width: 1120px;
+  max-width: var(--content-max);
   margin: 0 auto;
-  padding: 56px 20px;
+  padding: var(--pad-y) var(--lg-space-5);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--stack-gap);
   align-items: flex-start;
   text-align: start;
 }
@@ -29,8 +53,8 @@
 
 .title {
   margin: 0;
-  max-width: 760px;
-  font-size: clamp(30px, 4.5vw, 46px);
+  max-width: var(--title-max-w);
+  font-size: clamp(30px, 4.5vw, 46px); /* akışkan tip — token ölçeğinde karşılığı yok (borç notu) */
   line-height: 1.12;
   font-weight: 700;
   letter-spacing: -0.028em;
@@ -38,23 +62,23 @@
 }
 .subtitle {
   margin: 0;
-  max-width: 640px;
-  font-size: 17px;
+  max-width: var(--subtitle-max-w);
+  font-size: var(--lg-text-headline);
   line-height: 1.55;
   color: var(--lg-label-secondary);
 }
-.actionsRow { display: flex; flex-wrap: wrap; gap: 10px; }
-.searchSlot { width: 100%; max-width: 660px; }
-.quickLinks { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 14px; }
+.actionsRow { display: flex; flex-wrap: wrap; gap: var(--actions-gap); }
+.searchSlot { width: 100%; max-width: var(--search-max-w); }
+.quickLinks { display: flex; flex-wrap: wrap; gap: var(--lg-space-2) var(--quicklink-gap); font-size: var(--text-sm); }
 
 /* split */
 .splitGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
-  gap: 36px;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--split-min), 100%), 1fr));
+  gap: var(--split-gap);
   align-items: center;
 }
-.splitText { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.splitText { display: flex; flex-direction: column; gap: var(--stack-gap); min-width: 0; }
 .media { min-width: 0; }
 .media > * { max-width: 100%; }
 
@@ -69,12 +93,12 @@
 }
 .showcaseContent {
   position: relative;
-  max-width: 1120px;
+  max-width: var(--content-max);
   margin: 0 auto;
-  padding: 150px 20px 56px;
+  padding: var(--showcase-pad-top) var(--lg-space-5) var(--pad-y);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--stack-gap);
   align-items: flex-start;
   text-align: start;
 }
@@ -92,15 +116,17 @@
   will-change: transform;
 }
 
-/* ── Ambient aurora (opsiyonel): düşük opaklıkta süzülen renk lekeleri ── */
+/* ── Ambient aurora (opsiyonel): düşük opaklıkta süzülen renk lekeleri ──
+   Konum/sürüklenme px'leri dekoratif animasyon geometrisi — keyframe içinde
+   var() güvenilir çalışmadığından raw bırakıldı (bkz. rules.md §9 borç notu). */
 .ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .blobA,
 .blobB {
   position: absolute;
-  width: 640px;
-  height: 640px;
+  width: var(--blob-size);
+  height: var(--blob-size);
   border-radius: var(--lg-radius-capsule, 999px);
-  filter: blur(90px);
+  filter: blur(var(--blob-blur));
   opacity: 0.32;
 }
 .blobA {

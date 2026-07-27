@@ -120,7 +120,7 @@ function CommandPaletteDemo(props: Omit<GlassCommandPaletteProps, 'open' | 'onCl
 }
 
 const meta = {
-  title: 'Components/GlassCommandPalette',
+  title: 'Bileşenler/Navigasyon/GlassCommandPalette',
   component: GlassCommandPalette,
   tags: ['autodocs'],
   args: {

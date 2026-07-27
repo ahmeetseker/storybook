@@ -62,7 +62,7 @@ const arsaHazards: GlassClimateRiskHazard[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassClimateRiskPanel',
+  title: 'Bileşenler/Pazar Yeri/GlassClimateRiskPanel',
   component: GlassClimateRiskPanel,
   tags: ['autodocs'],
   args: {

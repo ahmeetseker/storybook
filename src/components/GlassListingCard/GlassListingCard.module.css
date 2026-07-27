@@ -1,8 +1,16 @@
 .card {
+  /* Mikro-geometri / ölçek dışı ölçüler (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --card-w: 240px;
+  --card-pad: 6px;
+  --media-radius: 13px;
+  --body-gap: 3px;
+  --body-pad-top: 10px;
+  --title-text: 14px;
+  --price-text: 16px;
   display: flex;
   flex-direction: column;
-  width: 240px;
-  padding: 6px;
+  width: var(--card-w);
+  padding: var(--card-pad);
   margin: 0;
   border: none;
   font: inherit;
@@ -19,14 +27,14 @@
 
 @media (hover: hover) {
   .card:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.16); /* Bilinçli raw: beyaz-alfa cam hover vurgusu */
   }
 }
 
 .media {
   position: relative;
   display: block;
-  border-radius: 13px;
+  border-radius: var(--media-radius);
   overflow: hidden;
 }
 
@@ -39,20 +47,20 @@
 
 .badge {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: var(--lg-space-2);
+  left: var(--lg-space-2);
   display: inline-flex;
 }
 
 .body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 10px 8px 8px;
+  gap: var(--body-gap);
+  padding: var(--body-pad-top) var(--lg-space-2) var(--lg-space-2);
 }
 
 .title {
-  font-size: 14px;
+  font-size: var(--title-text);
   font-weight: 600;
   line-height: 1.35;
   display: -webkit-box;
@@ -62,13 +70,13 @@
 }
 
 .location {
-  font-size: 12px;
+  font-size: var(--lg-text-caption);
   opacity: 0.65;
 }
 
 .price {
-  margin-top: 4px;
-  font-size: 16px;
+  margin-top: var(--lg-space-1);
+  font-size: var(--price-text);
   font-weight: 800;
   letter-spacing: -0.022em;
 }

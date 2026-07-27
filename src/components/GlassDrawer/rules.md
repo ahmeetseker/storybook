@@ -96,8 +96,15 @@ içinde scroll eder; footer aksiyonu görünür kalır (body `flex:1`).
 | description | color / font-size | `--lg-label-secondary` / `--lg-text-footnote` |
 | footer | gap | `--lg-space-2` |
 
-Borç: backdrop scrim, panel gölgesi, `z-index: 1000` ve yan genişlikler
-(320/400/560) raw — overlay/genişlik token seti tanımlanınca bağlanacak.
+**Borç (raw / mikro-geometri):** yan genişlikler ve backdrop blur token
+karşılığı olmadığından component kökünde yerel değişken olarak toplandı
+(`.root { --backdrop-blur: 8px; --panel-w-sm: 320px; --panel-w-md: 400px;
+--panel-w-lg: 560px; }`); backdrop scrim `rgba(0,0,0,0.4)` bilinçli yerinde
+bırakıldı — `--lg-scrim` (`rgba(10,12,16,0.55)`) ile birebir aynı değil,
+bağlamak görsel değişiklik olurdu; panel gölgesi `0 24px 64px rgba(0,0,0,0.35)`
+hiçbir `--lg-shadow-*` deseniyle birebir değil (`lg` alfa 0.32) — dokunulmadı;
+`z-index: 1000` raw (z token'ı yok). Overlay/genişlik token seti tanımlanınca
+bağlanacak.
 
 ## 10. Storybook kapsamı
 

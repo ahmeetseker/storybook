@@ -2,7 +2,7 @@
 name: GlassAiAgentActivity
 category: içerik
 status: hazır
-lastReviewed: 2026-07-18
+lastReviewed: 2026-07-24
 ---
 
 # GlassAiAgentActivity Kuralları
@@ -25,8 +25,10 @@ ajan izin almadan ilerlemez.
 - Durum ("Sırada/Çalışıyor/Tamamlandı/İzin bekliyor/Reddedildi/Hata") renk
   dışında metinle iletilir.
 - `needsApproval` girişte "İzin ver"/"Reddet" butonları — yalnız ilgili callback
-  verilince çizilir (false affordance yok).
-- Çalışan/sırada işlem + `onStop` → "Çalışmayı durdur".
+  verilince çizilir (false affordance yok). İzin kapısı butonları `GlassButton`
+  compose eder: "İzin ver" `prominent size="sm"`, "Reddet" default `size="sm"`;
+  kapı davranışı (callback sözleşmesi, id ile çağrı) değişmez.
+- Çalışan/sırada işlem + `onStop` → "Çalışmayı durdur" (`GlassButton size="sm"`).
 - Teknik ayrıntı `<details>` içinde katlı.
 - Kalıcı yetki notu her durumda görünür.
 - Boş akış: `role="status"` bilgilendirme.
@@ -35,9 +37,9 @@ ajan izin almadan ilerlemez.
 
 | Slot | Zorunlu | İçerik |
 |---|---|---|
-| header | ✅ | başlık + `✦ AI` + (koşullu) durdur |
+| header | ✅ | başlık + `✦ AI` + (koşullu) durdur (`GlassButton size="sm"`) |
 | log | dolu | işlem kalemleri (mark/durum/detay/meta/details) |
-| actions | koşullu | izin ver/reddet (needsApproval) |
+| actions | koşullu | izin ver/reddet (needsApproval) — `GlassButton` compose (approve `prominent`) |
 | empty | boşken | bilgilendirme |
 | permission | ✅ | kalıcı yetki notu |
 
@@ -72,7 +74,8 @@ Akış tamamen kontrollü (`entries`). Component iç state tutmaz; ebeveyn günc
 
 - `role="log"` + `aria-live="polite"` yeni giriş duyurur.
 - `running` mark nabız animasyonu (transform/opacity); reduced-motion kapatır.
-- Butonlar `:focus-visible` + coarse'da min 44px.
+- Eylem butonları `GlassButton` compose eder; `:focus-visible` halkası ve
+  coarse pointer'da 44px+ hedef GlassButton/kontrol token'larından gelir.
 
 ## 8. İçerik kuralları
 
@@ -87,10 +90,24 @@ Akış tamamen kontrollü (`entries`). Component iç state tutmaz; ebeveyn günc
 | root | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-card` |
 | mark running | background | `--lg-accent` |
 | item needsApproval | background/border | `color-mix(--lg-warning ...)` |
-| approve | background | `--lg-accent` |
+| approve | görsel | `GlassButton prominent` (accent dolgu GlassButton'dan) |
+| reject / stop | görsel | `GlassButton` default (cam kapsül) |
 | permission | border-top | `--lg-hairline` |
 
-Raw px: mark 9px + rozet 10.5px (AI rozet standardı borcu).
+Not (stop butonu): eski elle çizilmiş görünüm danger-karışımlı kenarlıklı
+şeffaf ghost'tu. `tint={var(--lg-danger)}` tinted varyantı %55 saydam danger
+dolgu verdiği için bu görünümden belirgin sapardı; bu yüzden tint'siz default
+GlassButton kullanıldı. `.stop` sınıfı yalnız yerleşim (flex-shrink kilidi)
+olarak korunur.
+
+Rozet font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması).
+
+Borç (mikro-geometri): token karşılığı olmayan değerler component kökünde
+yerel değişken olarak toplandı — `.root { --mark-size: 9px; --mark-offset: 5px;
+--gap-tight: 2px; --badge-pad-block: 3px; }` (durum noktası çapı/baseline
+hizası, satır içi mikro aralık ve AI rozeti dikey dolgusu — kontrat sabiti,
+diğer AI component'lerindeki 3px ile aynı).
 
 ## 10. Storybook kapsamı
 
@@ -118,5 +135,9 @@ Default, İzin Bekliyor, Hepsi Tamamlandı, Hata Durumu, Boş Akış, Responsive
 
 ## Changelog
 
+- 2026-07-24: Durdur/İzin ver/Reddet butonları `GlassButton` kompozisyonuna
+  geçirildi (approve `prominent size="sm"`, diğerleri default `size="sm"`);
+  izin kapısı davranışı ve log semantiği birebir korundu. Ölü buton CSS'i
+  silindi; stop'ta tint kullanılmama gerekçesi §9'da.
 - 2026-07-18: İlk sürüm — `role="log"` denetim akışı + izin kapısı + yetki notu.
   Codex `CodexAiAgentActivity` deseninden türetildi.

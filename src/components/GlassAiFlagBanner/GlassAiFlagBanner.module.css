@@ -5,8 +5,17 @@
    --lg-label/--lg-label-secondary'den gelir; semantik renk yalnız ikon +
    zemin karışımını sürer (kontrast dersi). */
 .banner {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --nudge: 2px;
+  --textlink-height: 24px;
+  --content-basis: 240px;
+  --underline-offset: 2px;
+  --badge-pad-y: 3px;
+  --dismiss-size: 28px;
+  --placeholder-bar-h: 11px;
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--lg-space-3);
   box-sizing: border-box;
@@ -30,7 +39,7 @@
   justify-content: center;
   width: var(--lg-control-sm);
   height: var(--lg-control-sm);
-  margin-top: -2px;
+  margin-top: calc(-1 * var(--nudge));
   border-radius: var(--lg-radius-capsule);
   /* Raw --flag-color kendi %16 zemine karşı ~1.9-2.9:1 kontrasta düşüyordu
      (Codex bulgusu, işaret grafiği ≥3:1 eşiğini kaçırıyordu). Diğer AI
@@ -39,8 +48,9 @@
   background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 16%, var(--lg-surface));
 }
 
+/* İçsel akış: dar konteynerde içerik kendi satırına sarar (breakpoint yok) */
 .content {
-  flex: 1 1 0;
+  flex: 1 1 var(--content-basis);
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -94,7 +104,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--lg-space-4);
-  margin-top: 2px;
+  margin-top: var(--nudge);
 }
 
 /* "Ayrıntılar" metin aksiyonu — GlassButton değil, düz metin linki (spec).
@@ -110,9 +120,9 @@
   font-size: var(--lg-text-footnote);
   font-weight: 700;
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: var(--underline-offset);
   cursor: pointer;
-  min-height: 24px;
+  min-height: var(--textlink-height);
 }
 .detailsAction:focus-visible {
   outline: 2px solid var(--lg-accent);
@@ -126,7 +136,7 @@
 }
 @media (pointer: coarse) {
   .detailsAction {
-    min-height: 44px;
+    min-height: var(--lg-control-md); /* coarse'ta birebir 44px hedef */
     display: inline-flex;
     align-items: center;
   }
@@ -134,7 +144,7 @@
 
 /* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
    AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
-   radius capsule, 10.5px/700. Severity'den bağımsız — daima accent. ── */
+   radius capsule, --lg-text-badge/700. Severity'den bağımsız — daima accent. ── */
 .aiMeta {
   display: inline-flex;
   align-items: center;
@@ -144,11 +154,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--badge-pad-y) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -201,8 +211,8 @@
 }
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--lg-control-md); /* coarse'ta birebir 44px hedef */
+    min-height: var(--lg-control-md);
   }
 }
 .thumbIcon[data-direction='down'] {
@@ -216,9 +226,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin: -2px -2px 0 0;
+  width: var(--dismiss-size);
+  height: var(--dismiss-size);
+  margin: calc(-1 * var(--nudge)) calc(-1 * var(--nudge)) 0 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -239,8 +249,8 @@
 }
 @media (pointer: coarse) {
   .dismiss {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md); /* coarse'ta birebir 44px hedef (kare) */
+    height: var(--lg-control-md);
   }
 }
 
@@ -253,7 +263,7 @@
 .placeholderBar {
   display: block;
   width: 55%;
-  height: 11px;
+  height: var(--placeholder-bar-h);
   border-radius: var(--lg-radius-chip);
   background: color-mix(in srgb, var(--flag-color, var(--lg-warning)) 22%, var(--lg-hairline));
 }
@@ -280,17 +290,6 @@
   .feedbackButton,
   .detailsAction {
     transition: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .banner {
-    flex-wrap: wrap;
-    padding: var(--lg-space-3);
-  }
-  .dismiss {
-    order: -1;
-    margin-left: auto;
   }
 }
 

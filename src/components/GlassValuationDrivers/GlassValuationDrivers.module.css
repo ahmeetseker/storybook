@@ -1,7 +1,17 @@
 /* GlassValuationDrivers — içerik katmanı FLAT: cam/backdrop-filter YOK.
-   Yalnız token'lar (--lg-*) + color-mix türevleri. Bar/track yükseklikleri +
-   AI rozeti font-size raw px borcu — bkz. rules.md §9. */
+   Yalnız token'lar (--lg-*) + color-mix türevleri. Bar/track mikro-geometrisi
+   kökteki yerel değişkenlerde — bkz. rules.md §9. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --vd-ai-gap: 6px;
+  --vd-ai-pad-block: 3px;
+  --vd-row-gap: 2px;
+  --vd-track-h: 18px;
+  --vd-bar-h: 8px;
+  --vd-centerline-w: 1px;
+  --vd-col-label-min: 76px;
+  --vd-col-track-min: 96px;
+  --vd-col-impact-min: 64px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -49,7 +59,7 @@
 .aiRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--vd-ai-gap);
   flex-wrap: wrap;
 }
 
@@ -57,11 +67,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--vd-ai-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge, 11px);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -91,10 +101,10 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(76px, 0.85fr) minmax(96px, 1.5fr) minmax(64px, auto);
+  grid-template-columns: minmax(var(--vd-col-label-min), 0.85fr) minmax(var(--vd-col-track-min), 1.5fr) minmax(var(--vd-col-impact-min), auto);
   align-items: center;
   column-gap: var(--lg-space-3);
-  row-gap: 2px;
+  row-gap: var(--vd-row-gap);
   padding: var(--lg-space-2) 0;
   border-bottom: 1px solid var(--lg-hairline);
 }
@@ -117,13 +127,13 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  height: 18px;
+  height: var(--vd-track-h);
 }
 
 .half {
   display: flex;
   flex: 1 1 0;
-  height: 8px;
+  height: var(--vd-bar-h);
   overflow: hidden;
 }
 
@@ -135,10 +145,24 @@
   justify-content: flex-start;
 }
 
+/* Bar %100 genişlikte çizilir, oran `transform: scaleX(oran)` ile uygulanır —
+   genişlik animasyonu yasak (animasyon yalnız transform/opacity/filter).
+   Çift yönlü tornado bar: transform-origin merkez hattına göre ayarlanır —
+   pozitif yarıda merkez soldadır (left), negatif yarıda merkez sağdadır
+   (right); yön korunur, taşan kısım half'in overflow:hidden'ında kırpılır. */
 .bar {
+  width: 100%;
   height: 100%;
   border-radius: var(--lg-radius-capsule);
-  transition: width 0.3s ease-out;
+  transition: transform 0.3s ease-out;
+}
+
+.half[data-side='negative'] .bar {
+  transform-origin: right center;
+}
+
+.half[data-side='positive'] .bar {
+  transform-origin: left center;
 }
 
 .bar[data-tone='danger'] {
@@ -151,7 +175,7 @@
 
 .centerLine {
   flex: none;
-  width: 1px;
+  width: var(--vd-centerline-w);
   align-self: stretch;
   background: var(--lg-hairline);
 }
@@ -219,7 +243,7 @@
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+  /* transition yok: renk değişimi anlıktır — animasyon yalnız transform/opacity/filter kuralı */
 }
 
 .feedbackButton:focus-visible {
@@ -240,8 +264,9 @@
 
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi */
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -287,8 +312,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar,
-  .feedbackButton {
+  .bar {
     transition: none;
   }
   .skeletonLine {

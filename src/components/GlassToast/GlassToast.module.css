@@ -1,11 +1,17 @@
 /* Mobile-first: <640px'te position prop'u yok sayılır — yığın altta tam genişlik
    (left/right 16px), fiilen bottom-center davranışı. */
 .stack {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --stack-width: 380px;  /* ≥bp-sm sabit yığın genişliği */
+  --stripe-width: 4px;   /* severity şeridi — ince şerit, space token'ı değil */
+  --stripe-radius: 2px;
+  --texts-gap: 2px;      /* başlık/açıklama arası mikro boşluk */
+  --close-size: 28px;    /* kapat butonu kutusu (coarse'ta 44'e büyür) */
   position: fixed;
   z-index: 60;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
+  left: var(--lg-space-4);
+  right: var(--lg-space-4);
+  bottom: var(--lg-space-4);
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-2);
@@ -19,7 +25,7 @@
 /* bp-sm */
 @media (min-width: 640px) {
   .stack {
-    width: 380px;
+    width: var(--stack-width);
     left: auto;
     right: auto;
     bottom: auto;
@@ -30,6 +36,8 @@
 }
 
 .toast {
+  /* Yüzen katman: taban yüzeyin gölge kanalını besler */
+  --lg-surface-shadow: var(--lg-shadow-md);
   display: block;
   padding: var(--lg-space-3) var(--lg-space-3) var(--lg-space-3) var(--lg-space-4);
   font-size: var(--lg-text-body);
@@ -45,8 +53,8 @@
 .stripe {
   align-self: stretch;
   flex: none;
-  width: 4px;
-  border-radius: 2px;
+  width: var(--stripe-width);
+  border-radius: var(--stripe-radius);
   background: var(--lg-accent);
 }
 .info { background: var(--lg-accent); }
@@ -56,7 +64,7 @@
 
 .texts {
   display: grid;
-  gap: 2px;
+  gap: var(--texts-gap);
   min-width: 0;
   flex: 1;
   padding-top: 1px;
@@ -95,8 +103,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: var(--close-size);
+  height: var(--close-size);
   font-size: var(--lg-text-caption);
   opacity: 0.7;
   transition: opacity 0.16s ease-out;
@@ -107,9 +115,14 @@
   .action:hover { text-decoration: underline; }
 }
 
-/* Dokunmatik: kapat butonu 44px hedefe büyür */
+/* Dokunmatik: kapat butonu 44px hedefe büyür — coarse'ta --lg-control-md = 44px;
+   negatif margin görsel ayak izini 28px'lik yerleşimde tutar: (28−44)/2 = −8px */
 @media (pointer: coarse) {
-  .close { width: 44px; height: 44px; margin: -8px; }
+  .close {
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
+    margin: calc((var(--close-size) - var(--lg-control-md)) / 2);
+  }
 }
 
 .action:focus-visible,

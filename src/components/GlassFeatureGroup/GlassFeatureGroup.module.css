@@ -1,5 +1,19 @@
 /* GlassFeatureGroup — içerik katmanı FLAT panel (cam yok, backdrop-filter yok). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9): satır dikey
+     iç boşluğu, ikon kutuları, chevron ölçüleri, başlık/kicker altı boşluk,
+     ızgara min kolon genişliği ve checklist satır min yüksekliği. */
+  --glass-feature-row-pad: 7px;
+  --glass-feature-presence-icon: 18px;
+  --glass-feature-icon: 20px;
+  --glass-feature-chevron-box: 16px;
+  --glass-feature-chevron-size: 8px;
+  --glass-feature-chevron-stroke: 2px;
+  --glass-feature-chevron-nudge: 1px;
+  --glass-feature-title-gap: 14px;
+  --glass-feature-kicker-gap: 10px;
+  --glass-feature-grid-min: 150px;
+  --glass-feature-item-min: 28px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -13,7 +27,7 @@
 .rows {
   display: grid;
   grid-template-columns: 1fr;
-  column-gap: 32px;
+  column-gap: var(--lg-space-7, 32px);
   margin: 0;
 }
 .twoColumns {
@@ -23,9 +37,9 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--lg-space-4, 16px);
   min-height: var(--lg-control-sm, 32px);
-  padding: 7px 0;
+  padding: var(--glass-feature-row-pad) 0;
   border-bottom: 1px solid var(--lg-hairline);
   box-sizing: border-box;
 }
@@ -52,11 +66,11 @@
 .presenceIcon {
   display: inline-grid;
   place-items: center;
-  width: 18px;
-  height: 18px;
+  width: var(--glass-feature-presence-icon);
+  height: var(--glass-feature-presence-icon);
   border-radius: var(--lg-radius-capsule, 999px);
-  font-size: 12px;
-  font-weight: 800;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 700;
   line-height: 1;
 }
 .presenceIcon[data-present='true'] {
@@ -83,10 +97,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--lg-space-3, 12px);
   width: 100%;
   min-height: var(--lg-control-lg, 48px);
-  padding: 0 20px;
+  padding: 0 var(--lg-space-5, 20px);
   border: none;
   background: none;
   color: inherit;
@@ -111,41 +125,59 @@
 .chevronBox {
   display: grid;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: var(--glass-feature-chevron-box);
+  height: var(--glass-feature-chevron-box);
   flex: none;
+  /* Kapalı: -90° (sağa bakar); açık: 0° (aşağı bakar). Yalnız transform animasyonu. */
+  transform: rotate(-90deg);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.chevronBox[data-open='true'] {
+  transform: rotate(0deg);
 }
 .chevron {
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg) translate(-1px, -1px);
+  width: var(--glass-feature-chevron-size);
+  height: var(--glass-feature-chevron-size);
+  border-right: var(--glass-feature-chevron-stroke) solid currentColor;
+  border-bottom: var(--glass-feature-chevron-stroke) solid currentColor;
+  transform: rotate(45deg)
+    translate(calc(-1 * var(--glass-feature-chevron-nudge)), calc(-1 * var(--glass-feature-chevron-nudge)));
   opacity: 0.55;
 }
+
+/* ── region: grid-template-rows 0fr→1fr tekniği (GlassAccordion ile aynı) —
+   height animasyonu YASAK. .accordionRegionOuter tek satırlı grid container;
+   .accordionRegionInner overflow:hidden ile 0fr durumunda içeriği kırpar,
+   display:none kullanılmadığı için transition kesintisiz çalışır ve içerik
+   `inert` iken de ölçülebilir kalır. ── */
 .accordionRegionOuter {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.accordionRegionOuter[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.accordionRegionInner {
   overflow: hidden;
+  min-height: 0;
 }
 .accordionRegion {
-  padding: 0 20px 16px;
+  padding: 0 var(--lg-space-5, 20px) var(--lg-space-4, 16px);
 }
 
-/* Dokunmatik: tetikleyici zaten ≥44px; pointer:coarse'ta yükselt */
-@media (pointer: coarse) {
-  .accordionTrigger {
-    min-height: 48px;
-  }
-}
+/* Dokunmatik: min-height --lg-control-lg token'ından gelir; token pointer:coarse'ta
+   48→50px büyür — tasarım sisteminin istediği davranış (bkz. rules.md §9). */
 
 /* ── checklist ── */
 .checklistGroup {
-  padding: 20px;
+  padding: var(--lg-space-5, 20px);
 }
 .checklistGroup + .checklistGroup {
   border-top: 1px solid var(--lg-hairline);
 }
 .checklistTitle {
-  margin: 0 0 14px;
+  margin: 0 0 var(--glass-feature-title-gap);
   font-size: var(--lg-text-headline, 17px);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -155,17 +187,17 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 12px 16px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--glass-feature-grid-min), 1fr));
+  gap: var(--lg-space-3, 12px) var(--lg-space-4, 16px);
 }
 .checklistGroup .rows {
-  margin-top: 14px;
+  margin-top: var(--glass-feature-title-gap);
 }
 .checklistItem {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 28px;
+  gap: var(--lg-space-2, 8px);
+  min-height: var(--glass-feature-item-min);
 }
 .checklistItem[data-present='false'],
 .checklistItem[data-present='unknown'] {
@@ -174,12 +206,12 @@
 .checklistIcon {
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: var(--glass-feature-icon);
+  height: var(--glass-feature-icon);
   flex: none;
   border-radius: var(--lg-radius-capsule, 999px);
-  font-size: 12px;
-  font-weight: 800;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 700;
   line-height: 1;
   color: var(--lg-success);
   background: color-mix(in srgb, var(--lg-success) 14%, transparent);
@@ -192,11 +224,11 @@
 .checklistIconNeutral {
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: var(--glass-feature-icon);
+  height: var(--glass-feature-icon);
   flex: none;
   color: var(--lg-label-secondary);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 .checklistLabel {
@@ -206,14 +238,14 @@
 
 /* ── columns ── */
 .columnsGroup {
-  padding: 16px 20px;
+  padding: var(--lg-space-4, 16px) var(--lg-space-5, 20px);
 }
 .columnsGroup + .columnsGroup {
   border-top: 1px solid var(--lg-hairline);
 }
 /* Kasıtlı olarak heading DEĞİL — birden çok grup başlığı doküman ana hattını kirletmesin */
 .columnsKicker {
-  margin: 0 0 10px;
+  margin: 0 0 var(--glass-feature-kicker-gap);
   font-size: var(--lg-text-footnote, 13px);
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -222,8 +254,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .accordionTrigger,
-  .chevronBox {
+  .chevronBox,
+  .accordionRegionOuter {
     transition: none;
   }
 }

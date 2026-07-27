@@ -81,7 +81,7 @@ const StatPanel = () => (
 )
 
 const meta = {
-  title: 'Components/GlassHero',
+  title: 'Bileşenler/Vitrin ve Yerleşim/GlassHero',
   component: GlassHero,
   parameters: { layout: 'fullscreen' },
   tags: ['autodocs'],

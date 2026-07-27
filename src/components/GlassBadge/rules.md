@@ -86,11 +86,16 @@ yapılmaz (CSS `text-transform` yok) — metin verildiği gibi görünür.
 | tinted | background | `--glass-tint` ← `tint` prop'u |
 | flat zemin/kenar | background/border | `--lg-surface` / `--lg-hairline` (GlassSurface'tan) |
 
-Borç: padding'ler (`3px 10px` / `5px 14px`) ve font-size'lar (12/13px) raw —
-`--lg-text-caption`/`--lg-text-footnote` ile aynı değerde ama token'a bağlı
-değil. Tint üstü metin `#fff` raw (koyu tint varsayımı; açık tint'te kontrast
-çağıranın sorumluluğunda). Story'lerdeki semantic renkler (`#ff453a`,
-`#ff9f0a`) henüz token değil (bkz. Token'lar → Açık Kararlar).
+**Borç (raw / mikro-geometri):** font-size'lar `--lg-text-caption` (sm) /
+`--lg-text-footnote` (md) token'larına bağlandı (birebir 12/13px). Padding'ler
+token karşılığı olmadığından (space ölçeğinin arasında) kökte yerel değişkende
+toplandı: `.badge { --badge-pad-y-sm: 3px; --badge-pad-x-sm: 10px;
+--badge-pad-y-md: 5px; --badge-pad-x-md: 14px; }`. Tint üstü metin `#fff`
+bilinçli raw bırakıldı: tint zemini temadan bağımsızdır, `--lg-accent-contrast`
+ise Grafit'te koyulaşır (`#1a140c`) — birebir token yok (koyu tint varsayımı;
+açık tint'te kontrast çağıranın sorumluluğunda). Story'lerdeki semantic
+renkler (`#ff453a`, `#ff9f0a`) henüz token değil (bkz. Token'lar → Açık
+Kararlar).
 
 ## 10. Storybook kapsamı
 

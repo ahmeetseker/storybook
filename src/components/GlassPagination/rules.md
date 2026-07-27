@@ -113,8 +113,13 @@ Varsayılan kombinasyon: `size=md`, `siblingCount=1`, `tone=auto`.
 | item | focus outline | `--lg-accent` |
 | ellipsis | min-width | `--lg-space-6` |
 
-Borç: hover zemini `rgba(255,255,255,.28)` (GlassTabs ile aynı raw değer),
-opacity değerleri (.75/.55/.35) raw.
+**Borç (raw / mikro-geometri):** öğe arası boşluk ve hover zemini component
+kökünde yerel değişkende toplandı — `.pagination { --item-gap: 2px;
+--hover-wash: rgba(255, 255, 255, 0.28); }`. `--item-gap` (2px) token
+karşılığı yok (`--lg-space-1` = 4px, yuvarlanmadı); `--hover-wash` GlassTabs
+ile aynı bilinçli beyaz-alfa malzeme etkisi — token karşılığı yok,
+`color-mix`'e çevrilmedi. Opacity değerleri (.75/.55/.35) ve geçiş süresi
+(`0.18s ease`) raw kalır — token yok.
 
 ## 10. Storybook kapsamı
 

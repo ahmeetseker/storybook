@@ -1,30 +1,47 @@
 .sidebar {
+  /* Mikro-geometri + beyaz-alfa cam katmanları (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --sidebar-width: 300px;
+  --subtitle-size: 14px;
+  --subtitle-gap: 2px;
+  --item-font: 15.5px;
+  --item-gap: 14px;
+  --touch-target: 44px;
+  --group-gap: 18px;
+  --group-pad-y: 6px;
+  --icon-box: 22px;
+  --icon-size: 18px;
+  --chevron-box: 16px;
+  --chevron-size: 8px;
+  --chevron-stroke: 2px;
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --selected-bg: rgba(255, 255, 255, 0.18);
+  --group-hover-bg: rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: var(--sidebar-width);
   box-sizing: border-box;
-  padding: 20px 12px;
+  padding: var(--lg-space-5) var(--lg-space-3);
 }
 
 .header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
-  padding: 4px 12px 20px;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-1) var(--lg-space-3) var(--lg-space-5);
 }
 
 .title {
   display: block;
-  font-size: 28px;
+  font-size: var(--lg-text-display);
   font-weight: 800;
   letter-spacing: -0.03em; /* SF display tracking */
 }
 
 .subtitle {
   display: block;
-  margin-top: 2px;
-  font-size: 14px;
+  margin-top: var(--subtitle-gap);
+  font-size: var(--subtitle-size);
   opacity: 0.6;
 }
 
@@ -32,42 +49,44 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--item-gap);
   width: 100%;
-  min-height: 44px; /* dokunma hedefi */
-  padding: 0 12px;
+  min-height: var(--touch-target); /* dokunma hedefi */
+  padding: 0 var(--lg-space-3);
   border: none;
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 15.5px;
+  font-size: var(--item-font);
   font-weight: 500;
-  border-radius: 14px;
+  border-radius: var(--lg-radius-media);
   cursor: pointer;
   text-align: left;
 }
-.item:hover {
-  background: rgba(255, 255, 255, 0.08);
+@media (hover: hover) {
+  .item:hover {
+    background: var(--hover-bg);
+  }
 }
 
 .itemHighlight {
   position: absolute;
   inset: 0;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--lg-radius-media);
+  background: var(--selected-bg);
 }
 
 .itemIcon {
   position: relative;
   z-index: 1;
-  width: 22px;
+  width: var(--icon-box);
   display: grid;
   place-items: center;
   flex: none;
 }
 .itemIcon svg {
-  width: 18px;
-  height: 18px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .itemLabel {
@@ -81,7 +100,7 @@
 }
 
 .group {
-  margin-top: 18px;
+  margin-top: var(--group-gap);
 }
 
 .groupHeader {
@@ -93,14 +112,16 @@
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 17px;
+  font-size: var(--lg-text-headline);
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: var(--group-pad-y) var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
   cursor: pointer;
 }
-.groupHeader:hover {
-  background: rgba(255, 255, 255, 0.06);
+@media (hover: hover) {
+  .groupHeader:hover {
+    background: var(--group-hover-bg);
+  }
 }
 
 .groupItems {
@@ -110,16 +131,16 @@
 .chevronBox {
   display: grid;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: var(--chevron-box);
+  height: var(--chevron-box);
 }
 
 /* Aşağı bakan chevron; kapalıyken motion rotate(-90) ile sağa döner */
 .chevron {
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
+  width: var(--chevron-size);
+  height: var(--chevron-size);
+  border-right: var(--chevron-stroke) solid currentColor;
+  border-bottom: var(--chevron-stroke) solid currentColor;
   transform: rotate(45deg) translate(-1px, -1px);
   opacity: 0.6;
 }

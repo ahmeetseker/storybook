@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassScoreMeter } from './GlassScoreMeter'
 
 const meta = {
-  title: 'Components/GlassScoreMeter',
+  title: 'Bileşenler/Veri Gösterimi/GlassScoreMeter',
   component: GlassScoreMeter,
   tags: ['autodocs'],
   args: {

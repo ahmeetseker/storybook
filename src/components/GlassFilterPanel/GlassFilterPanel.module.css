@@ -1,6 +1,11 @@
 /* Filtre paneli: complementary landmark. İçerik katmanı olduğu için varsayılan
    düz yüzey; `glass` yalnız gerçek chrome bağlamında (sayfa başına max 6 cam). */
 .root {
+  /* Yerel değişkenler (token karşılığı yok — bkz. rules.md §9): cam malzeme
+     parametreleri ve başlık kutusu mikro boşluğu. */
+  --glass-filterpanel-blur: 20px;
+  --glass-filterpanel-saturate: 1.6;
+  --glass-filterpanel-heading-gap: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -16,7 +21,7 @@
 .glass {
   background: color-mix(in srgb, var(--lg-surface) 72%, transparent);
   border: 1px solid var(--lg-hairline);
-  backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(var(--glass-filterpanel-blur)) saturate(var(--glass-filterpanel-saturate));
 }
 
 .header {
@@ -30,7 +35,7 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--glass-filterpanel-heading-gap);
 }
 
 .title {
@@ -60,8 +65,10 @@
   cursor: pointer;
 }
 
-.reset:hover {
-  background: color-mix(in srgb, var(--lg-accent) 10%, transparent);
+@media (hover: hover) {
+  .reset:hover {
+    background: color-mix(in srgb, var(--lg-accent) 10%, transparent);
+  }
 }
 
 .reset:focus-visible {

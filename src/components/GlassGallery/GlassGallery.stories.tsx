@@ -12,7 +12,7 @@ const images = [
 ]
 
 const meta = {
-  title: 'Components/GlassGallery',
+  title: 'Bileşenler/Medya ve Harita/GlassGallery',
   component: GlassGallery,
   tags: ['autodocs'],
   args: { onIndexChange: fn() },

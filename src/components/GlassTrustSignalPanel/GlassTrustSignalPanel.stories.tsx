@@ -52,7 +52,7 @@ const sorunluIlanSinyalleri: GlassTrustSignal[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassTrustSignalPanel',
+  title: 'Bileşenler/AI/GlassTrustSignalPanel',
   component: GlassTrustSignalPanel,
   tags: ['autodocs'],
   args: {

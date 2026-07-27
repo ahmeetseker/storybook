@@ -107,11 +107,18 @@ GlassButton sözleşmesine tabidir.
 | avatarFallback (flat) | background | `[data-material='flat']` ile `rgba(0,0,0,.07)` — raw |
 | root | radius | `shape={20}` — `--lg-radius-card` değeriyle aynı, sayısal |
 
-Borç: padding 20px, gap'ler (14/12/6/2/10) raw · avatar 48px raw · font
-boyutları (16 / 12.5 / 16 / 20px) tipografi token'larına bağlı değil · cam
-avatar zemini `rgba(255,255,255,.22)` raw · flat avatar zemini koyu flat
-kartta (`flat + tone="light"`) görünmez kalabilir — yalnız açık flat'e göre
-ayarlı.
+**Borç (raw / mikro-geometri):** birebir karşılığı olanlar token'a bağlandı —
+padding 20px → `--lg-space-5`, identity gap 12px → `--lg-space-3`, baş harf
+17px → `--lg-text-headline`. Token karşılığı olmayanlar component kökünde
+yerel değişkene toplandı: gap'ler (`--card-gap: 14px; --who-gap: 2px;
+--name-gap: 6px; --phone-row-gap: 10px`), avatar (`--avatar-size: 48px` —
+kontrol değil, `--lg-control-lg` bilinçli kullanılmadı), rozet ikonu
+(`--verified-icon: 17px`), ölçek dışı tipografi (`--name-text: 16px;
+--member-text: 12.5px; --masked-text: 16px; --phone-text: 20px`). Bilinçli
+bırakılanlar: cam avatar zemini `rgba(255,255,255,.22)` (beyaz-alfa malzeme
+etkisi, color-mix'e çevrilmez) ve flat avatar zemini `rgba(0,0,0,.07)` —
+birebir renk token'ı yok; flat zemin koyu flat kartta (`flat + tone="light"`)
+görünmez kalabilir, yalnız açık flat'e göre ayarlı.
 
 ## 10. Storybook kapsamı
 

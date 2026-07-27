@@ -150,7 +150,9 @@ export function GlassTable({
   const classes = [styles.wrapper, className].filter(Boolean).join(' ')
 
   return (
-    <div className={classes}>
+    /* Dar ekran çözümü kart modu DEĞİL, yatay kaydırmadır: kaydırma kabı
+       klavyeyle erişilebilir olmalı (tabIndex=0 + :focus-visible halkası). */
+    <div className={classes} tabIndex={0} role="region" aria-label={ariaLabel}>
       <table className={styles.table} aria-label={ariaLabel} {...rest}>
         <thead className={styles.thead}>
           <tr>
@@ -201,7 +203,7 @@ export function GlassTable({
             rows.map((row) => (
               <tr key={row.id} className={styles.tr} data-selected={effectiveSelectedIds.includes(row.id) || undefined}>
                 {selectable ? (
-                  <td className={styles.selectCell} data-label="Seç">
+                  <td className={styles.selectCell}>
                     <GlassCheckbox
                       size="sm"
                       label={<span className={styles.srOnly}>{deriveRowLabel(row, columns)} satırını seç</span>}
@@ -214,7 +216,6 @@ export function GlassTable({
                   <td
                     key={col.key}
                     className={[styles.td, col.align === 'end' ? styles.alignEnd : ''].filter(Boolean).join(' ')}
-                    data-label={col.label}
                   >
                     {row[col.key]}
                   </td>

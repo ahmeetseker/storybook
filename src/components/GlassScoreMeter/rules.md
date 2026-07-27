@@ -135,9 +135,23 @@ katmanı yok.
 | ring/bar aralığı | gap | `--lg-space-2`/`--lg-space-4` | — |
 | ring/bar/badge sayı | font-size | `--lg-text-title` (ring) / `--lg-text-headline` (bar, badge) | — |
 
-**Borç (raw):** ring SVG çapı 96px + stroke-width 8, bar track yüksekliği
-8px — GlassProgress'teki circle/bar ölçek borcuyla aynı gerekçe: gösterge
-kalınlığı/çapı için token yok.
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--gsm-meta-gap: 2px` — ring meta sütununda label/description arası.
+- `--gsm-bar-height: 8px` — bar track kalınlığı.
+
+**Borç (raw, değişkene alınmayan):** ring SVG çapı 96px + stroke-width 8
+(SVG attribute/vektör geometrisi) — GlassProgress'teki circle/bar ölçek
+borcuyla aynı gerekçe: gösterge kalınlığı/çapı için token yok.
+
+**Animasyon notları:**
+- Bar dolgusu genişlik animasyonu KULLANMAZ: dolgu %100 genişlikte, oran
+  inline `transform: scaleX(oran)` ile verilir (`transform-origin:
+  inline-start`, fallback `left center`; track `overflow: hidden`) —
+  animasyon yalnız transform/opacity/filter kuralı.
+- **Bilinçli istisna:** ring `stroke-dashoffset` geçişi KALIR — SVG stroke
+  ofseti paint-only'dir (layout tetiklemez), transform/opacity/filter
+  kuralının SVG karşılığı olarak kabul edilir; `prefers-reduced-motion`
+  altında kapanır.
 
 ## 10. Storybook kapsamı
 
@@ -161,7 +175,7 @@ otomatik doğrulanır (GlassProgress ile aynı karar).
 - [x] otomatik ton eşiği (≥70/40-69/<40) `data-tone`'a yansır
 - [x] `tone` prop'u otomatik eşiği geçersiz kılar
 - [x] ring: SVG 2 circle + dashoffset %50'de çevrenin yarısı
-- [x] bar: fill genişliği value yüzdesiyle birebir
+- [x] bar: fill oranı (`scaleX`) value yüzdesiyle birebir
 - [x] badge: sayı + etiket birlikte render edilir
 - [ ] reduced-motion'da transition kapanması (visual)
 
@@ -186,6 +200,12 @@ bu component `material`/tema `tone` eksenini hiç kullanmadığından pratikte
 
 ## Changelog
 
+- 2026-07-24: Uyum düzeltmesi — bar dolgusu `transition: width` + inline
+  `width` yerine %100 genişlik + `transform: scaleX(oran)` tekniğine taşındı
+  (paint-only animasyon); ring `stroke-dashoffset` geçişi bilinçli istisna
+  olarak korundu (§9 notu); mikro-geometri (`2px` meta gap, `8px` bar
+  yüksekliği) `.root` üzerinde yerel değişkenlere toplandı. Bar genişlik
+  testi scaleX'e göre güncellendi.
 - 2026-07-17: İlk sürüm — ring/bar/badge varyantları, otomatik/override renk
   eşiği, `role="meter"` sözleşmesi, 4'lü grid kompozisyon story'si.
 - 2026-07-17: fix — `value` `NaN`/`Infinity` gelirse clamp öncesi 0'a

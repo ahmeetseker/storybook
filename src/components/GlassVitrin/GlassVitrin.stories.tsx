@@ -43,7 +43,7 @@ const demoItems = (n: number): GlassVitrinItem[] =>
   })
 
 const meta = {
-  title: 'Components/GlassVitrin',
+  title: 'Bileşenler/Vitrin ve Yerleşim/GlassVitrin',
   component: GlassVitrin,
   parameters: { layout: 'padded' },
   tags: ['autodocs'],

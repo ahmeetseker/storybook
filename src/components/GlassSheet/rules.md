@@ -97,8 +97,20 @@ Başlık kısa isim ("Filtreler"); durak sayısı 2–3'ü geçmemeli.
 | tutamaç barı | renk | `--lg-label` %25 |
 | focus | outline | `--lg-accent` |
 
-Borç: `z-index: 1000` raw (GlassDrawer ile aynı) · backdrop `rgba(0,0,0,.4)`
-raw (aynı borç) · kalınlaşma katsayıları (72/24, 14/10) component'e özgü.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
+kökünde yerel değişkene toplandı — `.root { --backdrop-blur: 8px;
+--grabber-min-h: 28px; --grabber-bar-w: 36px; --grabber-bar-h: 5px;
+--sheet-max-w: 560px; --sheet-side-inset: 48px; }` (tutamaç 28px kontrol
+ölçeğine uymuyor — control token'ı verilmedi; 48px kenar payı boşluk
+ölçeğinde yok ve kontrol geometrisi değil). Bilinçli bırakılanlar:
+`z-index: 1000` raw (GlassDrawer ile aynı — z-scale token'ı yok) · backdrop
+`rgba(0,0,0,.4)` raw (--lg-scrim alfa .55 ile birebir değil, overlay scrim
+token'ı bekliyor) · kalınlaşan panel gölgesi
+`0 -12px 48px rgba(0,0,0,calc(...))` component'e özgü dinamik desen — hiçbir
+gölge token'ıyla eşleşmez, dokunulmadı · kalınlaşma katsayıları (72/24,
+14/10) ve duraklar arası `height` transition'ı (`0.38s
+cubic-bezier(0.32,0.72,0,1)`) bilinçli istisna (bkz. Açık kararlar) —
+süre/easing token'ı da yok.
 
 ## 10. Storybook kapsamı
 

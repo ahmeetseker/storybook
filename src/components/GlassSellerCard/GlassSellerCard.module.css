@@ -1,21 +1,32 @@
 .card {
+  /* Mikro-geometri / ölçek dışı tipografi (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --card-gap: 14px;
+  --who-gap: 2px;
+  --name-gap: 6px;
+  --phone-row-gap: 10px;
+  --avatar-size: 48px;
+  --verified-icon: 17px;
+  --name-text: 16px;
+  --member-text: 12.5px;
+  --masked-text: 16px;
+  --phone-text: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--card-gap);
   box-sizing: border-box;
-  padding: 20px;
+  padding: var(--lg-space-5);
 }
 
 .identity {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--lg-space-3);
 }
 
 .avatar,
 .avatarFallback {
-  width: 48px;
-  height: 48px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 50%;
   flex: none;
 }
@@ -23,8 +34,8 @@
 .avatarFallback {
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.22);
-  font-size: 17px;
+  background: rgba(255, 255, 255, 0.22); /* Bilinçli raw: beyaz-alfa cam malzeme etkisi */
+  font-size: var(--lg-text-headline);
   font-weight: 700;
   letter-spacing: 0.02em;
   user-select: none;
@@ -37,15 +48,15 @@
 .who {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--who-gap);
   min-width: 0;
 }
 
 .name {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 16px;
+  gap: var(--name-gap);
+  font-size: var(--name-text);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -56,12 +67,12 @@
   color: var(--lg-accent, #0a84ff);
 }
 .verified svg {
-  width: 17px;
-  height: 17px;
+  width: var(--verified-icon);
+  height: var(--verified-icon);
 }
 
 .member {
-  font-size: 12.5px;
+  font-size: var(--member-text);
   opacity: 0.6;
 }
 
@@ -69,11 +80,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--phone-row-gap);
 }
 
 .phoneMasked {
-  font-size: 16px;
+  font-size: var(--masked-text);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
@@ -81,10 +92,12 @@
 }
 
 .phone {
-  font-size: 20px;
+  font-size: var(--phone-text);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: inherit;
   text-decoration: none;
 }
-.phone:hover { text-decoration: underline; }
+@media (hover: hover) {
+  .phone:hover { text-decoration: underline; }
+}

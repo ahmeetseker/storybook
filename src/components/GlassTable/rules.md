@@ -124,11 +124,12 @@ callback'i tetikler).
   birlikte controlled) tek desteklenen controlled kullanım şeklidir.
 - **Sticky header:** `th` `position: sticky; top: 0`; en yakın kaydıran
   ata (sarmalayıcı `div` veya sayfa) üzerinde çalışır — ek prop gerekmez.
-- **Responsive:** 700px altında `<thead>` `display: none` ile tamamen
-  kaldırılır (DOM'da kalır ama render edilmez, erişilebilirlik ağacından ve
-  Tab sırasından çıkar), satırlar blok karta düşer, her `<td>` `data-label`
-  attribute'undan `::before` ile etiketini gösterir (bkz. §9 borç). Bilinen
-  kısıt: mobilde sort butonları da bu şekilde erişilemez olur — bkz. §12.
+- **Responsive:** breakpoint YOK — tablo her genişlikte tablo kalır. Dar
+  ekran çözümü sarmalayıcının yatay kaydırmasıdır (`overflow-x: auto`):
+  `thead`, sıralama butonları ve tümünü-seç checkbox'ı her genişlikte DOM'da
+  ve Tab sırasında kalır (fonksiyon kaybı yok). Kaydırma kabı `tabIndex=0` +
+  `role="region"` (`aria-label` tablodan aynı) ile klavyeyle kaydırılabilir;
+  standart `:focus-visible` halkası taşır.
 
 ## 8. İçerik kuralları
 
@@ -153,11 +154,17 @@ callback'i tetikler).
 | sort buton focus | outline | `--lg-accent` | yalnız `:focus-visible` |
 | td/th padding, font | boşluk/tipografi | `--lg-space-*` / `--lg-text-*` | — |
 
-**Borç (raw):** `sortIcon` 10×10px SVG ikon ölçüsü ve `viewBox` koordinatları
-· mobil kart kırılım noktası 700px (spec'in kendisi) · sr-only clip tekniği
-(diğer component'lerle aynı raw değerler — GlassLink/GlassRadioGroup'ta da
-mevcut, ortak yardımcıya taşınmadı) · `.selectCell` `width: 1%` (intrinsic
-genişlik hack'i, token yok).
+**Borç (mikro-geometri, `.wrapper` üzerinde yerel değişken):**
+- `--gt-sort-icon-size: 10px` — sıralama ikonu kutusu (ikon boyutu için
+  token yok).
+
+**Borç (raw, değişkene alınmayan):** `sortIcon` `viewBox` koordinatları
+(vektör geometrisi) · sr-only clip tekniği (diğer component'lerle aynı raw
+değerler — GlassLink/GlassRadioGroup'ta da mevcut, ortak yardımcıya
+taşınmadı) · `.selectCell` `width: 1%` (intrinsic genişlik hack'i, token yok).
+2026-07-24: `pointer: coarse` sıralama butonu min-height'ı (44px)
+`--lg-control-md`'ye bağlandı — coarse'ta birebir 44px, dokunmatikte
+büyüme tasarımın istediği davranıştır.
 
 ## 10. Storybook kapsamı
 

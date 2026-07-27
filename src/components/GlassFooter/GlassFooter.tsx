@@ -1,44 +1,44 @@
 // İçerik katmanı footer'ı — her zaman flat. Beş yerleşim varyantı.
-import type { MouseEvent, ReactNode } from 'react'
-import styles from './GlassFooter.module.css'
+import type { MouseEvent, ReactNode } from "react";
+import styles from "./GlassFooter.module.css";
 
 export interface GlassFooterLinkItem {
-  label: string
-  onClick?: () => void
-  href?: string
+  label: string;
+  onClick?: () => void;
+  href?: string;
 }
 
 export interface GlassFooterColumn {
-  title: string
-  links: GlassFooterLinkItem[]
+  title: string;
+  links: GlassFooterLinkItem[];
 }
 
 export interface GlassFooterProps {
   /** columns/cta/newsletter varyantlarında sütun grupları; slim/centered'da satıra düzleştirilir */
-  columns?: GlassFooterColumn[]
+  columns?: GlassFooterColumn[];
   /** Telif + yasal satır — zorunlu */
-  legal: ReactNode
+  legal: ReactNode;
   /** Yalnız variant="cta": üst bant içeriği */
-  cta?: ReactNode
+  cta?: ReactNode;
   /** Logo/marka bloğu */
-  brand?: ReactNode
+  brand?: ReactNode;
   /** Sosyal linkler satırı */
-  social?: ReactNode
+  social?: ReactNode;
   /** Yalnız variant="newsletter": kayıt formu slotu */
-  newsletter?: ReactNode
-  variant?: 'columns' | 'slim' | 'cta' | 'centered' | 'newsletter'
+  newsletter?: ReactNode;
+  variant?: "columns" | "slim" | "cta" | "centered" | "newsletter";
 }
 
 function FootLink({ link }: { link: GlassFooterLinkItem }) {
   const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (!link.href) e.preventDefault()
-    link.onClick?.()
-  }
+    if (!link.href) e.preventDefault();
+    link.onClick?.();
+  };
   return (
-    <a href={link.href ?? '#'} onClick={onClick} className={styles.link}>
+    <a href={link.href ?? "#"} onClick={onClick} className={styles.link}>
       {link.label}
     </a>
-  )
+  );
 }
 
 export function GlassFooter({
@@ -48,9 +48,9 @@ export function GlassFooter({
   brand,
   social,
   newsletter,
-  variant = 'columns',
+  variant = "columns",
 }: GlassFooterProps) {
-  const flatLinks = columns.flatMap((c) => c.links)
+  const flatLinks = columns.flatMap((c) => c.links);
 
   const inlineNav = flatLinks.length ? (
     <nav aria-label="Alt bilgi">
@@ -62,9 +62,9 @@ export function GlassFooter({
         ))}
       </ul>
     </nav>
-  ) : null
+  ) : null;
 
-  if (variant === 'slim') {
+  if (variant === "slim") {
     return (
       <footer className={styles.root} data-variant={variant}>
         <div className={`${styles.inner} ${styles.slimInner}`}>
@@ -72,10 +72,10 @@ export function GlassFooter({
           {inlineNav}
         </div>
       </footer>
-    )
+    );
   }
 
-  if (variant === 'centered') {
+  if (variant === "centered") {
     return (
       <footer className={styles.root} data-variant={variant}>
         <div className={`${styles.inner} ${styles.centeredInner}`}>
@@ -85,18 +85,18 @@ export function GlassFooter({
           <span className={styles.legal}>{legal}</span>
         </div>
       </footer>
-    )
+    );
   }
 
   return (
     <footer className={styles.root} data-variant={variant}>
       <div className={styles.inner}>
-        {variant === 'cta' && cta ? (
+        {variant === "cta" && cta ? (
           <div className={styles.ctaBand} data-footer-cta>
             {cta}
           </div>
         ) : null}
-        {variant === 'newsletter' && newsletter ? (
+        {variant === "newsletter" && newsletter ? (
           <div className={styles.newsletterBand} data-footer-newsletter>
             {newsletter}
           </div>
@@ -109,7 +109,7 @@ export function GlassFooter({
                 {columns.map((col) => (
                   <div key={col.title} className={styles.column}>
                     <span className={styles.columnTitle}>{col.title}</span>
-                    <ul className={styles.columnList}>
+                    <ul className={styles.columnList} aria-label={col.title}>
                       {col.links.map((link) => (
                         <li key={link.label}>
                           <FootLink link={link} />
@@ -128,5 +128,5 @@ export function GlassFooter({
         </div>
       </div>
     </footer>
-  )
+  );
 }

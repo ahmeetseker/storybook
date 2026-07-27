@@ -98,7 +98,13 @@ etiket koyulmaz.
 | aralık | gap | `--lg-space-2` |
 | focus | outline | `--lg-accent` |
 
-Borç: buton hover beyazı raw (GlassButton ile aynı borç).
+**Borç (raw / mikro-geometri):** glyph ikon boyutları (14/16/18px) ve değer
+rozetinin dikey dolgusu (2px) token karşılığı olmadığından component kökünde
+yerel değişken olarak toplandı (`.root { --glyph-sm: 14px; --glyph-md: 16px;
+--glyph-lg: 18px; --value-pad-block: 2px; }`); buton hover beyazı
+`rgba(255,255,255,0.55)` bilinçli beyaz-alfa malzeme etkisi (GlassButton ile
+aynı borç), token'a bağlanmadı; geçiş süresi/easing (`0.16s ease-out`) süre
+token'ı olmadığından raw.
 
 ## 10. Storybook kapsamı
 

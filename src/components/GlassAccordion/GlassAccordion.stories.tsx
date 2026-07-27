@@ -68,7 +68,7 @@ const sikSorulanSorular: GlassAccordionItem[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassAccordion',
+  title: 'Bileşenler/Veri Gösterimi/GlassAccordion',
   component: GlassAccordion,
   tags: ['autodocs'],
   args: { items: sikSorulanSorular, 'aria-label': 'Sık sorulan sorular', onOpenIdsChange: fn() },

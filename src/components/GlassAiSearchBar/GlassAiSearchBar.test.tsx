@@ -95,6 +95,22 @@ describe('GlassAiSearchBar', () => {
     expect(sameLiveRegion?.textContent).toContain('Düşünüyor…')
   })
 
+  it('harici duyuru modunda düşünme metnini korur ama live-region sahipliğini parenta bırakır', () => {
+    const { container } = renderBar({
+      loading: true,
+      announcementMode: 'external',
+    })
+    const input = screen.getByRole('searchbox')
+    const descriptionId = input.getAttribute('aria-describedby')
+
+    expect(container.querySelector('[aria-live="polite"]')).toBeNull()
+    expect(screen.getByText('Düşünüyor…')).toBeTruthy()
+    expect(descriptionId).toBeTruthy()
+    expect(document.getElementById(descriptionId!)?.textContent).toContain(
+      'Düşünüyor…',
+    )
+  })
+
   it('Escape ile öneri listesi kapanınca event propagation durdurulur (üst katman dock kapanmamalı)', () => {
     const onOuterKeyDown = vi.fn()
     render(

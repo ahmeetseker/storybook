@@ -32,7 +32,7 @@ function popupFor(pinId: string) {
 }
 
 const meta = {
-  title: 'Components/GlassMap',
+  title: 'Bileşenler/Medya ve Harita/GlassMap',
   component: GlassMap,
   parameters: { layout: 'padded' },
   tags: ['autodocs'],

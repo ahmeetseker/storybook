@@ -102,10 +102,17 @@ tooltip'i de aynı metni gösterir. Boş `children` verilmesi sözleşme ihlalid
 | pressed/hover-tint | background | `--glass-tint` ← `tint` prop'u |
 | root | font | miras (`font: inherit`) |
 
-Borç: hover beyazı `rgba(255,255,255,.94)`, ikon font-size'ları (14/17/20px),
-color-mix yüzdeleri (%65–85) ve hover
-gölgesi raw. Hover gölgesinde `!important` var (GlassSurface inline
-box-shadow'unu ezmek için) — kırılgan, bkz. Bilinen kısıtlar.
+**Borç (raw / mikro-geometri):** ikon glyph boyutları 14/20px token
+karşılığı olmadığından kökte yerel değişkenlerde toplandı
+(`.button { --icon-font-sm: 14px; --icon-font-lg: 20px; }`); md'nin 17px'i
+birebir `--lg-text-headline`'a bağlandı. Bilinçli raw bırakılanlar: tvOS
+hover beyazı `rgba(255,255,255,.94)` + koyu ikon `rgba(0,0,0,.85)` + `#fff`
+active zemini + aktif-hover `color-mix(%75, #ffffff)`/`#fff` metinleri —
+opak malzeme etkisi, tema token'ına bağlanmaz (değer değiştirilmedi); hover
+gölgesi `0 10px 26px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.45)`
+shadow token'larıyla birebir eşleşmiyor. Hover gölgesinde `!important` var
+(GlassSurface inline box-shadow'unu ezmek için) — kırılgan, bkz. Bilinen
+kısıtlar. Süre/easing (`0.16s ease-out`) raw — token yok.
 
 ## 10. Storybook kapsamı
 

@@ -29,6 +29,7 @@ Font: **Manrope Variable** (`--lg-font`, self-host `@fontsource-variable/manrope
 
 | Token | Değer | Ağırlık kuralı |
 |---|---|---|
+| `--lg-text-badge` | 11px | 600 — yalnız rozet/mini etiket (AI rozeti, sayaç); gövde metni asla |
 | `--lg-text-caption` | 12px | 500 |
 | `--lg-text-footnote` | 13px | 400 |
 | `--lg-text-body` | 15px | 400 |
@@ -48,6 +49,28 @@ Font: **Manrope Variable** (`--lg-font`, self-host `@fontsource-variable/manrope
 | `--lg-radius-capsule` | 999px | Buton, badge, tab bar |
 
 Keyfî radius verilmez; `shape` prop'u yalnız bu ölçekten değer alır.
+Tam daire gereken kare öğelerde (nokta, pin, avatar) `border-radius: 50%` yerine
+`--lg-radius-capsule` kullanılır — kare kutuda aynı görsel sonucu verir.
+
+## Etkileşim
+
+| Token | Değer | Kullanım |
+|---|---|---|
+| `--lg-focus-ring-width` | 2px | Yalnız `:focus-visible` odak halkası |
+| `--lg-focus-ring-offset` | 2px | Odak halkasının kontrol sınırından uzaklığı |
+
+## Gölge
+
+| Token | Kullanım |
+|---|---|
+| `--lg-shadow-xs` | İnce ayrım — input, satır vurgusu |
+| `--lg-shadow-sm` | Kart hover, tooltip |
+| `--lg-shadow-md` | Yüzen panel, popover, dock |
+| `--lg-shadow-lg` | Overlay — modal, command palette |
+
+Component CSS'inde raw `box-shadow: … rgba(…)` yazılmaz; koyu temada
+token'lar otomatik koyulaşır. (İç ışıma `inset` katmanları cam malzemenin
+parçasıdır ve `GlassSurface`'ta yaşar — bu ölçeğin dışındadır.)
 
 ## Boşluk
 

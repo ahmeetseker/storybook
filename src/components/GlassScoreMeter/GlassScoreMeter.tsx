@@ -119,7 +119,13 @@ export function GlassScoreMeter({
             </span>
           </span>
           <span className={styles.barTrack}>
-            <span className={styles.barFill} style={{ width: `${clamped}%` }} />
+            {/* Genişlik animasyonu yerine paint-only scaleX — bar %100
+                genişlikte, oran transform ile verilir (tasarım sistemi
+                animasyon kuralı). */}
+            <span
+              className={styles.barFill}
+              style={{ transform: `scaleX(${clamped / 100})` }}
+            />
           </span>
           {showDescription ? (
             <span id={descId} className={styles.description}>

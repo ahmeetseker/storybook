@@ -14,7 +14,7 @@ const mutfakOzellikleri: GlassPhotoFeatureOverlayFeature[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassPhotoFeatureOverlay',
+  title: 'Bileşenler/Medya ve Harita/GlassPhotoFeatureOverlay',
   component: GlassPhotoFeatureOverlay,
   tags: ['autodocs'],
   args: {

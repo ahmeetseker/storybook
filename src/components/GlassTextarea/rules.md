@@ -94,7 +94,17 @@ Karakter sınırı gösterimi çağıranın işi (Açık Kararlar: sayaç slotu)
 | root | invalid çerçeve | `--lg-danger` |
 | textarea | font-size (≥sm) | `--lg-text-footnote/body/headline` |
 | placeholder | color | `--lg-label-secondary` |
-| textarea | padding | boyuta özel raw px (borç) |
+| textarea | padding | md `--lg-space-2/3`, lg `--lg-space-3/4`; sm yerel değişken |
+
+**Borç (raw / mikro-geometri):** md/lg padding'leri birebir space token'larına
+bağlandı (`8px 12px` → `--lg-space-2/3`, `12px 16px` → `--lg-space-3/4`);
+token karşılığı olmayanlar kökte yerel değişkenlerde toplandı: `--pad-y-sm` /
+`--pad-x-sm` (6px/10px — ölçekte yok), `--ios-min-font` (16px — iOS Safari
+zoom eşiği, platform sabiti, <bp-sm tüm boyutlarda). Bilinçli bırakılan:
+invalid gölge deseni `inset 0 0 0 1.5px var(--lg-danger) + 0 4px 16px
+rgba(0,0,0,.12)` shadow token'larıyla birebir eşleşmediğinden raw kaldı
+(`!important` GlassSurface inline gölgesini ezmek için). Süre/easing
+(`0.16s ease-out`) raw — token yok.
 
 ## 10. Storybook kapsamı
 

@@ -75,7 +75,9 @@ Varsayılan kombinasyon: `size=md`, cam, nötr.
 
 - Keyboard: Enter/Space aktive eder (native). Focus halkası yalnız klavyede.
 - `prefers-reduced-motion`: spring'ler ve hover scale kapalı; renk geçişi kalır.
-- Touch: `touch-action: manipulation`; yükseklik dokunmatikte min 44px (md).
+- Touch: `touch-action: manipulation`; yükseklik dokunmatikte TÜM boylarda min
+  44px — `sm` coarse'ta `--lg-control-md`'ye yükselir (token'ı 36px'te kalırdı),
+  md/lg/xl coarse token'larıyla zaten 44px+.
 
 ## 8. İçerik
 
@@ -92,8 +94,11 @@ Tek satır; uzun metin taşarsa buton büyür, kırpma yapılmaz — çağıran 
 | prominent | background | `--glass-tint` ← `--lg-accent` |
 | root | font | miras (`--lg-font`) |
 
-Borç: hover beyazı (`rgba(255,255,255,.94)`) ve boyut padding'leri raw — token'a
-bağlanmaları değerlendirilecek.
+Boyut rampası `--lg-space-*`, `--lg-text-*`, `--lg-control-*` ve
+`--lg-focus-ring-width` bileşimlerinden üretilir. Prominent durumda normal,
+hover ve loading metni daima `--lg-accent-contrast` kullanır; hover arka planı
+opak `--glass-tint` / `--lg-accent` olur. Böylece Kağıt ve Grafit temada metin
+kontrastı durum değişiminde bozulmaz.
 
 ## 10. Storybook kapsamı
 

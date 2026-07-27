@@ -7,7 +7,7 @@ import { placeholderImage } from '../../demo/placeholderImage'
 const avatar = (initials: string, from: string, to: string) => placeholderImage(initials, from, to, 160, 160)
 
 const meta = {
-  title: 'Components/GlassReviewCard',
+  title: 'Bileşenler/Pazar Yeri/GlassReviewCard',
   component: GlassReviewCard,
   tags: ['autodocs'],
   args: {

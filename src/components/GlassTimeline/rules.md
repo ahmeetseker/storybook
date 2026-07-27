@@ -58,7 +58,7 @@ veya düzenleme taşımaz.
 | rail (nokta+çizgi) | Yalnız `variant="line"` | ton renkli nokta, opsiyonel `icon`, dikey bağlantı çizgisi | `aria-hidden`; son olayda bağlantı çizgisi render edilmez |
 | compact nokta | Yalnız `variant="compact"` | ton renkli küçük nokta | `aria-hidden` |
 | date | ✅ | `event.date` | tabular-nums, küçük/ikincil |
-| title | ✅ | `event.title` + (tone'luysa) sr-only durum eki | 14px/600, birincil label rengi |
+| title | ✅ | `event.title` + (tone'luysa) sr-only durum eki | `--lg-text-body`/600, birincil label rengi |
 | description | Yalnız `variant="line"` ve `event.description` verilmişse | `event.description` | `variant="compact"`'ta render EDİLMEZ (spec: "yalnız tarih+başlık") |
 | emptyState | Yalnız `events.length === 0` | `emptyState` prop'u ya da varsayılan metin | Liste hiç render edilmez, `role="list"` yok |
 
@@ -158,12 +158,16 @@ marker'da aynı formül ikonun `color`'ına uygulanır (zemin tint'i dekoratif
 kaldığı için ham renkte bırakılabilir — kontrast hedefi anlam taşıyan
 grafiğe, yani ikonun kendisine bakar).
 
-**Borç (raw):** `.title` font-size `14px` (spec sabiti, `--lg-text-*`
-ölçeğinde 13/15 var ama 14 yok), nokta çapları `10px`/`8px`/`22px` ve
-bağlantı çizgisi genişliği `2px` (tasarım sistemi ölçek token'ı yok, spec
-görsel sabiti), ton koyulaştırma karışım oranı `68%` (spec görsel sabiti —
-`--lg-*` ölçeğinde bir "kontrast karışım oranı" token'ı yok, 65-70% aralığı
-kontrat notundan; bkz. yukarıdaki kontrast notu).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan görsel sabitler
+component kökünde yerel değişken olarak toplanır (görsel değer değişmedi):
+`--tl-rail-w: 24px` · `--tl-marker-size: 10px` · `--tl-marker-icon-size:
+22px` · `--tl-marker-glyph: 13px` (marker içi SVG ikon) · `--tl-marker-offset:
+6px` · `--tl-connector-w: 2px` · `--tl-dot-size: 8px` · `--tl-dot-offset:
+7px` · `--tl-text-gap: 2px`. Ayrıca ton
+koyulaştırma karışım oranı `68%` (spec görsel sabiti — `--lg-*` ölçeğinde
+"kontrast karışım oranı" token'ı yok; bkz. yukarıdaki kontrast notu).
+2026-07-24: `.title` font-size borcu `--lg-text-body`'ye taşınarak kapandı
+(14→15px, ≤1.5px kabul aralığında).
 
 ## 10. Storybook kapsamı
 
@@ -236,3 +240,8 @@ doğarsa `event.dateTime?: string` opsiyonel bir alan olarak eklenip
   var(--lg-label))` kullanır — açık temada ~2.2–3.6:1 olan kontrast
   ~3.9–5.9:1'e çıkarılarak WCAG non-text ≥3:1 eşiği karşılandı (bkz. §9).
   İki davranış fix'i için de regresyon testi eklendi (§11).
+- 2026-07-24: Tasarım sistemi uyum düzeltmesi — `.title` font-size
+  `--lg-text-body`'ye taşındı (14→15px); `@media (max-width: 360px)` padding
+  daraltması kaldırıldı (içsel akış kuralı — breakpoint yok); marker/nokta/
+  ray/bağlantı çizgisi mikro-geometrisi component kökünde yerel `--tl-*`
+  değişkenlerinde toplandı (görsel değer değişmedi, bkz. §9 borç notu).

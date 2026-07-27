@@ -1,14 +1,24 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --ts-chip-pad-block: 6px;
+  --ts-chip-pad-inline: 14px;
+  --ts-chip-gap: 2px;
+  --ts-strip-pad-b: 2px;
+  --ts-check-size: 40px;
+  --ts-check-glyph: 18px;
+  --ts-max-w: 460px;
+  --ts-max-w-compact: 300px;
+  --ts-slot-min: 76px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-5, 20px);
   box-sizing: border-box;
   padding: var(--lg-space-5, 20px);
-  max-width: 460px;
+  max-width: var(--ts-max-w);
 }
 
 .compact {
-  max-width: 300px;
+  max-width: var(--ts-max-w-compact);
 }
 
 .section {
@@ -19,7 +29,7 @@
 }
 
 .sectionTitle {
-  font-size: 13px;
+  font-size: var(--lg-text-footnote, 13px);
   font-weight: 700;
   letter-spacing: -0.01em;
   opacity: 0.7;
@@ -31,7 +41,7 @@
   display: flex;
   gap: var(--lg-space-2, 8px);
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding-bottom: var(--ts-strip-pad-b);
   scrollbar-width: none;
 }
 .daysStrip::-webkit-scrollbar {
@@ -43,9 +53,9 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: var(--ts-chip-gap);
   min-height: var(--lg-control-sm, 32px);
-  padding: 6px 14px;
+  padding: var(--ts-chip-pad-block) var(--ts-chip-pad-inline);
   border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
   border-radius: var(--lg-radius-chip, 10px);
   background: var(--lg-surface, #fff);
@@ -54,14 +64,14 @@
   cursor: pointer;
   white-space: nowrap;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.16s ease-out, border-color 0.16s ease-out, color 0.16s ease-out;
+  /* transition yok: renk değişimi anlıktır — animasyon yalnız transform/opacity/filter kuralı */
 }
 .dayChipLabel {
-  font-size: 14px;
+  font-size: var(--lg-text-body, 15px);
   font-weight: 700;
 }
 .dayChipMeta {
-  font-size: 11.5px;
+  font-size: var(--lg-text-caption, 12px);
   opacity: 0.65;
   font-variant-numeric: tabular-nums;
 }
@@ -89,7 +99,7 @@
 
 .slotGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--ts-slot-min), 1fr));
   gap: var(--lg-space-2, 8px);
 }
 
@@ -99,7 +109,7 @@
 
 .slot {
   min-height: var(--lg-control-sm, 32px);
-  padding: 0 12px;
+  padding: 0 var(--lg-space-3, 12px);
   border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
   border-radius: var(--lg-radius-chip, 10px);
   background: var(--lg-surface, #fff);
@@ -109,7 +119,7 @@
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.16s ease-out, border-color 0.16s ease-out, color 0.16s ease-out, opacity 0.16s ease-out;
+  transition: opacity 0.16s ease-out; /* yalnız opacity — animasyon transform/opacity/filter kuralı */
 }
 .slot:focus-visible {
   outline: 2px solid var(--lg-accent, #b45309);
@@ -134,7 +144,7 @@
 
 .empty {
   margin: 0;
-  font-size: 13.5px;
+  font-size: var(--lg-text-footnote, 13px);
   opacity: 0.65;
 }
 
@@ -161,26 +171,26 @@
 .checkIcon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: var(--ts-check-size);
+  height: var(--ts-check-size);
+  border-radius: var(--lg-radius-capsule, 999px);
   background: var(--lg-success, #34c759);
   color: var(--lg-on-scrim, #ffffff);
-  font-size: 18px;
+  font-size: var(--ts-check-glyph);
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: var(--lg-space-1, 4px);
 }
 
 .confirmTitle {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--lg-text-headline, 17px);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .confirmSummary {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--lg-text-body, 15px);
   opacity: 0.75;
   font-variant-numeric: tabular-nums;
 }
@@ -200,9 +210,9 @@
 .resetLink {
   border: none;
   background: none;
-  padding: 4px 8px;
+  padding: var(--lg-space-1, 4px) var(--lg-space-2, 8px);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--lg-text-footnote, 13px);
   font-weight: 600;
   color: var(--lg-accent, #b45309);
   cursor: pointer;
@@ -224,12 +234,12 @@
   .dayChip,
   .slot,
   .resetLink {
-    min-height: 44px;
+    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi */
+    min-height: var(--lg-control-md);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dayChip,
   .slot {
     transition: none;
   }

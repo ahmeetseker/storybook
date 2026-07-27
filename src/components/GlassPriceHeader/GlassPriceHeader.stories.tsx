@@ -11,7 +11,7 @@ const HeartIcon = () => (
 )
 
 const meta = {
-  title: 'Components/GlassPriceHeader',
+  title: 'Bileşenler/Pazar Yeri/GlassPriceHeader',
   component: GlassPriceHeader,
   tags: ['autodocs'],
   argTypes: { priceTint: { control: 'color' } },

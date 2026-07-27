@@ -184,12 +184,20 @@ bastırır (üstte). Geri bildirim seçimi salt görsel/yerel state — dışar�
 | feedbackButton (seçili) | border/background/color | `color-mix(... var(--lg-accent) ...)` | `aria-pressed` |
 | placeholderBar/placeholderIcon | background | `--lg-hairline` | `aria-busy` altında opacity animasyonu |
 
-**Borç (raw):** durum ikonu 24×24 — GlassScoreMeter'ın ring stroke-width
-borcuyla aynı gerekçe: gösterge çapı için token yok. AI rozeti `font-size:
-10.5px` — kontratın kendisinde sabitlenmiş literal değer (token değil,
-tasarım sistemi kararı). `aiCorner` 12×12/`font-size: 8px` — aynı gerekçeyle
-köşe rozetine özgü küçültülmüş literal (aiBadge'in 24×24 ikona sığacak
-ölçeği).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan görsel sabitler
+component kökünde yerel değişken olarak toplanır (görsel değer değişmedi):
+`--tsp-icon-size: 24px` (durum ikonu + placeholder ikon — GlassScoreMeter'ın
+ring stroke-width borcuyla aynı gerekçe: gösterge çapı için token yok) ·
+`--tsp-icon-offset: 1px` · `--tsp-ai-pad-block: 3px` · `--tsp-corner-size:
+12px` · `--tsp-corner-offset: -4px` · `--tsp-corner-glyph: 8px` ·
+`--tsp-feedback-gap-top: 2px` · `--tsp-ph-bar-h: 12px` ·
+`--tsp-ph-bar-wide-h: 14px` · `--tsp-ph-summary-w: 160px`. 2026-07-24:
+AI rozeti font-size borcu `--lg-text-badge`'e (10.5→11px) taşınarak kapandı;
+`.icon` font-size → `--lg-text-footnote`, font-weight 800→700 (ağırlık
+ölçeği kuralı); feedbackButton font-size → `--lg-text-body` (14→15px); renk
+transition'ları kaldırıldı (animasyon yalnız transform/opacity/filter).
+feedbackButton dokunmatik hedefi pointer:coarse'ta `--lg-control-md`
+token'ından gelir (coarse'ta 44px — birebir eski raw değer).
 
 ## 10. Storybook kapsamı
 
@@ -249,6 +257,12 @@ sapma — burada tekrar tıklama serbest) · `status` renginin override edilebil
 olup olmaması (şimdilik kapalı, ClimateRiskPanel kararıyla tutarlı).
 
 ## Changelog
+
+- 2026-07-24: Tasarım sistemi uyum düzeltmesi — AI rozeti →
+  `--lg-text-badge`, `.icon` → `--lg-text-footnote`/700, feedbackButton →
+  `--lg-text-body`; aiCorner/placeholder/ikon mikro-geometrisi kök
+  `--tsp-*` değişkenlerinde toplandı (görsel değer değişmedi); renk
+  transition'ları kaldırıldı (yalnız transform/opacity/filter animlanır).
 
 - 2026-07-17: Code review düzeltmeleri — `compact` varyantı artık `aiGenerated`
   bilgisini hiç atmıyor: ikon köşesinde mini `✦` işareti (`aria-label="Yapay

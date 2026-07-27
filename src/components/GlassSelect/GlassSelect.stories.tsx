@@ -25,14 +25,16 @@ const ilOptions = [
 ]
 
 const meta = {
-  title: 'Components/GlassSelect',
+  title: 'Bileşenler/Form/GlassSelect',
   component: GlassSelect,
   tags: ['autodocs'],
   args: { onChange: fn(), options: vitesOptions, 'aria-label': 'Vites' },
   argTypes: {
+    material: { control: 'select', options: ['glass', 'flat'] },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     invalid: { control: 'boolean' },
     disabled: { control: 'boolean' },
+    'aria-required': { control: 'boolean' },
   },
   // Panel absolute açıldığı için story'lere alt boşluk bırakıyoruz
   decorators: [
@@ -53,7 +55,37 @@ export const Preselected: Story = { args: { defaultValue: 'otomatik' } }
 
 export const Invalid: Story = { args: { placeholder: 'Vites seçin', invalid: true } }
 
+export const Required: Story = {
+  args: { placeholder: 'Vites seçin', 'aria-required': true },
+}
+
 export const Disabled: Story = { args: { placeholder: 'Vites seçin', disabled: true } }
+
+/** Malzeme ekseni trigger ve seçenek panelinde birlikte uygulanır. */
+export const Materials: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--lg-space-3)',
+      }}
+    >
+      <GlassSelect
+        material="glass"
+        aria-label="Cam malzeme"
+        placeholder="Cam malzeme"
+        options={vitesOptions}
+      />
+      <GlassSelect
+        material="flat"
+        aria-label="Düz malzeme"
+        placeholder="Düz malzeme"
+        options={vitesOptions}
+      />
+    </div>
+  ),
+}
 
 /** Devre dışı seçenek: klavye gezinmesi atlar, tıklama seçmez. */
 export const DisabledOption: Story = {
@@ -94,8 +126,8 @@ export const Controlled: Story = {
 }
 
 /**
- * Responsive: bp-sm altında panel listesi max-height %50vh (bottom-sheet hissi,
- * içeride scroll); ≥640px'te 320px'e sabitlenir. Trigger metni mobilde 16px.
+ * Responsive: coarse pointer'da dokunmatik tipografi ve 50vh liste tavanı;
+ * fine pointer'da kontrol token'ından türeyen liste tavanı kullanılır.
  */
 export const Mobile: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },

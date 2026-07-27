@@ -1,5 +1,15 @@
 /* İçerik katmanı FLAT: cam/backdrop-filter yok — yüzey + hairline token'ları. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --tl-rail-w: 24px;
+  --tl-marker-size: 10px;
+  --tl-marker-icon-size: 22px;
+  --tl-marker-glyph: 13px;
+  --tl-marker-offset: 6px;
+  --tl-connector-w: 2px;
+  --tl-dot-size: 8px;
+  --tl-dot-offset: 7px;
+  --tl-text-gap: 2px;
   box-sizing: border-box;
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
@@ -27,7 +37,7 @@
   flex: none;
   flex-direction: column;
   align-items: center;
-  width: 24px;
+  width: var(--tl-rail-w);
 }
 
 .marker {
@@ -35,9 +45,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
+  width: var(--tl-marker-size);
+  height: var(--tl-marker-size);
+  margin-top: var(--tl-marker-offset);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
 }
@@ -57,8 +67,8 @@
 }
 /* İkonlu marker: büyür, ton rengi zemin karışımına döner — ikon rengi tone'u takip eder */
 .marker[data-has-icon] {
-  width: 22px;
-  height: 22px;
+  width: var(--tl-marker-icon-size);
+  height: var(--tl-marker-icon-size);
   margin-top: 0;
   color: var(--lg-label-secondary);
   background: color-mix(in srgb, var(--lg-label-secondary) 14%, var(--lg-surface));
@@ -76,13 +86,13 @@
   background: color-mix(in srgb, var(--lg-danger) 16%, var(--lg-surface));
 }
 .marker svg {
-  width: 13px;
-  height: 13px;
+  width: var(--tl-marker-glyph);
+  height: var(--tl-marker-glyph);
 }
 
 .connector {
   flex: 1 1 auto;
-  width: 2px;
+  width: var(--tl-connector-w);
   min-height: var(--lg-space-4);
   margin-top: var(--lg-space-1);
   background: var(--lg-hairline);
@@ -91,9 +101,9 @@
 /* ── variant="compact": ray yok, yalnız küçük ton noktası ── */
 .compactDot {
   flex: none;
-  width: 8px;
-  height: 8px;
-  margin-top: 7px;
+  width: var(--tl-dot-size);
+  height: var(--tl-dot-size);
+  margin-top: var(--tl-dot-offset);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
 }
@@ -126,15 +136,15 @@
 }
 
 .title {
-  margin: 2px 0 0;
-  font-size: 14px; /* borç: token ölçeğinde yok, bkz. rules.md §9 */
+  margin: var(--tl-text-gap) 0 0;
+  font-size: var(--lg-text-body);
   font-weight: 600;
   color: var(--lg-label);
   overflow-wrap: anywhere;
 }
 
 .description {
-  margin: 2px 0 0;
+  margin: var(--tl-text-gap) 0 0;
   font-size: var(--lg-text-footnote);
   color: var(--lg-label-secondary);
   overflow-wrap: anywhere;
@@ -156,12 +166,4 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-/* Dar konteyner: içerik zaten daralıp sarıyor, ekstra kırılım gerekmiyor —
-   yalnız kök dolgusu daralır. */
-@media (max-width: 360px) {
-  .root {
-    padding: var(--lg-space-4);
-  }
 }

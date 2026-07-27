@@ -211,6 +211,20 @@ const ENTRIES: CatalogEntry[] = [
     status: 'hazır',
     storyPath: '/story/components-glassfooter--default',
   },
+  {
+    name: 'Dock',
+    description: 'Sürekli açık, sabit geometrili cam ikon gezinmesi — aktif rota göstergesi, tooltip ve opsiyonel legacy morph davranışı.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-navigasyon-glassdock--default',
+  },
+  {
+    name: 'Island Header',
+    description: 'Dynamic Island tarzı üst başlık — hover\'da "Şu an" durum chip\'i, tıklamada hızlı gezinme paneli (sayfa kartları → alt navigasyon, extras + arama slotları).',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/components-glassislandheader--default',
+  },
   // ── Overlay ─────────────────────────────────────────────────────────────
   {
     name: 'Dropdown / Menü',

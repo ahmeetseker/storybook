@@ -2,8 +2,8 @@
   position: relative;
   /* Form kontrolleri default blok akışında tam genişlik */
   width: 100%;
-  font-family: var(--lg-font, inherit);
-  color: var(--lg-label, inherit);
+  font-family: var(--lg-font);
+  color: var(--lg-label);
 }
 
 /* ── Trigger ── */
@@ -11,16 +11,25 @@
   display: block;
   width: 100%;
   padding: 0;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip) !important;
+  background: color-mix(in srgb, var(--lg-surface) 92%, transparent);
+  box-shadow: none !important;
   font: inherit;
   color: inherit;
   text-align: left;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: box-shadow 0.16s ease-out;
+}
+.trigger[aria-expanded='true'] {
+  border-color: var(--lg-accent);
 }
 .trigger:focus-visible {
-  outline: 2px solid var(--lg-accent, #0a84ff);
-  outline-offset: 2px;
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+.trigger[data-material='flat'] {
+  background: var(--lg-surface);
 }
 
 /* GlassSurface içeriği .content span'inde sarar; onu flex satırına çevir (yapısal: son çocuk) */
@@ -28,41 +37,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--lg-space-2, 8px);
+  gap: var(--lg-space-2);
   width: 100%;
 }
 
-/* Yükseklikler kontrol token'larından (dokunmatikte otomatik 44px+) */
-.sm { min-height: var(--lg-control-sm, 32px); }
-.md { min-height: var(--lg-control-md, 40px); }
-.lg { min-height: var(--lg-control-lg, 48px); }
-.sm > :last-child { padding: 0 10px; }
-.md > :last-child { padding: 0 12px; }
-.lg > :last-child { padding: 0 16px; }
+/* Yükseklikler kontrol token'larından; dokunmatik ölçüler tema katmanında büyür. */
+.sm { min-height: var(--lg-control-sm); }
+.md { min-height: var(--lg-control-md); }
+.lg { min-height: var(--lg-control-lg); }
+.sm > :last-child { padding: 0 var(--lg-space-3); }
+.md > :last-child { padding: 0 var(--lg-space-3); }
+.lg > :last-child { padding: 0 var(--lg-space-4); }
 
-/* iOS Safari zoom kuralıyla tutarlılık: bp-sm altında 16px, ≥640px'te token ölçeği */
 .value {
-  font-size: 16px;
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* bp-sm */
-@media (min-width: 640px) {
-  .sm .value { font-size: var(--lg-text-footnote, 13px); }
-  .md .value { font-size: var(--lg-text-body, 15px); }
-  .lg .value { font-size: var(--lg-text-headline, 17px); }
+.sm .value { font-size: var(--lg-text-footnote); }
+.md .value { font-size: var(--lg-text-body); }
+.lg .value { font-size: var(--lg-text-headline); }
+
+/* Dokunmatik tarayıcılarda alan odağında otomatik yakınlaştırmayı engeller. */
+@media (pointer: coarse) {
+  .sm .value,
+  .md .value,
+  .lg .value {
+    font-size: var(--lg-text-headline);
+  }
 }
 
 .placeholder {
-  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.45));
+  color: var(--lg-label-secondary);
   font-weight: 400;
 }
 
 .chevron {
   flex: none;
-  color: var(--lg-label-secondary, rgba(0, 0, 0, 0.5));
+  color: var(--lg-label-secondary);
   transition: transform 0.16s ease-out;
 }
 .chevron[data-open] {
@@ -74,11 +87,10 @@
   }
 }
 
-/* GlassSurface gölgeyi inline style ile verdiği için !important şart (GlassButton emsali) */
+/* Invalid, focus halkasını ezmeden yalnız kontrol sınırını değiştirir. */
 .invalid {
-  box-shadow:
-    inset 0 0 0 1.5px var(--lg-danger, #ff3b30),
-    0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  border-color: var(--lg-danger);
+  box-shadow: none !important;
 }
 
 .disabled {
@@ -89,7 +101,7 @@
 /* ── Panel (overlay kalıbı: relative kök + absolute slot, portal yok) ── */
 .panelSlot {
   position: absolute;
-  top: calc(100% + var(--lg-space-1, 4px));
+  top: calc(100% + var(--lg-space-1));
   left: 0;
   right: 0;
   z-index: 30;
@@ -100,21 +112,26 @@
 .panel {
   display: block;
   width: 100%;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip) !important;
+  box-shadow: none !important;
   /* Cam liste okunur kalsın: yüzey token'ı üzerine yarı saydam dolgu */
-  background: color-mix(in srgb, var(--lg-surface, #fff) 72%, transparent);
+  background: color-mix(in srgb, var(--lg-surface) 72%, transparent);
+}
+.panel[data-material='flat'] {
+  background: var(--lg-surface);
 }
 
 .list {
-  /* bp-sm altı (mobil): panel en fazla ekranın yarısı, içeride scroll */
+  /* Dokunmatik varsayılanı: panel en fazla ekranın yarısı, içeride scroll. */
   max-height: 50vh;
   overflow-y: auto;
-  padding: var(--lg-space-1, 4px);
+  padding: var(--lg-space-1);
   overscroll-behavior: contain;
 }
-/* bp-sm */
-@media (min-width: 640px) {
+@media (pointer: fine) {
   .list {
-    max-height: 320px;
+    max-height: calc(var(--lg-control-xl) * 6);
   }
 }
 
@@ -122,21 +139,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--lg-space-2, 8px);
-  min-height: var(--lg-control-sm, 32px);
-  padding: 6px 10px;
-  border-radius: var(--lg-radius-chip, 10px);
-  font-size: var(--lg-text-body, 15px);
+  gap: var(--lg-space-2);
+  min-height: var(--lg-control-sm);
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  font-size: var(--lg-text-body);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 .option[data-active] {
-  background: color-mix(in srgb, var(--lg-accent, #0a84ff) 18%, transparent);
+  background: color-mix(in srgb, var(--lg-accent) 18%, transparent);
 }
 .optionSelected {
   font-weight: 600;
-  color: var(--lg-accent, inherit);
+  color: var(--lg-accent);
 }
 .optionDisabled {
   opacity: 0.4;

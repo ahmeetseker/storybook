@@ -152,11 +152,27 @@ Katman sırası: layer (zemin) → pins (üstte) → popup (en üstte, `z-index`
 | radius | — | `--lg-radius-media` (kök), `--lg-radius-capsule` (pin/toggle), `--lg-radius-chip` (popup) |
 | focus | outline | `--lg-accent` |
 
-**Borç (raw):** panel `min-height: 420px`; popup `min/max-width` 168/240px;
-pin/toggle iç dolgu px değerleri; `box-shadow`/popup gölgesi `color-mix`
-türevi (raw rgba değil, ama offset/blur px raw); popup yön/hizalama eşikleri
-(`y<0.24`, `x<0.18`/`x>0.82`) sabit sayı — gerçek DOM ölçümü değil, tahmini
-sınır (§7).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçülerin tamamı
+component kökünde yerel değişkenlerde toplanır — `--map-toggle-gap` (2px),
+`--map-toggle-pad` (3px), `--map-toggle-btn-pad[-coarse]` (5px 11px /
+10px 13px), `--map-pin-price-h` (26px), `--map-pin-price-pad` (5px 10px),
+`--map-pin-price-pad-inline-coarse` (14px), `--map-pin-cluster-size` (30px),
+`--map-pin-cluster-pad-inline` (6px), `--map-popup-close-size` (22px),
+`--map-popup-close-glyph[-coarse]` (15/17px), `--map-popup-min-w` /
+`--map-popup-max-w` (168/240px), `--map-popup-offset` (10px),
+`--map-popup-in-shift` (4px — giriş animasyonu yer değiştirmesi; sayısal
+olarak `--lg-space-1`'e eşit ama boşluk ölçeğine bilinçli bağlanmadı, spacing
+token'ı değişirse animasyon etkilenmemeli), `--map-panel-min-h` (420px —
+dikey dolu panel varsayılan yüksekliği). Coarse hedefler
+`--lg-control-md`/`--lg-control-sm` token'larına bağlıdır (coarse'ta 44/36px).
+Bilinçli bırakılan: pin/popup gölgeleri (`0 1px 3px` / `0 6px 18px`, renk
+`color-mix` token türevi) — hiçbir `--lg-shadow-*` deseniyle birebir
+eşleşmediğinden offset/blur raw; popup yön/hizalama eşikleri (`y<0.24`,
+`x<0.18`/`x>0.82`) sabit sayı — gerçek DOM ölçümü değil, tahmini sınır (§7);
+SVG `stroke-width`/`stroke-dasharray` vektör gereği raw; süre/easing
+(`0.15s`/`0.16s ease[-out]`) süre token'ı olmadığından raw. Font ağırlıkları
+ölçeğe çekildi: toggle 600 (eski 650), pin fiyat 700 (eski 750), cluster 700
+(eski 800).
 
 ## 10. Storybook kapsamı
 

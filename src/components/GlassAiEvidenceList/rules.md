@@ -91,7 +91,13 @@ Etkileşimsiz veri sunumu; hover/focus yalnız açılabilir kaynaklarda (`:focus
 | verify false | color | `--lg-warning` |
 | empty | background/border | `color-mix(--lg-warning ...)` |
 
-Raw px: index rozeti 22px + rozet font 10.5px — AI rozet standardıyla aynı borç.
+Rozet font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması). Item hover'ı yalnız `@media (hover: hover)` içinde çalışır.
+
+Borç (mikro-geometri): token karşılığı olmayan değerler component kökünde
+yerel değişken olarak toplandı — `.root { --index-size: 22px; --gap-tight: 2px;
+--badge-pad-block: 3px; }` (index kutusu, satır içi mikro aralık ve AI rozeti
+dikey dolgusu — rozet dolgusu tüm AI component'lerindeki 3px kontrat sabiti).
 
 ## 10. Storybook kapsamı
 

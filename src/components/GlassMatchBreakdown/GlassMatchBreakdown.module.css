@@ -1,7 +1,16 @@
 /* GlassMatchBreakdown — içerik katmanı FLAT: cam/backdrop-filter YOK.
-   Yalnız token'lar (--lg-*) + color-mix türevleri. Bar yüksekliği/skeleton
-   satır yükseklikleri raw px borcu — bkz. rules.md §9. */
+   Yalnız token'lar (--lg-*) + color-mix türevleri. Mikro-geometri raw px'leri
+   aşağıdaki yerel değişkenlerde toplanır — bkz. rules.md §9. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --bd-ai-gap: 6px;
+  --bd-badge-pad-block: 3px;
+  --bd-bar-h: 6px;
+  --bd-chip-gap: 5px;
+  --bd-chip-pad-block: 3px;
+  --bd-chip-pad-start: 6px;
+  --bd-skeleton-overall-h: 14px;
+  --bd-skeleton-group-h: 10px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-5);
@@ -36,7 +45,7 @@
 .aiRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--bd-ai-gap);
   flex-wrap: wrap;
 }
 
@@ -44,11 +53,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--bd-badge-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -93,17 +102,22 @@
   position: relative;
   display: block;
   width: 100%;
-  height: 6px;
+  height: var(--bd-bar-h);
   overflow: hidden;
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
 
+/* Dolum %100 genişlikte çizilir, oran scaleX ile uygulanır — animasyon
+   yalnız transform (paint/layout tetiklemez); track overflow:hidden kırpar. */
 .barFill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
-  transition: width 0.3s ease-out;
+  transform-origin: left center; /* logical desteklemeyen tarayıcılar için fallback */
+  transform-origin: inline-start;
+  transition: transform 0.3s ease-out;
 }
 
 /* ── grup listesi ── */
@@ -185,8 +199,8 @@
 .detail {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px var(--lg-space-2) 3px 6px;
+  gap: var(--bd-chip-gap);
+  padding: var(--bd-chip-pad-block) var(--lg-space-2) var(--bd-chip-pad-block) var(--bd-chip-pad-start);
   border-radius: var(--lg-radius-chip);
   font-size: var(--lg-text-caption);
   font-weight: 600;
@@ -212,7 +226,7 @@
 
 .detailIcon {
   flex: none;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -286,10 +300,11 @@
   }
 }
 
+/* Dokunmatikte 44px hedef — --lg-control-md coarse'ta 44px'e yükselir */
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -314,12 +329,12 @@
 
 .skeletonOverall {
   width: 100%;
-  height: 14px;
+  height: var(--bd-skeleton-overall-h);
 }
 
 .skeletonGroup {
   width: 100%;
-  height: 10px;
+  height: var(--bd-skeleton-group-h);
 }
 
 @keyframes lg-breakdown-pulse {

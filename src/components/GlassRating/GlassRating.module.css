@@ -1,6 +1,12 @@
 /* İçerik katmanı: cam DEĞİL — düz yüzey mantığı (GlassScoreMeter ile tutarlı).
    Tek vurgu rengi --lg-accent; boş yıldız --lg-label-secondary türevi. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --grt-star-gap: 2px;
+  --grt-star-size: 18px;
+  --grt-star-size-input: 22px;
+  --grt-dist-label-width: 52px;
+  --grt-dist-bar-height: 8px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -8,13 +14,13 @@
 .stars {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--grt-star-gap);
 }
 .starCell {
   position: relative;
   display: inline-flex;
-  width: 18px;
-  height: 18px;
+  width: var(--grt-star-size);
+  height: var(--grt-star-size);
   flex-shrink: 0;
 }
 .starTrack,
@@ -49,15 +55,15 @@
 
 /* ── input ── */
 .input .stars {
-  gap: 2px;
+  gap: var(--grt-star-gap);
 }
 .starButton {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: var(--lg-control-sm);
+  height: var(--lg-control-sm);
   padding: 0;
   border: none;
   margin: 0;
@@ -67,8 +73,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 .starButton .starCell {
-  width: 22px;
-  height: 22px;
+  width: var(--grt-star-size-input);
+  height: var(--grt-star-size-input);
   transition: transform 0.15s ease-out;
 }
 .starButton:focus-visible {
@@ -88,10 +94,11 @@
   pointer-events: none;
 }
 
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44px) */
 @media (pointer: coarse) {
   .starButton {
-    width: 44px;
-    height: 44px;
+    width: var(--lg-control-md);
+    height: var(--lg-control-md);
   }
 }
 
@@ -141,7 +148,7 @@
   min-width: 0;
 }
 .distLabel {
-  flex: 0 0 52px;
+  flex: 0 0 var(--grt-dist-label-width);
   margin: 0;
   font-size: var(--lg-text-footnote);
   color: var(--lg-label-secondary);
@@ -158,17 +165,22 @@
 .distBarTrack {
   position: relative;
   flex: 1;
-  height: 8px;
+  height: var(--grt-dist-bar-height);
   overflow: hidden;
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
+/* Dolgu %100 genişlikte; oran `transform: scaleX()` ile verilir (inline style)
+   — genişlik animasyonu yerine paint-only transform (tasarım sistemi kuralı). */
 .distBarFill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
   background: var(--lg-accent);
-  transition: width 0.3s ease-out;
+  transform-origin: left center; /* fallback: logical keyword desteklemeyen motorlar */
+  transform-origin: inline-start;
+  transition: transform 0.3s ease-out;
 }
 .distCount {
   flex: 0 0 auto;

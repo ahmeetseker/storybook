@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { HTMLAttributes } from 'react'
+import { GlassButton } from '../GlassButton'
 import styles from './GlassAiRiskReview.module.css'
 
 export type GlassAiRiskSeverity = 'low' | 'medium' | 'high' | 'blocking'
@@ -150,21 +151,16 @@ export function GlassAiRiskReview({
 
         {decision === 'pending' && (onApprove || onReject) ? (
           <div className={styles.actions}>
-            {onReject ? (
-              <button type="button" className={styles.reject} onClick={onReject}>
-                Reddet
-              </button>
-            ) : null}
+            {onReject ? <GlassButton onClick={onReject}>Reddet</GlassButton> : null}
             {onApprove ? (
-              <button
-                type="button"
-                className={styles.approve}
+              <GlassButton
+                prominent
                 onClick={onApprove}
                 disabled={approveLocked}
                 aria-describedby={approveLocked ? `${titleId}-lock` : undefined}
               >
                 İncelemeyi onayla
-              </button>
+              </GlassButton>
             ) : null}
           </div>
         ) : (

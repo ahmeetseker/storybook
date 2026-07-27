@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassSwitch } from './GlassSwitch'
 
 const meta = {
-  title: 'Components/GlassSwitch',
+  title: 'Bileşenler/Form/GlassSwitch',
   component: GlassSwitch,
   tags: ['autodocs'],
   args: { label: 'Fiyat düşünce bildir', onChange: fn() },
@@ -45,20 +45,22 @@ export const States: Story = {
   ),
 }
 
+const ControlledSettingRowDemo = () => {
+  const [on, setOn] = useState(true)
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, maxWidth: 360 }}>
+      <div>
+        <div style={{ fontWeight: 600, fontSize: 15 }}>Benzer ilan bildirimi</div>
+        <div style={{ fontSize: 12, opacity: 0.7 }}>{on ? 'Açık — günde en fazla 3 bildirim' : 'Kapalı'}</div>
+      </div>
+      <GlassSwitch label="Benzer ilan bildirimi" checked={on} onChange={setOn} />
+    </div>
+  )
+}
+
 /** Controlled ayar satırı: anında etkili tercih (form submit beklemez). */
 export const ControlledSettingRow: Story = {
-  render: () => {
-    const [on, setOn] = useState(true)
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, maxWidth: 360 }}>
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 15 }}>Benzer ilan bildirimi</div>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>{on ? 'Açık — günde en fazla 3 bildirim' : 'Kapalı'}</div>
-        </div>
-        <GlassSwitch label="Benzer ilan bildirimi" checked={on} onChange={setOn} />
-      </div>
-    )
-  },
+  render: () => <ControlledSettingRowDemo />,
 }
 
 /** Responsive: coarse pointer'da ray/thumb büyür, görünmez halo hedefi 44px'e tamamlar. */

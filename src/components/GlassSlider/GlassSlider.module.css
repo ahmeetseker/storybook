@@ -1,9 +1,14 @@
 .root {
   --lg-slider-thumb: 20px;
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --slider-height: 28px;
+  --track-height: 6px;
+  --bubble-gap: 6px;
+  --bubble-pad-y: 2px;
   position: relative;
   display: block;
   width: 100%;
-  height: 28px;
+  height: var(--slider-height);
   -webkit-tap-highlight-color: transparent;
 }
 .disabled { opacity: 0.45; }
@@ -27,7 +32,7 @@
   left: 0;
   right: 0;
   top: 50%;
-  height: 6px;
+  height: var(--track-height);
   transform: translateY(-50%);
   border-radius: var(--lg-radius-capsule, 999px);
   background: color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
@@ -70,25 +75,25 @@
 /* Değer baloncuğu: flat chip, thumb'ın üstünde */
 .bubble {
   position: absolute;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + var(--bubble-gap));
   left: 50%;
   transform: translateX(-50%);
-  padding: 2px 8px;
+  padding: var(--bubble-pad-y) var(--lg-space-2);
   border-radius: var(--lg-radius-chip, 10px);
   background: var(--lg-surface, #fff);
   border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.09));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--lg-shadow-sm);
   font-size: var(--lg-text-caption, 12px);
   font-weight: 600;
   color: var(--lg-label, #24211b);
   white-space: nowrap;
 }
 
-/* Dokunmatik: thumb 28px, kök 44px dokunma hedefi */
+/* Dokunmatik: thumb 28px, kök 44px dokunma hedefi (coarse'ta --lg-control-md birebir 44px) */
 @media (pointer: coarse) {
   .root {
     --lg-slider-thumb: 28px;
-    height: 44px;
+    --track-height: 8px;
+    height: var(--lg-control-md);
   }
-  .track { height: 8px; }
 }

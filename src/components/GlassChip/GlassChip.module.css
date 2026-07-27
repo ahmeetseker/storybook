@@ -1,4 +1,10 @@
 .chip {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
+     sm chip yüksekliği kontrol ölçeğinin altında; yatay padding'ler
+     space token'larının arasında (10/14px). */
+  --chip-h-sm: 26px;
+  --chip-pad-x-sm: 10px;
+  --chip-pad-x-md: 14px;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -14,15 +20,17 @@
   outline-offset: 2px;
 }
 
-/* Chip ölçüleri buton kontrol token'larından bir kademe küçük — bilinçli raw
-   (etiket yoğun dizilir; --lg-control-sm bile chip için yüksek kalır, bkz. rules.md) */
-.sm { min-height: 26px; padding: 0 10px; font-size: var(--lg-text-caption, 12px); }
-.md { min-height: 32px; padding: 0 14px; font-size: var(--lg-text-footnote, 13px); }
+/* Chip ölçüleri buton kontrol ölçeğinden bir kademe küçük: sm yerel değişken
+   (26px — --lg-control-sm bile sm chip için yüksek kalır, bkz. rules.md);
+   md tam olarak --lg-control-sm (32px, coarse'ta 36'ya büyür — istenen davranış). */
+.sm { min-height: var(--chip-h-sm); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
+.md { min-height: var(--lg-control-sm); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
 
-/* Dokunmatikte minimum 36px dokunma hedefi (görev gereksinimi; 44px'lik buton ölçeği chip'e ağır) */
+/* Dokunmatikte minimum 36px dokunma hedefi: coarse'ta --lg-control-sm = 36px
+   (birebir; 44px'lik buton ölçeği chip'e ağır) */
 @media (pointer: coarse) {
   .sm,
-  .md { min-height: 36px; }
+  .md { min-height: var(--lg-control-sm); }
 }
 
 /* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
@@ -71,8 +79,10 @@
   cursor: pointer;
   transition: background-color 0.16s ease-out;
 }
-.remove:hover:not(:disabled) {
-  background-color: color-mix(in srgb, currentColor 24%, transparent);
+@media (hover: hover) {
+  .remove:hover:not(:disabled) {
+    background-color: color-mix(in srgb, currentColor 24%, transparent);
+  }
 }
 .remove:focus-visible {
   outline: 2px solid var(--lg-accent, #b45309);

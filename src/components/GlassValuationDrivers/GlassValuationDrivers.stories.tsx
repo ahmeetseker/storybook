@@ -18,7 +18,7 @@ const dusukEtkiliOrnek: GlassValuationDriver[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassValuationDrivers',
+  title: 'Bileşenler/AI/GlassValuationDrivers',
   component: GlassValuationDrivers,
   tags: ['autodocs'],
   args: {

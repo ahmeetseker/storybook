@@ -1,16 +1,38 @@
 # liquid-glass-ui
 
-Apple'ın Liquid Glass tasarım dilinin web'e taşınması. React + Vite + TypeScript ile yazılmış bir component kütüphanesi; Storybook v10 üzerinde canlı bir vitrini var.
+Apple'ın Liquid Glass tasarım dilinin web'e taşınması. Repository, React + Vite + TypeScript ile yazılmış ortak component kütüphanesini, Storybook v10 vitrini ve TanStack Start tabanlı SSR web uygulamasıyla birlikte barındırır.
 
 ## Kurulum ve çalıştırma
 
 ```bash
 npm install
-npm run storybook   # http://localhost:6006 — component vitrini
-npm test            # vitest ile birim testleri çalıştırır
+npm run dev         # web :3000 + Storybook :6006
+npm run dev:web     # yalnızca TanStack Start web uygulaması
+npm run storybook   # yalnızca component vitrini
+npm test            # Vitest birim/component testleri
+npm run test:e2e    # Playwright responsive, a11y ve SSR testleri
+npm run build       # typecheck + web production build + Storybook build
 ```
 
-Proje yalnızca Storybook üzerinden çalışır; ayrı bir uygulama kabuğu yoktur (`npm run dev` de Storybook'u açar).
+Web uygulaması, Storybook'taki gerçek `GlassIslandHeader` ve `GlassDock` kaynaklarını `@repo/ui` alias'ı üzerinden doğrudan kullanır. Bu nedenle component kaynağındaki bir değişiklik hem Storybook'a hem web uygulamasına HMR ile yansır; ikinci bir component kopyası yoktur.
+
+İlk teslimatta `/`, `/arsa-ara`, `/ofisler`, `/bolgeler`, `/blog`, `/ai-danisman`, `/karsilastir`, `/favoriler`, `/ilan-ver`, `/hesabim` ve `/hesabim/mesajlar` rota kabukları hazırdır. Tamamlanmamış sayfalar bilinçli olarak `noindex`; public içerikler tamamlandıkça rota bazında indekslemeye açılacaktır.
+
+## Üretim
+
+```bash
+npm run build:web
+npm run start:web
+```
+
+Uygulama Node/Nitro SSR çıktısı üretir ve `/health` endpoint'i sunar. Container görüntüsü repository kökünden oluşturulur:
+
+```bash
+docker build -f apps/web/Dockerfile -t arsam-web .
+docker run --rm -p 3000:3000 arsam-web
+```
+
+Canonical origin varsayılan olarak `https://arsam.net` değeridir. Yerel build'de `VITE_APP_ORIGIN`, Docker build'inde ise `--build-arg APP_ORIGIN=https://ornek.test` ile değiştirilebilir.
 
 ## Tarayıcı tier tablosu
 
@@ -29,6 +51,8 @@ Gerçek kırılma efekti yalnızca `backdrop-filter: url(#svg)` + displacement m
 - **GlassSurface** (+ `GlassTierProvider` / `useGlassTier`) — kütüphanenin temel yüzey primitive'i. `regular`/`clear` varyantları, ayarlanabilir `thickness`, `capsule` şekli.
 - **GlassButton** — `sm`/`md`/`lg`/`xl` boyutları, `tint` rengi, `prominent` modu; basılınca sıvılaşan (liquefy) displacement animasyonu.
 - **GlassNavbar** (+ `GlassBackButton`) — geri tuşu, action pill grubu (birden fazla aksiyonu tek bir cam yüzeyde toplar), scroll ile beliren yumuşak kenar (soft scroll edge).
+- **GlassIslandHeader** — marka, canlı breadcrumb/durum hapı, bildirim aksiyonu ve erişilebilir modal hızlı-gezinme paneli.
+- **GlassDock** — masaüstü, tablet ve mobil için farklılaştırılmış; gerçek linklerle SSR'da da çalışan alt navigasyon.
 
 ## Mimari, kısaca
 

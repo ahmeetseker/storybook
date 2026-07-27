@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassLink } from './GlassLink'
 
 const meta = {
-  title: 'Components/GlassLink',
+  title: 'Bileşenler/Eylemler/GlassLink',
   component: GlassLink,
   tags: ['autodocs'],
   args: { href: '#', onClick: fn(), children: 'Satıcının diğer ilanları' },

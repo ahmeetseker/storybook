@@ -30,6 +30,8 @@ export interface GlassSelectProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
   tone?: 'light' | 'dark' | 'auto'
+  /** Trigger ve seçenek panelinin malzeme ekseni */
+  material?: 'glass' | 'flat'
   /** aria-invalid + --lg-danger çerçeve. Verilmezse GlassField context'inden türetilir */
   invalid?: boolean
   disabled?: boolean
@@ -43,11 +45,15 @@ export function GlassSelect({
   placeholder = 'Seçin',
   size = 'md',
   tone = 'auto',
+  material = 'glass',
   invalid,
   disabled = false,
   className,
   id,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
+  'aria-required': ariaRequired,
   ...rest
 }: GlassSelectProps) {
   const field = useGlassFieldContext()
@@ -68,6 +74,7 @@ export function GlassSelect({
   const listboxId = `${baseId}-listbox`
   const optionId = (index: number) => `${baseId}-option-${index}`
   const describedBy = [ariaDescribedBy, field?.describedBy].filter(Boolean).join(' ') || undefined
+  const required = ariaRequired ?? (field?.required || undefined)
 
   const focusTrigger = () => document.getElementById(triggerId)?.focus()
 
@@ -190,7 +197,7 @@ export function GlassSelect({
     <div ref={rootRef} className={[styles.root, className].filter(Boolean).join(' ')} {...rest}>
       <GlassSurface
         as="button"
-        material="glass"
+        material={material}
         shape={12}
         thickness={0.25}
         tone={tone}
@@ -213,6 +220,9 @@ export function GlassSelect({
           'aria-controls': open ? listboxId : undefined,
           'aria-activedescendant': open && activeIndex >= 0 ? optionId(activeIndex) : undefined,
           'aria-invalid': isInvalid || undefined,
+          'aria-label': ariaLabel,
+          'aria-labelledby': ariaLabelledBy,
+          'aria-required': required,
           'aria-describedby': describedBy,
           onClick: () => (open ? close() : openPanel()),
           onKeyDown: onTriggerKeyDown,
@@ -245,7 +255,7 @@ export function GlassSelect({
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.98 }}
               transition={{ duration: 0.16, ease: 'easeOut' }}
             >
-              <GlassSurface material="glass" shape={12} thickness={0.5} tone={tone} className={styles.panel}>
+              <GlassSurface material={material} shape={12} thickness={0.5} tone={tone} className={styles.panel}>
                 <div role="listbox" id={listboxId} aria-labelledby={triggerId} className={styles.list}>
                   {options.map((option, index) => {
                     const isSelected = option.value === current

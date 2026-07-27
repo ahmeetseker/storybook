@@ -134,13 +134,22 @@ interaction (tıklama/Enter/Space native buton davranışıyla toggle eder).
 | tetikleyici yükseklik | min-height | `--lg-control-lg` (48px) | `pointer:coarse`'ta 48px sabit |
 | tetikleyici hover | background | `color-mix(in srgb, var(--lg-label) 4%, transparent)` | `@media (hover:hover)` |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
-| başlık metni | font-size | `--lg-text-headline` | — |
+| başlık metni | font-size/weight | `--lg-text-headline` / 600 (headline ağırlık kuralı) | — |
 | panel metni | color | `--lg-label-secondary` | — |
 | boşluk | padding/gap | `--lg-space-3/4/5` | — |
 
-**Borç (raw):** chevron kutu 20×20px, SVG viewBox 12×12, geçiş süresi/easing
+**Borç (raw / mikro-geometri):** chevron kutu 20×20px ve ikon 12×12 token
+karşılığı olmadığından component kökünde yerel değişken olarak toplandı
+(`.root { --chevron-box: 20px; --chevron-icon: 12px; }`); geçiş süresi/easing
 (`0.24s`/`0.32s` `cubic-bezier(0.32,0.72,0,1)`) — mevcut proje konvansiyonu
-(GlassFeatureGroup'ta aynı eğri kullanılıyor), token'a bağlanmadı.
+(GlassFeatureGroup'ta aynı eğri kullanılıyor), token'a bağlanmadı. Tetikleyici
+min-height'ı her yerde `--lg-control-lg` token'ından gelir; sabit 48px
+pointer:coarse override'ı kaldırıldı — token coarse'ta 48→50px büyür, kontrol
+token'ının coarse büyümesi tasarımın istediği davranıştır.
+
+**Bilinçli istisna:** panel açılışı `grid-template-rows 0fr→1fr` geçişi
+transform/opacity/filter dışıdır; `height` animasyonu yasağının kabul edilmiş
+alternatifi olarak korunur (reduced-motion'da kapanır).
 
 ## 10. Storybook kapsamı
 

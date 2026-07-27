@@ -87,8 +87,15 @@ Açık/kapalı metni switch'e yazılmaz; gerekiyorsa satır açıklamasında gö
 | focus | outline | `--lg-accent` |
 | thumb | background | `#fff` (bilinçli raw — cam üstü kontrast) |
 
-Borç: ray ölçüleri (34×18 / 44×24) raw — kontrol token'ları switch oranına
-uymadığı için bilinçli; coarse varyantları CSS'te.
+**Borç (raw / mikro-geometri):** ray ölçüleri (34×18 / 44×24, coarse
+varyantları CSS'te) kontrol token'ları switch oranına uymadığı için yerel
+değişkenlerde (`--lg-switch-w/h/thumb`); kök kapsül padding'i de yerel
+değişkende toplandı (`--lg-switch-pad: 3px`). Bilinçli bırakılanlar: thumb
+`background: #fff` (cam üstü kontrast — tema token'ı değil, her temada
+beyaz) ve thumb gölgesi `0 1px 3px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.15)`
+(hiçbir `--lg-shadow-*` deseniyle birebir değil — dokunulmadı). Coarse
+dokunma halosu `max(100%, var(--lg-control-md))` — coarse'ta 44px, birebir.
+Geçiş süresi `0.18s ease-out` raw (süre token'ı yok).
 
 ## 10. Storybook kapsamı
 

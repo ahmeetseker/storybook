@@ -17,7 +17,7 @@ const WarningIcon = (
 )
 
 const meta = {
-  title: 'Components/GlassEmptyState',
+  title: 'Bileşenler/Veri Gösterimi/GlassEmptyState',
   component: GlassEmptyState,
   tags: ['autodocs'],
   args: { title: 'Sonuç bulunamadı' },

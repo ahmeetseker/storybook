@@ -104,7 +104,12 @@ tekrarlama.
 | panel | padding | `--lg-space-1` / `--lg-space-2` |
 | panel | offset | `--lg-space-2` (8px tetikleyici mesafesi) |
 
-Borç: gölge raw rgba — GlassSurface gölge sistemine bağlanması değerlendirilecek.
+**Borç (raw / mikro-geometri):** gölge `0 4px 16px rgba(0,0,0,.18)` raw KALIR —
+token ölçeğinde birebir karşılığı yok (`--lg-shadow-sm` 0 2px 8px .12 /
+`--lg-shadow-md` 0 12px 32px .16; yakına yuvarlama görsel değişiklik yaratır);
+GlassSurface gölge sistemine bağlanması değerlendirilecek. Panel genişliği
+kökte yerel değişkende (`.wrapper { --panel-max-width: 240px; }` — token
+karşılığı yok).
 
 ## 10. Storybook kapsamı
 

@@ -155,9 +155,15 @@ Katman sırası: girdi state'leri → `calculateLoan` (saf fonksiyon, yan etkisi
 | tüm boşluklar | gap/padding | `--lg-space-1..6` | — |
 | CTA | — | `GlassButton` kendi token'ları (`--lg-control-lg` vb.) | — |
 
-Borç (raw): yok — tüm ölçüler token'lardan; yalnız `.card`/`.compact`
-`max-width` (420px/360px) ve `@media (max-width: 420px)` kırılımı raw px
-(kart-özel yerleşim kararı, token karşılığı yok).
+Borç (raw / mikro-geometri): token karşılığı olmayan ölçüler component
+kökünde yerel değişkenlerde toplanır — `--calc-max-w` (kart genişliği 420px)
+ve `--calc-max-w-compact` (360px; kart-özel yerleşim kararı, token karşılığı
+yok), `--calc-bar-h` (oran barı 10px), `--calc-dot-size` (legend noktası 8px),
+`--calc-legend-gap` (6px). Legend noktaları `--lg-radius-capsule` kullanır
+(eski `border-radius: 50%`). `@media (max-width: 420px)` kırılımı kaldırıldı:
+kart padding'i `clamp(--lg-space-4, 6%, --lg-space-6)` ile dar container'da
+içsel olarak bir kademe düşer; `max-width` zaten dar container'da doğal
+daralmaya izin verir.
 
 ## 10. Storybook kapsamı
 

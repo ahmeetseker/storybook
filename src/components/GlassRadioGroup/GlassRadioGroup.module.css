@@ -1,4 +1,13 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
+     daire/nokta çapları, metin blok arası ve dokunmatik hedef sabiti.
+     pointer:coarse'ta daire/nokta değişkenleri aşağıda büyütülür. */
+  --radio-circle-sm: 18px;
+  --radio-circle-md: 20px;
+  --radio-dot-sm: 7px;
+  --radio-dot-md: 8px;
+  --radio-text-gap: 2px;
+  --radio-touch-target: 44px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-3, 12px);
@@ -51,8 +60,8 @@
   /* İlk metin satırıyla optik hizalama */
   margin-top: 1px;
 }
-.sm .circle { width: 18px; height: 18px; }
-.md .circle { width: 20px; height: 20px; }
+.sm .circle { width: var(--radio-circle-sm); height: var(--radio-circle-sm); }
+.md .circle { width: var(--radio-circle-md); height: var(--radio-circle-md); }
 
 .dot {
   display: block;
@@ -61,8 +70,8 @@
   transform: scale(0);
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.sm .dot { width: 7px; height: 7px; }
-.md .dot { width: 8px; height: 8px; }
+.sm .dot { width: var(--radio-dot-sm); height: var(--radio-dot-sm); }
+.md .dot { width: var(--radio-dot-md); height: var(--radio-dot-md); }
 
 .input:checked ~ .circle {
   background-color: color-mix(in srgb, var(--lg-accent, #b45309) 88%, transparent);
@@ -77,7 +86,7 @@
 .texts {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--radio-text-gap);
 }
 .sm .label { font-size: var(--lg-text-footnote, 13px); }
 .md .label { font-size: var(--lg-text-body, 15px); }
@@ -87,13 +96,16 @@
   color: var(--lg-label-secondary, #79726a);
 }
 
-/* Dokunmatik: daire büyür, satır 44px dokunma hedefine ulaşır */
+/* Dokunmatik: daire büyür, satır 44px dokunma hedefine ulaşır —
+   kök değişkenleri büyütülür, kural yapısı aynı kalır */
 @media (pointer: coarse) {
-  .option { min-height: 44px; }
-  .sm .circle { width: 22px; height: 22px; }
-  .md .circle { width: 24px; height: 24px; }
-  .sm .dot { width: 9px; height: 9px; }
-  .md .dot { width: 10px; height: 10px; }
+  .root {
+    --radio-circle-sm: 22px;
+    --radio-circle-md: 24px;
+    --radio-dot-sm: 9px;
+    --radio-dot-md: 10px;
+  }
+  .option { min-height: var(--radio-touch-target); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -2,7 +2,7 @@
 name: GlassCompareTable
 category: içerik
 status: hazır
-lastReviewed: 2026-07-17
+lastReviewed: 2026-07-27
 ---
 
 # GlassCompareTable Kuralları
@@ -54,6 +54,7 @@ component'idir — cam yok, gerçek `<table>` semantiği.
 | fields[].higherIsBetter | — | `boolean` | verilirse + değerler sayısalsa en iyi hücre işaretlenir |
 | listings[].title | ✅ | `string` | `th scope="col"` içinde görünür başlık, 2 satırda kırpılır |
 | listings[].image | — | `string` (URL) | dekoratif, `alt=""`; bilgi başlık metninde |
+| listings[].imageFallback | — | `string` (URL) | `image` hata verirse yalnız bir kez denenir; dekoratif `alt=""` değişmez |
 | listings[].values | ✅ | `Record<string, string\|number>` | eksik anahtar → hücrede "—" |
 | kaldırma butonu | `onRemove` verilirse | — | erişilebilir isim `Karşılaştırmadan çıkar: {title}` |
 
@@ -62,19 +63,19 @@ component'idir — cam yok, gerçek `<table>` semantiği.
 | Ad | Tür | Type | Default | Açıklama |
 |---|---|---|---|---|
 | fields | prop | `GlassCompareField[]` (`{key, label, higherIsBetter?}`) | — (zorunlu) | Satır sırası = dizi sırası |
-| listings | prop | `GlassCompareListing[]` (`{id, title, image?, values}`) | — (zorunlu) | Sütun sırası = dizi sırası; ilk 4'ü render edilir (bkz. §5) |
+| listings | prop | `GlassCompareListing[]` (`{id, title, image?, imageFallback?, values}`) | — (zorunlu) | Sütun sırası = dizi sırası; `imageFallback`, `image` hata verirse bir kez denenir; ilk 4'ü render edilir (bkz. §5) |
 | highlightDifferences | prop | `boolean` | `true` | Bir satırda ilanlar arasında değer farkı varsa satırı hafif vurgular |
 | onRemove | event | `(id: string) => void` | — | Verilirse her sütun başlığında kaldırma butonu görünür; tıklanınca `listing.id` ile çağrılır — component kendi `listings`'ini FİLTRELEMEZ, yeni diziyi vermek çağıranın işidir. Çağrı sonrası odak kalan ilk kaldırma butonuna, hiç kalmadıysa kaydırma kabına taşınır (bkz. §7) |
 | aria-label | prop | `string` | — | Tabloyu VE yatay kaydırma kabını (`role="region"`) adlandırır; verilmezse kap `"İlan karşılaştırma tablosu"` varsayılanını kullanır, `<table>`'ın kendi `aria-label`'ı boş kalır |
 | ...rest | — | `HTMLAttributes<HTMLTableElement>` (`onChange` hariç) | — | `<table>` elemanına geçer; `className` sarmalayıcı `div`'e uygulanır |
 
-Ref hedefi: yok (v1, dışa açık `ref` prop'u yok). Event sözleşmesi: `onRemove`
-yalnız kullanıcının butona tıklamasıyla tetiklenir; component görünür state
-tutmaz — render tamamen `fields`/`listings` prop'larından türetilir, bu
-yüzden `value`/`defaultValue`/`onXChange` üçlüsü N/A (controlled/uncontrolled
-eksen yok). İstisna: odak kurtarma yalnızca DOM'a yazılmayan iç `ref`'lerle
-(kaldırma butonu haritası + "kurtarma bekliyor" bayrağı) yürütülen bir yan
-etkidir, render çıktısını etkilemez (bkz. §6).
+Ref hedefi: yok (v1, dışa açık `ref` prop'u yok). Event sözleşmesi:
+`onRemove` yalnız kullanıcının butona tıklamasıyla tetiklenir; karşılaştırma
+verisi tamamen `fields`/`listings` prop'larından türetilir, bu yüzden
+`value`/`defaultValue`/`onXChange` üçlüsü N/A (controlled/uncontrolled eksen
+yok). İki iç mekanizma public state değildir: odak kurtarma DOM'a yazılmayan
+`ref`'lerle, görsel fallback seçimi ise her ilan görselinin yerel hata
+state'iyle yürür (bkz. §6).
 
 ## 5. Seçenek eksenleri
 
@@ -92,12 +93,19 @@ birer özellik anahtarı (prop), state değil.
 
 ## 6. State modeli
 
-Render açısından N/A — görünür/kontrollü hiçbir state yoktur; her render
-tamamen `fields` + `listings` + `highlightDifferences` prop'larından
-türetilir ("en iyi değer" kümesi ve "satır farklı mı" bayrağı saf
-fonksiyonlarla hesaplanır, state'e yazılmaz). `onRemove` çağrısı sonrası
-`listings`'i güncellemek/filtrelemek tamamen çağıranın sorumluluğundadır
-(bkz. `Kaldirilabilir` story).
+Karşılaştırma açısından görünür/kontrollü state yoktur; alanlar, değerler,
+"en iyi değer" kümesi ve "satır farklı mı" bayrağı tamamen `fields` +
+`listings` + `highlightDifferences` prop'larından türetilir. `onRemove`
+çağrısı sonrası `listings`'i güncellemek/filtrelemek tamamen çağıranın
+sorumluluğundadır (bkz. `Kaldirilabilir` story).
+
+Görsel hata state'i her `CompareListingImage` örneğinin içinde yereldir:
+başarısız olan `{image, imageFallback}` çifti tutulur. Geçerli prop çifti bu
+kayıtla eşleşiyorsa `imageFallback` gösterilir. Fallback de hata verirse
+state yeniden yazılmaz ve `src` sabit kalır; böylece hata döngüsü oluşmaz.
+Aynı `listing.id` korunurken `image` veya `imageFallback` değişirse kayıt
+artık eşleşmez ve yeni `image` hemen yeniden denenir. State component
+örnekleri arasında paylaşılmaz, global hata kaydı yoktur.
 
 İstisna — odak kurtarma (yalnız yan etki, render'ı etkilemez): bir
 `removeButtonRefs` haritası (`listing.id` → buton DOM node'u) ve bir
@@ -113,6 +121,12 @@ bozmaz.
 
 - **Pointer:** kaldırma butonuna tıklama `onRemove(id)` çağırır; başka
   etkileşim yok (satır/hücre tıklaması anlamsız).
+- **Görsel fallback:** `listing.image` yükleme hatasında geçerli
+  `listing.imageFallback` yalnız bir kez kaynak olarak seçilir. Fallback'in
+  kendi hatası ikinci bir kaynak değişimi tetiklemez. `image` veya
+  `imageFallback` prop'u aynı id altında değişirse yeni çift bağımsız bir
+  yükleme denemesi sayılır. `imageFallback` yoksa ya da `image` ile aynıysa
+  kaynak değiştirilmez.
 - **Klavye:** özel widget rolü YOK — bu gerçek bir `<table>`, hücre içi
   gezinme tarayıcının doğal `Tab` sırasıyla çalışır (yalnız kaldırma
   butonları odaklanabilir; `Enter`/`Space` native `<button>` davranışı).
@@ -174,6 +188,8 @@ bozmaz.
   boş string/undefined ile aynı muameleyi görür.
 - `listing.image` dekoratifse `alt=""` sabit — görsel bilgi zaten başlık
   metninde; görselin kendisi karar verici bilgi taşımamalı.
+- `listing.imageFallback` de aynı dekoratif sözleşmeyi sürdürür; fallback'e
+  geçiş accessible name üretmez ve görünür başlığın yerine geçmez.
 
 ## 9. Token eşlemesi
 
@@ -189,23 +205,28 @@ bozmaz.
 | görsel radius | `--lg-radius-chip` | — | — |
 | td/th padding, font | `--lg-space-*` / `--lg-text-*` | — | — |
 
-**Borç (raw):** kaldırma butonu ölçüsü 24px (coarse pointer'da 44px'e
-yükseliyor) — token yok, `GlassChip`'in `.remove`'u ile aynı raw desen ·
-`.image` `max-width: 160px` / `aspect-ratio: 4/3` raw · `.corner`/
-`.rowHeader`/`.listingHead` `min-width: 140-160px` raw (sütun genişliği
-tahmini, container query yok) · `line-clamp: 2` raw satır sayısı.
+**Borç (mikro-geometri):** kökte (`.wrapper`) yerel değişkenlerde toplandı:
+`--glass-comparetable-remove-size/font` (24px/16px kaldırma butonu — token
+yok, `GlassChip`'in `.remove`'u ile aynı desen; coarse pointer büyümesi
+`--lg-control-md`'ye bağlandı, coarse'ta birebir 44px — dokunmatikte büyüme
+tasarımın istediği davranıştır), `--glass-comparetable-image-max` (160px, `aspect-ratio: 4/3`
+raw), `--glass-comparetable-label-col`/`--glass-comparetable-listing-col`
+(140px/160px sütun genişliği tahmini, container query yok) ·
+`line-clamp: 2` raw satır sayısı. Görsel değerler değişmedi.
 
 ## 10. Storybook kapsamı
 
 Var: Default, Playground, Kaldirilabilir (controlled `onRemove` akışı,
 listeden filtreleme çağıranın işi), VurgusuzKarsilastirma
-(`highlightDifferences=false`), DortIlan (üst sınır), BesIlanKirpilir (sınır
-üstü sessiz kırpma), UzunIcerik (uzun başlık + uzun metin değerleri, dar
-container), Responsive (mobile viewport + sticky ilk kolon), Erisilebilirlik
-(docs açıklamalı, `onRemove` ile).
+(`highlightDifferences=false`), GorselFallback (deterministik kırık temsili
+görsel → ilan görseli fallback'i), DortIlan (üst sınır), BesIlanKirpilir
+(sınır üstü sessiz kırpma), UzunIcerik (uzun başlık + uzun metin değerleri,
+dar container), Responsive (mobile viewport + sticky ilk kolon),
+Erisilebilirlik (docs açıklamalı, `onRemove` ile). States kapsamındaki
+görsel yükleme hatası `GorselFallback` ile kapsanır; disabled ilan/alan
+v1'de N/A'dır.
 **Eksik:** Temalar (ayrı story yok — toolbar'la Kağıt/Grafit doğrulanır,
-tüm token'lar üzerinden otomatik) · States (disabled ilan/alan N/A — v1'de
-yok).
+tüm token'lar üzerinden otomatik).
 
 ## 11. Test kabul kriterleri
 
@@ -227,6 +248,11 @@ yok).
 - [x] `onRemove` verilmediğinde hiçbir buton render edilmez (unit)
 - [x] 4'ten fazla ilan sessizce ilk 4'e kırpılır (unit)
 - [x] eksik değer "—" gösterir (unit)
+- [x] temsili görsel hata verince `imageFallback` yalnız bir kez seçilir;
+      fallback hatası kaynağı değiştirmez ve görsel `alt=""` ile dekoratif
+      kalır (unit)
+- [x] aynı `listing.id` için `image`/`imageFallback` çifti değişince yeni
+      temsili görsel yeniden denenir (unit)
 - [x] yatay kaydırma kabı `role="region"` + `aria-label` taşır ve
       `tabIndex={0}` ile klavyeyle odaklanabilir; `aria-label` verilmezse
       varsayılan "İlan karşılaştırma tablosu" adı kullanılır (unit)
@@ -250,6 +276,8 @@ yok).
   component hücreye birim eklemez.
 - ✅ `onRemove` verdiğinde kaldırılan id'yi kendi `listings` state'inden
   filtrelemeyi unutma (`Kaldirilabilir` story'sindeki desene bak).
+- ✅ Temsili bir `image` veriyorsan gerçek ilana ait mevcut görseli
+  `imageFallback` olarak taşı ve bu temsili kullanımı sayfa bağlamında açıkla.
 - ❌ `values` içine blok component (kart, ikinci tablo) koyma — hücre
   içeriği kısa metin/sayı içindir.
 - ❌ 2'den az veya 4'ten çok ilanla "karşılaştırma" UX'i kurma — alt sınır
@@ -275,4 +303,7 @@ kabına `role="region"` + `tabIndex={0}` + `aria-label` (varsayılan "İlan
 karşılaştırma tablosu") ve `:focus-visible` halkası eklendi; `onRemove`
 sonrası odak kurtarma (kalan ilk kaldırma butonuna, yoksa kaba) eklendi;
 `highlightDifferences` fark hesabı locale-farkındalıklı sayısal
-normalizasyonla düzeltildi (`1000` ile `"1.000"` artık aynı sayılır).
+normalizasyonla düzeltildi (`1000` ile `"1.000"` artık aynı sayılır) ·
+2026-07-27 `GlassCompareListing.imageFallback` eklendi; temsili görsel
+hatasında ilan görseline yalnız bir kez geçiş, ikinci hatada sabit kaynak ve
+aynı id altında görsel prop çifti değişince yeniden deneme sözleşmesi eklendi.

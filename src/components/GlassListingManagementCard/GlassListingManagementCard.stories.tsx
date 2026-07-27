@@ -26,7 +26,7 @@ const ActionButtons = () => (
 )
 
 const meta = {
-  title: 'Components/GlassListingManagementCard',
+  title: 'Bileşenler/Pazar Yeri/GlassListingManagementCard',
   component: GlassListingManagementCard,
   tags: ['autodocs'],
   args: {

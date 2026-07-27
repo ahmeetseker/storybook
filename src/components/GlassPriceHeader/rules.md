@@ -96,13 +96,18 @@ Etkileşimli durumlar slot'a konan `GlassIconButton`'ların kendi sözleşmesind
 |---|---|---|
 | root | radius | `shape={20}` — `--lg-radius-card` ile aynı değer, sayısal |
 | root (flat) | background / border / renk | `--lg-surface` / `--lg-hairline` / `--lg-label` (GlassSurface) |
-| meta | font-size | 13px — `--lg-text-footnote` değeriyle aynı, raw |
+| meta | font-size | `--lg-text-footnote` |
+| root | padding / gap | `--lg-space-5` / `--lg-space-3` (root+top) / `--lg-space-2` (actions) |
 | price | color | `priceTint` inline; verilmezse miras |
 
-Borç: `padding: 20px`, gap'ler (12/6/8) raw — `--lg-space-*` bağlanmalı ·
-başlık `20px/700` hiçbir tipografi token'ına denk değil (headline 17 / title 22
-arası) · fiyat `30px/800` — **800 ağırlık üç-ağırlık kuralını (400/600/700)
-ihlal eder**, display token'ı 28px/700 · letter-spacing değerleri raw.
+**Borç (raw / mikro-geometri):** `padding: 20px` → `--lg-space-5`, gap 12 →
+`--lg-space-3`, gap 8 → `--lg-space-2`, meta 13px → `--lg-text-footnote`
+bağlandı (birebir, görsel değişiklik yok). Token karşılığı olmayanlar kökte
+yerel değişkende toplandı: `--ph-title-size: 20px` (headline 17 / title 22
+arası), `--ph-price-size: 30px` (display 28'den büyük), `--ph-gap-tight: 6px`
+(space-1/2 arası sıkı gap). Fiyat `800` ağırlığı **üç-ağırlık kuralını
+(400/600/700) ihlal eder** — ayrı tasarım borcu, bu temizlikte değer
+değiştirilmedi · letter-spacing em değerleri raw (tipografi token'ı yok).
 
 ## 10. Storybook kapsamı
 

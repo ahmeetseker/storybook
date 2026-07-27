@@ -44,6 +44,13 @@ export interface GlassTourSchedulerProps
   /** grid: çok kolonlu saat ızgarası (geniş panel) · compact: tek kolon, dar panel */
   variant?: 'grid' | 'compact'
   tone?: 'light' | 'dark' | 'auto'
+  /**
+   * Kök yüzey malzemesi — varsayılan `'flat'`: bu component bir İÇERİK
+   * katmanıdır ve içine cam kontroller (GlassSegmentedControl/GlassButton)
+   * istifler; cam üstüne cam yasağı gereği kök cam AÇILMAZ (bkz. rules.md
+   * katman kararı). `'glass'` yalnız kökün gerçekten navigasyon/kontrol
+   * katmanı olduğu istisna yerleşimler içindir.
+   */
   material?: 'glass' | 'flat'
 }
 
@@ -76,7 +83,7 @@ export function GlassTourScheduler({
   onAddToCalendar,
   variant = 'grid',
   tone = 'auto',
-  material,
+  material = 'flat',
   className,
   ...rest
 }: GlassTourSchedulerProps) {

@@ -15,6 +15,11 @@ const FLAT: Record<string, { scheme: 'light' | 'dark'; vars: Record<string, stri
       '--lg-hairline': 'rgba(36, 33, 27, 0.09)',
       '--lg-accent': '#b45309',
       '--lg-accent-contrast': '#ffffff',
+      '--lg-danger': '#c92a20',
+      '--lg-warning': '#9a5700',
+      '--lg-success': '#18743a',
+      '--lg-scrim': 'rgba(10, 12, 16, 0.55)',
+      '--lg-on-scrim': '#ffffff',
     },
   },
   dark: {
@@ -27,6 +32,11 @@ const FLAT: Record<string, { scheme: 'light' | 'dark'; vars: Record<string, stri
       '--lg-hairline': 'rgba(255, 255, 255, 0.1)',
       '--lg-accent': '#e09143',
       '--lg-accent-contrast': '#1a140c',
+      '--lg-danger': '#ff6961',
+      '--lg-warning': '#ffb44c',
+      '--lg-success': '#52d273',
+      '--lg-scrim': 'rgba(4, 5, 8, 0.62)',
+      '--lg-on-scrim': '#ffffff',
     },
   },
 }

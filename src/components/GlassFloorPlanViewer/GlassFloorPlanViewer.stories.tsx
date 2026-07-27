@@ -40,7 +40,7 @@ const villaPlans: GlassFloorPlanPlan[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassFloorPlanViewer',
+  title: 'Bileşenler/Medya ve Harita/GlassFloorPlanViewer',
   component: GlassFloorPlanViewer,
   tags: ['autodocs'],
   args: { plans: villaPlans, onActiveIndexChange: fn() },

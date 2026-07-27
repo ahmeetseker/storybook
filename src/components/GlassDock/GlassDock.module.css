@@ -1,0 +1,263 @@
+/* GlassDock — fixed davranışta sürekli açık, public-site referanslı
+   magnification rayı; morph davranışında legacy peek↔dock aç/kapa.
+   Cam malzeme GlassSurface'tan gelir (navigasyon katmanı). Mikro-geometri
+   kökte yerel değişkenlerde toplanır — bkz. rules.md §9. */
+.root {
+  --glass-dock-icon: 38px; /* BASE_ICON — JS sabitiyle birebir, bkz. rules.md §9 borç */
+  --glass-dock-peek-long: 140px;
+  --glass-dock-peek-thick: 24px;
+  --glass-dock-track-pad-inline: 8px;
+  --glass-dock-track-pad-block: 6px;
+  --glass-dock-tooltip-track: 0.18em;
+  position: fixed;
+  z-index: 60;
+  max-width: calc(
+    100vw - var(--lg-space-4) - env(safe-area-inset-left, 0px) -
+      env(safe-area-inset-right, 0px)
+  );
+  max-height: calc(
+    100dvh - var(--lg-space-4) - env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.rootH {
+  bottom: calc(var(--lg-space-3) + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.rootV {
+  right: calc(var(--lg-space-2) + env(safe-area-inset-right, 0px));
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ── morph kapsayıcısı: kapalıda peek hap boyutu, açıkta içerik güdümlü ── */
+.morph {
+  position: relative;
+  outline: none;
+}
+
+.morphClosed {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--lg-label) 55%, transparent);
+  /* bg geçiş temposu layout FLIP ile eşit (~spring kuyruğu) */
+  transition: background-color 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.morphClosed.morphH {
+  width: var(--glass-dock-peek-long);
+  height: var(--glass-dock-peek-thick);
+  border-radius: var(--lg-radius-capsule) var(--lg-radius-capsule) 0 0;
+}
+
+.morphClosed.morphV {
+  width: var(--glass-dock-peek-thick);
+  height: var(--glass-dock-peek-long);
+  border-radius: var(--lg-radius-capsule) 0 0 var(--lg-radius-capsule);
+}
+
+.morphOpen {
+  overflow: visible;
+  border-radius: var(--lg-radius-capsule);
+  background: transparent;
+}
+
+/* Peek butonu kapsayıcıyı tamamen doldurur — görsel yüzeyin kendisi buton. */
+.peek {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.peek:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+/* Dokunmatik: 24px kalınlıktaki peek şeridinin dokunma hedefi görünmez
+   ::after taşmasıyla ≥44px'e (--lg-control-md, coarse'ta 44px) genişletilir. */
+@media (pointer: coarse) {
+  .peek::after {
+    content: '';
+    position: absolute;
+    inset: calc((var(--glass-dock-peek-thick) - var(--lg-control-md)) / 2) 0;
+  }
+}
+
+/* ── sürekli açık gövde: cam kapsül + sabit ikon rayı ── */
+.body {
+  position: relative;
+}
+
+.bodyH {
+  padding: var(--glass-dock-track-pad-block) var(--glass-dock-track-pad-inline);
+  max-width: calc(
+    100vw - var(--lg-space-4) - env(safe-area-inset-left, 0px) -
+      env(safe-area-inset-right, 0px)
+  );
+}
+
+.bodyV {
+  padding: var(--glass-dock-track-pad-inline) var(--glass-dock-track-pad-block);
+  max-height: calc(
+    100dvh - var(--lg-space-4) - env(safe-area-inset-top, 0px) -
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* Cam yüzey arka katman olarak yayılır; ikon rayından ayrı kardeş katmandır. */
+.glass {
+  /* Yüzen katman: taban yüzeyin gölge kanalını besler */
+  --lg-surface-shadow: var(--lg-shadow-md);
+  position: absolute;
+  inset: 0;
+}
+
+.track {
+  position: relative;
+}
+
+/* public-site edge lens: aktif öğede dinlenir, hover edilen öğeyi büyütülmüş
+   scale ve yeniden hesaplanan merkezle takip eder. */
+.indicator {
+  position: absolute;
+  z-index: 0;
+  width: var(--glass-dock-icon);
+  height: var(--glass-dock-icon);
+  border-radius: var(--lg-radius-capsule);
+  pointer-events: none;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--lg-surface) 82%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 color-mix(in srgb, var(--lg-label) 6%, transparent),
+    inset 0 0 0 0.5px color-mix(in srgb, var(--lg-label) 16%, transparent),
+    0 4px 12px -2px rgba(0, 0, 0, 0.18);
+  will-change: left, top, transform;
+}
+
+/* ── ikon karosu ── */
+.item {
+  position: absolute;
+  width: var(--glass-dock-icon);
+  height: var(--glass-dock-icon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--lg-label);
+  text-decoration: none;
+  border-radius: var(--lg-radius-capsule);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  will-change: left, top, transform;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  color: var(--lg-accent);
+}
+
+/* Dokunmatik: 38px karo görünmez ::after taşmasıyla ≥44px hedefe genişler. */
+@media (pointer: coarse) {
+  .item::after {
+    content: '';
+    position: absolute;
+    inset: calc((var(--glass-dock-icon) - var(--lg-control-md)) / 2);
+  }
+}
+
+.itemIcon {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+/* ── hover tooltip'i — mono, büyük harf mini chip (ekran görüntüsündeki
+      "COMPARE" kapsülü) ── */
+.tooltip {
+  position: absolute;
+  z-index: 3;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 2px var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  border: 1px solid var(--lg-hairline);
+  background: color-mix(in srgb, var(--lg-surface) 92%, transparent);
+  color: var(--lg-label);
+  font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--glass-dock-tooltip-track);
+  box-shadow: var(--lg-shadow-sm);
+}
+
+.tooltipH {
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: var(--lg-space-2);
+  transform: translateX(-50%);
+}
+
+.tooltipV {
+  top: 50%;
+  right: 100%;
+  margin-right: var(--lg-space-2);
+  transform: translateY(-50%);
+}
+
+/* Dar veya dokunmatik viewport'ta öğeleri düşürmek yerine rayı kaydırılabilir
+   tutar. Tooltip bu bağlamda kapatılır; 44px hedefler korunur. */
+@media (pointer: coarse), (max-width: 560px) {
+  .bodyH {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: var(--glass-dock-track-pad-inline);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .bodyV {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-block: contain;
+    scroll-padding-block: var(--glass-dock-track-pad-inline);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .bodyH::-webkit-scrollbar,
+  .bodyV::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tooltip {
+    display: none;
+  }
+}
+
+/* Reduced-motion: morph geçişi sadeleşir; JS magnification'ı 1x'e sabitler. */
+@media (prefers-reduced-motion: reduce) {
+  .morphClosed {
+    transition: none;
+  }
+}

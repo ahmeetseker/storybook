@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { GlassRadioGroup } from './GlassRadioGroup'
@@ -11,7 +11,7 @@ const yakit = [
 ]
 
 const meta = {
-  title: 'Components/GlassRadioGroup',
+  title: 'Bileşenler/Form/GlassRadioGroup',
   component: GlassRadioGroup,
   tags: ['autodocs'],
   args: { options: yakit, label: 'Yakıt tipi', onChange: fn() },
@@ -73,17 +73,19 @@ export const DisabledOption: Story = {
   },
 }
 
+const ControlledDemo = (args: ComponentProps<typeof GlassRadioGroup>) => {
+  const [val, setVal] = useState('hibrit')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <GlassRadioGroup {...args} value={val} onChange={setVal} />
+      <span style={{ fontSize: 13, opacity: 0.7 }}>Seçili: {val}</span>
+    </div>
+  )
+}
+
 /** Controlled kullanım: seçim dışarıdan yönetilir. */
 export const Controlled: Story = {
-  render: (args) => {
-    const [val, setVal] = useState('hibrit')
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <GlassRadioGroup {...args} value={val} onChange={setVal} />
-        <span style={{ fontSize: 13, opacity: 0.7 }}>Seçili: {val}</span>
-      </div>
-    )
-  },
+  render: (args) => <ControlledDemo {...args} />,
 }
 
 /** Responsive: horizontal grup mobil genişlikte dikeye düşer (media query, flex-wrap değil). */

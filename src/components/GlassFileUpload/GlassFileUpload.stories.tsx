@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassFileUpload } from './GlassFileUpload'
 
 const meta = {
-  title: 'Components/GlassFileUpload',
+  title: 'Bileşenler/Form/GlassFileUpload',
   component: GlassFileUpload,
   tags: ['autodocs'],
   args: { onFiles: fn() },

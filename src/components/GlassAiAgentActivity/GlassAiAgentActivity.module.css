@@ -2,6 +2,11 @@
    Durum renk dışında metinle iletilir; running için nabız animasyonu (yalnız
    transform/opacity) reduced-motion'da kapanır. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --mark-size: 9px;
+  --mark-offset: 5px;
+  --gap-tight: 2px;
+  --badge-pad-block: 3px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -35,32 +40,19 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--badge-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
+/* Yalnız yerleşim: GlassButton'ın başlık sıkışmasında büzülmemesi için */
 .stop {
   flex-shrink: 0;
-  min-height: var(--lg-control-sm);
-  padding: 0 var(--lg-space-3);
-  font: inherit;
-  font-size: var(--lg-text-footnote);
-  font-weight: 600;
-  color: var(--lg-danger);
-  background: transparent;
-  border: 1px solid color-mix(in srgb, var(--lg-danger) 32%, var(--lg-hairline));
-  border-radius: var(--lg-radius-chip);
-  cursor: pointer;
-}
-.stop:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
 }
 
 .list {
@@ -91,9 +83,9 @@
 
 .mark {
   flex: none;
-  width: 9px;
-  height: 9px;
-  margin-top: 5px;
+  width: var(--mark-size);
+  height: var(--mark-size);
+  margin-top: var(--mark-offset);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-label-secondary);
 }
@@ -129,7 +121,7 @@
   min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--gap-tight);
 }
 
 .itemHead {
@@ -141,7 +133,7 @@
 
 .itemTitle {
   font-size: var(--lg-text-body);
-  font-weight: 650;
+  font-weight: 600;
   color: var(--lg-label);
 }
 
@@ -151,14 +143,14 @@
   color: var(--lg-label-secondary);
 }
 .status[data-status='needsApproval'] {
-  color: color-mix(in srgb, var(--lg-warning) 72%, var(--lg-label));
+  color: color-mix(in srgb, var(--lg-warning) 50%, var(--lg-label));
 }
 .status[data-status='error'],
 .status[data-status='rejected'] {
   color: color-mix(in srgb, var(--lg-danger) 78%, var(--lg-label));
 }
 .status[data-status='done'] {
-  color: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));
+  color: color-mix(in srgb, var(--lg-success) 50%, var(--lg-label));
 }
 
 .detail {
@@ -177,7 +169,7 @@
 }
 
 .technical {
-  margin-top: 2px;
+  margin-top: var(--gap-tight);
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
 }
@@ -196,32 +188,6 @@
   gap: var(--lg-space-2);
 }
 
-.reject,
-.approve {
-  min-height: var(--lg-control-sm);
-  padding: 0 var(--lg-space-3);
-  font: inherit;
-  font-size: var(--lg-text-footnote);
-  font-weight: 600;
-  border-radius: var(--lg-radius-chip);
-  cursor: pointer;
-}
-.reject {
-  color: var(--lg-label);
-  background: transparent;
-  border: 1px solid var(--lg-hairline);
-}
-.approve {
-  color: var(--lg-accent-contrast);
-  background: var(--lg-accent);
-  border: 1px solid transparent;
-}
-.reject:focus-visible,
-.approve:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
-}
-
 .empty {
   margin: 0;
   padding: var(--lg-space-3);
@@ -238,14 +204,6 @@
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
   border-top: 1px solid var(--lg-hairline);
-}
-
-@media (pointer: coarse) {
-  .reject,
-  .approve,
-  .stop {
-    min-height: var(--lg-control-md);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

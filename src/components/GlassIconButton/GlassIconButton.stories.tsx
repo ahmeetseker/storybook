@@ -15,7 +15,7 @@ const ShareIcon = () => (
 )
 
 const meta = {
-  title: 'Components/GlassIconButton',
+  title: 'Bileşenler/Eylemler/GlassIconButton',
   component: GlassIconButton,
   tags: ['autodocs'],
   args: { onClick: fn() },

@@ -34,7 +34,7 @@ sayfalarında kullanılır.
 | header | ✅ | başlık + yeni rozet + alarm switch |
 | criteria | — | ölçüt chip listesi |
 | meta | — | son çalıştırma / sıklık |
-| actions | — | aç / düzenle / sil (koşullu) |
+| actions | — | aç / düzenle / sil (koşullu). "Sonuçları aç" `<GlassButton prominent size="sm">`, "Düzenle" `<GlassButton size="sm">` compose eder; "Sil" yerel quiet/danger buton (danger ekseni kararı bekliyor). |
 
 ## 4. Public API
 
@@ -68,7 +68,9 @@ başka durumu yok.
 
 ## 7. Davranış
 
-- Butonlar `:focus-visible` + min 44px (`--lg-control-md`).
+- "Sonuçları aç"/"Düzenle" GlassButton'dır (focus halkası ve basınç etkileşimi
+  GlassButton sözleşmesinden gelir); "Sil" `:focus-visible` + min 44px
+  (`--lg-control-md`).
 - Uzun başlık/kriter sarar; kriter listesi `flex-wrap`.
 - Animasyon yok.
 
@@ -85,11 +87,16 @@ başka durumu yok.
 | root | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-card` |
 | newBadge | background | `color-mix(--lg-accent 14%)` |
 | chip | background | `color-mix(--lg-label-secondary 10%)` |
-| primary | background | `--lg-accent` |
+| aç / düzenle | — | GlassButton compose (`prominent size="sm"` / `size="sm"`) — kendi token setini kullanır |
 | quiet (sil) | color | `--lg-danger` |
-| buton min-height | | `--lg-control-md` |
+| sil min-height | | `--lg-control-md` |
 
-Raw px: yok.
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--gssc-badge-padding-block: 2px` — yeni sonuç rozeti dikey dolgusu.
+- `--gssc-chip-padding-block: 3px` — ölçüt çipi dikey dolgusu.
+
+Bunların dışında raw px yok. `.quiet` `:hover` kuralı `@media (hover: hover)`
+bloğu içinde — dokunmatikte yapışan hover durumu oluşmaz.
 
 ## 10. Storybook kapsamı
 
@@ -116,5 +123,13 @@ Responsive (mobile1), Erişilebilirlik (docs).
 
 ## Changelog
 
+- 2026-07-24: Buton kompozisyonu — "Sonuçları aç" → `<GlassButton prominent
+  size="sm">`, "Düzenle" → `<GlassButton size="sm">`; `.primary`/`.secondary`
+  CSS sınıfları silindi. "Sil" (quiet/danger) danger ekseni kararı bekleyene
+  dek yerel kaldı. Davranış (koşullu render, onClick) değişmedi.
+- 2026-07-24: Uyum düzeltmesi — `.primary`/`.secondary`/`.quiet` hover
+  kuralları `@media (hover: hover)` içine alındı (dokunmatikte yapışan hover
+  giderildi); mikro-geometri (`2px` rozet, `3px` çip dikey dolguları) `.root`
+  üzerinde yerel değişkenlere toplandı (§9). Görsel değişiklik yok.
 - 2026-07-18: İlk sürüm — article + heading, controlled alarm switch, koşullu
   aksiyonlar. Codex `CodexSavedSearchCard` deseninden türetildi.

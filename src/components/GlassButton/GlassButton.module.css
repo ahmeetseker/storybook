@@ -11,30 +11,30 @@
   transition: background-color 0.16s ease-out, color 0.16s ease-out, scale 0.16s ease-out, box-shadow 0.16s ease-out;
 }
 .button:focus-visible {
-  outline: 2px solid var(--lg-accent, #0a84ff);
-  outline-offset: 2px;
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
 }
 
 /* tvOS focus modeli: hover'da cam opak beyaza döner, metin koyulaşır, öğe "lift" olur.
    scale CSS özelliği, motion'ın inline transform'uyla (basınç jölesi) çarpılarak birleşir. */
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.94);
-    color: rgba(0, 0, 0, 0.85);
+    background-color: var(--lg-surface);
+    color: var(--lg-label);
     scale: 1.05;
-    /* GlassSurface gölgeyi inline style ile verdiği için !important şart */
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+    /* Yükselti yalnız hover'da: GlassSurface'in gölge kanalını besleriz, rim korunur */
+    --lg-surface-shadow: var(--lg-shadow-md);
   }
   .button:active:not(:disabled) {
-    background-color: #fff;
+    background-color: var(--lg-surface);
     scale: 1.02;
   }
   .tinted:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--glass-tint) 30%, #ffffff);
+    background-color: color-mix(in srgb, var(--glass-tint) 30%, var(--lg-surface));
   }
   .prominent:hover:not(:disabled) {
-    background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #0a84ff)) 78%, #ffffff);
-    color: #fff;
+    background-color: var(--glass-tint, var(--lg-accent));
+    color: var(--lg-accent-contrast);
   }
 }
 
@@ -48,19 +48,25 @@
 
 /* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 55%, transparent); }
-.prominent { background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent, #0a84ff)) 85%, transparent); color: #fff; }
+.button.prominent { background-color: color-mix(in srgb, var(--glass-tint, var(--lg-accent)) 85%, transparent); color: var(--lg-accent-contrast) !important; }
+.button.prominent .label { color: var(--lg-accent-contrast) !important; }
 
-/* Yükseklikler kontrol token'larından gelir (dokunmatikte otomatik 44px+);
+/* Yükseklikler kontrol token'larından gelir (dokunmatikte otomatik büyür);
    letter-spacing SF tracking tablosuna yakın, boyuta özel */
-.sm { min-height: var(--lg-control-sm, 32px); padding: 0 14px; font-size: 13px; letter-spacing: 0; }
-.md { min-height: var(--lg-control-md, 40px); padding: 0 20px; font-size: 15px; letter-spacing: -0.01em; }
-.lg { min-height: var(--lg-control-lg, 48px); padding: 0 28px; font-size: 17px; letter-spacing: -0.022em; }
-.xl { min-height: var(--lg-control-xl, 56px); padding: 0 36px; font-size: 19px; letter-spacing: -0.022em; } /* Apple'ın yeni extra-large boyutu */
+.sm { min-height: var(--lg-control-sm); padding: 0 calc(var(--lg-space-3) + var(--lg-stroke-hairline) + var(--lg-stroke-hairline)); font-size: var(--lg-text-footnote); letter-spacing: 0; }
+.md { min-height: var(--lg-control-md); padding: 0 var(--lg-space-5); font-size: var(--lg-text-body); letter-spacing: -0.01em; }
+.lg { min-height: var(--lg-control-lg); padding: 0 calc(var(--lg-space-6) + var(--lg-space-1)); font-size: var(--lg-text-headline); letter-spacing: -0.022em; }
+.xl { min-height: var(--lg-control-xl); padding: 0 calc(var(--lg-space-7) + var(--lg-space-1)); font-size: calc(var(--lg-text-headline) + var(--lg-focus-ring-width)); letter-spacing: -0.022em; } /* Apple extra-large boyutu */
+
+/* Dokunmatikte yalnız küçük boyut bir üst kontrol token'ına yükselir. */
+@media (pointer: coarse) {
+  .sm { min-height: var(--lg-control-md); }
+}
 
 .button:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
 
 /* Loading: genişlik korunur (etiket görünmez ama yer tutar), spinner ortada döner */
-.label { display: inline-flex; align-items: center; gap: 0.5em; transition: opacity 0.15s ease; }
+.label { display: flex; align-items: center; gap: 0.5em; transition: opacity 0.15s ease; }
 .loading { cursor: progress; }
 .loading .label { opacity: 0; }
 .loading:hover:not(:disabled) { scale: none; }
@@ -71,7 +77,7 @@
   width: 1.1em;
   height: 1.1em;
   margin: -0.55em 0 0 -0.55em;
-  border: 2px solid currentColor;
+  border: var(--lg-focus-ring-width) solid currentColor;
   border-top-color: transparent;
   border-radius: 50%;
   animation: lg-spin 0.7s linear infinite;

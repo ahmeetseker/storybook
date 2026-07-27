@@ -56,7 +56,7 @@ ekranı. Tek component içinde uçtan uca dört adımlı bir mini-form.
 | onAddToCalendar | prop | `() => void` | — (opsiyonel) | — | Onay ekranındaki "Takvime ekle" butonunu tetikler; verilmezse buton hiç render edilmez (noop buton yasak) |
 | variant | prop | `'grid'\|'compact'` | `'grid'` | — | `compact`: tek kolon saat listesi + dar panel (`max-width: 300px`) |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | — | Surface + iç GlassButton/GlassSegmentedControl'e geçer |
-| material | prop | `'glass'\|'flat'` | — (GlassSurface default'u `glass`) | — | İçerikte `flat` önerilir |
+| material | prop | `'glass'\|'flat'` | `'flat'` | — | **Katman kararı (2026-07-24):** varsayılan `flat` — kök bir İÇERİK katmanıdır ve içine cam kontroller (GlassSegmentedControl + GlassButton) istifler; kök cam açılırsa "cam üstüne cam" yasağı ihlal edilir. İç kontroller kontrol camı olarak kalır. `'glass'` yalnız kökün gerçekten tekil kontrol katmanı olduğu istisna yerleşimler için |
 | ...rest | — | `HTMLAttributes<HTMLElement>` | — | — | `className` birleştirilir |
 
 Ref hedefi yok. `date`/`time`/`type` seçimi tamamen uncontrolled internal
@@ -145,9 +145,23 @@ değildir, component'te yok.
 | resetLink | color | `--lg-accent` |
 | focus halkası | outline | `--lg-accent`, yalnız `:focus-visible` |
 
-**Borç (raw):** chip/slot iç `padding` (6-14px), `slotGrid` minmax kolon
-genişliği (76px), `checkIcon` çapı (40px) ve font boyutları (11.5-19px) —
-mevcut kütüphane konvansiyonuyla tutarlı (bkz. GlassSellerCard §9).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan görsel sabitler
+component kökünde yerel değişken olarak toplanır (görsel değer değişmedi):
+`--ts-chip-pad-block: 6px` · `--ts-chip-pad-inline: 14px` · `--ts-chip-gap:
+2px` · `--ts-strip-pad-b: 2px` · `--ts-check-size: 40px` ·
+`--ts-check-glyph: 18px` · `--ts-max-w: 460px` / `--ts-max-w-compact: 300px`
+(kart genişlik sınırları) · `--ts-slot-min: 76px` (slotGrid minmax kolon
+tabanı). `pointer: coarse` dokunma hedefi `--lg-control-md`'ye bağlandı
+(coarse'ta 44px — birebir; token'ın coarse'ta büyümesi istenen davranış).
+Geçiş süresi/easing (`0.16s ease-out`) raw — süre token'ı yok.
+2026-07-24: tipografi borçları
+kapandı — sectionTitle/empty/resetLink → `--lg-text-footnote`,
+dayChipLabel/confirmSummary → `--lg-text-body` (14→15px), dayChipMeta →
+`--lg-text-caption` (11.5→12px), confirmTitle → `--lg-text-headline`;
+checkIcon `border-radius: 50%` → `--lg-radius-capsule`; slot padding →
+`--lg-space-3`; resetLink padding → `--lg-space-1/2`; renk transition'ları
+kaldırıldı (animasyon yalnız transform/opacity/filter — slot yalnız opacity
+animlar).
 
 ## 10. Storybook kapsamı
 
@@ -216,4 +230,8 @@ callback verildiğinde açılır); `days`/`tourTypes` değişince seçili
 gün/saat/tip render sırasında türetilmiş doğrulamayla uzlaştırılıyor (stale
 seçim sızmaz, boş→dolu `days` geçişinde ilk gün tabbable olur); `onAddToCalendar`
 prop'u eklendi, verilmezse "Takvime ekle" hiç render edilmiyor (eski noop
-buton kaldırıldı).
+buton kaldırıldı). · 2026-07-24 — Tasarım sistemi uyum düzeltmesi: kök
+`material` varsayılanı `'flat'` yapıldı (cam istifi ihlali — içerik katmanı
+FLAT, iç cam kontroller korunur; bkz. §4 katman kararı); tipografi/spacing
+token eşlemesi tamamlandı, mikro-geometri kök `--ts-*` değişkenlerinde
+toplandı, renk transition'ları kaldırıldı (bkz. §9).

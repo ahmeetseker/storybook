@@ -2,23 +2,31 @@
    (GlassInput/GlassSlider/GlassButton) kendi kontrol-katmanı camını taşır. */
 
 .card {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --calc-bar-h: 10px;
+  --calc-dot-size: 8px;
+  --calc-legend-gap: 6px;
+  --calc-max-w: 420px;
+  --calc-max-w-compact: 360px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   gap: var(--lg-space-5, 20px);
-  padding: var(--lg-space-6, 24px);
+  /* Dar container'da iç boşluk içsel olarak bir kademe düşer
+     (eski 420px breakpoint'in karşılığı: % genişliğe bağlı clamp) */
+  padding: clamp(var(--lg-space-4, 16px), 6%, var(--lg-space-6, 24px));
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-card, 20px);
   color: var(--lg-label);
   font-family: var(--lg-font, inherit);
-  max-width: 420px;
+  max-width: var(--calc-max-w);
 }
 
 .compact {
   gap: var(--lg-space-4, 16px);
   padding: var(--lg-space-5, 20px);
-  max-width: 360px;
+  max-width: var(--calc-max-w-compact);
 }
 
 .title {
@@ -98,7 +106,7 @@
 .ratioBar {
   display: flex;
   width: 100%;
-  height: 10px;
+  height: var(--calc-bar-h);
   border-radius: var(--lg-radius-capsule, 999px);
   overflow: hidden;
   background: var(--lg-hairline);
@@ -128,14 +136,14 @@
 .legendItem {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--calc-legend-gap);
 }
 
 .legendDotPrincipal,
 .legendDotInterest {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: var(--calc-dot-size);
+  height: var(--calc-dot-size);
+  border-radius: var(--lg-radius-capsule);
   flex: none;
 }
 .legendDotPrincipal {
@@ -178,12 +186,4 @@
 
 .cta {
   width: 100%;
-}
-
-/* Dar container: kart genişliği daralır, iç boşluklar bir kademe düşer */
-@media (max-width: 420px) {
-  .card {
-    max-width: 100%;
-    padding: var(--lg-space-4, 16px);
-  }
 }

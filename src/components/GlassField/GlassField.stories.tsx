@@ -6,7 +6,7 @@ import { GlassTextarea } from '../GlassTextarea'
 import { GlassSelect } from '../GlassSelect'
 
 const meta = {
-  title: 'Components/GlassField',
+  title: 'Bileşenler/Form/GlassField',
   component: GlassField,
   tags: ['autodocs'],
   argTypes: {

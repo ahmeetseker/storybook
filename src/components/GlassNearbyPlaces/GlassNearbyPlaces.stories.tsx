@@ -84,7 +84,7 @@ const nearbyCategories: GlassNearbyCategory[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassNearbyPlaces',
+  title: 'Bileşenler/Medya ve Harita/GlassNearbyPlaces',
   component: GlassNearbyPlaces,
   tags: ['autodocs'],
   args: { categories: nearbyCategories, variant: 'chips', onActiveCategoryIdChange: fn() },

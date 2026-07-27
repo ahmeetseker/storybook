@@ -93,13 +93,19 @@ ile cam beyaz-alfa ayraç yerine koyu ayraç uygulanır.
 |---|---|---|
 | root (flat) | background / border / renk | `--lg-surface` / `--lg-hairline` / `--lg-label` (GlassSurface) |
 | root | radius | `shape={20}` — `--lg-radius-card` değeriyle aynı, sayısal |
-| title | font-size | 17px — `--lg-text-headline` değeriyle aynı, raw |
+| title | font-size | `--lg-text-headline` |
 
-Borç: satır ayracı iki malzemede de raw — cam `rgba(255,255,255,.16)`,
-flat `rgba(0,0,0,.08)`; flat ayracı `--lg-hairline`'a bağlanmalı (tema başına
-doğru değeri oradan alır) · label/value 14px hiçbir tipografi token'ına denk
-değil (footnote 13 / body 15 arası) · padding 20px, column-gap 32px,
-min-height 36px raw.
+**Borç (raw / mikro-geometri):** satır ayracı iki malzemede de bilinçli raw —
+cam `rgba(255,255,255,.16)` beyaz-alfa malzeme etkisi; flat `rgba(0,0,0,.08)`
+`--lg-hairline` (`rgba(36,33,27,.09)`) ile birebir aynı olmadığından bağlamak
+tema başına görsel değişiklik yaratırdı (hairline'a geçiş ayrı görsel karar
+olarak bekliyor). Label/value 14px hiçbir tipografi token'ına denk değil
+(footnote 13 / body 15 arası); satır min-height 36px ve dikey padding 7px ile
+birlikte component kökünde yerel değişkene toplandı (`.card {
+--row-min-height: 36px; --row-pad-block: 7px; --cell-font-size: 14px; }`).
+Bağlananlar: padding 20px → `--lg-space-5`, başlık 17px → `--lg-text-headline`,
+başlık alt boşluğu 12px → `--lg-space-3`, column-gap 32px → `--lg-space-7`,
+satır gap 16px → `--lg-space-4`.
 
 ## 10. Storybook kapsamı
 

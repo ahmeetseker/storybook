@@ -69,7 +69,7 @@ export function GlassMetricStrip({
                 </span>
               ) : null}
             </dd>
-            {item.hint ? <p className={styles.hint}>{item.hint}</p> : null}
+            {item.hint ? <dd className={styles.hint}>{item.hint}</dd> : null}
           </div>
         )
       })}

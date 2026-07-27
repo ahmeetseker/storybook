@@ -75,7 +75,10 @@ Açık kararlar).
   soruya bağlanır — `GlassAiFlagBanner`'daki gruplama deseniyle aynı (Codex
   Dalga 4 bulgusu: önceki sürümde görünür soru butonlarla programatik
   ilişkili değildi).
-- "Planı Onayla": gerçek `<button type="button">`, **her zaman** DOM'da —
+- "Planı Onayla": `GlassButton prominent` compose edilir (gerçek
+  `<button type="button">` render eder; `GlassTourScheduler` footer'ıyla aynı
+  desen — tam genişlik `.footer` sütun sarmalayıcısının stretch'inden gelir),
+  **her zaman** DOM'da —
   `onConfirm` verilmezse `disabled` (buton yok sayılmaz/gizlenmez, AI
   çıktısının otomatik eylem tetiklememesi ilkesi görsel olarak sürekli
   hatırlatılır). `loading` sırasında da `disabled` (henüz onaylanacak bir
@@ -97,7 +100,7 @@ Açık kararlar).
 | durak rotası | ✅ (`stops` boş değilse) | `stops[]` → sıra numaralı kartlar | `stops=[]` → sabit boş durum metni |
 | ulaşım notu | — | `stop.travelNote` | Yalnız 2. ve sonraki duraklarda; ilk durakta yok sayılır |
 | geri bildirim | — | 👍/👎 | Yalnız `onFeedback` verilirse VE `stops` boş değilken VE `loading=false`'ken |
-| onay butonu | ✅ (her zaman) | "Planı Onayla" | `onConfirm` yoksa/`loading`sa/`stops` boşsa `disabled`, asla gizlenmez |
+| onay butonu | ✅ (her zaman) | "Planı Onayla" (`GlassButton prominent`) | `onConfirm` yoksa/`loading`sa/`stops` boşsa `disabled`, asla gizlenmez |
 
 Children kabul edilmez — tamamen prop güdümlü (`GlassMatchScore`/
 `GlassTourScheduler` ile aynı karar). Bu **tip düzeyinde** uygulanır:
@@ -233,17 +236,25 @@ Katman sırası: `loading` (varsa AI rozeti hariç her şeyi bastırır) → `st
 | sıra numarası rozeti | background/color | `color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface))` / `color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label))` | dekoratif, `aria-hidden` |
 | bağlantı çizgisi | background | `--lg-hairline` | — |
 | durak görseli | border-radius | `--lg-radius-media` | — |
-| onay butonu | background/color | `--lg-accent` / `--lg-accent-contrast` | `:disabled` → opacity 0.4 |
+| onay butonu | — | `GlassButton prominent` compose edilir — görsel stil/token tüketimi GlassButton'a ait, burada ek stil yazılmaz | disabled/hover/focus GlassButton sözleşmesinden |
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | skeleton | background | `color-mix(... var(--lg-label) 8% ...)` | `loading` |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
 
-**Borç (raw):** rail genişliği 26px, sıra numarası rozeti çapı 24px, durak
-görseli 48px, `.stopTitle` font-size 14px (tasarım sistemi ölçeğinde yok —
-`GlassTimeline .title` ile aynı gerekçe/değer), AI rozeti font-size
-10.5px/700 (kontrat sabiti), skeleton satır yüksekliği 56px, "Planı Onayla"/
-"Bu plan faydalı mıydı?"/"Bu tur planında henüz durak eklenmemiş." metinleri
-hardcoded Türkçe (i18n borcu, kütüphane genelinde tutarlı).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan görsel sabitler
+component kökünde yerel değişken olarak toplanır (görsel değer değişmedi):
+`--tp-rail-w: 26px` · `--tp-badge-size: 24px` (sıra rozeti + skeleton
+rozeti) · `--tp-connector-w: 2px` · `--tp-image-size: 48px` ·
+`--tp-skeleton-card-h: 56px` · `--tp-ai-gap: 6px` · `--tp-ai-pad-block:
+3px` · `--tp-text-gap: 2px`. "Planı Onayla"/"Bu plan faydalı mıydı?"/"Bu
+tur planında henüz durak eklenmemiş." metinleri hardcoded Türkçe (i18n
+borcu, kütüphane genelinde tutarlı). 2026-07-24: `.stopTitle` font-size
+borcu `--lg-text-body`'ye (14→15px), AI rozeti font-size'ı
+`--lg-text-badge`'e (10.5→11px) taşınarak kapandı; buton renk
+transition'ları kaldırıldı (animasyon yalnız transform/opacity/filter).
+2026-07-24: `pointer: coarse` dokunmatik hedefleri (44px)
+`--lg-control-md`'ye bağlandı — coarse'ta birebir 44px, dokunmatikte
+büyüme tasarımın istediği davranıştır.
 
 ## 10. Storybook kapsamı
 
@@ -316,6 +327,13 @@ maksimum sayı/uzunluk sınırı.
 
 ## Changelog
 
+- 2026-07-24: "Planı Onayla" butonu artık `GlassButton prominent` compose
+  ediyor (buton kompozisyon politikası) — `.confirmButton` CSS sınıfı ve
+  ona bağlı `:disabled`/`:focus-visible`/hover/coarse/reduced-motion
+  kuralları silindi; tam genişlik `.footer` sütun sarmalayıcısının
+  cross-axis stretch'iyle sağlanıyor (GlassTourScheduler footer deseni).
+  👍/👎 geri bildirim butonları bilinçli olarak elle çizilmiş kaldı (AI
+  deseni). Davranış (disabled koşulu, handler koruması) değişmedi.
 - 2026-07-17: Codex Dalga 4 konsolide rapor düzeltmeleri — `children`
   `Omit<HTMLAttributes<HTMLElement>, 'children'>` ile tip düzeyinde
   kaldırıldı; `stops=[]` iken "Planı Onayla" `onConfirm` verilse bile
@@ -329,3 +347,8 @@ maksimum sayı/uzunluk sınırı.
   metni, her zaman görünür (gerekirse disabled) "Planı Onayla" onay butonu,
   👍/👎 geri bildirim, flat `loading` placeholder. `onReorder` v1'de
   bilinçli olarak yok.
+- 2026-07-24: Tasarım sistemi uyum düzeltmesi — `.stopTitle` →
+  `--lg-text-body`, AI rozeti → `--lg-text-badge`; rail/rozet/görsel/
+  skeleton mikro-geometrisi kökteki yerel `--tp-*` değişkenlerinde toplandı
+  (görsel değer değişmedi); renk transition'ları kaldırıldı (yalnız
+  transform/opacity/filter animlanır).

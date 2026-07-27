@@ -1,5 +1,8 @@
 /* İçerik katmanı FLAT: cam/backdrop-filter yok — yüzey + hairline token'ları. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --gnp-icon-size: 18px;
+  --gnp-info-gap: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-5);
@@ -37,8 +40,8 @@
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: var(--gnp-icon-size);
+  height: var(--gnp-icon-size);
   color: var(--lg-label-secondary);
 }
 .categoryIcon svg {
@@ -61,6 +64,7 @@
 
 .placeRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--lg-space-3);
@@ -75,7 +79,7 @@
 .placeInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--gnp-info-gap);
   min-width: 0;
 }
 
@@ -156,23 +160,16 @@
   border-color: transparent;
   color: var(--lg-accent-contrast);
 }
-/* Dokunmatikte minimum 44px hedef */
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44px) */
 @media (pointer: coarse) {
   .tab {
-    min-height: 44px;
+    min-height: var(--lg-control-md);
   }
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-}
-
-/* Dar konteyner: satır yer adı üstte, mesafe çipi ayrı satıra düşebilir */
-@media (max-width: 360px) {
-  .placeRow {
-    flex-wrap: wrap;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

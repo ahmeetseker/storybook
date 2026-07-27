@@ -83,8 +83,11 @@ fiil öbeğidir ("İlanı Yayınla").
 | gruplar arası | gap | `--lg-space-2` |
 | grup kapsülü | radius/malzeme | GlassSurface `capsule`, thickness .25 |
 
-Borç: grup içi 3px dolgu ve 2px kontrol arası raw — kapsül geometrisi
-(GlassTabs/SegmentedControl ile aynı değerler).
+**Borç (raw / mikro-geometri):** grup içi dolgu, kontrol arası boşluk ve focus
+halkası taşma payı token karşılığı olmadığından component kökünde yerel
+değişkende toplandı (`.root { --focus-bleed: 3px; --group-pad: 3px;
+--group-gap: 2px; }`) — kapsül geometrisi (GlassTabs/SegmentedControl ile
+aynı değerler).
 
 ## 10. Storybook kapsamı
 

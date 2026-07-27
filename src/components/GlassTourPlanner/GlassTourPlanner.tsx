@@ -5,6 +5,7 @@
 // tone yerine sıra numarası taşır ve kendi AI-first sözleşmesi (rozet/
 // güven/geri bildirim/yükleme/onay) eklenir (bkz. rules.md §1).
 import { useId, useRef, useState, type HTMLAttributes } from 'react'
+import { GlassButton } from '../GlassButton'
 import styles from './GlassTourPlanner.module.css'
 
 /** Tur planındaki tek bir durak. */
@@ -263,9 +264,12 @@ export function GlassTourPlanner({
             </div>
           </div>
         ) : null}
-        <button type="button" className={styles.confirmButton} disabled={confirmDisabled} onClick={handleConfirm}>
+        {/* GlassButton compose edilir (GlassTourScheduler footer deseniyle aynı);
+            tam genişlik .footer sütun sarmalayıcısının cross-axis stretch'inden
+            gelir — butona görsel/yerleşim stili yazılmaz. */}
+        <GlassButton prominent disabled={confirmDisabled} onClick={handleConfirm}>
           Planı Onayla
-        </button>
+        </GlassButton>
       </div>
     </section>
   )

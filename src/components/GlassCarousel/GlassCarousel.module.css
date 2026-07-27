@@ -1,13 +1,15 @@
 .carousel {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --track-gap: 14px;
   position: relative;
 }
 
 .track {
   display: flex;
-  gap: 14px;
+  gap: var(--track-gap);
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 4px;
+  padding: var(--lg-space-1);
   scrollbar-width: none;
 }
 .track::-webkit-scrollbar { display: none; }
@@ -23,5 +25,5 @@
   transform: translateY(-50%);
   z-index: 2;
 }
-.navLeft { left: -8px; }
-.navRight { right: -8px; }
+.navLeft { left: calc(-1 * var(--lg-space-2)); }
+.navRight { right: calc(-1 * var(--lg-space-2)); }

@@ -1,6 +1,12 @@
 /* iOS Settings tarzı gruplu liste. İçerik katmanı → flat yüzey (--lg-surface),
    cam yok; ayraçlar hairline, ikon hizasından inset. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --icon-col: 28px;
+  --row-min-height: 44px; /* dokunma hedefi — her pointer'da sabit */
+  --chevron-size: 8px;
+  --chevron-stroke: 2px;
+  --chevron-nudge: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-2);
@@ -86,7 +92,7 @@ button.row:disabled,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
+  width: var(--icon-col);
   flex-shrink: 0;
   font-size: var(--lg-text-headline);
 }
@@ -99,7 +105,7 @@ button.row:disabled,
   flex: 1;
   min-width: 0;
   gap: var(--lg-space-3);
-  min-height: 44px; /* dokunma hedefi */
+  min-height: var(--row-min-height); /* dokunma hedefi */
   padding: var(--lg-space-2) var(--lg-space-3) var(--lg-space-2) 0;
 }
 .item + .item .inner {
@@ -133,12 +139,12 @@ button.row:disabled,
   color: var(--lg-label-secondary);
 }
 .chevron {
-  width: 8px;
-  height: 8px;
+  width: var(--chevron-size);
+  height: var(--chevron-size);
   flex-shrink: 0;
-  margin-right: 2px;
-  border-top: 2px solid var(--lg-label-secondary);
-  border-right: 2px solid var(--lg-label-secondary);
+  margin-right: var(--chevron-nudge);
+  border-top: var(--chevron-stroke) solid var(--lg-label-secondary);
+  border-right: var(--chevron-stroke) solid var(--lg-label-secondary);
   transform: rotate(45deg);
   opacity: 0.6;
 }

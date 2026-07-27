@@ -17,6 +17,7 @@ describe('GlassMetricStrip', () => {
     expect(list.tagName).toBe('DL')
     expect(screen.getByText('Görüntülenme').tagName).toBe('DT')
     expect(screen.getByText('12.480').closest('dd')).toBeTruthy()
+    expect(screen.getByText('Son 7 gün').tagName).toBe('DD')
   })
 
   it('varsayılan erişilebilir ad "Temel göstergeler"dir', () => {

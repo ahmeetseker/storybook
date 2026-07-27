@@ -11,6 +11,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react'
+import { GlassButton } from '../GlassButton'
 import styles from './GlassPersonalNote.module.css'
 
 export interface GlassPersonalNoteProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -67,7 +68,8 @@ function LockIcon() {
  * ikonlu "Not ekle" satırı, düzenlenirken flat textarea + Kaydet/Vazgeç,
  * kayıtlı notu varken not metni + "Düzenle" aksiyonu. "Yalnız sen görürsün"
  * gizlilik satırı üç durumda da sabit görünür. İçerik katmanı FLAT — cam
- * yüzey/backdrop-filter kullanılmaz.
+ * yüzey/backdrop-filter kullanılmaz; yalnız Kaydet/Vazgeç eylem kontrolleri
+ * GlassButton compose eder (kontrol katmanı).
  *
  * Düzenleme durumu tamamen iç state'tir (controlled değil) — bu yüzden odak
  * yönetimi basittir: `editing` yalnız BU component'in kendi buton
@@ -187,12 +189,12 @@ export function GlassPersonalNote({
               {remaining} karakter kaldı
             </span>
             <div className={styles.editorActions}>
-              <button type="button" className={styles.cancelButton} onClick={cancelEdit}>
+              <GlassButton size="sm" onClick={cancelEdit}>
                 Vazgeç
-              </button>
-              <button type="button" className={styles.saveButton} onClick={save}>
+              </GlassButton>
+              <GlassButton prominent size="sm" onClick={save}>
                 Kaydet
-              </button>
+              </GlassButton>
             </div>
           </div>
         </div>

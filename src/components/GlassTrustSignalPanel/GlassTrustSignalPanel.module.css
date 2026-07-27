@@ -3,6 +3,17 @@
    info için nötr --lg-label-secondary) sürülür; runtime CSS değişkeni
    enjeksiyonuna gerek yok çünkü sabit 4 durum var. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --tsp-icon-size: 24px;
+  --tsp-icon-offset: 1px;
+  --tsp-ai-pad-block: 3px;
+  --tsp-corner-size: 12px;
+  --tsp-corner-offset: -4px;
+  --tsp-corner-glyph: 8px;
+  --tsp-feedback-gap-top: 2px;
+  --tsp-ph-bar-h: 12px;
+  --tsp-ph-bar-wide-h: 14px;
+  --tsp-ph-summary-w: 160px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -63,20 +74,20 @@
   border-bottom: none;
 }
 
-/* Borç (raw): ikon rozeti 24×24 — GlassScoreMeter'ın ring stroke-width
-   borcuyla aynı gerekçe, gösterge çapı için token yok. Radius token'dan
-   (capsule) — küçük karede tam yuvarlak üretir. */
+/* İkon rozeti çapı mikro-geometri (--tsp-icon-size) — GlassScoreMeter'ın
+   ring stroke-width borcuyla aynı gerekçe, gösterge çapı için token yok.
+   Radius token'dan (capsule) — küçük karede tam yuvarlak üretir. */
 .icon {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-top: 1px;
+  width: var(--tsp-icon-size);
+  height: var(--tsp-icon-size);
+  margin-top: var(--tsp-icon-offset);
   border-radius: var(--lg-radius-capsule);
-  font-size: 13px;
-  font-weight: 800;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
   line-height: 1;
 }
 .icon[data-status='verified'] {
@@ -153,19 +164,19 @@
 }
 .aiCorner {
   position: absolute;
-  top: -4px;
-  right: -4px;
+  top: var(--tsp-corner-offset);
+  right: var(--tsp-corner-offset);
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  height: 12px;
+  width: var(--tsp-corner-size);
+  height: var(--tsp-corner-size);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
   border: 1px solid var(--lg-surface);
-  font-size: 8px;
+  font-size: var(--tsp-corner-glyph);
   font-weight: 700;
   line-height: 1;
 }
@@ -179,7 +190,7 @@
 
 /* ── AI-first rozet — kontrattaki tanıma birebir, tüm AI component'lerinde
    AYNI (kopya CSS kabul): metin "✦ AI", zemin/metin color-mix türevi,
-   radius capsule, 10.5px/700. ── */
+    radius capsule, --lg-text-badge/700. ── */
 .aiMeta {
   display: inline-flex;
   align-items: center;
@@ -189,11 +200,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--tsp-ai-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge, 11px);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -209,7 +220,7 @@
 .feedback {
   display: flex;
   gap: var(--lg-space-2);
-  margin-top: 2px;
+  margin-top: var(--tsp-feedback-gap-top);
 }
 .feedbackButton {
   display: inline-flex;
@@ -223,13 +234,10 @@
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
-  font-size: 14px;
+  font-size: var(--lg-text-body);
   line-height: 1;
   cursor: pointer;
-  transition:
-    background-color 0.15s ease-out,
-    border-color 0.15s ease-out,
-    color 0.15s ease-out;
+  /* transition yok: renk değişimi anlıktır — animasyon yalnız transform/opacity/filter kuralı */
 }
 .feedbackButton[aria-pressed='true'] {
   border-color: color-mix(in srgb, var(--lg-accent) 50%, transparent);
@@ -245,10 +253,11 @@
     background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
   }
 }
+/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44px) */
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -256,22 +265,22 @@
 .placeholderBar {
   display: block;
   width: 70%;
-  height: 12px;
+  height: var(--tsp-ph-bar-h);
   border-radius: var(--lg-radius-chip);
   background: var(--lg-hairline);
 }
 .placeholderBarWide {
   width: 40%;
-  height: 14px;
+  height: var(--tsp-ph-bar-wide-h);
 }
 .placeholderBarSummary {
-  width: 160px;
-  height: 12px;
+  width: var(--tsp-ph-summary-w);
+  height: var(--tsp-ph-bar-h);
 }
 .placeholderIcon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
+  width: var(--tsp-icon-size);
+  height: var(--tsp-icon-size);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
@@ -296,9 +305,6 @@
   .root[aria-busy='true'] .placeholderBar,
   .root[aria-busy='true'] .placeholderIcon {
     animation: none;
-  }
-  .feedbackButton {
-    transition: none;
   }
 }
 

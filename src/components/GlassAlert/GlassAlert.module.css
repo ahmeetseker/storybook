@@ -1,12 +1,16 @@
 /* Akış içi banner — flat yüzey; mobil-first: dar padding, action alt satıra sarar */
 .alert {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --stripe-width: 3px;
+  --dismiss-size: 28px;
+  --dismiss-nudge: -2px;
   position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--lg-space-3, 12px);
   padding: var(--lg-space-3, 12px);
-  padding-left: calc(var(--lg-space-3, 12px) + 3px); /* sol şerit payı */
+  padding-left: calc(var(--lg-space-3, 12px) + var(--stripe-width)); /* sol şerit payı */
   border-radius: var(--lg-radius-media, 14px);
   background: color-mix(in srgb, var(--alert-color, var(--lg-accent, #b45309)) 12%, transparent);
   color: var(--lg-label, #24211b);
@@ -20,7 +24,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: var(--stripe-width);
   background: var(--alert-color, var(--lg-accent, #b45309));
 }
 
@@ -70,9 +74,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  margin: -2px -2px 0 0; /* optik hizalama: ikon üst çizgisine */
+  width: var(--dismiss-size);
+  height: var(--dismiss-size);
+  margin: var(--dismiss-nudge) var(--dismiss-nudge) 0 0; /* optik hizalama: ikon üst çizgisine */
   padding: 0;
   border: 0;
   background: transparent;
@@ -81,9 +85,11 @@
   cursor: pointer;
   transition: background-color 0.15s ease-out, color 0.15s ease-out;
 }
-.dismiss:hover {
-  background: color-mix(in srgb, var(--alert-color, var(--lg-accent, #b45309)) 18%, transparent);
-  color: var(--lg-label, #24211b);
+@media (hover: hover) {
+  .dismiss:hover {
+    background: color-mix(in srgb, var(--alert-color, var(--lg-accent, #b45309)) 18%, transparent);
+    color: var(--lg-label, #24211b);
+  }
 }
 .dismiss:focus-visible {
   outline: 2px solid var(--lg-accent, #b45309);
@@ -92,14 +98,14 @@
 
 /* Dokunmatik: kapatma hedefi büyür */
 @media (pointer: coarse) {
-  .dismiss { width: 36px; height: 36px; }
+  .dismiss { width: var(--lg-control-sm); height: var(--lg-control-sm); } /* coarse'ta token 36px */
 }
 
 /* bp-sm */
 @media (min-width: 640px) {
   .alert {
     padding: var(--lg-space-4, 16px);
-    padding-left: calc(var(--lg-space-4, 16px) + 3px);
+    padding-left: calc(var(--lg-space-4, 16px) + var(--stripe-width));
   }
   .action {
     order: 0;

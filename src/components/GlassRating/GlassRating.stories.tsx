@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassRating } from './GlassRating'
 
 const meta = {
-  title: 'Components/GlassRating',
+  title: 'Bileşenler/Form/GlassRating',
   component: GlassRating,
   tags: ['autodocs'],
   args: { variant: 'display', value: 4.6, count: 128 },

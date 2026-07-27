@@ -94,6 +94,12 @@ tek cümle. Error, kullanıcının eylemiyle düzelteceği dille yazılır
 | error, required | color | `--lg-danger` |
 | dikey boşluklar | margin | `--lg-space-1` |
 
+**Borç (raw / mikro-geometri):** required işaretinin label metnine mesafesi
+2px — token karşılığı yok (`--lg-space-1` 4px görsel olarak fazla geniş),
+component kökünde yerel değişkende toplandı (`.field { --required-gap: 2px; }`).
+Bunun dışında raw px yok; `@media (min-width: 768px)` bp-md breakpoint'i
+bilinçli istisnadır (satırda `bp-md` yorumu var).
+
 ## 10. Storybook kapsamı
 
 Var: Default, WithDescription, WithError, LiveValidation (kontrollü),

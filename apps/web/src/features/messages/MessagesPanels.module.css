@@ -1,0 +1,655 @@
+/* Mesaj panelleri — tüm ölçüler token'dan gelir; gölge/gradient kullanılmaz.
+   Rail ve thread, `--messages-inset` ile tek bir sol/sağ hiza çizgisini paylaşır. */
+.panels {
+  --messages-panel-gap: var(--lg-space-4);
+  --messages-inset: var(--lg-space-5);
+}
+
+/* ── Konuşma rayı ──────────────────────────────────────────── */
+
+.panels :global(.conversationRail) {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  block-size: 100%;
+  min-block-size: 0;
+  padding-block: var(--lg-space-5) var(--lg-space-4);
+  gap: var(--lg-space-3);
+}
+
+/* Başlık · arama · filtre · sayaç · liste · "daha fazla" aynı hizada başlar */
+.panels :global(.conversationRail) > h2,
+.panels :global(.conversationRail) > [role='status'],
+.panels :global(.conversationRail) > button,
+.panels :global(.conversationRail__search),
+.panels :global(.conversationRail__filter),
+.panels :global(.conversationRail__list) {
+  margin-inline: var(--messages-inset);
+}
+
+.panels :global(.conversationRail) > h2 {
+  margin-block: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.panels :global(.conversationRail) > [role='status'] {
+  margin-block: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Arama alanı satır içi genişliğini bırakır, rayın tamamını kaplar */
+/* `auto` + block akış: margin düşülmüş gerçek genişlik; 100% verilirse margin kadar taşar */
+.panels :global(.conversationRail__search) {
+  --lg-search-w: auto;
+  --lg-search-w-focus: auto;
+  display: block;
+}
+
+/* Filtre: üç segment eşit paylaşır, kapsül tam genişlik oturur */
+.panels :global(.conversationRail__filter) {
+  display: flex;
+  inline-size: auto;
+}
+
+.panels :global(.conversationRail__filter) [role='radiogroup'] {
+  inline-size: 100%;
+}
+
+.panels :global(.conversationRail__filter) [role='radio'] {
+  flex: 1 1 0;
+}
+
+.panels :global(.conversationRail__scrollArea) {
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.panels :global(.conversationRail__list) {
+  min-inline-size: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Kart aralığı satırın ölçülen yüksekliğine dahildir (sanal liste offset'i bozulmaz) */
+.panels :global(.conversationRail__item) {
+  inline-size: 100%;
+  padding-block-end: var(--lg-space-2);
+}
+
+.panels :global(.conversationRail__link) {
+  display: grid;
+  grid-template-columns: var(--lg-control-lg) minmax(0, 1fr);
+  align-items: start;
+  inline-size: 100%;
+  padding: var(--lg-space-3);
+  gap: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  color: var(--lg-label);
+  text-decoration: none;
+  transition:
+    background-color 0.16s ease-out,
+    border-color 0.16s ease-out;
+}
+
+.panels :global(.conversationRail__link[aria-current='page']) {
+  border-color: var(--lg-accent);
+  background-color: var(--lg-bg);
+}
+
+.panels :global(.conversationRail__listingImage) {
+  inline-size: var(--lg-control-lg);
+  block-size: var(--lg-control-lg);
+  border-radius: var(--lg-radius-chip);
+  object-fit: cover;
+}
+
+.panels :global(.conversationRail__content) {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  overflow-wrap: anywhere;
+}
+
+.panels :global(.conversationRail__topline) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-inline-size: 0;
+  gap: var(--lg-space-2);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+}
+
+.panels :global(.conversationRail__topline) time {
+  flex: none;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-variant-numeric: tabular-nums;
+}
+
+/* İçerik hiyerarşisi: ilan adı okunur, referans sessiz, önizleme iki satırda kırpılır */
+.panels :global(.conversationRail__listing) {
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+}
+
+.panels :global(.conversationRail__reference) {
+  font-size: var(--lg-text-badge);
+  letter-spacing: 0.02em;
+}
+
+.panels :global(.conversationRail__preview) {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.panels :global(.conversationRail__state) {
+  color: var(--lg-warning);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+}
+
+.panels :global(.conversationRail__item--unread) strong {
+  font-weight: 700;
+}
+
+.panels :global(.conversationRail__unread) {
+  display: flex;
+  align-items: center;
+  margin-block-start: var(--lg-space-1);
+  gap: var(--lg-space-1);
+  color: var(--lg-accent);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+}
+
+.panels :global(.conversationRail__unreadDot) {
+  inline-size: var(--lg-space-2);
+  block-size: var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-accent);
+}
+
+/* ── Konuşma paneli ────────────────────────────────────────── */
+
+.panels :global(.messageThread) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-inline-size: 0;
+  min-block-size: 0;
+  block-size: 100%;
+}
+
+.panels :global(.messageThread) > p {
+  grid-row: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  margin: var(--lg-space-5);
+  color: var(--lg-label-secondary);
+}
+
+.panels :global(.messageThread__header) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-inline-size: 0;
+  padding: var(--lg-space-4) var(--messages-inset);
+  gap: var(--lg-space-3);
+  border-block-end:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.panels :global(.messageThread__header) h2,
+.panels :global(.messageThread__header) p {
+  margin: 0;
+}
+
+.panels :global(.messageThread__header) h2 {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.panels :global(.messageThread__header) p {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  overflow-wrap: anywhere;
+}
+
+.panels :global(.messageThread__actions) {
+  display: flex;
+  align-self: center;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: var(--lg-space-2);
+}
+
+.panels :global(.messageTimeline__viewport) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.panels :global(.messageTimeline__olderControl) {
+  grid-row: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--lg-space-2);
+  border-block-end:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.panels :global(.messageTimeline__olderControl) button,
+.panels :global(.messageTimeline__latestControl),
+.panels :global(.conversationRail) > button {
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+/* Sohbet alta yaslanır: az mesajda balonlar composer'ın hemen üstünde toplanır */
+.panels :global(.messageTimeline) {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  min-block-size: 0;
+  overflow: auto;
+  padding-inline: var(--messages-inset);
+  padding-block: var(--lg-space-3);
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.panels :global(.messageTimeline) [data-virtual-row] {
+  display: flex;
+  align-items: center;
+  padding-block: var(--lg-space-1);
+}
+
+/* Gün ayracı: ortalanmış kapsül */
+.panels :global(.messageTimeline) [data-virtual-row] > p {
+  inline-size: fit-content;
+  margin: 0 auto;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Mesaj balonları ───────────────────────────────────────── */
+
+.panels :global(.messageTimeline__incoming),
+.panels :global(.messageTimeline__outgoing) {
+  display: grid;
+  max-inline-size: min(68ch, 78%);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  gap: var(--lg-space-1);
+  overflow-wrap: anywhere;
+}
+
+/* Gelen: panel beyazından ayrışan sakin fildişi kart */
+.panels :global(.messageTimeline__incoming) {
+  margin-inline-end: auto;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius:
+    var(--lg-radius-card) var(--lg-radius-card)
+    var(--lg-radius-card) var(--lg-radius-chip);
+  background-color: var(--lg-bg);
+  color: var(--lg-label);
+}
+
+/* Giden: vurgu dolgusu, karşı köşede yakınlaşan radius */
+.panels :global(.messageTimeline__outgoing) {
+  margin-inline-start: auto;
+  border: var(--lg-stroke-hairline) solid transparent;
+  border-radius:
+    var(--lg-radius-card) var(--lg-radius-card)
+    var(--lg-radius-chip) var(--lg-radius-card);
+  background-color: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.panels :global(.messageTimeline__outgoing[data-failed]) {
+  border-color: var(--lg-danger);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+/* Konuşan + yön: hiza ve renk bunu görsel olarak söyler, metin ekran okuyucuda kalır */
+.panels :global(.messageTimeline__meta) {
+  position: absolute;
+  inline-size: var(--lg-space-1);
+  block-size: var(--lg-space-1);
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.panels :global(.messageTimeline__body) {
+  margin: 0;
+  font-size: var(--lg-text-body);
+  line-height: 1.45;
+}
+
+.panels :global(.messageTimeline__attachments) {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--lg-space-1);
+  list-style: none;
+  font-size: var(--lg-text-caption);
+}
+
+.panels :global(.messageTimeline__footer) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: end;
+  margin: 0;
+  gap: var(--lg-space-2);
+  font-size: var(--lg-text-badge);
+  font-variant-numeric: tabular-nums;
+}
+
+.panels :global(.messageTimeline__incoming .messageTimeline__footer) {
+  color: var(--lg-label-secondary);
+}
+
+.panels :global(.messageTimeline__outgoing .messageTimeline__footer) {
+  color: color-mix(in srgb, var(--lg-accent-contrast) 78%, transparent);
+}
+
+.panels :global(.messageTimeline__outgoing[data-failed] .messageTimeline__footer) {
+  color: var(--lg-label-secondary);
+}
+
+.panels :global(.messageTimeline__failure) {
+  color: var(--lg-danger);
+  font-weight: 600;
+}
+
+.panels :global(.messageTimeline__footer) button {
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+}
+
+/* Sistem/güvenlik notu: taraf tutmayan, ortalanmış sakin kart */
+.panels :global(.messageTimeline__note) {
+  display: grid;
+  max-inline-size: min(68ch, 100%);
+  margin-inline: auto;
+  padding: var(--lg-space-2) var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  text-align: center;
+}
+
+/* Güvenlik uyarısı sistem duyurusundan ayrışır: uyarı tonu + belirgin çerçeve */
+.panels :global(.messageTimeline__note[data-note-kind='safety']) {
+  border-color: color-mix(in srgb, var(--lg-warning) 35%, transparent);
+  color: var(--lg-warning);
+  font-weight: 600;
+}
+
+.panels :global(.messageTimeline__note) p {
+  margin: 0;
+}
+
+.panels :global(.messageTimeline__announcement) {
+  grid-row: 4;
+  min-block-size: var(--lg-space-4);
+  margin: 0;
+  padding-inline: var(--messages-inset);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  text-align: center;
+}
+
+.panels :global(.messageTimeline__latestControl) {
+  grid-row: 3;
+  justify-self: center;
+  margin-block: var(--lg-space-2);
+}
+
+/* ── Composer ──────────────────────────────────────────────── */
+
+.panels :global(.messageComposer) {
+  display: grid;
+  min-inline-size: 0;
+  padding: var(--lg-space-3) var(--messages-inset) var(--lg-space-4);
+  gap: var(--lg-space-2);
+  border-block-start:
+    var(--lg-stroke-hairline) solid var(--lg-hairline);
+  background-color: var(--lg-surface);
+}
+
+/* Tek satır: ek · alan · gönder — hepsi taban çizgisinde buluşur */
+.panels :global(.messageComposer__bar) {
+  display: flex;
+  align-items: end;
+  min-inline-size: 0;
+  gap: var(--lg-space-2);
+}
+
+.panels :global(.messageComposer__field) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  /* Beyaz composer zemininde alanın kendisi okunur kalsın */
+  background-color: var(--lg-bg);
+}
+
+.panels :global(.messageComposer__field) textarea {
+  padding-block: var(--lg-space-2);
+}
+
+.panels :global(.messageComposer__attachmentControl) {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+
+.panels :global(.messageComposer__send) {
+  flex: none;
+  background-color: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.panels :global(.messageComposer__send):disabled {
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+}
+
+.panels :global(.messageComposer__disabledReason) {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+.panels :global(.messageComposer__attachmentInput) {
+  position: absolute;
+  inline-size: var(--lg-space-1);
+  block-size: var(--lg-space-1);
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.panels :global(.messageComposer__attachments) {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--lg-space-2);
+  list-style: none;
+}
+
+.panels :global(.messageComposer__attachment) {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  padding: var(--lg-space-2);
+  gap: var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  font-size: var(--lg-text-caption);
+}
+
+.panels :global(.messageComposer__attachmentPreview) {
+  inline-size: var(--lg-control-xl);
+  block-size: var(--lg-control-xl);
+  border-radius: var(--lg-radius-media);
+  object-fit: cover;
+}
+
+/* ── Drawer içeriği ────────────────────────────────────────── */
+/* Drawer portal ile body'ye taşınır: `.panels` scope'u burada geçerli olmaz,
+   bu yüzden kurallar global yazılır. Aksi halde görsel doğal boyutunda kalır. */
+
+:global(.messageDrawers__listing) {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-2);
+  overflow-wrap: anywhere;
+}
+
+:global(.messageDrawers__listing) p {
+  margin: 0;
+}
+
+:global(.messageDrawers__listingImage) {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  max-block-size: 14rem;
+  margin-block-end: var(--lg-space-1);
+  border-radius: var(--lg-radius-media);
+  object-fit: cover;
+}
+
+:global(.messageDrawers__listingTitle) {
+  color: var(--lg-label);
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:global(.messageDrawers__listingPrice) {
+  color: var(--lg-label);
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+:global(.messageDrawers__listingMeta) {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Metin alanları halkayı kendi cam kabuğunda çizer; buraya eklemek çift halka üretir. */
+.panels :global(.messageComposer) button:focus-visible,
+.panels :global(.messageTimeline) button:focus-visible,
+.panels :global(.messageTimeline__olderControl) button:focus-visible,
+.panels :global(.messageTimeline__latestControl):focus-visible,
+.panels :global(.conversationRail) :is(a, button):focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@container (inline-size <= 52rem) {
+  .panels {
+    --messages-inset: var(--lg-space-4);
+  }
+
+  .panels :global(.messageThread__header) {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .panels :global(.messageThread__actions) {
+    grid-column: 1 / -1;
+    justify-content: start;
+  }
+
+  .panels :global(.messageComposer) {
+    padding-block: var(--lg-space-3);
+  }
+
+  .panels :global(.messageTimeline__incoming),
+  .panels :global(.messageTimeline__outgoing) {
+    max-inline-size: min(68ch, 88%);
+  }
+}
+
+@media (hover: hover) {
+  .panels :global(.conversationRail__link:hover) {
+    border-color: var(--lg-hairline);
+    background-color: var(--lg-bg);
+  }
+
+  .panels :global(.messageTimeline) button:hover,
+  .panels :global(.messageTimeline__olderControl) button:hover,
+  .panels :global(.messageTimeline__latestControl):hover,
+  .panels :global(.conversationRail) > button:hover {
+    border-color: var(--lg-accent);
+  }
+}
+
+@media (pointer: coarse) {
+  .panels :global(.conversationRail__link),
+  .panels :global(.messageTimeline) button,
+  .panels :global(.conversationRail) > button,
+  .panels :global(.messageTimeline__olderControl) button,
+  .panels :global(.messageTimeline__latestControl) {
+    min-block-size: var(--lg-control-md);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panels :global(.conversationRail__link),
+  .panels :global(.messageTimeline),
+  .panels :global(.messageComposer) {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panels :global(.messageComposer),
+  .panels :global(.messageTimeline__incoming),
+  .panels :global(.conversationRail__link[aria-current='page']) {
+    background-color: var(--lg-surface);
+    backdrop-filter: none;
+  }
+}

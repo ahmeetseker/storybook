@@ -25,48 +25,8 @@
   pointer-events: none;
 }
 
-.loadMoreButton {
-  appearance: none;
-  box-sizing: border-box;
-  margin: 0;
-  min-height: var(--lg-control-md);
-  padding: 0 var(--lg-space-6);
-  border: 1px solid var(--lg-hairline);
-  border-radius: var(--lg-radius-capsule);
-  background: var(--lg-surface);
-  color: var(--lg-label);
-  font: inherit;
-  font-size: var(--lg-text-footnote);
-  font-weight: 700;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.16s ease-out, border-color 0.16s ease-out, opacity 0.16s ease-out;
-}
-
-.loadMoreButton:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .loadMoreButton:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
-    border-color: color-mix(in srgb, var(--lg-label) 24%, var(--lg-hairline));
-  }
-}
-
-.loadMoreButton:disabled {
-  opacity: 0.55;
-  cursor: default;
-  pointer-events: none;
-}
-
-/* Dokunmatikte minimum 44px hedef */
-@media (pointer: coarse) {
-  .loadMoreButton {
-    min-height: 44px;
-  }
-}
+/* "Daha fazla yükle" butonu GlassButton compose eder — görsel stil burada
+   TANIMLANMAZ (bkz. rules.md §9); bu dosya yalnız yerleşim verir. */
 
 .status {
   margin: 0;
@@ -76,10 +36,4 @@
   font-size: var(--lg-text-footnote);
   font-variant-numeric: tabular-nums;
   color: var(--lg-label-secondary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .loadMoreButton {
-    transition: none;
-  }
 }

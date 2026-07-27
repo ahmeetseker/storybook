@@ -2,15 +2,15 @@
 name: GlassSelect
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-07-25
 ---
 
 # GlassSelect Kuralları
 
 ## 1. Amaç
 
-Custom cam listbox: önceden tanımlı seçeneklerden tekli seçim (vites, yakıt,
-il...). Native `<select>` yerine, cam panel + tam klavye desteğiyle
+Önceden tanımlı seçeneklerden tekli seçim (vites, yakıt, il...). Native
+`<select>` yerine, seçilebilir cam/düz malzeme + tam klavye desteğiyle
 select-only combobox deseni uygular.
 
 - **Kullan:** 3–30 seçenekli tekli seçim; filtre ve ilan formu alanları.
@@ -27,11 +27,14 @@ select-only combobox deseni uygular.
 
 - Trigger: gerçek `<button role="combobox" aria-expanded aria-haspopup="listbox">`;
   açıkken `aria-controls` + `aria-activedescendant` verir. DOM focus'u hep
-  trigger'da kalır (APG select-only combobox deseni).
+  trigger'da kalır. Dışarıdan verilen `aria-label`, `aria-labelledby`,
+  `aria-required` ve `aria-describedby` gerçek trigger'a taşınır (APG
+  select-only combobox deseni).
 - Panel: `role="listbox"`, seçenekler `role="option" aria-selected`
   (+ `aria-disabled`). Portal YOK — relative kök içinde absolute panel
   (brief'teki overlay kalıbı).
-- Accessible name: dışarıdan `aria-label` ya da GlassField label'ı.
+- Accessible name: dışarıdan `aria-label` / `aria-labelledby` ya da GlassField
+  label'ı. GlassField `required` bağlamı trigger'da `aria-required` üretir.
 - DOM değişmezleri: (1) trigger gerçek button kalır, (2) options sırası
   `options` prop sırasıdır, sıralama yapılmaz.
 
@@ -55,17 +58,20 @@ select-only combobox deseni uygular.
 | placeholder | prop | `string` | `'Seçin'` | Seçim yokken trigger metni |
 | size | prop | `'sm'\|'md'\|'lg'` | `'md'` | Yükseklik `--lg-control-*` token'ından |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | Zemin bağlamı ipucu |
+| material | prop | `'glass'\|'flat'` | `'glass'` | Trigger ve panel malzemesi |
 | invalid | prop | `boolean` | field context ?? `false` | `aria-invalid` + `--lg-danger` çerçeve |
 | disabled | prop | `boolean` | `false` | Trigger devre dışı; panel açılmaz |
-| ...rest | — | `Omit<HTMLAttributes, 'onChange'\|'defaultValue'>` | — | Kök div'e akar; `id` trigger'a |
+| ...rest | — | `Omit<HTMLAttributes, 'onChange'\|'defaultValue'>` | — | Genel nitelikler köke; adlandırma/required/describedBy ARIA'ları ve `id` trigger'a |
 
 ## 5. Seçenek eksenleri
 
-Varsayılan kombinasyon: `size=md`, kapalı, seçimsiz (placeholder).
+Varsayılan kombinasyon: `material=glass`, `size=md`, kapalı, seçimsiz
+(placeholder).
 
 | Yasak / türetilen | Davranış |
 |---|---|
 | `value` verildi | iç state devre dışı; etiket yalnız prop'la değişir |
+| `material` | trigger ve açılan panel aynı `glass` / `flat` değerini kullanır |
 | açılışta aktif öğe | seçili seçenek; yoksa ilk enabled seçenek |
 | `option.disabled` | klavye gezinmesi atlar, tıklama seçmez |
 | `invalid`/`id` verilmedi + GlassField içinde | context'ten türetilir |
@@ -77,8 +83,8 @@ Varsayılan kombinasyon: `size=md`, kapalı, seçimsiz (placeholder).
 | open | click / ok tuşları | — | Panel fade+drop; chevron döner; `aria-expanded` |
 | active option | ok tuşları / pointer enter | — | `--lg-accent` %18 dolgu; `aria-activedescendant` |
 | selected | value | — | Semibold + accent + tik; `aria-selected` |
-| focus-visible | CSS | — | Trigger'da 2px `--lg-accent` halka |
-| invalid | prop / context | — | 1.5px inset `--lg-danger` çerçeve |
+| focus-visible | CSS | — | Trigger'da `--lg-focus-ring-*` ile accent halka |
+| invalid | prop / context | — | `--lg-danger` sınır; focus halkasını bastırmaz |
 | disabled | prop | open | opacity .45 + `pointer-events: none` |
 
 ## 7. Davranış
@@ -92,9 +98,9 @@ Varsayılan kombinasyon: `size=md`, kapalı, seçimsiz (placeholder).
 - Aktif öğe panel scroll'unda `scrollIntoView({ block: 'nearest' })` ile görünür.
 - Animasyon: `AnimatePresence` + opacity/translate/scale (0.16s);
   `prefers-reduced-motion`'da yalnız opacity, chevron dönüşü transition'sız.
-- Responsive: genişlik %100. **bp-sm altında** trigger metni 16px (iOS zoom
-  kuralıyla tutarlılık) ve panel listesi **max-height 50vh** (bottom-sheet
-  hissi, içeride scroll); ≥640px'te 320px.
+- Responsive: genişlik %100. `pointer: coarse` yeteneğinde dokunmatik
+  tipografi token'ı ve panelde `50vh` tavanı (içeride scroll) kullanılır;
+  `pointer: fine` yeteneğinde liste tavanı kontrol token'ından türetilir.
 
 ## 8. İçerik
 
@@ -107,17 +113,22 @@ düşünülmeli (Açık Kararlar).
 | Part | Property | Token |
 |---|---|---|
 | trigger | min-height | `--lg-control-{size}` |
-| trigger/panel | radius | shape 12 (GlassSurface) |
+| trigger/panel | material | `material=glass` veya `material=flat` |
+| trigger/panel | border / radius | `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-chip` |
 | trigger | focus outline / invalid | `--lg-accent` / `--lg-danger` |
-| panel | background | `--lg-surface` %72 (okunurluk dolgusu) |
+| trigger/panel | background | `--lg-surface` tabanlı malzeme dolgusu |
 | option | radius / active bg | `--lg-radius-chip` / `--lg-accent` %18 |
 | placeholder, chevron | color | `--lg-label-secondary` |
-| boşluklar | gap/padding | `--lg-space-1/2` + raw px (borç) |
+| boşluklar | gap/padding | `--lg-space-1/2`; md/lg trigger padding `--lg-space-3/4` |
+
+Component CSS'inde raw ölçü/renk bulunmaz; geometriler ve durum renkleri
+`--lg-*` token'larından tüketilir.
 
 ## 10. Storybook kapsamı
 
-Var: Default, Preselected, Invalid, Disabled, DisabledOption, Sizes,
-Controlled, Mobile (viewport mobile1, uzun il listesi + 50vh scroll).
+Var: Default, Preselected, Invalid, Required, Disabled, Materials,
+DisabledOption, Sizes, Controlled, Mobile (viewport mobile1, uzun il listesi
+ve 50vh scroll).
 **Eksik:** çok uzun label ellipsis görseli, RTL, gruplu seçenekler.
 
 ## 11. Test kabul kriterleri
@@ -129,6 +140,9 @@ Controlled, Mobile (viewport mobile1, uzun il listesi + 50vh scroll).
 - [x] disabled trigger açılmaz; disabled option atlanır/seçilmez
 - [x] typeahead kapalıyken doğrudan seçer
 - [x] invalid → aria-invalid; controlled değer dışarıda kalır
+- [x] `aria-label` / `aria-labelledby` gerçek combobox'ı adlandırır
+- [x] GlassField required → trigger'da `aria-required`
+- [x] material ekseni trigger ve panelde birlikte uygulanır
 
 ## 12. Do / Don't
 
@@ -144,5 +158,9 @@ option grupları (`optgroup` eşleniği) · form submit için hidden input.
 
 ## Changelog
 
+- 2026-07-25: Accessible name/required nitelikleri trigger'a taşındı;
+  `material=glass|flat` ekseni eklendi; odak/invalid ve responsive CSS
+  token sözleşmesine geçirildi; Required/Materials story'leri ve regresyon
+  testleri eklendi.
 - 2026-07-16: İlk sürüm — select-only combobox deseni (aria-activedescendant),
   typeahead, overlay kalıbı (portal'sız), mobil 50vh panel.

@@ -200,15 +200,27 @@ Katman sırası: `loading` (varsa AI rozeti hariç her şeyi bastırır) → `va
 | kart zemini | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-card` | yalnız `card` |
 | başlık | color | `--lg-label` | — |
 | açıklama/güven metni | color | `--lg-label-secondary` | — |
-| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassAiSummaryCard.module.css`'teki `.badge` bloğuyla (padding `3px var(--lg-space-2)` dahil) birebir aynı, component'ler arası kopya |
+| AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassAiSummaryCard.module.css`'teki `.badge` bloğuyla görsel olarak birebir aynı (dikey padding 3px yerel `--ms-badge-pad-block` değişkeninde, font boyutu `--lg-text-badge`), component'ler arası kopya |
 | kriter chip (matched) | background/color | `color-mix(... var(--lg-success) ...)` / `--lg-success` (ikon) | `data-matched=true` |
 | kriter chip (unmatched) | background/color | `color-mix(... var(--lg-label) ...)` / `--lg-label-secondary` | `data-matched=false` |
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | skeleton | background | `color-mix(... var(--lg-label) 8% ...)` | `loading` |
 
-**Borç (raw):** ring SVG çapı 72px (`card`)/40px (`compact`) + stroke-width
-6/4, AI rozeti font-size 10.5px/700 (kontrat sabiti, tasarım sistemi
-ölçeğinde yok) — `GlassScoreMeter`'daki ring çapı borcuyla aynı gerekçe.
+**Borç (raw / mikro-geometri):** ring SVG çapı 72px (`card`)/40px (`compact`)
++ stroke-width 6/4 — `GlassScoreMeter`'daki ring çapı borcuyla aynı gerekçe.
+Token karşılığı olmayan mikro ölçüler component kökünde yerel değişkenlerde
+toplanır — `--ms-meta-gap` (2px), `--ms-ai-gap` (6px), `--ms-badge-pad-block`
+(3px), `--ms-chip-gap` (5px), `--ms-chip-pad-block` (3px),
+`--ms-chip-pad-start` (6px), `--ms-skeleton-ring-card/-compact` (72/40px),
+`--ms-skeleton-body-mt` (6px). AI rozeti font boyutu `--lg-text-badge`
+token'ına bağlandı (eski 10.5px → 11px, ≤1.5px kabul edilen tipografi
+kayması); kriter ikonu `font-weight: 700` (eski 800 — ölçek dışıydı).
+Coarse geri bildirim hedefi `--lg-control-md` (coarse'ta 44px).
+
+**Bilinçli istisna (animasyon):** `.ringFill`'deki `stroke-dashoffset`
+geçişi korunur — SVG stroke ilerlemesi paint-only'dir (layout tetiklemez);
+"animasyon yalnız transform/opacity/filter" kuralının kabul edilen SVG
+istisnasıdır. `prefers-reduced-motion`'da kapanır.
 
 ## 10. Storybook kapsamı
 

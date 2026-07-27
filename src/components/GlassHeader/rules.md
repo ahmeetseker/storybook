@@ -105,9 +105,27 @@ CSS'te; basışta `scale(0.98)`.
 | refraktif çizgi | `color-mix(--lg-accent 78%)` + blur(4px) |
 | radius/kontrol | `--lg-radius-capsule/chip`, `--lg-control-sm/lg` |
 
-**Borç (raw):** padding/gap değerleri, font-size 13-17px + clamp 24-32px,
-760px breakpoint, z-index 30/40, 1120px container, scroll eşiği 24px,
-kapsül gölge blur değerleri.
+**Borç (raw / mikro-geometri):** Token karşılığı olmayan layout ölçüleri ve
+mikro-geometri kökte yerel değişkenlere toplandı — masthead kökü `.root`
+sınıfını taşımadığından blok `.root, .masthead` çift seçicisinde:
+`--container-max: 1120px`, `--zone-gap: 18px` (iç gap + overlay/masthead dikey
+pad ritmi), `--nav-font: 14px`, `--summary-font: 13.5px`, `--wordmark-gap: 9px`,
+`--link-gap: 2px`, `--link-pad-x: 13px`, `--actions-gap: 14px`,
+`--focus-radius: 4px`, `--capsule-pad: 3px`, `--pill-inset: 3px 1px`,
+`--line-w/h: 24/3px`, `--bead-size: 6px`, `--island-pad-y(-scrolled): 14/7px`,
+`--command-pad-y: 10px`, `--command-min-h: 52px`, `--search-max: 620px`,
+`--search-shift: 4px`, `--masthead-pad-t: 26px`, `--wordmark-min/max: 24/32px`,
+`--index-rail-h: 42px`, `--index-link-gap: 6px`, `--overlay-link-pad: 15px`.
+Drawer içeriği GlassDrawer portalında render edildiğinden kök kaskadı ulaşmaz;
+drawer ölçüleri kendi üst sınıflarında yerel (`.drawerList { --drawer-pad-x:
+14px }`, `.drawerSecondary { --drawer-btn-pad: 10px 14px; --drawer-font: 14px }`).
+Token'a bağlananlar: 17/15/13px metinler → `--lg-text-headline/body/footnote`;
+20/16/12/8/4px boşluklar → `--lg-space-5/4/3/2/1`. Bilinçli bırakılanlar:
+cam malzeme reçetesi `blur(4/8px) + saturate(150%)` ve `color-mix`'li
+ışıma/gölge desenleri (token gölge kalıplarıyla birebir değil), geçiş
+süre/easing'leri (token yok), z-index 30/40, 760px özel kırılımı (bp ölçeği
+dışı — satırda yorumlu), `var(--x, ...)` token fallback'leri (proje
+konvansiyonu), dokunmatik 44px hedefi (`pointer: coarse` bloğunda).
 
 ## 10. Storybook kapsamı
 

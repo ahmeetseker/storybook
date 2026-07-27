@@ -85,8 +85,11 @@ Etkileşimsiz. Durum yalnız veri (`items`) ile belirlenir; hover/focus/active y
 | change down | color | `--lg-danger` |
 | gap | gap | `--lg-space-5` |
 
-Raw px: yok (yalnız `flex-basis: 140px` yerleşim borcu; kırılım genişliği için
-token yok).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
+kökünde yerel değişkenlerde toplanır — `--strip-item-basis` (metrik hücresi
+`flex: 1 1` taban genişliği 140px; sarma kırılımını belirleyen yerleşim
+kararı, kırılım genişliği için token yok) ve `--strip-change-gap` (`change`
+ok-metin arası 2px boşluk). Bunların dışında raw px yok.
 
 ## 10. Storybook kapsamı
 

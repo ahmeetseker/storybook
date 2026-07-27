@@ -51,7 +51,7 @@ export function GlassButton({
       thickness={0.35}
       displacementScale={press.displacementScale}
       className={classes}
-      style={{ ...cssVars, scale: press.transformScale, ...style } as CSSProperties}
+      style={{ ...cssVars, color: prominent ? 'var(--lg-accent-contrast)' : undefined, scale: press.transformScale, ...style } as CSSProperties}
       {...press.handlers}
       {...({
         disabled,

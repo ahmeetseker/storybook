@@ -188,9 +188,10 @@ Katman sırası: `open` (kapalıyken hiçbir şey render edilmez) → `query`
   taşınır (klavye ve fare imleci arasında tutarlı vurgu); tıklama doğrudan
   seçer.
 - Dokunmatik: komut butonları `pointer: coarse`'ta ≥44px hedefe yükselir.
-- Responsive: ≥481px `min(560px, 100%)` genişlikte, üstten `12vh` boşluklu
-  ortalanmış panel; ≤480px kenar boşlukları daralır, panel dikeyde daha
-  fazla alan kaplar (bkz. `.module.css` `@media (max-width: 480px)`).
+- Responsive: breakpoint yok — panel `min(560px, 100%)` genişlikte; üst
+  boşluk `min(12vh, max(space-4, 100vw - 464px))` ile, dikey pay
+  `min(70vh, 60vh + max(0px, 480px - 100vw), …)` ile viewport daraldıkça
+  içsel olarak akar (uçlarda eski kırılım değerleriyle birebir aynı).
 
 ## 8. İçerik kuralları
 
@@ -219,10 +220,17 @@ Katman sırası: `open` (kapalıyken hiçbir şey render edilmez) → `query`
 | kontrol yüksekliği (komut satırı) | min-height | `--lg-control-md` (44px `pointer:coarse`'ta) | — |
 
 **Borç (raw):** `z-index: 80` (z token'ı yok, `GlassChatDock`/`GlassToast`
-ile aynı gerekçe, palet en üstte olmalı → onlardan daha yüksek), `box-shadow`
-rgba değeri (Modal/Drawer/ChatDock ile aynı borç), backdrop üst boşluğu
-`12vh` + panel `max-height: min(60vh, 480px)` (spec sabiti, tasarım sistemi
-ölçeğinde yok).
+ile aynı gerekçe, palet en üstte olmalı → onlardan daha yüksek), backdrop
+üst boşluğu `12vh` + `60vh/70vh` payları raw (viewport oranı, token yok) ·
+mikro-geometri ve içsel-akış sabitleri kökte (`.backdrop`) yerel
+değişkenlerde: `--glass-palette-hint-pad-block/inline` (2px/7px kısayol
+ipucu çipi iç boşluğu), `--glass-palette-w: 560px` (panel maks. genişliği),
+`--glass-palette-pad-flow: 464px` (üst boşluk akış eşiği),
+`--glass-palette-narrow-vw: 480px` (dar viewport eşiği),
+`--glass-palette-max-h-wide/narrow: 480px/560px` (yükseklik payları) — spec
+sabitleri, tasarım sistemi ölçeğinde yok. `pointer: coarse` komut satırı
+hedefi `--lg-control-md`'ye bağlandı (coarse'ta 44px — birebir). Panel
+gölgesi `--lg-shadow-lg`.
 
 ## 10. Storybook kapsamı
 

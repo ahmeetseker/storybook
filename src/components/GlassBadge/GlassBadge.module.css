@@ -1,4 +1,10 @@
 .badge {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
+     rozet iç boşlukları space token'larının arasında kalır. */
+  --badge-pad-y-sm: 3px;
+  --badge-pad-x-sm: 10px;
+  --badge-pad-y-md: 5px;
+  --badge-pad-x-md: 14px;
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
@@ -7,13 +13,13 @@
   user-select: none;
 }
 
-.sm { padding: 3px 10px; font-size: 12px; letter-spacing: 0; }
-.md { padding: 5px 14px; font-size: 13px; letter-spacing: 0; }
+.sm { padding: var(--badge-pad-y-sm) var(--badge-pad-x-sm); font-size: var(--lg-text-caption); letter-spacing: 0; }
+.md { padding: var(--badge-pad-y-md) var(--badge-pad-x-md); font-size: var(--lg-text-footnote); letter-spacing: 0; }
 
 /* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
 .tinted {
   background-color: color-mix(in srgb, var(--glass-tint) 65%, transparent);
-  color: #fff;
+  color: #fff; /* bilinçli raw: tint zemini temadan bağımsız — accent-contrast Grafit'te koyulaşır, birebir değil (bkz. rules.md §9) */
 }
 /* Flat malzemede yarı saydam tint soluk kalır; opak tam renk kullan */
 .tinted[data-material='flat'] {

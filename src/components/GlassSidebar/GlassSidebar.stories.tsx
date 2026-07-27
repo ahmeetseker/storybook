@@ -106,7 +106,7 @@ function ControlledSidebarDemo() {
 }
 
 const meta = {
-  title: 'Components/GlassSidebar',
+  title: 'Bileşenler/Navigasyon/GlassSidebar',
   component: GlassSidebar,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },

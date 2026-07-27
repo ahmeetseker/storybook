@@ -112,11 +112,16 @@ Katman sırası: value (selected `background`) → interaction (hover opacity).
 | bar/panel | cam görünümü | GlassSurface'ten (`thickness`, `tone`) | — |
 | tab | font | miras (`font: inherit`) | — |
 
-**Borç (raw değerler):** kök `gap: 14px` (token dışı; `--lg-space-3/4` arası) ·
-bar `padding: 4px` · tab `padding: 8px 18px`, `font-size: 14px` (`--lg-text-*`
-ölçeğinde yok) · aktif zemin `rgba(255,255,255,0.28)` · panel `padding: 20px`,
-`font-size: 15px` (≈`--lg-text-body` ama raw) · panel `shape={20}` sayısal
-(değer `--lg-radius-card`'a eşit ama token'dan okunmuyor).
+**Borç (raw değerler):** token karşılığı olmayanlar component kökünde yerel
+değişkene toplandı — `.root { --root-gap: 14px; --list-gap: 2px;
+--tab-pad-inline: 18px; --tab-font-size: 14px; }` (14px `--lg-text-*`
+ölçeğinde, 14/18px boşluk ölçeğinde yok). Bağlananlar: bar `padding` →
+`--lg-space-1`, tab dikey padding → `--lg-space-2`, tab radius →
+`--lg-radius-capsule`, panel `padding` → `--lg-space-5`, panel font →
+`--lg-text-body`. Aktif zemin `rgba(255,255,255,0.28)` bilinçli beyaz-alfa
+malzeme etkisi — token'a bağlanmadı; panel `shape={20}` sayısal (değer
+`--lg-radius-card`'a eşit ama token'dan okunmuyor — `.tsx` bu fazın kapsamı
+dışında); geçiş süresi/easing (`0.18s ease`) süre token'ı olmadığından raw.
 
 ## 10. Storybook kapsamı
 

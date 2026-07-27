@@ -6,7 +6,7 @@ import { placeholderImage } from '../../demo/placeholderImage'
 const kayaLogo = placeholderImage('KE', '#b45309', '#7c3d0a', 200, 200)
 
 const meta = {
-  title: 'Components/GlassAgencyCard',
+  title: 'Bileşenler/Pazar Yeri/GlassAgencyCard',
   component: GlassAgencyCard,
   tags: ['autodocs'],
   args: {
@@ -17,6 +17,7 @@ const meta = {
       { label: 'Danışman', value: '12' },
     ],
     verified: true,
+    verifiedBy: 'arsam.net',
     phone: '0 (216) 348 22 11',
     variant: 'panel',
     onMessage: fn(),
@@ -27,6 +28,7 @@ const meta = {
     logoSrc: { control: 'text' },
     tagline: { control: 'text' },
     verified: { control: 'boolean' },
+    verifiedBy: { control: 'text' },
     phone: { control: 'text' },
     variant: { control: 'select', options: ['panel', 'inline'] },
     stats: { control: 'object' },
@@ -81,9 +83,8 @@ export const WithLogo: Story = {
 }
 
 /**
- * Durum matrisi: minimal (aksiyonsuz, doğrulanmamış), yalnız telefon (mesaj yok),
- * yalnız mesaj (telefon/ilan linki yok) — her aksiyon prop'u bağımsız olarak
- * render'ı kontrol eder (bkz. rules.md §5).
+ * Durum matrisi: minimal, yalnız telefon, kaynaksız doğrulama işareti ve
+ * doğrulama kaynağı tooltip'i — her prop render'ı bağımsız kontrol eder.
  */
 export const States: Story = {
   name: 'Durumlar',
@@ -107,6 +108,15 @@ export const States: Story = {
         <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>Yalnız mesaj (telefon/ilan linki yok)</p>
         <GlassAgencyCard name="Panorama Gayrimenkul" verified onMessage={fn()} />
       </div>
+      <div>
+        <p style={{ fontSize: 12, opacity: 0.7, margin: '0 0 8px' }}>Doğrulama kaynağı — bilgi ikonu hover/focus tooltip'i</p>
+        <GlassAgencyCard
+          name="Başkent Arazi"
+          tagline="Ankara tarla ve yatırım arazileri"
+          verified
+          verifiedBy="arsam.net"
+        />
+      </div>
     </div>
   ),
 }
@@ -128,7 +138,7 @@ export const UzunIcerik: Story = {
   },
 }
 
-/** Dar konteyner + dokunmatik bağlam: `inline` varyant 420px altında dikey akışa düşer. */
+/** Dar konteyner: `inline` varyant container genişliğine göre iki satıra, sonra tek kolona düşer. */
 export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   args: { variant: 'inline' },
@@ -149,7 +159,9 @@ export const Erisilebilirlik: Story = {
         story:
           'Kök `<section>` düz metin akışıdır — özel bir ARIA rolü üstlenmez. Logo dekoratiftir ' +
           '(`alt=""`); kurum adı zaten görünür metin olarak yanında yer aldığından tekrar okutulmaz. ' +
-          '"Doğrulanmış Kurumsal" rozeti kendi görünür metnini taşır (ekstra `aria-label` gerekmez). ' +
+          'Kompakt doğrulama işareti "Doğrulanmış kurumsal ofis" accessible adına sahiptir. ' +
+          '`verifiedBy` verildiğinde bilgi düğmesi doğrulayan kurumu `GlassTooltip` ile hover/focus\'ta açıklar; ' +
+          'düğmenin accessible adı ve `title` metni aynı açıklamayı taşır. ' +
           'İstatistikler `<dl>` ile etiket/değer ilişkisi kurar. Telefon gerçek bir `tel:` linkidir ' +
           '(Enter ile native aktivasyon, orta tık/kopyala çalışır); "N ilanı görüntüle" ve "Mesaj Gönder" ' +
           'gerçek `<button>` — ikisi de `:focus-visible`\'da `--lg-accent` halkası alır, dokunmatikte ' +

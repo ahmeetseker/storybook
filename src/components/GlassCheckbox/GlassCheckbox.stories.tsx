@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassCheckbox } from './GlassCheckbox'
 
 const meta = {
-  title: 'Components/GlassCheckbox',
+  title: 'Bileşenler/Form/GlassCheckbox',
   component: GlassCheckbox,
   tags: ['autodocs'],
   args: { label: 'Garantili ilanlar', onChange: fn() },
@@ -46,32 +46,34 @@ export const States: Story = {
   ),
 }
 
+const ControlledSelectAllDemo = () => {
+  const [items, setItems] = useState([true, false, true])
+  const all = items.every(Boolean)
+  const some = items.some(Boolean)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <GlassCheckbox
+        label="Tüm ilan tiplerini seç"
+        checked={all}
+        indeterminate={some && !all}
+        onChange={(e) => setItems(items.map(() => e.target.checked))}
+      />
+      {['Sahibinden', 'Galeriden', 'Yetkili bayiden'].map((l, i) => (
+        <div key={l} style={{ paddingLeft: 24 }}>
+          <GlassCheckbox
+            label={l}
+            checked={items[i]}
+            onChange={(e) => setItems(items.map((v, j) => (j === i ? e.target.checked : v)))}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Controlled kullanım: "tümünü seç" + alt öğeler — indeterminate senaryosu. */
 export const ControlledSelectAll: Story = {
-  render: () => {
-    const [items, setItems] = useState([true, false, true])
-    const all = items.every(Boolean)
-    const some = items.some(Boolean)
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <GlassCheckbox
-          label="Tüm ilan tiplerini seç"
-          checked={all}
-          indeterminate={some && !all}
-          onChange={(e) => setItems(items.map(() => e.target.checked))}
-        />
-        {['Sahibinden', 'Galeriden', 'Yetkili bayiden'].map((l, i) => (
-          <div key={l} style={{ paddingLeft: 24 }}>
-            <GlassCheckbox
-              label={l}
-              checked={items[i]}
-              onChange={(e) => setItems(items.map((v, j) => (j === i ? e.target.checked : v)))}
-            />
-          </div>
-        ))}
-      </div>
-    )
-  },
+  render: () => <ControlledSelectAllDemo />,
 }
 
 /** Responsive: dar ekran + coarse pointer'da kutu büyür, satır 44px dokunma hedefi olur. */

@@ -105,10 +105,13 @@ state'i yok.
 | Part | Property | Token |
 |---|---|---|
 | oklar | tüm görünüm | GlassIconButton token'ları |
-| carousel/track | — | Token kullanımı yok |
+| track | padding | `--lg-space-1` |
+| oklar | ofset | `calc(-1 * var(--lg-space-2))` (birebir -8px) |
 
-**Borç (tümü raw):** track `gap: 14px` (kart arası kural 16 → `--lg-space-4`
-ile uyumsuz) · `padding: 4px` · ok ofsetleri `±-8px`. Ayrıca smooth scroll'un
+**Borç (raw / mikro-geometri):** track `gap: 14px` token karşılığı
+olmadığından (kart arası kural 16 → `--lg-space-4` ile uyumsuz; görsel
+değişiklik yasağı gereği yuvarlanmadı) component kökünde yerel değişkende
+toplandı (`.carousel { --track-gap: 14px; }`). Ayrıca smooth scroll'un
 reduced-motion'a bağlanmaması davranış borcudur.
 
 ## 10. Storybook kapsamı

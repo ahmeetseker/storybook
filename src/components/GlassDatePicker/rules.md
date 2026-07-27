@@ -107,7 +107,18 @@ eylem dilinde kısa tutulur ("Tarih seç", "Randevu tarihi").
 | day today | ring | `--lg-hairline` |
 | focus | outline | `--lg-accent` |
 
-Borç: trigger `min-width` değerleri (168/200/232px) raw — layout token'ı yok.
+**Borç (raw / mikro-geometri):** Token'a bağlananlar: popover mobil taşma
+payı `calc(100vw - var(--lg-space-7))` (32px). Token karşılığı olmayanlar
+component kökünde yerel değişkene toplandı: trigger `--min-w-sm/md/lg:
+168/200/232px` (layout token'ı yok) · takvim `--grid-gap: 2px` ·
+`--day-size: 40px` (bp-sm 640px'te 36px'e iner) · bugün halkası
+`--today-ring: 1.5px`. `--day-size` bilinçli olarak `--lg-control-md`'ye
+BAĞLANMADI: control token'ı `pointer: coarse`'ta 44px'e büyür ve mevcut
+mobile-first tasarım (base 40px dokunma hedefi + ≥640px'te 36px breakpoint
+override'ı) ile çelişip görsel değişiklik yaratırdı; birebir görsel
+eşdeğerlik korundu. Bilinçli bırakılanlar: geçiş süreleri `0.16s`/`0.12s
+ease-out` (süre/easing token'ı yok) · invalid iç halka `outline: 1.5px`
+(focus/outline istisnası).
 
 ## 10. Storybook kapsamı
 

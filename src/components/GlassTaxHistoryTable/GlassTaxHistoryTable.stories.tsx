@@ -10,7 +10,7 @@ const bodrumVillaGecmisi: GlassTaxHistoryTableRow[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassTaxHistoryTable',
+  title: 'Bileşenler/Pazar Yeri/GlassTaxHistoryTable',
   component: GlassTaxHistoryTable,
   tags: ['autodocs'],
   args: {
@@ -99,7 +99,7 @@ export const UzunIcerik: Story = {
   ),
 }
 
-/** Dar ekran + dokunmatik: 480px altında satırlar kart görünümüne düşer, her hücre kendi etiketiyle listelenir. */
+/** Dar ekran + dokunmatik: tablo kendi kaydırma sarmalayıcısında (`overflow-x: auto`) yatay kayar — breakpoint yok, içsel akış. */
 export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
   render: (args) => (

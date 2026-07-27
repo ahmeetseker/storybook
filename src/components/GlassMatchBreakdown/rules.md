@@ -209,7 +209,7 @@ içerik imzasının parçası, her grup bağımsız) → render.
 | başlık | color | `--lg-label` | — |
 | genel/grup skor sayısı | color | `--lg-label` (tona bağlı DEĞİL — bkz. Do/Don't) | — |
 | bar track | background | `--lg-hairline` | — |
-| bar fill | background (inline style) | `var(--lg-success/-accent/-danger)` | otomatik eşik (`overall`/`group.score`) |
+| bar fill | background + `transform: scaleX(oran)` (inline style) | `var(--lg-success/-accent/-danger)` | otomatik eşik (`overall`/`group.score`); dolum %100 genişlik + `scaleX`, `transform-origin: inline-start`, track `overflow: hidden` — genişlik animasyonu yasağına uygun (yalnız transform anime edilir) |
 | grup ayırıcı | border-top | `--lg-hairline` | ilk grupta yok |
 | ağırlık etiketi | color | `--lg-label-secondary` | — |
 | AI rozeti zemin/metin | background/color | `color-mix(... var(--lg-accent) ... var(--lg-surface)/var(--lg-label))` | kontrat sabiti — `GlassMatchScore.module.css`'teki `.aiBadge` bloğuyla birebir aynı |
@@ -218,9 +218,15 @@ içerik imzasının parçası, her grup bağımsız) → render.
 | geri bildirim butonu | border/background/radius | `--lg-hairline`/`--lg-surface`/`--lg-radius-capsule` | `aria-pressed=true` → `--lg-accent` tint |
 | skeleton | background | `color-mix(... var(--lg-label) 8% ...)` | `loading` |
 
-**Borç (raw):** bar track yüksekliği 6px, AI rozeti font-size 10.5px/700
-(kontrat sabiti, tasarım sistemi ölçeğinde yok) — `GlassMatchScore`'daki ring
-çapı borcuyla aynı gerekçe.
+**Borç (raw / mikro-geometri):** token karşılığı olmayan mikro ölçüler
+component kökünde yerel değişkenlerde toplanır — `--bd-ai-gap` (6px),
+`--bd-badge-pad-block` (3px), `--bd-bar-h` (bar track 6px), `--bd-chip-gap`
+(5px), `--bd-chip-pad-block` (3px), `--bd-chip-pad-start` (6px),
+`--bd-skeleton-overall-h` (14px), `--bd-skeleton-group-h` (10px). AI rozeti
+font boyutu `--lg-text-badge` token'ına bağlandı (eski 10.5px → 11px, ≤1.5px
+kabul edilen tipografi kayması); detay ikonu `font-weight: 700` (eski 800 —
+ölçek dışıydı). Coarse geri bildirim hedefi `--lg-control-md` (coarse'ta
+44px).
 
 ## 10. Storybook kapsamı
 

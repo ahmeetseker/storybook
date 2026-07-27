@@ -208,10 +208,32 @@ Changelog); `JSON.stringify` tuple alan/eleman sınırlarını korur.
 | dismiss (hover) | background | `color-mix(in srgb, var(--flag-color) 18%, transparent)` | `@media (hover: hover)` |
 | placeholderBar | background | `color-mix(in srgb, var(--flag-color) 22%, var(--lg-hairline))` | `aria-busy` altında opacity animasyonu |
 
-**Borç (raw):** dismiss butonu 28px taban boyutu (coarse'ta 44px'e büyür) —
-GlassAlert'in aynı borcuyla aynı gerekçe: gösterge/kontrol ölçeği için özel
-token yok. AI rozeti `font-size: 10.5px` — kontratın kendisinde sabitlenmiş
-literal değer (tasarım sistemi kararı, token değil).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan tüm ölçüler component
+kökünde yerel değişkende toplandı — `.banner { --nudge: 2px;
+--textlink-height: 24px; --content-basis: 240px; --underline-offset: 2px;
+--badge-pad-y: 3px; --dismiss-size: 28px; --placeholder-bar-h: 11px; }`
+(hizalama nudge'ları, metin-link taban yüksekliği, içerik sarma eşiği,
+alt çizgi ofseti, rozet dikey padding'i, dismiss taban boyutu — kontrol ölçeği
+28px'e uymadığından control token'ı verilmedi (GlassAlert'le aynı gerekçe),
+placeholder bar yüksekliği — 11px `--lg-text-badge` ile aynı değer ama font
+token'ı boy geometrisine bağlanmaz). Coarse'taki 44px dokunma hedefleri
+(dismiss kare boyutu, feedback min-width/height, detailsAction min-height)
+`--lg-control-md`'ye bağlandı — `pointer: coarse` bloğunda token birebir
+44px'tir, spec'in "sabit zorunlu 44px" isteği aynen korunur. Süre/easing raw
+kalır (token yok): buton geçişleri `0.15s ease-out`, placeholder nabzı
+`1.6s ease-in-out`.
+
+AI rozeti font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması — kontrattaki literal, token'a devredildi).
+
+**Responsive:** `@media (max-width: …)` KULLANILMAZ — kök `flex-wrap: wrap` +
+`.content { flex-basis: var(--content-basis) }` içsel akışı: dar konteynerde
+içerik kendi satırına sarar, dismiss içerik satırının sonunda kalır.
+
+**Bilinçli istisna (paint-only geçişler):** feedback/dismiss/detailsAction
+`background-color/border-color/color` geçişleri layout tetiklemez (paint-only)
+ve reduced-motion'da kapanır — transform/opacity/filter kuralının kabul edilen
+istisnasıdır.
 
 ## 10. Storybook kapsamı
 

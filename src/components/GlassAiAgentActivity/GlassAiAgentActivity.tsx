@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import type { HTMLAttributes } from 'react'
+import { GlassButton } from '../GlassButton'
 import styles from './GlassAiAgentActivity.module.css'
 
 export type GlassAgentActivityStatus =
@@ -87,55 +88,57 @@ export function GlassAiAgentActivity({
           </span>
         </div>
         {active && onStop ? (
-          <button type="button" className={styles.stop} onClick={onStop}>
+          <GlassButton size="sm" className={styles.stop} onClick={onStop}>
             Çalışmayı durdur
-          </button>
+          </GlassButton>
         ) : null}
       </header>
 
       {entries.length ? (
-        <ol className={styles.list} role="log" aria-live="polite" aria-label="Ajan işlem günlüğü">
-          {entries.map((entry) => (
-            <li key={entry.id} className={styles.item} data-status={entry.status}>
-              <span className={styles.mark} data-status={entry.status} aria-hidden />
-              <div className={styles.body}>
-                <div className={styles.itemHead}>
-                  <strong className={styles.itemTitle}>{entry.title}</strong>
-                  <span className={styles.status} data-status={entry.status}>
-                    {STATUS_LABELS[entry.status]}
-                  </span>
+        <div role="log" aria-live="polite" aria-label="Ajan işlem günlüğü">
+          <ol className={styles.list}>
+            {entries.map((entry) => (
+              <li key={entry.id} className={styles.item} data-status={entry.status}>
+                <span className={styles.mark} data-status={entry.status} aria-hidden />
+                <div className={styles.body}>
+                  <div className={styles.itemHead}>
+                    <strong className={styles.itemTitle}>{entry.title}</strong>
+                    <span className={styles.status} data-status={entry.status}>
+                      {STATUS_LABELS[entry.status]}
+                    </span>
+                  </div>
+                  {entry.detail ? <p className={styles.detail}>{entry.detail}</p> : null}
+                  {entry.toolLabel || entry.timeLabel ? (
+                    <div className={styles.meta}>
+                      {entry.toolLabel ? <span>Araç: {entry.toolLabel}</span> : null}
+                      {entry.timeLabel ? <time>{entry.timeLabel}</time> : null}
+                    </div>
+                  ) : null}
+                  {entry.technical ? (
+                    <details className={styles.technical}>
+                      <summary>Teknik detay</summary>
+                      <p>{entry.technical}</p>
+                    </details>
+                  ) : null}
                 </div>
-                {entry.detail ? <p className={styles.detail}>{entry.detail}</p> : null}
-                {entry.toolLabel || entry.timeLabel ? (
-                  <div className={styles.meta}>
-                    {entry.toolLabel ? <span>Araç: {entry.toolLabel}</span> : null}
-                    {entry.timeLabel ? <time>{entry.timeLabel}</time> : null}
+                {entry.status === 'needsApproval' && (onApprove || onReject) ? (
+                  <div className={styles.actions}>
+                    {onReject ? (
+                      <GlassButton size="sm" onClick={() => onReject(entry.id)}>
+                        Reddet
+                      </GlassButton>
+                    ) : null}
+                    {onApprove ? (
+                      <GlassButton prominent size="sm" onClick={() => onApprove(entry.id)}>
+                        İzin ver
+                      </GlassButton>
+                    ) : null}
                   </div>
                 ) : null}
-                {entry.technical ? (
-                  <details className={styles.technical}>
-                    <summary>Teknik detay</summary>
-                    <p>{entry.technical}</p>
-                  </details>
-                ) : null}
-              </div>
-              {entry.status === 'needsApproval' && (onApprove || onReject) ? (
-                <div className={styles.actions}>
-                  {onReject ? (
-                    <button type="button" className={styles.reject} onClick={() => onReject(entry.id)}>
-                      Reddet
-                    </button>
-                  ) : null}
-                  {onApprove ? (
-                    <button type="button" className={styles.approve} onClick={() => onApprove(entry.id)}>
-                      İzin ver
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-            </li>
-          ))}
-        </ol>
+              </li>
+            ))}
+          </ol>
+        </div>
       ) : (
         <p className={styles.empty} role="status">
           Henüz bir ajan işlemi başlatılmadı. İlk işlem başladığında araç çağrıları burada görünecek.

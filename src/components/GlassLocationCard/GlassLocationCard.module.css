@@ -1,27 +1,44 @@
 .card {
+  /* Mikro-geometri + dekoratif harita paleti (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --card-pad: 14px;
+  --info-gap: 3px;
+  --address-size: 14.5px;
+  --map-height: 150px;
+  --map-radius: 13px;
+  --map-green-1: #4a7a63;
+  --map-green-2: #2f5546;
+  --map-grid-line: rgba(255, 255, 255, 0.16);
+  --map-row-a: 34px;
+  --map-row-b: 36px;
+  --map-col-a: 46px;
+  --map-col-b: 48px;
+  --map-glow: rgba(255, 255, 255, 0.18);
+  --map-glow-size: 160px;
+  --pin-color: #ff453a;
+  --pin-size: 36px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--lg-space-3);
   box-sizing: border-box;
-  padding: 14px;
+  padding: var(--card-pad);
 }
 
 /* Stilize harita placeholder'ı: gradyan zemin + sokak ızgarası */
 .map {
   position: relative;
-  height: 150px;
-  border-radius: 13px;
+  height: var(--map-height);
+  border-radius: var(--map-radius);
   overflow: hidden;
   background:
-    repeating-linear-gradient(0deg, transparent 0 34px, rgba(255, 255, 255, 0.16) 34px 36px),
-    repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, 0.16) 46px 48px),
-    linear-gradient(135deg, #4a7a63, #2f5546);
+    repeating-linear-gradient(0deg, transparent 0 var(--map-row-a), var(--map-grid-line) var(--map-row-a) var(--map-row-b)),
+    repeating-linear-gradient(90deg, transparent 0 var(--map-col-a), var(--map-grid-line) var(--map-col-a) var(--map-col-b)),
+    linear-gradient(135deg, var(--map-green-1), var(--map-green-2));
 }
 .map::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(160px circle at 50% 48%, rgba(255, 255, 255, 0.18), transparent 70%);
+  background: radial-gradient(var(--map-glow-size) circle at 50% 48%, var(--map-glow), transparent 70%);
 }
 
 .pin {
@@ -30,30 +47,30 @@
   top: 50%;
   transform: translate(-50%, -85%);
   z-index: 1;
-  color: #ff453a;
+  color: var(--pin-color);
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
 }
 .pin svg {
-  width: 36px;
-  height: 36px;
+  width: var(--pin-size);
+  height: var(--pin-size);
 }
 
 .info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 0 4px;
+  gap: var(--info-gap);
+  padding: 0 var(--lg-space-1);
 }
 
 .address {
   margin: 0;
-  font-size: 14.5px;
+  font-size: var(--address-size);
   font-weight: 600;
   line-height: 1.4;
 }
 
 .note {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--lg-text-caption);
   opacity: 0.6;
 }

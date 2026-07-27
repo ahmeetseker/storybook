@@ -150,8 +150,8 @@ stale değer taşınmaz.
 | area gradyan üst durak | stop-color | `color-mix(in srgb, tint 26%, transparent)` | — |
 | son nokta etiketi | color | `--lg-accent` | — |
 | y/x etiketleri, tooltip | font-size / color | `--lg-text-caption`/`--lg-text-footnote` / `--lg-label-secondary` | — |
-| tooltip yüzeyi | background / border / radius | `--lg-surface` / `--lg-hairline` / `--lg-radius-chip` | — |
-| boşluklar | gap/padding | `--lg-space-3/5` | — |
+| tooltip yüzeyi | background / border / radius / shadow | `--lg-surface` / `--lg-hairline` / `--lg-radius-chip` / `--lg-shadow-sm` | — |
+| boşluklar | gap/padding | `--lg-space-1/2/3/5` | — |
 
 Borç (raw): `VIEW_WIDTH=600` mantıksal SVG genişliği + `PAD_Y=16` dikey
 boşluk ve grid satır sayısı (4) component-özel geometri sabitleri, token
@@ -159,9 +159,10 @@ karşılığı yok · `svg`'de `preserveAspectRatio="none"` ile yatay ölçeklem
 konteyner genişliği 600'den belirgin saparsa son nokta/kılavuz daireleri
 hafifçe eliptikleşebilir (küçük yarıçapta — 4-5px — pratikte fark edilmez;
 tam pixel-doğru ölçek için `ResizeObserver` ile ölçüm gerekir, bilinçli
-olarak eklenmedi, bkz. Açık Kararlar) · tooltip/son-etiket/y-etiket
-konumlandırması raw px (2px, 4px, 6px) — küçük UI ofsetleri, token ölçeğine
-girmez.
+olarak eklenmedi, bkz. Açık Kararlar) · mikro-geometri kökte yerel
+değişkenlerde toplandı: `--glass-chart-edge-inset: 2px` (son etiket sağ
+ofseti), `--glass-chart-tooltip-gap: 1px` (tooltip satır arası) — token
+ölçeğine girmeyen küçük UI ofsetleri.
 
 ## 10. Storybook kapsamı
 

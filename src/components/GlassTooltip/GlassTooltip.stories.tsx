@@ -4,7 +4,7 @@ import { GlassButton } from '../GlassButton/GlassButton'
 import { GlassBadge } from '../GlassBadge/GlassBadge'
 
 const meta = {
-  title: 'Components/GlassTooltip',
+  title: 'Bileşenler/Katmanlar/GlassTooltip',
   component: GlassTooltip,
   tags: ['autodocs'],
   args: {

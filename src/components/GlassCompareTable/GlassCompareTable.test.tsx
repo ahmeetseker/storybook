@@ -120,6 +120,57 @@ describe('GlassCompareTable', () => {
     expect(within(imarRow as HTMLElement).getByText('—')).toBeDefined()
   })
 
+  it('temsili görsel hata verince listing fallbackine yalnız bir kez geçer', () => {
+    const fallbackListing: GlassCompareListing = {
+      ...listings[0],
+      image: 'representative-image.jpg',
+      imageFallback: 'listing-fallback.jpg',
+    }
+    const { container } = render(
+      <GlassCompareTable fields={fields} listings={[fallbackListing]} />,
+    )
+    const image = container.querySelector('img')
+
+    expect(image).not.toBeNull()
+    expect(image?.getAttribute('alt')).toBe('')
+    fireEvent.error(image!)
+    expect(image?.getAttribute('src')).toBe('listing-fallback.jpg')
+
+    fireEvent.error(image!)
+    expect(image?.getAttribute('src')).toBe('listing-fallback.jpg')
+  })
+
+  it('aynı id için görsel prop çifti değişince yeni temsili görseli yeniden dener', () => {
+    const firstListing: GlassCompareListing = {
+      ...listings[0],
+      image: 'first-representative.jpg',
+      imageFallback: 'first-listing.jpg',
+    }
+    const { container, rerender } = render(
+      <GlassCompareTable fields={fields} listings={[firstListing]} />,
+    )
+    const image = container.querySelector('img')
+
+    fireEvent.error(image!)
+    expect(image?.getAttribute('src')).toBe('first-listing.jpg')
+
+    rerender(
+      <GlassCompareTable
+        fields={fields}
+        listings={[
+          {
+            ...firstListing,
+            image: 'replacement-representative.jpg',
+            imageFallback: 'replacement-listing.jpg',
+          },
+        ]}
+      />,
+    )
+    expect(image?.getAttribute('src')).toBe('replacement-representative.jpg')
+    fireEvent.error(image!)
+    expect(image?.getAttribute('src')).toBe('replacement-listing.jpg')
+  })
+
   it('yatay kaydırma kabı role="region" + aria-label taşır ve klavyeyle (tabIndex) odaklanabilir', () => {
     render(<GlassCompareTable fields={fields} listings={listings} aria-label="İlan karşılaştırması" />)
     const region = screen.getByRole('region', { name: 'İlan karşılaştırması' })

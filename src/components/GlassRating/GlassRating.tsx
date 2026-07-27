@@ -265,7 +265,13 @@ function SummaryRating({ value, distribution, className, ...rest }: Omit<GlassRa
               <dt className={styles.distLabel}>{star} yıldız</dt>
               <dd className={styles.distValue}>
                 <span className={styles.distBarTrack} aria-hidden>
-                  <span className={styles.distBarFill} style={{ width: `${pct}%` }} />
+                  {/* Genişlik animasyonu yerine paint-only scaleX — bar %100
+                      genişlikte, oran transform ile verilir (tasarım sistemi
+                      animasyon kuralı). */}
+                  <span
+                    className={styles.distBarFill}
+                    style={{ transform: `scaleX(${pct / 100})` }}
+                  />
                 </span>
                 <span className={styles.distCount}>{formatCount(n)}</span>
               </dd>

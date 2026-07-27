@@ -150,10 +150,16 @@ tekil statik kart, form kontrolü değil).
 | yıldız dolgu/iz | `stop-color` | `--lg-accent` (dolu) / `color-mix(--lg-label-secondary 32%)` (boş) | — |
 | helpful butonu | min-height / radius / focus | `--lg-control-md` / `--lg-radius-capsule` / `outline: --lg-accent` | hover yalnız `@media (hover:hover)` |
 
-**Borç (raw):** yıldız SVG `viewBox="0 0 24 24"` + poligon koordinatları
-(geometri, renk değil) · ikon boyutları 13/14/15px (avatar/ikon ölçeğinde
-mevcut repo konvansiyonuyla tutarlı, ör. `GlassAvatar` sabit px boyutları) ·
-compact yazar `max-width: 40%` (layout oranı, token kapsamında değil).
+**Borç (mikro-geometri, `.card` üzerinde yerel değişken):**
+- `--grc-star-gap: 1px` — yıldızlar arası mikro boşluk.
+- `--grc-verified-padding-block: 2px` — doğrulanmış rozet dikey dolgusu
+  (yatay dolgu `--lg-space-2`, ikon/metin arası `--lg-space-1`).
+
+**Borç (raw, değişkene alınmayan):** yıldız SVG `viewBox="0 0 24 24"` +
+poligon koordinatları (geometri, renk değil) · ikon boyutları 13/14/15px
+(avatar/ikon ölçeğinde mevcut repo konvansiyonuyla tutarlı, ör. `GlassAvatar`
+sabit px boyutları) · compact yazar `max-width: 40%` (layout oranı, token
+kapsamında değil).
 
 ## 10. Storybook kapsamı
 
@@ -210,3 +216,6 @@ buton/düz-metin "Faydalı" aksiyonu.
 **Changelog:** 2026-07-17 — Codex review fix: avatar sarmalayıcısı
 `aria-hidden="true"` yapıldı (yazar adının ekran okuyucuda iki kez
 duyurulması giderildi); regresyon testi eklendi.
+**Changelog:** 2026-07-24 — Uyum düzeltmesi: verified rozet `gap: 4px` →
+`--lg-space-1`; mikro-geometri (1px yıldız gap, 2px rozet dikey dolgusu)
+`.card` üzerinde yerel değişkenlere toplandı (§9). Görsel değişiklik yok.

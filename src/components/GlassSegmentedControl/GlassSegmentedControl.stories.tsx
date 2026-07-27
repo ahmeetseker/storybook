@@ -10,7 +10,7 @@ const viewOptions = [
 ]
 
 const meta = {
-  title: 'Components/GlassSegmentedControl',
+  title: 'Bileşenler/Navigasyon/GlassSegmentedControl',
   component: GlassSegmentedControl,
   tags: ['autodocs'],
   args: { options: viewOptions, label: 'Görünüm', onChange: fn() },
@@ -51,19 +51,21 @@ export const States: Story = {
   ),
 }
 
+const ControlledDemo = () => {
+  const [view, setView] = useState('list')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+      <GlassSegmentedControl label="Görünüm" options={viewOptions} value={view} onChange={setView} />
+      <span style={{ fontSize: 13, opacity: 0.7 }}>
+        Aktif görünüm: {viewOptions.find((o) => o.value === view)?.label}
+      </span>
+    </div>
+  )
+}
+
 /** Controlled kullanım: seçim dışarıdan yönetilir, görünüm anında değişir. */
 export const Controlled: Story = {
-  render: () => {
-    const [view, setView] = useState('list')
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
-        <GlassSegmentedControl label="Görünüm" options={viewOptions} value={view} onChange={setView} />
-        <span style={{ fontSize: 13, opacity: 0.7 }}>
-          Aktif görünüm: {viewOptions.find((o) => o.value === view)?.label}
-        </span>
-      </div>
-    )
-  },
+  render: () => <ControlledDemo />,
 }
 
 /** Uzun içerik: segmentler daralmaz, bar yatay scroll'a düşer. */

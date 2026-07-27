@@ -111,8 +111,12 @@ Varsayılan kombinasyon: `variant=inline`.
 | disabled | color | `--lg-label-secondary` |
 | font | — | miras (bağlamın font-size/family'si) |
 
-Borç: focus halkası `border-radius: 2px`, chevron kayması `2px`, opacity `.6`,
-alt çizgi offset `.18em` raw.
+**Borç (raw / mikro-geometri):** focus halkası köşesi ve chevron hover kayması
+token karşılığı olmadığından component kökünde yerel değişkende toplandı
+(`.link { --focus-radius: 2px; --chevron-nudge: 2px; }`). Bilinçli bırakılan:
+disabled `opacity: .6` (oran, uzunluk/renk değil), alt çizgi offset `.18em`
+(font'a göreli tipografik ölçü), geçiş süresi `0.15s ease` (süre/easing
+token'ı yok).
 
 ## 10. Storybook kapsamı
 

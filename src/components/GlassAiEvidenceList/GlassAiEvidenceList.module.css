@@ -1,6 +1,10 @@
 /* AI şeffaflık: kaynak listesi. İçerik katmanı — düz yüzey, cam yok.
    Doğrulama durumu ve ilgi oranı renk dışında metinle de iletilir. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --index-size: 22px;
+  --gap-tight: 2px;
+  --badge-pad-block: 3px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-3);
@@ -19,7 +23,7 @@
 .title {
   margin: 0;
   font-size: var(--lg-text-headline);
-  font-weight: 650;
+  font-weight: 600;
   color: var(--lg-label);
 }
 
@@ -28,11 +32,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--badge-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -75,9 +79,11 @@ button.item {
   cursor: pointer;
 }
 
-a.item:hover,
-button.item:hover {
-  border-color: color-mix(in srgb, var(--lg-accent) 40%, var(--lg-hairline));
+@media (hover: hover) {
+  a.item:hover,
+  button.item:hover {
+    border-color: color-mix(in srgb, var(--lg-accent) 40%, var(--lg-hairline));
+  }
 }
 
 a.item:focus-visible,
@@ -91,8 +97,8 @@ button.item:focus-visible {
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: var(--index-size);
+  height: var(--index-size);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 75%, var(--lg-label));
@@ -106,7 +112,7 @@ button.item:focus-visible {
   min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--gap-tight);
 }
 
 .itemTitle {
@@ -122,7 +128,7 @@ button.item:focus-visible {
 }
 
 .excerpt {
-  margin-top: 2px;
+  margin-top: var(--gap-tight);
   font-size: var(--lg-text-footnote);
   color: var(--lg-label-secondary);
   overflow-wrap: anywhere;
@@ -133,7 +139,7 @@ button.item:focus-visible {
   flex: none;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: var(--gap-tight);
   text-align: end;
 }
 
@@ -143,11 +149,11 @@ button.item:focus-visible {
 }
 
 .verify[data-verified='true'] {
-  color: var(--lg-success);
+  color: color-mix(in srgb, var(--lg-success) 55%, var(--lg-label));
 }
 
 .verify[data-verified='false'] {
-  color: var(--lg-warning);
+  color: color-mix(in srgb, var(--lg-warning) 55%, var(--lg-label));
 }
 
 .relevance {

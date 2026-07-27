@@ -2,6 +2,16 @@
    Yalnız token'lar (--lg-*) + color-mix türevleri. Ring çapı/stroke-width ve
    skeleton satır yükseklikleri raw px borcu — bkz. rules.md §9. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --ms-meta-gap: 2px;
+  --ms-ai-gap: 6px;
+  --ms-badge-pad-block: 3px;
+  --ms-chip-gap: 5px;
+  --ms-chip-pad-block: 3px;
+  --ms-chip-pad-start: 6px;
+  --ms-skeleton-ring-card: 72px;
+  --ms-skeleton-ring-compact: 40px;
+  --ms-skeleton-body-mt: 6px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -38,7 +48,7 @@
 .meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--ms-meta-gap);
   min-width: 0;
 }
 
@@ -73,7 +83,7 @@
 .aiRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--ms-ai-gap);
   flex-wrap: wrap;
 }
 
@@ -81,11 +91,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--ms-badge-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -114,6 +124,9 @@
   stroke: var(--lg-hairline);
 }
 
+/* Bilinçli istisna: stroke-dashoffset geçişi paint-only'dir (layout tetiklemez)
+   — "yalnız transform/opacity/filter" kuralının kabul edilen SVG istisnası,
+   bkz. rules.md. */
 .ringFill {
   fill: none;
   transition: stroke-dashoffset 0.3s ease-out;
@@ -150,8 +163,8 @@
 .criterion {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px var(--lg-space-2) 3px 6px;
+  gap: var(--ms-chip-gap);
+  padding: var(--ms-chip-pad-block) var(--lg-space-2) var(--ms-chip-pad-block) var(--ms-chip-pad-start);
   border-radius: var(--lg-radius-chip);
   font-size: var(--lg-text-caption);
   font-weight: 600;
@@ -173,7 +186,7 @@
 
 .criterionIcon {
   flex: none;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -186,6 +199,7 @@
 }
 
 .criterionLabel {
+  color: var(--lg-label);
   overflow-wrap: anywhere;
 }
 
@@ -243,28 +257,29 @@
   }
 }
 
+/* Dokunmatikte 44px hedef — --lg-control-md coarse'ta 44px'e yükselir */
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
 /* ── yükleme placeholder'ı: kendi flat skeleton'u, shimmer yok — yalnız opacity ── */
 .skeletonRing {
-  border-radius: 50%;
+  border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
   animation: lg-match-pulse 1.4s ease-in-out infinite;
 }
 
 .skeletonRing[data-size='card'] {
-  width: 72px;
-  height: 72px;
+  width: var(--ms-skeleton-ring-card);
+  height: var(--ms-skeleton-ring-card);
 }
 
 .skeletonRing[data-size='compact'] {
-  width: 40px;
-  height: 40px;
+  width: var(--ms-skeleton-ring-compact);
+  height: var(--ms-skeleton-ring-compact);
 }
 
 .skeletonLine {
@@ -281,7 +296,7 @@
 
 .skeletonBody {
   width: 80%;
-  margin-top: 6px;
+  margin-top: var(--ms-skeleton-body-mt);
 }
 
 @keyframes lg-match-pulse {

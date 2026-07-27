@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassTextarea } from './GlassTextarea'
 
 const meta = {
-  title: 'Components/GlassTextarea',
+  title: 'Bileşenler/Form/GlassTextarea',
   component: GlassTextarea,
   tags: ['autodocs'],
   args: { onChange: fn(), 'aria-label': 'Açıklama' },

@@ -1,4 +1,7 @@
 .button {
+  /* Mikro-geometri: ikon glyph boyutları — 14/20px token ölçeğinde yok (bkz. rules.md §9 borç notu) */
+  --icon-font-sm: 14px;
+  --icon-font-lg: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,7 +22,8 @@
     background-color: rgba(255, 255, 255, 0.94);
     color: rgba(0, 0, 0, 0.85);
     scale: 1.08;
-    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
+    /* Yükselti yalnız hover'da: GlassSurface'in gölge kanalı (rim CSS'te korunur) */
+    --lg-surface-shadow: 0 10px 26px rgba(0, 0, 0, 0.26);
   }
   .button:active:not(:disabled) {
     background-color: #fff;
@@ -39,9 +43,9 @@
 }
 
 /* Kare gövde + capsule shape = daire; boyutlar kontrol token'larından */
-.sm { width: var(--lg-control-sm, 32px); height: var(--lg-control-sm, 32px); font-size: 14px; }
-.md { width: var(--lg-control-md, 40px); height: var(--lg-control-md, 40px); font-size: 17px; }
-.lg { width: var(--lg-control-lg, 48px); height: var(--lg-control-lg, 48px); font-size: 20px; }
+.sm { width: var(--lg-control-sm, 32px); height: var(--lg-control-sm, 32px); font-size: var(--icon-font-sm); }
+.md { width: var(--lg-control-md, 40px); height: var(--lg-control-md, 40px); font-size: var(--lg-text-headline); }
+.lg { width: var(--lg-control-lg, 48px); height: var(--lg-control-lg, 48px); font-size: var(--icon-font-lg); }
 
 .active {
   background-color: color-mix(in srgb, var(--glass-tint) 85%, transparent);

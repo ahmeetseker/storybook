@@ -116,8 +116,14 @@ Varsayılan kombinasyon: `size=md`, seçimsiz, nötr cam.
 | hover (nötr) | background | `color-mix(--lg-label 8%, transparent)` |
 | root | radius | capsule (`shape="capsule"`) |
 
-Borç: min-height'lar (26/32/36px) raw — kontrol token'ları chip için bir
-kademe büyük kaldığından bilinçli; chip ölçeği token'ı açık karar.
+**Borç (raw / mikro-geometri):** sm chip yüksekliği ve yatay padding'ler
+token karşılığı olmadığından kökte yerel değişkende toplandı
+(`.chip { --chip-h-sm: 26px; --chip-pad-x-sm: 10px; --chip-pad-x-md: 14px; }`).
+md min-height tam olarak `--lg-control-sm`'e bağlandı (32px; coarse'ta 36px'e
+büyür — dokunmatik hedef zaten 36 olarak tasarlanmıştı, birebir).
+Coarse'taki 36px minimumu da `--lg-control-sm` (coarse değeri 36 — birebir).
+sm chip için `--lg-control-sm` bile yüksek kaldığından chip ölçeği yerel
+kalır (açık karar). Geçiş süreleri `0.16s ease-out` raw (süre token'ı yok).
 
 ## 10. Storybook kapsamı
 

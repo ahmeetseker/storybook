@@ -168,10 +168,13 @@ zemini) → `authorRole`/`verified` (koşullu slotlar) → render.
 | rozet ikon | color | `--lg-success` | `verified` |
 | metin gövdesi | color | `--lg-label` (`quote`) / `--lg-label-secondary` yok, `--lg-label` (`inline` de aynı) | — |
 
-**Borç (raw):** sol accent çizgi kalınlığı 3px, rozet ikon boyutu 13x13px +
-`strokeWidth 1.8`, rozet ikon-metin arası `gap: 4px` — `GlassReviewCard`
-"Doğrulanmış görüşme" rozetiyle aynı gerekçe/aynı raw değerler (tasarım
-sistemi ölçeğinde tanımlı değil, component ailesi içinde tutarlı).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
+kökünde yerel değişkenlerde toplanır — `--note-strip-w` (sol accent çizgi
+kalınlığı 3px) ve `--note-verified-pad-block` (rozet dikey padding'i 2px).
+Rozet ikon boyutu 13x13px + `strokeWidth 1.8` TSX tarafında raw kalır —
+`GlassReviewCard` "Doğrulanmış görüşme" rozetiyle aynı gerekçe/aynı raw
+değerler (tasarım sistemi ölçeğinde tanımlı değil, component ailesi içinde
+tutarlı). Rozet ikon-metin arası boşluk `--lg-space-1`'e taşındı.
 
 ## 10. Storybook kapsamı
 

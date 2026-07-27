@@ -69,7 +69,7 @@ function sortFaturalar(key: string, direction: GlassTableSortDirection): Fatura[
 }
 
 const meta = {
-  title: 'Components/GlassTable',
+  title: 'Bileşenler/Veri Gösterimi/GlassTable',
   component: GlassTable,
   tags: ['autodocs'],
   args: {

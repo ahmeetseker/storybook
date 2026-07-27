@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { fn } from 'storybook/test'
+import { fn, userEvent, within } from 'storybook/test'
 import { GlassAiSearchBar, type GlassAiSearchBarFilter } from './GlassAiSearchBar'
 
 const meta = {
-  title: 'Components/GlassAiSearchBar',
+  title: 'Bileşenler/AI/GlassAiSearchBar',
   component: GlassAiSearchBar,
   tags: ['autodocs'],
   args: {
     onSubmit: fn(),
     placeholder: 'Örn. "Urla\'da deniz manzaralı 3+1 daire"',
+    announcementMode: 'internal',
   },
   argTypes: {
     onSubmit: { control: false },
@@ -17,6 +18,10 @@ const meta = {
     onRemoveFilter: { control: false },
     onFeedback: { control: false },
     parsedFilters: { control: false },
+    announcementMode: {
+      control: 'select',
+      options: ['internal', 'external'],
+    },
   },
   parameters: {
     docs: {
@@ -65,6 +70,13 @@ export const Playground: Story = {
 export const OneriListesi: Story = {
   name: 'Öneri Listesi',
   args: { suggestions: SUGGESTIONS },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('searchbox', {
+        name: 'Doğal dilde arama',
+      }),
+    )
+  },
   parameters: {
     docs: {
       description: {
@@ -161,6 +173,34 @@ export const States: Story = {
       </div>
     </div>
   ),
+}
+
+/** Parent kendi canlı durum bölgesini yönetiyorsa component görsel açıklamayı korur, ikinci bir live-region oluşturmaz. */
+export const HariciDuyuru: Story = {
+  name: 'Harici Duyuru Sahipliği',
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 420 }}>
+      <p role="status" aria-live="polite">
+        İlanlar analiz ediliyor.
+      </p>
+      <GlassAiSearchBar
+        onSubmit={fn()}
+        defaultValue="Urla'da deniz manzaralı 3+1 daire"
+        loading
+        announcementMode="external"
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Composition sahibi parent tek canlı durum bölgesini yönetir. `external` modunda ' +
+          'inputun "Düşünüyor…" açıklaması ve `aria-describedby` bağlantısı korunur; yalnız ' +
+          'component içindeki `aria-live` niteliği kaldırılır.',
+      },
+    },
+  },
 }
 
 /** Uzun sorgu metni, uzun öneri cümleleri ve çok filtreli AI çıktısı — taşma/kırpma yerine sarma. */

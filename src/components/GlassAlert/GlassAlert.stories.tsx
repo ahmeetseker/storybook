@@ -4,7 +4,7 @@ import { GlassAlert } from './GlassAlert'
 import { GlassButton } from '../GlassButton'
 
 const meta = {
-  title: 'Components/GlassAlert',
+  title: 'Bileşenler/Katmanlar/GlassAlert',
   component: GlassAlert,
   tags: ['autodocs'],
   args: { children: 'İlanınız yayına alındı.' },

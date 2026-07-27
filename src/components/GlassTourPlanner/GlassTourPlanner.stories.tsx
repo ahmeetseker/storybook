@@ -39,7 +39,7 @@ const kozluDuraklari: GlassTourPlannerStop[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassTourPlanner',
+  title: 'Bileşenler/AI/GlassTourPlanner',
   component: GlassTourPlanner,
   tags: ['autodocs'],
   args: {

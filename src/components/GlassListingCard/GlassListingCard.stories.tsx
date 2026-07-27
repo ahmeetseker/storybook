@@ -5,7 +5,7 @@ import { GlassBadge } from '../GlassBadge'
 import { placeholderImage } from '../../demo/placeholderImage'
 
 const meta = {
-  title: 'Components/GlassListingCard',
+  title: 'Bileşenler/Pazar Yeri/GlassListingCard',
   component: GlassListingCard,
   tags: ['autodocs'],
   args: { onClick: fn() },

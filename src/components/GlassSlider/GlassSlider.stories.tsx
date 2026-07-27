@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, type ComponentProps } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { GlassSlider } from './GlassSlider'
 
 const meta = {
-  title: 'Components/GlassSlider',
+  title: 'Bileşenler/Form/GlassSlider',
   component: GlassSlider,
   tags: ['autodocs'],
   args: { label: 'Azami fiyat', onChange: fn() },
@@ -39,17 +39,19 @@ export const Kilometre: Story = {
 
 export const Disabled: Story = { args: { defaultValue: 60, disabled: true, showValue: true } }
 
+const ControlledDemo = (args: ComponentProps<typeof GlassSlider>) => {
+  const [val, setVal] = useState(25)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <GlassSlider {...args} label="İlan yaşı (gün)" min={0} max={90} value={val} onChange={setVal} />
+      <span style={{ fontSize: 13, opacity: 0.7 }}>Son {val} günün ilanları</span>
+    </div>
+  )
+}
+
 /** Controlled kullanım: değer dışarıdan yönetilir, onChange number döner. */
 export const Controlled: Story = {
-  render: (args) => {
-    const [val, setVal] = useState(25)
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <GlassSlider {...args} label="İlan yaşı (gün)" min={0} max={90} value={val} onChange={setVal} />
-        <span style={{ fontSize: 13, opacity: 0.7 }}>Son {val} günün ilanları</span>
-      </div>
-    )
-  },
+  render: (args) => <ControlledDemo {...args} />,
 }
 
 /** Responsive: coarse pointer'da thumb 28px, kök 44px dokunma hedefi olur. */

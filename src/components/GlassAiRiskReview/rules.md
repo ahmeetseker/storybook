@@ -23,7 +23,9 @@ gelinerek onaylanamaz — bu bir güvenlik sözleşmesidir.
 - Önem ("Düşük/Orta/Yüksek/Engelleyici") ve durum ("Açık/Çözüldü/Kabul edildi")
   renk dışında metinle iletilir.
 - **Kilit kuralı:** açık `high`/`blocking` risk varken onay butonu `disabled` +
-  `role="status"` neden notu + `aria-describedby` ile bağlanır.
+  `role="status"` neden notu + `aria-describedby` ile bağlanır. Kilit
+  öznitelikleri (`disabled`, `aria-describedby`) compose edilen `GlassButton`'a
+  aynen geçer.
 - Karar verilmişse (`approved`/`rejected`) aksiyon yerine `role="status"` karar
   özeti + reviewer gösterilir.
 - Onay/red butonları yalnız callback verilince çizilir (false affordance yok).
@@ -36,7 +38,7 @@ gelinerek onaylanamaz — bu bir güvenlik sözleşmesidir.
 | header | ✅ | başlık + özet + `✦ AI` |
 | list | dolu | risk kalemleri (severity/status + toggle) |
 | empty | boşken | güvenli not |
-| decision | ✅ | insan kararı + aksiyon/özet |
+| decision | ✅ | insan kararı + aksiyon/özet — "Reddet" `GlassButton`, "İncelemeyi onayla" `GlassButton prominent` |
 | lockNote | koşullu | onay kilidi nedeni |
 
 ## 4. Public API
@@ -72,8 +74,11 @@ component iç state tutmaz — ebeveyn yönetir.
 ## 7. Davranış
 
 - Onay kilidi anında hesaplanır (render'da); risk çözülünce kilit kalkar.
-- Butonlar `:focus-visible` halkası + min 44px.
-- Animasyon yok.
+- Karar kapısı butonları `GlassButton` compose eder (md, onay `prominent`);
+  focus halkası, basınç etkileşimi ve min dokunma hedefi GlassButton'dan gelir.
+- "Çözüldü işaretle" metin-link aksiyonu yereldir: `:focus-visible` halkası +
+  `--lg-control-sm` min yükseklik.
+- Animasyon yok (buton press etkileşimi hariç — GlassButton sözleşmesi).
 
 ## 8. İçerik kuralları
 
@@ -87,11 +92,20 @@ component iç state tutmaz — ebeveyn yönetir.
 |---|---|---|
 | root | background/border/radius | `--lg-surface`/`--lg-hairline`/`--lg-radius-card` |
 | item severity kenarı | border-inline-start | `--lg-danger`/`--lg-warning`/`--lg-hairline` |
-| approve | background | `--lg-accent` |
+| approve/reject | kompozisyon | `GlassButton` (md; approve `prominent`) — görsel token'lar GlassButton'da |
 | lockNote | color | `color-mix(--lg-danger ...)` |
-| buton min-height | | `--lg-control-md` |
+| itemAction min-height | | `--lg-control-sm` |
 
-Raw px: yok (severity glifi yerine metin + renkli kenar).
+Rozet font'u `--lg-text-badge` token'ına bağlandı (10.5→11px kabul edilen
+tipografi kayması). Karar butonlarının hover/press davranışı GlassButton
+sözleşmesinden gelir; module.css'te butonlara görsel stil yazılmaz
+(`.actions` yalnız yerleşim verir).
+
+Borç (mikro-geometri): token karşılığı olmayan değerler component kökünde
+yerel değişken olarak toplandı — `.root { --severity-edge: 3px; --gap-tight: 2px;
+--gap-hair: 1px; --badge-pad-y: 3px; }` (severity kenar kalınlığı, summary üst
+boşluğu, decisionInfo satır aralığı, rozet/karar rozeti dikey padding'i —
+3px `--lg-space-1`'in [4px] birebir karşılığı değil, yuvarlanmadı).
 
 ## 10. Storybook kapsamı
 
@@ -119,5 +133,9 @@ Boş Liste, Responsive (mobile1), Erişilebilirlik (docs).
 
 ## Changelog
 
+- 2026-07-24: Karar kapısı butonları `GlassButton` kompozisyonuna geçti
+  ("Reddet" → `GlassButton`, "İncelemeyi onayla" → `GlassButton prominent`);
+  ölü `.reject`/`.approve` stilleri silindi. Kilit sözleşmesi
+  (`disabled` + `aria-describedby`) aynen korunuyor.
 - 2026-07-18: İlk sürüm — risk kalemleri + insan karar kapısı + ağır-risk onay
   kilidi. Codex `CodexAiRiskReview` deseninden türetildi.

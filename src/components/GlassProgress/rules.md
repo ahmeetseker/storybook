@@ -74,14 +74,17 @@ Varsayılan kombinasyon: `variant=bar`, `size=md`, accent dolgu.
 
 | State | Kaynak | Bastırdığı | Görsel |
 |---|---|---|---|
-| determinate | `value` sayı | — | Dolgu genişliği/dashoffset %'ye göre; width transition |
+| determinate | `value` sayı | — | Dolgu `scaleX`/dashoffset %'ye göre; transform transition |
 | indeterminate | `value` yok/null | showValue | Bar: %40'lık kayan bant; circle: dönen çeyrek yay |
 | disabled/hover/focus | — | — | YOK — etkileşimsiz component |
 
 ## 7. Davranış
 
-- Değer değişimi: bar `width`, circle `stroke-dashoffset` 0.3s ease-out ile
-  akar (canlı yükleme yüzdesi yumuşak ilerler).
+- Değer değişimi: bar `transform: scaleX()` (transform-origin: left), circle
+  `stroke-dashoffset` 0.3s ease-out ile akar (canlı yükleme yüzdesi yumuşak
+  ilerler) — "animasyon yalnız transform/opacity/filter" kuralına uygun;
+  indeterminate bant da `translateX` ile kayar. Not: `stroke-dashoffset` SVG
+  geometri özniteliğidir, kuralın bilinçli ve yerleşik istisnasıdır.
 - `prefers-reduced-motion`: transition kapanır (değer sıçrayarak güncellenir);
   indeterminate animasyon DURMAZ ama belirgin yavaşlar — "çalışıyor"
   bilgisinin kendisi harekettir, tamamen dondurulamaz.
@@ -106,8 +109,13 @@ tamsayı yüzdedir.
 | value | color | `--lg-label-secondary` |
 | root | gap | `--lg-space-2` |
 
-Borç: bar yükseklikleri (4/6/8px) ve circle çapları (28/40/56px) raw px —
-gösterge kalınlığı için token yok.
+**Borç (raw / mikro-geometri):** bar yükseklikleri component kökünde yerel
+değişkende toplandı (`.root { --track-h-sm: 4px; --track-h-md: 6px;
+--track-h-lg: 8px; }` — ince şerit kalınlığı için token yok; kontrol geometrisi
+değil, control token bağlanmaz). Circle çapları (28/40/56px) tsx'te SVG
+geometrisidir (viewBox ölçüsü) — raw kalır. Süre/easing (`0.3s ease-out`,
+indeterminate `1.2s`/`1s` döngüleri) raw — süre token'ı yok. Bar dolgusu %100
+genişlik + `transform: scaleX(oran)` ile sürülür (paint-only), bu desen korunur.
 
 ## 10. Storybook kapsamı
 

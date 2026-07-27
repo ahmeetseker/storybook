@@ -1,4 +1,8 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --focus-bleed: 3px;
+  --group-pad: 3px;
+  --group-gap: 2px;
   display: flex;
   align-items: center;
   gap: var(--lg-space-3, 12px);
@@ -12,8 +16,8 @@
   overflow-x: auto;
   scrollbar-width: none;
   /* Focus halkası kapsül dışına taşar; scroll kırpmasın */
-  padding: 3px;
-  margin: -3px;
+  padding: var(--focus-bleed);
+  margin: calc(-1 * var(--focus-bleed));
 }
 .groups::-webkit-scrollbar { display: none; }
 
@@ -25,8 +29,8 @@
 .groupInner {
   display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 3px;
+  gap: var(--group-gap);
+  padding: var(--group-pad);
 }
 
 /* Primary action gruplardan kopuk, satırın sonunda durur */

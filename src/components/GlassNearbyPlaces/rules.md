@@ -156,12 +156,18 @@ Katman sırası: `categories` verisi → controlled/uncontrolled çözümleme
 | tab focus | outline | `--lg-accent` | yalnız `:focus-visible` |
 | boşluklar | gap/padding | `--lg-space-1..5` | — |
 
-Raw değer kullanılmadı — tüm renk/radius/boşluk token'lardan; ikon kutusu
-18px sabit ölçek borç olarak not düşülür (GlassBadge/GlassSegmentedControl
-ikon slotlarındaki aynı gerekçe: ikon boyutu için ayrı token yok).
+Raw değer kullanılmadı — tüm renk/radius/boşluk token'lardan; token karşılığı
+olmayan mikro-geometri değerleri component kökünde yerel CSS değişkeni olarak
+toplanır.
 
-**Borç (raw):** `.categoryIcon` 18×18px sabit ölçek — ikon boyutu için token
-yok (proje genelinde tutarlı borç, bkz. GlassSegmentedControl `.icon`).
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--gnp-icon-size: 18px` — kategori ikon kutusu; ikon boyutu için token yok
+  (proje genelinde tutarlı borç, bkz. GlassSegmentedControl `.icon`).
+- `--gnp-info-gap: 2px` — yer adı ile not arası mikro boşluk; `--lg-space-1`
+  (4px) görsel olarak fazla geniş.
+
+Sekme dokunmatik hedefi pointer:coarse'ta `--lg-control-md` token'ından gelir
+(coarse'ta 44px — birebir eski raw değer).
 
 ## 10. Storybook kapsamı
 
@@ -225,6 +231,11 @@ string verir.
 - 2026-07-17: İlk sürüm — `chips`/`tabs` varyantları, WAI-ARIA tablist +
   roving tabindex deseni (`GlassFloorPlanViewer` ile aynı iskelet), boş
   kategori/boş liste güvenli davranışı.
+- 2026-07-24: Uyum düzeltmesi — `@media (max-width: 360px)` breakpoint'i
+  kaldırıldı, `.placeRow` kalıcı `flex-wrap: wrap` ile içsel akışla çözülüyor
+  (dar konteynerde mesafe çipi kendiliğinden alt satıra düşer); mikro-geometri
+  değerleri (`18px` ikon, `2px` info gap) `.root` üzerinde yerel CSS
+  değişkenlerine toplandı (§9 borç notu güncellendi).
 - 2026-07-17: Code review fix — (1) odak taşıma artık yalnız kullanıcının
   ok tuşu/`Home`/`End` etkileşiminde ve resolved index'i izleyen bir
   `useEffect` üzerinden yapılıyor, controlled reddi odakta sapma

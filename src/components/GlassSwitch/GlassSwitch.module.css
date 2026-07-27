@@ -1,8 +1,11 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
+     ray çevresindeki kapsül padding'i. */
+  --lg-switch-pad: 3px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px;
+  padding: var(--lg-switch-pad);
   margin: 0;
   font: inherit;
   cursor: pointer;
@@ -56,8 +59,9 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: max(100%, 44px);
-    height: max(100%, 44px);
+    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi halosu */
+    width: max(100%, var(--lg-control-md));
+    height: max(100%, var(--lg-control-md));
     transform: translate(-50%, -50%);
   }
 }

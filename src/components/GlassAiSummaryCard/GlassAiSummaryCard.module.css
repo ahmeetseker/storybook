@@ -1,5 +1,9 @@
 /* İçerik katmanı FLAT: cam yok, yalnız yüzey + hairline token'ları (bkz. rules.md §1/§9). */
 .card {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --skeleton-line: 13px;
+  --column-min: 220px;
+  --badge-pad-y: 3px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-4);
@@ -21,7 +25,7 @@
 .title {
   margin: 0;
   font-size: var(--lg-text-headline);
-  font-weight: 650;
+  font-weight: 600;
   color: var(--lg-label);
 }
 
@@ -31,11 +35,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--badge-pad-y) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -57,9 +61,11 @@
   white-space: pre-line;
 }
 
+/* İçsel akış: dar konteynerde kolonlar kendiliğinden tek kolona düşer
+   (breakpoint yok) — auto-fit + minmax, eski 1fr 1fr / 420px davranışını verir. */
 .columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--column-min), 100%), 1fr));
   gap: var(--lg-space-4);
 }
 
@@ -178,11 +184,11 @@
   }
 }
 
-/* Dokunmatik hedef ≥44px (Dalga 1 kontratı). */
+/* Dokunmatik hedef ≥44px (Dalga 1 kontratı) — control-md coarse'ta 44px. */
 @media (pointer: coarse) {
   .feedbackButton {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -204,7 +210,7 @@
 
 .skeletonLine {
   display: block;
-  height: 13px;
+  height: var(--skeleton-line);
   border-radius: var(--lg-radius-chip);
   background: color-mix(in srgb, var(--lg-label) 10%, var(--lg-surface));
   animation: glass-ai-summary-pulse 1.6s ease-in-out infinite;
@@ -227,12 +233,5 @@
   .skeletonLine {
     animation: none;
     opacity: 0.75;
-  }
-}
-
-/* Dar konteyner: iki kolonlu artı/eksi ızgarası dikey akışa düşer. */
-@media (max-width: 420px) {
-  .columns {
-    grid-template-columns: 1fr;
   }
 }

@@ -231,12 +231,23 @@ odaya düşüş) → render.
 | skeleton çip | background | `color-mix(in srgb, var(--lg-label) 8%, var(--lg-surface))` | `loading` |
 | boşluklar | gap/padding | `--lg-space-1..5` | — |
 
-Raw değer kullanılmadı — tüm renk/radius/boşluk token'lardan; AI rozeti
-font-size 10.5px/700 kontrat sabiti (tasarım sistemi ölçeğinde yok, tüm AI
-component'lerinde aynı borç); `loading` skeleton çip genişlikleri sabit px
-listesi (`72px`/`96px`/`60px`/`84px`) — gerçek etiket genişliklerini taklit
-eden görsel bir borç, `GlassMatchScore`/`GlassAiSummaryCard` skeleton
-satırlarındaki aynı gerekçe.
+Raw değer kullanılmadı — tüm renk/radius/boşluk token'lardan. AI rozeti
+tipografisi `--lg-text-badge`/700 token'ından (kontrat sabiti).
+
+**Borç (mikro-geometri, `.root` üzerinde yerel değişken):**
+- `--grct-ai-row-gap: 6px` — rozet/güven metni arası ara boşluk.
+- `--grct-badge-padding-block: 3px` — AI rozeti dikey dolgusu (kontrat
+  sabiti, tüm AI component'lerinde aynı).
+- `--grct-count-padding-block: 1px` — fotoğraf adedi rozeti dikey dolgusu.
+
+Sekme dokunmatik hedefi pointer:coarse'ta `--lg-control-md` token'ından gelir
+(coarse'ta 44px — birebir eski raw değer).
+
+**Borç (raw, değişkene alınmayan):** `loading` skeleton çip genişlikleri
+tsx'te sabit px listesi (`LOADING_TAB_WIDTHS = 72/96/60/84px`) — layout
+değeri değil, gerçek etiket genişliklerini taklit eden skeleton VERİSİ;
+`GlassMatchScore`/`GlassAiSummaryCard` skeleton satırlarındaki aynı gerekçe
+ile inline `style` olarak KALIR.
 
 ## 10. Storybook kapsamı
 
@@ -312,6 +323,11 @@ istediği sırada verir (component sıralamayı değiştirmez).
 
 ## Changelog
 
+- 2026-07-24: Uyum düzeltmesi — AI rozeti `font-size: 10.5px` →
+  `--lg-text-badge` (11px, ≤1.5px tipografi kayması kabulü); mikro-geometri
+  (`6px` aiRow gap, `3px` rozet dikey dolgu, `1px` countBadge dikey dolgu)
+  `.root` üzerinde yerel değişkenlere toplandı; `LOADING_TAB_WIDTHS` inline
+  px değerleri skeleton verisi olarak kaldı (§9 notu).
 - 2026-07-17 (dalga4 düzeltme geçişi, Codex konsolide raporu): (1) ARIA
   rolleri `tablist`/`tab` → `radiogroup`/`radio` (`aria-selected` →
   `aria-checked`) — panelsiz `tab` kullanımı APG tab↔panel şartını ihlal

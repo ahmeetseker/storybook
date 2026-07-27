@@ -94,7 +94,16 @@ hiçbirinde kullan.
 | description | font-size / color | `--lg-text-caption` / `--lg-label-secondary` |
 | grup boşluğu | gap | `--lg-space-3` (dikey) / `--lg-space-5` (yatay) |
 
-Borç: daire çapları (18/20px) raw — bilinçli, kontrol token'ı ölçeğe uymuyor.
+**Borç (raw / mikro-geometri):** kontrol token ölçeğine uymayan ölçüler
+component kökünde yerel değişkenlerde toplandı: `--radio-circle-sm/md`
+(18/20px) ve `--radio-dot-sm/md` (7/8px) — `pointer: coarse`'ta kök
+değişkenleri 22/24 ve 9/10px'e büyütülür (dokunmatik büyüme tasarımın istediği
+davranıştır); `--radio-text-gap` (2px); `--radio-touch-target` (44px —
+dokunmatik satır hedefi sabiti; satır bir `<label>`'dır, `--lg-control-*`
+kontrol yüksekliği ölçeğine bağlanmadı). Daire/ilk metin satırı optik hizası
+`margin-top: 1px` (hairline istisnası). Geçiş süresi/easing (`0.16s ease-out`,
+`0.18s cubic-bezier(0.34, 1.56, 0.64, 1)` nokta scale-in yayı) süre token'ı
+olmadığından bilinçli raw.
 
 ## 10. Storybook kapsamı
 

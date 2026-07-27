@@ -98,6 +98,18 @@ olaylarda birleştir.
 | description | color / size | `--lg-label-secondary` / `--lg-text-footnote` |
 | action | color | `--lg-accent` |
 | focus | outline | `--lg-accent` |
+| stack | mobil offset (left/right/bottom) | `--lg-space-4` |
+| close (coarse) | width/height | `--lg-control-md` (44px dokunmatik hedef) |
+
+**Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler `.stack`
+kökünde yerel değişkenlerde toplandı: `--stack-width` (380px ≥bp-sm yığın
+genişliği), `--stripe-width/radius` (4px/2px severity şeridi — ince şerit,
+space token'ı kullanılmadı), `--texts-gap` (2px başlık/açıklama arası),
+`--close-size` (28px). Coarse'ta kapat butonu `--lg-control-md`'ye (=44px)
+büyür; negatif margin `calc((--close-size − --lg-control-md)/2)` = −8px ile
+yerleşim ayak izi 28px'te korunur. Bilinçli bırakılan: `z-index: 60`
+(z token'ı yok), `.texts` içi `padding-top: 1px` optik hizalama, süre/easing
+(`0.16s ease-out`) — token yok.
 
 ## 10. Storybook kapsamı
 

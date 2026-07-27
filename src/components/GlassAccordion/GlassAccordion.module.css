@@ -1,5 +1,8 @@
 /* GlassAccordion — içerik katmanı FLAT panel (cam yok, backdrop-filter yok). */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --chevron-box: 20px;
+  --chevron-icon: 12px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -48,24 +51,20 @@
   }
 }
 
-/* Dokunmatik: tetikleyici zaten ≥44px hedefte; pointer:coarse'ta yükselt */
-@media (pointer: coarse) {
-  .trigger {
-    min-height: 48px;
-  }
-}
+/* Dokunmatik: min-height --lg-control-lg token'ından gelir; token pointer:coarse'ta
+   48→50px büyür — tasarım sisteminin istediği davranış (bkz. rules.md §9). */
 
 .title {
   font-size: var(--lg-text-headline, 17px);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .chevronBox {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: var(--chevron-box);
+  height: var(--chevron-box);
   flex: none;
   color: var(--lg-label-secondary);
   transform: rotate(0deg);
@@ -75,8 +74,8 @@
   transform: rotate(-180deg);
 }
 .chevron {
-  width: 12px;
-  height: 12px;
+  width: var(--chevron-icon);
+  height: var(--chevron-icon);
 }
 
 /* ── panel: grid-template-rows 0fr→1fr tekniği — height animasyonu YASAK.

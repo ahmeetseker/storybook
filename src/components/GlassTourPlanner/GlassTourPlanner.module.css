@@ -1,7 +1,16 @@
 /* GlassTourPlanner — içerik katmanı FLAT: cam/backdrop-filter YOK.
    Yalnız token'lar (--lg-*) + color-mix türevleri. Rozet/rail/skeleton
-   ölçüleri raw px borcu — bkz. rules.md §9. */
+   mikro-geometrisi kökteki yerel değişkenlerde — bkz. rules.md §9. */
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --tp-ai-gap: 6px;
+  --tp-ai-pad-block: 3px;
+  --tp-rail-w: 26px;
+  --tp-badge-size: 24px;
+  --tp-connector-w: 2px;
+  --tp-image-size: 48px;
+  --tp-skeleton-card-h: 56px;
+  --tp-text-gap: 2px;
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-5);
@@ -47,7 +56,7 @@
 .aiRow {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--tp-ai-gap);
   flex-wrap: wrap;
 }
 
@@ -55,11 +64,11 @@
   display: inline-flex;
   align-items: center;
   flex: none;
-  padding: 3px var(--lg-space-2);
+  padding: var(--tp-ai-pad-block) var(--lg-space-2);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: 10.5px;
+  font-size: var(--lg-text-badge, 11px);
   font-weight: 700;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -96,7 +105,7 @@
   flex: none;
   flex-direction: column;
   align-items: center;
-  width: 26px;
+  width: var(--tp-rail-w);
 }
 
 .badge {
@@ -104,9 +113,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-top: 4px;
+  width: var(--tp-badge-size);
+  height: var(--tp-badge-size);
+  margin-top: var(--lg-space-1);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface));
   color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
@@ -116,7 +125,7 @@
 
 .connector {
   flex: 1 1 auto;
-  width: 2px;
+  width: var(--tp-connector-w);
   min-height: var(--lg-space-4);
   margin-top: var(--lg-space-1);
   background: var(--lg-hairline);
@@ -151,8 +160,8 @@
 
 .stopImage {
   flex: none;
-  width: 48px;
-  height: 48px;
+  width: var(--tp-image-size);
+  height: var(--tp-image-size);
   border-radius: var(--lg-radius-media);
   object-fit: cover;
 }
@@ -180,8 +189,8 @@
 }
 
 .stopTitle {
-  margin: 2px 0 0;
-  font-size: 14px; /* borç: token ölçeğinde yok, bkz. GlassTimeline .title ile aynı gerekçe */
+  margin: var(--tp-text-gap) 0 0;
+  font-size: var(--lg-text-body);
   font-weight: 600;
   color: var(--lg-label);
   overflow-wrap: anywhere;
@@ -208,8 +217,8 @@
 
 .skeletonBadge {
   flex: none;
-  width: 24px;
-  height: 24px;
+  width: var(--tp-badge-size);
+  height: var(--tp-badge-size);
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
   animation: lg-tourplanner-pulse 1.4s ease-in-out infinite;
@@ -217,7 +226,7 @@
 
 .skeletonCard {
   flex: 1 1 auto;
-  height: 56px;
+  height: var(--tp-skeleton-card-h);
   border-radius: var(--lg-radius-card);
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
   animation: lg-tourplanner-pulse 1.4s ease-in-out infinite;
@@ -274,7 +283,7 @@
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.15s ease-out, border-color 0.15s ease-out;
+  /* transition yok: renk değişimi anlıktır — animasyon yalnız transform/opacity/filter kuralı */
 }
 
 .feedbackButton:focus-visible {
@@ -293,48 +302,15 @@
   }
 }
 
-.confirmButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: stretch;
-  min-height: var(--lg-control-md);
-  padding: 0 var(--lg-space-5);
-  border: none;
-  border-radius: var(--lg-radius-capsule);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
-  font-size: var(--lg-text-body);
-  font-weight: 700;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 0.15s ease-out, background-color 0.15s ease-out;
-}
+/* Onay butonu GlassButton compose eder (kendi görsel stilini kendisi taşır);
+   tam genişlik .footer sütun sarmalayıcısının varsayılan cross-axis
+   stretch'inden gelir — burada butona ek stil verilmez. */
 
-.confirmButton:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.confirmButton:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 2px;
-}
-
-@media (hover: hover) {
-  .confirmButton:not(:disabled):hover {
-    background: color-mix(in srgb, var(--lg-accent) 88%, black);
-  }
-}
-
+/* Dokunmatik: hedef control-md'ye (coarse'ta 44px) yükselir. */
 @media (pointer: coarse) {
-  .feedbackButton,
-  .confirmButton {
-    min-height: 44px;
-  }
-
   .feedbackButton {
-    min-width: 44px;
+    min-width: var(--lg-control-md);
+    min-height: var(--lg-control-md);
   }
 }
 
@@ -351,8 +327,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .feedbackButton,
-  .confirmButton {
+  .feedbackButton {
     transition: none;
   }
 

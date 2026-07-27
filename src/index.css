@@ -10,7 +10,7 @@
   --lg-bg: #faf8f4;                          /* fildişi zemin */
   --lg-surface: #ffffff;                     /* flat kart */
   --lg-label: #24211b;
-  --lg-label-secondary: #79726a;
+  --lg-label-secondary: #756e66;
   --lg-hairline: rgba(36, 33, 27, 0.09);
   --lg-accent: #b45309;                      /* amber */
   --lg-accent-contrast: #ffffff;             /* amber üstü metin */
@@ -19,14 +19,15 @@
   --lg-scrim: rgba(10, 12, 16, 0.55);
   --lg-on-scrim: #ffffff;
 
-  /* Semantic tone'lar (rozet, uyarı, durum) — Apple sistem renkleri */
-  --lg-danger: #ff3b30;
-  --lg-warning: #ff9500;
-  --lg-success: #34c759;
+  /* Semantic tone'lar — küçük metin/ikon kullanımında AA kontrastlı */
+  --lg-danger: #c92a20;
+  --lg-warning: #9a5700;
+  --lg-success: #18743a;
 
   /* Tipografi ölçeği */
   --lg-font: 'Manrope Variable', 'Manrope', -apple-system, BlinkMacSystemFont,
     system-ui, 'Segoe UI', Roboto, sans-serif;
+  --lg-text-badge: 11px;                     /* rozet/mini etiket — caption altı tek adım */
   --lg-text-caption: 12px;
   --lg-text-footnote: 13px;
   --lg-text-body: 15px;
@@ -39,6 +40,11 @@
   --lg-radius-media: 14px;
   --lg-radius-card: 20px;
   --lg-radius-capsule: 999px;
+
+  /* Etkileşim */
+  --lg-stroke-hairline: 1px;
+  --lg-focus-ring-width: 2px;
+  --lg-focus-ring-offset: 2px;
 
   /* Boşluk ölçeği */
   --lg-space-1: 4px;
@@ -54,6 +60,12 @@
   --lg-control-md: 40px;
   --lg-control-lg: 48px;
   --lg-control-xl: 56px;
+
+  /* Gölge ölçeği */
+  --lg-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --lg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --lg-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.16);
+  --lg-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.32);
 
   /* Breakpoint ölçeği (Tailwind eşdeğeri) — CSS var media query'de çalışmadığı
      için component CSS'lerinde raw px kullanılır, başına `bp-*` yorumu yazılır:
@@ -72,9 +84,13 @@
     --lg-accent-contrast: #1a140c;
     --lg-scrim: rgba(4, 5, 8, 0.62);
     --lg-on-scrim: #ffffff;
-    --lg-danger: #ff453a;
-    --lg-warning: #ff9f0a;
-    --lg-success: #30d158;
+    --lg-danger: #ff6961;
+    --lg-warning: #ffb44c;
+    --lg-success: #52d273;
+    --lg-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --lg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
+    --lg-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --lg-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55);
   }
 }
 

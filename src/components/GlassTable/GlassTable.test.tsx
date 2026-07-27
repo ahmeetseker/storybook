@@ -113,11 +113,12 @@ describe('GlassTable', () => {
     expect(tarihHeader.getAttribute('aria-sort')).toBe('ascending')
   })
 
-  it('her satır bir <tr> ve her hücre data-label taşır (mobil kart görünümü için)', () => {
-    renderTable(<GlassTable columns={columns} rows={rows} />)
-    const table = screen.getByRole('table')
-    const firstRow = within(table).getAllByRole('row')[1]
-    const cell = within(firstRow).getByText('349 TL')
-    expect(cell.getAttribute('data-label')).toBe('Tutar')
+  it('kaydırma kabı klavyeyle erişilebilir (tabIndex=0 + region) — dar ekran çözümü yatay kaydırmadır', () => {
+    renderTable(<GlassTable columns={columns} rows={rows} aria-label="Ödemeler" />)
+    const region = screen.getByRole('region', { name: 'Ödemeler' })
+    expect(region.getAttribute('tabindex')).toBe('0')
+    // Tablo anatomisi her genişlikte korunur: thead + columnheader'lar DOM'da.
+    const table = screen.getByRole('table', { name: 'Ödemeler' })
+    expect(within(table).getAllByRole('columnheader').length).toBe(columns.length)
   })
 })

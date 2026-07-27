@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassButton } from './GlassButton'
 
 const meta = {
-  title: 'Components/GlassButton',
+  title: 'Bileşenler/Eylemler/GlassButton',
   component: GlassButton,
   tags: ['autodocs'],
   args: { onClick: fn() },

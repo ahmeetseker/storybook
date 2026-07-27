@@ -1,4 +1,7 @@
 .root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --panel-min-width: 220px;
+  --panel-max-width: 320px;
   position: relative;
   display: inline-block;
 }
@@ -32,10 +35,12 @@
 .alignEndY { bottom: 0; }
 
 .card {
+  /* Yüzen katman: taban yüzeyin gölge kanalını besler */
+  --lg-surface-shadow: var(--lg-shadow-md);
   display: block;
-  min-width: 220px;
+  min-width: var(--panel-min-width);
   /* mobil: viewport'tan taşmasın */
-  max-width: calc(100vw - 32px);
+  max-width: calc(100vw - var(--lg-space-7));
   padding: var(--lg-space-4);
   font-size: var(--lg-text-body);
   line-height: 1.45;
@@ -44,7 +49,7 @@
 /* bp-sm */
 @media (min-width: 640px) {
   .card {
-    max-width: 320px;
+    max-width: var(--panel-max-width);
   }
 }
 

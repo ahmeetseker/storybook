@@ -2,8 +2,6 @@
 // Üç sunum biçimi: accordion (aç/kapa grup), checklist (ikonlu amenity ızgarası),
 // columns (GlassSpecTable görünümünde 1|2 kolon). İçerik katmanı FLAT — cam yok.
 import { useId, useState, type HTMLAttributes, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
-import { prefersReducedMotion } from '../../core/tier'
 import styles from './GlassFeatureGroup.module.css'
 
 export interface GlassFeatureGroupItem {
@@ -60,12 +58,15 @@ function FeatureRows({ items }: { items: GlassFeatureGroupItem[] }) {
   )
 }
 
-// ── accordion: gerçek button aria-expanded + region; ilk grup varsayılan açık ──
+// ── accordion: gerçek button aria-expanded + region; ilk grup varsayılan açık.
+// Açılış animasyonu GlassAccordion'daki `grid-template-rows: 0fr→1fr` CSS
+// tekniğiyle yapılır — height animasyonu YASAK (bkz. tasarım sistemi motion
+// kuralı). İçerik DOM'da kalır; kapalıyken `inert` ile klavye/AT gezinmesinden
+// çıkarılır, display:none kullanılmadığı için geçiş kesintisiz çalışır. ──
 function AccordionSection({ group, defaultOpen }: { group: GlassFeatureGroupSection; defaultOpen: boolean }) {
   const [open, setOpen] = useState(defaultOpen)
   const buttonId = useId()
   const regionId = useId()
-  const reduced = prefersReducedMotion()
 
   return (
     <div className={styles.accordionGroup}>
@@ -79,34 +80,25 @@ function AccordionSection({ group, defaultOpen }: { group: GlassFeatureGroupSect
           onClick={() => setOpen((o) => !o)}
         >
           <span className={styles.accordionTitle}>{group.title}</span>
-          <motion.span
-            className={styles.chevronBox}
-            animate={{ rotate: open ? 0 : -90 }}
-            transition={reduced ? { duration: 0 } : { duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
-            aria-hidden
-          >
+          <span className={styles.chevronBox} data-open={open} aria-hidden>
             <span className={styles.chevron} />
-          </motion.span>
+          </span>
         </button>
       </h3>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.div
-            id={regionId}
-            role="region"
-            aria-labelledby={buttonId}
-            className={styles.accordionRegionOuter}
-            initial={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            animate={reduced ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
-            exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            transition={reduced ? { duration: 0 } : { duration: 0.32, ease: [0.32, 0.72, 0, 1] }}
-          >
-            <div className={styles.accordionRegion}>
-              <FeatureRows items={group.items} />
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      <div
+        id={regionId}
+        role="region"
+        aria-labelledby={buttonId}
+        className={styles.accordionRegionOuter}
+        data-open={open}
+        inert={open ? undefined : true}
+      >
+        <div className={styles.accordionRegionInner}>
+          <div className={styles.accordionRegion}>
+            <FeatureRows items={group.items} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

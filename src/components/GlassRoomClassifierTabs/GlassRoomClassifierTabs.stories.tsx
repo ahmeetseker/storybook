@@ -13,7 +13,7 @@ const listingRooms: GlassRoomClassifierRoom[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassRoomClassifierTabs',
+  title: 'Bileşenler/AI/GlassRoomClassifierTabs',
   component: GlassRoomClassifierTabs,
   tags: ['autodocs'],
   args: { rooms: listingRooms, onActiveRoomIdChange: fn() },

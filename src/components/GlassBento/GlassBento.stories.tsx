@@ -3,7 +3,7 @@ import { GlassBento } from './GlassBento'
 import { placeholderImage } from '../../demo/placeholderImage'
 
 const meta = {
-  title: 'Components/GlassBento',
+  title: 'Bileşenler/Vitrin ve Yerleşim/GlassBento',
   component: GlassBento,
   parameters: { layout: 'padded' },
   tags: ['autodocs'],

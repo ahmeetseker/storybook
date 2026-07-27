@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { GlassVoiceBar, type GlassVoiceBarState } from './GlassVoiceBar'
 
 const meta = {
-  title: 'Components/GlassVoiceBar',
+  title: 'Bileşenler/AI/GlassVoiceBar',
   component: GlassVoiceBar,
   tags: ['autodocs'],
   args: {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { GlassSelect, type GlassSelectOption } from './GlassSelect'
 import { GlassTierProvider } from '../GlassSurface/GlassTierContext'
+import { GlassField } from '../GlassField'
 
 const options: GlassSelectOption[] = [
   { value: 'manuel', label: 'Manuel' },
@@ -95,6 +96,63 @@ describe('GlassSelect', () => {
   it('invalid iken trigger aria-invalid alır', () => {
     renderSelect({ invalid: true })
     expect(trigger().getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('zorunlu alan semantiğini combobox triggerına taşır', () => {
+    renderSelect({ 'aria-required': true })
+    expect(trigger().getAttribute('aria-required')).toBe('true')
+  })
+
+  it('bağımsız aria-label değerini gerçek combobox triggerına taşır', () => {
+    renderSelect()
+
+    expect(screen.getByRole('combobox', { name: 'Vites' })).toBeTruthy()
+  })
+
+  it('aria-labelledby değerini gerçek combobox triggerına taşır', () => {
+    render(
+      <GlassTierProvider tier="fallback">
+        <span id="transmission-label">Şanzıman türü</span>
+        <GlassSelect
+          aria-labelledby="transmission-label"
+          options={options}
+          placeholder="Vites seçin"
+        />
+      </GlassTierProvider>,
+    )
+
+    expect(
+      screen.getByRole('combobox', { name: 'Şanzıman türü' }),
+    ).toBeTruthy()
+  })
+
+  it('GlassField required contextini combobox triggerında aria-required olarak kullanır', () => {
+    render(
+      <GlassTierProvider tier="fallback">
+        <GlassField label="Vites" required>
+          <GlassSelect options={options} placeholder="Vites seçin" />
+        </GlassField>
+      </GlassTierProvider>,
+    )
+
+    expect(
+      screen
+        .getByRole('combobox', { name: 'Vites' })
+        .getAttribute('aria-required'),
+    ).toBe('true')
+  })
+
+  it('material eksenini trigger ve açılan panele birlikte iletir', () => {
+    renderSelect({ material: 'flat' })
+    const button = trigger()
+
+    expect(button.getAttribute('data-material')).toBe('flat')
+    fireEvent.click(button)
+    expect(
+      screen.getByRole('listbox').closest('[data-material]')?.getAttribute(
+        'data-material',
+      ),
+    ).toBe('flat')
   })
 
   it('controlled: value prop\'u dışarıdan yönetilir, iç state devreye girmez', () => {

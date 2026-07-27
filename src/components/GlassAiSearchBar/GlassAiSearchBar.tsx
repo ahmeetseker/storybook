@@ -40,6 +40,8 @@ export interface GlassAiSearchBarProps
   onRemoveFilter?: (id: string) => void
   /** Gönderim sürerken: input devre dışı kalır + soluk "düşünüyor" göstergesi görünür */
   loading?: boolean
+  /** Duyuru sahipliği: standalone kullanımda internal, parent live-region varsa external */
+  announcementMode?: 'internal' | 'external'
   /** parsedFilters için 0-100 güven skoru; verilirse rozetin yanında "%N güven" metni görünür */
   confidence?: number
   /** Verilirse parsedFilters başlığında 👍/👎 geri bildirim butonları görünür */
@@ -96,6 +98,7 @@ export function GlassAiSearchBar({
   parsedFilters,
   onRemoveFilter,
   loading = false,
+  announcementMode = 'internal',
   confidence,
   onFeedback,
   className,
@@ -212,7 +215,11 @@ export function GlassAiSearchBar({
         ) : null}
       </div>
 
-      <p id={thinkingId} className={styles.thinking} aria-live="polite">
+      <p
+        id={thinkingId}
+        className={styles.thinking}
+        aria-live={announcementMode === 'internal' ? 'polite' : undefined}
+      >
         {loading ? (
           <>
             <span className={styles.thinkingDot} aria-hidden="true" />

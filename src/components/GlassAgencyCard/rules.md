@@ -2,7 +2,7 @@
 name: GlassAgencyCard
 category: içerik
 status: hazır
-lastReviewed: 2026-07-17
+lastReviewed: 2026-07-24
 ---
 
 # GlassAgencyCard Kuralları
@@ -10,10 +10,11 @@ lastReviewed: 2026-07-17
 ## 1. Amaç
 
 Kurumsal emlak ofisi kimlik kartı — `GlassSellerCard`'ın kurumsal karşılığı.
-Logo/baş harf + kurum adı + doğrulanmış rozeti + tagline + tabular istatistik
-satırı (Aktif İlan/Danışman vb.) + telefon/ilan sade metin-link aksiyonları +
-tek birincil "Mesaj Gönder" aksiyonu. İçerik katmanı component'idir — cam
-DEĞİL, düz yüzey (`--lg-surface` + `--lg-hairline`).
+Logo/baş harf + kurum adı + kompakt doğrulama işareti ve isteğe bağlı kaynak
+tooltip'i + tagline + tabular istatistik satırı (Aktif İlan/Danışman vb.) +
+telefon/ilan sade metin-link aksiyonları + tek birincil "Mesaj Gönder"
+aksiyonu. İçerik katmanı component'idir — cam DEĞİL, düz yüzey
+(`--lg-surface` + `--lg-hairline`).
 
 - **Kullan:** ilan detay sayfasında kurumsal satıcı yan kolonu (`panel`),
   ofis dizini/liste sayfasında satır kartı (`inline`).
@@ -33,16 +34,21 @@ DEĞİL, düz yüzey (`--lg-surface` + `--lg-hairline`).
 - Logo: `GlassAvatar` (`shape="rounded"`, `alt=""`) — dekoratif, kurum adı
   zaten yanında görünür metin olarak var, tekrar okutulmaz. `logoSrc` yoksa
   `GlassAvatar` kendi baş harf fallback'ine düşer (`name`'den türetilir).
-- Doğrulanmış rozet: `GlassBadge` içinde görünür metin "Doğrulanmış
-  Kurumsal" — accessible name children metninden gelir, ekstra `role`/
-  `aria-label` gerekmez (GlassSellerCard'daki ikon-tek `role="img"` rozetinin
-  aksine, burada metin zaten var).
+- Doğrulama işareti: ikon-tek `<span role="img"
+  aria-label="Doğrulanmış kurumsal ofis">`; büyük görünür metin rozeti yoktur.
+- Doğrulama kaynağı: `verified && verifiedBy` iken `GlassTooltip` içinde
+  odaklanabilir `<button type="button">`. Accessible adı
+  `"Doğrulama ayrıntısı: Kurumsal kimlik {source} tarafından doğrulandı."`,
+  `title` ve tooltip içeriği aynı açıklamayı taşır. Tooltip açıkken
+  `GlassTooltip` düğmeye `aria-describedby` yazar.
 - İstatistikler: `<dl>` + her çift `<dt>`/`<dd>` (GlassSpecTable ile aynı
   desen) — etiket/değer ilişkisi AT'ye native aktarılır.
 - Telefon: gerçek `<a href="tel:...">` (`GlassLink`, `variant="inline"`) —
   Enter native aktive eder, orta tık/kopyala çalışır.
 - "N ilanı görüntüle": gerçek `<button type="button">` — callback tabanlı
   (`onViewListings`), `href` yok, bu yüzden `GlassLink` değil yerel buton.
+- Stabil DOM kancaları: `data-part="identity|verification|stats|actions"`;
+  `verification` ve `stats` yalnız ilgili içerik render edildiğinde vardır.
 - Portal yok, ref forwarding yok.
 
 ## 3. Anatomy ve slotlar
@@ -52,7 +58,7 @@ DEĞİL, düz yüzey (`--lg-surface` + `--lg-hairline`).
 | logo | otomatik | `GlassAvatar` (img veya baş harf) | `logoSrc` yoksa `name`'den fallback; `panel`'de `lg` (56px), `inline`'da `md` (40px) |
 | name | ✅ | string | Kart genelinin de accessible bağlamı; truncation yok, sarar |
 | tagline | — | string | İsmin altında ikincil satır |
-| verifiedBadge | — | `GlassBadge` | Yalnız `verified` true iken; `--lg-success` tint, flat opak |
+| verification | — | küçük check + opsiyonel info button | Check yalnız `verified`; info button ayrıca `verifiedBy` ister |
 | stats | — | `{label,value}[]` | `<dl>`, yatay, hairline ayraçlı; boşsa hiç render edilmez |
 | phone | — | `tel:` linki | Yalnız `phone` verilince |
 | viewListings | — | metin-link buton | Yalnız `onViewListings` verilince; metni stats'tan türer (bkz. §7) |
@@ -66,7 +72,8 @@ DEĞİL, düz yüzey (`--lg-surface` + `--lg-hairline`).
 | logoSrc | prop | `string` | — | — | Verilmezse `GlassAvatar` baş harf fallback'i |
 | tagline | prop | `string` | — | — | Serbest metin |
 | stats | prop | `{ label: string; value: string }[]` | — | — | Sayı formatı çağıranındır (`value` string) |
-| verified | prop | `boolean` | `false` | — | "Doğrulanmış Kurumsal" rozeti |
+| verified | prop | `boolean` | `false` | — | Kompakt, erişilebilir doğrulama işareti |
+| verifiedBy | prop | `string` | — | — | `verified=true` iken doğrulayan kurum tooltip'ini üretir; tek başına doğrulama açmaz |
 | phone | prop | `string` | — | — | Biçimli numara; `tel:` href rakam-dışı karakterlerden arındırılır |
 | onMessage | prop | `() => void` | — | — | Verilmezse "Mesaj Gönder" hiç render edilmez |
 | onViewListings | prop | `() => void` | — | — | Verilmezse ilan linki hiç render edilmez |
@@ -86,6 +93,8 @@ Varsayılan kombinasyon: `variant=panel`, `verified=false`, aksiyonsuz.
 | `phone` yok | Telefon linki render edilmez |
 | `onViewListings` yok | İlan linki render edilmez |
 | `onMessage` yok | "Mesaj Gönder" render edilmez |
+| `verified=false` + `verifiedBy` | Doğrulama işareti ve bilgi düğmesi render edilmez; `verified` tek doğruluk kaynağıdır |
+| `verified=true` + `verifiedBy` yok | Yalnız erişilebilir check işareti render edilir |
 | `logoSrc` + fallback | img kazanır; ikisi aynı anda çıkmaz (GlassAvatar sözleşmesi) |
 | Kart başına tek `prominent` | Yalnız "Mesaj Gönder"; telefon/ilan linki sade tipografi, buton chrome'u yok |
 
@@ -95,17 +104,19 @@ malzeme eksenini korur.
 
 ## 6. State modeli
 
-N/A — component tamamen prop güdümlü, kendi internal state'i yok (GlassButton/
-GlassAvatar'ın kendi hover/focus/error state'leri hariç, onlar kendi
-sözleşmelerine tabidir). "panel/inline" bir görünüm ekseni, hover/focus/active
-gibi bir durum değildir; her ikisi de sürekli, controlled olmayan bir prop.
+Component tamamen prop güdümlüdür; kendi internal state'i yoktur.
+`GlassTooltip` hover/focus/açık state'ini kendi sözleşmesiyle yönetir.
+`panel/inline` bir görünüm ekseni, hover/focus/active gibi bir durum değildir;
+her ikisi de sürekli, controlled olmayan bir prop.
 
 ## 7. Davranış
 
-- Pointer/keyboard: telefon linki native `<a>` Tab sırasına girer; "N ilanı
-  görüntüle" ve "Mesaj Gönder" native `<button>` — Enter/Space aktive eder.
-- Focus akışı DOM sırası: logo (focus almaz) → telefon linki → ilan linki →
-  Mesaj Gönder.
+- Pointer/keyboard: doğrulama bilgi düğmesi focus'ta tooltip'i anında açar;
+  hover varsayılan gecikmeyle açar, Escape/blur kapatır. Telefon linki native
+  `<a>` Tab sırasına girer; "N ilanı görüntüle" ve "Mesaj Gönder" native
+  `<button>` — Enter/Space aktive eder.
+- Focus akışı DOM sırası: logo/check (focus almaz) → varsa doğrulama bilgisi →
+  telefon linki → ilan linki → Mesaj Gönder.
 - "N ilanı görüntüle" metni `stats` içinde etiketinde (Türkçe büyük/küçük
   harf duyarsız) "ilan" geçen ilk kaydın `value`'sunu kullanarak türer (ör.
   `{ label: 'Aktif İlan', value: '48' }` → "48 ilanı görüntüle"); eşleşme
@@ -114,8 +125,12 @@ gibi bir durum değildir; her ikisi de sürekli, controlled olmayan bir prop.
   DEĞİL — `'İlan'.toLowerCase()` iki karakterli `'i̇lan'` üretir ve eşleşmeyi
   bozar).
 - `prefers-reduced-motion: reduce`: ilan linkinin chevron kayma geçişi kapanır.
-- Responsive: `inline` varyant 420px altında dikey akışa düşer (bkz. §9);
-  `panel` her genişlikte aynı dikey akışı korur.
+- Responsive: `inline` varyant kökte `container-type: inline-size` kullanır.
+  Genişte her kart aynı `2fr / 1fr / 1fr` identity/stats/actions kolonlarını
+  taşır. Kart 768px ve altında identity tam satıra, stats/actions ikinci
+  satıra; 640px ve altında tüm bölümler tek kolona düşer. En dar düzende
+  avatar iki satırı kaplar, doğrulama grubu isim/tagline'ın altında kalır.
+  `panel` dikey flex akışını korur.
 
 ## 8. İçerik kuralları
 
@@ -123,8 +138,10 @@ gibi bir durum değildir; her ikisi de sürekli, controlled olmayan bir prop.
   story).
 - `stats` etiketleri kısa tutulmalı (`white-space: nowrap`); uzun etiket
   satırı büyütür, kesilmez.
-- Buton/rozet metinleri hardcoded Türkçe: "Doğrulanmış Kurumsal", "Mesaj
-  Gönder", "İlanları görüntüle" — i18n borcu (GlassSellerCard ile aynı karar).
+- Doğrulama metinleri `"Doğrulanmış kurumsal ofis"` ve `"Doğrulama
+  ayrıntısı: Kurumsal kimlik {source} tarafından doğrulandı."`; buton
+  metinleri "Mesaj Gönder"/"İlanları görüntüle" hardcoded Türkçedir — i18n
+  borcu.
 
 ## 9. Token eşlemesi
 
@@ -134,39 +151,33 @@ gibi bir durum değildir; her ikisi de sürekli, controlled olmayan bir prop.
 | name | font-size | `--lg-text-headline` |
 | tagline / statLabel | color | `--lg-label-secondary` |
 | statValue | font-size / font-variant-numeric | `--lg-text-title` / `tabular-nums` |
-| verifiedBadge | tint | `var(--lg-success)` (`GlassBadge` `material="flat"`) |
+| verificationMark | color | `color-mix(--lg-success 55%, --lg-label)` |
+| verificationInfo | size / color / radius / focus | `--lg-control-sm` (`coarse`: `--lg-control-md`) / `--lg-label-secondary` / `--lg-radius-chip` / `--lg-accent` |
 | viewListings | color / focus outline | `--lg-accent` |
-| viewListings (dokunmatik) | min-height | `44px` (`@media (pointer: coarse)`) |
+| viewListings (dokunmatik) | min-height | `--lg-control-md` (`@media (pointer: coarse)` — coarse'ta 44px) |
 | messageButton | — | `GlassButton` kendi token'larını taşır (`prominent`) |
 
-Borç: `stat` ayraç aralığı (`--lg-space-5`) ve statLabel/statValue satır
-aralığı (`2px`) raw sabit · `checkIcon`/`chevronIcon` boyutları (13px/10px)
-raw — ikon ölçeği için token yok (GlassSellerCard'daki `VerifiedIcon`
-borcuyla aynı gerekçe) · `viewListings` taban `min-height: 24px` raw
-(GlassFooter `.link` deseniyle tutarlı).
+Borç (mikro-geometri): token karşılığı olmayan değerler component kökünde
+yerel değişken olarak toplandı — `.card { --gap-tight: 2px; --icon-check: 13px;
+--icon-info: 14px; --icon-chevron: 10px; --chevron-shift: 2px;
+--textlink-height: 24px; }`.
+`--gap-tight` statLabel/statValue ve `who` satır aralığı; ikon ölçeği için
+token yok (GlassSellerCard'daki `VerifiedIcon` borcuyla aynı gerekçe);
+`--chevron-shift` hover'da chevron kayma mesafesi (salt efekt geometrisi);
+`--textlink-height` GlassFooter `.link` deseniyle tutarlı. Chevron geçiş
+süresi (`0.15s ease`) raw kalır — süre/easing token'ı yok.
 
-**Kontrast kararı (code review, 2026-07-17):** `verifiedBadge`,
-`GlassBadge`'in `material="flat"` + `tint="var(--lg-success)"` varsayılanını
-(opak success zemin + sabit beyaz metin, `.tinted` kuralı) kullanmıyor —
-açık temada ~2.2:1 ölçülüp WCAG AA 4.5:1 hedefinin altında kaldı. Bunun
-yerine `.verifiedBadge` kendi zeminini nötr yüzeye (`--lg-surface` +
-`--lg-hairline`) çekiyor, metni `color-mix(in srgb, var(--lg-success) 55%,
-var(--lg-label))` ile koyulaştırıyor — hesaplanan kontrast açık temada
-~5.2:1, koyu temada ~10.7:1 (her iki tema da 4.5:1 hedefini rahat geçiyor;
-`checkIcon` `currentColor` kullandığından metinle aynı rengi otomatik alır).
-Override, `GlassBadge`'in `.tinted[data-material='flat']` kuralıyla eşit CSS
-özgüllüğü taşıdığı için `!important` ile yapılmak zorunda (bkz.
-`GlassAgencyCard.module.css` `.verifiedBadge` yorumu). Bu, otomatik test
-yazılamayan bir görsel/kontrast kararıdır — hesaplama elle (WCAG relative
-luminance formülü) doğrulandı, ekran görüntüsü/regresyon testi Storybook'ta
-manuel QA'ya bırakıldı.
+Doğrulama check'i `currentColor` kullanır; eski opak success rozetinin
+düşük-kontrastlı beyaz metni ve `!important` override'ı kaldırılmıştır.
+Info button görünür glyph'i küçük kalırken odak hedefi masaüstünde
+`--lg-control-sm`, coarse pointer'da `--lg-control-md` olur.
 
 ## 10. Storybook kapsamı
 
 Var: Default, Playground, Varyantlar (panel/inline yan yana), Logolu,
-Durumlar (minimal · yalnız telefon+ilan · yalnız mesaj), Uzun İçerik,
-Responsive (mobile1, `inline` dikey akışa düşüşü), Erişilebilirlik (docs
-description'lı). **Eksik:** Sizes (N/A — `size` ekseni tanımlı değil),
+Durumlar (minimal · yalnız telefon+ilan · kaynaksız doğrulama · kaynak
+tooltip'i), Uzun İçerik, Responsive (mobile1, container-güdümlü tek kolon),
+Erişilebilirlik (docs description'lı). **Eksik:** Sizes (N/A — `size` ekseni tanımlı değil),
 Temalar (ayrı story yok — tema toolbar'la otomatik doğrulanır, GlassScoreMeter
 ile aynı karar).
 
@@ -174,7 +185,9 @@ ile aynı karar).
 
 - [x] kurum adı + baş harf fallback'i render edilir (unit)
 - [x] `logoSrc` verilince img render, fallback yok (unit)
-- [x] `verified` true/false rozet render/yok kontrolü (unit)
+- [x] `verified` true/false kompakt işaret render/yok kontrolü (unit)
+- [x] `verifiedBy` bilgi düğmesinin accessible name/title/tooltip içeriği (interaction)
+- [x] `data-part` identity/verification/stats/actions kancaları (unit)
 - [x] `stats` etiket/değer çiftleri render edilir (unit)
 - [x] `phone` → `tel:` href doğru üretilir (unit)
 - [x] `onViewListings` + "Aktif İlan" stat'ından dinamik metin türer, tıklamada çağrılır (interaction)
@@ -183,7 +196,7 @@ ile aynı karar).
 - [x] `variant` → `data-variant` attribute'üne yansır (unit)
 - [x] `tagline` var/yok render kontrolü (unit)
 - [ ] dokunmatikte "N ilanı görüntüle" 44px hedefine büyümesi (visual)
-- [ ] `inline` varyantın 420px altında dikey akışa düşmesi (visual)
+- [ ] `inline` varyantın 768px/640px container geçişleri ve ortak kolon hizası (visual)
 
 ## 12. Do / Don't
 
@@ -191,15 +204,19 @@ ile aynı karar).
   metni otomatik sayıyla zenginleşir — ayrıca bir sayı prop'u geçirme.
 - ✅ İçerik sayfasında kurumsal karşılaştırma listelerinde `inline`, ilan
   detay yan kolonunda `panel` kullan.
+- ✅ Doğrulayan kurum biliniyorsa `verifiedBy` ile kısa kurum adını ver;
+  doğrulama kapsamını abartılı onay/garanti diliyle genişletme.
 - ❌ Karta ikinci bir `prominent` aksiyon ekleme — telefon/ilan linki sade
   tipografi kalmalı, buton chrome'u almamalı.
 - ❌ `GlassSellerCard`'a dokunma/birleştirme — bireysel ve kurumsal kimlik
   kartları kasıtlı olarak ayrı component'ler (farklı istatistik/telefon
   sözleşmeleri).
 
-**Bilinen kısıtlar:** `stats` sayı formatı doğrulanmaz (çağıran sorumluluğu)
+**Bilinen kısıtlar:** `GlassTooltip` coarse pointer'da açılmaz; doğrulayan
+kurum dokunmatik kullanıcı için kritik bilgi olacaksa görünür metin veya
+tap-popover gerekir · `stats` sayı formatı doğrulanmaz (çağıran sorumluluğu)
 · ilan linki metni yalnız etiket eşleşmesiyle türer, açık bir `listingCount`
-prop'u yok · `name`/`tagline` metinleri i18n'siz. **Açık kararlar:** ayrı bir
+prop'u yok · metinler i18n'siz. **Açık kararlar:** ayrı bir
 `listingCount` prop'unun eklenip eklenmeyeceği (şu an `stats` eşleşmesine
 bağlı) · `stats` öğe sayısı üst sınırı (şu an sınırsız, `flex-wrap` ile sarar)
 · telefon linkine `GlassSellerCard`'daki gibi maskeleme/reveal deseni
@@ -211,6 +228,8 @@ varsayıldı).
 - 2026-07-17: İlk sürüm — panel/inline varyantları, GlassAvatar logo
   fallback'i, tabular stats satırı, telefon `tel:` linki, dinamik "N ilanı
   görüntüle" metni, tek prominent "Mesaj Gönder" CTA.
-- 2026-07-17: Code review fix — `verifiedBadge` kontrastı (bkz. §9 "Kontrast
-  kararı"): açık temada ~2.2:1'den ~5.2:1'e çıkarıldı, zemin nötr yüzeye
-  çekildi, metin koyulaştırılmış success karışımı oldu.
+- 2026-07-17: Eski metin rozetinin kontrastı açık temada ~2.2:1'den ~5.2:1'e
+  çıkarıldı; bu rozet 2026-07-24 kompakt işaret değişikliğinde kaldırıldı.
+- 2026-07-24: Büyük doğrulama rozeti kompakt check + isteğe bağlı kaynak
+  tooltip'ine dönüştürüldü; `verifiedBy` ve stabil `data-part` kancaları
+  eklendi. Inline flex, ortak kolonlu ve container-responsive grid oldu.

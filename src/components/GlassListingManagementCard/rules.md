@@ -77,7 +77,11 @@ yalnız `onOpen`'a bağlı.
 ## 7. Davranış
 
 - Başlık butonu `:focus-visible` + hover underline.
-- Dar ekranda (520px altı) medya üste yığılır.
+- Dar container'da medya üste yığılır — breakpoint yok, içsel akışla:
+  kök `flex-wrap`, gövde `flex: 999 1 min(100%, var(--card-body-basis))`
+  (≈376px taban). Gövdeye taban genişliği kalmayınca medya tek başına ilk
+  satırda kalır, tam genişliğe büyür ve `max-height` (140px) ile kırpılır.
+- `.titleButton:hover` yalnız `@media (hover: hover)` içinde tanımlıdır.
 - Animasyon yok.
 
 ## 8. İçerik kuralları
@@ -96,7 +100,13 @@ yalnız `onOpen`'a bağlı.
 | issue | background/border | `color-mix(--lg-danger ...)` |
 | price | font-size | `--lg-text-title` |
 
-Raw px: medya 96px (kart görsel ölçek borcu), kırılım 520px (bp-sm yorumu).
+Mikro-geometri borcu: token karşılığı olmayan raw ölçüler component kökünde
+yerel değişkenlerde toplanır — `--card-strip-w` (sol durum şeridi 3px),
+`--card-media-size` (96px), `--card-media-stack-h` (yığılmış medya 140px),
+`--card-heading-gap` (2px), `--card-stat-gap` (1px), `--card-state-pad-block`
+(2px), `--card-body-basis` (içsel sarma tabanı 376px). Görsel değerler
+değişmedi; `@media (max-width: 520px)` kırılımı kaldırıldı (bkz. §7).
+Metrik değerleri `font-weight: 600` (eski 650 — ölçek dışıydı).
 
 ## 10. Storybook kapsamı
 

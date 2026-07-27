@@ -89,10 +89,23 @@ başlık overlay'i focus'ta da açılır.
 | metin | `--lg-label(-secondary)` |
 | overlay/scrim | `--lg-scrim` + `--lg-on-scrim` |
 | rozetler | `--lg-success` (EİDS), `--lg-accent` (VİTRİN) |
-| radius | `--lg-radius-chip/media/capsule` (iç hücreler 6-9px raw — mikro ölçek) |
+| radius | `--lg-radius-chip/media/capsule` (iç hücreler `--radius-cell/thumb/tile` yerel — mikro ölçek) |
 
-**Borç (raw):** mikro font kademesi 9-12px, gap 6-12px, 64px list thumb,
-1000/700/480px kırılımları, hücre iç radius 6/7/9px.
+**Borç (raw / mikro-geometri):** Token-altı mikro ölçek yerel değişkenlere
+toplandı — banded kökü sınıfsız sarmalayıcı div olduğundan blok beş üst ızgara
+sınıfında (`.microGrid, .ruledGrid, .mosaicGrid, .listGrid, .band`) tanımlı:
+mikro tipografi `--font-3xs/2xs/xs/sm/md = 9/10/10.5/11.5/14px`; geometri
+`--eids-size: 16px` (ikon kutusu — boşluk token'ı değil), `--eids-offset: 5px`,
+`--chip-offset: 4px`, `--rozet-offset: 7px`, `--rozet-pad-y: 3px`,
+`--thumb-w: 64px`, `--radius-cell/thumb/tile: 6/7/9px`; boşluk ritmi
+`--card-gap: 5px`, `--cell-gap: 6px`, `--cell-pad-x: 6px`, `--micro-gap-x: 10px`,
+`--list-col-gap: 22px`, `--band-mb: 18px`, `--ruled-pad: 6px 6px 7px`,
+`--chip-pad: 1px 6px`, `--hov-pad: 26px 7px 22px`, `--cap-pad: 30px 10px 9px`.
+Token'a bağlananlar: 12/11px metinler → `--lg-text-caption/badge`; 12/8px
+boşluklar → `--lg-space-3/2`. Bilinçli bırakılanlar: fiyat chip'inin buzlu
+`blur(6px)`'i (malzeme etkisi), geçiş süre/easing'leri (token yok),
+1000/700/480px sütun kırılımları (bp ölçeği dışı — satırlarda yorumlu),
+`var(--x, ...)` token fallback'leri (proje konvansiyonu).
 
 ## 10. Storybook kapsamı
 

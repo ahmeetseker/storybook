@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { GlassNavbar } from './GlassNavbar'
 
 const meta = {
-  title: 'Components/GlassNavbar',
+  title: 'Bileşenler/Navigasyon/GlassNavbar',
   component: GlassNavbar,
   parameters: { layout: 'fullscreen' },
   args: { onBack: fn() },

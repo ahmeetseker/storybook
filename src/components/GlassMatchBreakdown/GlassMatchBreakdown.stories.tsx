@@ -97,7 +97,7 @@ const dusukUyumGruplari: GlassMatchBreakdownGroup[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassMatchBreakdown',
+  title: 'Bileşenler/AI/GlassMatchBreakdown',
   component: GlassMatchBreakdown,
   tags: ['autodocs'],
   args: {

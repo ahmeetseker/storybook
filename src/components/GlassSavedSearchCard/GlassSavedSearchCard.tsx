@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from 'react'
+import { GlassButton } from '../GlassButton'
 import { GlassSwitch } from '../GlassSwitch'
 import styles from './GlassSavedSearchCard.module.css'
 
@@ -100,14 +101,14 @@ export function GlassSavedSearchCard({
       {onOpen || onEdit || onDelete ? (
         <footer className={styles.actions}>
           {onOpen ? (
-            <button type="button" className={styles.primary} onClick={onOpen}>
+            <GlassButton prominent size="sm" onClick={onOpen}>
               Sonuçları aç
-            </button>
+            </GlassButton>
           ) : null}
           {onEdit ? (
-            <button type="button" className={styles.secondary} onClick={onEdit}>
+            <GlassButton size="sm" onClick={onEdit}>
               Düzenle
-            </button>
+            </GlassButton>
           ) : null}
           {onDelete ? (
             <button

@@ -94,8 +94,17 @@ aşarsa taşar. Birimi `formatValue` içinde ver, ayrı etiket koyma.
 | bubble | background/border/font | `--lg-surface` / `--lg-hairline` / `--lg-text-caption` |
 | focus | outline | `--lg-accent` |
 
-Borç: thumb beyazı ve gölgeleri raw — bilinçli (kontrast); ray cam yerine
-hairline kanal — filtre maliyeti olmadan cam hissi (Açık Kararlar).
+**Borç (raw / mikro-geometri):** kök/ray/baloncuk mikro-geometrisi component
+kökünde yerel değişkene toplandı (`.root { --slider-height: 28px;
+--track-height: 6px; --bubble-gap: 6px; --bubble-pad-y: 2px; }` — coarse'ta
+`--track-height: 8px`); baloncuk gölgesi `--lg-shadow-sm`'e, baloncuk yatay
+padding'i `--lg-space-2`'ye bağlandı; coarse kök yüksekliği 44px →
+`--lg-control-md` (coarse'ta token birebir 44px; dokunma hedefi büyümesi
+tasarımın istediği davranış). Bilinçli bırakılanlar: thumb beyazı (`#fff`) ve
+thumb gölgeleri (`0 1px 4px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.2)`) raw —
+kontrast gereği, hiçbir gölge token deseniyle birebir değil; ray iç gölgesi
+`inset 0 1px 1px rgba(0,0,0,.06)` de token dışı (inset desen yok) — raw; ray
+cam yerine hairline kanal — filtre maliyeti olmadan cam hissi (Açık Kararlar).
 
 ## 10. Storybook kapsamı
 

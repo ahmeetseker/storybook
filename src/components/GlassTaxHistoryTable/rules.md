@@ -35,8 +35,8 @@ içerik tablosu.
   ayrıca görsel olarak gizli (`srOnly`) "Artış:"/"Azalış:"/"Değişim yok:"/
   "Değişim bilgisi yok" metniyle taşınır — durum yalnız renkle iletilmez.
 - DOM değişmezi: her satır tam bir `<tr>`; React `key` = `${row.year}-${index}`
-  (ham veri `year` DOM `id`'sine YAZILMAZ, yalnız React key + `data-label`
-  metninde kullanılır — başlık `id`'si `useId()`'den gelir).
+  (ham veri `year` DOM `id`'sine YAZILMAZ, yalnız React key olarak kullanılır —
+  başlık `id`'si `useId()`'den gelir).
 
 ## 3. Anatomy ve slotlar
 
@@ -104,10 +104,10 @@ varyantı).
 - **Sayı biçimi:** yüzde metni işaretsizdir (`Math.abs`), yön ok ikonuyla
   taşınır; `%N,N` biçimi `toLocaleString('tr-TR', {minimumFractionDigits:1,
   maximumFractionDigits:1})` ile üretilir (Türkçe ondalık virgül).
-- **Responsive:** 480px altında `<thead>` `display: none`, satırlar blok
-  karta düşer, her `<td>` `data-label` attribute'undan `::before` ile
-  etiketini gösterir (bkz. `GlassTable` aynı deseni, burada 3 sütun daha dar
-  bir kırılım noktası kullanır).
+- **Responsive:** breakpoint YOK — tablo `overflow-x: auto` sarmalayıcı
+  içinde dar ekranda yatay kaydırmada kalır (içsel akış kuralı,
+  `ErisilebilirlikMotionResponsive.mdx`). 2026-07-24: eski 480px satır→kart
+  reflow'u kaldırıldı.
 
 ## 8. İçerik kuralları
 
@@ -144,12 +144,13 @@ temada koyulaşır, koyu temada zaten aydınlık olan label ile karışıp
 kontrastı daha da artırır) — aynı desen `GlassTimeline`'daki ton
 işaretlerinde de kullanılır, kasıtlı tekrar.
 
-**Borç (raw):** ok karakteri font-size `11px` · "Güncel" etiketi
-padding/font-size (`2px 8px` / `10.5px`) · mobil kart kırılım noktası
-`480px` (spec'in kendisi, `GlassTable`'ın 700px'inden farklı — burada 3 dar
-sütun 700px'te bile sığdığı için daha küçük bir eşik seçildi) · sr-only clip
-tekniği (diğer component'lerle aynı raw değerler, ortak yardımcıya
-taşınmadı).
+**Borç (raw / mikro-geometri):** "Güncel" etiketi dikey padding'i component
+kökünde yerel değişken `--tax-latest-pad-block: 2px` olarak toplanır (token
+karşılığı yok) · sr-only clip tekniği (diğer component'lerle aynı raw
+değerler, ortak yardımcıya taşınmadı). 2026-07-24: ok karakteri ve "Güncel"
+etiketi font-size'ı `--lg-text-badge`'e, etiket yatay padding'i
+`--lg-space-2`'ye taşındı; 480px kırılım noktası borcu breakpoint'in
+kaldırılmasıyla kapandı.
 
 ## 10. Storybook kapsamı
 
@@ -176,7 +177,7 @@ token'lar üzerinden otomatik) · Sizes/Variants (N/A — eksen yok, §5).
       (unit)
 - [x] boş `rows` → varsayılan boş durum metni (unit)
 - [x] `caption` verilince görünür, verilmeyince hiç render edilmez (unit)
-- [ ] 480px altı gerçek kart görünümü (visual, Chrome)
+- [ ] dar ekranda tablo yatay kaydırma davranışı (visual, Chrome)
 - [ ] Kağıt/Grafit tema kontrastı — özellikle ok ikonu renkleri (visual)
 
 ## 12. Do / Don't
@@ -213,3 +214,9 @@ sayısal input daha öngörülebilir).
   kaçırdığı için `color-mix(in srgb, var(--lg-<tone>) 65%,
   var(--lg-label))` ile koyulaştırıldı (bkz. §9 kontrast notu). Her iki
   fix için regresyon testi eklendi.
+- 2026-07-24 — Tasarım sistemi uyum düzeltmesi: `480px` satır→kart reflow
+  breakpoint'i kaldırıldı (içsel akış — `overflow-x: auto` yatay kaydırma
+  kalır), `data-label` attribute'ları söküldü; ok + "Güncel" etiketi
+  font-size → `--lg-text-badge`, etiket yatay padding → `--lg-space-2`,
+  dikey padding yerel mikro-geometri değişkenine (`--tax-latest-pad-block`)
+  taşındı. Görsel kimlik korunur (yalnız 10.5→11px etiket kayması).

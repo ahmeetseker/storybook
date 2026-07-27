@@ -7,6 +7,38 @@
   width: 100%;
   box-sizing: border-box;
 }
+
+/* Layout ölçüleri + mikro-geometri — token karşılığı yok (bkz. rules.md §9 borç notu).
+   masthead kökü .root sınıfını taşımadığından değişken bloğu iki seçicide tanımlı. */
+.root,
+.masthead {
+  --container-max: 1120px; /* içerik rayı genişliği */
+  --zone-gap: 18px; /* bar içi ana ritim: iç gap + overlay/masthead dikey pad */
+  --nav-font: 14px; /* nav linki + ikincil aksiyon metni */
+  --summary-font: 13.5px; /* command arama özeti */
+  --wordmark-gap: 9px;
+  --link-gap: 2px;
+  --link-pad-x: 13px;
+  --actions-gap: 14px;
+  --focus-radius: 4px; /* metin aksiyonunun focus halka köşesi */
+  --capsule-pad: 3px; /* nav kapsülü iç pad */
+  --pill-inset: 3px 1px; /* cam pill'in link içi payı */
+  --line-w: 24px; /* refraktif çizgi */
+  --line-h: 3px;
+  --bead-size: 6px; /* overlay boncuğu */
+  --island-pad-y: 14px; /* islands dikey pad (scroll'da daralır) */
+  --island-pad-y-scrolled: 7px;
+  --command-pad-y: 10px;
+  --command-min-h: 52px; /* command bar yüksekliği */
+  --search-max: 620px; /* arama rayı genişliği */
+  --search-shift: 4px; /* ray/özet geçişinin mikro-offseti */
+  --masthead-pad-t: 26px; /* kimlik satırı üst pad */
+  --wordmark-min: 24px; /* masthead akışkan wordmark ölçüsü */
+  --wordmark-max: 32px;
+  --index-rail-h: 42px; /* sticky indeks rayı yüksekliği */
+  --index-link-gap: 6px;
+  --overlay-link-pad: 15px;
+}
 .sticky { position: sticky; top: 0; }
 .grow { flex: 1; min-width: 0; }
 
@@ -14,9 +46,9 @@
 .wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: var(--wordmark-gap);
   flex: none;
-  font-size: 17px;
+  font-size: var(--lg-text-headline);
   font-weight: 750;
   letter-spacing: -0.032em;
   color: var(--lg-label);
@@ -26,7 +58,7 @@
 .linkList {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--link-gap);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -36,12 +68,12 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: var(--lg-control-sm, 36px);
-  padding: 0 13px;
+  min-height: var(--lg-control-sm, 32px);
+  padding: 0 var(--link-pad-x);
   border-radius: var(--lg-radius-capsule, 999px);
   color: var(--lg-label-secondary);
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--nav-font);
   font-weight: 500;
   letter-spacing: -0.01em;
   transition: color 0.2s ease, transform 0.15s ease;
@@ -53,13 +85,13 @@
 .linkLabel { position: relative; z-index: 1; }
 @media (pointer: coarse) { .link { min-height: 44px; } }
 
-.actions { display: inline-flex; align-items: center; gap: 14px; flex: none; }
+.actions { display: inline-flex; align-items: center; gap: var(--actions-gap); flex: none; }
 .secondary :is(a, button) {
   border: none;
   background: none;
   padding: 0;
   font: inherit;
-  font-size: 14px;
+  font-size: var(--nav-font);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--lg-label-secondary);
@@ -68,13 +100,13 @@
   transition: color 0.2s ease;
 }
 @media (hover: hover) { .secondary :is(a, button):hover { color: var(--lg-label); } }
-.secondary :is(a, button):focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 3px; border-radius: 4px; }
+.secondary :is(a, button):focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 3px; border-radius: var(--focus-radius); }
 .burger { display: none; }
 
 /* ── Liquid glass göstergeleri (tek küçük cam dokunuş) ──────────────── */
 .glassPill {
   position: absolute;
-  inset: 3px 1px;
+  inset: var(--pill-inset);
   border-radius: var(--lg-radius-capsule, 999px);
   background: color-mix(in srgb, var(--lg-surface) 52%, transparent);
   backdrop-filter: blur(8px) saturate(150%);
@@ -88,8 +120,8 @@
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: 24px;
-  height: 3px;
+  width: var(--line-w);
+  height: var(--line-h);
   transform: translateX(-50%);
   border-radius: var(--lg-radius-capsule, 999px);
   background: color-mix(in srgb, var(--lg-accent) 78%, transparent);
@@ -101,8 +133,8 @@
   position: absolute;
   left: 1px;
   top: 50%;
-  width: 6px;
-  height: 6px;
+  width: var(--bead-size);
+  height: var(--bead-size);
   transform: translateY(-50%);
   border-radius: var(--lg-radius-capsule, 999px);
   background: color-mix(in srgb, var(--lg-on-scrim, var(--lg-surface)) 75%, transparent);
@@ -118,15 +150,15 @@
   border-bottom: 1px solid var(--lg-hairline);
 }
 .islandsInner {
-  max-width: 1120px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 14px 20px;
+  padding: var(--island-pad-y) var(--lg-space-5);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: var(--zone-gap);
   transition: padding 0.25s ease;
 }
-.islands[data-scrolled] .islandsInner { padding: 7px 20px; }
+.islands[data-scrolled] .islandsInner { padding: var(--island-pad-y-scrolled) var(--lg-space-5); }
 .navCapsule {
   flex: 1;
   justify-content: center;
@@ -135,7 +167,7 @@
   background: var(--lg-surface);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule, 999px);
-  padding: 3px;
+  padding: var(--capsule-pad);
   box-shadow: none;
   transition: box-shadow 0.25s ease;
 }
@@ -146,40 +178,40 @@
 /* ── command: arama omurgası ────────────────────────────────────────── */
 .command { background: var(--lg-bg); border-bottom: 1px solid var(--lg-hairline); }
 .commandInner {
-  max-width: 1120px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: var(--command-pad-y) var(--lg-space-5);
   display: flex;
   align-items: center;
-  gap: 18px;
-  min-height: 52px;
+  gap: var(--zone-gap);
+  min-height: var(--command-min-h);
 }
 .command .burger { display: inline-flex; } /* command'da merkez nav yok — menü hep hamburger'da */
 .searchZone { flex: 1; min-width: 0; display: grid; justify-items: center; }
 .searchZone > * { grid-area: 1 / 1; transition: opacity 0.25s ease, transform 0.25s ease; }
-.searchRail { width: 100%; max-width: 620px; }
+.searchRail { width: 100%; max-width: var(--search-max); }
 .searchSummary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: var(--lg-control-sm, 36px);
-  padding: 0 16px;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-control-sm, 32px);
+  padding: 0 var(--lg-space-4);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule, 999px);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
-  font-size: 13.5px;
+  font-size: var(--summary-font);
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(4px);
+  transform: translateY(var(--search-shift));
 }
 .command[data-scrolled] .searchZone:not(:focus-within) .searchRail {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-4px) scale(0.98);
+  transform: translateY(calc(-1 * var(--search-shift))) scale(0.98);
 }
 .command[data-scrolled] .searchZone:not(:focus-within) .searchSummary {
   opacity: 1;
@@ -189,23 +221,23 @@
 /* ── masthead: kadastral kimlik + sticky indeks rayı ────────────────── */
 .masthead { width: 100%; box-sizing: border-box; background: var(--lg-bg); }
 .mastheadIdentity {
-  max-width: 1120px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 26px 20px 18px;
+  padding: var(--masthead-pad-t) var(--lg-space-5) var(--zone-gap);
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--lg-space-5);
   flex-wrap: wrap;
 }
 .mastheadWordmark {
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(var(--wordmark-min), 3vw, var(--wordmark-max));
   font-weight: 750;
   letter-spacing: -0.04em;
   color: var(--lg-label);
 }
 .mastheadMeta {
-  font-size: 13px;
+  font-size: var(--lg-text-footnote);
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--lg-label-secondary);
@@ -219,19 +251,19 @@
 }
 .stickyRow { position: sticky; top: 0; }
 .mastheadIndexInner {
-  max-width: 1120px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 0 20px;
-  min-height: 42px;
+  padding: 0 var(--lg-space-5);
+  min-height: var(--index-rail-h);
   display: flex;
   align-items: stretch;
-  gap: 16px;
+  gap: var(--lg-space-4);
 }
 .mastheadIndexInner .nav { flex: 1; }
-.mastheadIndexInner .linkList { gap: 6px; }
-.mastheadIndexInner .link { border-radius: 0; min-height: 42px; }
+.mastheadIndexInner .linkList { gap: var(--index-link-gap); }
+.mastheadIndexInner .link { border-radius: 0; min-height: var(--index-rail-h); }
 .mastheadIndexInner .linkActive { color: var(--lg-accent); }
-.mastheadIndexInner .actions { gap: 12px; }
+.mastheadIndexInner .actions { gap: var(--lg-space-3); }
 
 /* ── overlay: galeri eşiği ──────────────────────────────────────────── */
 .overlay {
@@ -241,16 +273,16 @@
   z-index: 30;
 }
 .overlayInner {
-  max-width: 1120px;
+  max-width: var(--container-max);
   margin: 0 auto;
-  padding: 18px 20px;
+  padding: var(--zone-gap) var(--lg-space-5);
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: var(--zone-gap);
 }
 .onMedia { color: var(--lg-on-scrim, var(--lg-surface)); }
 .overlayNav { flex: 1; justify-content: flex-end; display: flex; }
-.overlayNav .link { color: color-mix(in srgb, var(--lg-on-scrim, var(--lg-surface)) 78%, transparent); padding-left: 15px; }
+.overlayNav .link { color: color-mix(in srgb, var(--lg-on-scrim, var(--lg-surface)) 78%, transparent); padding-left: var(--overlay-link-pad); }
 @media (hover: hover) { .overlayNav .link:hover { color: var(--lg-on-scrim, var(--lg-surface)); } }
 .overlayNav .linkActive { color: var(--lg-on-scrim, var(--lg-surface)); }
 .overlay .secondary :is(a, button) { color: color-mix(in srgb, var(--lg-on-scrim, var(--lg-surface)) 80%, transparent); }
@@ -262,8 +294,8 @@
   z-index: 40;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 8px 20px;
+  gap: var(--lg-space-4);
+  padding: var(--lg-space-2) var(--lg-space-5);
   background: color-mix(in srgb, var(--lg-bg) 96%, transparent);
   border-bottom: 1px solid var(--lg-hairline);
   transform: translateY(-100%);
@@ -279,18 +311,28 @@
 }
 
 /* ── mobil menü (GlassDrawer içi) — v1 sözleşmesi aynen ─────────────── */
-.drawerList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+/* Drawer içeriği GlassDrawer portalında render edilir — .root/.masthead
+   değişken kaskadı buraya ulaşmaz; ölçüler drawer üst sınıflarında yerel. */
+.drawerList {
+  --drawer-pad-x: 14px; /* mikro-geometri (token karşılığı yok — rules.md §9) */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
 .drawerLink {
   display: flex;
   width: 100%;
   align-items: center;
-  min-height: var(--lg-control-lg, 44px);
-  padding: 0 14px;
+  min-height: var(--lg-control-lg, 48px);
+  padding: 0 var(--drawer-pad-x);
   border: none;
   border-radius: var(--lg-radius-chip, 10px);
   background: none;
   font: inherit;
-  font-size: 15px;
+  font-size: var(--lg-text-body);
   color: var(--lg-label);
   cursor: pointer;
   text-align: start;
@@ -300,15 +342,20 @@
 @media (hover: hover) { .drawerLink:hover { background: color-mix(in srgb, var(--lg-label) 7%, transparent); } }
 .drawerLink:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
 .drawerLinkActive { font-weight: 700; color: var(--lg-accent); }
-.drawerSecondary { display: flex; width: 100%; }
+.drawerSecondary {
+  --drawer-btn-pad: 10px 14px; /* mikro-geometri (token karşılığı yok — rules.md §9) */
+  --drawer-font: 14px;
+  display: flex;
+  width: 100%;
+}
 .drawerSecondary :is(a, button) {
   flex: 1;
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip, 10px);
   background: none;
-  padding: 10px 14px;
+  padding: var(--drawer-btn-pad);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--drawer-font);
   font-weight: 600;
   color: var(--lg-label);
   text-align: center;
@@ -319,7 +366,7 @@
 
 /* Dar viewport: linkler menüye çöker. Container query pratik değil (kök sticky;
    containment sticky'i bozar) — gerekçe rules.md §7. */
-@media (max-width: 760px) {
+@media (max-width: 760px) { /* özel eşik (bp ölçeği dışı, bp-md 768 komşusu) — nav sıkışma noktası */
   .islands .nav, .overlayNav { display: none; }
   .burger { display: inline-flex; }
   .secondary { display: none; }

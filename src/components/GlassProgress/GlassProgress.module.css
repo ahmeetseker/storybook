@@ -1,6 +1,10 @@
 /* Durum göstergesi içerik katmanındadır: cam yok, hairline ray + accent dolgu.
    Bar her genişlikte %100 — genişliği çağıranın konteyneri belirler. */
 .root {
+  /* Mikro-geometri: ince şerit yükseklikleri (token karşılığı yok — bkz. rules.md §9 borç) */
+  --track-h-sm: 4px;
+  --track-h-md: 6px;
+  --track-h-lg: 8px;
   display: inline-flex;
   align-items: center;
   gap: var(--lg-space-2);
@@ -19,27 +23,32 @@
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-hairline);
 }
-.sm .track { height: 4px; }
-.md .track { height: 6px; }
-.lg .track { height: 8px; }
+.sm .track { height: var(--track-h-sm); }
+.md .track { height: var(--track-h-md); }
+.lg .track { height: var(--track-h-lg); }
 
+/* Dolgu tam genişlik; oran scaleX ile verilir — width animasyonu YASAK
+   (animasyon yalnız transform/opacity/filter). */
 .fill {
   display: block;
+  width: 100%;
   height: 100%;
   border-radius: inherit;
   background: var(--glass-tint, var(--lg-accent));
-  transition: width 0.3s ease-out;
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
 }
-/* Indeterminate: kayan bant */
+/* Indeterminate: kayan bant — %'ler dolgunun kendi genişliğine (track'in %40'ı) göre */
 [data-indeterminate] .fill {
   position: absolute;
   top: 0;
+  left: 0;
   width: 40%;
   animation: lg-progress-slide 1.2s ease-in-out infinite;
 }
 @keyframes lg-progress-slide {
-  from { left: -40%; }
-  to { left: 100%; }
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
 }
 
 .value {

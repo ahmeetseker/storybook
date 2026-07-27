@@ -61,7 +61,7 @@ const days: GlassTourDay[] = [
 ]
 
 const meta = {
-  title: 'Components/GlassTourScheduler',
+  title: 'Bileşenler/Pazar Yeri/GlassTourScheduler',
   component: GlassTourScheduler,
   tags: ['autodocs'],
   args: { days, onRequest: fn() },

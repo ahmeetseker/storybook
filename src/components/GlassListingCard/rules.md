@@ -116,11 +116,19 @@ Hook'un `glowX/glowY/glowOpacity` değerleri kartta **kullanılmaz** (parmak ucu
 | root | focus outline | `--lg-accent` (fallback `#0a84ff`) |
 | root | font | miras (`font: inherit`) |
 
-**Borç:** genişlik `240px` raw · `shape={18}` ve media radius `13px` raw (token
-ölçeği 20/14 — ikisi de ölçek dışı) · tipografi raw: başlık `14px/600` (ölçekte
-yok), konum `12px`, fiyat `16px/800` — **800 ağırlığı "en fazla 400/600/700"
-kuralını ihlal ediyor** · hover `rgba(255,255,255,.16)` · iç boşluklar
-(`padding: 6px`, `10px 8px 8px`, `gap: 3px`) raw.
+**Borç (raw / mikro-geometri):** birebir karşılığı olanlar token'a bağlandı —
+konum 12px → `--lg-text-caption`, rozet ofseti 8px → `--lg-space-2`, gövde
+yan/alt padding 8px → `--lg-space-2`, fiyat üst boşluğu 4px → `--lg-space-1`.
+Token karşılığı olmayanlar component kökünde yerel değişkene toplandı:
+`.card { --card-w: 240px; --card-pad: 6px; --media-radius: 13px;
+--body-gap: 3px; --body-pad-top: 10px; --title-text: 14px;
+--price-text: 16px; }` (media radius 13px ve tipografi 14/16px ölçek dışı —
+"yakın" token'a yuvarlanmadı; `shape={18}` tsx tarafında, bu fazda
+dokunulmadı). Bilinçli bırakılanlar: hover `rgba(255,255,255,.16)` beyaz-alfa
+cam vurgusu (color-mix'e çevrilmez) · geçiş süresi `0.18s ease` (süre token'ı
+yok) · fiyat `800` ağırlığı — **"en fazla 400/600/700" kuralını ihlal etmeye
+devam ediyor** (görsel değişiklik yasağı nedeniyle bu fazda düzeltilmedi,
+bkz. Açık Kararlar).
 
 ## 10. Storybook kapsamı
 

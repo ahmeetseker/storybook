@@ -34,6 +34,15 @@ const listings: GlassCompareListing[] = [
   },
 ]
 
+const fallbackListings: GlassCompareListing[] = [
+  {
+    ...listings[0],
+    image: 'data:image/png;base64,temsili-gorsel-yuklenemedi',
+    imageFallback: placeholderImage('Urla ilanı', '#456f54', '#a7c59d', 480, 360),
+  },
+  listings[1],
+]
+
 const dorduncuIlan: GlassCompareListing = {
   id: 'ilan-ayvalik',
   title: 'Balıkesir Ayvalık, imarlı köşe parsel',
@@ -49,7 +58,7 @@ const besinciIlan: GlassCompareListing = {
 }
 
 const meta = {
-  title: 'Components/GlassCompareTable',
+  title: 'Bileşenler/Pazar Yeri/GlassCompareTable',
   component: GlassCompareTable,
   tags: ['autodocs'],
   args: {
@@ -105,6 +114,23 @@ export const Kaldirilabilir: Story = {
  */
 export const VurgusuzKarsilastirma: Story = {
   args: { highlightDifferences: false },
+  render: Default.render,
+}
+
+/**
+ * Temsili görsel deterministik olarak hata verir; component ilan görseli
+ * fallback'ine bir kez geçer ve fallback de hata verirse kaynağı sabit tutar.
+ */
+export const GorselFallback: Story = {
+  args: { listings: fallbackListings },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`image` yüklenemediğinde aynı ilana ait `imageFallback` bir kez denenir. Görseller dekoratif kalır (`alt=""`).',
+      },
+    },
+  },
   render: Default.render,
 }
 

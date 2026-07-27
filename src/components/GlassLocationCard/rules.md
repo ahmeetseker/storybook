@@ -98,11 +98,23 @@ gradyan render edilir.
 | root | radius | `shape={20}` — `--lg-radius-card` değeriyle aynı, sayısal |
 | action | yükseklik | `--lg-control-sm` (GlassButton üzerinden) |
 
-Borç: harita radius'u 13px raw (`--lg-radius-media` 14px'e denk gelmeli) ·
-pin rengi `#ff453a` raw — semantic danger değeri hardcoded, temayla değişmez ·
-harita gradyanları (`#4a7a63`, `#2f5546`) ve ızgara beyaz-alfaları raw, tema
-duyarsız (Kağıt temada da koyu yeşil kalır) · padding 14px set'teki diğer
-kartların 20px'inden farklı ve token'sız · drop-shadow raw.
+**Borç (raw / mikro-geometri):** Token'a bağlananlar: kart iç `gap`
+`--lg-space-3` (12px), info yatay padding `--lg-space-1` (4px), not fontu
+`--lg-text-caption` (12px). Token karşılığı olmayanlar component kökünde
+yerel değişkene toplandı: `--card-pad: 14px` (set'teki diğer kartların
+20px'inden farklı — görsel eşdeğerlik için değer korundu) ·
+`--map-height: 150px` · `--map-radius: 13px` (`--lg-radius-media` 14px'e
+denk gelmeli ama birebir değil — yuvarlama yasak, değer korundu) ·
+`--address-size: 14.5px` / `--info-gap: 3px` (tipografi/boşluk ölçeği dışı) ·
+pin `--pin-size: 36px` / `--pin-color: #ff453a` (semantic danger değil,
+hardcoded — temayla değişmez, bilinçli dekoratif) · harita paleti
+`--map-green-1/2` (#4a7a63/#2f5546), ızgara `--map-grid-line`
+rgba(255,255,255,.16) + adımları `--map-row-a/b` 34/36px,
+`--map-col-a/b` 46/48px, parlama `--map-glow` rgba(255,255,255,.18) /
+`--map-glow-size: 160px` — tümü tema duyarsız dekoratif görsel (Kağıt temada
+da koyu yeşil kalır; tema token'ına bağlanması Açık Kararlar'da). Bilinçli
+bırakılan: pin `drop-shadow(0 4px 8px rgba(0,0,0,.35))` — `--lg-shadow-*`
+desenleriyle birebir eşleşmediğinden dokunulmadı.
 
 ## 10. Storybook kapsamı
 

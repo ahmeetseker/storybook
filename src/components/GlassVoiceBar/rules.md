@@ -152,10 +152,14 @@ hover/focus/active hiçbir zaman prop değildir (yalnız CSS
 | transkript/ipucu | color | `--lg-label-secondary` | — (kontrat: küçük metin renk yalnız label token'larından, semantik renk yalnız buton zemininde) |
 | focus halkası | outline | `--lg-accent` (yalnız `:focus-visible`) | — |
 
-**Borç (raw):** nabız halkası `inset: -7px` / `border-width: 1.5px` ve
-keyframe `scale(0.55→1.9)` değerleri raw px/oran — token karşılığı yok,
-salt görsel efekt geometrisi (GlassScoreMeter'daki `R = 40` SVG sabiti ile
-aynı gerekçe).
+**Borç (raw / mikro-geometri):** token karşılığı olmayan efekt/ikon
+geometrisi component kökünde yerel değişkende toplandı — `.root {
+--icon-box: 20px; --pulse-inset: -7px; --pulse-border: 1.5px; }` (ikon
+kutusu 20×20 spacing değil ikon ölçüsüdür — GlassAccordion chevron
+kararıyla aynı; nabız halkası taşması ve kenarlık kalınlığı salt görsel
+efekt geometrisi, GlassScoreMeter'daki `R = 40` SVG sabiti ile aynı
+gerekçe). Keyframe `scale(0.55→1.9)` oranları ve süre/gecikme
+(`1.7s`/`0.55s`) raw kalır — süre/easing token'ı yok.
 
 ## 10. Storybook kapsamı
 

@@ -147,10 +147,19 @@ Katman sırası: veri (items boş/tek) → seçim (aktif tür/sahne) → etkile�
 | tab yüksekliği | min-height | `--lg-control-md` |
 | sayılar | — | `font-variant-numeric: tabular-nums` (sayaç, sekme sayacı) |
 
-**Borç (raw, mevcut konvansiyon):** sahne oranı `aspect-ratio: 4/3` · thumbnail
-boyutu `64px`/`72px` (coarse) · thumbnail kenarlık kalınlığı `2px` · tür rozeti
-font-size `10px` (token ölçeğinde yok, caption'dan küçük) · boşluklar (`gap:
-8/12px`, `padding` değerleri) raw.
+**Borç (raw / mikro-geometri):** sahne oranı `aspect-ratio: 4/3` raw kalır
+(token karşılığı yok). Boşluklar token'a
+taşındı: kök/panel gap `--lg-space-3`, tablist gap `--lg-space-1`, tab padding
+`0 var(--lg-space-3)`, sahne bloğu/thumbs gap `--lg-space-2`, thumbFallback
+padding `--lg-space-1`, tür rozeti konumu `--lg-space-1`. Tür rozeti font
+boyutu `--lg-text-badge` (eski 10px → 11px, ≤1.5px kabul edilen tipografi
+kayması). Token karşılığı olmayan mikro ölçüler component kökünde yerel
+değişkenlerde toplanır — `--mg-tab-gap` (6px), `--mg-counter-inset` (10px),
+`--mg-counter-pad` (3px 10px), `--mg-thumb-size` (64px),
+`--mg-thumb-size-coarse` (72px), `--mg-thumbs-pad-b` (2px),
+`--mg-type-badge-pad` (1px 6px), `--mg-select-border` (2px — aktif sekme alt
+çizgisi + thumbnail seçim kenarlığı, token karşılığı yok). Görsel değerler
+değişmedi.
 
 ## 10. Storybook kapsamı
 
