@@ -120,12 +120,15 @@ export function useBasemap(
           markerZoomAnimation: false,
           minZoom,
           maxZoom,
-        }) as unknown as LeafletMapLike
+        })
         map.setView([centerLat, centerLng], zoom)
-        L.tileLayer(tileUrl, { maxZoom: maxZoom ?? 19 }).addTo(map as never)
-        mapRef.current = map
-        map.on('move zoom viewreset resize', schedule)
-        map.invalidateSize()
+        L.tileLayer(tileUrl, { maxZoom: maxZoom ?? 19 }).addTo(map)
+        // Gerçek Leaflet.Map tipiyle kurulum bitti; yüzeyimizi yalnız burada,
+        // ref'e atamadan hemen önce LeafletMapLike'a indirgiyoruz — `as never` gerekmez.
+        const typedMap = map as unknown as LeafletMapLike
+        mapRef.current = typedMap
+        typedMap.on('move zoom viewreset resize', schedule)
+        typedMap.invalidateSize()
         setStatus('ready')
         project()
       } catch {
