@@ -2,7 +2,7 @@
 name: GlassMap
 category: içerik
 status: hazır
-lastReviewed: 2026-07-17
+lastReviewed: 2026-07-27
 ---
 
 # GlassMap Kuralları
@@ -16,8 +16,10 @@ bağlamı verir.
 
 - **Kullan:** ilan detay konum bloğu, arama sonuçları harita paneli, mahalle
   önizlemesi.
-- **Kullanma:** gerçek coğrafi hassasiyet gereken üretim haritası (→ v2
-  MapLibre adaptörü, bkz. Açık Kararlar), rota/yol tarifi.
+- **Kullanma:** rota/yol tarifi (zoom/pan dışı bir gezinme deneyimi gerektirir).
+  Gerçek coğrafi hassasiyet artık `basemap` prop'uyla desteklenir (bkz. §2, §7,
+  Açık Kararlar) — bu, "gerçek üretim haritası" için ayrı bir v2 gerekçesini
+  ortadan kaldırır.
 
 | İlgili | Farkı |
 |---|---|
@@ -41,13 +43,22 @@ bağlamı verir.
   `.canvasClip` kırpılır (rounded-corner için); popup ve pinler kök
   sınırının dışına taşabilir ama asla kırpılıp görünmezleşmez.
 - DOM değişmezi: her `pins[]` öğesi tek `pinWrap` üretir; `id` React `key`.
+- `basemap` verildiğinde zemin, `aria-hidden="true"` bir Leaflet konteynerine
+  (`.tiles`) döner — bilgi taşımayan dekoratif katman olma sözleşmesi seed'li
+  SVG zeminle aynıdır. Zoom kontrolleri Leaflet'in kendi kontrol katmanı
+  DEĞİL, GlassMap'in kendi `aria-label`'lı butonlarıdır (`Yakınlaştır` /
+  `Uzaklaştır`). Atıf (`basemap.attribution`) lisans gereği her zaman görünür
+  ve linklidir, kaldırılamaz/gizlenemez. Zemin yüklenemezse (`status
+  ==='error'`) `role="status"` ile bildirim yapılır ve harita seed'li SVG
+  zeminine düşer (bkz. §7).
 
 ## 3. Anatomy ve slotlar
 
 | Slot | Zorunlu | İçerik | Kurallar |
 |---|---|---|---|
 | pins[].id | ✅ | `string` | React key + popup/seçim kimliği |
-| pins[].x / y | ✅ | `number` (0-1) | Normalize konum; harita kutusuna göre. Finite değilse (NaN/Infinity) pin RENDER EDİLMEZ; finite ama 0-1 dışıysa 0-1'e kenetlenir (`clampUnit`) — harita dışında etkileşimli pin üretilmez |
+| pins[].x / y | ⚠️ | `number` (0-1) | `basemap` YOKKEN zorunlu. Normalize konum; harita kutusuna göre. Finite değilse (NaN/Infinity) pin RENDER EDİLMEZ; finite ama 0-1 dışıysa 0-1'e kenetlenir (`clampUnit`) — harita dışında etkileşimli pin üretilmez |
+| pins[].lat / lng | ⚠️ | `number` | `basemap` VARKEN kullanılır; Leaflet projeksiyonuyla piksele çevrilir. Moda uymayan pin (ör. `basemap` varken yalnız `x`/`y` verilmiş, `basemap` yokken yalnız `lat`/`lng` verilmiş) sessizce atlanır — hata fırlatılmaz (bkz. §7 zarif düşüş) |
 | pins[].price | — | `string` | Verilmezse ve `count` yoksa pin boş görünür (kullanıcı hatası) |
 | pins[].count | — | `number` | Verilirse cluster rozeti; `price` yok sayılır |
 | popupContent | — | `(pinId) => ReactNode` | Yalnız seçili pin için çağrılır |
@@ -69,6 +80,7 @@ bağlamı verir.
 | variant | `'inline'\|'panel'` | `'inline'` | — | inline 16:9, panel dikey dolu (üst bileşen yükseklik verir) |
 | seed | `number \| string` | `1` | — | Sokak dokusu üretim tohumu — deterministik |
 | label | `string` | `'Harita'` | — | Kök `aria-label` |
+| basemap | `GlassMapBasemap` | — | — | Gerçek tile zemini (Leaflet projeksiyon/tile motoru). Verilmezse seed'li SVG zemin (bugünkü v1 davranışı) korunur; verildiğinde pin konumu `lat`/`lng` üzerinden hesaplanır (bkz. §3, §7) |
 
 Ref hedefi yok. `onPinSelect`/`onLayerChange` yalnız kullanıcı etkileşiminde
 çalışır (prop değişikliği kendi kendine tetiklemez).
@@ -95,8 +107,13 @@ variant yok. `seed` görsel bir eksen değil, üretim parametresidir.
 | layer | prop/iç state | — | `aria-checked` (radio) |
 | focus-visible | CSS | — | 2px `--lg-accent` halka |
 | popup açık | `selected && popupContent` türetilmiş | — | `role="group"` |
+| basemap durumu | `useBasemap` iç state'i (`idle/loading/ready/error`) — prop değil | pin konum kaynağını (projeksiyon ↔ `x`/`y`) belirler | `error` iken `role="status"` bildirim |
 
 Katman sırası: layer (zemin) → pins (üstte) → popup (en üstte, `z-index`).
+Pin konumu `basemap` yokken her zaman `x`/`y` (0-1 normalize) üzerinden,
+`basemap` varken Leaflet projeksiyonundan (piksel) gelir; ilgili moda uymayan
+alanlar (basemap yokken `lat`/`lng`, basemap varken yalnız `x`/`y` YOKSA)
+sessizce atlanır — bkz. §3, §7.
 
 ## 7. Davranış
 
@@ -183,11 +200,26 @@ SVG `stroke-width`/`stroke-dasharray` vektör gereği raw; süre/easing
 ölçeğe çekildi: toggle 600 (eski 650), pin fiyat 700 (eski 750), cluster 700
 (eski 800).
 
+**Borç (v2 — gerçek zemin mikro-geometrisi):** `--map-zoom-btn-size` (30px),
+`--map-zoom-radius` (10px), `--map-attr-pad` (2px 7px — atıf/hata bildirimi
+iç boşluğu), `--map-corner-surface-max-w` (`calc(50% - var(--lg-space-2) *
+1.5)` — atıf ve hata bildirimi aynı satırda yan yana durduğunda çakışmasınlar
+diye her biri genişliğin yarısından biraz azını alır). `tone` filtre
+değerlerinin (`saturate`/`sepia`/`brightness`/`contrast` katsayıları, `quiet`/
+`raw`/`satellite` + koyu tema varyantları) token karşılığı yok — bunlar tile
+sağlayıcısının (OSM) kendi paletini sitenin sıcak nötrlerine yaklaştırmak için
+ampirik olarak ayarlanmış, tasarım tokenlarına bilinçli bağlanmamış değerler.
+`.zoomBtn:hover` arka planı için `--lg-fill-quaternary` token'ı projede
+tanımsız çıktı; onun yerine `color-mix(in srgb, var(--lg-label) 6%,
+transparent)` kullanıldı (aynı görsel niyet, mevcut token setiyle).
+
 ## 10. Storybook kapsamı
 
 Var: Default(Inline), Playground, Panel, UyduKatmani, Cluster,
-PrivacyCircle, Controlled, UzunIcerik, Erisilebilirlik (docs). Eksik:
-Sizes N/A — tek ölçek.
+PrivacyCircle, Controlled, UzunIcerik, Erisilebilirlik (docs),
+GercekZeminSessiz, GercekZeminHam, GercekZeminPopup (gerçek OSM tile zemini —
+sırasıyla varsayılan sessiz ton, filtresiz ham ton, popup ile birlikte).
+Eksik: Sizes N/A — tek ölçek.
 
 ## 11. Test kabul kriterleri
 
@@ -230,15 +262,23 @@ Sizes N/A — tek ölçek.
 **Bilinen kısıtlar:** zoom/pan yok (v1 statik kutu); cluster'a tıklama
 "genişletme" değil, yalnız seçim/popup tetikler — gerçek gruplama v2'de.
 
-**Açık kararlar:** gerçek MapLibre/coğrafi veri adaptörü (v2 — bu component
-v1'de tamamen sentetik, seed'li SVG zemin kullanır) · katman etiketlerinin
-("Yol"/"Uydu") i18n'i · cluster tıklamasının alt-pinleri açması (v2) ·
-`privacyCircle`'ın sürüklenebilir/ayarlanabilir olması (v2) · popup'ın
-gerçek DOM ölçümüyle (ResizeObserver/`getBoundingClientRect`) tam kenar-
-güvenli konumlanması — v1 yalnız pin koordinatına göre sabit eşiklerle
-(y/x) yön ve hizalama tahmin eder, kökün `overflow:hidden` taşımaması
-sayesinde en kötü durumda bile popup görünmez olmaz, yalnız kök sınırının
-biraz dışına taşabilir.
+**Açık kararlar:** katman etiketlerinin ("Yol"/"Uydu") i18n'i · cluster
+tıklamasının alt-pinleri açması (v2) · `privacyCircle`'ın sürüklenebilir/
+ayarlanabilir olması (v2) · popup'ın gerçek DOM ölçümüyle
+(ResizeObserver/`getBoundingClientRect`) tam kenar-güvenli konumlanması — v1
+yalnız pin koordinatına göre sabit eşiklerle (y/x) yön ve hizalama tahmin
+eder, kökün `overflow:hidden` taşımaması sayesinde en kötü durumda bile popup
+görünmez olmaz, yalnız kök sınırının biraz dışına taşabilir.
+
+**Kapatılan kararlar:** gerçek coğrafi veri adaptörü (v2) — karar `basemap`
+prop'u (bkz. §4) lehine verildi: Leaflet YALNIZ projeksiyon/tile motoru
+olarak kullanılır, kendi marker ve kontrol katmanları (zoom butonları, atıf)
+bilerek kullanılmaz — bunların yerine GlassMap'in kendi tasarım-dili DOM
+öğeleri (`.pin`, `.zoomBtn`, `.attribution`) render edilir, böylece pin
+tipografisi/rengi ve kontrol görünümü tasarım sisteminden gelir, hiçbir CSS
+değişkeni Leaflet'in kendi stiline/SVG attribute'una sızmaz. `basemap`
+verilmezse component v1'deki gibi tamamen sentetik, seed'li SVG zeminde
+kalmaya devam eder (geriye dönük uyumlu, kırılma yok).
 
 **Changelog:** 2026-07-17 — İlk sürüm: seed'li deterministik SVG sokak
 dokusu, fiyat/cluster pinleri, controlled seçim + katman, popup, privacy
@@ -261,3 +301,14 @@ etkileşimli pin üretilmesi engellendi).
 sonucunun varlığına bakıyor — projeksiyon yoksa ve pin'de `x`/`y` varsa pin
 yüzde koordinatla render edilmeye devam ediyor (önceden yalnız `lat`/`lng`
 verilen pin'ler zemin hatasında sessizce kayboluyordu).
+2026-07-27 — Dokümantasyon: gerçek OSM tile zemini için üç yeni story
+(`GercekZeminSessiz`/`GercekZeminHam`/`GercekZeminPopup`) eklendi; §1/§2/§3/
+§4/§6/§9 gerçek zemin (`basemap`) sözleşmesiyle güncellendi; "gerçek coğrafi
+veri adaptörü" açık kararı `basemap` + Leaflet-yalnız-projeksiyon lehine
+kapatıldı. Chrome + Playwright (gerçek Chromium) ile görsel doğrulama
+yapıldı: sessiz ton sağlayıcı paletini nötrlüyor, pin/cluster tasarım
+dilinde (Leaflet'in kendi mavi işaretçileri yok), zoom kontrolleri sağ üstte
+cam yüzeyde (Leaflet kutusu yok), atıf sol altta tek/linkli, koyu temada
+zemin kararıyor ama etiketler okunur kalıyor, dar viewport'ta atıf ellipsis
+alıyor ve zorlanmış hata durumunda atıf ile hata bildirimi çakışmıyor, popup
+okunaklı ve doğru konumlanıyor (ayrıntılar için task-4-report.md).

@@ -149,3 +149,43 @@ export const Erisilebilirlik: Story = {
     },
   },
 }
+
+const osmBasemap = {
+  tileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  attribution: (
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+      © OpenStreetMap katkıcıları
+    </a>
+  ),
+  center: [39, 35.2] as [number, number],
+  zoom: 6,
+  maxZoom: 19,
+}
+
+const geoPins: GlassMapPin[] = [
+  { id: 'urla', lat: 38.322, lng: 26.764, price: '4.250.000 TL' },
+  { id: 'golbasi', lat: 39.783, lng: 32.809, price: '1.850.000 TL' },
+  { id: 'kas', lat: 36.2, lng: 29.64, price: '6.900.000 TL' },
+  { id: 'ege', lat: 37.04, lng: 27.43, count: 18 },
+]
+
+/** Gerçek tile zemini — sessiz ton, sitenin sıcak nötrlerine yaklaştırılmış. */
+export const GercekZeminSessiz: Story = {
+  args: { pins: geoPins, basemap: osmBasemap, label: 'Arsa ilanları haritası' },
+}
+
+/** Filtresiz tile — sağlayıcının kendi paleti. */
+export const GercekZeminHam: Story = {
+  args: { pins: geoPins, basemap: { ...osmBasemap, tone: 'raw' }, label: 'Ham zemin' },
+}
+
+/** Popup ile birlikte gerçek zemin. */
+export const GercekZeminPopup: Story = {
+  args: {
+    pins: geoPins,
+    basemap: osmBasemap,
+    defaultSelectedId: 'golbasi',
+    popupContent: (id: string) => <strong>{id === 'golbasi' ? 'Gölbaşı · 1.240 m²' : id}</strong>,
+    label: 'Popuplı harita',
+  },
+}
