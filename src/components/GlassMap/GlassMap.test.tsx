@@ -1,6 +1,36 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GlassMap, type GlassMapPin } from './GlassMap'
+
+const basemapInstance = {
+  setView: vi.fn(),
+  remove: vi.fn(),
+  invalidateSize: vi.fn(),
+  on: vi.fn(),
+  off: vi.fn(),
+  zoomIn: vi.fn(),
+  zoomOut: vi.fn(),
+  latLngToContainerPoint: vi.fn((coords: [number, number]) => ({ x: coords[1], y: coords[0] })),
+}
+
+vi.mock('leaflet', () => ({
+  default: {
+    map: vi.fn(() => {
+      basemapInstance.setView.mockReturnValue(basemapInstance)
+      return basemapInstance
+    }),
+    tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
+  },
+}))
+
+vi.mock('leaflet/dist/leaflet.css', () => ({}))
+
+const basemap = {
+  tileUrl: 'https://tile.example/{z}/{x}/{y}.png',
+  attribution: <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>,
+  center: [39, 35.2] as [number, number],
+  zoom: 6,
+}
 
 const pins: GlassMapPin[] = [
   { id: 'p1', x: 0.2, y: 0.3, price: '4.250.000 TL' },
@@ -183,5 +213,57 @@ describe('GlassMap', () => {
       <GlassMap pins={[right]} popupContent={(id) => `Detay: ${id}`} defaultSelectedId="right" />,
     )
     expect(rightRender.container.querySelector('[data-align]')?.getAttribute('data-align')).toBe('end')
+  })
+
+  it('basemap verilmezse mevcut SVG zemini korunur', () => {
+    const { container } = render(<GlassMap pins={pins} />)
+    expect(container.querySelector('svg')).not.toBeNull()
+    expect(container.querySelector('[data-basemap]')).toBeNull()
+  })
+
+  it('basemap verilince tile katmanı render edilir ve atıf görünür', async () => {
+    render(
+      <GlassMap
+        pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]}
+        basemap={basemap}
+      />,
+    )
+    await waitFor(() => expect(screen.getByRole('link', { name: 'OpenStreetMap' })).toBeDefined())
+  })
+
+  it('basemap modunda pin konumu piksel olarak yazılır', async () => {
+    render(
+      <GlassMap
+        pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]}
+        basemap={basemap}
+      />,
+    )
+    const pin = await screen.findByRole('button', { name: '4.250.000 TL' })
+    const wrap = pin.parentElement as HTMLElement
+    await waitFor(() => expect(wrap.style.left).toBe('26.7px'))
+    expect(wrap.style.top).toBe('38.3px')
+  })
+
+  it('basemap modunda lat/lng olmayan pin render edilmez', async () => {
+    render(
+      <GlassMap
+        pins={[
+          { id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' },
+          { id: 'eksik', price: '1.000.000 TL' },
+        ]}
+        basemap={basemap}
+      />,
+    )
+    await screen.findByRole('button', { name: '4.250.000 TL' })
+    expect(screen.queryByRole('button', { name: '1.000.000 TL' })).toBeNull()
+  })
+
+  it('zoom kontrolleri erişilebilir ad taşır ve haritayı yakınlaştırır', async () => {
+    render(<GlassMap pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]} basemap={basemap} />)
+    const zoomIn = await screen.findByRole('button', { name: 'Yakınlaştır' })
+    fireEvent.click(zoomIn)
+    expect(basemapInstance.zoomIn).toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Uzaklaştır' }))
+    expect(basemapInstance.zoomOut).toHaveBeenCalled()
   })
 })

@@ -3,13 +3,18 @@
 // sokak dokusuyla üretilir (Math.random YASAK — seeded PRNG kullanılır).
 import { useId, useMemo, useRef, useState, type HTMLAttributes, type KeyboardEvent, type ReactNode } from 'react'
 import styles from './GlassMap.module.css'
+import { useBasemap, type BasemapPoint, type GlassMapBasemap } from './useBasemap'
 
 export interface GlassMapPin {
   id: string
-  /** Yatay konum, 0-1 normalize (soldan) */
-  x: number
-  /** Dikey konum, 0-1 normalize (üstten) */
-  y: number
+  /** Yatay konum, 0-1 normalize (soldan) — yalnız `basemap` yokken kullanılır */
+  x?: number
+  /** Dikey konum, 0-1 normalize (üstten) — yalnız `basemap` yokken kullanılır */
+  y?: number
+  /** Enlem — yalnız `basemap` verildiğinde kullanılır */
+  lat?: number
+  /** Boylam — yalnız `basemap` verildiğinde kullanılır */
+  lng?: number
   /** Fiyat etiketi — verilirse kapsül pin */
   price?: string
   /** Cluster sayısı — verilirse rozet pin (price yok sayılır) */
@@ -53,6 +58,11 @@ export interface GlassMapProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onS
   seed?: number | string
   /** Kök bölgenin erişilebilir adı */
   label?: string
+  /**
+   * Gerçek tile zemini. Verilmezse component seed'li SVG sokak dokusunda kalır
+   * (bugünkü davranış). Verildiğinde pin'ler `lat`/`lng` üzerinden konumlanır.
+   */
+  basemap?: GlassMapBasemap
 }
 
 // ── Seed'den deterministik üretim (Math.random YASAK) ──────────────────────
@@ -173,6 +183,7 @@ export function GlassMap({
   variant = 'inline',
   seed = 1,
   label,
+  basemap,
   className,
   ...rest
 }: GlassMapProps) {
@@ -180,6 +191,21 @@ export function GlassMap({
   const [innerSelected, setInnerSelected] = useState<string | undefined>(defaultSelectedId)
   const [innerLayer, setInnerLayer] = useState<'yol' | 'uydu'>(defaultLayer)
   const rootRef = useRef<HTMLDivElement>(null)
+  const tilesRef = useRef<HTMLDivElement>(null)
+
+  // pins referansı her render'da yeni olabilir (yaygın: parent'ta inline dizi literali);
+  // useBasemap'in projeksiyon effect'i `points` referansını bağımlılık olarak kullanıyor,
+  // bu yüzden burada yalnız projeksiyonu etkileyen alanların (id/lat/lng) içerik imzasına
+  // göre referans sabitlenir — gereksiz project() çağrısı önlenir (bkz. görev risk notu).
+  const pointsSignature = pins.map((pin) => `${pin.id}:${pin.lat}:${pin.lng}`).join('|')
+  const basemapPoints = useMemo<BasemapPoint[]>(
+    () => pins.map((pin) => ({ id: pin.id, lat: pin.lat, lng: pin.lng })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pointsSignature],
+  )
+  const { status: basemapStatus, positions, zoomIn, zoomOut } = useBasemap(tilesRef, basemap, basemapPoints)
+  // Zemin yüklenemezse seed'li SVG dokusuna düşülür — harita hiçbir zaman boş kutu olmaz.
+  const usingTiles = Boolean(basemap) && basemapStatus !== 'error'
 
   // `selectedId !== undefined` controlled tespiti: prop `null` (controlled boş
   // seçim) verildiğinde de bu true'dur, böylece parent seçimi temizlediğinde
@@ -253,41 +279,53 @@ export function GlassMap({
       {...rest}
     >
       <div className={styles.canvasClip}>
-        <svg
-          className={styles.canvas}
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          focusable="false"
-        >
-          <rect className={styles.ground} x={0} y={0} width={100} height={100} />
-          {grid.blocks.map((block, i) => (
-            <rect
-              key={`b${i}`}
-              className={blockClass[block.variant]}
-              x={block.x}
-              y={block.y}
-              width={block.w}
-              height={block.h}
-              rx={0.8}
-            />
-          ))}
-          {grid.hLines.map((y, i) => (
-            <line key={`h${i}`} className={styles.road} x1={0} y1={y} x2={100} y2={y} />
-          ))}
-          {grid.vLines.map((x, i) => (
-            <line key={`v${i}`} className={styles.road} x1={x} y1={0} x2={x} y2={100} />
-          ))}
-          {privacyCircle
-            ? (() => {
-                const cx = clampUnit(privacyCircle.x)
-                const cy = clampUnit(privacyCircle.y)
-                const r = clampUnit(privacyCircle.r)
-                if (cx === null || cy === null || r === null) return null
-                return <circle className={styles.privacyCircle} cx={cx * 100} cy={cy * 100} r={r * 100} />
-              })()
-            : null}
-        </svg>
+        {basemap ? (
+          <div
+            ref={tilesRef}
+            className={styles.tiles}
+            data-basemap=""
+            data-tone={basemap.tone ?? 'quiet'}
+            data-status={basemapStatus}
+            aria-hidden="true"
+          />
+        ) : null}
+        {usingTiles ? null : (
+          <svg
+            className={styles.canvas}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect className={styles.ground} x={0} y={0} width={100} height={100} />
+            {grid.blocks.map((block, i) => (
+              <rect
+                key={`b${i}`}
+                className={blockClass[block.variant]}
+                x={block.x}
+                y={block.y}
+                width={block.w}
+                height={block.h}
+                rx={0.8}
+              />
+            ))}
+            {grid.hLines.map((y, i) => (
+              <line key={`h${i}`} className={styles.road} x1={0} y1={y} x2={100} y2={y} />
+            ))}
+            {grid.vLines.map((x, i) => (
+              <line key={`v${i}`} className={styles.road} x1={x} y1={0} x2={x} y2={100} />
+            ))}
+            {privacyCircle
+              ? (() => {
+                  const cx = clampUnit(privacyCircle.x)
+                  const cy = clampUnit(privacyCircle.y)
+                  const r = clampUnit(privacyCircle.r)
+                  if (cx === null || cy === null || r === null) return null
+                  return <circle className={styles.privacyCircle} cx={cx * 100} cy={cy * 100} r={r * 100} />
+                })()
+              : null}
+          </svg>
+        )}
       </div>
 
       <div className={styles.toggle} role="radiogroup" aria-label="Harita katmanı" onKeyDown={onLayerKeyDown}>
@@ -310,21 +348,46 @@ export function GlassMap({
         })}
       </div>
 
+      {basemap ? (
+        <>
+          <div className={styles.zoomCtl}>
+            <button type="button" className={styles.zoomBtn} aria-label="Yakınlaştır" onClick={zoomIn}>
+              <span aria-hidden="true">+</span>
+            </button>
+            <button type="button" className={styles.zoomBtn} aria-label="Uzaklaştır" onClick={zoomOut}>
+              <span aria-hidden="true">−</span>
+            </button>
+          </div>
+          <div className={styles.attribution}>{basemap.attribution}</div>
+          {basemapStatus === 'error' ? (
+            <p className={styles.basemapNotice} role="status">
+              Harita zemini yüklenemedi; şematik görünüm kullanılıyor.
+            </p>
+          ) : null}
+        </>
+      ) : null}
+
       {pins.map((pin, index) => {
-        // finite olmayan/aralık dışı koordinat: harita dışında etkileşimli pin
-        // üretmemek için render EDİLMEZ (bkz. rules.md §7, clampUnit).
-        const clampedX = clampUnit(pin.x)
-        const clampedY = clampUnit(pin.y)
-        if (clampedX === null || clampedY === null) return null
+        // basemap modunda konum projeksiyondan (px) gelir; klasik modda 0-1 normalize
+        // koordinattan (%) gelir. İki modda da geçersiz konumlu pin render EDİLMEZ.
+        const projected = usingTiles ? positions[pin.id] : undefined
+        const clampedX = usingTiles ? null : clampUnit(pin.x ?? Number.NaN)
+        const clampedY = usingTiles ? null : clampUnit(pin.y ?? Number.NaN)
+        if (usingTiles ? !projected : clampedX === null || clampedY === null) return null
         const selected = currentSelected === pin.id
         const isCluster = typeof pin.count === 'number'
         const pinId = `${baseId}-pin-${pin.id}`
+        const wrapStyle = projected
+          ? { left: `${projected.left}px`, top: `${projected.top}px`, zIndex: selected ? 2 : 1 }
+          : { left: `${(clampedX as number) * 100}%`, top: `${(clampedY as number) * 100}%`, zIndex: selected ? 2 : 1 }
+        const normX = projected && tilesRef.current
+          ? projected.left / Math.max(1, tilesRef.current.clientWidth)
+          : (clampedX as number)
+        const normY = projected && tilesRef.current
+          ? projected.top / Math.max(1, tilesRef.current.clientHeight)
+          : (clampedY as number)
         return (
-          <div
-            key={pin.id}
-            className={styles.pinWrap}
-            style={{ left: `${clampedX * 100}%`, top: `${clampedY * 100}%`, zIndex: selected ? 2 : 1 }}
-          >
+          <div key={pin.id} className={styles.pinWrap} style={wrapStyle}>
             <button
               id={pinId}
               type="button"
@@ -341,8 +404,8 @@ export function GlassMap({
             {selected && popupContent ? (
               <div
                 className={styles.popup}
-                data-vertical={popupVertical(clampedY)}
-                data-align={popupAlign(clampedX)}
+                data-vertical={popupVertical(normY)}
+                data-align={popupAlign(normX)}
                 role="group"
                 aria-label={`${pin.price ?? pin.id} detayı`}
               >
@@ -365,3 +428,5 @@ export function GlassMap({
     </div>
   )
 }
+
+export type { GlassMapBasemap } from './useBasemap'
