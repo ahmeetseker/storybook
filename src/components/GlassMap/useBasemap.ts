@@ -24,10 +24,25 @@ export interface GlassMapBasemap {
   center: [number, number]
   /** Başlangıç yakınlaştırma seviyesi */
   zoom: number
+  /**
+   * Kadraja oturtulacak coğrafi sınır `[[güneyEnlem, batıBoylam], [kuzeyEnlem, doğuBoylam]]`.
+   * Verilirse `center`/`zoom` yerine bu kullanılır ve panel boyutu ne olursa olsun
+   * bölge kadraja sığdırılır — sabit zoom, dar panelde bölgenin bir kısmını
+   * dışarıda bırakıp pinlerin elenmesine yol açıyordu. Panel yeniden
+   * boyutlandığında kadraj tazelenir.
+   */
+  bounds?: [[number, number], [number, number]]
   minZoom?: number
   maxZoom?: number
   /** Zemin tonu — CSS filtresiyle uygulanır, tile sağlayıcısından bağımsızdır */
   tone?: 'quiet' | 'raw' | 'satellite'
+  /**
+   * Haritanın sürüklenip sürüklenemeyeceği. Varsayılan `true`. Vitrin
+   * haritalarında (ör. ana sayfa hero'su) `false` verilir: kadraj sabit kalır,
+   * kullanıcı ülkeyi kaybetmez ve pinler görünür alandan çıkmaz. Zoom butonları
+   * merkezi koruduğu için bu ayardan etkilenmez.
+   */
+  pannable?: boolean
 }
 
 /** Projeksiyona girecek en küçük pin bilgisi (GlassMapPin'in alt kümesi). */
@@ -49,6 +64,10 @@ export interface BasemapState {
 
 interface LeafletMapLike {
   setView(center: [number, number], zoom: number): LeafletMapLike
+  fitBounds(
+    bounds: [[number, number], [number, number]],
+    options?: { padding?: [number, number]; animate?: boolean },
+  ): LeafletMapLike
   remove(): void
   invalidateSize(): void
   on(events: string, handler: () => void): void
@@ -104,6 +123,8 @@ export function useBasemap(
     for (const point of pointsRef.current) {
       if (!Number.isFinite(point.lat) || !Number.isFinite(point.lng)) continue
       const pixel = map.latLngToContainerPoint([point.lat as number, point.lng as number])
+      // Projeksiyon sonlu bir nokta üretmediyse pin konumlandırılamaz.
+      if (!Number.isFinite(pixel.x) || !Number.isFinite(pixel.y)) continue
       if (cull && (pixel.x < 0 || pixel.y < 0 || pixel.x > width || pixel.y > height)) continue
       next[point.id] = { left: pixel.x, top: pixel.y }
     }
@@ -118,6 +139,12 @@ export function useBasemap(
   const zoom = basemap?.zoom
   const minZoom = basemap?.minZoom
   const maxZoom = basemap?.maxZoom
+  const pannable = basemap?.pannable ?? true
+  // Sınır dizisi her render'da yeni referans olabilir; effect'i gereksiz yere
+  // yeniden kurmamak için değerlerinden türetilmiş bir anahtara indirgenir.
+  const boundsKey = basemap?.bounds ? basemap.bounds.flat().join(',') : ''
+  const boundsRef = useRef(basemap?.bounds)
+  boundsRef.current = basemap?.bounds
 
   useEffect(() => {
     if (!tileUrl || centerLat === undefined || centerLng === undefined || zoom === undefined) {
@@ -130,6 +157,7 @@ export function useBasemap(
 
     let disposed = false
     let frame = 0
+    let resizeObserver: ResizeObserver | undefined
     setStatus('loading')
 
     const schedule = () => {
@@ -141,6 +169,7 @@ export function useBasemap(
     }
 
     void (async () => {
+      const fitBounds = boundsRef.current
       try {
         const [leaflet] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')])
         if (disposed) return
@@ -161,13 +190,30 @@ export function useBasemap(
           // task-9-report.md). GlassMap'in kendi zoom butonları ve pin roving
           // tabindex'i zaten aynı işlevi tasarım diliyle sağlıyor.
           keyboard: false,
+          // Vitrin haritalarında (hero) kadraj sabit kalmalı: sürükleme açıkken
+          // kullanıcı ülkeyi kaybediyor ve pinler görünür alandan çıkıyor.
+          // Zoom butonları merkezi koruduğu için etkilenmez.
+          dragging: pannable,
+          touchZoom: pannable,
+          doubleClickZoom: pannable,
+          boxZoom: pannable,
           zoomAnimation: !reduced,
           fadeAnimation: !reduced,
           markerZoomAnimation: false,
+          // Kesirli zoom'a izin verilir: varsayılan `zoomSnap: 1` istenen
+          // seviyeyi tam sayıya yuvarlayıp kadrajı beklenenden yakın kılıyordu
+          // (5.6 → 6), bu da bölgenin bir kısmını dışarıda bırakıyordu.
+          zoomSnap: 0,
           minZoom,
           maxZoom,
         })
-        map.setView([centerLat, centerLng], zoom)
+        // Sınır verilmişse kadraj panele göre hesaplanır; sabit zoom dar
+        // panelde bölgeyi kırpıyordu.
+        if (fitBounds) {
+          map.fitBounds(fitBounds, { padding: [6, 6], animate: false })
+        } else {
+          map.setView([centerLat, centerLng], zoom)
+        }
         // İlk kurulumda hangi tile URL'inin gösterileceği kurulum anındaki
         // katmana (layerAtSetupRef) göre seçilir — `satelliteTileUrl` yoksa
         // her zaman `tileUrl` (Yol) kullanılır.
@@ -184,6 +230,18 @@ export function useBasemap(
         mapRef.current = typedMap
         typedMap.on('move zoom viewreset resize', schedule)
         typedMap.invalidateSize()
+        // Panel CSS ile yeniden boyutlanınca (responsive yerleşim, pencere
+        // değişimi) Leaflet bunu kendiliğinden algılamaz: boyut bildirilmezse
+        // kadraj kayar ve pinler yanlış konumlanır.
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => {
+            typedMap.invalidateSize()
+            const current = boundsRef.current
+            if (current) typedMap.fitBounds(current, { padding: [6, 6], animate: false })
+            schedule()
+          })
+          resizeObserver.observe(element)
+        }
         setStatus('ready')
         project()
       } catch {
@@ -194,12 +252,13 @@ export function useBasemap(
     return () => {
       disposed = true
       if (frame) cancelAnimationFrame(frame)
+      resizeObserver?.disconnect()
       mapRef.current?.off()
       mapRef.current?.remove()
       tileLayerRef.current = undefined
       mapRef.current = undefined
     }
-  }, [containerRef, tileUrl, centerLat, centerLng, zoom, minZoom, maxZoom, project])
+  }, [containerRef, tileUrl, centerLat, centerLng, zoom, minZoom, maxZoom, pannable, boundsKey, project])
 
   // Katman (yol/uydu) değişince zemin YENİDEN KURULMAZ — yalnız aktif tile
   // katmanının kaynağı değişir (`L.TileLayer#setUrl`, harita yeniden kurulmadan

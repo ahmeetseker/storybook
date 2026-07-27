@@ -181,6 +181,15 @@ gerekir (bkz. §3, §7).
   tüketicilerin pin'lere mümkünse kaba `x`/`y` de vermesi önerilir — bu,
   zemin servisi (ağ/CSP/adblock) çökse bile ilanların kaba konumla görünür
   kalmasını sağlar.
+- Buna karşılık zemin ÇALIŞIRKEN `x`/`y`'ye düşülmez: konum yalnız
+  projeksiyondan gelir. Görünür alan dışına çıkan pin (harita kaydırıldığında
+  ya da kadraj dışında kalan konum) render EDİLMEZ. Aksi halde elenen pin
+  yüzde koordinatına düşüp zeminden kopar ve haritayla ilgisiz sabit bir
+  noktada belirirdi.
+- Kadraj `basemap.bounds` verilerek bölge sınırından hesaplanabilir; bu,
+  sabit `zoom`'a yeğlenir çünkü sabit zoom dar panelde bölgenin bir kısmını
+  kadraj dışında bırakıp o bölgedeki pinlerin elenmesine yol açar. Panel
+  yeniden boyutlandığında kadraj `ResizeObserver` ile tazelenir.
 
 ## 8. İçerik kuralları
 
@@ -299,9 +308,12 @@ Eksik: Sizes N/A — tek ölçek.
   geri getirebilir; `null` kullan.
 
 **Bilinen kısıtlar:** sentetik modda (`basemap` verilmemişse) zoom/pan yok —
-seed'li SVG statik bir kutudur. `basemap` modunda ise Leaflet'in kendi
-sürükleme (pan) ve çift tıklamayla zoom'u aktiftir; yalnız fare
-tekerleğiyle yakınlaştırma (`scrollWheelZoom`) bilinçli olarak kapatıldı —
+seed'li SVG statik bir kutudur. `basemap` modunda sürükleme `basemap.pannable`
+ile yönetilir (varsayılan `true`): vitrin haritalarında `false` verilir, böylece
+kadraj sabit kalır — açıkken kullanıcı bölgeyi kaybediyor ve pinler görünür
+alandan çıkıp eleniyordu. Zoom butonları merkezi koruduğu için bu ayardan
+etkilenmez. Çift tıklama/dokunmatik zoom da `pannable`'a bağlıdır; fare
+tekerleğiyle yakınlaştırma (`scrollWheelZoom`) her koşulda kapalıdır —
 sayfa kaydırılırken haritanın istemsizce yakınlaşmasını önlemek için
 (`useBasemap.ts`). Leaflet'in kendi klavye tutamacı (`keyboard`) da kapalı:
 açıkken konteyner kendi `tabindex=0`'ını alıp Tab sırasına tasarım sistemi

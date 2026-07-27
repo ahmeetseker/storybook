@@ -315,6 +315,29 @@ describe('GlassMap', () => {
     expect(screen.queryByRole('button', { name: '4.250.000 TL' })).toBeNull()
   })
 
+  // Zemin ÇALIŞIRKEN x/y'ye düşmek, harita kaydırılınca pini zeminden koparıp
+  // sabit bir noktada gösterirdi (kullanıcı bildirimi). Projeksiyondan elenen
+  // pin, x/y'si olsa bile çizilmemeli.
+  it('zemin çalışırken projeksiyondan elenen pin, x/y verilmiş olsa bile render edilmez', async () => {
+    // Konteyner boyutu jsdom'da 0 olduğu için eleme hook içinde atlanır;
+    // burada projeksiyonun o pini hiç üretmediği durumu taklit ediyoruz.
+    basemapInstance.latLngToContainerPoint.mockImplementation((coords: [number, number]) => {
+      if (coords[0] === 99) return { x: Number.NaN, y: Number.NaN }
+      return { x: coords[1], y: coords[0] }
+    })
+    render(
+      <GlassMap
+        pins={[
+          { id: 'gorunen', lat: 38.3, lng: 26.7, x: 0.2, y: 0.3, price: '4.250.000 TL' },
+          { id: 'elenen', lat: 99, lng: 99, x: 0.8, y: 0.8, price: '9.999.999 TL' },
+        ]}
+        basemap={basemap}
+      />,
+    )
+    await screen.findByRole('button', { name: '4.250.000 TL' })
+    expect(screen.queryByRole('button', { name: '9.999.999 TL' })).toBeNull()
+  })
+
   // ── Bulgu 1 (task-9 review): satelliteTileUrl verilmeden gerçek bir şey
   // değiştirmeyen Yol/Uydu toggle'ı kullanıcıyı yanıltmasın diye basemap
   // modunda yalnız `satelliteTileUrl` verildiğinde render edilir. ──

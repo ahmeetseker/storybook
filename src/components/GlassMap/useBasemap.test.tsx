@@ -5,6 +5,7 @@ import { useBasemap, type GlassMapBasemap } from './useBasemap'
 
 const mapInstance = {
   setView: vi.fn(),
+  fitBounds: vi.fn(),
   remove: vi.fn(),
   invalidateSize: vi.fn(),
   on: vi.fn(),
@@ -203,6 +204,51 @@ describe('useBasemap', () => {
     expect(result.current.positions.altta).toBeUndefined()
     expect(result.current.positions.solda).toBeUndefined()
     expect(result.current.positions.ustte).toBeUndefined()
+  })
+
+  it('bounds verilince kadraj setView yerine fitBounds ile kurulur', async () => {
+    const bounds: [[number, number], [number, number]] = [
+      [35.9, 25.7],
+      [42.2, 44.6],
+    ]
+    const { result } = renderHook(() => useHarness({ ...basemap, bounds }, noPoints))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(mapInstance.fitBounds).toHaveBeenCalledWith(bounds, expect.anything())
+    expect(mapInstance.setView).not.toHaveBeenCalled()
+  })
+
+  it('bounds verilmezse center/zoom ile setView kullanılır', async () => {
+    const { result } = renderHook(() => useHarness(basemap, noPoints))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(mapInstance.setView).toHaveBeenCalledWith(basemap.center, basemap.zoom)
+    expect(mapInstance.fitBounds).not.toHaveBeenCalled()
+  })
+
+  it('pannable false verilince Leaflet sürükleme/zoom tutamaçları kapatılır', async () => {
+    const L = (await import('leaflet')).default
+    const { result } = renderHook(() =>
+      useHarness({ ...basemap, pannable: false }, noPoints),
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(L.map).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        dragging: false,
+        touchZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+      }),
+    )
+  })
+
+  it('pannable varsayılanı true — sürükleme açık kalır', async () => {
+    const L = (await import('leaflet')).default
+    const { result } = renderHook(() => useHarness(basemap, noPoints))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(L.map).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ dragging: true }),
+    )
   })
 
   // Boyut okunamadığında (SSR/jsdom, ilk yerleşim öncesi) eleme atlanmalı,

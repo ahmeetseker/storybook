@@ -26,10 +26,17 @@ const HERO_BASEMAP = {
       © OpenStreetMap katkıcıları
     </a>
   ),
-  // Kadraj Türkiye'ye kilitlenir: merkez ülke ağırlık noktasında, zoom panelin
-  // 16:10 oranıyla birlikte komşu ülke payını en aza indirecek şekilde seçildi.
+  // Kadraj Türkiye sınırlarına oturtulur. Sabit zoom panel genişliğine göre
+  // ülkeyi kırpıyordu (dar panelde batı illeri dışarıda kalıp pinler eleniyordu);
+  // bounds ile kadraj panele göre hesaplanır. center/zoom yalnız yedek.
   center: [39.1, 35.3] as [number, number],
-  zoom: 5.6,
+  zoom: 5.4,
+  bounds: [
+    [35.9, 25.7],
+    [42.2, 44.6],
+  ] as [[number, number], [number, number]],
+  // Vitrin haritası: kadraj Türkiye'de sabit kalsın, sürüklenip kaybolmasın.
+  pannable: false,
   maxZoom: 19,
   tone: "quiet" as const,
 };
