@@ -9,6 +9,15 @@ import { prefersReducedMotion } from '../../core/tier'
 export interface GlassMapBasemap {
   /** Tile şablonu, ör. `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png` */
   tileUrl: string
+  /**
+   * Uydu görünümü için ayrı tile şablonu. Verilmezse `basemap` modunda
+   * Yol/Uydu katman toggle'ı hiç RENDER EDİLMEZ — gerçekte hiçbir şeyi
+   * değiştirmeyen, kullanıcıyı yanıltan işlevsiz bir kontrol gösterilmez
+   * (bkz. GlassMap.tsx `showLayerToggle`). Verildiğinde toggle görünür ve
+   * `currentLayer==='uydu'` iken tile katmanı harita yeniden kurulmadan
+   * (`L.TileLayer#setUrl`) bu URL'e geçer.
+   */
+  satelliteTileUrl?: string
   /** Lisans gereği görünür kalması zorunlu atıf — GlassMap kendi yüzeyinde render eder */
   attribution: ReactNode
   /** Başlangıç merkezi `[enlem, boylam]` */
@@ -49,14 +58,31 @@ interface LeafletMapLike {
   latLngToContainerPoint(coords: [number, number]): { x: number; y: number }
 }
 
+interface LeafletTileLayerLike {
+  addTo(map: LeafletMapLike): unknown
+  setUrl(url: string): unknown
+}
+
 export function useBasemap(
   containerRef: RefObject<HTMLDivElement | null>,
   basemap: GlassMapBasemap | undefined,
   points: BasemapPoint[],
+  /** Aktif katman — `basemap.satelliteTileUrl` verildiğinde tile katmanını değiştirir. */
+  layer: 'yol' | 'uydu',
 ): BasemapState {
   const [status, setStatus] = useState<BasemapStatus>(basemap ? 'loading' : 'idle')
   const [positions, setPositions] = useState<Record<string, { left: number; top: number }>>({})
   const mapRef = useRef<LeafletMapLike | undefined>(undefined)
+  const tileLayerRef = useRef<LeafletTileLayerLike | undefined>(undefined)
+  // İlk kurulumda hangi katmanın aktif olduğunu okumak için ref'te tutulur —
+  // `layer` değişince zemin YENİDEN KURULMAZ (maliyetli/titrek olur), yalnız
+  // aşağıdaki ayrı efekt tileLayer'ın `setUrl`'ünü çağırır (bkz. Bulgu 1).
+  const layerAtSetupRef = useRef(layer)
+  layerAtSetupRef.current = layer
+  // Kurulum efektinin bağımlılık listesine girmesin diye ref'te tutulur —
+  // yalnız ilk tile URL seçiminde okunur, değişimi zemini yeniden KURMAZ.
+  const satelliteTileUrlAtSetupRef = useRef(basemap?.satelliteTileUrl)
+  satelliteTileUrlAtSetupRef.current = basemap?.satelliteTileUrl
 
   // Pinler her render'da yeni dizi olabilir; effect'i yeniden kurmamak için ref'te tutulur.
   const pointsRef = useRef(points)
@@ -76,6 +102,7 @@ export function useBasemap(
 
   // Zemin kurulumu — yalnız istemcide, yalnız basemap verildiğinde.
   const tileUrl = basemap?.tileUrl
+  const satelliteTileUrl = basemap?.satelliteTileUrl
   const centerLat = basemap?.center[0]
   const centerLng = basemap?.center[1]
   const zoom = basemap?.zoom
@@ -131,7 +158,16 @@ export function useBasemap(
           maxZoom,
         })
         map.setView([centerLat, centerLng], zoom)
-        L.tileLayer(tileUrl, { maxZoom: maxZoom ?? 19 }).addTo(map)
+        // İlk kurulumda hangi tile URL'inin gösterileceği kurulum anındaki
+        // katmana (layerAtSetupRef) göre seçilir — `satelliteTileUrl` yoksa
+        // her zaman `tileUrl` (Yol) kullanılır.
+        const initialUrl =
+          layerAtSetupRef.current === 'uydu' && satelliteTileUrlAtSetupRef.current
+            ? satelliteTileUrlAtSetupRef.current
+            : tileUrl
+        const tileLayer = L.tileLayer(initialUrl, { maxZoom: maxZoom ?? 19 })
+        tileLayer.addTo(map)
+        tileLayerRef.current = tileLayer as unknown as LeafletTileLayerLike
         // Gerçek Leaflet.Map tipiyle kurulum bitti; yüzeyimizi yalnız burada,
         // ref'e atamadan hemen önce LeafletMapLike'a indirgiyoruz — `as never` gerekmez.
         const typedMap = map as unknown as LeafletMapLike
@@ -150,9 +186,21 @@ export function useBasemap(
       if (frame) cancelAnimationFrame(frame)
       mapRef.current?.off()
       mapRef.current?.remove()
+      tileLayerRef.current = undefined
       mapRef.current = undefined
     }
   }, [containerRef, tileUrl, centerLat, centerLng, zoom, minZoom, maxZoom, project])
+
+  // Katman (yol/uydu) değişince zemin YENİDEN KURULMAZ — yalnız aktif tile
+  // katmanının kaynağı değişir (`L.TileLayer#setUrl`, harita yeniden kurulmadan
+  // aynı yerde kalır). `satelliteTileUrl` yoksa her zaman `tileUrl`'e (Yol)
+  // düşülür — bu efekt yalnız `satelliteTileUrl` verilmiş haritalarda görünür
+  // bir fark yaratır (toggle da yalnız o durumda render edilir, bkz. GlassMap.tsx).
+  useEffect(() => {
+    if (status !== 'ready' || !tileLayerRef.current || !tileUrl) return
+    const nextUrl = layer === 'uydu' && satelliteTileUrl ? satelliteTileUrl : tileUrl
+    tileLayerRef.current.setUrl(nextUrl)
+  }, [layer, satelliteTileUrl, tileUrl, status])
 
   // Pin listesi değiştiğinde zemin yeniden kurulmaz, yalnız yeniden izdüşürülür.
   useEffect(() => {

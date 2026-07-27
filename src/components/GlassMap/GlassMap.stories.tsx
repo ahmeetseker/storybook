@@ -189,3 +189,22 @@ export const GercekZeminPopup: Story = {
     label: 'Popuplı harita',
   },
 }
+
+/**
+ * `satelliteTileUrl` verilince Yol/Uydu toggle'ı görünür ve gerçekten iki
+ * tile katmanı arasında geçiş yapar (bkz. Bulgu 1, task-9-report.md — yukarıdaki
+ * `GercekZemin*` story'lerinde `satelliteTileUrl` YOK, bu yüzden onlarda toggle
+ * hiç render edilmez; bu, gerçekte hiçbir şeyi değiştirmeyen yanıltıcı bir
+ * kontrolün kullanıcıya gösterilmesini engeller).
+ */
+export const GercekZeminUyduToggle: Story = {
+  args: {
+    pins: geoPins,
+    basemap: {
+      ...osmBasemap,
+      satelliteTileUrl:
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    },
+    label: 'Uydu geçişli harita',
+  },
+}

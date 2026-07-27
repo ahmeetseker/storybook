@@ -205,16 +205,29 @@ export function GlassMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [pointsSignature],
   )
-  const { status: basemapStatus, positions, zoomIn, zoomOut } = useBasemap(tilesRef, basemap, basemapPoints)
-  // Zemin yüklenemezse seed'li SVG dokusuna düşülür — harita hiçbir zaman boş kutu olmaz.
-  const usingTiles = Boolean(basemap) && basemapStatus !== 'error'
-
   // `selectedId !== undefined` controlled tespiti: prop `null` (controlled boş
   // seçim) verildiğinde de bu true'dur, böylece parent seçimi temizlediğinde
   // eski iç seçim geri sızmaz (bkz. rules.md §4/§6).
   const isSelectionControlled = selectedId !== undefined
   const currentSelected = isSelectionControlled ? selectedId : innerSelected
   const currentLayer = layer ?? innerLayer
+
+  const { status: basemapStatus, positions, zoomIn, zoomOut } = useBasemap(
+    tilesRef,
+    basemap,
+    basemapPoints,
+    currentLayer,
+  )
+  // Zemin yüklenemezse seed'li SVG dokusuna düşülür — harita hiçbir zaman boş kutu olmaz.
+  const usingTiles = Boolean(basemap) && basemapStatus !== 'error'
+  // Katman toggle'ı YALNIZ gerçekten bir şeyi değiştirdiğinde gösterilir:
+  // `basemap` yokken (sentetik SVG modu) toggle CSS'teki `[data-layer='uydu']`
+  // seçicileriyle zemini gerçekten değiştirir — bugünkü davranış korunur.
+  // `basemap` verildiğinde ise yalnız `satelliteTileUrl` de verilmişse toggle
+  // gerçek bir tile geçişi yapar; verilmemişse toggle hiçbir şeyi değiştirmeyen
+  // yanıltıcı bir kontrol olurdu, bu yüzden hiç render EDİLMEZ (bkz. Bulgu 1,
+  // task-9-report.md).
+  const showLayerToggle = !basemap || Boolean(basemap.satelliteTileUrl)
 
   const grid = useMemo(() => generateStreetGrid(seed), [seed])
 
@@ -330,25 +343,27 @@ export function GlassMap({
         )}
       </div>
 
-      <div className={styles.toggle} role="radiogroup" aria-label="Harita katmanı" onKeyDown={onLayerKeyDown}>
-        {LAYERS.map((opt) => {
-          const active = currentLayer === opt.value
-          return (
-            <button
-              key={opt.value}
-              id={`${baseId}-layer-${opt.value}`}
-              type="button"
-              role="radio"
-              aria-checked={active}
-              tabIndex={active ? 0 : -1}
-              className={[styles.toggleBtn, active ? styles.toggleBtnActive : ''].join(' ')}
-              onClick={() => setLayer(opt.value)}
-            >
-              {opt.label}
-            </button>
-          )
-        })}
-      </div>
+      {showLayerToggle ? (
+        <div className={styles.toggle} role="radiogroup" aria-label="Harita katmanı" onKeyDown={onLayerKeyDown}>
+          {LAYERS.map((opt) => {
+            const active = currentLayer === opt.value
+            return (
+              <button
+                key={opt.value}
+                id={`${baseId}-layer-${opt.value}`}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                tabIndex={active ? 0 : -1}
+                className={[styles.toggleBtn, active ? styles.toggleBtnActive : ''].join(' ')}
+                onClick={() => setLayer(opt.value)}
+              >
+                {opt.label}
+              </button>
+            )
+          })}
+        </div>
+      ) : null}
 
       {basemap ? (
         <>

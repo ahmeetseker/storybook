@@ -20,10 +20,15 @@ const leafletMapMock = vi.fn(() => {
   return basemapInstance
 })
 
+// Son oluşturulan tile layer'ı yakalar — Bulgu 1 regresyon testi (Yol/Uydu
+// gerçekten `setUrl` çağırıp çağırmadığını) bununla doğrular.
+const tileLayerInstance = { addTo: vi.fn(), setUrl: vi.fn() }
+const leafletTileLayerMock = vi.fn(() => tileLayerInstance)
+
 vi.mock('leaflet', () => ({
   default: {
     map: leafletMapMock,
-    tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
+    tileLayer: leafletTileLayerMock,
   },
 }))
 
@@ -308,5 +313,42 @@ describe('GlassMap', () => {
     )
     await waitFor(() => expect(screen.getByRole('status')).toBeDefined())
     expect(screen.queryByRole('button', { name: '4.250.000 TL' })).toBeNull()
+  })
+
+  // ── Bulgu 1 (task-9 review): satelliteTileUrl verilmeden gerçek bir şey
+  // değiştirmeyen Yol/Uydu toggle'ı kullanıcıyı yanıltmasın diye basemap
+  // modunda yalnız `satelliteTileUrl` verildiğinde render edilir. ──
+
+  it('basemap satelliteTileUrl olmadan verilince katman toggle render edilmez (yanıltıcı kontrol gösterilmez)', async () => {
+    render(
+      <GlassMap pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]} basemap={basemap} />,
+    )
+    await screen.findByRole('button', { name: '4.250.000 TL' })
+    expect(screen.queryByRole('radiogroup', { name: 'Harita katmanı' })).toBeNull()
+    expect(screen.queryByRole('radio', { name: 'Uydu' })).toBeNull()
+  })
+
+  it('basemap satelliteTileUrl VERİLİNCE katman toggle görünür ve gerçekten tile katmanını değiştirir', async () => {
+    const basemapWithSatellite = { ...basemap, satelliteTileUrl: 'https://sat.example/{z}/{x}/{y}.png' }
+    render(
+      <GlassMap pins={[{ id: 'urla', lat: 38.3, lng: 26.7, price: '4.250.000 TL' }]} basemap={basemapWithSatellite} />,
+    )
+    await screen.findByRole('button', { name: '4.250.000 TL' })
+    const uydu = screen.getByRole('radio', { name: 'Uydu' })
+    tileLayerInstance.setUrl.mockClear()
+    fireEvent.click(uydu)
+    await waitFor(() =>
+      expect(tileLayerInstance.setUrl).toHaveBeenCalledWith('https://sat.example/{z}/{x}/{y}.png'),
+    )
+    const yol = screen.getByRole('radio', { name: 'Yol' })
+    fireEvent.click(yol)
+    await waitFor(() => expect(tileLayerInstance.setUrl).toHaveBeenCalledWith(basemap.tileUrl))
+  })
+
+  it('basemap yokken (sentetik SVG modu) katman toggle bugünkü gibi görünür ve data-layer değiştirir', () => {
+    const { container } = render(<GlassMap pins={pins} />)
+    expect(screen.getByRole('radio', { name: 'Uydu' })).toBeDefined()
+    fireEvent.click(screen.getByRole('radio', { name: 'Uydu' }))
+    expect(container.querySelector('[data-layer="uydu"]')).not.toBeNull()
   })
 })

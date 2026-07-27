@@ -51,6 +51,15 @@ bağlamı verir.
   ve linklidir, kaldırılamaz/gizlenemez. Zemin yüklenemezse (`status
   ==='error'`) `role="status"` ile bildirim yapılır ve harita seed'li SVG
   zeminine düşer (bkz. §7).
+- Katman (Yol/Uydu) toggle'ı **yalnız gerçekten bir şeyi değiştiriyorsa**
+  render edilir: `basemap` yokken (sentetik SVG modu) her zaman görünür ve
+  `data-layer` ile zemin CSS'ini değiştirir (bugünkü davranış). `basemap`
+  verildiğinde ise yalnız `basemap.satelliteTileUrl` de verilmişse görünür —
+  o zaman toggle Leaflet tile katmanının kaynağını gerçekten değiştirir
+  (`L.TileLayer#setUrl`, harita yeniden kurulmadan). `satelliteTileUrl`
+  verilmemiş bir `basemap` ile toggle hiç render EDİLMEZ; aksi halde buton
+  `role="radio"`, aktif stil ve focus halkasıyla tam işlevsel görünüp sıfır
+  etki üreten yanıltıcı bir kontrol olurdu (bkz. §4, §9, Task 9 review Bulgu 1).
 
 ## 3. Anatomy ve slotlar
 
@@ -80,7 +89,7 @@ bağlamı verir.
 | variant | `'inline'\|'panel'` | `'inline'` | — | inline 16:9, panel dikey dolu (üst bileşen yükseklik verir) |
 | seed | `number \| string` | `1` | — | Sokak dokusu üretim tohumu — deterministik |
 | label | `string` | `'Harita'` | — | Kök `aria-label` |
-| basemap | `GlassMapBasemap` | — | — | Gerçek tile zemini (Leaflet projeksiyon/tile motoru). Verilmezse seed'li SVG zemin (bugünkü v1 davranışı) korunur; verildiğinde pin konumu `lat`/`lng` üzerinden hesaplanır (bkz. §3, §7) |
+| basemap | `GlassMapBasemap` | — | — | Gerçek tile zemini (Leaflet projeksiyon/tile motoru). Verilmezse seed'li SVG zemin (bugünkü v1 davranışı) korunur; verildiğinde pin konumu `lat`/`lng` üzerinden hesaplanır (bkz. §3, §7). `basemap.satelliteTileUrl` verilmezse katman toggle'ı `basemap` modunda hiç render EDİLMEZ (bkz. §2, §7) |
 
 Ref hedefi yok. `onPinSelect`/`onLayerChange` yalnız kullanıcı etkileşiminde
 çalışır (prop değişikliği kendi kendine tetiklemez).
@@ -156,6 +165,13 @@ gerekir (bkz. §3, §7).
   o pin/daire hiç render edilmez (butonun kendisi DOM'a yazılmaz, tıklanabilir
   bir "harita dışı" öğe oluşmaz); finite ama 0-1 aralığı dışındaysa 0-1'e
   kenetlenir (ör. `x=4` → `1`, `y=-2` → `0`).
+- `basemap.satelliteTileUrl` verilmişse katman toggle'ı Leaflet'in aktif tile
+  katmanını **gerçekten** değiştirir: `currentLayer==='uydu'` olduğunda tile
+  kaynağı `satelliteTileUrl`'e, `'yol'` olduğunda `tileUrl`'e döner
+  (`L.TileLayer#setUrl`, zemin yeniden kurulmadan, pan/zoom konumu korunarak).
+  Bu geçiş `basemap.tone` filtresinden (data-tone/CSS) bağımsızdır — ikisi
+  ayrı eksenler: `tone` görsel filtre, katman ise tile KAYNAĞI. `satelliteTileUrl`
+  verilmemişse toggle zaten render edilmediği için bu dal hiç tetiklenmez.
 - Zemin (`basemap`) modunda zarif düşüş: `basemap` verilip gerçek tile zemini
   kurulamazsa (`status==='error'`) harita seed'li SVG dokusuna döner ve pin
   konumu artık lat/lng projeksiyonundan gelmez. Bu anda pin'e `x`/`y` de
@@ -232,7 +248,10 @@ transparent)` kullanıldı (aynı görsel niyet, mevcut token setiyle).
 Var: Default(Inline), Playground, Panel, UyduKatmani, Cluster,
 PrivacyCircle, Controlled, UzunIcerik, Erisilebilirlik (docs),
 GercekZeminSessiz, GercekZeminHam, GercekZeminPopup (gerçek OSM tile zemini —
-sırasıyla varsayılan sessiz ton, filtresiz ham ton, popup ile birlikte).
+sırasıyla varsayılan sessiz ton, filtresiz ham ton, popup ile birlikte),
+GercekZeminUyduToggle (`satelliteTileUrl` verilmiş — Yol/Uydu toggle görünür
+ve gerçekten iki tile katmanı arasında geçiş yapar; `GercekZemin*` story'lerinde
+`satelliteTileUrl` YOK, bu yüzden onlarda toggle hiç render edilmez).
 Eksik: Sizes N/A — tek ölçek.
 
 ## 11. Test kabul kriterleri
@@ -256,6 +275,9 @@ Eksik: Sizes N/A — tek ölçek.
       geçerli pinler etkilenmez
 - [x] finite ama 0-1 dışı pin koordinatı 0-1'e kenetlenir
 - [x] finite olmayan `privacyCircle` koordinatı/yarıçapı render edilmez
+- [x] `basemap` modunda `satelliteTileUrl` verilmezse katman toggle render
+      edilmez; verilince render edilir ve Yol/Uydu tıklaması tile katmanının
+      `setUrl` ile gerçek kaynağını değiştirir (bkz. Task 9 review Bulgu 1)
 - [ ] zemin dokusunun görsel yoğunluğu (visual, Chrome)
 - [ ] popup'ın gerçek DOM ölçümüyle (ör. ResizeObserver) tam kenar-güvenli
       konumlanması — v1 yalnız pin koordinatına göre eşiklenmiş tahmin
@@ -289,7 +311,11 @@ kaydırmaya bağlıyordu — Tab, zoom/katman kontrollerinden sonra pinlere değ
 bu görünmez konteynere ulaşıyordu (Task 9 Chrome/Playwright QA'sında
 bulundu, bkz. task-9-report.md). Zoom yalnız GlassMap'in kendi butonları ve
 çift tıklamayla yapılabilir. Cluster'a tıklama "genişletme" değil, yalnız
-seçim/popup tetikler — gerçek gruplama v2'de.
+seçim/popup tetikler — gerçek gruplama v2'de. `basemap.attribution` tek bir
+sabit içerik olduğundan Yol/Uydu katmanları arasında AYRI atıf metni
+göstermez (ör. Esri World Imagery atfı OSM'den farklıdır) — tüketici birden
+fazla sağlayıcı karıştırıyorsa `attribution` içeriğini her iki sağlayıcıyı da
+kapsayacak şekilde vermelidir (v1 sınırı, ayrı bir düzeltme değil).
 
 **Açık kararlar:** katman etiketlerinin ("Yol"/"Uydu") i18n'i · cluster
 tıklamasının alt-pinleri açması (v2) · `privacyCircle`'ın sürüklenebilir/
@@ -349,3 +375,16 @@ sözleşmesiyle çakışacak şekilde haritayı kaydırmaya bağlıyor ve Tab'ı
 zoom/katman kontrollerinden sonra doğrudan pinlere ulaşmasını engelliyordu.
 Regresyon testi eklendi (`GlassMap.test.tsx`: "Leaflet kurulumunda kendi
 klavye tutamacı kapalıdır").
+2026-07-27 — Task 9 review Bulgu 1 düzeltmesi: `basemap` modunda Yol/Uydu
+toggle'ı önceden HER ZAMAN görünüyor ama `data-layer` yalnız sentetik SVG
+sınıflarını (`.ground`/`.road`/`.block*`) hedeflediği için `basemap` modunda
+(gerçek tile) hiçbir şeyi değiştirmiyordu — kullanıcıya işlevsiz bir kontrol
+gösteriliyordu. `GlassMapBasemap`'e opsiyonel `satelliteTileUrl` eklendi;
+`useBasemap` artık aktif katmanı parametre olarak alıp `satelliteTileUrl`
+verilmişse Leaflet tile katmanını `setUrl` ile gerçekten değiştiriyor (harita
+yeniden kurulmadan). `GlassMap.tsx`'te toggle artık yalnız `!basemap ||
+basemap.satelliteTileUrl` iken render ediliyor — `basemap` verilip
+`satelliteTileUrl` verilmemişse toggle hiç render edilmiyor. Yeni Storybook
+story'si `GercekZeminUyduToggle` eklendi; regresyon testleri eklendi
+(toggle'ın gizlenmesi, gerçek `setUrl` çağrısı, sentetik moddaki eski
+davranışın korunduğu).

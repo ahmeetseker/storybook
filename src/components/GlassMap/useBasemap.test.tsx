@@ -15,13 +15,15 @@ const mapInstance = {
   latLngToContainerPoint: vi.fn((coords: [number, number]) => ({ x: coords[1], y: coords[0] })),
 }
 
+const tileLayerInstance = { addTo: vi.fn(), setUrl: vi.fn() }
+
 vi.mock('leaflet', () => ({
   default: {
     map: vi.fn(() => {
       mapInstance.setView.mockReturnValue(mapInstance)
       return mapInstance
     }),
-    tileLayer: vi.fn(() => ({ addTo: vi.fn() })),
+    tileLayer: vi.fn(() => tileLayerInstance),
   },
 }))
 
@@ -34,9 +36,22 @@ const basemap: GlassMapBasemap = {
   zoom: 6,
 }
 
-function useHarness(map: GlassMapBasemap | undefined, points: { id: string; lat?: number; lng?: number }[]) {
+// Sabit referans: `rerender()` ile birden çok kez render edilen testlerde
+// her seferinde YENİ bir dizi literali (`[]`) geçmek, `useBasemap`'in "pin
+// listesi değişince yeniden izdüşür" efektini (deps: `points`) her render'da
+// yeniden tetikleyip gerçek bir üretim tüketicisinde asla oluşmayan (GlassMap.tsx
+// `pins`'i `pointsSignature`'a göre memoize eder) bir render fırtınasına yol
+// açar. Bulgu 1 testleri gerçek tüketici davranışını (memoize edilmiş points)
+// yansıtsın diye burada da sabit bir referans kullanılır.
+const noPoints: { id: string; lat?: number; lng?: number }[] = []
+
+function useHarness(
+  map: GlassMapBasemap | undefined,
+  points: { id: string; lat?: number; lng?: number }[],
+  layer: 'yol' | 'uydu' = 'yol',
+) {
   const ref = useRef<HTMLDivElement | null>(document.createElement('div'))
-  return useBasemap(ref, map, points)
+  return useBasemap(ref, map, points, layer)
 }
 
 describe('useBasemap', () => {
@@ -100,5 +115,55 @@ describe('useBasemap', () => {
     expect(mapInstance.zoomIn).toHaveBeenCalled()
     result.current.zoomOut()
     expect(mapInstance.zoomOut).toHaveBeenCalled()
+  })
+
+  // ── Bulgu 1 (task-9 review): satelliteTileUrl verilince katman gerçekten
+  // tile kaynağını değiştirir; harita yeniden kurulmaz (bkz. GlassMap.test.tsx
+  // için component seviyesinde eşdeğer testler). ──
+
+  it('satelliteTileUrl verilmişse başlangıç katmanına göre doğru tile URL ile kurulur', async () => {
+    const L = (await import('leaflet')).default
+    const withSat: GlassMapBasemap = {
+      ...basemap,
+      satelliteTileUrl: 'https://sat.example/{z}/{x}/{y}.png',
+    }
+    const { result } = renderHook(() => useHarness(withSat, noPoints, 'uydu'))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(L.tileLayer).toHaveBeenCalledWith('https://sat.example/{z}/{x}/{y}.png', expect.anything())
+  })
+
+  it('layer değişince tile katmanının kaynağı setUrl ile değişir, harita yeniden KURULMAZ', async () => {
+    const L = (await import('leaflet')).default
+    const withSat: GlassMapBasemap = {
+      ...basemap,
+      satelliteTileUrl: 'https://sat.example/{z}/{x}/{y}.png',
+    }
+    const { result, rerender } = renderHook(
+      ({ layer }: { layer: 'yol' | 'uydu' }) => useHarness(withSat, noPoints, layer),
+      { initialProps: { layer: 'yol' as 'yol' | 'uydu' } },
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    expect(L.map).toHaveBeenCalledTimes(1)
+
+    rerender({ layer: 'uydu' })
+    await waitFor(() =>
+      expect(tileLayerInstance.setUrl).toHaveBeenCalledWith('https://sat.example/{z}/{x}/{y}.png'),
+    )
+    expect(L.map).toHaveBeenCalledTimes(1)
+
+    rerender({ layer: 'yol' })
+    await waitFor(() => expect(tileLayerInstance.setUrl).toHaveBeenCalledWith(basemap.tileUrl))
+    expect(L.map).toHaveBeenCalledTimes(1)
+  })
+
+  it('satelliteTileUrl verilmemişse layer değişse bile tile kaynağı hep tileUrl kalır', async () => {
+    const { result, rerender } = renderHook(
+      ({ layer }: { layer: 'yol' | 'uydu' }) => useHarness(basemap, noPoints, layer),
+      { initialProps: { layer: 'yol' as 'yol' | 'uydu' } },
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    tileLayerInstance.setUrl.mockClear()
+    rerender({ layer: 'uydu' })
+    await waitFor(() => expect(tileLayerInstance.setUrl).toHaveBeenCalledWith(basemap.tileUrl))
   })
 })
