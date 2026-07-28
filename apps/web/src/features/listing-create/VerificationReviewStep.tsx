@@ -19,7 +19,10 @@ const roleGuidance: Record<
 > = {
   owner: {
     title: 'Mülk sahibi doğrulaması',
-    description: 'Taşınmaz sahibi ile tapu kaydı eşleştirilir',
+    // EİDS yalnız ilan verme yetkisini kurar: kimliğin malik kaydında görünüp
+    // görünmediği sorgulanır. Tapu niteliği, takyidat veya imar bu kontrolün
+    // kapsamında değildir — kapsam cümlesi adımın altında görünür.
+    description: 'Kimliğinizin malik kaydında görünüp görünmediği sorgulanır',
   },
   relative: {
     title: 'Yakınlık doğrulaması',

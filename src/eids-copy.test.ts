@@ -18,6 +18,22 @@ const FORBIDDEN = [
   /EİDS\s+tapu\s+eşleşmesi/i,
   /tapu\s+kaydıyla\s+eşleşti/i,
   /Her\s+ilan\s+tapu\s+kaydıyla\s+EİDS/i,
+
+  // "Senin tapu kaydın" kurgusu: kontrolü kullanıcının tapusuna bağlayan
+  // 2. tekil/çoğul iyelik çekimleri ("tapu kaydınla", "tapu kaydınızdan").
+  // EİDS tapuyu değil, ilan verme yetkisini kontrol eder. 3. tekil iyelik
+  // ("arsanın tapu kaydında") kasıtla dışarıdadır: o bir EİDS iddiası değil.
+  // Not: `\w` Türkçe harfleri (ı, ş, ğ…) kapsamaz; ek eşlemesi `\S*` ile yapılır.
+  /tapu\s+kaydın(?:la|ız\S*)/i,
+  // "tapu kaydı/kayıtlarıyla eşleştirilir" — hangi çekimde olursa olsun,
+  // ilanın tapuyla eşleştirildiği iddiası.
+  /tapu\s+kay(?:d|ıt)\S*\s+eşleş\S*/i,
+
+  // Alan adı taşımayan rozet iddiası: rozet neyin doğrulandığını söylemeli.
+  /["'“”]Doğrulanmış["'“”]\s*roz/i,
+  /Doğrulanmış\s+roz\S*\s+al\S*/i,
+  /["'“”]EİDS\s+Doğrulandı["'“”]\s*roz/i,
+  /✓\s*EİDS\s+Doğrulandı/i,
 ]
 
 const ROOTS = ['src', 'apps/web/src']

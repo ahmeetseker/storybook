@@ -17,7 +17,7 @@ function draftFor(role: Exclude<PublisherRole, ''>): ListingDraft {
 
 describe('VerificationReviewStep', () => {
   it.each([
-    ['owner', 'Taşınmaz sahibi ile tapu kaydı eşleştirilir'],
+    ['owner', 'Kimliğinizin malik kaydında görünüp görünmediği sorgulanır'],
     ['relative', 'Eş veya birinci / ikinci derece kan hısımlığı kontrol edilir'],
     ['agency', 'Mülk sahibinin e-Devlet üzerinden verdiği süreli ilan yetkisi aranır'],
   ] as const)('shows role-aware guidance for %s', (role, copy) => {

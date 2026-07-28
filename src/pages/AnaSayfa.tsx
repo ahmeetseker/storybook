@@ -156,11 +156,14 @@ export function AnaSayfa() {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 260, flex: 1 }}>
             <h2 id="eids-cta-baslik" style={{ margin: 0, fontSize: 'var(--lg-text-headline, 17px)', fontWeight: 600 }}>
-              İlanını EİDS ile doğrula
+              İlan verme yetkini EİDS ile doğrula
             </h2>
             <p style={{ margin: 0, fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
-              Taşınmaz numaranı gir, tapu kaydınla eşleşen ilanın "Doğrulanmış" rozeti alsın. Doğrulanmış ilanlar
-              aramada öne çıkar ve alıcıya güven verir.
+              Taşınmaz numaranı gir, bu taşınmazı ilan etme yetkin Ticaret Bakanlığı EİDS kaydından
+              kontrol edilsin. İlanında hangi kontrolün yapıldığı kaynağıyla birlikte görünür.
+            </p>
+            <p style={{ margin: 0, fontSize: 'var(--lg-text-caption, 12px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
+              Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
             </p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

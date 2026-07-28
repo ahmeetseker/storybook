@@ -123,9 +123,10 @@ export function IlanVer() {
         {/* Bilgi kartları */}
         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
           <BilgiKarti baslik="EİDS doğrulama nedir?" ikon="✓">
-            Elektronik İlan Doğrulama Sistemi, ilanındaki taşınmaz numarasını tapu kayıtlarıyla eşleştirir.
-            Doğrulama tamamlanmadan ilan yayına alınmaz; doğrulanan ilanlar arama sonuçlarında
-            "EİDS Doğrulandı" rozetiyle öne çıkar.
+            Elektronik İlan Doğrulama Sistemi, Ticaret Bakanlığı kaydından ilan verenin kimliğini ve
+            bu taşınmazı ilan etme yetkisini kontrol eder. Kontrol tamamlanmadan ilan yayına alınmaz;
+            kontrolü geçen ilanlarda arama sonuçlarında "EİDS: ilan yetkisi" rozeti görünür. Bu kontrol
+            tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
           </BilgiKarti>
           <BilgiKarti baslik="Gerekli belgeler" ikon="≡">
             <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>

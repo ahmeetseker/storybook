@@ -82,7 +82,20 @@ export function StatusBadge({ tone, children }: { tone: 'neutral' | 'success' | 
   )
 }
 
-/** EİDS doğrulama göstergesi */
+/**
+ * EİDS kapsam notu — repo genelinde tek cümle. Rozet neyin doğrulandığını
+ * değil, neyin doğrulanmadığını da söylemek zorundadır.
+ */
+export const EIDS_SCOPE_NOTE =
+  'Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.'
+
+/**
+ * EİDS göstergesi.
+ *
+ * Rozet alan-kapsamlıdır: EİDS yalnız **ilan verme yetkisini** kontrol eder.
+ * Bu yüzden görünür metin çıplak bir "Doğrulandı" değil, kontrolün adıdır;
+ * kapsam cümlesi `title` ile taşınır.
+ */
 export function EidsBadge({ dogrulandi }: { dogrulandi: boolean }) {
   return (
     <span
@@ -98,9 +111,13 @@ export function EidsBadge({ dogrulandi }: { dogrulandi: boolean }) {
         fontSize: 12,
         fontWeight: 700,
       }}
-      title={dogrulandi ? 'Taşınmaz numarası EİDS ile doğrulandı' : 'EİDS doğrulaması bekleniyor'}
+      title={
+        dogrulandi
+          ? `İlan verme yetkisi EİDS ile doğrulandı. ${EIDS_SCOPE_NOTE}`
+          : `İlan verme yetkisinin EİDS kontrolü tamamlanmadı. ${EIDS_SCOPE_NOTE}`
+      }
     >
-      {dogrulandi ? '✓ EİDS Doğrulandı' : '… EİDS Bekliyor'}
+      {dogrulandi ? '✓ EİDS: ilan yetkisi' : '… EİDS: yetki bekliyor'}
     </span>
   )
 }
