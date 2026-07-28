@@ -72,7 +72,7 @@ function priceNote(detail: ListingDetail): string {
  * Bölümler DOM'da kalır: indeks bir tab seti değil, çapa gezinmesidir.
  */
 export function ListingDetailWorkspace({ result }: ListingDetailWorkspaceProps) {
-  const { detail, sections } = result
+  const { detail, sections, aiBrief } = result
 
   return (
     <main className={styles.shell}>
@@ -92,7 +92,7 @@ export function ListingDetailWorkspace({ result }: ListingDetailWorkspaceProps) 
 
       <div className={styles.body}>
         <div className={styles.flow}>
-          <ListingEvidenceBrief />
+          <ListingEvidenceBrief brief={aiBrief} detail={detail} />
           <GlassMetricStrip
             items={metricStripItems(detail)}
             label="Temel göstergeler"

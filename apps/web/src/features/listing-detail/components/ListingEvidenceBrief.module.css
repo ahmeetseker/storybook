@@ -1,0 +1,111 @@
+/* İçerik katmanı: cam yok, yalnız yüzey/hairline/metin token'ları. */
+
+.claimList {
+  display: grid;
+  gap: var(--lg-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.claimItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  color: var(--lg-label);
+}
+
+.claimLink {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.claimLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .claimLink:hover {
+    background: color-mix(in srgb, var(--lg-accent) 20%, var(--lg-surface));
+  }
+}
+
+@media (pointer: coarse) {
+  .claimLink {
+    min-block-size: var(--lg-control-md);
+  }
+}
+
+.checklists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: var(--lg-space-4);
+}
+
+.checklistTitle {
+  margin: 0 0 var(--lg-space-2);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  color: var(--lg-label);
+}
+
+.checklist {
+  display: grid;
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding-inline-start: var(--lg-space-4);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+}
+
+.feedbackButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-4);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.feedbackButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .feedbackButton:hover {
+    background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
+  }
+}
+
+@media (pointer: coarse) {
+  .feedbackButton {
+    min-block-size: var(--lg-control-md);
+  }
+}
