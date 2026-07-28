@@ -223,7 +223,13 @@ const TEMPLATES: Template[] = [
   },
 ]
 
-function placeholderImage(
+/**
+ * Kategori zeminli yer tutucu görsel (data URI).
+ *
+ * Fotoğraf yüklenemediğinde gösterilecek gerileme karesi tek yerden gelir:
+ * arama kartı, karşılaştırma ve ilan detayı aynı kareyi kullanır.
+ */
+export function placeholderImage(
   category: Exclude<PropertyCategory, 'all'>,
   label: string,
 ): string {

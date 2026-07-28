@@ -8,6 +8,7 @@ import {
   GlassSelect,
   type GlassCompareField,
 } from '@repo/ui'
+import { REPRESENTATIVE_IMAGE_NOTE } from '../listings/data/listing-photos'
 import {
   createComparisonListings,
   type CompareProperty,
@@ -204,10 +205,8 @@ export function ComparisonWorkbench({
               Kaynakta bulunmayan alanlar Bilgi sağlanmadı olarak
               gösterilir.
             </p>
-            <p>
-              Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan
-              görseli gösterilir.
-            </p>
+            {/* Metin tek kaynaktan gelir; ilan detayı da aynı cümleyi yazar. */}
+            <p>{REPRESENTATIVE_IMAGE_NOTE}</p>
           </article>
         ) : (
           <GlassAiSummaryCard
