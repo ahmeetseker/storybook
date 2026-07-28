@@ -184,6 +184,12 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 - `loadListingDetail` **zamanı kendisi okumaz**: `now` çağıran tarafından
   verilir. Fixture ve adapter içinde `Math.random()` ve argümansız `new Date()`
   yasaktır; testler ve story'ler sabit `NOW` kullanır.
+- `now` **okunur**: adapter defterdeki her `EvidenceValue`'nun `freshness`
+  alanını `freshnessFrom(retrievedAt, now, effectiveAt)` ile yeniden hesaplar.
+  Fixture'daki güncellik bayrakları yalnız varsayılandır; elle yazılan bir
+  bayrak sayfa bir yıl sonra açıldığında da eski sorguya "güncel" derdi.
+  Cevapsız değerde (`isAnswered` false) güncellik `unknown` kalır — sorgunun
+  dün yapılmış olması olmayan veriyi güncel yapmaz.
 - Tarih biçimlendirme `format.ts`'te `Europe/Istanbul`'a sabitlenmiştir —
   sunucu ve tarayıcı aynı tarihi yazar.
 - `withScenario` derin kopya döner: bir tüketicinin mutasyonu modül düzeyindeki

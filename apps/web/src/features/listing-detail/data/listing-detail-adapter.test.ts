@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { freshnessFrom } from '../domain/evidence'
-import { loadListingDetail } from './listing-detail-adapter'
+import type { LandListingDetail } from '../domain/listing-detail-types'
+import { medianPosition, medianPositionPhrase } from '../domain/listing-detail-view-model'
+import { briefFor, loadListingDetail } from './listing-detail-adapter'
 
 const NOW = '2026-07-27T09:00:00.000Z'
+
+async function landDetail(): Promise<LandListingDetail> {
+  const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+  if (!result) throw new Error('fixture bulunamadı')
+  return result.detail
+}
 
 describe('loadListingDetail', () => {
   it('aynı girdiyle iki kez çağrıldığında birebir aynı sonucu üretir', async () => {
@@ -49,6 +57,58 @@ describe('loadListingDetail', () => {
     expect(freshnessFrom(planStatus.retrievedAt, NOW, planStatus.effectiveAt)).toBe('stale')
   })
 
+  // `now` süs değildir: fixture'daki `freshness` yalnız varsayılandır, gerçek
+  // değer tarihlerden türetilir. Aynı fixture, iki farklı `now` → iki farklı
+  // güncellik. Donmuş bayrakla bu test düşer.
+  it('güncellik `now` ile birlikte değişir', async () => {
+    const early = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const late = await loadListingDetail({
+      listingId: 'arsa-214-7',
+      now: '2027-07-27T09:00:00.000Z',
+    })
+
+    expect(early?.detail.planning.planStatus.freshness).toBe('current')
+    expect(late?.detail.planning.planStatus.freshness).toBe('stale')
+
+    // 90 günü aşan ama 180 günü aşmayan beyan: "aging".
+    expect(early?.detail.planning.titleDeedType.freshness).toBe('aging')
+    expect(late?.detail.planning.titleDeedType.freshness).toBe('stale')
+  })
+
+  it('güncellik normalizasyonu dizilerin içindeki kanıt değerlerine de iner', async () => {
+    const early = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const late = await loadListingDetail({
+      listingId: 'arsa-214-7',
+      now: '2027-07-27T09:00:00.000Z',
+    })
+
+    expect(early?.detail.access.utilities.map((item) => item.value.freshness)).toEqual([
+      'current',
+      'aging',
+      'aging',
+    ])
+    expect(late?.detail.access.utilities.map((item) => item.value.freshness)).toEqual([
+      'stale',
+      'stale',
+      'stale',
+    ])
+    expect(late?.detail.terrain.hazards.map((item) => item.value.freshness)).toEqual([
+      'stale',
+      'stale',
+      'unknown',
+    ])
+  })
+
+  // Cevapsız değerde güncellik yoktur: sorgunun dün yapılmış olması olmayan
+  // veriyi güncel yapmaz.
+  it('cevapsız değer hiçbir `now` için güncel sayılmaz', async () => {
+    for (const now of [NOW, '2027-07-27T09:00:00.000Z']) {
+      const result = await loadListingDetail({ listingId: 'arsa-214-7', now })
+      expect(result?.detail.planning.encumbrance.freshness).toBe('unknown')
+      expect(result?.detail.access.legalRoadAccess.freshness).toBe('unknown')
+    }
+  })
+
   it('AI kullanılamadığında yapılandırılmış içerik korunur, yalnız brief düşer', async () => {
     const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'ai-unavailable', now: NOW })
     expect(result?.aiBrief.state).toBe('unavailable')
@@ -70,6 +130,39 @@ describe('loadListingDetail', () => {
     for (const claim of brief.data.claims) {
       expect(claim.sectionId).toMatch(/^(parsel|imar|altyapi|arazi|piyasa|belgeler)$/)
     }
+  })
+
+  // Özet "kaynaklı" diyorsa sayıları defterden gelmelidir. Bu test defteri
+  // değiştirip özetin birlikte değişmesini bekler: donmuş sabitlerle düşer.
+  it('karar özetinin karşılaştırmalı sayıları kanıt defterinden türetilir', async () => {
+    const detail = structuredClone(await landDetail())
+    detail.market.comparableMedianUnitPrice.value = 2400
+    detail.market.comparableCount = 31
+    detail.planning.shared.share = '1/3'
+    detail.parcel.area.value = 4600
+
+    const brief = briefFor(detail)
+    const claimText = (id: string) => brief.claims.find((claim) => claim.id === id)?.text
+
+    // 1804 → 2400 medyanı: %25 altında.
+    expect(medianPositionPhrase(medianPosition(1804, 2400))).toBe('emsal medyanının %25 altında')
+    expect(claimText('price-vs-median')).toContain('emsal medyanının %25 altında')
+    expect(claimText('price-vs-median')).toContain('31 ilanlık kesitte')
+    expect(claimText('shared-deed')).toContain('1/3 pay')
+    // 4.850 beyan − 4.600 kayıt = 250 m² fark.
+    expect(brief.unknowns.join(' ')).toContain('250 m²')
+    expect(brief.summary).toContain('emsal medyanının %25 altında')
+  })
+
+  it('varsayılan defterde özet ile piyasa bölümü aynı sayıyı yazar', async () => {
+    const detail = await landDetail()
+    const median = detail.market.comparableMedianUnitPrice.value
+    if (median === undefined) throw new Error('emsal medyanı bulunamadı')
+
+    const phrase = medianPositionPhrase(medianPosition(detail.price.unitPrice, median))
+    const brief = briefFor(detail)
+    expect(brief.claims.find((claim) => claim.id === 'price-vs-median')?.text).toContain(phrase)
+    expect(brief.summary).toContain(phrase)
   })
 
   it('AI özeti fiyat tahmini uydurmaz — değerleme çekinmesini aktarır', async () => {

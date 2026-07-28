@@ -1,6 +1,7 @@
 import { GlassTable, type GlassTableRow } from '@repo/ui'
 
 import type { ListingDetail } from '../domain/listing-detail-types'
+import { medianPosition, medianPositionPhrase } from '../domain/listing-detail-view-model'
 import { formatNumber, formatPrice, formatUnitPrice } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
@@ -15,13 +16,13 @@ const COLUMNS = [
   { key: 'source', label: 'Kaynak' },
 ]
 
-/** İlanın birim fiyatının emsal medyanına göre konumu — yön kelimeyle yazılır. */
+/**
+ * İlanın birim fiyatının emsal medyanına göre konumu — yön kelimeyle yazılır.
+ * Hesap `domain/listing-detail-view-model`'den gelir; AI karar özeti de aynı
+ * türetimi kullanır, iki yerde iki farklı sayı çıkmaz.
+ */
 function medianComparison(unitPrice: number, median: number): string {
-  const percent = Math.round(((unitPrice - median) / median) * 100)
-  if (percent === 0) return 'Bu ilanın birim fiyatı emsal medyanıyla aynı düzeyde.'
-  return percent < 0
-    ? `Bu ilanın birim fiyatı emsal medyanının %${Math.abs(percent)} altında.`
-    : `Bu ilanın birim fiyatı emsal medyanının %${percent} üstünde.`
+  return `Bu ilanın birim fiyatı ${medianPositionPhrase(medianPosition(unitPrice, median))}.`
 }
 
 /**

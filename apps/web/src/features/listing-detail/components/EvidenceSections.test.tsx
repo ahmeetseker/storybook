@@ -2,6 +2,8 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { loadListingDetail } from '../data/listing-detail-adapter'
+import type { EvidenceValue } from '../domain/evidence'
+import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import { PlanningAndLegalSection } from './PlanningAndLegalSection'
 import { InfrastructureSection } from './InfrastructureSection'
 import { HazardSection } from './HazardSection'
@@ -64,5 +66,33 @@ describe('kanıt bölümleri', () => {
   it('emsal tablosu gerçek table semantiği kullanır', async () => {
     render(<MarketSection detail={await detail()} />)
     expect(screen.getByRole('table', { name: /Emsal/ })).toBeTruthy()
+  })
+
+  // Kaynağın bilinmesi cevabın doğrulandığı anlamına gelmez: bilinen resmî bir
+  // sağlayıcıdan cevap alınamadığında künye "Resmî kayıttan" diyemez.
+  it('bilinen kaynaktan cevap alınamadığında künye "Doğrulanamadı" der', () => {
+    const unreachable: EvidenceValue<string> = {
+      status: 'unavailable',
+      unavailableReason: 'provider_unavailable',
+      freshness: 'unknown',
+      source: {
+        id: 'megsis',
+        name: 'TKGM MEGSİS',
+        sourceClass: 'official',
+        authority: 'Tapu ve Kadastro Genel Müdürlüğü',
+      },
+      retrievedAt: '2026-07-24T09:12:00.000Z',
+      scope: 'parcel',
+    }
+
+    render(
+      <EvidenceList>
+        <EvidenceRow label="Yüzölçümü" value={unreachable} />
+      </EvidenceList>,
+    )
+
+    expect(screen.getByText(/sorgusuna ulaşılamadı/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /Doğrulanamadı/ })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /Resmî kayıttan/ })).toBeNull()
   })
 })

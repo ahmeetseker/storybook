@@ -1,6 +1,10 @@
 import type { GlassMetricStripItem } from '@repo/ui'
 import { hasConflict, isAnswered } from './evidence'
 import type { ListingDetail, VerificationRow } from './listing-detail-types'
+// Biçimlendirme tek modülde yaşar (`../format`): sayı, para, alan ve birim
+// fiyat aynı cümlede iki farklı biçimde yazılamaz. Modül feature kökündedir,
+// görünüm katmanına ait değildir — domain de tüketebilir.
+import { formatArea, formatNumber, formatPrice, formatUnitPrice } from '../format'
 
 export interface CriticalIssue {
   id: string
@@ -10,7 +14,34 @@ export interface CriticalIssue {
   action?: string
 }
 
-const trNumber = new Intl.NumberFormat('tr-TR')
+/** İlan birim fiyatının emsal medyanına göre konumu. */
+export interface MedianPosition {
+  /** Yuvarlanmış yüzde farkı; negatif değer medyanın altını gösterir */
+  percent: number
+  direction: 'below' | 'above' | 'level'
+}
+
+/**
+ * Emsal karşılaştırmasının **tek** türetimi.
+ *
+ * Piyasa bölümü de kaynaklı AI karar özeti de aynı sayıyı yazar; iki ayrı
+ * hesap (veya biri donmuş sabit) olduğunda ilk fixture değişikliğinde özet
+ * kanıtla çelişir.
+ */
+export function medianPosition(unitPrice: number, median: number): MedianPosition {
+  const percent = Math.round(((unitPrice - median) / median) * 100)
+  return {
+    percent,
+    direction: percent === 0 ? 'level' : percent < 0 ? 'below' : 'above',
+  }
+}
+
+/** Konumun cümle içinde kullanılan görünür parçası — yön kelimeyle yazılır. */
+export function medianPositionPhrase(position: MedianPosition): string {
+  if (position.direction === 'level') return 'emsal medyanıyla aynı düzeyde'
+  const side = position.direction === 'below' ? 'altında' : 'üstünde'
+  return `emsal medyanının %${Math.abs(position.percent)} ${side}`
+}
 
 /** Karar öncesi çözülmesi gereken konular — accordion arkasına saklanmaz. */
 export function criticalIssues(detail: ListingDetail): CriticalIssue[] {
@@ -43,12 +74,12 @@ export function criticalIssues(detail: ListingDetail): CriticalIssue[] {
     const declared = detail.price.declaredArea
     const recordedText =
       recorded !== undefined
-        ? `Kayıtta ${trNumber.format(recorded)} m², ilanda`
+        ? `Kayıtta ${formatArea(recorded)}, ilanda`
         : 'Kayıt değeri alınamadı; ilanda'
     issues.push({
       id: 'area-conflict',
       title: 'Yüzölçümü çelişkisi',
-      detail: `${recordedText} ${trNumber.format(declared)} m² beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
+      detail: `${recordedText} ${formatArea(declared)} beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
       action: 'Aplikasyon krokisi iste',
     })
   }
@@ -69,13 +100,13 @@ export function metricStripItems(detail: ListingDetail): GlassMetricStripItem[] 
     {
       id: 'price',
       label: 'Toplam fiyat',
-      value: `${trNumber.format(detail.price.amount)} ₺`,
+      value: formatPrice(detail.price.amount),
       hint: 'İlan sahibi beyanı',
     },
     {
       id: 'unit-price',
       label: 'Birim fiyat',
-      value: `${trNumber.format(detail.price.unitPrice)} ₺/m²`,
+      value: formatUnitPrice(detail.price.unitPrice),
       hint: 'Beyan edilen alana göre türetildi',
     },
   ]
@@ -85,7 +116,7 @@ export function metricStripItems(detail: ListingDetail): GlassMetricStripItem[] 
     items.push({
       id: 'area',
       label: 'Yüzölçümü',
-      value: `${trNumber.format(area.value)} m²`,
+      value: formatArea(area.value),
       hint: hasConflict(area) ? 'MEGSİS kaydı · beyanla çelişiyor' : 'MEGSİS kaydı',
     })
   }
@@ -95,8 +126,8 @@ export function metricStripItems(detail: ListingDetail): GlassMetricStripItem[] 
     items.push({
       id: 'comparable-median',
       label: 'Emsal medyanı',
-      value: `${trNumber.format(median.value)} ₺/m²`,
-      hint: `${detail.market.comparableCount} ilan · yalnız ilan fiyatı`,
+      value: formatUnitPrice(median.value),
+      hint: `${formatNumber(detail.market.comparableCount)} ilan · yalnız ilan fiyatı`,
     })
   }
 
@@ -105,10 +136,10 @@ export function metricStripItems(detail: ListingDetail): GlassMetricStripItem[] 
       ? {
           id: 'valuation',
           label: 'ArsaPazar tahmini',
-          value: `${trNumber.format(detail.market.valuation.low)} – ${trNumber.format(
+          value: `${formatPrice(detail.market.valuation.low)} – ${formatPrice(
             detail.market.valuation.high,
-          )} ₺`,
-          hint: `Model ${detail.market.valuation.methodVersion} · ${detail.market.valuation.sampleSize} emsal`,
+          )}`,
+          hint: `Model ${detail.market.valuation.methodVersion} · ${formatNumber(detail.market.valuation.sampleSize)} emsal`,
         }
       : {
           id: 'valuation',

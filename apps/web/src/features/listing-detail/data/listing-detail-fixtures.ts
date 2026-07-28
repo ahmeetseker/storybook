@@ -3,6 +3,13 @@ import type { LandListingDetail, VerificationRow } from '../domain/listing-detai
 
 const CUTOFF = '2026-07-24T09:12:00.000Z'
 
+/**
+ * Not: buradaki `freshness` değerleri yalnız **varsayılandır**. Tek doğru
+ * kaynak tarihlerdir; `loadListingDetail` her kanıt değerinin güncelliğini
+ * `now`'a göre `freshnessFrom` ile yeniden hesaplar ve bu alanları ezer.
+ * Elle yazılan bir bayrak bir yıl sonra da "güncel" demeye devam ederdi.
+ */
+
 /** EİDS satırında kapsam notu zorunludur — metin repo genelinde tek kaynaktır. */
 export const EIDS_SCOPE_NOTE =
   'Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.'

@@ -113,7 +113,13 @@ export function EvidenceRow<T>({
         <GlassDataProvenance
           fieldLabel={label}
           sourceLabel={value.source.name}
-          sourceClass={value.source.sourceClass as GlassProvenanceSourceClass}
+          // Cevapsız değerde kökenin rozeti gösterilemez: "Bilgi alınamadı"
+          // metninin yanında "Resmî kayıttan" rozeti, alınamayan bilgiyi resmî
+          // kayıtla doğrulanmış gibi gösterirdi. Kaynağın bilinmesi, cevabın
+          // doğrulandığı anlamına gelmez.
+          sourceClass={
+            (answered ? value.source.sourceClass : 'unknown') as GlassProvenanceSourceClass
+          }
           retrievedAt={formatEvidenceDate(value.retrievedAt)}
           effectiveAt={value.effectiveAt ? formatEvidenceDate(value.effectiveAt) : undefined}
           validUntil={value.validUntil ? formatEvidenceDate(value.validUntil) : undefined}

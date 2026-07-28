@@ -1,4 +1,16 @@
+import {
+  freshnessFrom,
+  hasConflict,
+  isAnswered,
+  type EvidenceValue,
+} from '../domain/evidence'
 import type { LandListingDetail, ListingDetail } from '../domain/listing-detail-types'
+import {
+  criticalIssues,
+  medianPosition,
+  medianPositionPhrase,
+} from '../domain/listing-detail-view-model'
+import { formatArea, formatNumber } from '../format'
 import { OREN_LAND_LISTING } from './listing-detail-fixtures'
 
 /** Storybook ve testlerin açıkça seçtiği durum senaryoları. */
@@ -46,22 +58,76 @@ const READY: SectionState<true> = { state: 'ready', data: true }
  */
 const STALE_PLAN_QUERY = '2025-09-15T00:00:00.000Z'
 
-function briefFor(detail: LandListingDetail): AiDecisionBrief {
+/**
+ * Kaynaklı karar özetini kanıt defterinden üretir.
+ *
+ * Karşılaştırmalı sayılar burada **donmuş sabit değildir**: emsal konumu
+ * `medianPosition` ile, kritik konuların varlığı `criticalIssues` ile — yani
+ * sayfadaki bölümlerin kullandığı aynı hesapla — türetilir. Aksi hâlde ilk
+ * fixture değişikliğinde "kaynaklı" özet, altındaki kanıtla çelişirdi.
+ *
+ * Test için dışa açıktır: değiştirilmiş bir defterle çağrılıp sayıların
+ * birlikte değişip değişmediği doğrulanır.
+ */
+export function briefFor(detail: LandListingDetail): AiDecisionBrief {
+  const issues = criticalIssues(detail)
+  const hasIssue = (id: string) => issues.some((issue) => issue.id === id)
+
+  const median = detail.market.comparableMedianUnitPrice.value
+  const comparisonPhrase =
+    median !== undefined
+      ? medianPositionPhrase(medianPosition(detail.price.unitPrice, median))
+      : undefined
+
+  const claims: AiClaim[] = []
+  if (comparisonPhrase) {
+    claims.push({
+      id: 'price-vs-median',
+      text: `${formatNumber(detail.market.comparableCount)} ilanlık kesitte birim fiyat ${comparisonPhrase}.`,
+      sectionId: 'piyasa',
+    })
+  }
+  claims.push({
+    id: 'terrain-fit',
+    text: 'Eğim ve bakı ölçümleri küçük ölçekli tesis için elverişli; ölçüm değerleri Arazi bölümünde.',
+    sectionId: 'arazi',
+  })
+  if (hasIssue('shared-title-deed')) {
+    const share = detail.planning.shared.share
+    claims.push({
+      id: 'shared-deed',
+      text: share
+        ? `Tapu hisseli; ilan ${share} pay için veriliyor.`
+        : 'Tapu hisseli; ilan taşınmazın tamamı için verilmiyor.',
+      sectionId: 'imar',
+    })
+  }
+  if (hasIssue('legal-access-unverified')) {
+    claims.push({
+      id: 'legal-access',
+      text: 'Yasal yol erişimini gösteren kadastral kayıt bulunamadı.',
+      sectionId: 'altyapi',
+    })
+  }
+  claims.push({
+    id: 'plan-pending',
+    text: `Kullanım kararının dayandığı ${detail.planning.planScale ?? 'uygulama'} plan askıda, yürürlükte değil.`,
+    sectionId: 'imar',
+  })
+
+  const unknowns = ['TAKBİS takyidat kaydı platformda yok', 'Planın kesinleşme takvimi belirsiz']
+  const recordedArea = detail.parcel.area.value
+  if (hasConflict(detail.parcel.area) && recordedArea !== undefined) {
+    const gap = Math.abs(detail.price.declaredArea - recordedArea)
+    unknowns.push(`Yüzölçümü çelişkisi çözülmedi (${formatArea(gap)})`)
+  }
+
   return {
-    summary:
-      'Birim fiyat emsal medyanının altında ve arazi küçük ölçekli bir tesis için elverişli; ancak tapu hisseli, yasal yol erişimi doğrulanamadı ve kullanım kararının dayandığı plan henüz yürürlükte değil.',
-    claims: [
-      { id: 'price-vs-median', text: 'Birim fiyat 14 ilan emsalinin medyanının %9 altında.', sectionId: 'piyasa' },
-      { id: 'terrain-fit', text: 'Güney bakı ve %12 ortalama eğim küçük ölçekli tesis için elverişli.', sectionId: 'arazi' },
-      { id: 'shared-deed', text: 'Tapu hisseli; ilan 2/4 pay için veriliyor.', sectionId: 'imar' },
-      { id: 'legal-access', text: 'Yasal yol erişimini gösteren kadastral kayıt bulunamadı.', sectionId: 'altyapi' },
-      { id: 'plan-pending', text: 'Kullanım kararının dayandığı 1/1000 plan askıda, yürürlükte değil.', sectionId: 'imar' },
-    ],
-    unknowns: [
-      'TAKBİS takyidat kaydı platformda yok',
-      'Planın kesinleşme takvimi belirsiz',
-      'Yüzölçümü çelişkisi çözülmedi (138 m²)',
-    ],
+    summary: comparisonPhrase
+      ? `Birim fiyat ${comparisonPhrase} ve arazi küçük ölçekli bir tesis için elverişli; ancak tapu hisseli, yasal yol erişimi doğrulanamadı ve kullanım kararının dayandığı plan henüz yürürlükte değil.`
+      : 'Arazi küçük ölçekli bir tesis için elverişli; ancak tapu hisseli, yasal yol erişimi doğrulanamadı ve kullanım kararının dayandığı plan henüz yürürlükte değil. Emsal kesiti üretilemediği için fiyat karşılaştırması yapılmadı.',
+    claims,
+    unknowns,
     nextChecks: [
       'Güncel takyidat belgesi isteyin',
       'Parsel bazlı imar durum belgesi isteyin',
@@ -71,6 +137,53 @@ function briefFor(detail: LandListingDetail): AiDecisionBrief {
     modelVersion: 'v2.4',
     evidenceCutoff: detail.evidenceCutoff,
   }
+}
+
+/**
+ * Bir düğümün kanıt değeri olup olmadığını yapısından anlar.
+ *
+ * Alan listesi yerine şekil kontrolü kullanılır: defter büyüdükçe yeni bir
+ * `EvidenceValue` alanının normalizasyondan sessizce kaçması mümkün olmasın.
+ */
+function isEvidenceValue(node: object): node is EvidenceValue<unknown> {
+  const candidate = node as Partial<EvidenceValue<unknown>>
+  return (
+    typeof candidate.retrievedAt === 'string' &&
+    typeof candidate.status === 'string' &&
+    typeof candidate.source === 'object' &&
+    candidate.source !== null
+  )
+}
+
+/** Defterdeki her kanıt değerini bir kez ziyaret eder (kanıt değerleri iç içe geçmez). */
+function forEachEvidenceValue(node: unknown, visit: (value: EvidenceValue<unknown>) => void): void {
+  if (Array.isArray(node)) {
+    for (const item of node) forEachEvidenceValue(item, visit)
+    return
+  }
+  if (typeof node !== 'object' || node === null) return
+  if (isEvidenceValue(node)) {
+    visit(node)
+    return
+  }
+  for (const item of Object.values(node)) forEachEvidenceValue(item, visit)
+}
+
+/**
+ * Güncelliği `now`'a göre yeniden hesaplar.
+ *
+ * Fixture'daki `freshness` alanları yalnız varsayılandır; tek doğru kaynak
+ * tarihlerdir. Elle yazılan bir bayrak, sayfa bir yıl sonra açıldığında da
+ * 2026 sorgusuna "güncel" demeye devam ederdi. Cevapsız değerde güncellik
+ * yoktur: `unknown` kalır — sorgunun dün yapılmış olması, olmayan veriyi
+ * güncel yapmaz.
+ */
+function normalizeFreshness(detail: LandListingDetail, now: string): void {
+  forEachEvidenceValue(detail, (value) => {
+    value.freshness = isAnswered(value)
+      ? freshnessFrom(value.retrievedAt, now, value.effectiveAt)
+      : 'unknown'
+  })
 }
 
 function withScenario(base: LandListingDetail, scenario: ListingDetailScenario): LandListingDetail {
@@ -83,11 +196,10 @@ function withScenario(base: LandListingDetail, scenario: ListingDetailScenario):
   if (scenario === 'stale-planning') {
     // Kaynağın bayatladığı hâl: varsayılanda plan durumu kanıt kesitiyle aynı
     // gün sorgulanmış (`current`). Bu senaryoda sorgu ve belge tarihi kesitten
-    // ~10 ay geriye alınır — bayrak elle konmaz, tarih `freshnessFrom`'un 180
-    // günlük eşiğini kendi başına aşar. `landUse` zaten her senaryoda bayattır.
+    // ~10 ay geriye alınır — bayrak elle konmaz, `normalizeFreshness` tarihten
+    // türetir. `landUse` zaten her senaryoda bayattır.
     clone.planning.planStatus.effectiveAt = STALE_PLAN_QUERY
     clone.planning.planStatus.retrievedAt = STALE_PLAN_QUERY
-    clone.planning.planStatus.freshness = 'stale'
     return clone
   }
   if (scenario === 'inactive') {
@@ -101,7 +213,8 @@ function withScenario(base: LandListingDetail, scenario: ListingDetailScenario):
  * İlan detayını normalize edilmiş kanıt defteri olarak yükler.
  *
  * `now` çağıran tarafından verilir; adapter zamanı kendisi okumaz — böylece
- * test ve prerender çıktıları deterministik kalır.
+ * test ve prerender çıktıları deterministik kalır. `now` süs değildir:
+ * defterdeki her kanıt değerinin güncelliği ona göre yeniden hesaplanır.
  */
 export async function loadListingDetail(input: {
   listingId: string
@@ -112,6 +225,7 @@ export async function loadListingDetail(input: {
   if (scenario === 'not-found' || input.listingId !== OREN_LAND_LISTING.id) return null
 
   const detail = withScenario(OREN_LAND_LISTING, scenario)
+  normalizeFreshness(detail, input.now)
 
   return {
     detail,
