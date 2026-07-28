@@ -23,6 +23,7 @@ import { Route as KarsilastirRouteImport } from './routes/karsilastir'
 import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
+import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KonseptlerIndexRouteImport } from './routes/konseptler.index'
 import { Route as KonseptlerAiDanismanRouteImport } from './routes/konseptler.ai-danisman'
 import { Route as KonseptlerAiKesifRouteImport } from './routes/konseptler.ai-kesif'
@@ -100,6 +101,11 @@ const HesabimMesajlarRoute = HesabimMesajlarRouteImport.update({
   path: '/hesabim/mesajlar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IlanListingIdRoute = IlanListingIdRouteImport.update({
+  id: '/ilan/$listingId',
+  path: '/ilan/$listingId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KonseptlerIndexRoute = KonseptlerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/karsilastir': typeof KarsilastirRoute
   '/ofisler': typeof OfislerRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
+  '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/konseptler'
     | '/ofisler'
     | '/hesabim/mesajlar'
+    | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/ofisler'
     | '/hesabim/mesajlar'
+    | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/konseptler'
     | '/ofisler'
     | '/hesabim_/mesajlar'
+    | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -280,6 +292,7 @@ export interface RootRouteChildren {
   KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
+  IlanListingIdRoute: typeof IlanListingIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -382,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HesabimMesajlarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ilan/$listingId': {
+      id: '/ilan/$listingId'
+      path: '/ilan/$listingId'
+      fullPath: '/ilan/$listingId'
+      preLoaderRoute: typeof IlanListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/konseptler/': {
       id: '/konseptler/'
       path: '/'
@@ -464,6 +484,7 @@ const rootRouteChildren: RootRouteChildren = {
   KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
+  IlanListingIdRoute: IlanListingIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

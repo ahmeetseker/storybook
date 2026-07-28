@@ -47,16 +47,13 @@ export default defineConfig({
     tanstackStart({
       // Statik dağıtımda her route için HTML üretilir. Crawler'ın bulduğu
       // ama HTML dosyası gerektirmeyen adresler burada elenir:
-      // `/health` sunucu handler'ı, query varyantları client'ta çözülür,
-      // `/ilan/:id` ise henüz route olarak tanımlı değil.
+      // `/health` sunucu handler'ı ve query varyantları HTML gerektirmez.
       prerender: {
         enabled: staticBuild,
         crawlLinks: true,
         failOnError: false,
         filter: ({ path: pagePath }) =>
-          !pagePath.includes('?') &&
-          !pagePath.endsWith('/health') &&
-          !pagePath.includes('/ilan/'),
+          !pagePath.includes('?') && !pagePath.endsWith('/health'),
       },
       // Prerender edilmemiş adresler için router state'i taşımayan kabuk;
       // GitHub Pages bunu 404 yanıtı olarak servis eder ve routing client'ta sürer.
