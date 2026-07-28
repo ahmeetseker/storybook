@@ -730,14 +730,17 @@ export function criticalIssues(detail: ListingDetail): CriticalIssue[] {
   }
 
   if (hasConflict(detail.parcel.area)) {
+    // Beyan edilen alan tipli tek kaynaktan okunur; `conflicts[0]` sırası
+    // garanti değildir. Kayıt değeri yoksa uydurma sayı basılmaz.
     const recorded = detail.parcel.area.value
-    const declared = detail.parcel.area.conflicts?.[0]?.value
+    const declaredText = `${trNumber.format(detail.price.declaredArea)} m²`
     issues.push({
       id: 'area-conflict',
       title: 'Yüzölçümü çelişkisi',
-      detail: `Kayıtta ${trNumber.format(Number(recorded))} m², ilanda ${trNumber.format(
-        Number(declared),
-      )} m² beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
+      detail:
+        recorded === undefined
+          ? `Kayıt değeri alınamadı; ilanda ${declaredText} beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`
+          : `Kayıtta ${trNumber.format(recorded)} m², ilanda ${declaredText} beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
       action: 'Aplikasyon krokisi iste',
     })
   }
@@ -1270,20 +1273,26 @@ function briefFor(detail: LandListingDetail): AiDecisionBrief {
   }
 }
 
+/**
+ * Senaryoyu derin kopya üzerinde uygular. Modül düzeyindeki fixture hiçbir
+ * çağrıyla paylaşılmaz; tek bir yerinde mutasyon sonraki tüm çağrıları
+ * bozamaz — determinizm garantisi buna dayanır.
+ */
 function withScenario(base: LandListingDetail, scenario: ListingDetailScenario): LandListingDetail {
+  const detail = structuredClone(base)
+
   if (scenario === 'stale-planning') {
-    return {
-      ...base,
-      planning: {
-        ...base.planning,
-        landUse: { ...base.planning.landUse, freshness: 'stale' },
-      },
-    }
+    // Varsayılan fixture'da plan notu zaten bayat (belge tarihi 180 günü aşıyor).
+    // Bu senaryo, varsayılanda güncel olan plan durumu sorgusunu bayatlatır —
+    // aksi hâlde senaryo varsayılanın kopyası olurdu.
+    detail.planning.planStatus.freshness = 'stale'
+    detail.planning.planStatus.effectiveAt = '2025-10-02T00:00:00.000Z'
+    detail.planning.planStatus.retrievedAt = '2025-10-02T00:00:00.000Z'
   }
   if (scenario === 'inactive') {
-    return { ...base, lifecycle: 'expired' }
+    detail.lifecycle = 'expired'
   }
-  return base
+  return detail
 }
 
 /**
@@ -1404,6 +1413,7 @@ import { describe, expect, it } from 'vitest'
 const FORBIDDEN = [
   /tapu\s+kaydıyla\s+EİDS/i,
   /tapu\s+(ve\s+imar\s+)?durumu\s+EİDS/i,
+  /Tapu\s+EİDS\s+ile\s+doğrulan/i,
   /İmar\s+EİDS\s+ile\s+doğrulan/i,
   /Tam\s+doğrulanmış\s+ilan/i,
   /Fiyatı\s+doğrulandı/i,
@@ -1468,8 +1478,8 @@ Satır 151-153'teki paragrafı değiştir:
                       <p style={{ margin: 0 }}>
                         1/1000 uygulama imar planında konut alanında kalmaktadır; 0.30 emsal ile
                         yaklaşık 150 m² taban oturumlu, iki katlı yapı yapılabilir. Bu taşınmaz için
-                        ilan verme yetkisi EİDS ile doğrulanmıştır; tapu niteliği ve imar bilgisi
-                        ayrı belgelerle teyit edilmelidir.
+                        ilan verme yetkisi EİDS ile doğrulanmıştır. Bu kontrol tapu niteliğini,
+                        takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
                       </p>
 ```
 
@@ -1477,6 +1487,9 @@ Satır 151-153'teki paragrafı değiştir:
 
 ```tsx
             Her ilanda, ilan verme yetkisi EİDS ile doğrulanır. Aradığınızı doğal dille yazın, filtreleri yapay zekâ kursun.
+          </p>
+          <p style={{ margin: 0, fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)' }}>
+            Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
 ```
 
 - [ ] **Step 5: Fix `GlassTrustSignalPanel` sinyal isimlendirmesi**
@@ -2377,8 +2390,12 @@ export interface GlassDetailUtilityAction extends GlassDetailAction {
   pressed?: boolean
 }
 
-export interface GlassDetailActionBarProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
-  /** Grubun erişilebilir adı — zorunlu */
+export interface GlassDetailActionBarProps
+  extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'role' | 'aria-label'> {
+  /**
+   * Grubun erişilebilir adı — zorunlu. `role` ve `aria-label` props tipinden
+   * dışlanmıştır: grup adı yalnız buradan gelir, çağıran ezemez.
+   */
   label: string
   /** Sayfadaki tek prominent CTA */
   primary: GlassDetailAction
@@ -3040,7 +3057,7 @@ export function EvidenceRow<T>({ label, value, formatValue, fallbackText }: Evid
 
 Her bölüm `<section id="..." aria-labelledby="...">` + `<h2>` + `<dl>` yapısındadır ve `LISTING_SECTIONS` etiketiyle aynı adı taşır:
 
-- **ParcelSection** (`id="parsel"`): `blockParcel`, `area` (çelişkili), `locationPrecision`, `distanceToSea`. `mapSection.state === 'ready'` iken `GlassMap` `variant="inline"`, `privacyCircle` ile; `unavailable` iken `GlassAlert severity="warning"` + aynı değerlerin tablo görünümü. Harita her durumda tablo eşdeğeriyle birlikte gelir.
+- **ParcelSection** (`id="parsel"`): `blockParcel`, `area` (çelişkili), `locationPrecision`, `distanceToSea`. Konum her durumda metin/tablo eşdeğeriyle gelir; `unavailable` iken üstte `GlassAlert severity="warning"` ile gerekçe. **Not (Task 10 kararı):** `GlassMap` bu fazda eklenmez — `material` ekseni olmadığı için yeni bir cam yüzey açar ve sayfa cam bütçesini ihlal eder. Harita entegrasyonu Faz 2'ye kalır.
 - **PlanningAndLegalSection** (`id="imar"`): `titleDeedType` (hisse bilgisi `dd` içinde metin olarak), `planStatus`, `landUse` (bayat), `encumbrance` (fallbackText: `Bilgi alınamadı — TAKBİS kaydı sunulmadı`, `knownLimitations`: `İpotek, haciz, şerh veya beyan bulunmadığı anlamına gelmez.` fixture'da tanımlı).
 - **InfrastructureSection** (`id="altyapi"`): üstte `GlassAlert severity="warning"` — `Yasal erişim ile fiziksel erişim aynı şey değildir. Yola yakınlık yasal erişim hakkı değildir.`; ardından `legalRoadAccess`, `physicalAccess` ve `utilities` satırları.
 - **HazardSection** (`id="arazi"`): `slope`, `aspect` ve `hazards[]`. Her tehlike satırı `label` + `scopeNote` (görünür `p`) + `EvidenceRow`.
