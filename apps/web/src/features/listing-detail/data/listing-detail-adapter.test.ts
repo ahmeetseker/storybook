@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { freshnessFrom } from '../domain/evidence'
 import { loadListingDetail } from './listing-detail-adapter'
 
 const NOW = '2026-07-27T09:00:00.000Z'
@@ -29,9 +30,23 @@ describe('loadListingDetail', () => {
     expect(row?.state).toBe('negative')
   })
 
-  it('plan notu bayat senaryosunda güncellik stale olarak işaretlenir', async () => {
+  it('bayat plan senaryosu plan durumu kaynağını bayatlatır — varsayılanda güncel', async () => {
+    const base = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    // Varsayılanda plan durumu kanıt kesitiyle aynı gün sorgulanmıştır…
+    expect(base?.detail.planning.planStatus.freshness).toBe('current')
+    // …plan notu ise belge tarihi gereği her senaryoda bayattır.
+    expect(base?.detail.planning.landUse.freshness).toBe('stale')
+
     const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
-    expect(result?.detail.planning.landUse.freshness).toBe('stale')
+    expect(result?.detail.planning.planStatus.freshness).toBe('stale')
+  })
+
+  it('bayat plan senaryosunda güncellik bayrağı tarihle tutarlıdır', async () => {
+    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
+    const planStatus = result?.detail.planning.planStatus
+    if (!planStatus) throw new Error('plan durumu bulunamadı')
+    // Bayrak elle konmuş değil: kendi sorgu/belge tarihi 180 günlük eşiği aşıyor.
+    expect(freshnessFrom(planStatus.retrievedAt, NOW, planStatus.effectiveAt)).toBe('stale')
   })
 
   it('AI kullanılamadığında yapılandırılmış içerik korunur, yalnız brief düşer', async () => {

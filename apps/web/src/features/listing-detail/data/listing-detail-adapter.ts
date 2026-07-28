@@ -39,6 +39,13 @@ export interface ListingDetailResult {
 
 const READY: SectionState<true> = { state: 'ready', data: true }
 
+/**
+ * `stale-planning` senaryosunda plan durumunun sorgu/belge tarihi.
+ * Kanıt kesitinden (2026-07-24) 312 gün önce — `freshnessFrom`'un 180 günlük
+ * `stale` eşiğinin açıkça ötesinde.
+ */
+const STALE_PLAN_QUERY = '2025-09-15T00:00:00.000Z'
+
 function briefFor(detail: LandListingDetail): AiDecisionBrief {
   return {
     summary:
@@ -74,7 +81,13 @@ function withScenario(base: LandListingDetail, scenario: ListingDetailScenario):
   const clone = structuredClone(base)
 
   if (scenario === 'stale-planning') {
-    clone.planning.landUse.freshness = 'stale'
+    // Kaynağın bayatladığı hâl: varsayılanda plan durumu kanıt kesitiyle aynı
+    // gün sorgulanmış (`current`). Bu senaryoda sorgu ve belge tarihi kesitten
+    // ~10 ay geriye alınır — bayrak elle konmaz, tarih `freshnessFrom`'un 180
+    // günlük eşiğini kendi başına aşar. `landUse` zaten her senaryoda bayattır.
+    clone.planning.planStatus.effectiveAt = STALE_PLAN_QUERY
+    clone.planning.planStatus.retrievedAt = STALE_PLAN_QUERY
+    clone.planning.planStatus.freshness = 'stale'
     return clone
   }
   if (scenario === 'inactive') {
