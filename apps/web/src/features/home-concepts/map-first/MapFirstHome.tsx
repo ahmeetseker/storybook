@@ -206,7 +206,7 @@ export function MapFirstHome({
             label="Doğrulama göstergeleri"
             items={[
               { id: "verified", label: "Doğrulanmış", value: active.verifiedCount, hint: active.verifiedLabel },
-              { id: "today", label: "Bugün doğrulanan", value: "12", hint: "EİDS tapu eşleşmesi" },
+              { id: "today", label: "Bugün doğrulanan", value: "12", hint: "EİDS ilan verme yetkisi" },
               { id: "cities", label: "İl", value: "81", hint: "Türkiye geneli" },
             ]}
           />

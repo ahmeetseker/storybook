@@ -75,7 +75,8 @@ const imarTapuDetaylari = [
   { label: 'Pafta', value: 'L17-B-23-C' },
   { label: 'Tapu Tipi', value: 'Müstakil Parsel (Kat mülkiyetsiz)' },
   { label: 'Taşınmaz No', value: '2841937465' },
-  { label: 'EİDS Durumu', value: 'Tapu kaydıyla eşleşti — 12 Temmuz 2026' },
+  { label: 'EİDS Durumu', value: 'İlan verme yetkisi doğrulandı — 12 Temmuz 2026' },
+  { label: 'EİDS Kapsamı', value: 'Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.' },
 ]
 
 const columnStyle: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 16 }
@@ -148,9 +149,9 @@ function ArsaIlanDetayIcerik() {
                       </p>
                       <p style={{ margin: 0 }}>
                         1/1000 uygulama imar planında konut alanında kalmaktadır; 0.30 emsal ile
-                        yaklaşık 150 m² taban oturumlu, iki katlı yapı yapılabilir. Tapu ve imar
-                        durumu EİDS üzerinden doğrulanmıştır; ekspertiz eşliğinde yerinde
-                        gösterim yapılır.
+                        yaklaşık 150 m² taban oturumlu, iki katlı yapı yapılabilir. Bu taşınmaz için
+                        ilan verme yetkisi EİDS ile doğrulanmıştır; tapu niteliği ve imar bilgisi
+                        ayrı belgelerle teyit edilmelidir.
                       </p>
                     </>
                   ),

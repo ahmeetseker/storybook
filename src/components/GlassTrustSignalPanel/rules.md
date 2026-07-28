@@ -9,8 +9,9 @@ lastReviewed: 2026-07-17
 
 ## 1. Amaç
 
-Bir ilanın güven sinyallerini (EİDS/tapu eşleşmesi, AI içerik moderasyonu,
-satıcı geçmişi, kimlik doğrulama vb.) durum ikonu + metniyle listeleyen
+Bir ilanın güven sinyallerini (EİDS ilan verme yetkisi, parsel kaydı
+eşleşmesi, AI içerik moderasyonu, satıcı geçmişi, kimlik doğrulama vb.) durum
+ikonu + metniyle listeleyen
 içerik paneli. Yalnız `verified`/`warning`/`failed`/`info` dört durumu değil,
 sinyallerden biri yapay zekâ tarafından üretildiyse (`aiGenerated`) AI-first
 sözleşmesini (rozet, güven yüzdesi, geri bildirim, yükleme) de uygular.
@@ -154,11 +155,16 @@ bastırır (üstte). Geri bildirim seçimi salt görsel/yerel state — dışar�
 
 ## 8. İçerik kuralları
 
-- `label` kısa sinyal adı olmalı ("EİDS tapu eşleşmesi", "AI içerik
-  moderasyonu") — durumu içermemeli (durum zaten ikon + `STATUS_LABEL`'da).
+- `label` kısa sinyal adı olmalı ("EİDS ilan verme yetkisi", "Parsel kaydı
+  eşleşmesi", "AI içerik moderasyonu") — durumu içermemeli (durum zaten ikon +
+  `STATUS_LABEL`'da).
 - `detail` tek cümlelik somut kayıt/gerekçe ("12 Temmuz 2026, kayıt
   2841937465") — `compact`'te yer olmadığından hiç yazılmamalı ya da
   verilirse component sessizce göz ardı eder.
+- `label` tek bir kaynağın tek bir kontrolünü adlandırır. Farklı kurumların
+  kontrolleri (EİDS ilan yetkisi, parsel kaydı eşleşmesi, imar belgesi
+  kaynağı, platform moderasyonu, AI içerik kontrolü) **ayrı satır** olur;
+  tek bir "doğrulandı" rozetinde birleştirilmez.
 - `confidence` yalnız gerçekten ölçülmüş bir güven değeri varsa verilmeli —
   uydurulmuş/varsayılan bir yüzde asla gösterilmemeli (bu yüzden `undefined`
   varsayılanı yok, yalnız gizlenir).
@@ -258,6 +264,7 @@ olup olmaması (şimdilik kapalı, ClimateRiskPanel kararıyla tutarlı).
 
 ## Changelog
 
+- 2026-07-27: EİDS ile tapu/parsel kontrolü ayrı sinyallere bölündü.
 - 2026-07-24: Tasarım sistemi uyum düzeltmesi — AI rozeti →
   `--lg-text-badge`, `.icon` → `--lg-text-footnote`/700, feedbackButton →
   `--lg-text-body`; aiCorner/placeholder/ikon mikro-geometrisi kök

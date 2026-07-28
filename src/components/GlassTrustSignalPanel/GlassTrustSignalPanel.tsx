@@ -18,7 +18,7 @@ export interface GlassTrustSignal {
    * hiçbir DOM `id` niteliğine YAZILMAZ (DOM id'ler `useId()` tabanlıdır).
    */
   id: string
-  /** Görünen sinyal adı ("EİDS tapu eşleşmesi") */
+  /** Görünen sinyal adı — tek bir kurumun tek bir kontrolünü adlandırır ("EİDS ilan verme yetkisi", "Parsel kaydı eşleşmesi") */
   label: string
   /** Durum — ikon (✓/!/✕/i) + `STATUS_LABEL` metniyle taşınır */
   status: GlassTrustSignalStatus
@@ -149,9 +149,12 @@ function PlaceholderRows({ variant }: { variant: 'panel' | 'compact' }) {
 }
 
 /**
- * Güven sinyalleri paneli — bir ilanın EİDS/tapu eşleşmesi, AI moderasyon
- * sonucu, satıcı geçmişi gibi doğrulama sinyallerini durum ikonu + metniyle
- * listeler. İçerik katmanı: cam/backdrop-filter kullanılmaz.
+ * Güven sinyalleri paneli — bir ilanın EİDS ilan verme yetkisi, parsel kaydı
+ * eşleşmesi, AI moderasyon sonucu, satıcı geçmişi gibi ayrı ayrı doğrulama
+ * sinyallerini durum ikonu + metniyle listeler. Her `label` yalnızca tek bir
+ * kurumun tek bir kontrolünü adlandırır; farklı kurumların kontrolleri tek
+ * bir "doğrulandı" rozetinde birleştirilmez. İçerik katmanı: cam/backdrop-filter
+ * kullanılmaz.
  */
 export function GlassTrustSignalPanel({
   signals,

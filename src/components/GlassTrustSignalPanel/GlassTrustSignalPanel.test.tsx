@@ -3,8 +3,8 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { GlassTrustSignalPanel, type GlassTrustSignal } from './GlassTrustSignalPanel'
 
 const signals: GlassTrustSignal[] = [
-  { id: 'eids', label: 'EİDS tapu eşleşmesi', status: 'verified', detail: '12 Temmuz 2026, kayıt 2841937465' },
-  { id: 'tapu', label: 'Tapu kaydı', status: 'verified', detail: 'Tapu Müdürlüğü sorgusu eşleşti' },
+  { id: 'eids', label: 'EİDS ilan verme yetkisi', status: 'verified', detail: '12 Temmuz 2026, kayıt 2841937465' },
+  { id: 'tapu', label: 'Parsel kaydı eşleşmesi', status: 'verified', detail: 'Tapu Müdürlüğü sorgusu eşleşti' },
   {
     id: 'moderasyon',
     label: 'AI içerik moderasyonu',

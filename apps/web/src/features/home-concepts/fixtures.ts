@@ -190,9 +190,9 @@ export const homeVitrinItems: GlassVitrinItem[] = listingData.map(
 export const trustSignals: GlassTrustSignal[] = [
   {
     id: 'eids',
-    label: 'EİDS tapu eşleşmesi',
+    label: 'EİDS ilan verme yetkisi',
     status: 'verified',
-    detail: 'Taşınmaz ve ilan sahibi bilgileri doğrulandı.',
+    detail: 'İlan sahibinin kimliği ve ilan verme yetkisi doğrulandı.',
   },
   {
     id: 'tapu',

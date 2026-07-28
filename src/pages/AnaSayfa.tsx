@@ -42,7 +42,7 @@ export function AnaSayfa() {
             Türkiye'nin doğrulanmış arsa ilan platformu
           </h1>
           <p style={{ margin: 0, fontSize: 'var(--lg-text-body, 15px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
-            Her ilan tapu kaydıyla EİDS üzerinden doğrulanır. Aradığınızı doğal dille yazın, filtreleri yapay zekâ kursun.
+            Her ilanda, ilan verme yetkisi EİDS ile doğrulanır. Aradığınızı doğal dille yazın, filtreleri yapay zekâ kursun.
           </p>
           <form
             role="search"

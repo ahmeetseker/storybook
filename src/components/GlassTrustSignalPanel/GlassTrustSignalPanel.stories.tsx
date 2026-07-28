@@ -5,13 +5,13 @@ import { GlassTrustSignalPanel, type GlassTrustSignal } from './GlassTrustSignal
 const ilanSinyalleri: GlassTrustSignal[] = [
   {
     id: 'eids',
-    label: 'EİDS tapu eşleşmesi',
+    label: 'EİDS ilan verme yetkisi',
     status: 'verified',
     detail: '12 Temmuz 2026, kayıt 2841937465',
   },
   {
     id: 'tapu',
-    label: 'Tapu kaydı',
+    label: 'Parsel kaydı eşleşmesi',
     status: 'verified',
     detail: 'Tapu Müdürlüğü sorgusu ilan sahibiyle birebir eşleşti',
   },
@@ -32,7 +32,7 @@ const ilanSinyalleri: GlassTrustSignal[] = [
 ]
 
 const sorunluIlanSinyalleri: GlassTrustSignal[] = [
-  { id: 'eids', label: 'EİDS tapu eşleşmesi', status: 'verified', detail: '9 Temmuz 2026, kayıt 2841911002' },
+  { id: 'eids', label: 'EİDS ilan verme yetkisi', status: 'verified', detail: '9 Temmuz 2026, kayıt 2841911002' },
   {
     id: 'kimlik',
     label: 'Satıcı kimlik doğrulama',
@@ -109,7 +109,7 @@ export const DurumEsleri: Story = {
   args: {
     title: 'Tüm Durumlar',
     signals: [
-      { id: 's1', label: 'EİDS tapu eşleşmesi', status: 'verified', detail: '12 Temmuz 2026, kayıt 2841937465' },
+      { id: 's1', label: 'EİDS ilan verme yetkisi', status: 'verified', detail: '12 Temmuz 2026, kayıt 2841937465' },
       { id: 's2', label: 'Fiyat tutarlılığı', status: 'warning', detail: 'Bölge ortalamasının %20 altında' },
       { id: 's3', label: 'Kimlik doğrulama', status: 'failed', detail: 'Belge okunamadı, yeniden yükleme gerekiyor' },
       { id: 's4', label: 'Satıcı geçmişi', status: 'info', detail: '3 yıldır ArsaPazar üyesi' },
@@ -159,10 +159,17 @@ export const UzunIcerik: Story = {
     signals: [
       {
         id: 'eids',
-        label: 'EİDS tapu eşleşmesi ve mülkiyet zinciri doğrulaması',
+        label: 'EİDS ilan verme yetkisi doğrulaması',
         status: 'verified',
         detail:
-          'Elektronik İlan Doğrulama Sistemi kaydı, tapu müdürlüğü mülkiyet bilgileriyle 12 Temmuz 2026 tarihinde birebir eşleşti — kayıt numarası 2841937465, önceki mülkiyet zincirinde uyuşmazlık tespit edilmedi.',
+          'Elektronik İlan Doğrulama Sistemi üzerinden ilan sahibinin kimliği ve bu taşınmazı ilan etme yetkisi 12 Temmuz 2026 tarihinde doğrulandı — kayıt numarası 2841937465. Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.',
+      },
+      {
+        id: 'parcel',
+        label: 'Parsel kaydı ve mülkiyet zinciri eşleşmesi',
+        status: 'verified',
+        detail:
+          'Tapu Müdürlüğü mülkiyet bilgileriyle 12 Temmuz 2026 tarihinde birebir eşleşti, önceki mülkiyet zincirinde uyuşmazlık tespit edilmedi.',
       },
       {
         id: 'moderasyon',
