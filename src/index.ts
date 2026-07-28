@@ -19,6 +19,13 @@ export { GlassBreadcrumb, type GlassBreadcrumbProps, type GlassBreadcrumbItem } 
 export { GlassGallery, type GlassGalleryProps, type GlassGalleryImage } from './components/GlassGallery'
 export { GlassPriceHeader, type GlassPriceHeaderProps } from './components/GlassPriceHeader'
 export { GlassSpecTable, type GlassSpecTableProps, type GlassSpecItem } from './components/GlassSpecTable'
+export {
+  GlassDataProvenance,
+  type GlassDataProvenanceProps,
+  type GlassProvenanceSourceClass,
+  type GlassProvenanceFreshness,
+  type GlassProvenanceConflict,
+} from './components/GlassDataProvenance'
 export { GlassTabs, type GlassTabsProps, type GlassTabItem } from './components/GlassTabs'
 export { GlassSellerCard, type GlassSellerCardProps } from './components/GlassSellerCard'
 export { GlassLocationCard, type GlassLocationCardProps } from './components/GlassLocationCard'

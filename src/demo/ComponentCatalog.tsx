@@ -657,6 +657,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassspectable--default',
   },
   {
+    name: 'Data Provenance',
+    description: 'Bir değerin kaynağı, sorgu tarihi, kapsamı, yöntemi ve çelişkisi — açılır kanıt künyesi.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-veri-gosterimi-glassdataprovenance--default',
+  },
+  {
     name: 'Seller Card',
     description: 'Satıcı kartı — baş harfli avatar, doğrulanmış rozeti, maskeli "Telefonu Göster" ve mesaj aksiyonu.',
     category: 'İçerik',
