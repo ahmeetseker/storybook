@@ -5,6 +5,7 @@ import {
   loadListingDetail,
   type ListingDetailScenario,
 } from '@/features/listing-detail/data/listing-detail-adapter'
+import { revealListingPhone } from '@/features/listing-detail/data/listing-phone'
 
 const SCENARIOS: ListingDetailScenario[] = [
   'default',
@@ -59,7 +60,14 @@ export const Route = createFileRoute('/ilan/$listingId')({
 
 function ListingDetailRoutePage() {
   const result = Route.useLoaderData()
-  return <ListingDetailWorkspace result={result} />
+  const { listingId } = Route.useParams()
+  // Numara loader'da getirilmez: sunucudan gelen HTML numarayı içermemelidir.
+  return (
+    <ListingDetailWorkspace
+      result={result}
+      onRevealPhone={() => revealListingPhone(listingId)}
+    />
+  )
 }
 
 function ListingNotFound() {

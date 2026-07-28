@@ -1,4 +1,6 @@
 export { ListingDetailWorkspace } from './ListingDetailWorkspace'
 export type { ListingDetailWorkspaceProps } from './ListingDetailWorkspace'
+export { SellerSection } from './components/SellerSection'
+export type { SellerSectionProps, SellerPhoneAnalyticsEvent } from './components/SellerSection'
 export { ListingSectionIndex } from './components/ListingSectionIndex'
 export { LISTING_SECTIONS } from './components/listing-sections'

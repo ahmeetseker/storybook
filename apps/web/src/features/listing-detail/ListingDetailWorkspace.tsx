@@ -16,7 +16,7 @@ import { ListingSectionIndex } from './components/ListingSectionIndex'
 import { MarketSection } from './components/MarketSection'
 import { ParcelSection } from './components/ParcelSection'
 import { PlanningAndLegalSection } from './components/PlanningAndLegalSection'
-import { SellerSection } from './components/SellerSection'
+import { SellerSection, type SellerPhoneAnalyticsEvent } from './components/SellerSection'
 import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
 import type { ListingDetail } from './domain/listing-detail-types'
@@ -26,6 +26,14 @@ import styles from './ListingDetailWorkspace.module.css'
 
 export interface ListingDetailWorkspaceProps {
   result: ListingDetailResult
+  /**
+   * Satıcı numarasını istek anında getirir. Sayfa kabuğunda bağlanır;
+   * verilmezse satıcı bölümü numara açma kontrolünü hiç render etmez —
+   * çalışmayan bir buton gösterilmez.
+   */
+  onRevealPhone?: () => Promise<string>
+  /** Numara açma olayları (yalnız olay adı; numara asla gönderilmez) */
+  onAnalyticsEvent?: (event: SellerPhoneAnalyticsEvent) => void
 }
 
 function breadcrumbItems(detail: ListingDetail): GlassBreadcrumbItem[] {
@@ -71,7 +79,11 @@ function priceNote(detail: ListingDetail): string {
  *
  * Bölümler DOM'da kalır: indeks bir tab seti değil, çapa gezinmesidir.
  */
-export function ListingDetailWorkspace({ result }: ListingDetailWorkspaceProps) {
+export function ListingDetailWorkspace({
+  result,
+  onRevealPhone,
+  onAnalyticsEvent,
+}: ListingDetailWorkspaceProps) {
   const { detail, sections, aiBrief } = result
 
   return (
@@ -108,7 +120,11 @@ export function ListingDetailWorkspace({ result }: ListingDetailWorkspaceProps) 
         <ListingDecisionRail detail={detail} />
       </div>
 
-      <SellerSection />
+      <SellerSection
+        detail={detail}
+        onRevealPhone={onRevealPhone}
+        onAnalyticsEvent={onAnalyticsEvent}
+      />
     </main>
   )
 }

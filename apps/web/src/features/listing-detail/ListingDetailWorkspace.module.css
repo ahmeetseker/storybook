@@ -115,6 +115,74 @@
   font-size: var(--lg-text-footnote);
 }
 
+/* ── Satıcı bölümü ───────────────────────────────────────────── */
+
+.sellerCard {
+  margin-block-start: var(--lg-space-4);
+}
+
+.sellerLicence {
+  margin-block-start: var(--lg-space-4);
+}
+
+.reveal {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+  margin-block-start: var(--lg-space-4);
+}
+
+.revealButton {
+  min-block-size: var(--lg-control-md);
+}
+
+.revealedPhone {
+  margin: 0;
+}
+
+.phoneLink {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-md);
+  border-radius: var(--lg-radius-chip);
+  padding-inline: var(--lg-space-2);
+  color: inherit;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.phoneLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .phoneLink:hover {
+    background: var(--lg-hairline);
+  }
+}
+
+.sellerAsk {
+  display: grid;
+  gap: var(--lg-space-2);
+  margin-block-start: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-bg);
+  padding: var(--lg-space-4);
+}
+
+.askList {
+  display: grid;
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding-inline-start: var(--lg-space-5);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
 /* ── Kanıt bölümleri (içerik katmanı — düz yüzey) ────────────── */
 
 .section,
