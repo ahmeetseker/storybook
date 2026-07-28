@@ -79,6 +79,20 @@
   color: var(--lg-label-secondary);
 }
 
+.feedback {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+}
+
+/* Bağlanmamış eylemin görünür gerekçesi — kontrolün hemen altında durur. */
+.feedbackNote {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+}
+
 .feedbackButton {
   display: inline-flex;
   align-items: center;
@@ -95,13 +109,21 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.feedbackButton:disabled {
+  /* Mikro-geometri — token karşılığı yok (devre dışı kontrol opaklığı,
+     GlassDetailActionBar ile aynı değer). */
+  --feedback-disabled-opacity: 0.45;
+  opacity: var(--feedback-disabled-opacity);
+  cursor: default;
+}
+
 .feedbackButton:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
 }
 
 @media (hover: hover) {
-  .feedbackButton:hover {
+  .feedbackButton:hover:not(:disabled) {
     background: color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface));
   }
 }

@@ -14,7 +14,17 @@ export interface ListingEvidenceBriefProps {
    * alınır; bu bölümün içeriği tamamen `brief`'ten gelir.
    */
   detail: ListingDetail
+  /**
+   * Geri bildirim akışı sayfa kabuğunda bağlanır. Verilmezse kontrol
+   * `disabled` render edilir ve gerekçesi altında görünür metin olarak durur
+   * (bkz. `rules.md` §4).
+   */
+  onReportIssue?: () => void
 }
+
+/** Bağlanmamış geri bildirim yeteneğinin görünür gerekçesi. */
+const FEEDBACK_NOT_CONNECTED =
+  'Geri bildirim akışı bu sürümde bağlı değil; sonraki fazda açılacak.'
 
 /**
  * Yapay zekâ karar özeti bölümü.
@@ -30,7 +40,7 @@ export interface ListingEvidenceBriefProps {
  * yapılandırılmış kanıt bölümleri (Parsel, İmar ve Hukuk, …) bundan etkilenmez,
  * çünkü zaten kendi verilerini bağımsız olarak taşırlar.
  */
-export function ListingEvidenceBrief({ brief }: ListingEvidenceBriefProps) {
+export function ListingEvidenceBrief({ brief, onReportIssue }: ListingEvidenceBriefProps) {
   if (brief.state === 'unavailable') {
     return (
       <GlassAlert severity="info" title="Karar özeti kullanılamıyor">
@@ -81,9 +91,19 @@ export function ListingEvidenceBrief({ brief }: ListingEvidenceBriefProps) {
         </div>
       </div>
 
-      <button type="button" className={styles.feedbackButton}>
-        Yanlış bilgi bildir
-      </button>
+      <div className={styles.feedback}>
+        <button
+          type="button"
+          className={styles.feedbackButton}
+          onClick={() => onReportIssue?.()}
+          disabled={!onReportIssue}
+        >
+          Yanlış bilgi bildir
+        </button>
+        {onReportIssue ? null : (
+          <p className={styles.feedbackNote}>{FEEDBACK_NOT_CONNECTED}</p>
+        )}
+      </div>
     </section>
   )
 }

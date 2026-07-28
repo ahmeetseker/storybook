@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 import { loadListingDetail } from '../data/listing-detail-adapter'
 import { ListingEvidenceBrief } from './ListingEvidenceBrief'
 
@@ -46,8 +47,30 @@ describe('ListingEvidenceBrief', () => {
     expect(screen.queryByRole('link')).toBeNull()
   })
 
-  it('geri bildirim kategorilerini sunar', async () => {
+  // rules.md §4: geri bildirim akışı bağlı değilken kontrol etkin durmaz.
+  it('geri bildirim akışı bağlı değilken kontrolü devre dışı bırakır ve nedenini yazar', async () => {
     await setup()
-    expect(screen.getByRole('button', { name: 'Yanlış bilgi bildir' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Yanlış bilgi bildir' })).toHaveProperty(
+      'disabled',
+      true,
+    )
+    expect(screen.getByText(/Geri bildirim akışı bu sürümde bağlı değil/i)).toBeTruthy()
+  })
+
+  it('geri bildirim akışı bağlandığında kontrol etkinleşir', async () => {
+    const user = userEvent.setup()
+    const onReportIssue = vi.fn()
+    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    if (!result) throw new Error('fixture bulunamadı')
+    render(
+      <ListingEvidenceBrief
+        brief={result.aiBrief}
+        detail={result.detail}
+        onReportIssue={onReportIssue}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Yanlış bilgi bildir' }))
+    expect(onReportIssue).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText(/bağlı değil/i)).toBeNull()
   })
 })

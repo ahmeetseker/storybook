@@ -7,15 +7,32 @@ import styles from '../ListingDetailWorkspace.module.css'
 
 export interface ListingDecisionRailProps {
   detail: ListingDetail
-  /** Mesaj akışı sayfa kabuğunda bağlanır; verilmezse eylem yalnız görünür kalır. */
+  /**
+   * Mesaj akışı sayfa kabuğunda bağlanır. Verilmezse birincil eylem
+   * `disabled` render edilir ve gerekçesi rayda görünür metin olarak durur —
+   * etkin ama hiçbir şey yapmayan buton bırakılmaz.
+   */
   onContact?: () => void
   /**
    * Kullanıcıyı satıcı bölümündeki numara kontrolüne götürür. Ray numarayı
    * kendisi açmaz — açılış sayfada tek bir yerde olur. Verilmezse ikincil
-   * eylem hiç render edilmez (işlevsiz buton gösterilmez).
+   * eylem `disabled` render edilir ve gerekçesi görünür kalır.
    */
   onGoToSeller?: () => void
 }
+
+/**
+ * Bağlanmamış yeteneklerin görünür gerekçeleri.
+ *
+ * Kural (bkz. `rules.md` §4): işleyicisi olmayan eylem etkin render edilmez;
+ * `disabled` durur ve nedeni aynı yüzeyde kelimeyle yazılır. Sessizce
+ * kaybolmaz — kullanıcı yeteneğin var olduğunu ama henüz bağlanmadığını
+ * görür.
+ */
+const CONTACT_NOT_CONNECTED =
+  'Mesaj gönderme bu sürümde bağlı değil; mesajlaşma sonraki fazda açılacak.'
+const SELLER_NAV_NOT_AVAILABLE =
+  'Satıcı bilgilerine gitme kapalı: bu görünümde açılabilecek bir numara kontrolü yok.'
 
 function sellerTypeLabel(type: ListingDetail['seller']['type']): string {
   return type === 'agency' ? 'Emlak ofisi' : 'Bireysel ilan sahibi'
@@ -31,13 +48,23 @@ function sellerTypeLabel(type: ListingDetail['seller']['type']): string {
  *
  * Ray numarayı açmaz: ikincil eylem kullanıcıyı satıcı bölümündeki tek
  * numara kontrolüne taşır. Böylece açılış mantığı tek yerde kalır ve rayda
- * hiçbir zaman işlevsiz bir buton bulunmaz.
+ * hiçbir zaman işlevsiz bir buton bulunmaz: işleyicisi olmayan eylem
+ * `disabled` durur, gerekçesi notta yazılıdır.
  */
 export function ListingDecisionRail({ detail, onContact, onGoToSeller }: ListingDecisionRailProps) {
   const [saved, setSaved] = useState(false)
   const closedReason = contactClosedReason(detail.lifecycle)
   const contactClosed = closedReason !== undefined
   const { seller } = detail
+
+  // Gerekçeler sırayla birikir: önce bağlanmamış yetenekler, sonra bağlam.
+  // İletişim kapalıyken neden zaten rayın üstündeki uyarıda yazılıdır.
+  const notes: string[] = []
+  if (!onContact) notes.push(CONTACT_NOT_CONNECTED)
+  if (!onGoToSeller && !contactClosed) notes.push(SELLER_NAV_NOT_AVAILABLE)
+  if (!contactClosed && seller.respondsInHours !== undefined) {
+    notes.push(`Ortalama yanıt süresi ${seller.respondsInHours} saat.`)
+  }
 
   return (
     <div className={styles.rail}>
@@ -54,18 +81,14 @@ export function ListingDecisionRail({ detail, onContact, onGoToSeller }: Listing
           id: 'contact',
           label: 'Mesaj gönder',
           onSelect: () => onContact?.(),
-          disabled: contactClosed,
+          disabled: contactClosed || !onContact,
         }}
-        secondary={
-          onGoToSeller
-            ? {
-                id: 'seller',
-                label: 'Satıcı bilgilerine git',
-                onSelect: onGoToSeller,
-                disabled: contactClosed,
-              }
-            : undefined
-        }
+        secondary={{
+          id: 'seller',
+          label: 'Satıcı bilgilerine git',
+          onSelect: () => onGoToSeller?.(),
+          disabled: contactClosed || !onGoToSeller,
+        }}
         utilities={[
           {
             id: 'save',
@@ -74,13 +97,7 @@ export function ListingDecisionRail({ detail, onContact, onGoToSeller }: Listing
             onSelect: () => setSaved((value) => !value),
           },
         ]}
-        note={
-          contactClosed
-            ? undefined
-            : seller.respondsInHours
-              ? `Ortalama yanıt süresi ${seller.respondsInHours} saat.`
-              : undefined
-        }
+        note={notes.length > 0 ? notes.join(' ') : undefined}
       />
 
       <div className={styles.sellerSummary}>

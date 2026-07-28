@@ -78,16 +78,23 @@ describe('ilan detayı erişilebilirlik geçidi', () => {
     expect(screen.getByRole('button', { name: 'Numarayı göster' })).toBeTruthy()
   })
 
-  // Numara sağlayıcısı bağlı değil → satıcı bölümünde kontrol yok → ray da
-  // eylemi göstermez. Render edilip işlevsiz kalan buton yok.
-  it('numara sağlayıcısı yokken rayın ikincil eylemi hiç render edilmez', async () => {
+  // Numara sağlayıcısı bağlı değil → satıcı bölümünde kontrol yok → rayın
+  // ikincil eylemi devre dışı kalır ve nedeni yazılır (rules.md §4).
+  it('numara sağlayıcısı yokken rayın ikincil eylemi devre dışı ve gerekçeli kalır', async () => {
     await renderPage()
-    expect(screen.queryByRole('button', { name: 'Satıcı bilgilerine git' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Satıcı bilgilerine git' })).toHaveProperty(
+      'disabled',
+      true,
+    )
+    expect(screen.getByText(/açılabilecek bir numara kontrolü yok/i)).toBeTruthy()
   })
 
-  it('iletişim kapalıyken rayın ikincil eylemi hiç render edilmez', async () => {
+  it('iletişim kapalıyken rayın ikincil eylemi devre dışı kalır', async () => {
     await renderPage(async () => '0 (252) 000 00 00', 'inactive')
-    expect(screen.queryByRole('button', { name: 'Satıcı bilgilerine git' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Satıcı bilgilerine git' })).toHaveProperty(
+      'disabled',
+      true,
+    )
     expect(screen.queryByRole('button', { name: 'Numarayı göster' })).toBeNull()
   })
 

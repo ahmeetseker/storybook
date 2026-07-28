@@ -1,14 +1,18 @@
 import { render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
-import { ListingDetailWorkspace } from './ListingDetailWorkspace'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
+import { ListingDetailWorkspace, type ListingDetailWorkspaceProps } from './ListingDetailWorkspace'
 import { loadListingDetail } from './data/listing-detail-adapter'
 
 const NOW = '2026-07-27T09:00:00.000Z'
 
-async function renderWorkspace(scenario?: Parameters<typeof loadListingDetail>[0]['scenario']) {
+async function renderWorkspace(
+  scenario?: Parameters<typeof loadListingDetail>[0]['scenario'],
+  handlers: Omit<ListingDetailWorkspaceProps, 'result'> = {},
+) {
   const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario, now: NOW })
   if (!result) throw new Error('fixture bulunamadı')
-  return render(<ListingDetailWorkspace result={result} />)
+  return render(<ListingDetailWorkspace result={result} {...handlers} />)
 }
 
 describe('ListingDetailWorkspace', () => {
@@ -59,6 +63,44 @@ describe('ListingDetailWorkspace', () => {
     await renderWorkspace()
     const rail = screen.getByRole('group', { name: 'Karar ve iletişim' })
     expect(within(rail).getByRole('button', { name: 'Mesaj gönder' })).toBeTruthy()
+  })
+
+  // rules.md §4: işleyicisi olmayan eylem etkin render edilmez. Test hem
+  // devre dışılığı hem gerekçenin görünürlüğünü arar — sessizce kaybolan
+  // veya sessizce ölü kalan kontrol ikisinde de kalmaz.
+  it('bağlanmamış eylem etkin render edilmez; gerekçesi görünür', async () => {
+    await renderWorkspace()
+
+    const actions = ['Mesaj gönder', 'Satıcı bilgilerine git', 'Yanlış bilgi bildir']
+    for (const name of actions) {
+      expect(screen.getByRole('button', { name })).toHaveProperty('disabled', true)
+    }
+
+    expect(screen.getByText(/Mesaj gönderme bu sürümde bağlı değil/i)).toBeTruthy()
+    expect(screen.getByText(/açılabilecek bir numara kontrolü yok/i)).toBeTruthy()
+    expect(screen.getByText(/Geri bildirim akışı bu sürümde bağlı değil/i)).toBeTruthy()
+  })
+
+  it('işleyici bağlandığında aynı eylemler etkinleşir ve çağrılır', async () => {
+    const user = userEvent.setup()
+    const onContact = vi.fn()
+    const onReportIssue = vi.fn()
+    await renderWorkspace(undefined, {
+      onContact,
+      onReportIssue,
+      onRevealPhone: async () => '0 (252) 000 00 00',
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Mesaj gönder' }))
+    await user.click(screen.getByRole('button', { name: 'Yanlış bilgi bildir' }))
+
+    expect(onContact).toHaveBeenCalledTimes(1)
+    expect(onReportIssue).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: 'Satıcı bilgilerine git' })).toHaveProperty(
+      'disabled',
+      false,
+    )
+    expect(screen.queryByText(/bu sürümde bağlı değil/i)).toBeNull()
   })
 
   it('süresi dolmuş ilanda iletişim eylemleri kapanır ve gerekçe görünür', async () => {

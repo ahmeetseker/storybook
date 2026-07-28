@@ -71,6 +71,24 @@ yapılabildiği yerde tekrar görünür. Faz 2'de mesaj bestecisi geldiğinde bu
 liste tek tek "taslağa ekle" eylemlerine bağlanabilir; o zamana kadar metin
 kalır.
 
+**Bağlanmamış eylem etkin render edilmez — tek kural.** Sayfadaki her eylem
+kontrolü (karar rayının birincil `Mesaj gönder` ve ikincil
+`Satıcı bilgilerine git` eylemleri, karar özetindeki `Yanlış bilgi bildir`)
+işleyicisini prop olarak alır. İşleyici verilmezse kontrol **`disabled`
+render edilir ve gerekçesi aynı yüzeyde görünür metin olarak durur**
+("… bu sürümde bağlı değil"). Etkin görünüp hiçbir şey yapmayan kontrol
+bırakılmaz; yetenek sessizce yok da sayılmaz — kullanıcı yeteneğin var
+olduğunu ama henüz bağlanmadığını okur. Kural
+`ListingDetailWorkspace.test.tsx` içindeki
+"bağlanmamış eylem etkin render edilmez" testiyle korunur: sayfa işleyicisiz
+render edildiğinde üç kontrolün de `disabled` olduğu ve gerekçelerinin
+göründüğü, işleyici verildiğinde etkinleştiği doğrulanır.
+
+Tek istisna satıcı bölümündeki numara kontrolüdür (§7): orada kontrolün
+yerini gerekçe metni alır, çünkü "Numarayı göster" yazan devre dışı bir buton
+bağlı olmayan bir servis hakkında verilmiş bir söz olurdu. Gerekçe yine
+görünürdür — kural aynı, taşıyıcı farklıdır.
+
 ## 5. Sayfa düzeyinde tab yok
 
 Bölüm indeksi bir tab seti değil, **çapa gezinmesidir**: bütün bölümler DOM'da
@@ -112,8 +130,9 @@ değildir ve bu görünür biçimde yazılır.
   o an canlı olan öğededir — açılıştan önce butonda, sonra `tel:` bağlantısında.
   Kaydırma `prefers-reduced-motion` altında anidir (`behavior: 'auto'`).
 - Satıcı bölümünde kontrol yoksa (`hasSellerRevealControl` false: sağlayıcı
-  bağlı değil veya iletişim kapalı) **rayın ikincil eylemi hiç render
-  edilmez.** Ray asla render edilip işlevsiz kalan bir buton göstermez.
+  bağlı değil veya iletişim kapalı) **rayın ikincil eylemi `disabled` render
+  edilir** ve gerekçesi rayın notunda yazılıdır (§4). Ray asla etkin ama
+  işlevsiz bir buton göstermez.
 - **Analitiğe numara gönderilmez.** `onAnalyticsEvent` yalnız olay adı alır
   (`seller_phone_reveal_requested` · `_succeeded` · `_failed`); tip bir string
   union'dır, numara taşıyan bir yük geçemez. **Not:** bu sözleşme tanımlıdır

@@ -33,6 +33,16 @@ export interface ListingDetailWorkspaceProps {
    * çalışmayan bir buton gösterilmez.
    */
   onRevealPhone?: () => Promise<string>
+  /**
+   * Mesaj akışını bağlar. Verilmezse karar rayının birincil eylemi `disabled`
+   * render edilir ve gerekçesi rayda görünür kalır (`rules.md` §4).
+   */
+  onContact?: () => void
+  /**
+   * "Yanlış bilgi bildir" akışını bağlar. Verilmezse kontrol `disabled`
+   * render edilir ve gerekçesi altında yazılır (`rules.md` §4).
+   */
+  onReportIssue?: () => void
   /** Numara açma olayları (yalnız olay adı; numara asla gönderilmez) */
   onAnalyticsEvent?: (event: SellerPhoneAnalyticsEvent) => void
 }
@@ -100,6 +110,8 @@ function goToSellerRevealControl(): void {
 export function ListingDetailWorkspace({
   result,
   onRevealPhone,
+  onContact,
+  onReportIssue,
   onAnalyticsEvent,
 }: ListingDetailWorkspaceProps) {
   const { detail, sections, aiBrief } = result
@@ -122,7 +134,7 @@ export function ListingDetailWorkspace({
 
       <div className={styles.body}>
         <div className={styles.flow}>
-          <ListingEvidenceBrief brief={aiBrief} detail={detail} />
+          <ListingEvidenceBrief brief={aiBrief} detail={detail} onReportIssue={onReportIssue} />
           <GlassMetricStrip
             items={metricStripItems(detail)}
             label="Temel göstergeler"
@@ -137,6 +149,7 @@ export function ListingDetailWorkspace({
         </div>
         <ListingDecisionRail
           detail={detail}
+          onContact={onContact}
           onGoToSeller={
             hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
           }
