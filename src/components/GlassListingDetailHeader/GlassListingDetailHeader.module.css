@@ -1,0 +1,121 @@
+.root {
+  container-type: inline-size;
+  display: block;
+  box-sizing: border-box;
+  padding: var(--lg-space-5, 20px);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--lg-space-5, 20px);
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-display, 28px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.status {
+  margin: 0;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+}
+
+.status[data-tone='success'] { color: var(--lg-success); }
+.status[data-tone='warning'] { color: var(--lg-warning); }
+.status[data-tone='danger'] { color: var(--lg-danger); }
+.status[data-tone='neutral'] { color: var(--lg-label-secondary); }
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-1, 4px) var(--lg-space-4, 16px);
+  margin: var(--lg-space-1, 4px) 0 0;
+}
+
+.metaItem {
+  display: flex;
+  gap: var(--lg-space-1, 4px);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.metaItem dt {
+  margin: 0;
+  color: var(--lg-label-secondary);
+}
+
+.metaItem dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--lg-space-1, 4px);
+  text-align: right;
+  flex: none;
+}
+
+.price {
+  margin: 0;
+  font-size: var(--lg-text-display, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.priceUnit {
+  margin: 0;
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.priceNote {
+  margin: 0;
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px);
+  margin-top: var(--lg-space-3, 12px);
+}
+
+.utilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px);
+  margin-top: var(--lg-space-3, 12px);
+}
+
+@container (max-width: 640px) {
+  .head {
+    grid-template-columns: 1fr;
+  }
+
+  .priceBlock {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

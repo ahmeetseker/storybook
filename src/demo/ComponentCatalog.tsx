@@ -650,6 +650,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glasspriceheader--default',
   },
   {
+    name: 'Listing Detail Header',
+    description: 'İlan detayının başlık bloğu — tek h1, yapılandırılmış meta ve para semantiği.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-pazar-yeri-glasslistingdetailheader--default',
+  },
+  {
     name: 'Spec Table',
     description: 'Etiket/değer özellik tablosu — tek ya da çift sütun, ayraç çizgili.',
     category: 'İçerik',

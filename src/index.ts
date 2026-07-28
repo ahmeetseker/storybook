@@ -251,3 +251,8 @@ export {
   type GlassIslandHeaderStatusVisibility,
   type GlassIslandHeaderInitialTime,
 } from './components/GlassIslandHeader'
+export {
+  GlassListingDetailHeader,
+  type GlassListingDetailHeaderProps,
+  type GlassListingMetaItem,
+} from './components/GlassListingDetailHeader'
