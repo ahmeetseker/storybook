@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { GlassDetailActionBar } from './GlassDetailActionBar'
+import { GlassDetailActionBar, type GlassDetailActionBarProps } from './GlassDetailActionBar'
 
 const PRIMARY = { id: 'message', label: 'Mesaj gönder', onSelect: () => {} }
 
@@ -66,5 +66,18 @@ describe('GlassDetailActionBar', () => {
   it('bar düzeninde safe-area sınıfını uygular', () => {
     const { container } = render(<GlassDetailActionBar label="Karar" primary={PRIMARY} layout="bar" />)
     expect(container.firstElementChild?.getAttribute('data-layout')).toBe('bar')
+  })
+
+  it('erişilebilir ad her zaman label\'dan gelir — dışarıdan aria-label geçirilemez (tip düzeyinde yasak, runtime\'da yok sayılır)', () => {
+    // `aria-label` GlassDetailActionBarProps'ta artık tip düzeyinde yok — bu,
+    // tip kontrolünü atlayan (ör. saf JS) bir çağrının bile grubun adını
+    // ezemediğini kanıtlamak için bilinçli bir `as` cast'i.
+    const props = {
+      label: 'Karar ve iletişim',
+      primary: PRIMARY,
+      'aria-label': 'Başka',
+    } as GlassDetailActionBarProps
+    render(<GlassDetailActionBar {...props} />)
+    expect(screen.getByRole('group', { name: 'Karar ve iletişim' })).toBeTruthy()
   })
 })

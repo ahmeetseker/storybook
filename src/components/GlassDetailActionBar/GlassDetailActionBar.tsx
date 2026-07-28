@@ -17,8 +17,13 @@ export interface GlassDetailUtilityAction extends GlassDetailAction {
   pressed?: boolean
 }
 
-export interface GlassDetailActionBarProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
-  /** Grubun erişilebilir adı — zorunlu, `role="group"` ile birlikte duyurulur */
+export interface GlassDetailActionBarProps
+  extends Omit<HTMLAttributes<HTMLElement>, 'children' | 'role' | 'aria-label'> {
+  /**
+   * Grubun erişilebilir adı — zorunlu. `role="group"` ile birlikte duyurulur;
+   * `role`/`aria-label` tip düzeyinde dışarıdan geçirilemez, grubun adı
+   * her zaman `label`'dan gelir.
+   */
   label: string
   /** Sayfadaki tek prominent CTA */
   primary: GlassDetailAction
@@ -55,14 +60,14 @@ export function GlassDetailActionBar({
   return (
     <GlassSurface
       as="section"
-      role="group"
-      aria-label={label}
       material={material}
       shape={20}
       thickness={0.5}
       data-layout={layout}
       className={[styles.root, className].filter(Boolean).join(' ')}
       {...rest}
+      role="group"
+      aria-label={label}
     >
       <button
         type="button"

@@ -59,7 +59,16 @@ component açar; içindeki kontroller kendi yüzeylerini üretmez.
 | note | prop | `string` | — | — | Eylemlerin altında bağlam notu |
 | layout | prop | `'rail' \| 'bar'` | `'rail'` | — | `rail`: dikey ray · `bar`: mobil alt çubuk (safe-area) |
 | material | prop | `'glass' \| 'flat'` | `'glass'` | — | Navigasyon/kontrol katmanı için varsayılan cam |
-| ...rest | — | `HTMLAttributes<HTMLElement>` | — | — | `className` birleştirilir; `children` kabul edilmez (kapalı slot modeli) |
+| ...rest | — | `Omit<HTMLAttributes<HTMLElement>, 'children' \| 'role' \| 'aria-label'>` | — | — | `className` birleştirilir; `children` kabul edilmez (kapalı slot modeli) |
+
+`role` ve `aria-label` dışarıdan **geçirilemez** — `Omit` ile tip düzeyinde
+props yüzeyinden çıkarılmıştır; bir TS çağrısı bu iki attribute'u geçirmeye
+çalışırsa derleme zamanında hata alır. Buna ek olarak JSX'te `{...rest}`
+render sırasında sabit `role="group"` + `aria-label={label}`'dan **önce**
+spread edilir, bu ikisi ondan **sonra** yazılır — tip kontrolünü atlayan bir
+`as`/JS çağrısı `rest` içine bir `aria-label`/`role` sızdırsa bile, sonradan
+yazılan sabit değerler onu ezer. Grubun accessible name'i her zaman `label`
+prop'undandır.
 
 `GlassDetailAction`: `{ id: string; label: string; onSelect: () => void;
 disabled?: boolean }` — `id` yalnız React `key` için, DOM'a yansımaz.
