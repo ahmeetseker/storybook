@@ -1,13 +1,13 @@
 import { GlassTable, type GlassTableRow } from '@repo/ui'
 
-import type { ListingDetail } from '../domain/listing-detail-types'
+import type { LandListingDetail } from '../domain/listing-detail-types'
 import { medianPosition, medianPositionPhrase } from '../domain/listing-detail-view-model'
 import { formatNumber, formatPrice, formatUnitPrice } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface MarketSectionProps {
-  detail: ListingDetail
+  detail: LandListingDetail
 }
 
 const COLUMNS = [

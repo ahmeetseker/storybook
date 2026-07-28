@@ -24,6 +24,77 @@ Bölüm sırası tek kaynaktan gelir: `components/listing-sections.ts`
 birebir aynıdır ve her `href="#id"` hedefi DOM'da bulunur
 (`ListingDetailAccessibility.test.tsx` bunu tarar).
 
+## 1a. İki paket, tek birleşim
+
+`ListingDetail` bir birleşimdir ve `kind` ile ayrışır:
+
+- **`land`** (`LandListingDetail`) — elle yazılmış kanıt defteri. Bugün yalnız
+  referans ilan `arsa-214-7` bu paketi taşır. Parsel, imar, altyapı, arazi ve
+  piyasa bölümleri yalnız burada açılır.
+- **`generic`** (`GenericListingDetail`) — arama kaydından **yansıtılmış**
+  ilan (`data/listing-detail-projection.ts`). Arama özeti (`ListingSummary`)
+  bir kanıt defteri değildir: tapu, imar, parsel, tehlike ve emsal bilgisi
+  taşımaz. Yansıtma yalnız gerçekten var olanı taşır.
+
+**Uydurma yasağı burada mutlak.** Referans defterin hiçbir değeri başka bir
+ilana kopyalanmaz; olmayan kanıt "isteğe bağlı alan" olarak da taşınmaz —
+`undefined` bir parsel ile sorgulanmamış bir parsel görünüm katmanında aynı
+şeye benzerdi. Bu yüzden arsa paketleri `LandListingDetail`'e opsiyonel alan
+olarak eklenmez; `kind` üzerinden daraltılır (`criticalIssues`,
+`metricStripItems`, `sectionsFor`, workspace kompozisyonu).
+
+Yansıtma eşlemesi (kaynak → alan):
+
+| Özet alanı | Detayda | Köken |
+|---|---|---|
+| `price` · `area` | `price.amount` · `price.declaredArea` | ilan sahibi beyanı |
+| türetim | `price.unitPrice` | ikisinden hesaplanır (ArsaPazar) |
+| `attributes` · `highlights` | `declaredAttributes` · `highlights` | `advertiser_declared` |
+| `verified` | **yalnız** EİDS satırı | olumlu/bilinmez |
+| `owner` · `sellerName` | `seller` | yetki belgesi değeri **yoktur** |
+| `publishedDays` + `now` | `publishedAt` | güncelleme kaydı yoktur |
+| `image` · `imageCount` | `media` (tek kalem, sayı beyan olarak) | — |
+| cevabı olmayanlar | `openQuestions` | `not_published` / `out_of_scope` |
+
+Kurallar:
+
+- **`verified` genişletilmez.** Bayrak yalnız EİDS satırına dönüşür. `true` →
+  repo genelinde tek izinli olumlu cümle + `EIDS_SCOPE_NOTE`. `false` →
+  `state: 'unknown'` ve görünür gerekçe: *sorgunun bulunmaması yetkinin
+  olmadığı anlamına gelmez*. Bayraktan tapu, içerik veya fiyat iddiası
+  türetilmez.
+- **Yetki belgesi uydurulmaz.** `owner === 'agency'` ilanlarda TTBS numarası
+  kayıtta yoktur; hem doğrulama satırı hem satıcı bölümü "kayıt bulunamadı"
+  okur, `seller.licence` hiç doldurulmaz.
+- **Değerleme çekinir.** Emsal kesiti ve gerçekleşmiş işlem verisi yoktur;
+  `valuation` her zaman `{ kind: 'insufficient' }`.
+- **Karar özeti üretilmez.** `aiBrief` gerekçesiyle `unavailable` döner.
+  Gerekçe: yansıtılmış ilanda özetlenecek kanıt defteri yoktur; sayfadaki
+  bütün içerik ilan sahibinin beyanıdır. Bu beyanları "ArsaPazar asistanı"
+  imzasıyla özetlemek doğrulanmamış bilgiye platformun sesini ödünç vermek
+  olurdu. `briefFor` bu ilanlarla **çağrılamaz**: parametre tipi
+  `LandListingDetail`'dir, yani kural tip düzeyinde korunur.
+- **Bölüm indeksi yalnız render edilen bölümleri bağlar** (`sectionsFor`).
+  Yansıtılmış ilanda üç bölüm vardır: `ozet` · `beyan` · `belgeler`.
+  Boş bir "Parsel" bölümü açıp içine gerekçe yazmak **yapılmaz**: sorulmamış
+  bir sorunun cevapsız kaldığını iddia etmek olurdu. Sayfanın her ilan için
+  gerçekten sorduğu alanlar (mahalle, tapu/takyidat, imar durumu, emsal
+  kesiti) ise Beyan Edilen Özellikler bölümünde `openQuestions` olarak,
+  nedeni ve kaynağıyla durur.
+- **Bilinmeyen temel alanlar boş string ile taklit edilmez.** `neighbourhood`
+  ve `updatedAt` artık `ListingDetailBase`'de isteğe bağlıdır: mahalle yoksa
+  kategori yolu kısalır, güncelleme kaydı yoksa başlık künyesi "Bu kayıtta
+  güncelleme tarihi yok" yazar — yayın tarihi "son güncelleme" diye tekrar
+  edilmez.
+- **`listingNumber`** yansıtılmış ilanda kaydın kendi anahtarıdır
+  (`listing-3-1`); ayrı bir ilan numarası kayıtta yoktur, uydurulmaz.
+- Türkçe etiket sözlüğü **veriyle aynı yerde** yaşar:
+  `features/listings/data/listing-attributes.ts` (kategori, işlem türü,
+  özellik anahtar/değer çiftleri, yer adı). Arama ve ilan detayı aynı
+  sözlükten okur.
+- Ne referans ilana ne de `LISTING_FIXTURES` kimliklerinden birine uyan kimlik
+  **404 kalır** — `loadListingDetail` `null` döner.
+
 ## 2. Cam bütçesi
 
 Sayfa başına **en fazla 6 cam yüzey**; test `ListingDetailWorkspace.test.tsx`
@@ -230,8 +301,8 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 `ListingDetailWorkspace.stories.tsx` — `Sayfalar/Public/İlan Detayı`:
 `Default` · `Bayat plan kaynağı` · `AI kullanılamıyor` ·
 `Harita kullanılamıyor` · `Süresi dolmuş` · `Yükleniyor` · `Uzun içerik` ·
-`Responsive` · `Temalar` · `Numara alınamadı`. Her story sabit `now` ile
-yükler.
+`Responsive` · `Temalar` · `Yansıtılmış ilan (arama sonucu)` ·
+`Numara alınamadı`. Her story sabit `now` ile yükler.
 
 ## 13. Bilinen kabuller
 
@@ -247,4 +318,7 @@ yükler.
 
 ## Changelog
 
+- 2026-07-28 — Arama sonuçlarından yansıtılan ilan paketi (`generic`) eklendi
+  (§1a): 72 arama kaydı artık dürüst bir detay sayfasına çözülüyor, arsa
+  kanıt paketi yalnız `kind === 'land'` ilanında açılıyor.
 - 2026-07-27 — Faz 0+1, Yön A (Karar Dosyası) yerleşimiyle ilk sürüm.

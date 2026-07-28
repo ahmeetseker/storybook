@@ -4,6 +4,9 @@ import type {
   PropertyCategory,
   TransactionType,
 } from '../domain/search-state'
+// Kategori etiketleri veri sözlüğünde tek kaynaktan gelir; ilan detayı da aynı
+// sözlüğü okur (bkz. `listing-attributes.ts`).
+import { CATEGORY_LABELS } from './listing-attributes'
 
 export interface ListingSummary {
   id: string
@@ -55,18 +58,6 @@ export interface AiFilterProposal {
     value: string | number
     displayValue: string
   }>
-}
-
-const CATEGORY_LABELS: Record<
-  Exclude<PropertyCategory, 'all'>,
-  string
-> = {
-  residential: 'Konut',
-  land: 'Arsa',
-  commercial: 'İş Yeri',
-  building: 'Bina',
-  timeshare: 'Devremülk',
-  touristic: 'Turistik Tesis',
 }
 
 const CATEGORY_PALETTES: Record<

@@ -28,6 +28,23 @@ function metaText(document: ListingDocument): string {
 }
 
 /**
+ * Bölüm girişindeki özet cümle.
+ *
+ * Belge listesi hiç yoksa "0 belgenin tamamı sunuldu" gibi doğru olmayan bir
+ * tamlık iddiası üretilmez: kayıtta belge bulunmadığı ve bunun olumsuzluk
+ * anlamına gelmediği yazılır.
+ */
+function summaryText(documents: ListingDocument[], criticalMissing: number): string {
+  if (documents.length === 0) {
+    return 'Bu ilan kaydında belge bulunmuyor. Tapu örneği, imar durum belgesi ve yapı ruhsatı gibi belgeler platforma sunulmamıştır; sunulmamış olması belgelerin bulunmadığı ya da içeriğinin olumsuz olduğu anlamına gelmez.'
+  }
+  if (criticalMissing > 0) {
+    return `${documents.length} belgeden ${criticalMissing} tanesi kritik ve sunulmadı. Eksik belge, içeriğinin olumsuz olduğu anlamına gelmez — yalnız doğrulanamadığı anlamına gelir.`
+  }
+  return `${documents.length} belgenin tamamı sunuldu.`
+}
+
+/**
  * Belgeler bölümü.
  *
  * Eksik belge sessizce listeden düşmez: kritik olanlar "Kritik eksik"
@@ -45,11 +62,7 @@ export function DocumentsSection({ detail }: DocumentsSectionProps) {
         Belgeler
       </h2>
 
-      <p className={styles.blockNote}>
-        {criticalMissing.length > 0
-          ? `${detail.documents.length} belgeden ${criticalMissing.length} tanesi kritik ve sunulmadı. Eksik belge, içeriğinin olumsuz olduğu anlamına gelmez — yalnız doğrulanamadığı anlamına gelir.`
-          : `${detail.documents.length} belgenin tamamı sunuldu.`}
-      </p>
+      <p className={styles.blockNote}>{summaryText(detail.documents, criticalMissing.length)}</p>
 
       <ul className={styles.docList}>
         {detail.documents.map((document) => (

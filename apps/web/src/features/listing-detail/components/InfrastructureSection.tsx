@@ -1,11 +1,11 @@
 import { GlassAlert } from '@repo/ui'
 
-import type { ListingDetail } from '../domain/listing-detail-types'
+import type { LandListingDetail } from '../domain/listing-detail-types'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface InfrastructureSectionProps {
-  detail: ListingDetail
+  detail: LandListingDetail
 }
 
 /**

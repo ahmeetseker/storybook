@@ -1,9 +1,9 @@
-import type { ListingDetail } from '../domain/listing-detail-types'
+import type { LandListingDetail } from '../domain/listing-detail-types'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface PlanningAndLegalSectionProps {
-  detail: ListingDetail
+  detail: LandListingDetail
 }
 
 /** Kaydın bulunmaması yükün bulunmadığı anlamına gelmez — künyede yazılı kalır. */

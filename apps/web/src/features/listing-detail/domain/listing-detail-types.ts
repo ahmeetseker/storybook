@@ -1,4 +1,12 @@
+import type {
+  PropertyCategory,
+  TransactionType,
+} from '@/features/listings/domain/search-state'
 import type { EvidenceValue } from './evidence'
+
+/** İlan kategorisi — arama tarafındaki sözlükle aynı kaynaktan gelir. */
+export type ListingCategory = Exclude<PropertyCategory, 'all'>
+export type ListingTransaction = TransactionType
 
 /** İlan yaşam döngüsü — aktif olmayan ilan sessizce aramaya yönlendirilmez. */
 export type ListingLifecycle = 'active' | 'expired' | 'sold' | 'withdrawn' | 'moderated'
@@ -29,7 +37,13 @@ export interface VerificationRow {
 export interface ListingLocation {
   city: string
   district: string
-  neighbourhood: string
+  /**
+   * Mahalle bilinmiyorsa alan hiç doldurulmaz.
+   *
+   * Arama kaydı yalnız il ve ilçe taşır; boş string veya ilçe adının tekrarı
+   * mahalle bilgisi yerine geçmez. Görünüm katmanı yokluğu kelimeyle yazar.
+   */
+  neighbourhood?: string
 }
 
 export interface ListingPrice {
@@ -93,7 +107,11 @@ export interface ListingDetailBase {
   lifecycle: ListingLifecycle
   listingNumber: string
   publishedAt: string
-  updatedAt: string
+  /**
+   * Kayıtta bir güncelleme tarihi varsa. Yoksa alan doldurulmaz: yayın
+   * tarihini "son güncelleme" diye tekrarlamak olmayan bir olayı bildirir.
+   */
+  updatedAt?: string
   /** Tüm kanıtların ortak sorgu kesiti */
   evidenceCutoff: string
   location: ListingLocation
@@ -140,5 +158,47 @@ export interface LandListingDetail extends ListingDetailBase {
   }
 }
 
+/**
+ * Beyana dayalı tek satır: etiket, değer ve (varsa) değerin nereden
+ * geleceğini söyleyen görünür not. Cevapsız satırda `value` doldurulmaz;
+ * künye nedeni yazar.
+ */
+export interface DeclaredAttribute {
+  id: string
+  label: string
+  value: EvidenceValue<string>
+  /** Değerin altında duran görünür açıklama — açılır katman değildir */
+  note?: string
+}
+
+/**
+ * Arama kaydından **yansıtılmış** ilan detayı.
+ *
+ * Kanıt defteri derlenmemiş ilanların paketi budur: yalnız arama özetinin
+ * gerçekten taşıdığı alanlar bulunur — kategori, işlem türü, fiyat/alan,
+ * ilan sahibi beyanları ve ilan kaydının kendi zaman damgaları. Parsel,
+ * imar, erişim, arazi ve emsal paketleri burada **yoktur**; olmayan bir
+ * kanıt isteğe bağlı alan olarak taşınmaz, çünkü `undefined` bir parsel ile
+ * "sorgulanmamış" bir parsel görünüm katmanında aynı şeye benzerdi.
+ */
+export interface GenericListingDetail extends ListingDetailBase {
+  kind: 'generic'
+  category: ListingCategory
+  categoryLabel: string
+  transaction: ListingTransaction
+  transactionLabel: string
+  /** İlan sahibinin beyan ettiği özellikler — doğrulanmış kayıt değildir */
+  declaredAttributes: DeclaredAttribute[]
+  /**
+   * Sayfanın her ilan için sorduğu ama arama kaydının cevaplayamadığı
+   * alanlar. Boş bırakılmaz: her biri nedeni ve kaynağıyla görünür.
+   */
+  openQuestions: DeclaredAttribute[]
+  /** İlan sahibinin öne çıkardığı maddeler — tek beyan satırı olarak taşınır */
+  highlights: EvidenceValue<string>
+  /** Emsal kesiti ve kanıt defteri olmadığı için değerleme çekinir */
+  valuation: ValuationOutcome
+}
+
 /** Kategori paketleri bu union üzerinden büyür (Faz 4). */
-export type ListingDetail = LandListingDetail
+export type ListingDetail = LandListingDetail | GenericListingDetail

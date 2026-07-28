@@ -81,10 +81,16 @@ export function ListingIntro({ detail, mapSection }: ListingIntroProps) {
         ) : (
           <p className={styles.mediaInventoryNote}>Bu kayıtta medya bilgisi bulunmuyor.</p>
         )}
-        {mapSection.state === 'unavailable' ? (
+        {/* Yönlendirme yalnız Parsel bölümü gerçekten render edildiğinde
+            yazılır: yansıtılmış ilanda böyle bir bölüm yoktur, kullanıcı
+            olmayan bir yere gönderilmez. */}
+        {detail.kind === 'land' && mapSection.state === 'unavailable' ? (
           <p className={styles.mediaInventoryMeta}>
             Konum ve parsel bilgisi Parsel bölümünde metin olarak yer alır.
           </p>
+        ) : null}
+        {detail.kind === 'generic' && mapSection.state === 'unavailable' ? (
+          <p className={styles.mediaInventoryMeta}>{mapSection.reason}</p>
         ) : null}
       </div>
 

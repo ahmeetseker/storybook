@@ -6,6 +6,7 @@ import {
   type GlassListingMetaItem,
 } from '@repo/ui'
 
+import { DeclaredFeaturesSection } from './components/DeclaredFeaturesSection'
 import { DocumentsSection } from './components/DocumentsSection'
 import { HazardSection } from './components/HazardSection'
 import { InfrastructureSection } from './components/InfrastructureSection'
@@ -17,6 +18,7 @@ import { MarketSection } from './components/MarketSection'
 import { ParcelSection } from './components/ParcelSection'
 import { PlanningAndLegalSection } from './components/PlanningAndLegalSection'
 import { SellerSection, type SellerPhoneAnalyticsEvent } from './components/SellerSection'
+import { sectionsFor } from './components/listing-sections'
 import { hasSellerRevealControl, SELLER_REVEAL_CONTROL_ID } from './components/seller-reveal'
 import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
@@ -48,35 +50,63 @@ export interface ListingDetailWorkspaceProps {
 }
 
 function breadcrumbItems(detail: ListingDetail): GlassBreadcrumbItem[] {
+  const root = detail.kind === 'land' ? 'Arsa ilanları' : `${detail.categoryLabel} ilanları`
   return [
-    { label: 'Arsa ilanları' },
+    { label: root },
     { label: detail.location.city },
     { label: detail.location.district },
-    { label: detail.location.neighbourhood },
+    // Mahalle bilinmiyorsa yol kısalır; boş bir basamak veya ilçe tekrarı
+    // uydurulmaz.
+    ...(detail.location.neighbourhood ? [{ label: detail.location.neighbourhood }] : []),
     { label: `İlan ${detail.listingNumber}` },
   ]
 }
 
+/** Konum satırı yalnız kayıtta bulunan basamakları yazar. */
+function locationText(detail: ListingDetail): string {
+  const place = `${detail.location.district} / ${detail.location.city}`
+  return detail.location.neighbourhood ? `${detail.location.neighbourhood}, ${place}` : place
+}
+
 function headerMeta(detail: ListingDetail): GlassListingMetaItem[] {
-  return [
-    {
-      id: 'location',
-      label: 'Konum',
-      value: `${detail.location.neighbourhood}, ${detail.location.district} / ${detail.location.city}`,
-    },
+  const items: GlassListingMetaItem[] = [
+    { id: 'location', label: 'Konum', value: locationText(detail) },
+  ]
+
+  if (detail.kind === 'generic') {
+    items.push({
+      id: 'category',
+      label: 'Kategori',
+      value: `${detail.categoryLabel} · ${detail.transactionLabel}`,
+    })
+  }
+
+  items.push(
     { id: 'listing-number', label: 'İlan numarası', value: detail.listingNumber },
     { id: 'published', label: 'Yayın tarihi', value: formatDate(detail.publishedAt) },
-    { id: 'updated', label: 'Son güncelleme', value: formatDate(detail.updatedAt) },
+    {
+      id: 'updated',
+      label: 'Son güncelleme',
+      // Güncelleme kaydı yoksa yayın tarihi "son güncelleme" diye tekrar
+      // edilmez: olmayan bir olay bildirilmiş olurdu.
+      value: detail.updatedAt
+        ? formatDate(detail.updatedAt)
+        : 'Bu kayıtta güncelleme tarihi yok',
+    },
     { id: 'cutoff', label: 'Kanıt kesiti', value: formatDate(detail.evidenceCutoff) },
-  ]
+  )
+
+  return items
 }
 
 /** Birim fiyatın hangi alana dayandığı gizlenmez; çelişki varsa aynı cümlede söylenir. */
 function priceNote(detail: ListingDetail): string {
   const declared = formatArea(detail.price.declaredArea)
-  const recorded = detail.parcel.area.value
-  if (hasConflict(detail.parcel.area) && recorded !== undefined) {
-    return `Birim fiyat beyan edilen ${declared} alana göre; kayıtlı yüzölçümü ${formatArea(recorded)}.`
+  if (detail.kind === 'land') {
+    const recorded = detail.parcel.area.value
+    if (hasConflict(detail.parcel.area) && recorded !== undefined) {
+      return `Birim fiyat beyan edilen ${declared} alana göre; kayıtlı yüzölçümü ${formatArea(recorded)}.`
+    }
   }
   return `Birim fiyat beyan edilen ${declared} alana göre hesaplandı.`
 }
@@ -133,7 +163,7 @@ export function ListingDetailWorkspace({
         />
 
         <ListingIntro detail={detail} mapSection={sections.map} />
-        <ListingSectionIndex />
+        <ListingSectionIndex sections={sectionsFor(detail)} />
 
         <div className={styles.body}>
           <div className={styles.flow}>
@@ -143,11 +173,19 @@ export function ListingDetailWorkspace({
               label="Temel göstergeler"
               className={styles.metrics}
             />
-            <ParcelSection detail={detail} mapSection={sections.map} />
-            <PlanningAndLegalSection detail={detail} />
-            <InfrastructureSection detail={detail} />
-            <HazardSection detail={detail} />
-            <MarketSection detail={detail} />
+            {/* Arsa kanıt paketi yalnız defteri olan ilanda açılır; yansıtılmış
+                ilanda o bölümler render edilmez, boş kabuk olarak da durmaz. */}
+            {detail.kind === 'land' ? (
+              <>
+                <ParcelSection detail={detail} mapSection={sections.map} />
+                <PlanningAndLegalSection detail={detail} />
+                <InfrastructureSection detail={detail} />
+                <HazardSection detail={detail} />
+                <MarketSection detail={detail} />
+              </>
+            ) : (
+              <DeclaredFeaturesSection detail={detail} />
+            )}
             <DocumentsSection detail={detail} />
           </div>
           <ListingDecisionRail

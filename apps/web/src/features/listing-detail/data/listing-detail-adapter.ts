@@ -5,14 +5,16 @@ import {
   isAnswered,
   type EvidenceValue,
 } from '../domain/evidence'
+import { LISTING_FIXTURES } from '@/features/listings/data/listing-adapter'
 import type { LandListingDetail, ListingDetail } from '../domain/listing-detail-types'
 import {
-  criticalIssues,
+  landCriticalIssues,
   medianPosition,
   medianPositionPhrase,
 } from '../domain/listing-detail-view-model'
 import { formatArea, formatNumber } from '../format'
 import { OREN_LAND_LISTING } from './listing-detail-fixtures'
+import { projectListingDetail } from './listing-detail-projection'
 
 /** Storybook ve testlerin açıkça seçtiği durum senaryoları. */
 export type ListingDetailScenario =
@@ -63,15 +65,20 @@ const STALE_PLAN_QUERY = '2025-09-15T00:00:00.000Z'
  * Kaynaklı karar özetini kanıt defterinden üretir.
  *
  * Karşılaştırmalı sayılar burada **donmuş sabit değildir**: emsal konumu
- * `medianPosition` ile, kritik konuların varlığı `criticalIssues` ile — yani
- * sayfadaki bölümlerin kullandığı aynı hesapla — türetilir. Aksi hâlde ilk
- * fixture değişikliğinde "kaynaklı" özet, altındaki kanıtla çelişirdi.
+ * `medianPosition` ile, kritik konuların varlığı `landCriticalIssues` ile —
+ * yani sayfadaki bölümlerin kullandığı aynı hesapla — türetilir. Aksi hâlde
+ * ilk fixture değişikliğinde "kaynaklı" özet, altındaki kanıtla çelişirdi.
+ *
+ * **Yalnız arsa defteri için geçerlidir.** Parametre tipi `LandListingDetail`
+ * olduğu için yansıtılmış bir ilanla çağrılamaz: o ilanlarda emsal kesiti,
+ * plan durumu ve hisse bilgisi yoktur; buradaki cümleler onlar için üretilse
+ * dayanağı olmayan sayılar yazardı.
  *
  * Test için dışa açıktır: değiştirilmiş bir defterle çağrılıp sayıların
  * birlikte değişip değişmediği doğrulanır.
  */
 export function briefFor(detail: LandListingDetail): AiDecisionBrief {
-  const issues = criticalIssues(detail)
+  const issues = landCriticalIssues(detail)
   const hasIssue = (id: string) => issues.some((issue) => issue.id === id)
 
   const median = detail.market.comparableMedianUnitPrice.value
@@ -195,7 +202,7 @@ export function forEachEvidenceValue(
  * - Cevapsız değerde güncellik yoktur: `unknown` kalır — sorgunun dün
  *   yapılmış olması, olmayan veriyi güncel yapmaz.
  */
-function normalizeFreshness(detail: LandListingDetail, now: string): void {
+function normalizeFreshness(detail: ListingDetail, now: string): void {
   forEachEvidenceValue(detail, (value) => {
     if (!decaysOverTime(value)) return
     value.freshness = isAnswered(value)
@@ -228,6 +235,60 @@ function withScenario(base: LandListingDetail, scenario: ListingDetailScenario):
 }
 
 /**
+ * Yansıtılmış ilanlarda bölüm durumlarının gerekçeleri.
+ *
+ * Bunlar bir sağlayıcı arızası değil, **kapsam bildirimidir**: bu ilanlar için
+ * ilgili sorgu hiç yapılmamıştır. Gerekçe her durumda kullanıcıya görünür bir
+ * cümledir; sessizce boş bölüm bırakılmaz.
+ */
+const PROJECTED_MAP_REASON =
+  'Bu ilan kaydında parsel geometrisi veya doğrulanmış koordinat yok; harita gösterilmiyor.'
+const PROJECTED_PLANNING_REASON =
+  'Bu ilan için imar ve tapu sorgusu yapılmadı; alanlar Beyan Edilen Özellikler bölümünde gerekçeleriyle listelenir.'
+const PROJECTED_MARKET_REASON =
+  'Bu ilan için emsal kesiti derlenmedi; fiyat karşılaştırması yapılmaz.'
+
+/**
+ * Karar özeti neden üretilmiyor?
+ *
+ * Yansıtılmış ilanda özetlenecek bir kanıt defteri yoktur: sayfadaki bütün
+ * içerik ilan sahibinin beyanıdır. Bu beyanları "ArsaPazar asistanı" imzasıyla
+ * özetlemek, doğrulanmamış bilgiye platformun sesini ödünç vermek olurdu —
+ * yani tam da bu sayfanın kaçındığı şey. Bu yüzden brief hiç üretilmez ve
+ * yerine gerekçe durur.
+ */
+const PROJECTED_BRIEF_REASON =
+  'Bu ilan için kanıt defteri henüz derlenmedi. Karar özeti yalnız kaynaklı kanıtlardan üretilir; aşağıdaki bilgiler ilan sahibinin beyanıdır ve özetlenerek doğrulanmış görünüm kazanmamalıdır.'
+
+/**
+ * Arama kaydından yansıtılmış ilan sonucu.
+ *
+ * `briefFor` burada **çağrılmaz**: tipi arsa defterine bağlıdır ve bu ilanlar
+ * için üreteceği sayıların dayanağı yoktur.
+ */
+function projectedResult(
+  summary: (typeof LISTING_FIXTURES)[number],
+  scenario: ListingDetailScenario,
+  now: string,
+): ListingDetailResult {
+  const detail = projectListingDetail(summary, now)
+  if (scenario === 'inactive') detail.lifecycle = 'expired'
+  normalizeFreshness(detail, now)
+
+  return {
+    detail,
+    sections: {
+      core: READY,
+      map: { state: 'unavailable', reason: PROJECTED_MAP_REASON },
+      planning: { state: 'unavailable', reason: PROJECTED_PLANNING_REASON },
+      market: { state: 'unavailable', reason: PROJECTED_MARKET_REASON },
+      ai: { state: 'unavailable', reason: PROJECTED_BRIEF_REASON },
+    },
+    aiBrief: { state: 'unavailable', reason: PROJECTED_BRIEF_REASON },
+  }
+}
+
+/**
  * İlan detayını normalize edilmiş kanıt defteri olarak yükler.
  *
  * `now` çağıran tarafından verilir; adapter zamanı kendisi okumaz — böylece
@@ -240,7 +301,13 @@ export async function loadListingDetail(input: {
   now: string
 }): Promise<ListingDetailResult | null> {
   const scenario = input.scenario ?? 'default'
-  if (scenario === 'not-found' || input.listingId !== OREN_LAND_LISTING.id) return null
+  if (scenario === 'not-found') return null
+
+  if (input.listingId !== OREN_LAND_LISTING.id) {
+    const summary = LISTING_FIXTURES.find((item) => item.id === input.listingId)
+    // Ne referans defter ne arama kaydı: ilan gerçekten yok.
+    return summary ? projectedResult(summary, scenario, input.now) : null
+  }
 
   const detail = withScenario(OREN_LAND_LISTING, scenario)
   normalizeFreshness(detail, input.now)

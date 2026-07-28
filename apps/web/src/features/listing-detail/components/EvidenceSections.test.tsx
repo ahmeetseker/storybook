@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { loadListingDetail } from '../data/listing-detail-adapter'
 import type { EvidenceValue } from '../domain/evidence'
+import type { LandListingDetail } from '../domain/listing-detail-types'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import { ParcelSection } from './ParcelSection'
 import { PlanningAndLegalSection } from './PlanningAndLegalSection'
@@ -14,9 +15,10 @@ const NOW = '2026-07-27T09:00:00.000Z'
 /** Kanıt kesitinden yıllar sonrası: takvim eşiği her şeyi bayatlatmaya yeter. */
 const MUCH_LATER = '2029-07-27T09:00:00.000Z'
 
-async function detail(now: string = NOW) {
+/** Bu bölümler yalnız arsa defterine bağlıdır; tip birleşimi burada daraltılır. */
+async function detail(now: string = NOW): Promise<LandListingDetail> {
   const result = await loadListingDetail({ listingId: 'arsa-214-7', now })
-  if (!result) throw new Error('fixture bulunamadı')
+  if (result?.detail.kind !== 'land') throw new Error('arsa defteri bulunamadı')
   return result.detail
 }
 

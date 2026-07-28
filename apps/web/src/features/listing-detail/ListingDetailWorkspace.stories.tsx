@@ -16,12 +16,20 @@ import styles from './ListingDetailWorkspace.module.css'
  */
 const NOW = '2026-07-27T09:00:00.000Z'
 const LISTING_ID = 'arsa-214-7'
+/**
+ * Arama sonucundan yansıtılan ilan: elle yazılmış kanıt defteri yoktur,
+ * sayfa yalnız arama kaydının gerçekten taşıdığı alanları gösterir.
+ */
+const PROJECTED_LISTING_ID = 'listing-3-1'
 
 /** Demo numarası — gerçek numara story'de de sayfa kaynağında durmaz. */
 const DEMO_PHONE = '0 (252) 000 00 00'
 
-async function loadScenario(scenario: ListingDetailScenario): Promise<ListingDetailResult> {
-  const result = await loadListingDetail({ listingId: LISTING_ID, scenario, now: NOW })
+async function loadScenario(
+  scenario: ListingDetailScenario,
+  listingId: string = LISTING_ID,
+): Promise<ListingDetailResult> {
+  const result = await loadListingDetail({ listingId, scenario, now: NOW })
   if (!result) throw new Error('senaryo fixture bulunamadı')
   return result
 }
@@ -72,6 +80,9 @@ function ListingDetailLoading() {
 
 /** 90 karakterlik başlık, 8 belge ve 6 altyapı satırıyla taşma senaryosu. */
 function withLongContent(result: ListingDetailResult): ListingDetailResult {
+  // Taşma senaryosu arsa defterinin altyapı satırlarını çoğaltır; yansıtılmış
+  // ilanda böyle bir paket yoktur.
+  if (result.detail.kind !== 'land') return result
   const detail = structuredClone(result.detail)
 
   detail.title =
@@ -131,6 +142,8 @@ function withLongContent(result: ListingDetailResult): ListingDetailResult {
 interface ScenarioPageProps {
   /** Adapter senaryosu — durum matrisinin tek girdisi */
   scenario: ListingDetailScenario
+  /** Hangi ilan yüklensin; verilmezse elle yazılmış referans defter */
+  listingId?: string
   /** Yüklenen sonucu story'ye özel biçimde dönüştürür (ör. uzun içerik) */
   transform?: (result: ListingDetailResult) => ListingDetailResult
   /** Numara sağlayıcısı; verilmezse satıcı bölümü kontrolü hiç göstermez */
@@ -139,18 +152,24 @@ interface ScenarioPageProps {
   containerWidth?: number | string
 }
 
-function ScenarioPage({ scenario, transform, revealPhone, containerWidth }: ScenarioPageProps) {
+function ScenarioPage({
+  scenario,
+  listingId,
+  transform,
+  revealPhone,
+  containerWidth,
+}: ScenarioPageProps) {
   const [result, setResult] = useState<ListingDetailResult | null>(null)
 
   useEffect(() => {
     let alive = true
-    void loadScenario(scenario).then((loaded) => {
+    void loadScenario(scenario, listingId).then((loaded) => {
       if (alive) setResult(transform ? transform(loaded) : loaded)
     })
     return () => {
       alive = false
     }
-  }, [scenario, transform])
+  }, [scenario, listingId, transform])
 
   const page = result ? (
     <ListingDetailWorkspace result={result} onRevealPhone={revealPhone} />
@@ -240,6 +259,19 @@ export const Responsive: Story = {
  * bayat) her iki temada kelimeyle de taşınır; cam yüzey sayısı değişmez.
  */
 export const Temalar: Story = {}
+
+/**
+ * Arama sonucundan yansıtılan ilan (`/ilan/listing-3-1`).
+ *
+ * Kanıt defteri derlenmemiştir: parsel, imar, altyapı, arazi ve piyasa
+ * bölümleri hiç açılmaz; bölüm indeksi de yalnız gerçekten render edilen üç
+ * bölümü bağlar. Değerleme çekinir, karar özeti üretilmez ve cevabı olmayan
+ * alanlar tire yerine gerekçesiyle görünür.
+ */
+export const YansitilmisIlan: Story = {
+  name: 'Yansıtılmış ilan (arama sonucu)',
+  args: { listingId: PROJECTED_LISTING_ID },
+}
 
 /**
  * Numara servisi yanıt vermediğinde gerekçe görünür ve kontrol tekrar

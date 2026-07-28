@@ -1,7 +1,16 @@
 import { GlassSurface } from '@repo/ui'
 
-import { LISTING_SECTIONS } from './listing-sections'
+import { LISTING_SECTIONS, type ListingSectionLink } from './listing-sections'
 import styles from '../ListingDetailWorkspace.module.css'
+
+export interface ListingSectionIndexProps {
+  /**
+   * Gerçekten render edilen bölümler. Verilmezse arsa defterinin tam sırası
+   * kullanılır. İndeks hiçbir zaman DOM'da bulunmayan bir çapaya bağlanmaz —
+   * liste çağıran tarafından, sayfanın kurduğu bölümlerle birlikte gelir.
+   */
+  sections?: readonly ListingSectionLink[]
+}
 
 /**
  * Sticky bölüm indeksi.
@@ -9,7 +18,7 @@ import styles from '../ListingDetailWorkspace.module.css'
  * Sayfa düzeyinde tab değildir: bütün bölümler DOM'da kalır, buradaki
  * bağlantılar yalnız çapa gezinmesi yapar. Sayfanın cam yüzeylerinden biridir.
  */
-export function ListingSectionIndex() {
+export function ListingSectionIndex({ sections = LISTING_SECTIONS }: ListingSectionIndexProps) {
   return (
     <GlassSurface
       as="nav"
@@ -19,7 +28,7 @@ export function ListingSectionIndex() {
       className={styles.sectionIndex}
     >
       <ul className={styles.sectionList}>
-        {LISTING_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <li key={section.id}>
             <a href={`#${section.id}`} className={styles.sectionLink}>
               {section.label}

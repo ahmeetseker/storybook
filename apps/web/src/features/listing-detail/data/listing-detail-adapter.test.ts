@@ -2,20 +2,37 @@ import { describe, expect, it } from 'vitest'
 import { freshnessFrom } from '../domain/evidence'
 import type { LandListingDetail } from '../domain/listing-detail-types'
 import { medianPosition, medianPositionPhrase } from '../domain/listing-detail-view-model'
-import { briefFor, forEachEvidenceValue, loadListingDetail } from './listing-detail-adapter'
+import {
+  briefFor,
+  forEachEvidenceValue,
+  loadListingDetail,
+  type ListingDetailResult,
+  type ListingDetailScenario,
+} from './listing-detail-adapter'
 
 const NOW = '2026-07-27T09:00:00.000Z'
 
+/** Referans defter sonucu — birleşim tipi burada arsa paketine daraltılır. */
+type LandResult = Omit<ListingDetailResult, 'detail'> & { detail: LandListingDetail }
+
+async function loadLand(input: {
+  listingId: string
+  scenario?: ListingDetailScenario
+  now: string
+}): Promise<LandResult> {
+  const result = await loadListingDetail(input)
+  if (result?.detail.kind !== 'land') throw new Error('arsa defteri bulunamadı')
+  return result as LandResult
+}
+
 async function landDetail(): Promise<LandListingDetail> {
-  const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
-  if (!result) throw new Error('fixture bulunamadı')
-  return result.detail
+  return (await loadLand({ listingId: 'arsa-214-7', now: NOW })).detail
 }
 
 describe('loadListingDetail', () => {
   it('aynı girdiyle iki kez çağrıldığında birebir aynı sonucu üretir', async () => {
-    const first = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
-    const second = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const first = await loadLand({ listingId: 'arsa-214-7', now: NOW })
+    const second = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     expect(JSON.stringify(first)).toBe(JSON.stringify(second))
   })
 
@@ -24,7 +41,7 @@ describe('loadListingDetail', () => {
   })
 
   it('EİDS satırı yalnız ilan verme yetkisini doğrular ve kapsam notu taşır', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     const row = result?.detail.verification.find((item) => item.id === 'listing_authorisation')
     expect(row?.title).toBe('İlan verme yetkisi EİDS ile doğrulandı')
     expect(row?.scopeNote).toBe(
@@ -33,24 +50,24 @@ describe('loadListingDetail', () => {
   })
 
   it('parsel eşleşmesi satırı çelişki nedeniyle olumsuzdur', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     const row = result?.detail.verification.find((item) => item.id === 'parcel_match')
     expect(row?.state).toBe('negative')
   })
 
   it('bayat plan senaryosu plan durumu kaynağını bayatlatır — varsayılanda güncel', async () => {
-    const base = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const base = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     // Varsayılanda plan durumu kanıt kesitiyle aynı gün sorgulanmıştır…
     expect(base?.detail.planning.planStatus.freshness).toBe('current')
     // …plan notu ise belge tarihi gereği her senaryoda bayattır.
     expect(base?.detail.planning.landUse.freshness).toBe('stale')
 
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
     expect(result?.detail.planning.planStatus.freshness).toBe('stale')
   })
 
   it('bayat plan senaryosunda güncellik bayrağı tarihle tutarlıdır', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', scenario: 'stale-planning', now: NOW })
     const planStatus = result?.detail.planning.planStatus
     if (!planStatus) throw new Error('plan durumu bulunamadı')
     // Bayrak elle konmuş değil: kendi sorgu/belge tarihi 180 günlük eşiği aşıyor.
@@ -61,8 +78,8 @@ describe('loadListingDetail', () => {
   // değer tarihlerden türetilir. Aynı fixture, iki farklı `now` → iki farklı
   // güncellik. Donmuş bayrakla bu test düşer.
   it('güncellik `now` ile birlikte değişir', async () => {
-    const early = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
-    const late = await loadListingDetail({
+    const early = await loadLand({ listingId: 'arsa-214-7', now: NOW })
+    const late = await loadLand({
       listingId: 'arsa-214-7',
       now: '2027-07-27T09:00:00.000Z',
     })
@@ -108,8 +125,8 @@ describe('loadListingDetail', () => {
   })
 
   it('güncellik normalizasyonu dizilerin içindeki kanıt değerlerine de iner', async () => {
-    const early = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
-    const late = await loadListingDetail({
+    const early = await loadLand({ listingId: 'arsa-214-7', now: NOW })
+    const late = await loadLand({
       listingId: 'arsa-214-7',
       now: '2027-07-27T09:00:00.000Z',
     })
@@ -137,27 +154,27 @@ describe('loadListingDetail', () => {
   // veriyi güncel yapmaz.
   it('cevapsız değer hiçbir `now` için güncel sayılmaz', async () => {
     for (const now of [NOW, '2027-07-27T09:00:00.000Z']) {
-      const result = await loadListingDetail({ listingId: 'arsa-214-7', now })
+      const result = await loadLand({ listingId: 'arsa-214-7', now })
       expect(result?.detail.planning.encumbrance.freshness).toBe('unknown')
       expect(result?.detail.access.legalRoadAccess.freshness).toBe('unknown')
     }
   })
 
   it('AI kullanılamadığında yapılandırılmış içerik korunur, yalnız brief düşer', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'ai-unavailable', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', scenario: 'ai-unavailable', now: NOW })
     expect(result?.aiBrief.state).toBe('unavailable')
     expect(result?.detail.parcel.blockParcel.value).toBe('214 ada / 7 parsel')
     expect(result?.sections.core.state).toBe('ready')
   })
 
   it('harita sağlayıcısı düştüğünde yalnız harita bölümü etkilenir', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'map-unavailable', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', scenario: 'map-unavailable', now: NOW })
     expect(result?.sections.map.state).toBe('unavailable')
     expect(result?.sections.planning.state).toBe('ready')
   })
 
   it('AI özetindeki her iddia bir bölüme bağlıdır', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     const brief = result?.aiBrief
     if (brief?.state !== 'ready') throw new Error('brief hazır olmalı')
     expect(brief.data.claims.length).toBeGreaterThan(0)
@@ -200,24 +217,24 @@ describe('loadListingDetail', () => {
   })
 
   it('AI özeti fiyat tahmini uydurmaz — değerleme çekinmesini aktarır', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     expect(result?.detail.market.valuation.kind).toBe('insufficient')
   })
 
   it('süresi dolmuş ilanda yaşam döngüsü aktarılır', async () => {
-    const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'inactive', now: NOW })
+    const result = await loadLand({ listingId: 'arsa-214-7', scenario: 'inactive', now: NOW })
     expect(result?.detail.lifecycle).toBe('expired')
   })
 
   it('iki çağrının sonuçları iç içe referansları paylaşmaz', async () => {
-    const first = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
-    const second = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const first = await loadLand({ listingId: 'arsa-214-7', now: NOW })
+    const second = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     expect(first?.detail.documents).not.toBe(second?.detail.documents)
     expect(first?.detail.parcel.area).not.toBe(second?.detail.parcel.area)
   })
 
   it('bir sonucun mutasyona uğratılması sonraki çağrıları veya fixture\'ı bozmaz', async () => {
-    const first = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const first = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     first?.detail.documents.push({
       id: 'mutation-probe',
       label: 'Sızıntı testi',
@@ -226,7 +243,7 @@ describe('loadListingDetail', () => {
     })
     if (first) first.detail.parcel.area.value = 9999
 
-    const fresh = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const fresh = await loadLand({ listingId: 'arsa-214-7', now: NOW })
     expect(fresh?.detail.documents).toHaveLength(5)
     expect(fresh?.detail.parcel.area.value).toBe(4712)
   })

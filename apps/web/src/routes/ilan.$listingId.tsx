@@ -49,7 +49,13 @@ export const Route = createFileRoute('/ilan/$listingId')({
           { title: `${loaderData.detail.title} · ArsaPazar` },
           {
             name: 'description',
-            content: `${loaderData.detail.location.neighbourhood}, ${loaderData.detail.location.district} · ${loaderData.detail.listingNumber} numaralı ilanın kaynaklı detayları.`,
+            // Mahalle her kayıtta bulunmaz; yoksa açıklama ilçeden başlar.
+            content: `${[
+              loaderData.detail.location.neighbourhood,
+              loaderData.detail.location.district,
+            ]
+              .filter(Boolean)
+              .join(', ')} · ${loaderData.detail.listingNumber} numaralı ilanın kaynaklı detayları.`,
           },
         ]
       : [{ title: 'İlan bulunamadı · ArsaPazar' }],

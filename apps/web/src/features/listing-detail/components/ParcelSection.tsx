@@ -1,13 +1,13 @@
 import { GlassAlert } from '@repo/ui'
 
 import type { SectionState } from '../data/listing-detail-adapter'
-import type { ListingDetail } from '../domain/listing-detail-types'
+import type { LandListingDetail } from '../domain/listing-detail-types'
 import { formatArea } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface ParcelSectionProps {
-  detail: ListingDetail
+  detail: LandListingDetail
   mapSection: SectionState<true>
 }
 
