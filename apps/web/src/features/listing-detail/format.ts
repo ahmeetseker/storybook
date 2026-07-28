@@ -13,6 +13,12 @@ const trDate = new Intl.DateTimeFormat('tr-TR', {
   year: 'numeric',
   timeZone: 'Europe/Istanbul',
 })
+const trDateShort = new Intl.DateTimeFormat('tr-TR', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'Europe/Istanbul',
+})
 
 export function formatNumber(value: number): string {
   return trNumber.format(value)
@@ -34,6 +40,17 @@ export function formatUnitPrice(value: number): string {
 export function formatDate(iso: string): string {
   const parsed = Date.parse(iso)
   return Number.isNaN(parsed) ? 'Bilinmiyor' : trDate.format(parsed)
+}
+
+/**
+ * ISO tarihi kısaltılmış ay adıyla yazar (ör. "24 Tem 2026"). `formatDate`
+ * sayfanın çoğu yerinde uzun ay adını kullanır; bu kısa biçim yalnız tek
+ * satırlık imza/künye gibi dar alanlarda tercih edilir. Aynı sabit saat
+ * dilimini ve "Bilinmiyor" gerilemesini `formatDate` ile paylaşır.
+ */
+export function formatDateShort(iso: string): string {
+  const parsed = Date.parse(iso)
+  return Number.isNaN(parsed) ? 'Bilinmiyor' : trDateShort.format(parsed)
 }
 
 /** İlan durumu metinle taşınır; renk tek başına durum bildirmez. */

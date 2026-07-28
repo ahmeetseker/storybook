@@ -2,6 +2,7 @@ import { GlassAiSummaryCard, GlassAlert } from '@repo/ui'
 
 import type { AiDecisionBrief, SectionState } from '../data/listing-detail-adapter'
 import type { ListingDetail } from '../domain/listing-detail-types'
+import { formatDateShort } from '../format'
 import workspaceStyles from '../ListingDetailWorkspace.module.css'
 import styles from './ListingEvidenceBrief.module.css'
 
@@ -13,24 +14,6 @@ export interface ListingEvidenceBriefProps {
    * alınır; bu bölümün içeriği tamamen `brief`'ten gelir.
    */
   detail: ListingDetail
-}
-
-/**
- * Kanıt kesiti tarihini gün/kısaltılmış ay/yıl olarak yazar (ör. "24 Tem
- * 2026"). Sayfanın diğer tarihleri `formatDate`/`formatEvidenceDate` ile uzun
- * ay adını kullanır; künye satırı burada kısaltılmış biçimi bilinçli olarak
- * ayrı tutar — kısa, tek satırlık bir asistan imzasında uzun ay adı satırı
- * gereksiz yer kaplar. Saat dilimi sayfanın geri kalanıyla aynı sabittir.
- */
-function formatBriefCutoff(iso: string): string {
-  const parsed = Date.parse(iso)
-  if (Number.isNaN(parsed)) return 'Bilinmiyor'
-  return new Intl.DateTimeFormat('tr-TR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'Europe/Istanbul',
-  }).format(parsed)
 }
 
 /**
@@ -57,15 +40,13 @@ export function ListingEvidenceBrief({ brief }: ListingEvidenceBriefProps) {
   }
 
   const { data } = brief
-  const sourceNote = `ArsaPazar asistanı · model ${data.modelVersion} · kanıt kesiti ${formatBriefCutoff(data.evidenceCutoff)}`
+  const sourceNote = `ArsaPazar asistanı · model ${data.modelVersion} · kanıt kesiti ${formatDateShort(data.evidenceCutoff)}`
 
   return (
-    <section
-      id="ai-karar-ozeti"
-      className={workspaceStyles.section}
-      aria-label="30 saniyelik karar özeti"
-    >
-      <h2 className={workspaceStyles.sectionTitle}>Yapay zekâ karar özeti</h2>
+    <section id="ai-karar-ozeti" className={workspaceStyles.section} aria-labelledby="ai-karar-ozeti-baslik">
+      <h2 id="ai-karar-ozeti-baslik" className={workspaceStyles.sectionTitle}>
+        Yapay zekâ karar özeti
+      </h2>
 
       <GlassAiSummaryCard summary={data.summary} sourceNote={sourceNote} />
 

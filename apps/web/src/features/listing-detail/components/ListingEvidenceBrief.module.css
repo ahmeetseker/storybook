@@ -55,8 +55,10 @@
 }
 
 .checklists {
+  /* Mikro-geometri — token karşılığı yok (grid track alt sınırı) */
+  --checklist-min: 240px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--checklist-min), 100%), 1fr));
   gap: var(--lg-space-4);
 }
 
@@ -83,7 +85,7 @@
   justify-content: center;
   min-block-size: var(--lg-control-sm);
   padding-inline: var(--lg-space-4);
-  border: 1px solid var(--lg-hairline);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-surface);
   color: var(--lg-label-secondary);
