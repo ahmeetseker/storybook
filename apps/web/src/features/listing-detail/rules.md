@@ -17,8 +17,14 @@ korur; burada yazılanlar sayfa düzeyinde onların üzerine gelir.
 tarihiyle ve kapsamıyla birlikte durur; bilinmeyen bir alan boş bırakılmaz,
 nedeni yazılır. Yerleşim "Yön A" şemasıdır — kategori yolu → başlık künyesi →
 bölüm indeksi → tek ızgara: solda kanıt akışı (özet/medya → doğrulama vektörü
-→ karar özeti → göstergeler → kanıt bölümleri → belgeler → satıcı), sağda
-sticky karar kolonu.
+→ karar özeti → göstergeler → kanıt bölümleri → belgeler), sağda karar kolonu;
+**satıcı bölümü ızgaranın ikinci satırındadır** — içerik kolonunun
+genişliğinde, ama karar kolonunun hareket alanının dışında.
+
+Karar kolonunun hareket alanı bu yüzden birinci satırdır: sticky eşlikçi kanıt
+akışıyla birlikte iner, kanıt akışı biterken **serbest kalır** ve satıcı
+bölümüyle hiçbir zaman yan yana durmaz. Kural tek cümleyle: *ray okuyucuya
+kanıt bölümleri boyunca eşlik eder, satıcı bölümünden önce bırakır.*
 
 ## 1b. Yerleşim, ritim ve tipografi
 
@@ -39,9 +45,37 @@ Bunlar süsleme değil, okunabilirlik sözleşmesidir:
   `body` (15) → etiket/not `footnote`/`caption` (13/12). Etiketler değerlerden
   küçük ve ikincil tondadır. Sayısal her değer `tabular-nums` taşır; görsel
   harf aralığı hiçbir yerde -0.03em'den sıkı değildir.
-- **Fiyat sayfada tek bir yerde büyür:** karar kolonunda, `display` ölçeğinde,
-  tabular. Başlık künyesi fiyatı **taşımaz** (`GlassListingDetailHeader`'a
-  `price` verilmez) — aynı sayı iki yüzeyde iki farklı vurguyla durmaz.
+- **Fiyat sayfada tek bir yerde büyür:** karar kolonunun giriş bloğunda,
+  `display` ölçeğinde, tabular. Başlık künyesi fiyatı **taşımaz**
+  (`GlassListingDetailHeader`'a `price` verilmez) — aynı sayı iki yüzeyde iki
+  farklı vurguyla durmaz. Sticky eşlikçideki tek satırlık fiyat çapası bu
+  kuralın istisnası değildir: `body` ölçeğinde, ikincil tonda ve **tek metin
+  düğümü** olarak (`toplam · birim`) yazılır — kaydırılıp gitmiş bir değerin
+  referansıdır, ikinci bir vurgu değil. Çapa ayrı bir öğeye bölünmez; bölünse
+  aynı sayı sayfada iki kez "büyümüş" olurdu.
+- **Karar kolonu iki parçadır.** Giriş bloğu (`railIntro`) bir kez okunur ve
+  akıp gider: fiyat, birim fiyatın dayanağı, doğrulama özeti, görüşme öncesi
+  çözülmesi gerekenler. Eşlikçi (`railSticky`) okuyucuyla kalır ve yalnız
+  kanıt taranırken hâlâ gereken üç şeyi taşır: **fiyat çapası · birincil eylem
+  · satıcı satırı.** Eşlikçi giriş bloğunun kopyası değildir — kritik konu
+  listesi ve doğrulama özeti oraya taşınmaz; onlar okunacak metindir, yanında
+  taşınacak araç değil. Eşlikçi sticky bölüm indeksinin altından başlar
+  (`--rail-sticky-top`) ve tek kolonlu yerleşimde yapışmaz.
+- **Yapay zekâ karar özeti de kutusuz akar.** Bölüm çerçeveli bir panel
+  açmaz (`GlassAiSummaryCard` bu sayfada kullanılmaz — kutusuz bir bölümün
+  içindeki çerçeveli kart, kart içinde kart olurdu). İddiaların dayanak
+  bağlantısı **dolu buton değildir**: cümlenin sonunda duran, altçizgili,
+  ikincil tonlu satır içi bir kaynak işaretidir ve gittiği bölümü adıyla söyler
+  (`Dayanak: Parsel`). Etiket bölüm indeksiyle aynı kaynaktan gelir
+  (`sectionLabel`), ikinci bir sözlük tutulmaz. Yapay zekâ atfı kaybolmaz:
+  bölüm başlığı ve altındaki kaynak künyesi (asistan · model sürümü · kanıt
+  kesiti) görünür kalır.
+- **Yüzen alt dock için pay sayfa tarafından ayrılır.** Kabuğun dock'u
+  viewport'un ortasına sabitlenmiştir ve sayfanın ızgarasını tanımaz; bu yüzden
+  `.shell` üzerinde tek bir `--dock-clearance` yerel özelliği tanımlıdır
+  (`--lg-shell-dock-offset` + `env(safe-area-inset-bottom)`). Hem gövdenin alt
+  dolgusu (son etkileşimli öğe: satıcı bölümündeki numara kontrolü) hem karar
+  rayının hareket alanı bunu okur. Sabit bir piksel değeri yazılmaz.
 - **Doğrulama vektörü dar kolona sıkışmaz.** Vektörün tamamı Özet bölümünde,
   kendi iki kolonlu ızgarasındadır (`#dogrulama`); karar kolonunda yalnız
   özeti durur (kaç kontrol olumlu · olumsuz satırların başlıkları · eksik
@@ -307,6 +341,10 @@ değildir ve bu görünür biçimde yazılır.
   (`outline: var(--lg-focus-ring-width) solid var(--lg-accent)`).
 - Dokunmatik hedefler ≥44px: kontrol yükseklikleri `--lg-control-*`
   token'larından gelir, `pointer: coarse` altında token'lar zaten büyür.
+  Tek istisna **cümlenin içinde duran** bağlantılardır (karar özetindeki
+  `Dayanak: …` işaretleri): boyutları çevreleyen metnin satır yüksekliğine
+  bağlıdır ve bir kontrol yüksekliğine zorlanamazlar. Orada `pointer: coarse`
+  altında dolgu ile isabet alanı büyütülür — dolgu satır kutusunu değiştirmez.
 - Animasyon yalnız transform/opacity/filter; `prefers-reduced-motion` altında
   kapalı (component'lerin kendi sözleşmesi).
 
@@ -390,6 +428,13 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 
 ## Changelog
 
+- 2026-07-29 — Görsel ikinci geçiş (§1, §1b, §8): yapay zekâ karar özeti
+  kutusundan çıktı ve dayanak butonları sessiz satır içi kaynak işaretlerine
+  indi; karar kolonu giriş bloğu + sticky eşlikçi olarak ikiye ayrıldı, satıcı
+  bölümü ızgaranın ikinci satırına alınarak rayın hareket alanı kanıt akışıyla
+  sınırlandı; yüzen alt dock payı tek bir `--dock-clearance` yerel
+  özelliğinden okunuyor. Bilgi mimarisi, metinler ve dürüstlük kuralları
+  değişmedi; 133 feature testinin hiçbiri değiştirilmedi.
 - 2026-07-28 — Görsel yapı yeniden kuruldu (§1b, §1c): bölümler kart olmaktan
   çıktı, kanıt satırları sayfa genelinde ortak dikey eksene oturdu, doğrulama
   vektörü kendi iki kolonlu ızgarasına taşındı, fiyat karar kolonuna alındı,
