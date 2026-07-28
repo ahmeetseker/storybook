@@ -26,6 +26,12 @@ export {
   type GlassProvenanceFreshness,
   type GlassProvenanceConflict,
 } from './components/GlassDataProvenance'
+export {
+  GlassDetailActionBar,
+  type GlassDetailActionBarProps,
+  type GlassDetailAction,
+  type GlassDetailUtilityAction,
+} from './components/GlassDetailActionBar'
 export { GlassTabs, type GlassTabsProps, type GlassTabItem } from './components/GlassTabs'
 export { GlassSellerCard, type GlassSellerCardProps } from './components/GlassSellerCard'
 export { GlassLocationCard, type GlassLocationCardProps } from './components/GlassLocationCard'

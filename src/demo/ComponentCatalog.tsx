@@ -153,6 +153,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glasschip--default',
     preview: <GlassChip defaultSelected onSelectedChange={noop}>Boyasız</GlassChip>,
   },
+  {
+    name: 'Detail Action Bar',
+    description: 'İlan detayının karar/iletişim eylem grubu — tek prominent CTA, ikincil eylem ve utility\'ler tek cam yüzeyde.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-eylemler-glassdetailactionbar--default',
+  },
   // ── Navigasyon ──────────────────────────────────────────────────────────
   {
     name: 'Navbar',
