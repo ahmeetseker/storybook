@@ -410,6 +410,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassaisearchbar--default',
   },
   {
+    name: "AI Kompozitör",
+    description: "Konuşmalı brief alanı — büyüyen textarea, bağlam ekleri (harita/görsel/ses), tek yapılandırılmış cevap (özet + takip önerisi + atıf).",
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassaicomposer--default',
+  },
+  {
     name: "AI Değerleme",
     description: "AVM değerleme kartı — tahmin + min-max aralık barı + liste fiyatı kıyası + güven yüzdesi; panel/inline.",
     category: 'İçerik',

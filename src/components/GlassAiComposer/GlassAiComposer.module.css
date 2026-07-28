@@ -1,0 +1,367 @@
+.root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --dot-size: 6px;
+  --remove-size: 20px;
+  --remove-size-coarse: 28px;
+  --chip-gap: 6px;
+  --textarea-min-lg: 72px;
+  --textarea-max-lg: 160px;
+  --textarea-min-md: 24px;
+  --textarea-max-md: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3, 12px);
+  width: 100%;
+}
+
+/* Kabuk: düz içerik yüzeyi (surface + hairline) — cam yalnız gömülü gönder butonunda */
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+  padding: var(--lg-space-4, 16px);
+  border-radius: var(--lg-radius-card, 20px);
+  background: var(--lg-surface, #fff);
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  box-shadow: var(--lg-shadow-xs);
+}
+
+.md .shell {
+  padding: var(--lg-space-3, 12px);
+}
+
+/* Odak görsel olarak algılanan birleşik kontrolün tamamında gösterilir.
+   Gönder butonu kendi :focus-visible halkasını koruduğu için yalnız textarea
+   focus-visible olduğunda kabuk halka alır. */
+.shell:has(.textarea:focus-visible) {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent, #b45309);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+.shell[data-disabled] {
+  opacity: 0.7;
+}
+
+/* ── Ekler ─────────────────────────────────────────────────────────── */
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.attachmentItem {
+  display: flex;
+}
+
+.attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chip-gap);
+  min-height: var(--lg-control-sm, 32px);
+  padding-inline: var(--lg-space-3, 12px);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-accent, #b45309) 10%, var(--lg-surface, #fff));
+  border: 1px solid color-mix(in srgb, var(--lg-accent, #b45309) 24%, transparent);
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label, #24211b);
+}
+
+.attachmentIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--lg-accent, #b45309);
+}
+
+.attachmentLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.attachmentRemove {
+  appearance: none;
+  border: 0;
+  margin-inline-end: calc(-1 * var(--lg-space-1, 4px));
+  width: var(--remove-size);
+  height: var(--remove-size);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
+  color: var(--lg-label, #24211b);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.16s ease-out;
+}
+@media (pointer: coarse) {
+  .attachmentRemove {
+    width: var(--remove-size-coarse);
+    height: var(--remove-size-coarse);
+  }
+}
+@media (hover: hover) {
+  .attachmentRemove:hover {
+    background-color: color-mix(in srgb, var(--lg-label, #24211b) 20%, transparent);
+  }
+}
+.attachmentRemove:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent, #b45309);
+  outline-offset: 1px;
+}
+.attachmentRemove:disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ── Giriş ─────────────────────────────────────────────────────────── */
+
+.textarea {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  resize: none;
+  font: inherit;
+  font-size: var(--lg-text-body, 15px);
+  line-height: 1.5;
+  color: var(--lg-label, #24211b);
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+}
+.textarea::placeholder {
+  color: var(--lg-label-secondary, #79726a);
+}
+.textarea:disabled {
+  cursor: default;
+}
+
+/* :has() desteklemeyen tarayıcılarda erişilebilir focus göstergesi textarea
+   üzerinde kalır; modern tarayıcılar bunu birleşik kabuk halkasına taşır. */
+.textarea:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent, #b45309);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+  border-radius: var(--lg-radius-chip, 10px);
+}
+@supports selector(:has(*)) {
+  .shell:has(.textarea:focus-visible) .textarea:focus-visible {
+    outline-color: transparent;
+  }
+}
+
+.lg .textarea {
+  min-height: var(--textarea-min-lg);
+  max-height: var(--textarea-max-lg);
+}
+
+.md .textarea {
+  min-height: var(--textarea-min-md);
+  max-height: var(--textarea-max-md);
+}
+
+/* ── Araç çubuğu ───────────────────────────────────────────────────── */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px);
+  min-width: 0;
+}
+
+/* Araç butonu metin taşır → ikon-tek kuralı devreye girmez, ikon dekoratiftir */
+.tool {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--chip-gap);
+  min-height: var(--lg-control-sm, 32px);
+  padding-inline: var(--lg-space-3, 12px);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: transparent;
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: var(--lg-label-secondary, #79726a);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.16s ease-out,
+    border-color 0.16s ease-out,
+    background-color 0.16s ease-out;
+}
+.toolIcon {
+  display: inline-flex;
+  flex: none;
+}
+@media (pointer: coarse) {
+  .tool {
+    min-height: var(--lg-control-md); /* coarse'ta token 44px */
+  }
+}
+@media (hover: hover) {
+  .tool:hover:not(:disabled) {
+    color: var(--lg-accent, #b45309);
+    border-color: color-mix(in srgb, var(--lg-accent, #b45309) 40%, transparent);
+    background-color: color-mix(in srgb, var(--lg-accent, #b45309) 8%, transparent);
+  }
+}
+.tool:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent, #b45309);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+.tool:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.submit {
+  flex: none;
+  margin-inline-start: auto;
+  inline-size: var(--lg-control-md, 40px);
+  block-size: var(--lg-control-md, 40px);
+  min-inline-size: var(--lg-control-md, 40px);
+  padding-inline: 0;
+}
+@media (pointer: coarse) {
+  .submit {
+    inline-size: var(--lg-control-lg);
+    block-size: var(--lg-control-lg);
+    min-inline-size: var(--lg-control-lg);
+  }
+}
+
+/* ── Durum bölgesi (düşünüyor + cevap) ─────────────────────────────── */
+
+/* Boşken alan kaplamasın — element AT için hep mount kalır, yalnız görsel olarak katlanır */
+.status:empty {
+  display: none;
+}
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  margin: 0;
+  padding-inline: var(--lg-space-4, 16px);
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary, #79726a);
+}
+
+.thinkingDot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  flex: none;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-accent, #b45309);
+  animation: lg-composer-pulse 1.2s ease-in-out infinite;
+}
+@keyframes lg-composer-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Cevap kartı — düz yüzey, cam üstüne cam yok ───────────────────── */
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3, 12px);
+  padding: var(--lg-space-4, 16px);
+  border-radius: var(--lg-radius-media, 14px);
+  background: var(--lg-surface, #fff);
+  border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  animation: lg-composer-enter 0.24s ease-out;
+}
+@keyframes lg-composer-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.answerText {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  line-height: 1.6;
+  color: var(--lg-label, #24211b);
+  overflow-wrap: anywhere;
+}
+
+.answerChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px);
+}
+
+.answerChip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lg-control-sm, 32px);
+  padding-inline: var(--lg-space-3, 12px);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-accent, #b45309) 10%, var(--lg-surface, #fff));
+  border: 1px solid color-mix(in srgb, var(--lg-accent, #b45309) 24%, transparent);
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--lg-accent, #b45309) 78%, var(--lg-label, #24211b));
+  cursor: pointer;
+  transition: background-color 0.16s ease-out;
+}
+@media (pointer: coarse) {
+  .answerChip {
+    min-height: var(--lg-control-md); /* coarse'ta token 44px */
+  }
+}
+@media (hover: hover) {
+  .answerChip:hover {
+    background-color: color-mix(in srgb, var(--lg-accent, #b45309) 20%, var(--lg-surface, #fff));
+  }
+}
+.answerChip:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent, #b45309);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+.answerSources {
+  margin: 0;
+  padding-top: var(--lg-space-3, 12px);
+  border-top: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary, #79726a);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachmentRemove,
+  .tool,
+  .answerChip {
+    transition: none;
+  }
+  .answer {
+    animation: none;
+  }
+  .thinkingDot {
+    animation: none;
+    opacity: 0.7;
+  }
+}

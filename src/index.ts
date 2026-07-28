@@ -69,6 +69,14 @@ export type {
   GlassAiFlagBannerFeedbackValue,
 } from './components/GlassAiFlagBanner'
 export { GlassAiSearchBar, type GlassAiSearchBarProps, type GlassAiSearchBarFilter } from './components/GlassAiSearchBar'
+export { GlassAiComposer } from './components/GlassAiComposer'
+export type {
+  GlassAiComposerProps,
+  GlassAiComposerTool,
+  GlassAiComposerAttachment,
+  GlassAiComposerAnswer,
+  GlassAiComposerAnswerChip,
+} from './components/GlassAiComposer'
 export { GlassValuationCard } from './components/GlassValuationCard'
 export type { GlassValuationCardProps, GlassValuationFeedback } from './components/GlassValuationCard'
 export { GlassAiSummaryCard } from './components/GlassAiSummaryCard'
