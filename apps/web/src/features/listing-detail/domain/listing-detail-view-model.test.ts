@@ -83,6 +83,20 @@ describe('criticalIssues', () => {
     expect(issue?.detail).toContain('4.850')
   })
 
+  it('kayıt değeri alınamadı durumunda NaN yerine açıklama gösterir', () => {
+    const detail = landDetail({
+      parcel: {
+        blockParcel: evidence('214 ada / 7 parsel'),
+        area: { status: 'conflicting', value: undefined, freshness: 'unknown', source: { id: 'kadastro', name: 'Kadastro', sourceClass: 'unknown' }, retrievedAt: '2026-07-24T09:12:00.000Z', scope: 'parcel', conflicts: [{ sourceId: 'advertiser', value: 4850 }] },
+        locationPrecision: evidence('±5 m'),
+      },
+    })
+    const issue = criticalIssues(detail).find((item) => item.id === 'area-conflict')
+    expect(issue?.detail).not.toContain('NaN')
+    expect(issue?.detail).toContain('Kayıt değeri alınamadı')
+    expect(issue?.detail).toContain('4.850')
+  })
+
   it('müstakil tapu ve doğrulanmış erişimde kritik eksik üretmez', () => {
     const detail = landDetail({
       planning: {

@@ -40,13 +40,15 @@ export function criticalIssues(detail: ListingDetail): CriticalIssue[] {
 
   if (hasConflict(detail.parcel.area)) {
     const recorded = detail.parcel.area.value
-    const declared = detail.parcel.area.conflicts?.[0]?.value
+    const declared = detail.price.declaredArea
+    const recordedText =
+      recorded !== undefined
+        ? `Kayıtta ${trNumber.format(recorded)} m², ilanda`
+        : 'Kayıt değeri alınamadı; ilanda'
     issues.push({
       id: 'area-conflict',
       title: 'Yüzölçümü çelişkisi',
-      detail: `Kayıtta ${trNumber.format(Number(recorded))} m², ilanda ${trNumber.format(
-        Number(declared),
-      )} m² beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
+      detail: `${recordedText} ${trNumber.format(declared)} m² beyan edildi. Birim fiyat beyan edilen alana göre hesaplandı.`,
       action: 'Aplikasyon krokisi iste',
     })
   }
