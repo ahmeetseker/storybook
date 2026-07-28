@@ -105,9 +105,20 @@ değildir ve bu görünür biçimde yazılır.
   render edilmez; yerine gerekçe metni durur.
 - `onRevealPhone` verilmezse **buton hiç render edilmez.** Çalışmayan buton
   gösterilmez.
+- **Numara sayfada tam olarak tek yerde açılır: satıcı bölümü.** Başka hiçbir
+  eylem açılış mantığını kopyalamaz. Karar rayının ikincil eylemi
+  (`Satıcı bilgilerine git`) yalnız **gezinir**: `SELLER_REVEAL_CONTROL_ID`
+  kimlikli kontrolü görünür alana getirir ve odağı ona taşır. Kimlik her zaman
+  o an canlı olan öğededir — açılıştan önce butonda, sonra `tel:` bağlantısında.
+  Kaydırma `prefers-reduced-motion` altında anidir (`behavior: 'auto'`).
+- Satıcı bölümünde kontrol yoksa (`hasSellerRevealControl` false: sağlayıcı
+  bağlı değil veya iletişim kapalı) **rayın ikincil eylemi hiç render
+  edilmez.** Ray asla render edilip işlevsiz kalan bir buton göstermez.
 - **Analitiğe numara gönderilmez.** `onAnalyticsEvent` yalnız olay adı alır
   (`seller_phone_reveal_requested` · `_succeeded` · `_failed`); tip bir string
-  union'dır, numara taşıyan bir yük geçemez.
+  union'dır, numara taşıyan bir yük geçemez. **Not:** bu sözleşme tanımlıdır
+  ama route henüz bir telemetri hedefi bağlamaz — `onAnalyticsEvent`
+  çağrılmadan durur; çalışan bir altyapı sanılmamalıdır.
 - `GlassSellerCard` numarayı `phone` prop'uyla alıp görsel olarak maskeler; bu
   sözleşmeyi ihlal ettiği için bu sayfada **kullanılmaz**. Satıcı kimliği
   `GlassAgencyCard` ile (numara prop'u verilmeden), açılan numara ise düz
@@ -167,9 +178,11 @@ yükler.
 
 - `GlassMap` Faz 1'de gerçek tile servisi kullanmaz (seed'li şematik zemin);
   parsel sınırı kadastral doğrulukta çizilmez.
-- `/api/ilan/:id/telefon` uç noktası Faz 1'de yayında değildir; çağrı görünür
+- `/api/ilan/:id/telefon` uç noktası **Faz 1'de mevcut değildir**; çağrı görünür
   bir gerekçeyle başarısız olur ve kontrol tekrar denenebilir kalır. Numaranın
-  istemci paketine gömülmesi bilinçli olarak yapılmamıştır.
+  istemci paketine gömülmesi bilinçli olarak yapılmamıştır. Aynı biçimde
+  `onAnalyticsEvent` bir sözleşmedir, bağlı bir telemetri hedefi yoktur —
+  ikisi de çalışan altyapı değil, tanımlanmış arayüzdür.
 - Faz 2+'ye bırakılanlar: sohbet ve ajan basamakları, JSON-LD, analytics olay
   sözlüğü, SLO ölçümü.
 

@@ -5,6 +5,7 @@ import type { ListingDetail } from '../domain/listing-detail-types'
 import { criticalIssues } from '../domain/listing-detail-view-model'
 import { contactClosedReason, formatDateShort, formatNumber } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
+import { SELLER_REVEAL_CONTROL_ID } from './seller-reveal'
 import styles from '../ListingDetailWorkspace.module.css'
 
 /**
@@ -200,12 +201,18 @@ export function SellerSection({
           </p>
         ) : phone !== null ? (
           <p className={styles.revealedPhone}>
-            <a ref={linkRef} href={toTelHref(phone)} className={styles.phoneLink}>
+            <a
+              ref={linkRef}
+              id={SELLER_REVEAL_CONTROL_ID}
+              href={toTelHref(phone)}
+              className={styles.phoneLink}
+            >
               {phone}
             </a>
           </p>
         ) : onRevealPhone ? (
           <GlassButton
+            id={SELLER_REVEAL_CONTROL_ID}
             onClick={handleReveal}
             loading={status === 'loading'}
             className={styles.revealButton}

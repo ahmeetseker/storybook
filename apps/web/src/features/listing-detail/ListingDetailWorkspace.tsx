@@ -17,6 +17,7 @@ import { MarketSection } from './components/MarketSection'
 import { ParcelSection } from './components/ParcelSection'
 import { PlanningAndLegalSection } from './components/PlanningAndLegalSection'
 import { SellerSection, type SellerPhoneAnalyticsEvent } from './components/SellerSection'
+import { hasSellerRevealControl, SELLER_REVEAL_CONTROL_ID } from './components/seller-reveal'
 import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
 import type { ListingDetail } from './domain/listing-detail-types'
@@ -71,6 +72,23 @@ function priceNote(detail: ListingDetail): string {
 }
 
 /**
+ * Kullanıcıyı satıcı bölümündeki numara kontrolüne taşır.
+ *
+ * Numara burada açılmaz — açılış sözleşmesi tek bir yerde, `SellerSection`
+ * içinde yaşar. Bu yalnız gezinmedir: kontrolü görünür alana getirir ve odağı
+ * ona verir. `prefers-reduced-motion` altında kaydırma anidir.
+ */
+function goToSellerRevealControl(): void {
+  const target = document.getElementById(SELLER_REVEAL_CONTROL_ID)
+  if (!target) return
+
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+  // jsdom `scrollIntoView`'ı uygulamaz; odak taşıma kaydırmadan bağımsız çalışır.
+  target.scrollIntoView?.({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' })
+  target.focus()
+}
+
+/**
  * İlan detayının Yön A yerleşimi.
  *
  * Cam bütçesi sayfa başına altı yüzeydir; bu çalışma alanı üçünü açar
@@ -117,7 +135,12 @@ export function ListingDetailWorkspace({
           <MarketSection detail={detail} />
           <DocumentsSection detail={detail} />
         </div>
-        <ListingDecisionRail detail={detail} />
+        <ListingDecisionRail
+          detail={detail}
+          onGoToSeller={
+            hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
+          }
+        />
       </div>
 
       <SellerSection

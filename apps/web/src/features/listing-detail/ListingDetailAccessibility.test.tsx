@@ -1,12 +1,19 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import { loadListingDetail } from './data/listing-detail-adapter'
+import {
+  loadListingDetail,
+  type ListingDetailScenario,
+} from './data/listing-detail-adapter'
 import { ListingDetailWorkspace } from './ListingDetailWorkspace'
 
 const NOW = '2026-07-27T09:00:00.000Z'
 
-async function renderPage(onRevealPhone?: () => Promise<string>) {
-  const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+async function renderPage(
+  onRevealPhone?: () => Promise<string>,
+  scenario?: ListingDetailScenario,
+) {
+  const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario, now: NOW })
   if (!result) throw new Error('fixture bulunamadı')
   return render(<ListingDetailWorkspace result={result} onRevealPhone={onRevealPhone} />)
 }
@@ -56,6 +63,32 @@ describe('ilan detayı erişilebilirlik geçidi', () => {
     const { container } = await renderPage(async () => '0 (252) 000 00 00')
     expect(screen.getByRole('button', { name: 'Numarayı göster' })).toBeTruthy()
     expect(container.querySelectorAll('[data-material="glass"]').length).toBeLessThanOrEqual(6)
+  })
+
+  it('karar rayının ikincil eylemi odağı satıcı bölümündeki numara kontrolüne taşır', async () => {
+    const user = userEvent.setup()
+    const { container } = await renderPage(async () => '0 (252) 000 00 00')
+
+    const control = screen.getByRole('button', { name: 'Numarayı göster' })
+    await user.click(screen.getByRole('button', { name: 'Satıcı bilgilerine git' }))
+
+    expect(document.activeElement).toBe(control)
+    // Odak taşımak tek başına numarayı açmaz.
+    expect(container.textContent).not.toMatch(/\d{3}\s?\d{2}\s?\d{2}\s?\d{2}/)
+    expect(screen.getByRole('button', { name: 'Numarayı göster' })).toBeTruthy()
+  })
+
+  // Numara sağlayıcısı bağlı değil → satıcı bölümünde kontrol yok → ray da
+  // eylemi göstermez. Render edilip işlevsiz kalan buton yok.
+  it('numara sağlayıcısı yokken rayın ikincil eylemi hiç render edilmez', async () => {
+    await renderPage()
+    expect(screen.queryByRole('button', { name: 'Satıcı bilgilerine git' })).toBeNull()
+  })
+
+  it('iletişim kapalıyken rayın ikincil eylemi hiç render edilmez', async () => {
+    await renderPage(async () => '0 (252) 000 00 00', 'inactive')
+    expect(screen.queryByRole('button', { name: 'Satıcı bilgilerine git' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Numarayı göster' })).toBeNull()
   })
 
   it('numara açılmadan önce sayfa kaynağında telefon numarası bulunmaz', async () => {
