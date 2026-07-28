@@ -1,0 +1,75 @@
+import { render, screen, within } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { ListingDetailWorkspace } from './ListingDetailWorkspace'
+import { loadListingDetail } from './data/listing-detail-adapter'
+
+const NOW = '2026-07-27T09:00:00.000Z'
+
+async function renderWorkspace(scenario?: Parameters<typeof loadListingDetail>[0]['scenario']) {
+  const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario, now: NOW })
+  if (!result) throw new Error('fixture bulunamadı')
+  return render(<ListingDetailWorkspace result={result} />)
+}
+
+describe('ListingDetailWorkspace', () => {
+  it('sayfada tek h1 bulunur', async () => {
+    await renderWorkspace()
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+  })
+
+  it('aynı anda en fazla altı cam yüzey render eder', async () => {
+    const { container } = await renderWorkspace()
+    expect(container.querySelectorAll('[data-material="glass"]').length).toBeLessThanOrEqual(6)
+  })
+
+  it('EİDS satırını kapsam notuyla birlikte gösterir', async () => {
+    await renderWorkspace()
+    expect(screen.getByText('İlan verme yetkisi EİDS ile doğrulandı')).toBeTruthy()
+    expect(
+      screen.getByText(
+        'Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.',
+      ),
+    ).toBeTruthy()
+  })
+
+  it('kritik eksikleri ilk görünümde, accordion arkasına saklamadan listeler', async () => {
+    await renderWorkspace()
+    const critical = screen.getByRole('region', { name: /Görüşmeden önce/ })
+    expect(within(critical).getByText(/hisseli/i)).toBeTruthy()
+    expect(within(critical).getByText(/Yasal yol erişimi/i)).toBeTruthy()
+    expect(within(critical).getByText(/çelişki/i)).toBeTruthy()
+  })
+
+  it('bölüm indeksi yedi bölümü sırayla bağlar', async () => {
+    await renderWorkspace()
+    const nav = screen.getByRole('navigation', { name: 'Bölümler' })
+    const links = within(nav).getAllByRole('link')
+    expect(links.map((link) => link.textContent)).toEqual([
+      'Özet',
+      'Parsel',
+      'İmar ve Hukuk',
+      'Altyapı ve Erişim',
+      'Arazi ve Tehlike',
+      'Piyasa',
+      'Belgeler',
+    ])
+  })
+
+  it('karar rayında tek prominent CTA bulunur', async () => {
+    await renderWorkspace()
+    const rail = screen.getByRole('group', { name: 'Karar ve iletişim' })
+    expect(within(rail).getByRole('button', { name: 'Mesaj gönder' })).toBeTruthy()
+  })
+
+  it('süresi dolmuş ilanda iletişim eylemleri kapanır ve gerekçe görünür', async () => {
+    await renderWorkspace('inactive')
+    expect(screen.getByText(/İlan süresi doldu/i)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Mesaj gönder' })).toHaveProperty('disabled', true)
+  })
+
+  it('harita kullanılamadığında konum bilgisi tablo olarak kalır', async () => {
+    await renderWorkspace('map-unavailable')
+    expect(screen.getByText(/Harita servisine ulaşılamadı/)).toBeTruthy()
+    expect(screen.getByText('214 ada / 7 parsel')).toBeTruthy()
+  })
+})
