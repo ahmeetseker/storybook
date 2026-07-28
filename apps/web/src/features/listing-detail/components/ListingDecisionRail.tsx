@@ -60,6 +60,20 @@ function sellerTypeLabel(type: ListingDetail['seller']['type']): string {
  * numara kontrolüne taşır. Böylece açılış mantığı tek yerde kalır ve rayda
  * hiçbir zaman işlevsiz bir buton bulunmaz: işleyicisi olmayan eylem
  * `disabled` durur, gerekçesi notta yazılıdır.
+ *
+ * Ray iki parçadır:
+ *
+ * - **Giriş bloğu** (`railIntro`) bir kez okunur ve akıp gider: fiyat, birim
+ *   fiyatın dayanağı, doğrulama özeti ve görüşme öncesi çözülmesi gerekenler.
+ * - **Eşlikçi** (`railSticky`) okuyucuyla birlikte kalır: fiyat çapası,
+ *   birincil eylem ve satıcı satırı — yani kanıt bölümlerini tararken hâlâ
+ *   gereken üç şey. Giriş bloğunun kopyası değildir; kritik konu listesi ve
+ *   doğrulama özeti eşlikçiye taşınmaz, çünkü onlar okunacak metindir,
+ *   yanında taşınacak araç değil.
+ *
+ * Fiyat sayfada yalnız **bir kez büyür** (giriş bloğu, `display` ölçeği);
+ * eşlikçideki satır aynı sayının `body` ölçeğinde tek satırlık hatırlatmasıdır
+ * — ikinci bir vurgu değil, kaydırılıp gitmiş bir değerin referansı.
  */
 export function ListingDecisionRail({
   detail,
@@ -87,120 +101,130 @@ export function ListingDecisionRail({
 
   return (
     <aside className={styles.rail} aria-label="Karar kolonu">
-      <div className={styles.priceBlock}>
-        <p className={styles.price}>{formatPrice(detail.price.amount)}</p>
-        <dl className={styles.priceFacts}>
-          <div>
-            <dt>Birim fiyat</dt>
-            <dd>{formatUnitPrice(detail.price.unitPrice)}</dd>
-          </div>
-          <div>
-            <dt>Beyan edilen alan</dt>
-            <dd>{formatArea(detail.price.declaredArea)}</dd>
-          </div>
-        </dl>
-        <p className={styles.priceBasis}>{priceNote}</p>
-      </div>
+      <div className={styles.railIntro}>
+        <div className={styles.priceBlock}>
+          <p className={styles.price}>{formatPrice(detail.price.amount)}</p>
+          <dl className={styles.priceFacts}>
+            <div>
+              <dt>Birim fiyat</dt>
+              <dd>{formatUnitPrice(detail.price.unitPrice)}</dd>
+            </div>
+            <div>
+              <dt>Beyan edilen alan</dt>
+              <dd>{formatArea(detail.price.declaredArea)}</dd>
+            </div>
+          </dl>
+          <p className={styles.priceBasis}>{priceNote}</p>
+        </div>
 
-      <div className={styles.verificationSummary}>
-        <h3 className={styles.railTitle}>Doğrulama</h3>
-        <p className={styles.railFact}>
-          {`${score.total} kontrolün ${score.positive} tanesi olumlu`}
-        </p>
-        {negatives.map((row) => (
-          <p key={row.id} className={styles.railState} data-state="negative">
-            <span className={styles.stateDot} aria-hidden="true" />
-            {`${STATE_LABEL.negative}: ${row.title}`}
+        <div className={styles.verificationSummary}>
+          <h3 className={styles.railTitle}>Doğrulama</h3>
+          <p className={styles.railFact}>
+            {`${score.total} kontrolün ${score.positive} tanesi olumlu`}
           </p>
-        ))}
-        {unknowns.length > 0 ? (
-          <p className={styles.railState} data-state="unknown">
-            <span className={styles.stateDot} aria-hidden="true" />
-            {`${STATE_LABEL.unknown}: ${unknowns.length} kontrolün sonucu kayıtta yok`}
-          </p>
-        ) : null}
-        <a className={styles.railLink} href={`#${VERIFICATION_SECTION_ID}`}>
-          Doğrulama vektörünün tamamı
-        </a>
-      </div>
+          {negatives.map((row) => (
+            <p key={row.id} className={styles.railState} data-state="negative">
+              <span className={styles.stateDot} aria-hidden="true" />
+              {`${STATE_LABEL.negative}: ${row.title}`}
+            </p>
+          ))}
+          {unknowns.length > 0 ? (
+            <p className={styles.railState} data-state="unknown">
+              <span className={styles.stateDot} aria-hidden="true" />
+              {`${STATE_LABEL.unknown}: ${unknowns.length} kontrolün sonucu kayıtta yok`}
+            </p>
+          ) : null}
+          <a className={styles.railLink} href={`#${VERIFICATION_SECTION_ID}`}>
+            Doğrulama vektörünün tamamı
+          </a>
+        </div>
 
-      <section className={styles.critical} aria-labelledby="kritik-baslik">
-        <h3 id="kritik-baslik" className={styles.railTitle}>
-          Görüşmeden önce çözülmesi gerekenler
-        </h3>
-        {issues.length === 0 ? (
-          <p className={styles.issueDetail}>
-            Bu ilanda karar öncesi çözülmesi gereken bir konu bulunmadı.
-          </p>
-        ) : (
-          <ul className={styles.criticalList}>
-            {issues.map((issue) => (
-              <li key={issue.id} className={styles.criticalItem}>
-                <p className={styles.issueTitle}>{issue.title}</p>
-                <p className={styles.issueDetail}>{issue.detail}</p>
-                {issue.action ? (
-                  <p className={styles.issueAction}>
-                    <span className={styles.issueActionLabel}>Sonraki adım:</span> {issue.action}
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {closedReason ? (
-        <GlassAlert severity="warning" title="İletişim kapalı">
-          {closedReason}
-        </GlassAlert>
-      ) : null}
-
-      <GlassDetailActionBar
-        label="Karar ve iletişim"
-        layout="rail"
-        primary={{
-          id: 'contact',
-          label: 'Mesaj gönder',
-          onSelect: () => onContact?.(),
-          disabled: contactClosed || !onContact,
-        }}
-        secondary={{
-          id: 'seller',
-          label: 'Satıcı bilgilerine git',
-          onSelect: () => onGoToSeller?.(),
-          disabled: contactClosed || !onGoToSeller,
-        }}
-        utilities={[
-          {
-            id: 'save',
-            label: saved ? 'Kayıtlı' : 'Kaydet',
-            pressed: saved,
-            onSelect: () => setSaved((value) => !value),
-          },
-        ]}
-        note={notes.length > 0 ? notes.join(' ') : undefined}
-      />
-
-      <div className={styles.sellerSummary}>
-        <p className={styles.sellerName}>{seller.name}</p>
-        <p className={styles.sellerMeta}>{sellerTypeLabel(seller.type)}</p>
-        {/* Yetki belgesi satırı yalnız kontrolün gerçekten uygulanabildiği
-            yerde bir sonuç bildirir. Bireysel satıcı TTBS kapsamında
-            değildir; orada "doğrulanamadı" demek hiç yapılmamış bir kontrolün
-            başarısız olduğunu iddia etmek olurdu. Metinler satıcı bölümüyle
-            tek kaynaktan gelir (`seller-copy.ts`). */}
-        {seller.type === 'agency' ? (
-          seller.licence?.value ? (
-            <p className={styles.sellerMeta}>{`Yetki belgesi: ${seller.licence.value}`}</p>
+        <section className={styles.critical} aria-labelledby="kritik-baslik">
+          <h3 id="kritik-baslik" className={styles.railTitle}>
+            Görüşmeden önce çözülmesi gerekenler
+          </h3>
+          {issues.length === 0 ? (
+            <p className={styles.issueDetail}>
+              Bu ilanda karar öncesi çözülmesi gereken bir konu bulunmadı.
+            </p>
           ) : (
-            <p className={styles.sellerMeta}>{AGENCY_LICENCE_UNVERIFIED}</p>
-          )
-        ) : (
-          <p className={styles.sellerMeta}>{INDIVIDUAL_TTBS_SCOPE_NOTE}</p>
-        )}
-        {seller.activeListings !== undefined ? (
-          <p className={styles.sellerMeta}>{`${seller.activeListings} aktif ilan`}</p>
+            <ul className={styles.criticalList}>
+              {issues.map((issue) => (
+                <li key={issue.id} className={styles.criticalItem}>
+                  <p className={styles.issueTitle}>{issue.title}</p>
+                  <p className={styles.issueDetail}>{issue.detail}</p>
+                  {issue.action ? (
+                    <p className={styles.issueAction}>
+                      <span className={styles.issueActionLabel}>Sonraki adım:</span> {issue.action}
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {closedReason ? (
+          <GlassAlert severity="warning" title="İletişim kapalı">
+            {closedReason}
+          </GlassAlert>
         ) : null}
+      </div>
+
+      {/* Okuyucuyla kalan parça. Fiyat çapası tek bir metin düğümüdür: aynı
+          sayıyı ikinci kez "büyüten" ayrı bir öğe açılmaz. */}
+      <div className={styles.railSticky}>
+        <p className={styles.railAnchor}>
+          {`${formatPrice(detail.price.amount)} · ${formatUnitPrice(detail.price.unitPrice)}`}
+        </p>
+
+        <GlassDetailActionBar
+          label="Karar ve iletişim"
+          layout="rail"
+          primary={{
+            id: 'contact',
+            label: 'Mesaj gönder',
+            onSelect: () => onContact?.(),
+            disabled: contactClosed || !onContact,
+          }}
+          secondary={{
+            id: 'seller',
+            label: 'Satıcı bilgilerine git',
+            onSelect: () => onGoToSeller?.(),
+            disabled: contactClosed || !onGoToSeller,
+          }}
+          utilities={[
+            {
+              id: 'save',
+              label: saved ? 'Kayıtlı' : 'Kaydet',
+              pressed: saved,
+              onSelect: () => setSaved((value) => !value),
+            },
+          ]}
+          note={notes.length > 0 ? notes.join(' ') : undefined}
+        />
+
+        <div className={styles.sellerSummary}>
+          <p className={styles.sellerName}>{seller.name}</p>
+          <p className={styles.sellerMeta}>{sellerTypeLabel(seller.type)}</p>
+          {/* Yetki belgesi satırı yalnız kontrolün gerçekten uygulanabildiği
+              yerde bir sonuç bildirir. Bireysel satıcı TTBS kapsamında
+              değildir; orada "doğrulanamadı" demek hiç yapılmamış bir kontrolün
+              başarısız olduğunu iddia etmek olurdu. Metinler satıcı bölümüyle
+              tek kaynaktan gelir (`seller-copy.ts`). */}
+          {seller.type === 'agency' ? (
+            seller.licence?.value ? (
+              <p className={styles.sellerMeta}>{`Yetki belgesi: ${seller.licence.value}`}</p>
+            ) : (
+              <p className={styles.sellerMeta}>{AGENCY_LICENCE_UNVERIFIED}</p>
+            )
+          ) : (
+            <p className={styles.sellerMeta}>{INDIVIDUAL_TTBS_SCOPE_NOTE}</p>
+          )}
+          {seller.activeListings !== undefined ? (
+            <p className={styles.sellerMeta}>{`${seller.activeListings} aktif ilan`}</p>
+          ) : null}
+        </div>
       </div>
     </aside>
   )

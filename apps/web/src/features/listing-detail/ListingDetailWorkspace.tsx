@@ -166,7 +166,14 @@ export function ListingDetailWorkspace({
 
         {/* Sayfanın tamamı tek ızgaradadır: solda kanıt akışı, sağda karar
             kolonu. Ortak eksen buradan gelir — her bölüm aynı içerik
-            kolonunun genişliğini paylaşır. */}
+            kolonunun genişliğini paylaşır.
+
+            Satıcı bölümü ızgaranın **ikinci satırındadır** (içerik kolonunun
+            genişliğinde, ama `.flow`'un dışında). Sebep yerleşimseldir: karar
+            rayının sticky eşlikçisi kendi ızgara alanı içinde hareket eder;
+            satıcı bölümü o alanın dışında kaldığı için ray kanıt akışı
+            biterken serbest kalır ve satıcı bölümüyle hiçbir zaman yan yana
+            durmaz (`rules.md` §1). */}
         <div className={styles.body}>
           <div className={styles.flow}>
             <ListingIntro detail={detail} mapSection={sections.map} />
@@ -195,11 +202,6 @@ export function ListingDetailWorkspace({
               <DeclaredFeaturesSection detail={detail} />
             )}
             <DocumentsSection detail={detail} />
-            <SellerSection
-              detail={detail}
-              onRevealPhone={onRevealPhone}
-              onAnalyticsEvent={onAnalyticsEvent}
-            />
           </div>
           <ListingDecisionRail
             detail={detail}
@@ -208,6 +210,11 @@ export function ListingDetailWorkspace({
             onGoToSeller={
               hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
             }
+          />
+          <SellerSection
+            detail={detail}
+            onRevealPhone={onRevealPhone}
+            onAnalyticsEvent={onAnalyticsEvent}
           />
         </div>
       </main>
