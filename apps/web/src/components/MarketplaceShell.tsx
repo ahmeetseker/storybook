@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import {
-  GlassAiSearchBar,
+  GlassAiComposer,
   GlassButton,
   GlassDock,
   GlassIslandHeader,
+  type GlassAiComposerAttachment,
+  type GlassAiComposerTool,
   type GlassDockItem,
   type GlassIslandHeaderPage,
 } from '@repo/ui'
@@ -22,6 +24,13 @@ type ViewportTier = keyof typeof dockRouteKeys
 type ThemeChoice = 'system' | 'light' | 'dark'
 
 const viewportTiers = ['desktop', 'tablet', 'mobile'] as const
+
+// Header kompozitörünün bağlam ekleme araçları — seçiciler parent'ın işi.
+const COMPOSER_TOOLS: GlassAiComposerTool[] = [
+  { id: 'map', label: 'Haritadan alan', icon: <NavigationIcon name="pin" size={16} /> },
+  { id: 'image', label: 'Görselle', icon: <NavigationIcon name="image" size={16} /> },
+  { id: 'voice', label: 'Sesli', icon: <NavigationIcon name="mic" size={16} /> },
+]
 
 function getViewportTier(): ViewportTier {
   if (typeof window === 'undefined') return 'desktop'
@@ -56,6 +65,8 @@ export function MarketplaceShell({
   const isFocusedListingFlow = currentRoute.key === 'create-listing'
   const [viewport, setViewport] = useState<ViewportTier | null>(null)
   const [theme, setTheme] = useState<ThemeChoice>('system')
+  const [brief, setBrief] = useState('')
+  const [briefContext, setBriefContext] = useState<GlassAiComposerAttachment[]>([])
 
   useEffect(() => {
     const update = () => setViewport(getViewportTier())
@@ -179,20 +190,41 @@ export function MarketplaceShell({
     </div>
   )
 
+  // Bağlamı zaten eklenmiş araç tekrar tıklanamaz — chip'i kaldırınca geri açılır.
+  const composerTools = COMPOSER_TOOLS.map((tool) => ({
+    ...tool,
+    disabled: briefContext.some((c) => c.id === tool.id),
+  }))
+
   const search = (
-    <GlassAiSearchBar
+    <GlassAiComposer
+      size="md"
+      value={brief}
+      onValueChange={setBrief}
+      placeholder="Aradığını anlat — “Urla’da bahçeli, 6 milyona kadar…”"
+      tools={composerTools}
+      attachments={briefContext}
+      onToolSelect={(id) => {
+        const tool = COMPOSER_TOOLS.find((t) => t.id === id)
+        // Harita/dosya/ses seçicileri henüz bağlı değil; şimdilik seçim niyeti
+        // kaldırılabilir bir bağlam chip'i olarak kaydedilir.
+        if (!tool || briefContext.some((c) => c.id === id)) return
+        setBriefContext((prev) => [
+          ...prev,
+          { id, label: tool.label, kind: 'Bağlam', icon: tool.icon },
+        ])
+      }}
+      onRemoveAttachment={(id) =>
+        setBriefContext((prev) => prev.filter((c) => c.id !== id))
+      }
       onSubmit={(query) => {
+        setBrief('')
+        setBriefContext([])
         void router.navigate({
           to: '/emlak',
           search: query ? ({ q: query } as never) : ({} as never),
         })
       }}
-      suggestions={[
-        'İzmir’de denize yakın satılık konut',
-        'Urla’da 5 milyon altı imarlı arsa',
-        'İstanbul’da kiralık cadde mağazası',
-      ]}
-      placeholder="Konut, arsa veya iş yeri ara"
     />
   )
 

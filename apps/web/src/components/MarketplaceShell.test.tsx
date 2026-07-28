@@ -18,7 +18,7 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@repo/ui', () => ({
-  GlassAiSearchBar: () => <div data-testid="global-search" />,
+  GlassAiComposer: () => <div data-testid="global-search" />,
   GlassButton: ({
     children,
     onClick,

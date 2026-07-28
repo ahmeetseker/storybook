@@ -3,7 +3,7 @@ import type { AppRouteDefinition } from '@/config/routes'
 
 export interface NavigationIconProps
   extends Omit<SVGProps<SVGSVGElement>, 'name'> {
-  name: AppRouteDefinition['icon'] | 'clock' | 'theme'
+  name: AppRouteDefinition['icon'] | 'clock' | 'theme' | 'image' | 'mic'
   size?: number
 }
 
@@ -21,6 +21,8 @@ const paths: Record<NavigationIconProps['name'], string[]> = {
   message: ['M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z'],
   clock: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z', 'M12 7v5l3 2'],
   theme: ['M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4', 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z'],
+  image: ['M4 5.5h16v13H4z', 'm4 15.5 4.5-4.5 3.5 3.5 3-3 5 5', 'M9.2 10.2a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z'],
+  mic: ['M12 3.5a2.5 2.5 0 0 1 2.5 2.5v5a2.5 2.5 0 0 1-5 0V6A2.5 2.5 0 0 1 12 3.5Z', 'M6.5 11a5.5 5.5 0 0 0 11 0', 'M12 16.5V20'],
 }
 
 export function NavigationIcon({
