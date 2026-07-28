@@ -67,19 +67,21 @@ function briefFor(detail: LandListingDetail): AiDecisionBrief {
 }
 
 function withScenario(base: LandListingDetail, scenario: ListingDetailScenario): LandListingDetail {
+  // Derin kopya: dönen `detail` hem modül düzeyindeki fixture'dan hem her
+  // çağrının kendi sonucundan bağımsız olmalı — aksi halde bir tüketicinin
+  // (ör. Storybook kontrolü, normalizer) iç içe bir diziyi/nesneyi mutasyona
+  // uğratması fixture'ı süreç ömrü boyunca kalıcı olarak bozar.
+  const clone = structuredClone(base)
+
   if (scenario === 'stale-planning') {
-    return {
-      ...base,
-      planning: {
-        ...base.planning,
-        landUse: { ...base.planning.landUse, freshness: 'stale' },
-      },
-    }
+    clone.planning.landUse.freshness = 'stale'
+    return clone
   }
   if (scenario === 'inactive') {
-    return { ...base, lifecycle: 'expired' }
+    clone.lifecycle = 'expired'
+    return clone
   }
-  return base
+  return clone
 }
 
 /**

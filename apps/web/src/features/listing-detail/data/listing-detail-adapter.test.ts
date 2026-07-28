@@ -66,4 +66,26 @@ describe('loadListingDetail', () => {
     const result = await loadListingDetail({ listingId: 'arsa-214-7', scenario: 'inactive', now: NOW })
     expect(result?.detail.lifecycle).toBe('expired')
   })
+
+  it('iki çağrının sonuçları iç içe referansları paylaşmaz', async () => {
+    const first = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const second = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    expect(first?.detail.documents).not.toBe(second?.detail.documents)
+    expect(first?.detail.parcel.area).not.toBe(second?.detail.parcel.area)
+  })
+
+  it('bir sonucun mutasyona uğratılması sonraki çağrıları veya fixture\'ı bozmaz', async () => {
+    const first = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    first?.detail.documents.push({
+      id: 'mutation-probe',
+      label: 'Sızıntı testi',
+      state: 'missing',
+      critical: false,
+    })
+    if (first) first.detail.parcel.area.value = 9999
+
+    const fresh = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    expect(fresh?.detail.documents).toHaveLength(5)
+    expect(fresh?.detail.parcel.area.value).toBe(4712)
+  })
 })
