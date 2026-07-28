@@ -154,7 +154,10 @@ export const OREN_LAND_LISTING: LandListingDetail = {
     landUse: {
       value: 'Turizm Tesis Alanı (öneri) · TAKS 0,20 · KAKS 0,40 · maks. 2 kat',
       status: 'declared',
-      freshness: 'aging',
+      // Belge tarihi kesitten ~8 ay eski: `freshnessFrom` eşiğine (180 gün)
+      // göre bayat. Güncellik kökenden bağımsızdır — plan notu resmî belge
+      // olsa da "Güncel değil" etiketiyle görünür.
+      freshness: 'stale',
       source: { id: 'plan-note', name: 'Plan notu belgesi', sourceClass: 'verified_document' },
       retrievedAt: CUTOFF,
       effectiveAt: '2025-11-19T00:00:00.000Z',

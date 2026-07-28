@@ -1,9 +1,9 @@
 import { GlassAlert } from '@repo/ui'
 
 import type { SectionState } from '../data/listing-detail-adapter'
-import type { EvidenceValue } from '../domain/evidence'
 import type { ListingDetail } from '../domain/listing-detail-types'
 import { formatArea } from '../format'
+import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface ParcelSectionProps {
@@ -11,17 +11,13 @@ export interface ParcelSectionProps {
   mapSection: SectionState<true>
 }
 
-/** Cevapsız kanıt boş string veya sıfırla taklit edilmez. */
-function textOf<T>(value: EvidenceValue<T>, format: (raw: T) => string): string {
-  return value.value === undefined ? 'Kayıt alınamadı' : format(value.value)
-}
-
 /**
  * Parsel kimliği ve konum bölümü.
  *
  * Harita bir zenginleştirmedir: sağlayıcı düşse de ada/parsel, kayıtlı
- * yüzölçümü ve konum kesinliği metin olarak burada kalır. Satır bazlı kaynak
- * rozetleri Task 10'da `EvidenceRow` ile eklenir.
+ * yüzölçümü ve konum kesinliği metin olarak burada kalır. Her satır kendi
+ * kaynak künyesini taşır; yüzölçümü çelişkisi künyede iki değeri birlikte
+ * gösterir ve sessizce çözülmez.
  */
 export function ParcelSection({ detail, mapSection }: ParcelSectionProps) {
   const { parcel } = detail
@@ -38,26 +34,19 @@ export function ParcelSection({ detail, mapSection }: ParcelSectionProps) {
         </GlassAlert>
       ) : null}
 
-      <dl className={styles.factList}>
-        <div className={styles.factRow}>
-          <dt>Ada / parsel</dt>
-          <dd>{textOf(parcel.blockParcel, (raw) => raw)}</dd>
-        </div>
-        <div className={styles.factRow}>
-          <dt>Kayıtlı yüzölçümü</dt>
-          <dd>{textOf(parcel.area, formatArea)}</dd>
-        </div>
-        <div className={styles.factRow}>
-          <dt>Konum kesinliği</dt>
-          <dd>{textOf(parcel.locationPrecision, (raw) => raw)}</dd>
-        </div>
+      <EvidenceList>
+        <EvidenceRow label="Ada / parsel" value={parcel.blockParcel} />
+        <EvidenceRow
+          label="Kayıtlı yüzölçümü"
+          value={parcel.area}
+          formatValue={formatArea}
+          note={`İlanda ${formatArea(detail.price.declaredArea)} beyan edildi; birim fiyat beyan edilen alana göre hesaplandı.`}
+        />
+        <EvidenceRow label="Konum kesinliği" value={parcel.locationPrecision} />
         {parcel.distanceToSea ? (
-          <div className={styles.factRow}>
-            <dt>Denize mesafe</dt>
-            <dd>{textOf(parcel.distanceToSea, (raw) => raw)}</dd>
-          </div>
+          <EvidenceRow label="Denize mesafe" value={parcel.distanceToSea} />
         ) : null}
-      </dl>
+      </EvidenceList>
     </section>
   )
 }

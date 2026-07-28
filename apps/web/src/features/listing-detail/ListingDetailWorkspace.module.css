@@ -142,30 +142,92 @@
   line-height: 1.3;
 }
 
-.factList {
-  display: grid;
-  gap: var(--lg-space-2);
-  margin: var(--lg-space-4) 0 0;
-}
+/* ── Bölüm içeriği: not blokları, piyasa ve belgeler ─────────── */
 
-.factRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--lg-space-2);
-  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  padding-block-start: var(--lg-space-2);
-}
-
-.factRow dt {
+.blockNote {
+  margin: var(--lg-space-2) 0 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-footnote);
+  line-height: 1.5;
 }
 
-.factRow dd {
+.marketBlock {
+  display: grid;
+  gap: var(--lg-space-2);
+  margin-block-start: var(--lg-space-5);
+}
+
+.marketBlock > .blockNote {
+  margin: 0;
+}
+
+.valuationRange {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.docList {
+  display: grid;
+  gap: var(--lg-space-3);
+  margin: var(--lg-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.docItem {
+  display: grid;
+  gap: var(--lg-space-1);
+  border-inline-start: var(--lg-space-1) solid var(--lg-hairline);
+  padding-inline-start: var(--lg-space-3);
+}
+
+.docItem[data-state='available'] {
+  border-inline-start-color: var(--lg-success);
+}
+
+.docItem[data-state='critical'] {
+  border-inline-start-color: var(--lg-danger);
+}
+
+.docItem[data-state='missing'] {
+  border-inline-start-color: var(--lg-warning);
+}
+
+.docLabel {
   margin: 0;
   font-size: var(--lg-text-body);
   font-weight: 600;
+  line-height: 1.4;
+}
+
+.docState {
+  margin: 0;
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.docItem[data-state='available'] .docState {
+  color: var(--lg-success);
+}
+
+.docItem[data-state='critical'] .docState {
+  color: var(--lg-danger);
+}
+
+.docItem[data-state='missing'] .docState {
+  color: var(--lg-warning);
+}
+
+.docMeta {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
 }
 
 /* ── Giriş bloğu: medya sahnesi + karar özeti ────────────────── */

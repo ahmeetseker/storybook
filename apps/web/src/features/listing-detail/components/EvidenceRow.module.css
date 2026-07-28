@@ -1,0 +1,71 @@
+/* Kanıt satırı — içerik katmanı, düz yüzey. Cam açmaz.
+   Tüm ölçüler --lg-* token'larından gelir. */
+
+.list {
+  container-type: inline-size;
+  display: grid;
+  margin: var(--lg-space-4) 0 0;
+  padding: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) minmax(0, 1.9fr) auto;
+  align-items: baseline;
+  gap: var(--lg-space-2) var(--lg-space-5);
+  padding: var(--lg-space-3) 0;
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.row:last-child {
+  border-block-end: 0;
+}
+
+.label {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.value {
+  display: grid;
+  gap: var(--lg-space-1);
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.valueText {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  line-height: 1.45;
+  /* Sayısal değerler sütun hâlinde okunabilsin */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cevapsız değer boş bırakılmaz; gerekçe cümlesi ikincil tonda okunur. */
+.row[data-state='missing'] .valueText {
+  color: var(--lg-label-secondary);
+  font-weight: 500;
+}
+
+.note {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+.source {
+  justify-self: end;
+}
+
+@container (inline-size <= 40rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .source {
+    justify-self: start;
+  }
+}

@@ -99,11 +99,11 @@ export function ListingDetailWorkspace({ result }: ListingDetailWorkspaceProps) 
             className={styles.metrics}
           />
           <ParcelSection detail={detail} mapSection={sections.map} />
-          <PlanningAndLegalSection />
-          <InfrastructureSection />
-          <HazardSection />
-          <MarketSection />
-          <DocumentsSection />
+          <PlanningAndLegalSection detail={detail} />
+          <InfrastructureSection detail={detail} />
+          <HazardSection detail={detail} />
+          <MarketSection detail={detail} />
+          <DocumentsSection detail={detail} />
         </div>
         <ListingDecisionRail detail={detail} />
       </div>
