@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -86,6 +87,55 @@ describe('SellerSection', () => {
     )
     await user.click(screen.getByRole('button', { name: 'Numarayı göster' }))
     expect(onRevealedChange).toHaveBeenCalledWith(true)
+  })
+
+  // Kontrollü desende karar ebeveynindir. `revealed={false}` verip değişikliği
+  // kabul etmeyen ebeveyn kazanır: numara ne getirilir ne DOM'a girer.
+  it('kontrollü revealed={false} reddedildiğinde numara getirilmez ve gösterilmez', async () => {
+    const user = userEvent.setup()
+    const onRevealPhone = vi.fn(async () => '0 (252) 000 00 00')
+    const { container } = render(
+      <SellerSection
+        detail={await detail()}
+        revealed={false}
+        onRevealedChange={() => undefined}
+        onRevealPhone={onRevealPhone}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Numarayı göster' }))
+
+    expect(onRevealPhone).not.toHaveBeenCalled()
+    expect(screen.queryByRole('link', { name: /0 \(252\)/ })).toBeNull()
+    expect(container.textContent).not.toMatch(/\d{3}\s?\d{2}\s?\d{2}/)
+    expect(screen.getByRole('button', { name: 'Numarayı göster' })).toBeTruthy()
+  })
+
+  it('kontrollü ebeveyn açılışı kabul edince numara gösterilir', async () => {
+    const user = userEvent.setup()
+    const onRevealPhone = vi.fn(async () => '0 (252) 000 00 00')
+    const loaded = await detail()
+
+    function Controlled() {
+      const [revealed, setRevealed] = useState(false)
+      return (
+        <SellerSection
+          detail={loaded}
+          revealed={revealed}
+          onRevealedChange={setRevealed}
+          onRevealPhone={onRevealPhone}
+        />
+      )
+    }
+
+    render(<Controlled />)
+    await user.click(screen.getByRole('button', { name: 'Numarayı göster' }))
+
+    await waitFor(() => {
+      const link = screen.getByRole('link', { name: /0 \(252\)/ })
+      expect(document.activeElement).toBe(link)
+    })
+    expect(onRevealPhone).toHaveBeenCalledTimes(1)
   })
 
   it('iletişim kapalıyken numara açma kontrolü sunmaz', async () => {

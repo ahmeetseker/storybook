@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import {
@@ -49,8 +49,23 @@ describe('ilan detayı erişilebilirlik geçidi', () => {
   // şey tekillik değil, durumun renk dışında metinle de taşınıyor olmasıdır.
   it('durum yalnız renkle değil metinle de taşınır', async () => {
     await renderPage()
-    expect(screen.getAllByText('Çelişkili').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Olumlu').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Olumsuz').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Eksik').length).toBeGreaterThan(0)
+  })
+
+  // Doğrulama vektörü çıplak "Doğrulandı" damgası vurmaz: olumlu satırların
+  // hepsi doğrulama değildir (ör. platform moderasyonu). Çelişki kelimesi
+  // yalnız çelişkinin gerçekten bildirildiği künyede kalır.
+  it('olumlu doğrulama satırına çıplak "Doğrulandı" damgası vurmaz', async () => {
+    await renderPage()
+    const moderation = screen.getByText('Platform moderasyonu tamamlandı')
+    const row = moderation.closest('li')
+    expect(row).toBeTruthy()
+    expect(within(row!).getByText('Olumlu')).toBeTruthy()
+    expect(within(row!).queryByText('Doğrulandı')).toBeNull()
+    expect(screen.queryByText('Çelişkili')).toBeNull()
+    expect(screen.getAllByText(/Kaynaklar çelişiyor/).length).toBeGreaterThan(0)
   })
 
   it('etiket/değer çiftleri dl, kıyaslar table kullanır', async () => {

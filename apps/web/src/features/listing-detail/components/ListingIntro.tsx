@@ -16,10 +16,20 @@ export interface ListingIntroProps {
   mapSection: SectionState<true>
 }
 
-/** Durum yalnız renkle taşınmaz: her satırın işareti kelimeyle de yazılır. */
+/**
+ * Durum yalnız renkle taşınmaz: her satırın işareti kelimeyle de yazılır.
+ *
+ * Kelimeler bilinçli olarak **nötr sonuç** bildirir, doğrulama iddiası değil.
+ * Vektörün olumlu satırlarının hepsi doğrulama değildir — ör. "Platform
+ * moderasyonu tamamlandı" bir içerik doğrulaması değil, yasak içerik/yinelenen
+ * ilan kontrolüdür. Her satırın neyi kapsadığı zaten `title` ve `scopeNote`
+ * içinde yazılıdır; buradaki kelime yalnız kontrolün sonucunu söyler.
+ * "Çelişkili" yalnız gerçekten çelişki bildirilen yerde kullanılır
+ * (kanıt künyesindeki `Kaynaklar çelişiyor` rozeti).
+ */
 const STATE_LABEL: Record<VerificationRow['state'], string> = {
-  positive: 'Doğrulandı',
-  negative: 'Çelişkili',
+  positive: 'Olumlu',
+  negative: 'Olumsuz',
   unknown: 'Eksik',
 }
 

@@ -77,6 +77,10 @@ function sellerStats(seller: ListingDetail['seller']): GlassAgencyCardStat[] {
  * Numara sözleşmesi: `phone` prop'u yoktur, numara istek anında getirilir,
  * başarıda odak numaraya taşınır, başarısızlıkta gerekçe görünür ve kontrol
  * tekrar denenebilir kalır. Analitiğe numara değil yalnız olay adı gider.
+ *
+ * Kontrollü desende hem **getirme** hem **gösterme** `revealed` değerine
+ * bağlıdır: `revealed={false}` veren ve değişikliği kabul etmeyen bir ebeveyn
+ * numaranın ne ağdan çekilmesine ne DOM'a girmesine izin verir.
  */
 export function SellerSection({
   detail,
@@ -99,6 +103,8 @@ export function SellerSection({
   // durumunda kilit açılır — tekrar denemek yeni bir istek üretebilmelidir.
   const requestedRef = useRef(false)
   const shouldFocusRef = useRef(false)
+  // Açılışı kullanıcı mı istedi? Yalnız kendi basışından sonra odak taşınır.
+  const pressedRef = useRef(false)
   const linkRef = useRef<HTMLAnchorElement>(null)
 
   const commitRevealed = useCallback(
@@ -131,11 +137,21 @@ export function SellerSection({
     [onRevealPhone, onAnalyticsEvent, commitRevealed],
   )
 
+  // Getirme yalnız açık duruma bağlıdır — tek kapı burasıdır.
+  //
+  // Kontrollü desende karar ebeveynindir: `revealed={false}` verip değişikliği
+  // kabul etmeyen bir ebeveynde `isRevealed` hiç true olmaz, dolayısıyla
+  // sağlayıcı hiç çağrılmaz. Butona basmak tek başına numarayı getirmez;
+  // yalnız isteği bildirir. Mahremiyette ebeveyn kazanır.
+  //
   // `defaultRevealed`/kontrollü `revealed` ile açık başlayan görünüm de numarayı
   // istek anında getirir; bu yol odağı çalmaz (kullanıcı henüz basmadı).
   useEffect(() => {
     if (contactClosed || phone !== null || status === 'error') return
-    if (isRevealed) void request(false)
+    if (!isRevealed) return
+    const focusAfter = pressedRef.current
+    pressedRef.current = false
+    void request(focusAfter)
   }, [contactClosed, isRevealed, phone, status, request])
 
   useEffect(() => {
@@ -146,8 +162,8 @@ export function SellerSection({
   }, [phone])
 
   const handleReveal = () => {
+    pressedRef.current = true
     commitRevealed(true)
-    void request(true)
   }
 
   const questions = criticalIssues(detail)
@@ -199,7 +215,7 @@ export function SellerSection({
           <p className={styles.blockNote}>
             İlan yayında olmadığı için numara paylaşımı kapalı. Bu görünüm arşiv kaydıdır.
           </p>
-        ) : phone !== null ? (
+        ) : isRevealed && phone !== null ? (
           <p className={styles.revealedPhone}>
             <a
               ref={linkRef}

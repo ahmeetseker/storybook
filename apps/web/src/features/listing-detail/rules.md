@@ -149,10 +149,17 @@ değildir ve bu görünür biçimde yazılır.
   bölüm içi bloklar `<h3>`.
 - Etiket/değer çiftleri `<dl>` (`EvidenceList`/`EvidenceRow`); gerçek kıyaslar
   `<table>` (`GlassTable`, emsal karşılaştırması).
-- Durum **yalnız renkle taşınmaz**: doğrulama satırları (`Doğrulandı` ·
-  `Çelişkili` · `Eksik`), belge durumları (`Sunuldu` · `Kritik eksik` ·
+- Durum **yalnız renkle taşınmaz**: doğrulama satırları (`Olumlu` ·
+  `Olumsuz` · `Eksik`), belge durumları (`Sunuldu` · `Kritik eksik` ·
   `Eksik`) ve künye rozetleri kelimeyle de yazılır. Bu kelimeler sayfada
   birden çok kez geçer — testler `getAllByText` kullanır.
+- Doğrulama vektörünün durum kelimeleri **nötr sonuç** bildirir, doğrulama
+  iddiası değil: olumlu her satır bir doğrulama değildir (ör.
+  `platform_moderation` yalnız yasak içerik/yinelenen ilan kontrolüdür).
+  Bu yüzden `Doğrulandı` damgası satır etiketi olarak kullanılmaz; neyin
+  kontrol edildiği satırın `title`/`scopeNote` metnindedir. `Çelişkili`
+  yalnız çelişkinin gerçekten bildirildiği yerde geçer (kanıt künyesindeki
+  `Kaynaklar çelişiyor` rozeti).
 - Focus halkası yalnız `:focus-visible`
   (`outline: var(--lg-focus-ring-width) solid var(--lg-accent)`).
 - Dokunmatik hedefler ≥44px: kontrol yükseklikleri `--lg-control-*`
