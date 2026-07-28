@@ -44,7 +44,6 @@ export interface ListingMediaItem {
   id: string
   kind: 'photo' | 'video' | 'plan' | 'parcel' | 'drone'
   label: string
-  src?: string
   capturedAt?: string
   /** AI ile üretilmiş veya maddi biçimde düzenlenmiş medya görünür etiketlenir */
   aiEdited?: boolean

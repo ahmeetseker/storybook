@@ -4,6 +4,7 @@ import {
   dockRouteKeys,
   getRouteByPath,
   headerRouteKeys,
+  nonNavRoutes,
   siteOrigin,
 } from './routes'
 
@@ -28,6 +29,32 @@ describe('uygulama rota kaydı', () => {
         .filter((route) => !['home', 'search'].includes(route.key))
         .every((route) => route.indexable === false),
     ).toBe(true)
+  })
+
+  // Kayıtlı olmayan dinamik rota `home`'a düşer ve kabuk yanlış sekmeyi aktif
+  // işaretlerdi. Kayıt gezinme listelerinin dışında durur.
+  it('ilan detayı yolunu gezinme listesine sokmadan çözer', () => {
+    const route = getRouteByPath('/ilan/arsa-214-7')
+    expect(route.key).toBe('listing-detail')
+
+    const navKeys = appRoutes.map((item) => item.key) as string[]
+    expect(navKeys).not.toContain('listing-detail')
+    expect(Object.values(dockRouteKeys).flat() as string[]).not.toContain('listing-detail')
+    expect(headerRouteKeys as readonly string[]).not.toContain('listing-detail')
+
+    // Sayfa kendi kategori yolunu taşır; kabuk ikinci bir durum izi basmaz.
+    expect(route.statusTrail).toEqual([])
+  })
+
+  it('ilan detayı öneki `/ilan-ver` rotasını yutmaz', () => {
+    expect(getRouteByPath('/ilan-ver').key).toBe('create-listing')
+    expect(getRouteByPath('/ilan-ver/adim-2').key).toBe('create-listing')
+  })
+
+  it('gezinme dışı rotalar da benzersiz ve mutlak href taşır', () => {
+    const hrefs = [...appRoutes, ...nonNavRoutes].map((route) => route.href)
+    expect(new Set(hrefs).size).toBe(hrefs.length)
+    expect(hrefs.every((href) => href.startsWith('/'))).toBe(true)
   })
 
   it('production canonical için güvenli arsam.net varsayılanını kullanır', () => {

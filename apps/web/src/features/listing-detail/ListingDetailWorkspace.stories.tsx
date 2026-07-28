@@ -49,18 +49,22 @@ function failingRevealPhone(): () => Promise<string> {
  */
 function ListingDetailLoading() {
   return (
-    <div className={styles.shell} role="status" aria-busy="true">
-      <p className={styles.blockNote}>İlan detayı yükleniyor…</p>
-      <GlassSkeleton variant="rect" height="var(--lg-control-xl)" />
-      <GlassSkeleton variant="rect" height="var(--lg-control-lg)" />
-      <div className={styles.section}>
-        <GlassSkeleton variant="text" lines={3} />
-      </div>
-      <div className={styles.section}>
-        <GlassSkeleton variant="text" lines={5} />
-      </div>
-      <div className={styles.section}>
-        <GlassSkeleton variant="text" lines={4} />
+    // Yüklenen sayfayla aynı kap/kabuk çifti: iskeletin dolgusu da container
+    // sorgularına yanıt verir.
+    <div className={styles.page}>
+      <div className={styles.shell} role="status" aria-busy="true">
+        <p className={styles.blockNote}>İlan detayı yükleniyor…</p>
+        <GlassSkeleton variant="rect" height="var(--lg-control-xl)" />
+        <GlassSkeleton variant="rect" height="var(--lg-control-lg)" />
+        <div className={styles.section}>
+          <GlassSkeleton variant="text" lines={3} />
+        </div>
+        <div className={styles.section}>
+          <GlassSkeleton variant="text" lines={5} />
+        </div>
+        <div className={styles.section}>
+          <GlassSkeleton variant="text" lines={4} />
+        </div>
       </div>
     </div>
   )

@@ -117,50 +117,54 @@ export function ListingDetailWorkspace({
   const { detail, sections, aiBrief } = result
 
   return (
-    <main className={styles.shell}>
-      <GlassBreadcrumb items={breadcrumbItems(detail)} className={styles.crumbs} />
+    // `.page` yalnız sorgu kabıdır: `.shell` kendi kabı olsaydı kendi dolgusunu
+    // `@container` ile daraltamazdı (bkz. ListingDetailWorkspace.module.css).
+    <div className={styles.page}>
+      <main className={styles.shell}>
+        <GlassBreadcrumb items={breadcrumbItems(detail)} className={styles.crumbs} />
 
-      <GlassListingDetailHeader
-        title={detail.title}
-        price={formatPrice(detail.price.amount)}
-        priceUnit={formatUnitPrice(detail.price.unitPrice)}
-        priceNote={priceNote(detail)}
-        status={lifecycleStatus(detail.lifecycle)}
-        meta={headerMeta(detail)}
-      />
-
-      <ListingIntro detail={detail} mapSection={sections.map} />
-      <ListingSectionIndex />
-
-      <div className={styles.body}>
-        <div className={styles.flow}>
-          <ListingEvidenceBrief brief={aiBrief} detail={detail} onReportIssue={onReportIssue} />
-          <GlassMetricStrip
-            items={metricStripItems(detail)}
-            label="Temel göstergeler"
-            className={styles.metrics}
-          />
-          <ParcelSection detail={detail} mapSection={sections.map} />
-          <PlanningAndLegalSection detail={detail} />
-          <InfrastructureSection detail={detail} />
-          <HazardSection detail={detail} />
-          <MarketSection detail={detail} />
-          <DocumentsSection detail={detail} />
-        </div>
-        <ListingDecisionRail
-          detail={detail}
-          onContact={onContact}
-          onGoToSeller={
-            hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
-          }
+        <GlassListingDetailHeader
+          title={detail.title}
+          price={formatPrice(detail.price.amount)}
+          priceUnit={formatUnitPrice(detail.price.unitPrice)}
+          priceNote={priceNote(detail)}
+          status={lifecycleStatus(detail.lifecycle)}
+          meta={headerMeta(detail)}
         />
-      </div>
 
-      <SellerSection
-        detail={detail}
-        onRevealPhone={onRevealPhone}
-        onAnalyticsEvent={onAnalyticsEvent}
-      />
-    </main>
+        <ListingIntro detail={detail} mapSection={sections.map} />
+        <ListingSectionIndex />
+
+        <div className={styles.body}>
+          <div className={styles.flow}>
+            <ListingEvidenceBrief brief={aiBrief} detail={detail} onReportIssue={onReportIssue} />
+            <GlassMetricStrip
+              items={metricStripItems(detail)}
+              label="Temel göstergeler"
+              className={styles.metrics}
+            />
+            <ParcelSection detail={detail} mapSection={sections.map} />
+            <PlanningAndLegalSection detail={detail} />
+            <InfrastructureSection detail={detail} />
+            <HazardSection detail={detail} />
+            <MarketSection detail={detail} />
+            <DocumentsSection detail={detail} />
+          </div>
+          <ListingDecisionRail
+            detail={detail}
+            onContact={onContact}
+            onGoToSeller={
+              hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
+            }
+          />
+        </div>
+
+        <SellerSection
+          detail={detail}
+          onRevealPhone={onRevealPhone}
+          onAnalyticsEvent={onAnalyticsEvent}
+        />
+      </main>
+    </div>
   )
 }

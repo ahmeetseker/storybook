@@ -1,5 +1,3 @@
-import { GlassMediaGallery, type GlassMediaGalleryItem, type GlassMediaGalleryItemType } from '@repo/ui'
-
 import type { SectionState } from '../data/listing-detail-adapter'
 import { criticalIssues, verificationScore } from '../domain/listing-detail-view-model'
 import type {
@@ -33,26 +31,12 @@ const STATE_LABEL: Record<VerificationRow['state'], string> = {
   unknown: 'Eksik',
 }
 
-const GALLERY_TYPE: Record<ListingMediaItem['kind'], GlassMediaGalleryItemType> = {
-  photo: 'image',
-  drone: 'image',
-  parcel: 'image',
-  plan: 'floorPlan',
-  video: 'video',
-}
-
-function galleryItems(media: ListingMediaItem[]): GlassMediaGalleryItem[] {
-  return media
-    .filter((item): item is ListingMediaItem & { src: string } => Boolean(item.src))
-    .map((item) => ({
-      type: GALLERY_TYPE[item.kind],
-      src: item.src,
-      alt: item.label,
-      label: item.aiEdited ? `${item.label} · yapay zekâ ile düzenlendi` : item.label,
-    }))
-}
-
-/** Medya dosyası taşımayan kayıtlarda sahne boş kalmaz: döküm metin olarak durur. */
+/**
+ * Medya dosyası taşımayan kayıtlarda sahne boş kalmaz: döküm metin olarak
+ * durur. Faz 1'de medya dosyası taşıyan kayıt yoktur — `GlassMediaGallery`
+ * yolu hiçbir fixture veya story tarafından beslenmediği için kaldırıldı;
+ * çalışmayan bir dal, çalıştığı sanılan bir daldan kötüdür.
+ */
 function MediaInventory({ media }: { media: ListingMediaItem[] }) {
   return (
     <div className={styles.mediaInventory}>
@@ -82,7 +66,6 @@ function MediaInventory({ media }: { media: ListingMediaItem[] }) {
  * arkasına saklanmaz. Kolon içerik katmanındadır — cam açmaz.
  */
 export function ListingIntro({ detail, mapSection }: ListingIntroProps) {
-  const items = galleryItems(detail.media)
   const score = verificationScore(detail.verification)
   const issues = criticalIssues(detail)
 
@@ -93,10 +76,10 @@ export function ListingIntro({ detail, mapSection }: ListingIntroProps) {
       </h2>
 
       <div className={styles.mediaStage}>
-        {items.length > 0 ? (
-          <GlassMediaGallery items={items} variant="stage" label="İlan medyası" />
-        ) : (
+        {detail.media.length > 0 ? (
           <MediaInventory media={detail.media} />
+        ) : (
+          <p className={styles.mediaInventoryNote}>Bu kayıtta medya bilgisi bulunmuyor.</p>
         )}
         {mapSection.state === 'unavailable' ? (
           <p className={styles.mediaInventoryMeta}>

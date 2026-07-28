@@ -2,8 +2,19 @@
    Yanıt verme yalnız container sorgularıyla: viewport breakpoint'i yok.
    Tüm ölçüler --lg-* token'larından gelir. */
 
-.shell {
+/* Sorgu kabı `.shell`'in DIŞINDADIR.
+
+   Bir öğe kendi sorgu kabı olamaz: `container-type` `.shell` üzerindeyken
+   `@container` içindeki `.shell` kuralları hiçbir zaman eşleşmez ve dar
+   genişlikteki dolgu azaltması sessizce uygulanmaz. Kap dışarı alınınca
+   `.shell`'in kendi dolgusu da sorguya yanıt verir. Ölçülen genişlik artık
+   `.shell`'in dış kutusudur (içerik kutusu değil); eşikler bu farkı
+   (yaklaşık iki dolguluk) hesaba katar. */
+.page {
   container-type: inline-size;
+}
+
+.shell {
   display: grid;
   gap: var(--lg-space-6);
   inline-size: min(100%, 88rem);

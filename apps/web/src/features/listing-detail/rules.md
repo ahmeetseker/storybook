@@ -169,10 +169,12 @@ değildir ve bu görünür biçimde yazılır.
 
 ## 9. Responsive
 
-Viewport breakpoint'i yoktur. `.shell` bir `container-type: inline-size`
-kabıdır; iki kolonlu yerleşimler `@container` sorgularıyla tek kolona iner
-(64rem gövde, 52rem ilk görünüm, 40rem iç boşluk). Yetenek sorguları
-`hover: hover` / `pointer: coarse` ile yapılır.
+Viewport breakpoint'i yoktur. Sorgu kabı `.shell`'i saran `.page`'tir —
+`.shell` kendi kabı olsaydı `@container` içindeki `.shell` kuralları (dar
+genişlikte iç boşluk azaltması) hiçbir zaman eşleşmezdi. İki kolonlu
+yerleşimler `@container` sorgularıyla tek kolona iner (64rem gövde, 52rem ilk
+görünüm, 40rem iç boşluk). Yetenek sorguları `hover: hover` /
+`pointer: coarse` ile yapılır.
 
 ## 10. Token disiplini
 

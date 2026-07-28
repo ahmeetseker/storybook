@@ -13,6 +13,7 @@ export interface AppRouteDefinition {
     | 'create-listing'
     | 'account'
     | 'messages'
+    | 'listing-detail'
   label: string
   href: string
   description: string
@@ -152,6 +153,32 @@ export const appRoutes = [
   },
 ] as const satisfies readonly AppRouteDefinition[]
 
+/**
+ * Gezinme listelerinde **yer almayan** rotalar.
+ *
+ * `appRoutes` bir navigasyon kaydıdır: header, dock ve `AppRouteKey` oradan
+ * türetilir. Dinamik bir detay rotası oraya konulsaydı gezinme öğesi gibi
+ * görünürdü; buraya konmazsa da `getRouteByPath` eşleşme bulamayıp `home`'a
+ * düşer ve kabuk yanlış sekmeyi aktif işaretlerdi. Bu liste ikisinin arasıdır:
+ * yalnız yol → rota çözümlemesi için tanımlıdır.
+ */
+export const nonNavRoutes = [
+  {
+    key: 'listing-detail',
+    label: 'İlan detayı',
+    // Önek eşleşmesi için: gerçek yol `/ilan/$listingId`.
+    href: '/ilan',
+    description:
+      'Bir ilanın kaynaklı kanıt defteri: her değer kaynağı, tarihi ve kapsamıyla birlikte.',
+    // Boş: sayfa kendi kategori yolunu (`GlassBreadcrumb`) taşır, kabuk
+    // bunun üstüne ikinci bir durum izi basmaz.
+    statusTrail: [],
+    scope: 'public',
+    indexable: true,
+    icon: 'pin',
+  },
+] as const satisfies readonly AppRouteDefinition[]
+
 export type AppRoute = (typeof appRoutes)[number]
 export type AppRouteKey = AppRoute['key']
 export type AppRouteHref = AppRoute['href']
@@ -190,13 +217,24 @@ export function getRouteByKey(key: AppRouteKey): AppRouteDefinition {
   return route
 }
 
+/**
+ * Yolu rota tanımına çözer.
+ *
+ * Gezinme rotaları ile gezinme dışı rotalar birlikte taranır: aksi hâlde
+ * `/ilan/…` eşleşme bulamayıp `home`'a düşer, kabuk "Anasayfa"yı aktif
+ * işaretler ve sayfanın kendi kategori yolunun üstüne yanlış bir durum izi
+ * basardı. Önek eşleşmesinde en uzun href kazanır; `/ilan-ver` ile `/ilan`
+ * karışmaz çünkü önek `/ilan/` ayıracıyla aranır.
+ */
 export function getRouteByPath(pathname: string): AppRouteDefinition {
   const path = pathname !== '/' ? pathname.replace(/\/+$/, '') : pathname
-  const exact = appRoutes.find((route) => route.href === path)
+  const candidates: readonly AppRouteDefinition[] = [...appRoutes, ...nonNavRoutes]
+
+  const exact = candidates.find((route) => route.href === path)
   if (exact) return exact
 
   return (
-    [...appRoutes]
+    candidates
       .filter((route) => route.href !== '/' && path.startsWith(`${route.href}/`))
       .sort((a, b) => b.href.length - a.href.length)[0] ?? getRouteByKey('home')
   )
