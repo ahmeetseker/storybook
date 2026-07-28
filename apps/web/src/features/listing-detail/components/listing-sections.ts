@@ -39,3 +39,23 @@ export interface ListingSectionLink {
 export function sectionsFor(detail: ListingDetail): readonly ListingSectionLink[] {
   return detail.kind === 'land' ? LISTING_SECTIONS : PROJECTED_LISTING_SECTIONS
 }
+
+const SECTION_LABELS = new Map<string, string>(
+  [...LISTING_SECTIONS, ...PROJECTED_LISTING_SECTIONS].map((section) => [
+    section.id,
+    section.label,
+  ]),
+)
+
+/**
+ * Bölüm kimliğinin görünür etiketi.
+ *
+ * Dayanak bağlantıları nereye götürdüklerini adıyla söyler: sayfada sekiz kez
+ * tekrar eden çıplak "Dayanak" bağlantısı ekran okuyucuda ayırt edilemez.
+ * Etiket bölüm indeksiyle **aynı** kaynaktan gelir; ikinci bir sözlük
+ * tutulmaz. Bilinmeyen kimlikte `undefined` döner — uydurulmuş bir bölüm adı
+ * yazılmaz.
+ */
+export function sectionLabel(id: string): string | undefined {
+  return SECTION_LABELS.get(id)
+}

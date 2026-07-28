@@ -1,5 +1,25 @@
 /* İçerik katmanı: cam yok, yalnız yüzey/hairline/metin token'ları. */
 
+/* Özet paragrafı kutusuz durur: komşu bölümlerin hiçbiri çerçeveli değil,
+   bu bölüm de değil (kart içinde kart yok). Ölçek bölüm içi blok başlığıyla
+   aynı adımdadır — özet, iddia satırlarından bir adım yukarıda okunur. */
+.summary {
+  margin: 0;
+  max-inline-size: 68ch;
+  font-size: var(--lg-text-headline);
+  line-height: 1.5;
+  color: var(--lg-label);
+}
+
+/* Yapay zekâ atfı: asistan adı · model sürümü · kanıt kesiti. Damga değil,
+   sessiz künye — annote ettiği metinle yarışmaz. */
+.sourceNote {
+  margin: calc(var(--lg-space-3) * -1) 0 0;
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+  color: var(--lg-label-secondary);
+}
+
 /* İddialar kutu değildir: bölüm zaten kutusuz akıyor, iddia satırı da
    hairline ile ayrılır (kart içinde kart yok). */
 .claimList {
@@ -9,15 +29,14 @@
   list-style: none;
 }
 
+/* Satır artık iki sütun değil tek bir cümledir: dayanak bağlantısı cümlenin
+   sonunda, kendi sütununda değil, metnin akışında durur. */
 .claimItem {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--lg-space-4);
   padding-block: var(--lg-space-3);
   border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  max-inline-size: 68ch;
   font-size: var(--lg-text-body);
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--lg-label);
 }
 
@@ -25,35 +44,39 @@
   border-block-end: 0;
 }
 
+/* Kaynak işareti: dolu buton değil, sessiz satır içi bağlantı. Renk değil
+   altçizgi taşır; vurgu rengi yalnız hover/focus'ta belirir. */
 .claimLink {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--lg-control-sm);
-  padding-inline: var(--lg-space-3);
-  border-radius: var(--lg-radius-capsule);
-  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
-  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
-  font-size: var(--lg-text-caption);
-  font-weight: 700;
-  text-decoration: none;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  text-decoration: underline;
+  text-decoration-color: var(--lg-hairline);
+  text-decoration-thickness: var(--lg-stroke-hairline);
+  text-underline-offset: 0.25em;
   white-space: nowrap;
 }
 
 .claimLink:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
 }
 
 @media (hover: hover) {
   .claimLink:hover {
-    background: color-mix(in srgb, var(--lg-accent) 20%, var(--lg-surface));
+    color: var(--lg-accent);
+    text-decoration-color: currentcolor;
   }
 }
 
+/* Satır içi bağlantı satır kutusunun yüksekliğine bağlıdır (cümlenin
+   parçası); yine de dokunmatikte dokunma alanı dolgu ile büyütülür — dolgu
+   satır yüksekliğini değiştirmez, yalnız isabet alanını genişletir. */
 @media (pointer: coarse) {
   .claimLink {
-    min-block-size: var(--lg-control-md);
+    padding-block: var(--lg-space-2);
+    padding-inline: var(--lg-space-1);
+    margin-inline: calc(var(--lg-space-1) * -1);
   }
 }
 

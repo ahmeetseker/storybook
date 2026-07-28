@@ -1,9 +1,10 @@
-import { GlassAiSummaryCard, GlassAlert } from '@repo/ui'
+import { GlassAlert } from '@repo/ui'
 
 import type { AiDecisionBrief, SectionState } from '../data/listing-detail-adapter'
 import type { ListingDetail } from '../domain/listing-detail-types'
 import { formatDateShort } from '../format'
 import workspaceStyles from '../ListingDetailWorkspace.module.css'
+import { sectionLabel } from './listing-sections'
 import styles from './ListingEvidenceBrief.module.css'
 
 export interface ListingEvidenceBriefProps {
@@ -39,6 +40,14 @@ const FEEDBACK_NOT_CONNECTED =
  * Asistan yanıt veremediğinde yalnız gerekçe gösterilir — sayfadaki
  * yapılandırılmış kanıt bölümleri (Parsel, İmar ve Hukuk, …) bundan etkilenmez,
  * çünkü zaten kendi verilerini bağımsız olarak taşırlar.
+ *
+ * Bölüm komşularıyla aynı kutusuz akıştadır: özet paragrafı çerçevesiz durur
+ * (`GlassAiSummaryCard` burada kullanılmaz — kutusuz bir bölümün içindeki
+ * çerçeveli panel kart içinde kart olurdu) ve iddiaların dayanak bağlantısı
+ * doldurulmuş bir buton değil, cümlenin sonunda duran sessiz bir kaynak
+ * işaretidir. İçerik iddianın kendisidir; bağlantı ona iliştirilmiş bir
+ * referanstır. Yapay zekâ atfı kaybolmaz: bölüm başlığı ve kaynak künyesi
+ * (asistan adı · model sürümü · kanıt kesiti) görünür kalır.
  */
 export function ListingEvidenceBrief({ brief, onReportIssue }: ListingEvidenceBriefProps) {
   if (brief.state === 'unavailable') {
@@ -58,17 +67,21 @@ export function ListingEvidenceBrief({ brief, onReportIssue }: ListingEvidenceBr
         Yapay zekâ karar özeti
       </h2>
 
-      <GlassAiSummaryCard summary={data.summary} sourceNote={sourceNote} />
+      <p className={styles.summary}>{data.summary}</p>
+      <p className={styles.sourceNote}>{sourceNote}</p>
 
       <ul className={styles.claimList}>
-        {data.claims.map((claim) => (
-          <li key={claim.id} className={styles.claimItem}>
-            <span>{claim.text}</span>
-            <a href={`#${claim.sectionId}`} className={styles.claimLink}>
-              Dayanak
-            </a>
-          </li>
-        ))}
+        {data.claims.map((claim) => {
+          const label = sectionLabel(claim.sectionId)
+          return (
+            <li key={claim.id} className={styles.claimItem}>
+              {claim.text}{' '}
+              <a href={`#${claim.sectionId}`} className={styles.claimLink}>
+                {label ? `Dayanak: ${label}` : 'Dayanak'}
+              </a>
+            </li>
+          )
+        })}
       </ul>
 
       <div className={styles.checklists}>
