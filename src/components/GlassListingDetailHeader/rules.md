@@ -55,7 +55,7 @@ default'u yerine içerik katmanına uygun `flat` default.
 | title | ✅ | string | `headingLevel` ile seçilen heading, 700 ağırlık, `text-wrap: balance` |
 | status | — | `{ label, tone? }` | Verilmezse render edilmez; `tone` yalnız renk, `label` her zaman görünür |
 | meta | — | `GlassListingMetaItem[]` | Boş/undefined ise `<dl>` hiç render edilmez |
-| price | ✅ | string | Biçimlenmiş fiyat metni — sayı değil |
+| price | — | string | Biçimlenmiş fiyat metni — sayı değil. Verilmezse **fiyat bloğunun tamamı** render edilmez (fiyatını kendi karar kolonunda taşıyan sayfalar için); boş sütun bırakılmaz |
 | priceUnit | — | string | Birim fiyat ("1.804 ₺/m²"); ayrı `<p>`, price'tan bağımsız okunur |
 | priceNote | — | string | Fiyatın altında küçük açıklama (alan kaynağı, çelişki notu) |
 | badges | — | ReactNode | `GlassBadge` öğeleri beklenir; wrap olur |
@@ -67,7 +67,7 @@ default'u yerine içerik katmanına uygun `flat` default.
 |---|---|---|---|---|---|
 | title | prop | `string` | — (zorunlu) | — | Heading içeriği |
 | headingLevel | prop | `1 \| 2 \| 3` | `1` | — | Render edilen heading elementini seçer |
-| price | prop | `string` | — (zorunlu) | — | Biçimleme çağıranda; component `Intl` çağırmaz |
+| price | prop | `string` | — | — | Biçimleme çağıranda; component `Intl` çağırmaz. Verilmezse fiyat bloğu (price/priceUnit/priceNote) hiç render edilmez |
 | priceUnit | prop | `string` | — | — | Birim fiyat metni |
 | priceNote | prop | `string` | — | — | Fiyatın altında küçük not |
 | meta | prop | `GlassListingMetaItem[]` | — | — | `dl` içinde `dt`/`dd` çiftleri |
@@ -168,6 +168,7 @@ içindeki gerçek butonların focus sırası). Eksik yok — matris tam.
 - [x] meta öğeleri `dl` içinde `dt`/`dd` çifti olarak render edilir (unit)
 - [x] varsayılan malzeme `flat` — `[data-material="glass"]` üretmez (unit)
 - [x] fiyat/birim fiyat/not ayrı okunabilir metinler olarak render edilir (unit)
+- [x] `price` verilmediğinde fiyat bloğu hiç render edilmez (unit)
 - [x] `utilities` slotu başlık bölgesinde render edilir (unit)
 - [x] durum metni yalnız renkle değil görünür metinle taşınır (unit)
 - [ ] container query'nin 640px altında tek kolona düştüğü (visual)
@@ -191,5 +192,7 @@ yalnız semantik ayrışır. **Açık kararlar:** `status` tonlarının `GlassBa
 ile mi yoksa mevcut `<p data-tone>` deseniyle mi ilerleyeceği (şu an ikincisi,
 `GlassDataProvenance` rozet deseninden daha hafif) · `priceUnit`/`priceNote`
 sırasının sabit mi kalacağı yoksa çağırana mı bırakılacağı.
-**Changelog:** 2026-07-28 — ilk sürüm; `GlassPriceHeader`'ın üretim sayfası
+**Changelog:** 2026-07-28 — `price` isteğe bağlı oldu: fiyatı kendi karar
+kolonunda taşıyan sayfalarda başlık yalnız künye bloğudur ve boş bir fiyat
+sütunu bırakmaz. · 2026-07-28 — ilk sürüm; `GlassPriceHeader`'ın üretim sayfası
 yerine geçer.

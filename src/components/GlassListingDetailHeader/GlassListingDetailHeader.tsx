@@ -13,8 +13,14 @@ export interface GlassListingDetailHeaderProps extends HTMLAttributes<HTMLElemen
   title: string
   /** Sayfada tek h1 kuralı için ayarlanabilir; varsayılan 1 */
   headingLevel?: 1 | 2 | 3
-  /** Biçimlenmiş para değeri — component biçimlendirme yapmaz */
-  price: string
+  /**
+   * Biçimlenmiş para değeri — component biçimlendirme yapmaz.
+   *
+   * İsteğe bağlıdır: fiyatı kendi karar kolonunda taşıyan sayfalarda başlık
+   * yalnız künye bloğu olur. Verilmezse fiyat bloğu **hiç** render edilmez —
+   * boş bir sütun bırakılmaz.
+   */
+  price?: string
   /** Birim fiyat, ör. "1.804 ₺/m²" */
   priceUnit?: string
   /** Fiyatın altında küçük açıklama (alan kaynağı, çelişki notu) */
@@ -83,11 +89,13 @@ export function GlassListingDetailHeader({
           ) : null}
         </div>
 
-        <div className={styles.priceBlock}>
-          <p className={styles.price}>{price}</p>
-          {priceUnit ? <p className={styles.priceUnit}>{priceUnit}</p> : null}
-          {priceNote ? <p className={styles.priceNote}>{priceNote}</p> : null}
-        </div>
+        {price ? (
+          <div className={styles.priceBlock}>
+            <p className={styles.price}>{price}</p>
+            {priceUnit ? <p className={styles.priceUnit}>{priceUnit}</p> : null}
+            {priceNote ? <p className={styles.priceNote}>{priceNote}</p> : null}
+          </div>
+        ) : null}
       </div>
 
       {badges ? <div className={styles.badges}>{badges}</div> : null}

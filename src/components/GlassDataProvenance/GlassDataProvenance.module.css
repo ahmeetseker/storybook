@@ -2,18 +2,41 @@
   display: block;
 }
 
+/* Künye tetikleyicisi sessiz bir işarettir, damga değildir.
+
+   Değeri annote ettiği satırla yarışmaması için: normal yazım, ikincil ton,
+   çerçevesiz. Durum yine de renkle DEĞİL kelimeyle taşınır (rozet metninin
+   kendisi); renk yalnız dikkat gerektiren üç durumda ikincil bir kanal olarak
+   eklenir — çelişki, bayatlık ve cevapsızlık. Resmî/beyan/türetilmiş künyeler
+   nötr metin olarak okunur. */
 .trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
   font: inherit;
-  font-size: var(--lg-text-badge, 11px);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: var(--lg-text-caption, 12px);
+  text-align: end;
   color: var(--lg-label-secondary);
   background: transparent;
-  border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
-  border-radius: var(--lg-radius-capsule, 999px);
-  padding: var(--lg-space-1, 4px) var(--lg-space-3, 12px);
+  border: 0;
+  border-radius: var(--lg-radius-chip, 10px);
+  padding: var(--lg-space-1, 4px) 0;
   min-height: var(--lg-control-sm, 32px);
   cursor: pointer;
+}
+
+/* Durum noktası — tarama hızı için; anlam rozet metnindedir. */
+.trigger::before {
+  /* Mikro-geometri — token karşılığı yok (durum noktasının çapı; sayfadaki
+     diğer durum noktalarıyla aynı değer). */
+  --provenance-dot-size: 8px;
+  content: '';
+  flex: none;
+  inline-size: var(--provenance-dot-size);
+  block-size: var(--provenance-dot-size);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: currentColor;
+  opacity: 0.45;
 }
 
 .trigger:focus-visible {
@@ -21,18 +44,34 @@
   outline-offset: var(--lg-focus-ring-offset, 2px);
 }
 
-.trigger[data-tone='official'] { color: var(--lg-success); }
-.trigger[data-tone='derived'] { color: var(--lg-accent); }
+@media (hover: hover) {
+  .trigger:hover {
+    color: var(--lg-label);
+  }
+}
+
+.trigger[data-tone='official'],
+.trigger[data-tone='derived'],
+.trigger[data-tone='declared'] { color: var(--lg-label-secondary); }
 .trigger[data-tone='stale'] { color: var(--lg-warning); }
 .trigger[data-tone='conflict'] { color: var(--lg-danger); }
-.trigger[data-tone='unknown'],
-.trigger[data-tone='declared'] { color: var(--lg-label-secondary); }
+.trigger[data-tone='unknown'] { color: var(--lg-warning); }
 
+/* Dikkat gerektiren üç durumda nokta tam opaklıkta okunur. */
+.trigger[data-tone='stale']::before,
+.trigger[data-tone='conflict']::before,
+.trigger[data-tone='unknown']::before { opacity: 1; }
+
+/* Çekmece akışta kalır (portal yok) ve kendi zeminini taşır: rozet dar bir
+   sütunda dursa bile çağıran taraf çekmeceyi tam genişlikte
+   yerleştirebilsin diye kök `display: contents` ile açılabilir. */
 .panel {
   margin-top: var(--lg-space-2, 8px);
   padding: var(--lg-space-3, 12px) var(--lg-space-4, 16px);
   border-radius: var(--lg-radius-chip, 10px);
   border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  background: var(--lg-surface);
+  text-align: start;
 }
 
 .grid {

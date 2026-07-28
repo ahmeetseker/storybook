@@ -2,7 +2,7 @@
 name: GlassDataProvenance
 category: içerik
 status: hazır
-lastReviewed: 2026-07-27
+lastReviewed: 2026-07-28
 ---
 
 # GlassDataProvenance Kuralları
@@ -35,6 +35,11 @@ gibi tekil değerlerin) arkasında bu component durur.
 - Panel `isOpen === false` iken **DOM'da hiç yoktur** (conditional render,
   `display:none` değil) — kapalı çekmecenin içeriği erişilebilirlik
   ağacında da, testte de bulunmaz.
+- Kök `<div>` yalnız bir sarmalayıcıdır: çağıran `className` ile
+  `display: contents` verip tetikleyici ile paneli **kendi ızgarasının
+  öğeleri** hâline getirebilir (ilan detayının kanıt satırı bunu yapar; rozet
+  dar kaynak sütununda kalır, çekmece satırın altına tam genişlikte iner).
+  Kök bu yüzden kendi geometrisini dayatmaz.
 - Tetikleyicinin erişilebilir adı görsel-gizli (`srOnly`) `"{fieldLabel}
   kaynağı: "` öneki + görünür rozet metninden oluşur; ekran okuyucu hangi
   alanın künyesi olduğunu rozet metninden önce duyurur.
@@ -45,7 +50,7 @@ gibi tekil değerlerin) arkasında bu component durur.
 
 | Slot | Zorunlu | İçerik | Kurallar |
 |---|---|---|---|
-| trigger | ✅ | rozet metni (üretilen) | `button`, `data-tone` ile renklenir |
+| trigger | ✅ | durum noktası + rozet metni (üretilen) | `button`; nokta `::before`, `data-tone` ile renklenir |
 | panel.sağlayıcı | ✅ | `sourceLabel` (+ `sourceHref` varsa link) | `dt`/`dd` |
 | panel.sorgu | ✅ | `retrievedAt` | `dt`/`dd` |
 | panel.geçerlilik/kapsam/yöntem | — | `effectiveAt`/`validUntil`/`scopeLabel`/`geographicResolution`/`method`/`methodVersion` | verilmeyen alan render edilmez |
@@ -150,15 +155,15 @@ tablosunun bir girdisidir.
 
 | Part | Property | Token |
 |---|---|---|
-| trigger | font-size / letter-spacing | `--lg-text-badge` |
-| trigger | renk (varsayılan) | `--lg-label-secondary` |
-| trigger | renk (`data-tone='official'`) | `--lg-success` |
-| trigger | renk (`data-tone='derived'`) | `--lg-accent` |
+| trigger | font-size | `--lg-text-caption` |
+| trigger | renk (official/declared/derived) | `--lg-label-secondary` |
 | trigger | renk (`data-tone='stale'`) | `--lg-warning` |
+| trigger | renk (`data-tone='unknown'`) | `--lg-warning` |
 | trigger | renk (`data-tone='conflict'`) | `--lg-danger` |
-| trigger | border | `--lg-stroke-hairline` / `--lg-hairline` |
-| trigger | radius | `--lg-radius-capsule` |
-| trigger | padding | `--lg-space-1` `--lg-space-3` |
+| trigger | durum noktası çapı | `--provenance-dot-size` (mikro-geometri) |
+| trigger | nokta/metin arası | `--lg-space-2` |
+| trigger | radius | `--lg-radius-chip` |
+| trigger | padding | `--lg-space-1` / 0 |
 | trigger | min-height | `--lg-control-sm` (coarse: `--lg-control-md`) |
 | trigger:focus-visible | outline | `--lg-focus-ring-width` solid `--lg-accent`, offset `--lg-focus-ring-offset` |
 | panel | radius / border | `--lg-radius-chip` / `--lg-hairline` |
@@ -171,8 +176,10 @@ tablosunun bir girdisidir.
 | conflictList span | font-size / renk | `--lg-text-caption` / `--lg-label-secondary` |
 | limitations | font-size / renk | `--lg-text-caption` / `--lg-label-secondary` |
 
-**Borç:** yok. Tüm CSS değerleri `--lg-*` token'ları (fallback'leriyle
-birlikte) üzerinden gelir; raw hex/px/shadow yok. `.srOnly` clip tekniği
+**Borç:** `--provenance-dot-size` (8px) tek mikro-geometri değeridir; token
+ölçeğinde durum noktası çapı yoktur ve değer sayfadaki diğer durum
+noktalarıyla aynıdır. Bunun dışında tüm CSS değerleri `--lg-*` token'ları
+(fallback'leriyle birlikte) üzerinden gelir; raw hex/px/shadow yok. `.srOnly` clip tekniği
 (`position:absolute; width:1px; height:1px; overflow:hidden;
 clip-path:inset(50%)`) tasarım token'ı değil, standart erişilebilirlik
 idiomudur — token borcu sayılmaz.
@@ -212,9 +219,15 @@ viewport), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik (açık panel 
 - ❌ Bu component'i `GlassSurface`/cam bir kapsayıcıya sarıp "cam üstüne
   cam" oluşturma — kendisi zaten düz yüzeydir ve içerik katmanında kalmalıdır.
 
-**Bilinen kısıtlar:** `freshness='aging'`/`'unknown'` değerleri şu an rozet
+**Bilinen kısıtlar:** rozet renk taşımayan üç sınıfta (`official` ·
+`declared` · `derived`) tamamen nötr okunur — bu bilinçlidir: künye annote
+ettiği değerle yarışmamalıdır ve durum zaten kelimeyle yazılıdır. Renk yalnız
+dikkat gerektiren üç durumda (çelişki · bayatlık · cevapsızlık) ikincil kanal
+olarak eklenir. · `freshness='aging'`/`'unknown'` değerleri şu an rozet
 metnini değiştirmez (yalnız `'stale'` özel davranış tetikler) — ileride
 ayrı bir görsel ipucu gerekebilir. **Açık kararlar:** `aging` durumunun
 kendi rozet metni alıp almayacağı · çoklu çelişki (3+ kaynak) düzeninde
-sıralama kuralı (şu an prop sırası korunur). **Changelog:** 2026-07-27 —
-ilk sürüm.
+sıralama kuralı (şu an prop sırası korunur). **Changelog:** 2026-07-28 — rozet
+sessiz işarete dönüştü (büyük harf/çerçeveli hap yerine durum noktası + normal
+yazım); çekmece kendi zeminini taşır ve kök `display: contents` ile açılabilir.
+· 2026-07-27 — ilk sürüm.

@@ -45,6 +45,14 @@ describe('GlassListingDetailHeader', () => {
     expect(screen.getByText('4.850 m² beyan')).toBeTruthy()
   })
 
+  // Fiyatını kendi karar kolonunda taşıyan sayfalarda başlık yalnız künyedir:
+  // boş bir fiyat sütunu bırakılmaz.
+  it('fiyat verilmediğinde fiyat bloğu hiç render edilmez', () => {
+    render(<GlassListingDetailHeader title={BASE.title} priceUnit="1.804 ₺/m²" />)
+    expect(screen.queryByText('1.804 ₺/m²')).toBeNull()
+    expect(screen.getByRole('heading', { level: 1 })).toBeTruthy()
+  })
+
   it('utilities slotunu başlık bölgesinde render eder', () => {
     render(<GlassListingDetailHeader {...BASE} utilities={<button type="button">Kaydet</button>} />)
     expect(screen.getByRole('button', { name: 'Kaydet' })).toBeTruthy()
