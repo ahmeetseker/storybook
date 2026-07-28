@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { freshnessFrom } from '../domain/evidence'
 import type { LandListingDetail } from '../domain/listing-detail-types'
 import { medianPosition, medianPositionPhrase } from '../domain/listing-detail-view-model'
-import { briefFor, loadListingDetail } from './listing-detail-adapter'
+import { briefFor, forEachEvidenceValue, loadListingDetail } from './listing-detail-adapter'
 
 const NOW = '2026-07-27T09:00:00.000Z'
 
@@ -73,6 +73,38 @@ describe('loadListingDetail', () => {
     // 90 günü aşan ama 180 günü aşmayan beyan: "aging".
     expect(early?.detail.planning.titleDeedType.freshness).toBe('aging')
     expect(late?.detail.planning.titleDeedType.freshness).toBe('stale')
+
+    // Dayanıklı değerler takvimi izlemez: kadastral kimlik ve yürürlükteki
+    // ulusal tehlike haritası sürümü yıllar sonra da "güncel" kalır.
+    // (`blockParcel` 2019, AFAD haritası 2018 tarihli.)
+    expect(early?.detail.parcel.blockParcel.freshness).toBe('current')
+    expect(late?.detail.parcel.blockParcel.freshness).toBe('current')
+
+    const earthquakeAt = (result: typeof early) =>
+      result?.detail.terrain.hazards.find((item) => item.id === 'earthquake')?.value.freshness
+    expect(earthquakeAt(early)).toBe('current')
+    expect(earthquakeAt(late)).toBe('current')
+  })
+
+  // Dayanıklılık istisnadır: işaretlenmemiş her değer takvimi izler. Bu test
+  // işaretin fixture'da sessizce yayılmasını engeller.
+  it('dayanıklı işareti yalnız kadastral kimlik ve ulusal tehlike haritasındadır', async () => {
+    const detail = await landDetail()
+    const durable: string[] = []
+    forEachEvidenceValue(detail, (value) => {
+      if (value.freshnessPolicy === 'durable') durable.push(String(value.value))
+    })
+    expect(durable).toEqual([
+      '214 ada / 7 parsel',
+      'PGA 0,32 g — 50 yılda %10 aşılma olasılığı',
+    ])
+
+    // Beyanlar, plan notu, emsal kesiti ve türetilmiş erişim bilgisi gerçekten
+    // bayatlar — hiçbiri dayanıklı işaretlenmemelidir.
+    expect(detail.planning.titleDeedType.freshnessPolicy).toBeUndefined()
+    expect(detail.planning.landUse.freshnessPolicy).toBeUndefined()
+    expect(detail.market.comparableMedianUnitPrice.freshnessPolicy).toBeUndefined()
+    expect(detail.access.physicalAccess.freshnessPolicy).toBeUndefined()
   })
 
   it('güncellik normalizasyonu dizilerin içindeki kanıt değerlerine de iner', async () => {
@@ -92,8 +124,10 @@ describe('loadListingDetail', () => {
       'stale',
       'stale',
     ])
+    // Deprem göstergesi dayanıklıdır (yürürlükteki harita sürümü), yangın
+    // duyarlılık sınıfı değildir; taşkın katmanı hiç yayımlanmamıştır.
     expect(late?.detail.terrain.hazards.map((item) => item.value.freshness)).toEqual([
-      'stale',
+      'current',
       'stale',
       'unknown',
     ])

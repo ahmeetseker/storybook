@@ -192,6 +192,31 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
   bayrak sayfa bir yıl sonra açıldığında da eski sorguya "güncel" derdi.
   Cevapsız değerde (`isAnswered` false) güncellik `unknown` kalır — sorgunun
   dün yapılmış olması olmayan veriyi güncel yapmaz.
+- **Her kanıt takvimle bayatlamaz.** `EvidenceValue.freshnessPolicy`
+  (`domain/evidence.ts`) iki sınıfı ayırır:
+  - `time_sensitive` (**varsayılan**) — doğruluğu iki sorgu arasında
+    değişebilen değer: ilan sahibi beyanları, plan durumu ve plan notu, emsal
+    kesiti, uydu görüntüsünden türetilmiş erişim/eğim bilgisi, orman yangını
+    duyarlılık sınıfı. Bunlarda geçen zaman gerçek bir belirsizliktir;
+    güncellik 90/180 günlük eşikten hesaplanır.
+  - `durable` — takvimle değil **olayla** değişen değer. Bugün yalnız iki
+    tanesi işaretlidir: kadastral kimlik (`parcel.blockParcel` — ada/parsel
+    numarası ancak yeniden ölçüm, ifraz veya tevhitle değişir) ve yürürlükteki
+    ulusal deprem tehlike haritası sürümü (`terrain.hazards[earthquake]` —
+    yeni sürüm yayımlanana kadar resmî standart olarak geçerlidir). Adapter
+    bunların güncelliğine dokunmaz.
+- Varsayılanın `time_sensitive` olması bilinçlidir: **dayanıklılık iddia
+  edilmelidir, varsayılamaz.** İşaret ancak "bu değer neden takvimle
+  bayatlamaz" sorusunun yazılı bir cevabıyla birlikte konur. Gerekçe fixture'da
+  işaretin yanında durur.
+- Gerekçe: sağlam resmî veriye "Güncel değil" demek, aşırı iddianın ters
+  yönüdür — kaynağın güvenilirliği hakkında dayanağı olmayan bir şüphe üretir.
+  Bu sayfa hangi yönde olursa olsun dayanaksız iddia üretmez.
+- Koruma: `listing-detail-adapter.test.ts` içinde (a) dayanıklı değerlerin
+  `now` yıllarca ilerlediğinde değişmediği, (b) zamana duyarlı değerlerin
+  değiştiği, (c) `durable` işaretinin defterde **yalnız o iki değerde**
+  bulunduğu taranır; `EvidenceSections.test.tsx` künye rozetlerini render
+  düzeyinde doğrular.
 - Tarih biçimlendirme `format.ts`'te `Europe/Istanbul`'a sabitlenmiştir —
   sunucu ve tarayıcı aynı tarihi yazar.
 - `withScenario` derin kopya döner: bir tüketicinin mutasyonu modül düzeyindeki

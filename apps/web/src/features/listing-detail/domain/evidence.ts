@@ -55,11 +55,36 @@ export interface EvidenceConflict {
 /** Değerin hangi coğrafi/hukuki birim için geçerli olduğu */
 export type EvidenceScope = 'property' | 'parcel' | 'building' | 'neighborhood' | 'district'
 
+/**
+ * Değerin zamanla bayatlayıp bayatlamadığı.
+ *
+ * - `time_sensitive`: doğruluğu iki sorgu arasında değişebilen değer — ilan
+ *   sahibi beyanı, plan durumu, emsal kesiti, uydu görüntüsünden türetilmiş
+ *   erişim bilgisi. Bunlarda geçen zaman gerçek bir belirsizliktir ve
+ *   güncellik `freshnessFrom` ile takvimden hesaplanır.
+ * - `durable`: takvimle değil, **olayla** değişen değer — kadastral kimlik
+ *   (ada/parsel numarası yeniden ölçüm veya ifrazla değişir) ya da resmî
+ *   olarak yürürlükte olan sürümlü bir yayın (ulusal tehlike haritası, yeni
+ *   sürüm yayımlanana kadar geçerli kalır). Bunlara takvim eşiği uygulamak
+ *   ters yönde bir aşırı iddiadır: sağlam resmî veriyi "Güncel değil" diye
+ *   şüpheye düşürür.
+ *
+ * Varsayılan `time_sensitive`'dir: bir değerin dayanıklı olduğu **iddia
+ * edilmelidir**, sessizce varsayılamaz. Alan boş bırakıldığında değer
+ * takvimi izler.
+ */
+export type FreshnessPolicy = 'time_sensitive' | 'durable'
+
 export interface EvidenceValue<T> {
   /** Değer yoksa alan hiç doldurulmaz — boş string veya 0 ile taklit edilmez */
   value?: T
   status: EvidenceStatus
   freshness: FreshnessStatus
+  /**
+   * Güncelliğin takvimden mi türetileceği. Verilmezse `time_sensitive`
+   * kabul edilir — dayanıklılık açıkça beyan edilmelidir.
+   */
+  freshnessPolicy?: FreshnessPolicy
   source: EvidenceSource
   /** Verinin geçerli olduğu tarih (belge/kayıt tarihi) */
   effectiveAt?: string
@@ -98,6 +123,16 @@ export function hasConflict(value: EvidenceValue<unknown>): boolean {
 
 export function isAnswered(value: EvidenceValue<unknown>): boolean {
   return value.value !== undefined && value.status !== 'unavailable'
+}
+
+/**
+ * Değerin güncelliği takvimden hesaplanmalı mı?
+ *
+ * Varsayılan burada, tek yerde yaşar: `freshnessPolicy` yazılmamış her değer
+ * zamana duyarlıdır. Dayanıklılık istisnadır ve gerekçesiyle işaretlenir.
+ */
+export function decaysOverTime(value: EvidenceValue<unknown>): boolean {
+  return value.freshnessPolicy !== 'durable'
 }
 
 /**

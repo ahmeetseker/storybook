@@ -1,4 +1,5 @@
 import {
+  decaysOverTime,
   freshnessFrom,
   hasConflict,
   isAnswered,
@@ -155,8 +156,16 @@ function isEvidenceValue(node: object): node is EvidenceValue<unknown> {
   )
 }
 
-/** Defterdeki her kanıt değerini bir kez ziyaret eder (kanıt değerleri iç içe geçmez). */
-function forEachEvidenceValue(node: unknown, visit: (value: EvidenceValue<unknown>) => void): void {
+/**
+ * Defterdeki her kanıt değerini bir kez ziyaret eder (kanıt değerleri iç içe
+ * geçmez). Testler de bunu kullanır: defterin tamamını taramak, bir işaretin
+ * (ör. `freshnessPolicy: 'durable'`) sessizce yayılmasını yakalamanın tek
+ * güvenilir yoludur.
+ */
+export function forEachEvidenceValue(
+  node: unknown,
+  visit: (value: EvidenceValue<unknown>) => void,
+): void {
   if (Array.isArray(node)) {
     for (const item of node) forEachEvidenceValue(item, visit)
     return
@@ -172,14 +181,23 @@ function forEachEvidenceValue(node: unknown, visit: (value: EvidenceValue<unknow
 /**
  * Güncelliği `now`'a göre yeniden hesaplar.
  *
- * Fixture'daki `freshness` alanları yalnız varsayılandır; tek doğru kaynak
- * tarihlerdir. Elle yazılan bir bayrak, sayfa bir yıl sonra açıldığında da
- * 2026 sorgusuna "güncel" demeye devam ederdi. Cevapsız değerde güncellik
- * yoktur: `unknown` kalır — sorgunun dün yapılmış olması, olmayan veriyi
- * güncel yapmaz.
+ * Zamana duyarlı değerlerde fixture'daki `freshness` yalnız varsayılandır;
+ * tek doğru kaynak tarihlerdir. Elle yazılan bir bayrak, sayfa bir yıl sonra
+ * açıldığında da 2026 sorgusuna "güncel" demeye devam ederdi.
+ *
+ * İki istisna vardır ve ikisi de veri katmanında beyan edilir, burada alan
+ * adına göre özel-durum yazılmaz:
+ *
+ * - `freshnessPolicy: 'durable'` değerler takvimle bayatlamaz (kadastral
+ *   kimlik, yürürlükteki resmî harita sürümü). Onlara 90/180 günlük eşiği
+ *   uygulamak ters yönde bir aşırı iddiadır: sağlam resmî veriyi "Güncel
+ *   değil" diye şüpheye düşürür. Bu değerler defterde ne yazıyorsa onu korur.
+ * - Cevapsız değerde güncellik yoktur: `unknown` kalır — sorgunun dün
+ *   yapılmış olması, olmayan veriyi güncel yapmaz.
  */
 function normalizeFreshness(detail: LandListingDetail, now: string): void {
   forEachEvidenceValue(detail, (value) => {
+    if (!decaysOverTime(value)) return
     value.freshness = isAnswered(value)
       ? freshnessFrom(value.retrievedAt, now, value.effectiveAt)
       : 'unknown'

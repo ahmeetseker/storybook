@@ -8,6 +8,10 @@ const CUTOFF = '2026-07-24T09:12:00.000Z'
  * kaynak tarihlerdir; `loadListingDetail` her kanıt değerinin güncelliğini
  * `now`'a göre `freshnessFrom` ile yeniden hesaplar ve bu alanları ezer.
  * Elle yazılan bir bayrak bir yıl sonra da "güncel" demeye devam ederdi.
+ *
+ * Tek istisna `freshnessPolicy: 'durable'` işaretli değerlerdir: onlar
+ * takvimle değil olayla değişir, burada yazan güncellik korunur. İşaret
+ * gerekçesiyle birlikte konur; varsayılan her zaman zamana duyarlıdır.
  */
 
 /** EİDS satırında kapsam notu zorunludur — metin repo genelinde tek kaynaktır. */
@@ -131,7 +135,14 @@ export const OREN_LAND_LISTING: LandListingDetail = {
   price: { amount: 8_750_000, currency: 'TRY', declaredArea: 4850, unitPrice: 1804 },
   verification: VERIFICATION,
   parcel: {
-    blockParcel: official('214 ada / 7 parsel', { effectiveAt: '2019-02-03T00:00:00.000Z' }),
+    // Kadastral kimlik takvimle bayatlamaz: "214 ada / 7 parsel" 2026'da 2019'daki
+    // kadar doğrudur. Numara yalnız yeniden ölçüm, ifraz veya tevhitle — yani bir
+    // olayla — değişir. Tescil tarihine 90/180 günlük eşik uygulamak parselin
+    // kimliğini şüpheli göstermek olurdu.
+    blockParcel: official('214 ada / 7 parsel', {
+      effectiveAt: '2019-02-03T00:00:00.000Z',
+      freshnessPolicy: 'durable',
+    }),
     area: official(4712, {
       status: 'conflicting',
       conflicts: [{ sourceId: 'advertiser', value: 4850, effectiveAt: '2026-04-12T00:00:00.000Z' }],
@@ -204,6 +215,11 @@ export const OREN_LAND_LISTING: LandListingDetail = {
           value: 'PGA 0,32 g — 50 yılda %10 aşılma olasılığı',
           status: 'verified',
           freshness: 'current',
+          // Haritanın 2018 sürümü yürürlükteki ulusal standarttır; yeni bir
+          // sürüm yayımlanana kadar geçerliliğini korur. Yayın tarihine takvim
+          // eşiği uygulamak "resmî deprem tehlike değeri güncel olmayabilir"
+          // demek olurdu — dayanağı olmayan, ters yönde bir iddia.
+          freshnessPolicy: 'durable',
           source: { id: 'afad', name: 'AFAD Türkiye Deprem Tehlike Haritası', sourceClass: 'official' },
           retrievedAt: CUTOFF,
           effectiveAt: '2018-01-18T00:00:00.000Z',

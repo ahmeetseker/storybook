@@ -4,15 +4,18 @@ import { describe, expect, it } from 'vitest'
 import { loadListingDetail } from '../data/listing-detail-adapter'
 import type { EvidenceValue } from '../domain/evidence'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
+import { ParcelSection } from './ParcelSection'
 import { PlanningAndLegalSection } from './PlanningAndLegalSection'
 import { InfrastructureSection } from './InfrastructureSection'
 import { HazardSection } from './HazardSection'
 import { MarketSection } from './MarketSection'
 
 const NOW = '2026-07-27T09:00:00.000Z'
+/** Kanıt kesitinden yıllar sonrası: takvim eşiği her şeyi bayatlatmaya yeter. */
+const MUCH_LATER = '2029-07-27T09:00:00.000Z'
 
-async function detail() {
-  const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+async function detail(now: string = NOW) {
+  const result = await loadListingDetail({ listingId: 'arsa-214-7', now })
   if (!result) throw new Error('fixture bulunamadı')
   return result.detail
 }
@@ -66,6 +69,48 @@ describe('kanıt bölümleri', () => {
   it('emsal tablosu gerçek table semantiği kullanır', async () => {
     render(<MarketSection detail={await detail()} />)
     expect(screen.getByRole('table', { name: /Emsal/ })).toBeTruthy()
+  })
+
+  // Takvim eşiği yalnız gerçekten bayatlayan veriye uygulanır. Kadastral
+  // kimlik ve yürürlükteki ulusal tehlike haritası sürümü yıllar sonra da
+  // "Güncel değil" damgası yemez — sağlam resmî veriyi şüpheye düşürmek,
+  // aşırı iddianın ters yönüdür.
+  // Not: künyenin erişilebilir adında ekran-okuyucu öneki ile rozet metni
+  // arasında boşluk yoktur (`… kaynağı:Resmî kayıttan`) — accname algoritması
+  // düğüm metinlerini ayrı ayrı kırpar. Eşleşmeler bu yüzden regex'tir.
+  it('kadastral kimlik yıllar sonra da "Güncel değil" damgası yemez', async () => {
+    render(
+      <ParcelSection detail={await detail(MUCH_LATER)} mapSection={{ state: 'ready', data: true }} />,
+    )
+
+    expect(screen.getByText('214 ada / 7 parsel')).toBeTruthy()
+    expect(screen.getByRole('button', { name: /^Ada \/ parsel kaynağı:\s*Resmî kayıttan$/ })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /^Ada \/ parsel kaynağı:\s*Güncel değil$/ })).toBeNull()
+
+    // Aynı bölümde gerçekten bayatlayan türetilmiş değerler hâlâ bayatlıyor:
+    // kural "her şeyi güncel say" değil, "yalnız takvimle değişeni ölç".
+    expect(screen.getByRole('button', { name: /^Konum kesinliği kaynağı:\s*Güncel değil$/ })).toBeTruthy()
+  })
+
+  it('yürürlükteki deprem tehlike haritası yıllar sonra da "Güncel değil" damgası yemez', async () => {
+    render(<HazardSection detail={await detail(MUCH_LATER)} />)
+
+    expect(
+      screen.getByRole('button', {
+        name: /^Bölgesel deprem tehlike göstergesi kaynağı:\s*Resmî kayıttan$/,
+      }),
+    ).toBeTruthy()
+    expect(
+      screen.queryByRole('button', {
+        name: /^Bölgesel deprem tehlike göstergesi kaynağı:\s*Güncel değil$/,
+      }),
+    ).toBeNull()
+
+    expect(
+      screen.getByRole('button', {
+        name: /^Orman yangını duyarlılık göstergesi kaynağı:\s*Güncel değil$/,
+      }),
+    ).toBeTruthy()
   })
 
   // Kaynağın bilinmesi cevabın doğrulandığı anlamına gelmez: bilinen resmî bir
