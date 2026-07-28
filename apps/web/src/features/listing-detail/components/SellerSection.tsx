@@ -5,6 +5,7 @@ import type { ListingDetail } from '../domain/listing-detail-types'
 import { criticalIssues } from '../domain/listing-detail-view-model'
 import { contactClosedReason, formatDateShort, formatNumber } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
+import { INDIVIDUAL_TTBS_SCOPE_NOTE, TTBS_SCOPE_NOTE } from './seller-copy'
 import { SELLER_REVEAL_CONTROL_ID } from './seller-reveal'
 import styles from '../ListingDetailWorkspace.module.css'
 
@@ -36,10 +37,6 @@ export interface SellerSectionProps {
   /** Yalnız olay adı gider; numara asla analitiğe verilmez. */
   onAnalyticsEvent?: (event: SellerPhoneAnalyticsEvent) => void
 }
-
-/** TTBS'in kapsamı görünür metindir: faaliyet yetkisi ilan içeriğini doğrulamaz. */
-const TTBS_SCOPE_NOTE =
-  'TTBS, işletmenin faaliyet yetkisidir; ilan içeriğinin doğruluğunu göstermez.'
 
 const REVEAL_FAILURE_TEXT =
   'Numara şu anda gösterilemiyor. Birkaç dakika sonra tekrar deneyin.'
@@ -206,7 +203,7 @@ export function SellerSection({
         </div>
       ) : (
         <p className={styles.blockNote}>
-          Bireysel ilan sahipleri TTBS yetki belgesi kapsamında değildir. {TTBS_SCOPE_NOTE}
+          {`${INDIVIDUAL_TTBS_SCOPE_NOTE} ${TTBS_SCOPE_NOTE}`}
         </p>
       )}
 

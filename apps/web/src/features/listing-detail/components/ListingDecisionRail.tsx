@@ -3,6 +3,7 @@ import { GlassAlert, GlassDetailActionBar } from '@repo/ui'
 
 import type { ListingDetail } from '../domain/listing-detail-types'
 import { contactClosedReason } from '../format'
+import { AGENCY_LICENCE_UNVERIFIED, INDIVIDUAL_TTBS_SCOPE_NOTE } from './seller-copy'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface ListingDecisionRailProps {
@@ -103,10 +104,19 @@ export function ListingDecisionRail({ detail, onContact, onGoToSeller }: Listing
       <div className={styles.sellerSummary}>
         <p className={styles.sellerName}>{seller.name}</p>
         <p className={styles.sellerMeta}>{sellerTypeLabel(seller.type)}</p>
-        {seller.licence?.value ? (
-          <p className={styles.sellerMeta}>{`Yetki belgesi: ${seller.licence.value}`}</p>
+        {/* Yetki belgesi satırı yalnız kontrolün gerçekten uygulanabildiği
+            yerde bir sonuç bildirir. Bireysel satıcı TTBS kapsamında
+            değildir; orada "doğrulanamadı" demek hiç yapılmamış bir kontrolün
+            başarısız olduğunu iddia etmek olurdu. Metinler satıcı bölümüyle
+            tek kaynaktan gelir (`seller-copy.ts`). */}
+        {seller.type === 'agency' ? (
+          seller.licence?.value ? (
+            <p className={styles.sellerMeta}>{`Yetki belgesi: ${seller.licence.value}`}</p>
+          ) : (
+            <p className={styles.sellerMeta}>{AGENCY_LICENCE_UNVERIFIED}</p>
+          )
         ) : (
-          <p className={styles.sellerMeta}>Yetki belgesi doğrulanamadı.</p>
+          <p className={styles.sellerMeta}>{INDIVIDUAL_TTBS_SCOPE_NOTE}</p>
         )}
         {seller.activeListings !== undefined ? (
           <p className={styles.sellerMeta}>{`${seller.activeListings} aktif ilan`}</p>

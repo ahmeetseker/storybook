@@ -122,6 +122,19 @@ bölümlerinin hepsi içerik katmanındadır: düz yüzey (`--lg-surface` +
 - **TTBS** işletmenin faaliyet yetkisidir; ilan içeriğini doğrulamaz. Satıcı
   bölümünde bu cümle görünür metindir:
   `TTBS, işletmenin faaliyet yetkisidir; ilan içeriğinin doğruluğunu göstermez.`
+- **TTBS yalnız emlak ofislerine uygulanır.** `seller.type === 'individual'`
+  satıcı için yetki belgesi bir **kontrol değildir**: ne "doğrulandı" ne
+  "doğrulanamadı" yazılabilir — ikisi de yapılmamış bir kontrolün sonucunu
+  bildirir. Bireysel satıcıda yalnız kapsam bildirilir:
+  `Bireysel ilan sahipleri TTBS yetki belgesi kapsamında değildir.`
+  `Yetki belgesi doğrulanamadı.` cümlesi **yalnız** yetki belgesi değeri
+  bulunamayan emlak ofisi ilanında geçer.
+- Satıcı hakkında sayfada iki yüzey konuşur (karar rayının özeti ve satıcı
+  bölümü) ve **ikisi de aynı cümleyi** kullanır: metinler
+  `components/seller-copy.ts` içinde tek kaynaktan gelir. İki ayrı ifade iki
+  ayrı iddia demektir; aynı satıcı için çelişen iki metin bırakılmaz. Koruma:
+  `ProjectedListingDetail.test.tsx` içindeki bireysel/ofis satıcı testleri ve
+  `ListingDetailWorkspace.test.tsx` içindeki belge numarası testi.
 - Bir kontrolün olumlu olması diğerlerini olumlu yapmaz; doğrulama bir vektördür,
   tek rozet değildir.
 

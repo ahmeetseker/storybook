@@ -136,6 +136,28 @@ describe('yansıtılmış ilan detayı sayfası', () => {
     expect(within(section).queryByText('0 belgenin tamamı sunuldu.')).toBeNull()
   })
 
+  // Karar rayı ile satıcı bölümü aynı satıcı hakkında çelişemez. TTBS bireysel
+  // ilan sahiplerine hiç uygulanmaz; orada "doğrulanamadı" demek yapılmamış bir
+  // kontrolün başarısız olduğunu iddia etmek olurdu.
+  it('bireysel satıcıda hiçbir yüzey "doğrulanamadı" demez, kapsam bildirilir', async () => {
+    const { container } = await renderProjected(VERIFIED_RESIDENTIAL)
+    expect(container.textContent).not.toContain('Yetki belgesi doğrulanamadı')
+    expect(screen.queryByText('Yetki belgesi doğrulanamadı.')).toBeNull()
+
+    // Ray ve satıcı bölümü aynı cümleyi kullanır; iki ayrı ifade yoktur.
+    expect(
+      screen.getAllByText(/Bireysel ilan sahipleri TTBS yetki belgesi kapsamında değildir/).length,
+    ).toBeGreaterThanOrEqual(2)
+  })
+
+  it('yetki belgesi değeri olmayan emlak ofisinde ray "doğrulanamadı" yazar', async () => {
+    await renderProjected(UNVERIFIED_RESIDENTIAL)
+    expect(screen.getByText('Yetki belgesi doğrulanamadı.')).toBeTruthy()
+    expect(
+      screen.queryByText(/Bireysel ilan sahipleri TTBS yetki belgesi kapsamında değildir/),
+    ).toBeNull()
+  })
+
   it('emlak ofisi ilanında yetki belgesi kaydının bulunmadığı yazılır', async () => {
     await renderProjected(UNVERIFIED_RESIDENTIAL)
     const section = screen.getByRole('region', { name: 'Satıcı' })

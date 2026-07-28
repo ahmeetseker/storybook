@@ -59,6 +59,14 @@ describe('ListingDetailWorkspace', () => {
     ])
   })
 
+  // Kontrolün gerçekten uygulandığı yerde sonucu yazılır: yetki belgesi değeri
+  // olan emlak ofisinde ray numarayı gösterir, "doğrulanamadı" demez.
+  it('yetki belgesi olan emlak ofisinde ray belge numarasını yazar', async () => {
+    await renderWorkspace()
+    expect(screen.getByText('Yetki belgesi: TTBS 4820/1173')).toBeTruthy()
+    expect(screen.queryByText('Yetki belgesi doğrulanamadı.')).toBeNull()
+  })
+
   it('karar rayında tek prominent CTA bulunur', async () => {
     await renderWorkspace()
     const rail = screen.getByRole('group', { name: 'Karar ve iletişim' })

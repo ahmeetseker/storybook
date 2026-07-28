@@ -165,7 +165,8 @@ const VALUATION_REASON =
  * Arama özetini ilan detayına yansıtır.
  *
  * Alan eşlemesi:
- * - fiyat ve alan → ilan sahibi beyanı, birim fiyat ikisinden türetilir
+ * - fiyat ve alan → ilan sahibi beyanı; birim fiyat arama kaydının kendi
+ *   türetimidir (ikisinden hesaplanır), burada ikinci kez hesaplanmaz
  * - `attributes` / `highlights` → beyan satırları
  * - `verified` → yalnız EİDS satırı
  * - `owner` / `sellerName` → satıcı bloğu (yetki belgesi değeri yoktur)
@@ -195,7 +196,9 @@ export function projectListingDetail(
       amount: summary.price,
       currency: 'TRY',
       declaredArea: summary.area,
-      unitPrice: Math.round(summary.price / summary.area),
+      // Türetim tek yerde yaşar: arama kaydı birim fiyatı zaten hesaplayıp
+      // taşır. Burada yeniden hesaplamak iki kopya türetim demek olurdu.
+      unitPrice: summary.unitPrice,
     },
     category: summary.category,
     categoryLabel: CATEGORY_LABELS[summary.category],
