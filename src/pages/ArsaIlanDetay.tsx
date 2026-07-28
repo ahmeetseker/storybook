@@ -150,8 +150,8 @@ function ArsaIlanDetayIcerik() {
                       <p style={{ margin: 0 }}>
                         1/1000 uygulama imar planında konut alanında kalmaktadır; 0.30 emsal ile
                         yaklaşık 150 m² taban oturumlu, iki katlı yapı yapılabilir. Bu taşınmaz için
-                        ilan verme yetkisi EİDS ile doğrulanmıştır; tapu niteliği ve imar bilgisi
-                        ayrı belgelerle teyit edilmelidir.
+                        ilan verme yetkisi EİDS ile doğrulanmıştır. Bu kontrol tapu niteliğini,
+                        takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
                       </p>
                     </>
                   ),

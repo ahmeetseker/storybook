@@ -11,6 +11,7 @@ const FORBIDDEN = [
   /tapu\s+kaydıyla\s+EİDS/i,
   /tapu\s+(ve\s+imar\s+)?durumu\s+EİDS/i,
   /İmar\s+EİDS\s+ile\s+doğrulan/i,
+  /Tapu\s+EİDS\s+ile\s+doğrulan/i,
   /Tam\s+doğrulanmış\s+ilan/i,
   /Fiyatı\s+doğrulandı/i,
   /Sorunsuz\s+taşınmaz/i,

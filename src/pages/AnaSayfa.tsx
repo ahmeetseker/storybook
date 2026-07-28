@@ -41,9 +41,14 @@ export function AnaSayfa() {
           <h1 style={{ margin: 0, fontSize: 'var(--lg-text-display, 28px)', fontWeight: 700, letterSpacing: '-0.022em', lineHeight: 1.15 }}>
             Türkiye'nin doğrulanmış arsa ilan platformu
           </h1>
-          <p style={{ margin: 0, fontSize: 'var(--lg-text-body, 15px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
-            Her ilanda, ilan verme yetkisi EİDS ile doğrulanır. Aradığınızı doğal dille yazın, filtreleri yapay zekâ kursun.
-          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <p style={{ margin: 0, fontSize: 'var(--lg-text-body, 15px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
+              Her ilanda, ilan verme yetkisi EİDS ile doğrulanır. Aradığınızı doğal dille yazın, filtreleri yapay zekâ kursun.
+            </p>
+            <p style={{ margin: 0, fontSize: 'var(--lg-text-footnote, 13px)', color: 'var(--lg-label-secondary)', lineHeight: 1.5 }}>
+              Bu kontrol tapu niteliğini, takyidatı, imar bilgisini, fiziksel durumu veya fiyatı doğrulamaz.
+            </p>
+          </div>
           <form
             role="search"
             onSubmit={(e) => e.preventDefault()}
