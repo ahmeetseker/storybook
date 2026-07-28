@@ -15,9 +15,65 @@ korur; burada yazılanlar sayfa düzeyinde onların üzerine gelir.
 
 İlan detayı bir vitrin değil, **karar dosyasıdır**: her değer kaynağıyla,
 tarihiyle ve kapsamıyla birlikte durur; bilinmeyen bir alan boş bırakılmaz,
-nedeni yazılır. Yerleşim "Yön A" şemasıdır — kategori yolu → başlık →
-ilk görünüm (medya + karar özeti) → bölüm indeksi → kanıt bölümleri + karar
-rayı → satıcı.
+nedeni yazılır. Yerleşim "Yön A" şemasıdır — kategori yolu → başlık künyesi →
+bölüm indeksi → tek ızgara: solda kanıt akışı (özet/medya → doğrulama vektörü
+→ karar özeti → göstergeler → kanıt bölümleri → belgeler → satıcı), sağda
+sticky karar kolonu.
+
+## 1b. Yerleşim, ritim ve tipografi
+
+Bunlar süsleme değil, okunabilirlik sözleşmesidir:
+
+- **Bölümler kart değildir.** Kanıt bölümlerinin çerçevesi, zemini ve gölgesi
+  yoktur; ayrımı hairline ve boşluk yapar (`--section-rhythm`, iki bölüm
+  arasında paylaşılan ~56px; grup içi ritim `--lg-space-3/4`). Sayfanın zemini
+  bölümleri taşır. **Kart içinde kart açılmaz.**
+- **Ortak dikey eksen.** Kanıt satırı üç sütundur: etiket (`--evidence-label-col`,
+  sabit) · değer (akışkan) · kaynak (`--evidence-source-col`, sabit, sağa
+  hizalı). İki sabit sütun `.shell` üzerinde tanımlıdır; sayfanın ilk
+  bölümünden sonuncusuna kadar aynıdır — hizanın kaynağı içerik uzunluğu değil
+  sayfanın kendisidir. Belge satırları ve gösterge ızgarası aynı sol ekseni
+  paylaşır.
+- **Tip ölçeği sabit adımlardan gelir** (`--lg-text-*`): başlık `display`
+  (28) → bölüm başlığı `title` (22) → blok başlığı `headline` (17) → değer
+  `body` (15) → etiket/not `footnote`/`caption` (13/12). Etiketler değerlerden
+  küçük ve ikincil tondadır. Sayısal her değer `tabular-nums` taşır; görsel
+  harf aralığı hiçbir yerde -0.03em'den sıkı değildir.
+- **Fiyat sayfada tek bir yerde büyür:** karar kolonunda, `display` ölçeğinde,
+  tabular. Başlık künyesi fiyatı **taşımaz** (`GlassListingDetailHeader`'a
+  `price` verilmez) — aynı sayı iki yüzeyde iki farklı vurguyla durmaz.
+- **Doğrulama vektörü dar kolona sıkışmaz.** Vektörün tamamı Özet bölümünde,
+  kendi iki kolonlu ızgarasındadır (`#dogrulama`); karar kolonunda yalnız
+  özeti durur (kaç kontrol olumlu · olumsuz satırların başlıkları · eksik
+  sayısı) ve özet vektöre bağlanır. Bilgi kaybolmaz, yer değiştirir.
+- **Renkli kenar şeridi yoktur.** Durum (doğrulama satırı, belge durumu, künye)
+  kelimeyle yazılır; renk yalnız küçük bir durum noktasıyla ikincil kanal
+  olarak eklenir ve yalnız dikkat gerektiren durumlarda (olumsuz/eksik ·
+  çelişki · bayatlık · cevapsızlık) doygunlaşır.
+- **Kaynak künyesi damga değildir.** `GlassDataProvenance` rozeti normal
+  yazımlı, çerçevesiz, ikincil tonlu bir işarettir; annote ettiği değerle
+  yarışmaz. Çekmece davranışı değişmez — açıldığında satırın altına tam
+  genişlikte iner (kök `display: contents`), değerin üstüne binmez.
+
+## 1c. Medya
+
+- Kayıtlarda **gerçek ilan fotoğrafı yoktur**. Gösterilen kareler kategoriyi
+  temsil eden stok fotoğraflardır ve kaynak tek yerdedir:
+  `features/listings/data/listing-photos.ts`. Arama, karşılaştırma ve ilan
+  detayı aynı havuzdan okur.
+- Temsili kullanım **gizlenmez**: medya sahnesinin altında tek kaynaklı cümle
+  görünür durur — `REPRESENTATIVE_IMAGE_NOTE`
+  (`Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.`).
+  Karşılaştırma tezgâhı aynı sabiti kullanır; iki ayrı cümle iki ayrı iddia
+  demek olurdu.
+- **Fotoğraf olmayan kaleme temsili kare iliştirilmez.** Parsel görünümü ve
+  plan notu (PDF) `representative` alanını hiç taşımaz; künyeleriyle (tür,
+  çekim tarihi, yapay zekâ düzenleme etiketi) birlikte döküm satırı olarak
+  görünür. Kayıtta hiç fotoğraf yoksa eski dürüst gerileme korunur — döküm
+  metin olarak, **derli toplu** bir blokta durur; bir kolonu baştan aşağı
+  işgal etmez.
+- Yüklenemeyen kare sessizce kaybolmaz: `fallbackSrc` (kategori zeminli yer
+  tutucu) devreye girer.
 
 Bölüm sırası tek kaynaktan gelir: `components/listing-sections.ts`
 (`LISTING_SECTIONS`). Bölüm indeksindeki etiket ile bölümün `<h2>` metni
@@ -105,13 +161,16 @@ ve `ListingDetailAccessibility.test.tsx` içinde
 |---|---|---|
 | `GlassBreadcrumb` | sayfa başı kategori yolu | navigasyon |
 | `GlassSurface as="nav"` | sticky bölüm indeksi | navigasyon |
-| `GlassDetailActionBar` | karar rayı | kontrol |
+| `GlassSurface` "Görsel gezinmesi" | medya sahnesinde kare geçişi | kontrol |
+| `GlassDetailActionBar` | karar kolonu | kontrol |
 | `GlassButton` "Numarayı göster" | satıcı bölümü | kontrol |
 
-Kalan iki yüzey **rezervdir** (Faz 2 sohbet dock'u / mobil alt çubuk). Kanıt
-bölümlerinin hepsi içerik katmanındadır: düz yüzey (`--lg-surface` +
-`--lg-hairline`), cam açmazlar. Cam üstüne cam yoktur — karar rayındaki satıcı
-özeti ve `GlassDataProvenance` künyeleri düz yüzeydir.
+Kalan **bir** yüzey rezervdir (Faz 2 sohbet dock'u / mobil alt çubuk). Medya
+kontrol grubu yalnız birden çok kare varken render edilir — tek kareli
+ilanlarda o yüzey de açılmaz. Kanıt bölümlerinin hepsi içerik katmanındadır:
+kutusuz düz akış, cam açmazlar. Cam üstüne cam yoktur — karar kolonundaki
+fiyat/özet/satıcı blokları ve `GlassDataProvenance` künyeleri düz yüzeydir;
+medya kontrolü camdır ama fotoğrafın üstündedir, camın üstünde değil.
 
 ## 3. EİDS ve doğrulama dili
 
@@ -331,6 +390,12 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 
 ## Changelog
 
+- 2026-07-28 — Görsel yapı yeniden kuruldu (§1b, §1c): bölümler kart olmaktan
+  çıktı, kanıt satırları sayfa genelinde ortak dikey eksene oturdu, doğrulama
+  vektörü kendi iki kolonlu ızgarasına taşındı, fiyat karar kolonuna alındı,
+  kaynak künyeleri damgadan sessiz işarete döndü ve medya sahnesi tek kaynaklı
+  temsili fotoğraflarla açıldı. Bilgi mimarisi ve dürüstlük kuralları
+  değişmedi.
 - 2026-07-28 — Arama sonuçlarından yansıtılan ilan paketi (`generic`) eklendi
   (§1a): 72 arama kaydı artık dürüst bir detay sayfasına çözülüyor, arsa
   kanıt paketi yalnız `kind === 'land'` ilanında açılıyor.

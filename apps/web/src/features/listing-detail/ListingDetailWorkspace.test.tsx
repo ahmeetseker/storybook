@@ -26,6 +26,58 @@ describe('ListingDetailWorkspace', () => {
     expect(container.querySelectorAll('[data-material="glass"]').length).toBeLessThanOrEqual(6)
   })
 
+  // Medya sahnesi: kayıt gerçek fotoğraf taşımadığı için kareler temsilidir
+  // ve bu gizlenmez — görselin yanında tek kaynaklı açıklama cümlesi durur.
+  it('temsili kapak görselini ve görünür açıklamasını gösterir', async () => {
+    await renderWorkspace()
+    const cover = screen.getByAltText(/temsili fotoğraf — parselden deniz yönü/i)
+    expect(cover.getAttribute('src')).toBeTruthy()
+    expect(
+      screen.getByText(
+        'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.',
+      ),
+    ).toBeTruthy()
+  })
+
+  // Fotoğrafı olmayan kalemler (parsel görünümü, plan notu) temsili bir kare
+  // almaz; künyeleriyle birlikte döküm olarak görünür kalır.
+  it('fotoğraf olmayan medya kalemleri künyesiyle döküm olarak kalır', async () => {
+    await renderWorkspace()
+    expect(screen.getByText('Parsel görünümü')).toBeTruthy()
+    expect(screen.getByText('Plan notu (PDF)')).toBeTruthy()
+    expect(screen.queryByAltText(/Plan notu/i)).toBeNull()
+  })
+
+  // Fiyat karar kolonundadır; başlık künyesi onu ikinci kez yazmaz.
+  it('fiyat başlık künyesinde değil karar kolonunda durur', async () => {
+    await renderWorkspace()
+    const header = screen.getByRole('heading', { level: 1 }).closest('header')
+    expect(header).toBeTruthy()
+    expect(header!.textContent).not.toContain('8.750.000 ₺')
+
+    const rail = screen.getByRole('complementary', { name: 'Karar kolonu' })
+    expect(within(rail).getByText('8.750.000 ₺')).toBeTruthy()
+  })
+
+  // Doğrulama vektörü dar kolonda değil kendi ızgarasındadır; karar kolonunda
+  // yalnız özeti kalır ve özet vektöre bağlanır — bilgi kaybolmaz, taşınır.
+  it('doğrulama vektörü kendi bölümünde durur; karar kolonu özetini bağlar', async () => {
+    const { container } = await renderWorkspace()
+    const rail = screen.getByRole('complementary', { name: 'Karar kolonu' })
+
+    expect(within(rail).getByText('7 kontrolün 4 tanesi olumlu')).toBeTruthy()
+    expect(
+      within(rail).getByText(/Olumsuz: İlan yüzölçümü parsel kaydıyla eşleşmedi/),
+    ).toBeTruthy()
+    // Satır başlıklarının tamamı rayda değil, vektörün kendisindedir.
+    expect(within(rail).queryByText('Platform moderasyonu tamamlandı')).toBeNull()
+
+    const link = within(rail).getByRole('link', { name: /Doğrulama vektörünün tamamı/ })
+    const target = container.querySelector(link.getAttribute('href')!)
+    expect(target).toBeTruthy()
+    expect(within(target as HTMLElement).getByText('Platform moderasyonu tamamlandı')).toBeTruthy()
+  })
+
   it('EİDS satırını kapsam notuyla birlikte gösterir', async () => {
     await renderWorkspace()
     expect(screen.getByText('İlan verme yetkisi EİDS ile doğrulandı')).toBeTruthy()

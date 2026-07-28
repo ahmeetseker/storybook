@@ -1,11 +1,7 @@
 import type { SectionState } from '../data/listing-detail-adapter'
-import { criticalIssues, verificationScore } from '../domain/listing-detail-view-model'
-import type {
-  ListingDetail,
-  ListingMediaItem,
-  VerificationRow,
-} from '../domain/listing-detail-types'
-import { formatArea, formatDate, formatUnitPrice } from '../format'
+import { verificationScore } from '../domain/listing-detail-view-model'
+import type { ListingDetail, VerificationRow } from '../domain/listing-detail-types'
+import { ListingMediaStage } from './ListingMediaStage'
 import styles from '../ListingDetailWorkspace.module.css'
 
 export interface ListingIntroProps {
@@ -13,6 +9,9 @@ export interface ListingIntroProps {
   /** Harita sağlayıcısının durumu — kullanılamadığında medya sahnesi susmaz. */
   mapSection: SectionState<true>
 }
+
+/** Doğrulama vektörünün çapası — karar kolonundaki özet buraya bağlanır. */
+export const VERIFICATION_SECTION_ID = 'dogrulama'
 
 /**
  * Durum yalnız renkle taşınmaz: her satırın işareti kelimeyle de yazılır.
@@ -25,123 +24,67 @@ export interface ListingIntroProps {
  * "Çelişkili" yalnız gerçekten çelişki bildirilen yerde kullanılır
  * (kanıt künyesindeki `Kaynaklar çelişiyor` rozeti).
  */
-const STATE_LABEL: Record<VerificationRow['state'], string> = {
+export const STATE_LABEL: Record<VerificationRow['state'], string> = {
   positive: 'Olumlu',
   negative: 'Olumsuz',
   unknown: 'Eksik',
 }
 
 /**
- * Medya dosyası taşımayan kayıtlarda sahne boş kalmaz: döküm metin olarak
- * durur. Faz 1'de medya dosyası taşıyan kayıt yoktur — `GlassMediaGallery`
- * yolu hiçbir fixture veya story tarafından beslenmediği için kaldırıldı;
- * çalışmayan bir dal, çalıştığı sanılan bir daldan kötüdür.
- */
-function MediaInventory({ media }: { media: ListingMediaItem[] }) {
-  return (
-    <div className={styles.mediaInventory}>
-      <p className={styles.mediaInventoryNote}>
-        Görsel dosyaları bu kayıtta bulunmuyor. İlanda listelenen medya:
-      </p>
-      <ul className={styles.mediaInventoryList}>
-        {media.map((item) => (
-          <li key={item.id}>
-            <span className={styles.mediaInventoryLabel}>{item.label}</span>
-            <span className={styles.mediaInventoryMeta}>
-              {item.capturedAt ? `Çekim: ${formatDate(item.capturedAt)}` : 'Çekim tarihi bildirilmedi'}
-              {item.aiEdited ? ' · yapay zekâ ile düzenlendi' : ''}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-/**
- * İlanın ilk görünümü: medya sahnesi + karar özeti kolonu.
+ * İlanın ilk görünümü: medya sahnesi ve doğrulama vektörü.
  *
- * Karar özeti kolonu birim fiyatın dayanağını, doğrulama vektörünü ve
- * görüşmeden önce çözülmesi gereken konuları taşır; hiçbiri accordion
- * arkasına saklanmaz. Kolon içerik katmanındadır — cam açmaz.
+ * Vektör dar bir kolona sıkışmaz — özetin altında kendi iki kolonlu ızgarasında
+ * durur; karar kolonunda yalnız **derli toplu** özeti kalır (kaç kontrol
+ * olumlu, olumsuz olan hangisi) ve o özet buraya bağlanır. Hiçbir satır
+ * kaybolmaz, yalnız yer değiştirir.
+ *
+ * Bölüm içerik katmanındadır: düz akış, cam açmaz. Tek istisna medya
+ * sahnesinin kare geçiş kontrolüdür (kontrol katmanı).
  */
 export function ListingIntro({ detail, mapSection }: ListingIntroProps) {
   const score = verificationScore(detail.verification)
-  const issues = criticalIssues(detail)
 
   return (
-    <section id="ozet" className={styles.intro} aria-labelledby="ozet-baslik">
+    <section id="ozet" className={styles.section} aria-labelledby="ozet-baslik">
       <h2 id="ozet-baslik" className={styles.sectionTitle}>
         Özet
       </h2>
 
-      <div className={styles.mediaStage}>
-        {detail.media.length > 0 ? (
-          <MediaInventory media={detail.media} />
-        ) : (
-          <p className={styles.mediaInventoryNote}>Bu kayıtta medya bilgisi bulunmuyor.</p>
-        )}
-        {/* Yönlendirme yalnız Parsel bölümü gerçekten render edildiğinde
-            yazılır: yansıtılmış ilanda böyle bir bölüm yoktur, kullanıcı
-            olmayan bir yere gönderilmez. */}
-        {detail.kind === 'land' && mapSection.state === 'unavailable' ? (
-          <p className={styles.mediaInventoryMeta}>
-            Konum ve parsel bilgisi Parsel bölümünde metin olarak yer alır.
-          </p>
-        ) : null}
-        {detail.kind === 'generic' && mapSection.state === 'unavailable' ? (
-          <p className={styles.mediaInventoryMeta}>{mapSection.reason}</p>
-        ) : null}
-      </div>
+      <ListingMediaStage media={detail.media} />
 
-      <div className={styles.decision}>
-        <p className={styles.introUnitPrice}>
-          <strong>{formatUnitPrice(detail.price.unitPrice)}</strong>
-          <span className={styles.introPriceBasis}>
-            {`Beyan edilen ${formatArea(detail.price.declaredArea)} alan üzerinden hesaplandı.`}
-          </span>
+      {/* Yönlendirme yalnız Parsel bölümü gerçekten render edildiğinde
+          yazılır: yansıtılmış ilanda böyle bir bölüm yoktur, kullanıcı
+          olmayan bir yere gönderilmez. */}
+      {detail.kind === 'land' && mapSection.state === 'unavailable' ? (
+        <p className={styles.blockNote}>
+          Konum ve parsel bilgisi Parsel bölümünde metin olarak yer alır.
         </p>
+      ) : null}
+      {detail.kind === 'generic' && mapSection.state === 'unavailable' ? (
+        <p className={styles.blockNote}>{mapSection.reason}</p>
+      ) : null}
 
-        <div className={styles.verification}>
-          <h3 className={styles.subTitle}>
-            {`Doğrulama vektörü · ${score.total} kontrolün ${score.positive} tanesi olumlu`}
-          </h3>
-          <ul className={styles.verificationList}>
-            {detail.verification.map((row) => (
-              <li key={row.id} className={styles.verificationItem} data-state={row.state}>
-                <p className={styles.rowTitle}>{row.title}</p>
-                <p className={styles.rowState}>{STATE_LABEL[row.state]}</p>
-                {row.scopeNote ? <p className={styles.rowScope}>{row.scopeNote}</p> : null}
-                <p className={styles.rowSource}>{`Kaynak: ${row.source}`}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <section className={styles.critical} aria-labelledby="kritik-baslik">
-          <h3 id="kritik-baslik" className={styles.subTitle}>
-            Görüşmeden önce çözülmesi gerekenler
-          </h3>
-          {issues.length === 0 ? (
-            <p className={styles.issueDetail}>
-              Bu ilanda karar öncesi çözülmesi gereken bir konu bulunmadı.
-            </p>
-          ) : (
-            <ul className={styles.criticalList}>
-              {issues.map((issue) => (
-                <li key={issue.id} className={styles.criticalItem}>
-                  <p className={styles.issueTitle}>{issue.title}</p>
-                  <p className={styles.issueDetail}>{issue.detail}</p>
-                  {issue.action ? (
-                    <p className={styles.issueAction}>
-                      <span className={styles.issueActionLabel}>Sonraki adım:</span> {issue.action}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+      <div id={VERIFICATION_SECTION_ID} className={styles.verification}>
+        <h3 className={styles.subTitle}>
+          {`Doğrulama vektörü · ${score.total} kontrolün ${score.positive} tanesi olumlu`}
+        </h3>
+        <p className={styles.blockNote}>
+          Bir kontrolün olumlu olması diğerlerini olumlu yapmaz; her satır yalnız kendi kapsamını
+          bildirir.
+        </p>
+        <ul className={styles.verificationList}>
+          {detail.verification.map((row) => (
+            <li key={row.id} className={styles.verificationItem} data-state={row.state}>
+              <p className={styles.rowState}>
+                <span className={styles.stateDot} aria-hidden="true" />
+                {STATE_LABEL[row.state]}
+              </p>
+              <p className={styles.rowTitle}>{row.title}</p>
+              {row.scopeNote ? <p className={styles.rowScope}>{row.scopeNote}</p> : null}
+              <p className={styles.rowSource}>{`Kaynak: ${row.source}`}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   )

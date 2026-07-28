@@ -1,8 +1,9 @@
 /* İçerik katmanı: cam yok, yalnız yüzey/hairline/metin token'ları. */
 
+/* İddialar kutu değildir: bölüm zaten kutusuz akıyor, iddia satırı da
+   hairline ile ayrılır (kart içinde kart yok). */
 .claimList {
   display: grid;
-  gap: var(--lg-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -10,16 +11,18 @@
 
 .claimItem {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
-  gap: var(--lg-space-3);
-  padding: var(--lg-space-3) var(--lg-space-4);
-  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  border-radius: var(--lg-radius-card);
-  background: var(--lg-surface);
-  font-size: var(--lg-text-footnote);
+  gap: var(--lg-space-4);
+  padding-block: var(--lg-space-3);
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  font-size: var(--lg-text-body);
   line-height: 1.5;
   color: var(--lg-label);
+}
+
+.claimItem:last-child {
+  border-block-end: 0;
 }
 
 .claimLink {

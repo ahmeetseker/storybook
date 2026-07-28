@@ -1,16 +1,24 @@
-/* Kanıt satırı — içerik katmanı, düz yüzey. Cam açmaz.
+/* Kanıt satırı — içerik katmanı, düz akış. Cam açmaz, kutu da değildir.
    Tüm ölçüler --lg-* token'larından gelir. */
 
 .list {
   container-type: inline-size;
   display: grid;
-  margin: var(--lg-space-4) 0 0;
+  margin: 0;
   padding: 0;
 }
 
+/* Üç sütun, tek eksen: etiket · değer · kaynak.
+   Etiket ve kaynak sütunları sayfanın tamamında aynı genişliktedir
+   (`--evidence-*-col`, `.shell` üzerinde tanımlı). Fallback değerleri
+   component tek başına render edildiğinde (test/story) devreye girer;
+   mikro-geometridir, token karşılığı yoktur. */
 .row {
   display: grid;
-  grid-template-columns: minmax(10rem, 1fr) minmax(0, 1.9fr) auto;
+  grid-template-columns:
+    var(--evidence-label-col, 200px)
+    minmax(0, 1fr)
+    var(--evidence-source-col, 176px);
   align-items: baseline;
   gap: var(--lg-space-2) var(--lg-space-5);
   padding: var(--lg-space-3) 0;
@@ -24,6 +32,7 @@
 .label {
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-footnote);
+  font-weight: 500;
   line-height: 1.45;
 }
 
@@ -56,8 +65,28 @@
   line-height: 1.45;
 }
 
-.source {
+/* Künye kökü ızgaranın dışına çıkar: rozet ve çekmece satırın doğrudan
+   ızgara öğeleri olur. Böylece rozet sağdaki dar kaynak sütununda kalırken
+   çekmece satırın altına tam genişlikte iner — dar bir sütuna sıkışmaz ve
+   değerin üstüne binmez. */
+/* Seçici bilinçli olarak iki kez yazıldı: künye kökünün kendi `display`
+   kuralı aynı özgüllükte olduğu için sıralamaya bağlı kalmadan ezilir. */
+.source.source {
+  display: contents;
+}
+
+/* Rozet: kaynak sütunu, satırın ilk şeridi. */
+.source > button {
+  grid-column: 3;
+  grid-row: 1;
   justify-self: end;
+  text-align: end;
+  min-inline-size: 0;
+}
+
+/* Çekmece: satırın altına tam genişlikte. */
+.source > div {
+  grid-column: 1 / -1;
 }
 
 @container (inline-size <= 40rem) {
@@ -65,7 +94,10 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .source {
+  .source > button {
+    grid-column: 1;
+    grid-row: auto;
     justify-self: start;
+    text-align: start;
   }
 }

@@ -24,7 +24,7 @@ import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
 import type { ListingDetail } from './domain/listing-detail-types'
 import { metricStripItems } from './domain/listing-detail-view-model'
-import { formatArea, formatDate, formatPrice, formatUnitPrice, lifecycleStatus } from './format'
+import { formatArea, formatDate, lifecycleStatus } from './format'
 import styles from './ListingDetailWorkspace.module.css'
 
 export interface ListingDetailWorkspaceProps {
@@ -153,26 +153,34 @@ export function ListingDetailWorkspace({
       <main className={styles.shell}>
         <GlassBreadcrumb items={breadcrumbItems(detail)} className={styles.crumbs} />
 
+        {/* Fiyat başlıkta değil karar kolonundadır: sayfanın en büyük sayısı
+            tek bir yerde durur, künye bloğu onu ikinci kez yazmaz. */}
         <GlassListingDetailHeader
           title={detail.title}
-          price={formatPrice(detail.price.amount)}
-          priceUnit={formatUnitPrice(detail.price.unitPrice)}
-          priceNote={priceNote(detail)}
           status={lifecycleStatus(detail.lifecycle)}
           meta={headerMeta(detail)}
+          className={styles.header}
         />
 
-        <ListingIntro detail={detail} mapSection={sections.map} />
         <ListingSectionIndex sections={sectionsFor(detail)} />
 
+        {/* Sayfanın tamamı tek ızgaradadır: solda kanıt akışı, sağda karar
+            kolonu. Ortak eksen buradan gelir — her bölüm aynı içerik
+            kolonunun genişliğini paylaşır. */}
         <div className={styles.body}>
           <div className={styles.flow}>
+            <ListingIntro detail={detail} mapSection={sections.map} />
             <ListingEvidenceBrief brief={aiBrief} detail={detail} onReportIssue={onReportIssue} />
-            <GlassMetricStrip
-              items={metricStripItems(detail)}
-              label="Temel göstergeler"
-              className={styles.metrics}
-            />
+            <section className={styles.section} aria-labelledby="gostergeler-baslik">
+              <h2 id="gostergeler-baslik" className={styles.sectionTitle}>
+                Temel göstergeler
+              </h2>
+              <GlassMetricStrip
+                items={metricStripItems(detail)}
+                label="Temel göstergeler"
+                className={styles.metrics}
+              />
+            </section>
             {/* Arsa kanıt paketi yalnız defteri olan ilanda açılır; yansıtılmış
                 ilanda o bölümler render edilmez, boş kabuk olarak da durmaz. */}
             {detail.kind === 'land' ? (
@@ -187,21 +195,21 @@ export function ListingDetailWorkspace({
               <DeclaredFeaturesSection detail={detail} />
             )}
             <DocumentsSection detail={detail} />
+            <SellerSection
+              detail={detail}
+              onRevealPhone={onRevealPhone}
+              onAnalyticsEvent={onAnalyticsEvent}
+            />
           </div>
           <ListingDecisionRail
             detail={detail}
+            priceNote={priceNote(detail)}
             onContact={onContact}
             onGoToSeller={
               hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
             }
           />
         </div>
-
-        <SellerSection
-          detail={detail}
-          onRevealPhone={onRevealPhone}
-          onAnalyticsEvent={onAnalyticsEvent}
-        />
       </main>
     </div>
   )

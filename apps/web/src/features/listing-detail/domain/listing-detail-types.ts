@@ -54,6 +54,22 @@ export interface ListingPrice {
   unitPrice: number
 }
 
+/**
+ * Medya kaleminin gösterilebilir karesi.
+ *
+ * **Taşınmazın kendi fotoğrafı değildir.** Ürün verisinde gerçek ilan
+ * görselleri bulunmadığı için kategoriyi temsil eden stok kare gösterilir;
+ * kaynak tek yerdedir (`features/listings/data/listing-photos.ts`) ve
+ * gösteren yüzey `REPRESENTATIVE_IMAGE_NOTE` cümlesini görünür yazar.
+ * Fotoğraf olmayan kalemler (plan PDF'i, parsel görünümü) bu alanı **hiç
+ * taşımaz** — onlara temsili bir fotoğraf iliştirmek yanlış olurdu.
+ */
+export interface ListingMediaPreview {
+  src: string
+  fallbackSrc: string
+  alt: string
+}
+
 export interface ListingMediaItem {
   id: string
   kind: 'photo' | 'video' | 'plan' | 'parcel' | 'drone'
@@ -61,6 +77,8 @@ export interface ListingMediaItem {
   capturedAt?: string
   /** AI ile üretilmiş veya maddi biçimde düzenlenmiş medya görünür etiketlenir */
   aiEdited?: boolean
+  /** Varsa temsili kare; yoksa kalem yalnız döküm satırı olarak görünür */
+  representative?: ListingMediaPreview
 }
 
 export interface ListingDocument {

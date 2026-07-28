@@ -1,7 +1,21 @@
+import { getCategoryStockPhoto } from '@/features/listings/data/listing-photos'
 import type { EvidenceValue } from '../domain/evidence'
-import type { LandListingDetail, VerificationRow } from '../domain/listing-detail-types'
+import type {
+  LandListingDetail,
+  ListingMediaPreview,
+  VerificationRow,
+} from '../domain/listing-detail-types'
 
 const CUTOFF = '2026-07-24T09:12:00.000Z'
+
+/**
+ * Arsa kategorisinin temsili karesi — kaynak arama tarafıyla ortaktır.
+ * Bu defterde gerçek ilan fotoğrafı yoktur; kare taşınmazın kendisini
+ * göstermez ve bu görünüm katmanında yazılı olarak söylenir.
+ */
+function landPhoto(index: number, alt: string): ListingMediaPreview {
+  return getCategoryStockPhoto('land', index, alt)
+}
 
 /**
  * Not: buradaki `freshness` değerleri yalnız **varsayılandır**. Tek doğru
@@ -279,11 +293,33 @@ export const OREN_LAND_LISTING: LandListingDetail = {
     activeListings: 42,
     memberSince: '2023-05-01T00:00:00.000Z',
   },
+  // Fotoğraf ve drone kalemleri temsili (stok) kare taşır; kaynak arama
+  // tarafıyla aynıdır ve görünüm katmanı bunu görünür bir cümleyle söyler.
+  // Parsel görünümü ve plan notu **fotoğraf değildir** — onlara temsili bir
+  // kare iliştirilmez, döküm satırı olarak durur.
   media: [
     { id: 'parcel', kind: 'parcel', label: 'Parsel görünümü', capturedAt: CUTOFF },
-    { id: 'photo-1', kind: 'photo', label: 'Parselden deniz yönü', capturedAt: '2026-04-08T00:00:00.000Z' },
-    { id: 'photo-2', kind: 'photo', label: 'Stabilize yol girişi', capturedAt: '2026-04-08T00:00:00.000Z' },
-    { id: 'drone-1', kind: 'drone', label: 'Drone çekimi', capturedAt: '2026-04-08T00:00:00.000Z' },
+    {
+      id: 'photo-1',
+      kind: 'photo',
+      label: 'Parselden deniz yönü',
+      capturedAt: '2026-04-08T00:00:00.000Z',
+      representative: landPhoto(0, 'Arsa ilanı için temsili fotoğraf — parselden deniz yönü'),
+    },
+    {
+      id: 'photo-2',
+      kind: 'photo',
+      label: 'Stabilize yol girişi',
+      capturedAt: '2026-04-08T00:00:00.000Z',
+      representative: landPhoto(1, 'Arsa ilanı için temsili fotoğraf — stabilize yol girişi'),
+    },
+    {
+      id: 'drone-1',
+      kind: 'drone',
+      label: 'Drone çekimi',
+      capturedAt: '2026-04-08T00:00:00.000Z',
+      representative: landPhoto(2, 'Arsa ilanı için temsili fotoğraf — havadan görünüm'),
+    },
     { id: 'plan-note', kind: 'plan', label: 'Plan notu (PDF)', capturedAt: '2025-11-19T00:00:00.000Z' },
   ],
 }

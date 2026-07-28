@@ -32,6 +32,19 @@ describe('yansıtılmış ilan detayı sayfası', () => {
     expect(container.textContent).not.toContain('8.750.000 ₺')
   })
 
+  // Yansıtılmış ilan da temsili kapak karesini arama tarafıyla aynı kaynaktan
+  // alır; kare taşınmazın kendi fotoğrafı olmadığı için açıklaması görünürdür.
+  it('temsili kapak görselini kendi başlığıyla ve açıklamasıyla gösterir', async () => {
+    await renderProjected()
+    const cover = screen.getByAltText(/için temsili ilan fotoğrafı$/)
+    expect(cover.getAttribute('src')).toBeTruthy()
+    expect(
+      screen.getByText(
+        'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.',
+      ),
+    ).toBeTruthy()
+  })
+
   it('konut ilanında parsel, imar ve tehlike bölümleri hiç render edilmez', async () => {
     const { container } = await renderProjected()
     for (const title of ['Parsel', 'İmar ve Hukuk', 'Altyapı ve Erişim', 'Arazi ve Tehlike', 'Piyasa']) {

@@ -6,6 +6,7 @@ import {
   placeLabel,
   TRANSACTION_LABELS,
 } from '@/features/listings/data/listing-attributes'
+import { getRepresentativeListingImage } from '@/features/listings/data/listing-photos'
 import type { EvidenceValue, UnavailableReason } from '../domain/evidence'
 import type {
   DeclaredAttribute,
@@ -144,9 +145,10 @@ function openQuestionsFor(retrievedAt: string): DeclaredAttribute[] {
 /**
  * Medya dökümü.
  *
- * Görsel dosyaları detay kaydında bulunmadığı için galeri açılmaz; ilanda
- * bildirilen görsel sayısı beyan olarak yazılır. Sayı kadar sahte başlık
- * üretilmez.
+ * Kaydın kendi fotoğrafları yoktur; kapak karesi arama tarafıyla **aynı
+ * kaynaktan** gelen temsili (stok) bir fotoğraftır ve görünüm katmanı bunu
+ * görünür bir cümleyle söyler. İlanda bildirilen görsel sayısı beyan olarak
+ * yazılır; sayı kadar sahte başlık üretilmez.
  */
 function mediaFor(summary: ListingSummary): ListingMediaItem[] {
   return [
@@ -154,6 +156,7 @@ function mediaFor(summary: ListingSummary): ListingMediaItem[] {
       id: 'cover',
       kind: 'photo',
       label: `Kapak görseli · ilanda toplam ${summary.imageCount} görsel bildirildi`,
+      representative: getRepresentativeListingImage(summary),
     },
   ]
 }

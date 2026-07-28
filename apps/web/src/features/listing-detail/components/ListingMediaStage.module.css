@@ -1,0 +1,233 @@
+/* Medya sahnesi — içerik katmanı. Tek cam yüzey kare geçiş kontrolüdür.
+   Tüm ölçüler --lg-* token'larından gelir; mikro-geometri adlandırılmış
+   yerel özelliklerde toplanır. */
+
+.stage {
+  /* Mikro-geometri — token karşılığı yok:
+     - kapak en/boy oranı sabittir (16:9), ölçek token'ı değildir
+     - küçük görsel şeridinin sütun genişliği ve kontrol yuvarlağının çapı
+       tipografik ölçekle değil dokunma hedefiyle belirlenir */
+  --media-aspect: 16 / 9;
+  --media-thumb-width: 108px;
+  --media-control-size: 36px;
+  display: grid;
+  gap: var(--lg-space-3);
+  min-inline-size: 0;
+}
+
+.cover {
+  position: relative;
+  display: grid;
+  gap: var(--lg-space-2);
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.coverImage {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: var(--media-aspect);
+  object-fit: cover;
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-hairline);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .coverImage {
+    animation: mediaFade 180ms ease-out;
+  }
+}
+
+@keyframes mediaFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Kontrol grubu kapağın üstünde durur — cam yalnız burada, fotoğrafın
+   üzerinde açılır (cam üstüne cam yoktur). */
+.controls {
+  position: absolute;
+  inset-block-start: var(--lg-space-3);
+  inset-inline-end: var(--lg-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-1);
+}
+
+.controlButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--media-control-size);
+  block-size: var(--media-control-size);
+  border: 0;
+  border-radius: var(--lg-radius-capsule);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: var(--lg-text-headline);
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.controlButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.counter {
+  min-inline-size: var(--media-control-size);
+  text-align: center;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (pointer: coarse) {
+  .controlButton {
+    inline-size: var(--lg-control-md);
+    block-size: var(--lg-control-md);
+  }
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lg-space-1) var(--lg-space-3);
+}
+
+.captionLabel {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.captionMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Küçük görsel şeridi — yatay akar, dar kapta kaydırılır. */
+.thumbs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--media-thumb-width);
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.thumb {
+  display: grid;
+  gap: var(--lg-space-1);
+  inline-size: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.thumb:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.thumbImage {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: var(--media-aspect);
+  object-fit: cover;
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-hairline);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .thumbImage {
+    transition: opacity 160ms ease-out;
+  }
+}
+
+/* Seçili olmayan kareler geri çekilir: durum yalnız renkle değil, seçili
+   karenin altındaki etiketin ağırlığıyla da taşınır. */
+.thumb[aria-current='false'] .thumbImage {
+  opacity: 0.6;
+}
+
+@media (hover: hover) {
+  .thumb:hover .thumbImage {
+    opacity: 1;
+  }
+}
+
+.thumbLabel {
+  display: block;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thumb[aria-current='true'] .thumbLabel {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+.note {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+/* Görsel dosyası olmayan kalemlerin dökümü — derli toplu blok. */
+.inventory {
+  display: grid;
+  gap: var(--lg-space-2);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-3);
+}
+
+.inventoryTitle {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.inventoryList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-1) var(--lg-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inventoryList li {
+  display: grid;
+  gap: 0;
+}
+
+.inventoryLabel {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.inventoryMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}

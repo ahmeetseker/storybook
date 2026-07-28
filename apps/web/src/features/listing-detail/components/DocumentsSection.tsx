@@ -72,8 +72,15 @@ export function DocumentsSection({ detail }: DocumentsSectionProps) {
             data-state={document.state === 'available' ? 'available' : document.critical ? 'critical' : 'missing'}
           >
             <p className={styles.docLabel}>{document.label}</p>
-            <p className={styles.docState}>{stateLabel(document)}</p>
-            <p className={styles.docMeta}>{metaText(document)}</p>
+            <div className={styles.docBody}>
+              {/* Durum kelimeyle yazılır; nokta yalnız tarama işaretidir.
+                  Renkli kenar şeridi kullanılmaz. */}
+              <p className={styles.docState}>
+                <span className={styles.stateDot} aria-hidden="true" />
+                {stateLabel(document)}
+              </p>
+              <p className={styles.docMeta}>{metaText(document)}</p>
+            </div>
           </li>
         ))}
       </ul>

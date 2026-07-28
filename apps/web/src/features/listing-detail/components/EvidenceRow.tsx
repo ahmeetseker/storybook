@@ -109,30 +109,32 @@ export function EvidenceRow<T>({
         <span className={styles.valueText}>{text}</span>
         {note ? <p className={styles.note}>{note}</p> : null}
       </dd>
-      <div className={styles.source}>
-        <GlassDataProvenance
-          fieldLabel={label}
-          sourceLabel={value.source.name}
-          // Cevapsız değerde kökenin rozeti gösterilemez: "Bilgi alınamadı"
-          // metninin yanında "Resmî kayıttan" rozeti, alınamayan bilgiyi resmî
-          // kayıtla doğrulanmış gibi gösterirdi. Kaynağın bilinmesi, cevabın
-          // doğrulandığı anlamına gelmez.
-          sourceClass={
-            (answered ? value.source.sourceClass : 'unknown') as GlassProvenanceSourceClass
-          }
-          retrievedAt={formatEvidenceDate(value.retrievedAt)}
-          effectiveAt={value.effectiveAt ? formatEvidenceDate(value.effectiveAt) : undefined}
-          validUntil={value.validUntil ? formatEvidenceDate(value.validUntil) : undefined}
-          freshness={value.freshness}
-          scopeLabel={SCOPE_LABELS[value.scope]}
-          geographicResolution={value.geographicResolution}
-          method={value.method}
-          methodVersion={value.methodVersion}
-          limitations={limitationsOverride ?? value.knownLimitations}
-          conflicts={hasConflict(value) ? conflicts : undefined}
-          currentValueLabel={answered ? text : undefined}
-        />
-      </div>
+      {/* Künye kökü `display: contents` ile açılır: rozet sağdaki kaynak
+          sütununda kalırken çekmece satırın altına tam genişlikte iner ve
+          değerin üstüne binmez. */}
+      <GlassDataProvenance
+        className={styles.source}
+        fieldLabel={label}
+        sourceLabel={value.source.name}
+        // Cevapsız değerde kökenin rozeti gösterilemez: "Bilgi alınamadı"
+        // metninin yanında "Resmî kayıttan" rozeti, alınamayan bilgiyi resmî
+        // kayıtla doğrulanmış gibi gösterirdi. Kaynağın bilinmesi, cevabın
+        // doğrulandığı anlamına gelmez.
+        sourceClass={
+          (answered ? value.source.sourceClass : 'unknown') as GlassProvenanceSourceClass
+        }
+        retrievedAt={formatEvidenceDate(value.retrievedAt)}
+        effectiveAt={value.effectiveAt ? formatEvidenceDate(value.effectiveAt) : undefined}
+        validUntil={value.validUntil ? formatEvidenceDate(value.validUntil) : undefined}
+        freshness={value.freshness}
+        scopeLabel={SCOPE_LABELS[value.scope]}
+        geographicResolution={value.geographicResolution}
+        method={value.method}
+        methodVersion={value.methodVersion}
+        limitations={limitationsOverride ?? value.knownLimitations}
+        conflicts={hasConflict(value) ? conflicts : undefined}
+        currentValueLabel={answered ? text : undefined}
+      />
     </div>
   )
 }
