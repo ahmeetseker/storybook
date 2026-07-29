@@ -57,14 +57,17 @@
 
 .segmentActive { opacity: 1; }
 
-/* Boyut ekseni: kontrol yüksekliği token'dan; kök padding'i (3px×2) düşülür */
+/* Boyut ekseni: dokunma hedefi segmentin kendisidir, kök değil — bu yüzden
+   segment TAM kontrol yüksekliğini alır ve kök payı dışarıya eklenir.
+   (Önceden kök payı segmentten düşülüyordu: 44 − 3×2 = 38px, WCAG 2.2 AAA
+   2.5.5'in 44px eşiğinin altı.) */
 .sm .segment {
-  height: calc(var(--lg-control-sm, 32px) - var(--root-pad) * 2);
+  height: var(--lg-control-sm, 44px);
   padding: 0 var(--pad-x-sm);
   font-size: var(--lg-text-footnote, 13px);
 }
 .md .segment {
-  height: calc(var(--lg-control-md, 40px) - var(--root-pad) * 2);
+  height: var(--lg-control-md, 44px);
   padding: 0 var(--pad-x-md);
   font-size: var(--font-md);
 }

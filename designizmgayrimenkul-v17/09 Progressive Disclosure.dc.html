@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E9E4DC}
+a{color:#B45309;text-decoration:none} a:hover{color:#8A3E06}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes sheetIn{from{transform:translate(-50%,44px);opacity:.5}to{transform:translate(-50%,0);opacity:1}}
+@keyframes acil{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+input,select,textarea,button{font-family:'Nunito Sans',sans-serif}
+</style>
+</helmet>
+
+<div data-screen-label="09 Progressive Disclosure" style="max-width:430px;margin:0 auto;min-height:100vh;background:#FBF9F6;font-family:'Nunito Sans',sans-serif;color:#231F19;box-shadow:0 0 40px rgba(35,31,25,.15);padding-bottom:92px;box-sizing:border-box">
+
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#231F19;color:#9B927F;padding:7px 16px;font:700 10px/1 'Nunito Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase">
+    <span style="color:#FBF9F6">09 · Progressive Disclosure</span><span>← Tüm akımlar</span>
+  </a>
+
+  <header style="background:#FFFFFF;border-bottom:1px solid #EBE5DA;padding:12px 16px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;font:800 17px/1 'Nunito Sans',sans-serif;letter-spacing:-.01em">emlaktr<span style="color:#B45309">.com</span></div>
+    <button style="height:34px;padding:0 12px;border:1px solid #EBE5DA;border-radius:17px;background:#FBF9F6;font:700 11px 'Nunito Sans',sans-serif;color:#6E6455;cursor:pointer">⌕ AI arama</button>
+    <button onClick="{{ favDegis }}" style="width:34px;height:34px;border:1px solid #EBE5DA;border-radius:17px;background:#FBF9F6;font-size:14px;color:#B3412C;cursor:pointer">{{ favIkon }}</button>
+  </header>
+
+  <section data-screen-label="Özet kartı" style="margin:14px 16px 0;background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(35,31,25,.05)">
+    <div style="font:700 9.5px 'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#B45309">İlk bakış · Glance Card</div>
+    <h1 style="margin:8px 0 0;font:800 18px/1.35 'Nunito Sans',sans-serif">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:10px">
+      <div style="font:800 27px/1 'Nunito Sans',sans-serif">₺8.450.000</div>
+      <span style="font:700 11px 'Nunito Sans',sans-serif;color:#1C7C46">−%5,1 · ₺6.401/m²</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;margin-top:10px;font:600 12px/1.5 'Nunito Sans',sans-serif;color:#4B4438">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #EBE5DA"><span style="color:#9B927F">Alan · İmar</span><span>1.320 m² · Konut (E 0,30)</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #EBE5DA"><span style="color:#9B927F">Konum</span><span>Döşemealtı · Yeniköy</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #EBE5DA"><span style="color:#9B927F">Tapu · Kredi</span><span>Müstakil · Uygun</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px dashed #EBE5DA"><span style="color:#9B927F">Durum</span><span style="color:#1C7C46">● Aktif · Doğrulanmış ✓</span></div>
+    </div>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FBF3DC;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Nunito Sans',sans-serif;color:#8A6116">◆ Rezerve — benzer portföyler önerilebilir</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#F9E9E4;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Nunito Sans',sans-serif;color:#B3412C">■ Satıldı — <a href="#" onClick="{{ benzerAcVeGit }}" style="color:#B3412C;text-decoration:underline">benzer ilanlar</a></div>
+    </sc-if>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onClick="{{ telGoster }}" style="flex:1.4;height:42px;border:0;border-radius:21px;background:{{ telZemin }};color:#FFFFFF;font:800 12px 'Nunito Sans',sans-serif;cursor:pointer;transition:background .2s">{{ telYazi }}</button>
+      <button onClick="{{ mesajAc }}" style="flex:1;height:42px;border:1px solid #B45309;border-radius:21px;background:#FFFFFF;color:#B45309;font:800 12px 'Nunito Sans',sans-serif;cursor:pointer">Mesaj</button>
+    </div>
+    <sc-if value="{{ telAra }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;font:600 10.5px/1.5 'Nunito Sans',sans-serif;color:#9B927F;text-align:center;animation:acil .2s ease">Numara yalnızca siz isteyince gösterilir — bir kez daha dokunun. Aramalar güvenlik için kayıtlıdır.</div>
+    </sc-if>
+    <div style="display:flex;gap:16px;margin-top:12px;justify-content:center;font:700 10.5px 'Nunito Sans',sans-serif">
+      <button onClick="{{ karsiDegis }}" style="border:0;background:none;color:#6E6455;cursor:pointer;padding:0">⇄ Karşılaştır</button>
+      <button onClick="{{ paylas }}" style="border:0;background:none;color:#6E6455;cursor:pointer;padding:0">↗ Paylaş</button>
+      <button onClick="{{ alarmDegis }}" style="border:0;background:none;color:{{ alarmRenk }};cursor:pointer;padding:0">{{ alarmYazi }}</button>
+      <button onClick="{{ randevu }}" style="border:0;background:none;color:#6E6455;cursor:pointer;padding:0">Randevu</button>
+    </div>
+  </section>
+
+  <section data-screen-label="Medya" style="padding:12px 16px 0">
+    <div style="position:relative;height:{{ medyaYuk }};border-radius:14px;overflow:hidden;background:{{ fotoBg }};transition:height .3s ease">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center">
+        <div style="font:700 9.5px 'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(35,31,25,.5)">{{ fotoKat }}</div>
+        <div style="font:800 16px 'Nunito Sans',sans-serif;color:rgba(35,31,25,.75)">{{ fotoAd }}</div>
+      </div>
+      <button onClick="{{ geri }}" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;border-radius:17px;background:rgba(255,255,255,.93);box-shadow:0 1px 4px rgba(35,31,25,.2);font-size:15px;cursor:pointer">‹</button>
+      <button onClick="{{ ileri }}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;border-radius:17px;background:rgba(255,255,255,.93);box-shadow:0 1px 4px rgba(35,31,25,.2);font-size:15px;cursor:pointer">›</button>
+      <span style="position:absolute;right:10px;bottom:10px;background:rgba(35,31,25,.75);color:#FFFFFF;font:700 10.5px 'Nunito Sans',sans-serif;border-radius:12px;padding:4px 9px">{{ fotoSay }}</span>
+    </div>
+    <button onClick="{{ medyaBuyut }}" style="margin-top:8px;width:100%;height:32px;border:1px dashed #D9D0C0;border-radius:16px;background:none;font:700 10.5px 'Nunito Sans',sans-serif;color:#6E6455;cursor:pointer">{{ medyaBtn }}</button>
+  </section>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 16px 8px">
+    <div style="font:700 9.5px 'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#9B927F">Katman katman keşfedin</div>
+    <button onClick="{{ tumunuDegis }}" style="border:0;background:none;color:#B45309;font:800 11px 'Nunito Sans',sans-serif;cursor:pointer;padding:0">{{ tumunuYazi }}</button>
+  </div>
+
+  <div style="padding:0 16px;display:flex;flex-direction:column;gap:8px">
+
+    <section id="ozellikler" data-screen-label="Özellikler" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acOzellik }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F6EFE3;color:#B45309;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">▤</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Özellikler ve imar</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">1.320 m² · E 0,30 · TAKS 0,15 · 2 kat · köşe parsel…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonOzellik }}</span>
+      </button>
+      <sc-if value="{{ acikOzellik }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:6px 16px 12px;animation:acil .25s ease">
+          <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+            <div style="border-bottom:1px dashed #EBE5DA">
+              <button onClick="{{ g.ac }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:11px 0;cursor:pointer">
+                <span style="font:800 12px 'Nunito Sans',sans-serif">{{ g.baslik }}</span><span style="color:#B45309;font-weight:800">{{ g.ikon }}</span>
+              </button>
+              <sc-if value="{{ g.acikMi }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 0 10px;animation:acil .2s ease">
+                  <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+                    <div style="display:flex;justify-content:space-between;gap:12px;padding:5px 0;font:600 11.5px 'Nunito Sans',sans-serif">
+                      <span style="color:#9B927F">{{ s.k }}</span><span style="text-align:right">{{ s.v }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <p style="margin:10px 0 0;font:600 11.5px/1.7 'Nunito Sans',sans-serif;color:#4B4438;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+          <button onClick="{{ aciklamaDegis }}" style="margin-top:6px;border:0;background:none;color:#B45309;font:800 10.5px 'Nunito Sans',sans-serif;cursor:pointer;padding:0">{{ aciklamaBtn }}</button>
+        </div>
+      </sc-if>
+    </section>
+
+    <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+    <section data-screen-label="AI" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acAi }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#231F19;color:#F6EFE3;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✦</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">AI özeti ve soru-cevap</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">≈396 m² inşaat hakkı · medyanın %7 altında · sorular…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonAi }}</span>
+      </button>
+      <sc-if value="{{ acikAi }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <ul style="margin:0;padding-left:18px;font:600 12px/1.7 'Nunito Sans',sans-serif;color:#4B4438">
+            <li>Köşe parsel, 24 m cephe; <b>≈396 m² inşaat hakkı</b> (2 kat).</li>
+            <li>m² fiyatı medyanın <b>%7 altında</b>; bölge 90 günde +%12.</li>
+            <li>Altyapı parselde; doğalgaz 400 m.</li>
+          </ul>
+          <div style="display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px">
+            <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+              <button onClick="{{ c.sor }}" style="flex:none;border:1px solid #EBE5DA;background:#FBF9F6;color:#8A5C10;border-radius:15px;padding:7px 11px;font:700 10.5px 'Nunito Sans',sans-serif;cursor:pointer">{{ c.q }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+            <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+              <div style="border-left:3px solid {{ m.kenar }};padding:2px 0 2px 10px">
+                <div style="font:800 9px 'Nunito Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:{{ m.etiketRenk }}">{{ m.etiket }}</div>
+                <div style="font:600 12px/1.65 'Nunito Sans',sans-serif;color:#37322A;margin-top:2px">{{ m.metin }}</div>
+                <sc-if value="{{ m.kaynakVar }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ m.kaynakAcikMi }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:4px;font:700 10px 'Nunito Sans',sans-serif;color:#B45309;animation:acil .2s ease">⌘ Kaynak: {{ m.kaynak }}</div>
+                  </sc-if>
+                  <sc-if value="{{ m.kaynakKapali }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ m.kaynakAc }}" style="margin-top:4px;border:0;background:none;color:#9B927F;font:700 10px 'Nunito Sans',sans-serif;cursor:pointer;padding:0;text-decoration:underline">kaynağı göster</button>
+                  </sc-if>
+                </sc-if>
+              </div>
+            </sc-for>
+            <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}">
+              <div style="font:600 11px 'Nunito Sans',sans-serif;color:#9B927F;font-style:italic">✦ katman katman tarıyor…</div>
+            </sc-if>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <input value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Sorunuzu yazın…" style="flex:1;height:38px;border:1px solid #EBE5DA;border-radius:19px;padding:0 14px;font:600 12px 'Nunito Sans',sans-serif;background:#FBF9F6;outline-color:#B45309">
+            <button onClick="{{ gonder }}" style="height:38px;padding:0 15px;border:0;border-radius:19px;background:#231F19;color:#FBF9F6;font:800 11.5px 'Nunito Sans',sans-serif;cursor:pointer">Sor</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <section id="konum" data-screen-label="Konum" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acKonum }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F6EFE3;color:#B45309;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">◉</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Konum ve çevre</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">D650 kavşağı 2,4 km · merkez 22 km · risk: düşük…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonKonum }}</span>
+      </button>
+      <sc-if value="{{ acikKonum }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <div style="position:relative;height:150px;border-radius:10px;overflow:hidden;background:repeating-linear-gradient(0deg,#F1EDE5 0 26px,#E9E3D7 26px 27px),repeating-linear-gradient(90deg,#F1EDE5 0 26px,#E9E3D7 26px 27px)">
+            <div style="position:absolute;left:54%;top:30%;width:112px;height:72px;border:2px dashed #B45309;background:rgba(180,83,9,.08);border-radius:4px;transform:rotate(-4deg)"></div>
+            <div style="position:absolute;left:62%;top:42%;width:11px;height:11px;border-radius:50%;background:#B45309"></div>
+            <span style="position:absolute;left:10px;bottom:10px;font:700 9.5px 'Nunito Sans',sans-serif;color:#6E6455;background:rgba(255,255,255,.9);border-radius:8px;padding:3px 8px">Kesin konum · 37.0021, 30.5983</span>
+          </div>
+          <div style="margin-top:8px">
+            <sc-for list="{{ poi }}" as="p" hint-placeholder-count="6">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px dashed #EBE5DA;font:600 11.5px 'Nunito Sans',sans-serif">
+                <span style="color:#37322A">{{ p.ad }}</span><span style="color:#9B927F;white-space:nowrap">{{ p.mesafe }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:12px">
+            <div style="flex:1">
+              <div style="font:800 9px 'Nunito Sans',sans-serif;letter-spacing:.14em;color:#9B927F;margin-bottom:5px">SKORLAR</div>
+              <sc-for list="{{ skorlar }}" as="s" hint-placeholder-count="4">
+                <div style="display:flex;justify-content:space-between;font:600 11px 'Nunito Sans',sans-serif;padding:2px 0"><span style="color:#6E6455">{{ s.k }}</span><b style="color:#B45309">{{ s.v }}</b></div>
+              </sc-for>
+            </div>
+            <div style="flex:1">
+              <div style="font:800 9px 'Nunito Sans',sans-serif;letter-spacing:.14em;color:#9B927F;margin-bottom:5px">RİSKLER</div>
+              <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;justify-content:space-between;gap:6px;font:600 11px/1.4 'Nunito Sans',sans-serif;padding:2px 0"><span style="color:#6E6455">{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="piyasa" data-screen-label="Piyasa" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acPiyasa }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F6EFE3;color:#B45309;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">↗</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Piyasa karşılaştırması</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">medyanın %7 altında · trend +%12 · 23 aktif ilan…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonPiyasa }}</span>
+      </button>
+      <sc-if value="{{ acikPiyasa }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <div style="display:flex;justify-content:space-between;font:700 10.5px 'Nunito Sans',sans-serif;color:#6E6455"><span>Bu ilan: <b style="color:#1C7C46">₺6.401/m²</b></span><span>Medyan: <b>₺6.900/m²</b></span></div>
+          <div style="position:relative;height:9px;border-radius:5px;background:linear-gradient(90deg,#4C9E6E,#DDB95B,#C5604C);margin-top:8px">
+            <div style="position:absolute;left:34%;top:-3px;width:4px;height:15px;border-radius:2px;background:#231F19;box-shadow:0 0 0 2px #FFFFFF"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font:600 9px 'Nunito Sans',sans-serif;color:#9B927F;margin-top:4px"><span>₺5.200</span><span>₺6.900</span><span>₺9.100</span></div>
+          <div style="display:flex;align-items:flex-end;gap:14px;margin-top:10px">
+            <svg viewBox="0 0 100 36" style="flex:1;height:38px" preserveAspectRatio="none"><polyline points="0,33 14,27 29,30 43,21 57,15 71,18 86,9 100,3" fill="none" stroke="#B45309" stroke-width="2.5"></polyline></svg>
+            <b style="font:800 17px 'Nunito Sans',sans-serif;color:#1C7C46">+%12</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;font:600 10.5px 'Nunito Sans',sans-serif;color:#6E6455">
+            <span>Yaş <b>26 g</b></span><span>Arz <b>23</b></span><span>Satış <b>74 g</b></span><span>Pazarlık <b>%3–5</b></span>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="finans" data-screen-label="Finans" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acFinans }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F6EFE3;color:#B45309;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">%</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Finansal analiz</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">%{{ pesinat }} peşinatla taksit ₺{{ taksitTL }} · senaryolar…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonFinans }}</span>
+      </button>
+      <sc-if value="{{ acikFinans }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <div style="display:flex;justify-content:space-between;font:700 11px 'Nunito Sans',sans-serif;color:#4B4438"><span>Peşinat %{{ pesinat }} (₺{{ pesinatTL }})</span><span>{{ vade }} ay</span></div>
+          <input type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#B45309;margin-top:8px">
+          <input type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#B45309">
+          <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
+            <span style="font:700 9.5px 'Nunito Sans',sans-serif;color:#9B927F">FAİZ</span>
+            <sc-for list="{{ faizler }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.sec }}" style="border:1px solid {{ f.kenar }};background:{{ f.zemin }};color:{{ f.renk }};border-radius:14px;padding:5px 10px;font:800 10.5px 'Nunito Sans',sans-serif;cursor:pointer">%{{ f.v }}</button>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
+            <div style="background:#FBF9F6;border-radius:10px;padding:8px 10px"><div style="font:700 8.5px 'Nunito Sans',sans-serif;color:#9B927F">KREDİ</div><b style="font:800 12.5px 'Nunito Sans',sans-serif">₺{{ krediTL }}</b></div>
+            <div style="background:#B45309;border-radius:10px;padding:8px 10px"><div style="font:700 8.5px 'Nunito Sans',sans-serif;color:#F2DCC2">TAKSİT</div><b style="font:800 12.5px 'Nunito Sans',sans-serif;color:#FFFFFF">₺{{ taksitTL }}</b></div>
+            <div style="background:#FBF9F6;border-radius:10px;padding:8px 10px"><div style="font:700 8.5px 'Nunito Sans',sans-serif;color:#9B927F">TOPLAM</div><b style="font:800 12.5px 'Nunito Sans',sans-serif">₺{{ toplamTL }}</b></div>
+          </div>
+          <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:8px;background:#FBF3DC;border-radius:10px;padding:8px 11px;font:700 10.5px/1.5 'Nunito Sans',sans-serif;color:#8A6116">Arsada tipik kredi limiti ekspertizin %50'si — peşinatı artırın.</div>
+          </sc-if>
+          <sc-if value="{{ masrafKapali }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ masrafAc }}" style="margin-top:10px;width:100%;height:34px;border:1px dashed #D9D0C0;border-radius:17px;background:none;font:800 10.5px 'Nunito Sans',sans-serif;color:#6E6455;cursor:pointer">+ Masraf detayı ve 3 yıllık senaryolar</button>
+          </sc-if>
+          <sc-if value="{{ masrafAcikMi }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:10px;animation:acil .25s ease">
+              <sc-for list="{{ masraflar }}" as="m" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;font:600 11px 'Nunito Sans',sans-serif;color:#4B4438;padding:3px 0"><span>{{ m.k }}</span><b>{{ m.v }}</b></div>
+              </sc-for>
+              <div style="display:flex;gap:6px;margin-top:10px">
+                <sc-for list="{{ senaryolar }}" as="sn" hint-placeholder-count="3">
+                  <div style="flex:1;background:#FBF9F6;border-radius:10px;padding:8px;text-align:center"><div style="font:700 9px 'Nunito Sans',sans-serif;color:#9B927F">{{ sn.ad }}</div><b style="font:800 12.5px 'Nunito Sans',sans-serif">{{ sn.deger }}</b><div style="font:600 8.5px 'Nunito Sans',sans-serif;color:#9B927F">{{ sn.yil }}</div></div>
+                </sc-for>
+              </div>
+              <button onClick="{{ pdf }}" style="margin-top:8px;width:100%;height:34px;border:1px solid #EBE5DA;border-radius:17px;background:#FBF9F6;font:800 10.5px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">⤓ PDF rapor indir</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="belgeler" data-screen-label="Belgeler" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acBelge }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#E5F2E9;color:#1C7C46;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">✓</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Belgeler ve doğrulama</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">tapu özeti ✓ · imar çapı ✓ · ekspertiz 🔒 · EİDS eşleşti…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonBelge }}</span>
+      </button>
+      <sc-if value="{{ acikBelge }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:4px 16px 12px;animation:acil .25s ease">
+          <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed #EBE5DA">
+              <div><b style="font:700 12px 'Nunito Sans',sans-serif">{{ b.ikon }} {{ b.ad }}</b><div style="font:600 9.5px 'Nunito Sans',sans-serif;color:{{ b.durumRenk }}">{{ b.durumYazi }}</div></div>
+              <button onClick="{{ b.tik }}" style="border:1px solid #EBE5DA;border-radius:14px;background:#FBF9F6;font:800 10px 'Nunito Sans',sans-serif;color:#4B4438;padding:6px 10px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+            </div>
+          </sc-for>
+          <div style="margin-top:8px;font:700 10px/1.6 'Nunito Sans',sans-serif;color:#1C7C46">✓ EİDS kaydıyla eşleştirildi (28 Haz) · kimlikler maskelenir</div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="danisman" data-screen-label="Danışman" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acDanisman }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#B45309;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:800 10px 'Nunito Sans',sans-serif;flex:none">AD</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Ayşe Demir · Akdeniz Gayrimenkul</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">✓ doğrulanmış · ~28 dk yanıt · 4,8★ (212)…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonDanisman }}</span>
+      </button>
+      <sc-if value="{{ acikDanisman }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <div style="font:600 11.5px/1.8 'Nunito Sans',sans-serif;color:#4B4438">TB Yetki No 0700123 · EİDS kayıtlı · üyelik 2019<br>46 aktif portföy · Döşemealtı &amp; Kepez uzmanı<br>Yeniköy Mah. Atatürk Cad. No:41 · Hİ 09.00–18.30, Cmt 10.00–16.00</div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button onClick="{{ tumIlanlar }}" style="flex:1;height:36px;border:1px solid #EBE5DA;border-radius:18px;background:#FBF9F6;font:800 11px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">Tüm ilanları</button>
+            <button onClick="{{ mesajAc }}" style="flex:1;height:36px;border:0;border-radius:18px;background:#B45309;color:#FFFFFF;font:800 11px 'Nunito Sans',sans-serif;cursor:pointer">Mesaj gönder</button>
+            <button onClick="{{ takipDegis }}" style="height:36px;padding:0 12px;border:1px solid #EBE5DA;border-radius:18px;background:#FBF9F6;font:800 11px 'Nunito Sans',sans-serif;color:{{ takipRenk }};cursor:pointer">{{ takipYazi }}</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="guvenlik" data-screen-label="Güvenlik" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acGuvenlik }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F9E9E4;color:#B3412C;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">⚑</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Güvenlik ve şikayet</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">kapora uyarısı · kalite 92/100 · bildir…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonGuvenlik }}</span>
+      </button>
+      <sc-if value="{{ acikGuvenlik }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 16px 14px;animation:acil .25s ease">
+          <div style="background:#F9E9E4;border-radius:10px;padding:10px 12px;font:700 11px/1.6 'Nunito Sans',sans-serif;color:#8A2F1E">⚠ Görmeden kapora göndermeyin; ödemeleri platform dışına taşımayın.</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onClick="{{ bildir }}" style="flex:1;height:32px;border:1px solid #EBE5DA;border-radius:16px;background:#FBF9F6;font:700 10px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">İlanı bildir</button>
+            <button onClick="{{ bildir }}" style="flex:1;height:32px;border:1px solid #EBE5DA;border-radius:16px;background:#FBF9F6;font:700 10px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">Konum hatası</button>
+            <button onClick="{{ bildir }}" style="flex:1;height:32px;border:1px solid #EBE5DA;border-radius:16px;background:#FBF9F6;font:700 10px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">Fiyat hatası</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;font:800 11.5px 'Nunito Sans',sans-serif"><span style="color:#6E6455">İlan kalite skoru</span><span style="color:#1C7C46">92/100</span></div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section id="benzer" data-screen-label="Benzer" style="background:#FFFFFF;border:1px solid #EBE5DA;border-radius:14px;overflow:hidden">
+      <button onClick="{{ acBenzer }}" style="width:100%;display:flex;align-items:center;gap:10px;background:#FFFFFF;border:0;padding:14px 16px;cursor:pointer;text-align:left">
+        <span style="width:28px;height:28px;border-radius:14px;background:#F6EFE3;color:#B45309;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">≋</span>
+        <span style="flex:1"><b style="font:800 13px 'Nunito Sans',sans-serif;display:block">Benzer ilanlar ve rehber</b><span style="font:600 10.5px 'Nunito Sans',sans-serif;color:#9B927F">4 benzer arsa · bölge rehberi · popüler aramalar…</span></span>
+        <span style="font:800 15px 'Nunito Sans',sans-serif;color:#B45309;flex:none">{{ ikonBenzer }}</span>
+      </button>
+      <sc-if value="{{ acikBenzer }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top:1px solid #F4EFE6;padding:12px 0 14px 16px;animation:acil .25s ease">
+          <div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px 0">
+            <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+              <div style="flex:none;width:180px;border:1px solid #EBE5DA;border-radius:12px;overflow:hidden">
+                <div style="height:78px;background:{{ b.bg }}"></div>
+                <div style="padding:9px 11px">
+                  <div style="font:700 11px/1.4 'Nunito Sans',sans-serif;height:30px;overflow:hidden">{{ b.ad }}</div>
+                  <b style="font:800 13px 'Nunito Sans',sans-serif;color:#B45309">{{ b.fiyat }}</b>
+                  <div style="font:600 9px 'Nunito Sans',sans-serif;color:#9B927F">{{ b.m2 }} · {{ b.m2f }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin:10px 16px 0 0">
+            <sc-for list="{{ rehber }}" as="r" hint-placeholder-count="4">
+              <a href="#" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #EBE5DA;font:700 11.5px 'Nunito Sans',sans-serif;color:#B45309"><span>{{ r.ad }}</span><span>→</span></a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </div>
+
+  <footer data-screen-label="Footer" style="margin-top:16px;background:#231F19;color:#9B927F;padding:20px 16px">
+    <div style="font:800 15px 'Nunito Sans',sans-serif;color:#FBF9F6">emlaktr<span style="color:#DB8B3E">.com</span></div>
+    <details style="margin-top:10px;border-top:1px solid #3A342B;padding-top:8px"><summary style="font:800 10px 'Nunito Sans',sans-serif;letter-spacing:.12em;color:#FBF9F6;cursor:pointer;text-transform:uppercase">Kurumsal</summary><div style="font:600 11px/2 'Nunito Sans',sans-serif;padding:6px 0 2px"><a href="#" style="display:block;color:#9B927F">Hakkımızda</a><a href="#" style="display:block;color:#9B927F">Kariyer</a><a href="#" style="display:block;color:#9B927F">İletişim</a></div></details>
+    <details style="border-top:1px solid #3A342B;padding-top:8px;margin-top:8px"><summary style="font:800 10px 'Nunito Sans',sans-serif;letter-spacing:.12em;color:#FBF9F6;cursor:pointer;text-transform:uppercase">Güven ve yardım</summary><div style="font:600 11px/2 'Nunito Sans',sans-serif;padding:6px 0 2px"><a href="#" style="display:block;color:#9B927F">Güvenli alışveriş rehberi</a><a href="#" style="display:block;color:#9B927F">Dolandırıcılık uyarıları</a><a href="#" style="display:block;color:#9B927F">Yardım merkezi</a></div></details>
+    <details style="border-top:1px solid #3A342B;padding-top:8px;margin-top:8px"><summary style="font:800 10px 'Nunito Sans',sans-serif;letter-spacing:.12em;color:#FBF9F6;cursor:pointer;text-transform:uppercase">Yasal</summary><div style="font:600 11px/2 'Nunito Sans',sans-serif;padding:6px 0 2px"><a href="#" style="display:block;color:#9B927F">Kullanım koşulları</a><a href="#" style="display:block;color:#9B927F">KVKK aydınlatma</a><a href="#" style="display:block;color:#9B927F">Çerez tercihleri</a></div></details>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;font:700 10px 'Nunito Sans',sans-serif"><span>TR · ₺ TRY</span><span>© 2026 emlaktr.com</span></div>
+    <div style="margin-top:6px;font:600 8.5px 'Nunito Sans',sans-serif;color:#5E574A">Progressive disclosure footer'da bile: details/summary · SSR · CWV yeşil</div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#FFFFFF;border-top:1px solid #EBE5DA;box-shadow:0 -4px 16px rgba(35,31,25,.08);display:flex;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <button onClick="{{ telGoster }}" style="flex:1.5;height:44px;border:0;border-radius:22px;background:{{ telZemin }};color:#FFFFFF;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer;transition:background .2s">{{ telYazi }}</button>
+    <button onClick="{{ mesajAc }}" style="flex:1;height:44px;border:1px solid #B45309;border-radius:22px;background:#FFFFFF;color:#B45309;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">Mesaj</button>
+    <button onClick="{{ favDegis }}" style="width:46px;height:44px;border:1px solid #EBE5DA;border-radius:22px;background:#FFFFFF;font-size:16px;color:#B3412C;cursor:pointer">{{ favIkon }}</button>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#231F19;display:flex;gap:10px;align-items:center;padding:12px 16px;box-sizing:border-box">
+    <span style="flex:1;font:700 12px 'Nunito Sans',sans-serif;color:#FBF9F6">Bu ilan satıldı.</span>
+    <button onClick="{{ benzerAcVeGit }}" style="height:38px;padding:0 16px;border:0;border-radius:19px;background:#FBF9F6;color:#231F19;font:800 11.5px 'Nunito Sans',sans-serif;cursor:pointer">Benzer ilanlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(35,31,25,.5);z-index:80"></div>
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:#FFFFFF;border-radius:18px 18px 0 0;box-shadow:0 -8px 40px rgba(35,31,25,.3);animation:sheetIn .22s ease;box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px">
+      <div><b style="font:800 15px 'Nunito Sans',sans-serif">{{ leadBaslik }}</b><div style="font:600 10px 'Nunito Sans',sans-serif;color:#9B927F;margin-top:2px">Adım adım — yalnızca gereken bilgiyi soruyoruz</div></div>
+      <button onClick="{{ leadKapat }}" style="width:30px;height:30px;border:1px solid #EBE5DA;border-radius:15px;background:#FBF9F6;cursor:pointer;color:#6E6455">✕</button>
+    </div>
+    <div style="display:flex;gap:5px;padding:8px 18px 0">
+      <div style="flex:1;height:4px;border-radius:2px;background:{{ adim1Renk }}"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:{{ adim2Renk }}"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:{{ adim3Renk }}"></div>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:20px 18px 26px;text-align:center">
+        <div style="width:54px;height:54px;border-radius:27px;background:#E5F2E9;color:#1C7C46;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto">✓</div>
+        <b style="display:block;font:800 16px 'Nunito Sans',sans-serif;margin-top:10px">Talebiniz iletildi</b>
+        <div style="font:600 11.5px/1.7 'Nunito Sans',sans-serif;color:#6E6455;margin-top:4px">CRM #L-88412 · ortalama yanıt 28 dk</div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button onClick="{{ leadKapatBenzer }}" style="flex:1;height:38px;border:1px solid #EBE5DA;border-radius:19px;background:#FBF9F6;font:800 11px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">Benzer ilanlar</button>
+          <button onClick="{{ leadKapatBelge }}" style="flex:1;height:38px;border:1px solid #EBE5DA;border-radius:19px;background:#FBF9F6;font:800 11px 'Nunito Sans',sans-serif;color:#4B4438;cursor:pointer">Belgeleri incele</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ adim1 }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:14px 18px 22px;animation:acil .2s ease">
+        <div style="font:800 12px 'Nunito Sans',sans-serif;margin-bottom:8px">1 / 3 — İletişim bilgileriniz</div>
+        <input value="{{ fAd }}" onChange="{{ fAdDegis }}" placeholder="Ad Soyad *" aria-label="Ad Soyad" style="width:100%;height:42px;border:1px solid #EBE5DA;border-radius:12px;padding:0 13px;font:600 12.5px 'Nunito Sans',sans-serif;box-sizing:border-box;background:#FBF9F6;outline-color:#B45309">
+        <input value="{{ fTel }}" onChange="{{ fTelDegis }}" placeholder="Telefon *" aria-label="Telefon" style="margin-top:8px;width:100%;height:42px;border:1px solid #EBE5DA;border-radius:12px;padding:0 13px;font:600 12.5px 'Nunito Sans',sans-serif;box-sizing:border-box;background:#FBF9F6;outline-color:#B45309">
+        <button onClick="{{ adimIleri1 }}" style="margin-top:12px;width:100%;height:44px;border:0;border-radius:22px;background:#B45309;color:#FFFFFF;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">Devam →</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ adim2 }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 22px;animation:acil .2s ease">
+        <div style="font:800 12px 'Nunito Sans',sans-serif;margin-bottom:8px">2 / 3 — Niyetiniz</div>
+        <select value="{{ fNiyet }}" onChange="{{ fNiyetDegis }}" aria-label="Niyet" style="width:100%;height:42px;border:1px solid #EBE5DA;border-radius:12px;padding:0 9px;font:600 12.5px 'Nunito Sans',sans-serif;background:#FBF9F6">
+          <option>Yatırım</option><option>Konut inşa etmek</option><option>Ticari değerlendirme</option><option>Sadece bilgi</option>
+        </select>
+        <textarea value="{{ fNot }}" onChange="{{ fNotDegis }}" placeholder="Not (isteğe bağlı)" aria-label="Not" style="margin-top:8px;width:100%;height:60px;border:1px solid #EBE5DA;border-radius:12px;padding:10px 13px;font:600 12.5px 'Nunito Sans',sans-serif;box-sizing:border-box;background:#FBF9F6;resize:none;outline-color:#B45309"></textarea>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button onClick="{{ adimGeri2 }}" style="flex:1;height:44px;border:1px solid #EBE5DA;border-radius:22px;background:#FBF9F6;color:#4B4438;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">← Geri</button>
+          <button onClick="{{ adimIleri2 }}" style="flex:2;height:44px;border:0;border-radius:22px;background:#B45309;color:#FFFFFF;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">Devam →</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ adim3 }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 22px;animation:acil .2s ease">
+        <div style="font:800 12px 'Nunito Sans',sans-serif;margin-bottom:8px">3 / 3 — Onay</div>
+        <div style="background:#FBF9F6;border:1px solid #EBE5DA;border-radius:12px;padding:11px 13px;font:600 11.5px/1.7 'Nunito Sans',sans-serif;color:#4B4438">{{ fAd }} · {{ fTel }}<br>Niyet: {{ fNiyet }}<br>İlan: 2470931 — Yeniköy köşe parsel</div>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" style="margin-top:2px;accent-color:#B45309">
+          <span style="font:600 10px/1.6 'Nunito Sans',sans-serif;color:#6E6455"><a href="#" style="text-decoration:underline">KVKK aydınlatma metnini</a> okudum; bilgilerimin bu talep için danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button onClick="{{ adimGeri3 }}" style="flex:1;height:44px;border:1px solid #EBE5DA;border-radius:22px;background:#FBF9F6;color:#4B4438;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">← Geri</button>
+          <button onClick="{{ leadGonder }}" style="flex:2;height:44px;border:0;border-radius:22px;background:#231F19;color:#FBF9F6;font:800 12.5px 'Nunito Sans',sans-serif;cursor:pointer">Gönder ✓</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:86px;left:50%;transform:translateX(-50%);z-index:90;background:#231F19;color:#FBF9F6;border-radius:20px;padding:10px 17px;font:700 11.5px 'Nunito Sans',sans-serif;box-shadow:0 8px 24px rgba(35,31,25,.35);animation:toastIn .2s ease;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, medyaBuyukMu:false, bolum:{}, acik:{}, masrafAcikDurum:false,
+    fav:false, karsi:false, takip:false, telAsama:0, alarm:false,
+    mesajlar:[], dusunuyor:false, yazi:"",
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, leadAdim:1, kvkk:false, fAd:"", fTel:"", fNiyet:"Yatırım", fNot:"", toast:""
+  };
+  componentDidMount(){ import("./arsa-data.js").then(m => this.setState({D: m.D})); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2400); }
+  b(k){ return () => this.setState({bolum:{...this.state.bolum, [k]: !this.state.bolum[k]}}); }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){
+        const t = q.toLowerCase();
+        c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback;
+      }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak, kAcik:false}], dusunuyor:false});
+    }, 900);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const bl = s.bolum, hepsi = ["ozellik","ai","konum","piyasa","finans","belge","danisman","guvenlik","benzer"];
+    const hepsiAcik = hepsi.every(k => bl[k]);
+    const ik = k => bl[k] ? "−" : "+";
+    const acikAciklama = s.aciklamaAcik;
+    return {
+      D, rezerve: durum === "rezerve", satildi: durum === "satildi", satilmadi: durum !== "satildi",
+      aiAcik: this.props.aiPaneli ?? true,
+      foto: s.foto, fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#E9E3D7",
+      fotoSay: (s.foto+1) + " / " + ((D.medya||[]).length || 5),
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      medyaYuk: s.medyaBuyukMu ? "340px" : "190px",
+      medyaBtn: s.medyaBuyukMu ? "− Galeriyi küçült" : "+ Galeriyi büyüt · kategoriler · 360° tur",
+      medyaBuyut: () => this.setState({medyaBuyukMu: !s.medyaBuyukMu}),
+      tumunuYazi: hepsiAcik ? "Tümünü kapat −" : "Tümünü aç +",
+      tumunuDegis: () => { const v = !hepsiAcik; const nb = {}; hepsi.forEach(k => nb[k] = v); this.setState({bolum:nb}); },
+      acOzellik: this.b("ozellik"), acikOzellik: !!bl.ozellik, ikonOzellik: ik("ozellik"),
+      acAi: this.b("ai"), acikAi: !!bl.ai, ikonAi: ik("ai"),
+      acKonum: this.b("konum"), acikKonum: !!bl.konum, ikonKonum: ik("konum"),
+      acPiyasa: this.b("piyasa"), acikPiyasa: !!bl.piyasa, ikonPiyasa: ik("piyasa"),
+      acFinans: this.b("finans"), acikFinans: !!bl.finans, ikonFinans: ik("finans"),
+      acBelge: this.b("belge"), acikBelge: !!bl.belge, ikonBelge: ik("belge"),
+      acDanisman: this.b("danisman"), acikDanisman: !!bl.danisman, ikonDanisman: ik("danisman"),
+      acGuvenlik: this.b("guvenlik"), acikGuvenlik: !!bl.guvenlik, ikonGuvenlik: ik("guvenlik"),
+      acBenzer: this.b("benzer"), acikBenzer: !!bl.benzer, ikonBenzer: ik("benzer"),
+      benzerAcVeGit: () => { this.setState({bolum:{...bl, benzer:true}}); setTimeout(() => { const el = document.getElementById("benzer"); if(el) window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth"}); }, 60); },
+      gruplar: (D.gruplar||[]).map((g,i) => ({...g, ac: () => this.setState({acik:{...s.acik, [i]: !s.acik[i]}}), acikMi: !!s.acik[i], ikon: s.acik[i] ? "−" : "+"})),
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map((m,i) => m.rol === "k"
+        ? {...m, kenar:"#D9D0C0", etiket:"Siz sordunuz", etiketRenk:"#9B927F", kaynakVar:false}
+        : {...m, kenar:"#B45309", etiket:"✦ AI cevabı", etiketRenk:"#B45309",
+           kaynakVar: !!m.kaynak, kaynakAcikMi: !!m.kAcik, kaynakKapali: !!m.kaynak && !m.kAcik,
+           kaynakAc: () => { const ms = [...s.mesajlar]; ms[i] = {...ms[i], kAcik:true}; this.setState({mesajlar:ms}); }}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()) this.sor(s.yazi.trim()); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favIkon: s.fav ? "♥" : "♡",
+      favDegis: () => { const v = !s.fav; this.setState({fav:v}); this.t(v ? "Favorilere eklendi" : "Favorilerden çıkarıldı"); },
+      karsiDegis: () => this.t("Karşılaştırma listesine eklendi (1/4)"),
+      paylas: () => this.t("İlan linki kopyalandı"),
+      telYazi: s.telAsama === 0 ? "Ara" : s.telAsama === 1 ? "Numarayı göster?" : "0532 481 07 00",
+      telZemin: s.telAsama === 2 ? "#1C7C46" : "#B45309",
+      telAra: s.telAsama === 1,
+      telGoster: () => { if(s.telAsama < 2){ this.setState({telAsama: s.telAsama + 1}); if(s.telAsama === 1) this.t("Numara gösterildi · aramalar kayıtlıdır"); } },
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false, leadAdim:1}),
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false, leadAdim:1}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Gösterim randevusu" : "Danışmana mesaj",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false, bolum:{...bl, benzer:true}}); },
+      leadKapatBelge: () => { this.setState({leadAcik:false, bolum:{...bl, belge:true}}); },
+      adim1: !s.leadOk && s.leadAdim === 1, adim2: !s.leadOk && s.leadAdim === 2, adim3: !s.leadOk && s.leadAdim === 3,
+      adim1Renk: s.leadAdim >= 1 ? "#B45309" : "#EBE5DA", adim2Renk: s.leadAdim >= 2 ? "#B45309" : "#EBE5DA", adim3Renk: s.leadAdim >= 3 || s.leadOk ? "#B45309" : "#EBE5DA",
+      adimIleri1: () => { if(!s.fAd.trim() || !s.fTel.trim()) return this.t("Ad ve telefon zorunlu"); this.setState({leadAdim:2}); },
+      adimGeri2: () => this.setState({leadAdim:1}),
+      adimIleri2: () => this.setState({leadAdim:3}),
+      adimGeri3: () => this.setState({leadAdim:2}),
+      fAd: s.fAd, fTel: s.fTel, fNiyet: s.fNiyet, fNot: s.fNot, kvkk: s.kvkk,
+      fAdDegis: e => this.setState({fAd: e.target.value}), fTelDegis: e => this.setState({fTel: e.target.value}),
+      fNiyetDegis: e => this.setState({fNiyet: e.target.value}), fNotDegis: e => this.setState({fNot: e.target.value}),
+      kvkkDegis: e => this.setState({kvkk: e.target.checked}),
+      leadGonder: () => { if(!s.kvkk) return this.t("KVKK iznini onaylayın"); this.setState({leadOk:true}); },
+      alarm: s.alarm, alarmYazi: s.alarm ? "✓ Alarm açık" : "Fiyat alarmı", alarmRenk: s.alarm ? "#1C7C46" : "#6E6455",
+      alarmDegis: () => { const v = !s.alarm; this.setState({alarm:v}); this.t(v ? "Fiyat düşünce haber vereceğiz" : "Alarm kapatıldı"); },
+      takip: s.takip, takipYazi: s.takip ? "✓ Takipte" : "Takip et", takipRenk: s.takip ? "#1C7C46" : "#4B4438",
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acikAciklama ? 99 : 3,
+      aciklamaBtn: acikAciklama ? "Daralt ↑" : "Açıklamanın devamı ↓",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acikAciklama}),
+      poi: D.poi || [], skorlar: D.skorlar || [],
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#8A6116" : "#1C7C46"})),
+      pesinat: s.pesinat, vade: s.vade,
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      faizler: [2.59, 2.79, 3.09].map(x => ({v: x.toFixed(2).replace(".", ","), sec: () => this.setState({faiz:x}),
+        kenar: s.faiz === x ? "#B45309" : "#EBE5DA", zemin: s.faiz === x ? "#F6EFE3" : "#FFFFFF", renk: s.faiz === x ? "#8A5C10" : "#9B927F"})),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      masrafKapali: !s.masrafAcikDurum, masrafAcikMi: s.masrafAcikDurum,
+      masrafAc: () => this.setState({masrafAcikDurum:true}),
+      pdf: () => this.t("Finansal rapor PDF hazırlanıyor…"),
+      masraflar: D.masraflar || [], senaryolar: D.senaryolar || [],
+      belgeler: (D.belgeler||[]).map(b => ({...b,
+        ikon: b.kilit ? "🔒" : "▤",
+        durumYazi: b.tarih ? b.durum + " · " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#1C7C46" : "#8A6116",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi ✓") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı · #R-1042"),
+      benzer: D.benzer || [],
+      rehber: ((D.seo||{}).rehber||[]).map(r => ({ad:r})),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

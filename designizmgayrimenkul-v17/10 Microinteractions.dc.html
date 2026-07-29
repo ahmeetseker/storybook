@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E4E6EC}
+a{color:#5B49E8;text-decoration:none} a:hover{color:#4636C4}
+input,select,textarea,button{font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,14px) scale(.96)}60%{transform:translate(-50%,-2px) scale(1.01)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes sheetIn{from{transform:translate(-50%,44px);opacity:.5}to{transform:translate(-50%,0);opacity:1}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes ring{0%{transform:scale(.6);opacity:.55}100%{transform:scale(2.4);opacity:0}}
+@keyframes floatUp{0%{opacity:0;transform:translateY(6px)}12%{opacity:1;transform:translateY(0)}80%{opacity:1;transform:translateY(-14px)}100%{opacity:0;transform:translateY(-24px)}}
+@keyframes shimmer{0%{background-position:-360px 0}100%{background-position:360px 0}}
+@keyframes barGrow{from{width:0}}
+@keyframes checkPop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.2) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes dotPulse{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes heartburst{0%{transform:scale(0);opacity:1}100%{transform:scale(1);opacity:0}}
+.mi-press{transition:transform .12s cubic-bezier(.34,1.56,.64,1),box-shadow .12s,background .2s}
+.mi-press:active{transform:scale(.94)}
+.mi-lift{transition:transform .18s ease,box-shadow .18s ease}
+.mi-lift:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(37,32,80,.16)}
+.mi-row{transition:background .16s ease}
+.mi-row:hover{background:#F4F3FE}
+.mi-chip{transition:transform .12s cubic-bezier(.34,1.56,.64,1),background .16s,color .16s,border-color .16s}
+.mi-chip:active{transform:scale(.92)}
+.mi-under{position:relative}
+.mi-under::after{content:"";position:absolute;left:0;bottom:-2px;height:2px;width:100%;background:#5B49E8;transform:scaleX(0);transform-origin:left;transition:transform .22s ease}
+.mi-under:hover::after{transform:scaleX(1)}
+.mi-skel{background:linear-gradient(90deg,#ECEAFB 25%,#F6F5FE 50%,#ECEAFB 75%);background-size:720px 100%;animation:shimmer 1.3s linear infinite}
+</style>
+</helmet>
+
+<sc-if value="{{ kompakt }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:70;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid #ECEAFB;display:flex;align-items:center;gap:10px;padding:10px 16px;box-sizing:border-box;animation:slideDown .25s ease">
+    <div style="flex:1;min-width:0"><div style="font:700 12px/1.3 'Plus Jakarta Sans',sans-serif;color:#1B1830;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ baslikKisa }}</div><div style="font:800 14px/1.3 'Plus Jakarta Sans',sans-serif;color:#5B49E8">₺8.450.000</div></div>
+    <button class="mi-press" onClick="{{ favDegis }}" style="width:34px;height:34px;border:1px solid #E4E1F5;border-radius:10px;background:#FFFFFF;font-size:15px;color:#E5484D;cursor:pointer">{{ favIkon }}</button>
+    <button class="mi-press" onClick="{{ telGoster }}" style="height:34px;padding:0 14px;border:0;border-radius:10px;background:#5B49E8;color:#FFFFFF;font:700 12px 'Plus Jakarta Sans',sans-serif;cursor:pointer">Ara</button>
+  </div>
+</sc-if>
+
+<div data-screen-label="10 Microinteractions" style="max-width:430px;margin:0 auto;min-height:100vh;background:#F6F5FB;font-family:'Plus Jakarta Sans',sans-serif;color:#1B1830;box-shadow:0 0 40px rgba(27,24,48,.16);padding-bottom:92px;box-sizing:border-box">
+
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#1B1830;color:#948EC0;padding:7px 16px;font:700 10px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase">
+    <span style="color:#FFFFFF">10 · Microinteractions</span><span class="mi-under">← Tüm akımlar</span>
+  </a>
+
+  <header style="background:#FFFFFF;border-bottom:1px solid #EEECF9;padding:12px 16px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;font:800 17px/1 'Plus Jakarta Sans',sans-serif;letter-spacing:-.02em">emlaktr<span style="color:#5B49E8">.com</span></div>
+    <button class="mi-press" title="AI arama" style="width:36px;height:36px;border:1px solid #E4E1F5;border-radius:10px;background:#FFFFFF;font-size:14px;color:#413A63;cursor:pointer">⌕</button>
+    <button class="mi-press" title="Bildirimler" style="width:36px;height:36px;border:1px solid #E4E1F5;border-radius:10px;background:#FFFFFF;font-size:14px;color:#413A63;cursor:pointer;position:relative">◷<span style="position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#E5484D"></span></button>
+    <button class="mi-press" onClick="{{ favDegis }}" style="width:36px;height:36px;border:1px solid #E4E1F5;border-radius:10px;background:#FFFFFF;font-size:15px;color:#E5484D;cursor:pointer;position:relative">{{ favIkon }}<sc-if value="{{ kalpBurst }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;border-radius:10px;border:2px solid #E5484D;animation:heartburst .5s ease forwards"></span></sc-if></button>
+  </header>
+
+  <section data-screen-label="Medya" style="padding:12px 16px 0">
+    <div style="position:relative;height:270px;border-radius:16px;overflow:hidden;background:#ECEAFB">
+      <sc-if value="{{ medyaYukleniyor }}" hint-placeholder-val="{{ true }}">
+        <div class="mi-skel" style="position:absolute;inset:0"></div>
+        <div style="position:absolute;left:14px;bottom:14px;font:700 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE;display:flex;align-items:center;gap:7px"><span style="width:13px;height:13px;border:2px solid #C9C3EC;border-top-color:#5B49E8;border-radius:50%;animation:spin .7s linear infinite"></span>Görsel yükleniyor…</div>
+      </sc-if>
+      <sc-if value="{{ medyaHazir }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;background:{{ fotoBg }};animation:slideDown .3s ease">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center">
+            <div style="font:700 9.5px 'Plus Jakarta Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(27,24,48,.5)">{{ fotoKat }}</div>
+            <div style="font:800 16px 'Plus Jakarta Sans',sans-serif;color:rgba(27,24,48,.75)">{{ fotoAd }}</div>
+          </div>
+          <button class="mi-press" onClick="{{ geri }}" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:18px;background:rgba(255,255,255,.94);box-shadow:0 2px 8px rgba(27,24,48,.2);font-size:16px;cursor:pointer">‹</button>
+          <button class="mi-press" onClick="{{ ileri }}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:18px;background:rgba(255,255,255,.94);box-shadow:0 2px 8px rgba(27,24,48,.2);font-size:16px;cursor:pointer">›</button>
+          <span style="position:absolute;right:10px;bottom:10px;background:rgba(27,24,48,.75);color:#FFFFFF;font:700 10.5px 'Plus Jakarta Sans',sans-serif;border-radius:12px;padding:4px 9px">{{ fotoSay }}</span>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;justify-content:center;gap:6px;margin-top:10px">
+      <sc-for list="{{ noktalar }}" as="n" hint-placeholder-count="5">
+        <button onClick="{{ n.sec }}" class="mi-press" style="height:6px;width:{{ n.gen }};border:0;border-radius:3px;background:{{ n.renk }};cursor:pointer;padding:0;transition:width .3s cubic-bezier(.34,1.56,.64,1),background .3s"></button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Başlık + Fiyat" style="margin:12px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <h1 style="margin:0;font:800 18px/1.35 'Plus Jakarta Sans',sans-serif;letter-spacing:-.01em">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <div style="font:800 28px/1 'Plus Jakarta Sans',sans-serif">₺8.450.000</div>
+      <span style="font:500 12px 'Plus Jakarta Sans',sans-serif;color:#8B84BE;text-decoration:line-through">₺8.900.000</span>
+      <span style="font:800 10.5px 'Plus Jakarta Sans',sans-serif;color:#1B8A5A;background:#E3F6EC;border-radius:7px;padding:3px 7px">−%5,1</span>
+    </div>
+    <div style="margin-top:6px;font:500 12px 'Plus Jakarta Sans',sans-serif;color:#605A85">₺6.401/m² · Krediye uygun · <span style="color:#5B49E8">✦ medyanın %7 altında</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+      <span class="mi-chip" style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#1B8A5A;background:#E3F6EC;border-radius:8px;padding:4px 8px;cursor:default">✓ Doğrulanmış</span>
+      <span class="mi-chip" style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#5B49E8;background:#ECEAFB;border-radius:8px;padding:4px 8px;cursor:default">Yetkili portföy</span>
+      <span class="mi-chip" style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#E5484D;background:#FDECEC;border-radius:8px;padding:4px 8px;cursor:default">↓ Fiyat düştü</span>
+      <span class="mi-chip" style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#8B5CF6;background:#F3ECFC;border-radius:8px;padding:4px 8px;cursor:default">✦ AI analizli</span>
+    </div>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FFF6E5;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Plus Jakarta Sans',sans-serif;color:#9A6A00;animation:slideDown .3s ease">◆ Rezerve — benzer portföyler önerilebilir</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FDECEC;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Plus Jakarta Sans',sans-serif;color:#C0362F;animation:slideDown .3s ease">■ Satıldı — <a href="#benzer" style="color:#C0362F;text-decoration:underline">benzer ilanlar</a></div>
+    </sc-if>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="mi-press" onClick="{{ telGoster }}" style="flex:1.4;height:44px;border:0;border-radius:12px;background:#5B49E8;color:#FFFFFF;font:700 12.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer;box-shadow:0 6px 16px rgba(91,73,232,.3)">{{ telYazi }}</button>
+      <button class="mi-press" onClick="{{ mesajAc }}" style="flex:1;height:44px;border:1px solid #5B49E8;border-radius:12px;background:#FFFFFF;color:#5B49E8;font:700 12.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer">Mesaj</button>
+      <button class="mi-press" onClick="{{ alarmDegis }}" title="Fiyat alarmı" style="width:46px;height:44px;border:1px solid {{ alarmKenar }};border-radius:12px;background:{{ alarmZemin }};color:{{ alarmRenk }};font-size:16px;cursor:pointer;position:relative">⊙<sc-if value="{{ alarmRing }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;border-radius:12px;border:2px solid #5B49E8;animation:ring .55s ease-out forwards"></span></sc-if></button>
+    </div>
+    <div style="display:flex;gap:18px;margin-top:12px;justify-content:center;font:700 10.5px 'Plus Jakarta Sans',sans-serif">
+      <button class="mi-under" onClick="{{ karsiDegis }}" style="border:0;background:none;color:#605A85;cursor:pointer;padding:0">⇄ Karşılaştır</button>
+      <button class="mi-under" onClick="{{ paylas }}" style="border:0;background:none;color:#605A85;cursor:pointer;padding:0">↗ Paylaş</button>
+      <button class="mi-under" onClick="{{ qr }}" style="border:0;background:none;color:#605A85;cursor:pointer;padding:0">▦ QR</button>
+      <button class="mi-under" onClick="{{ sikayet }}" style="border:0;background:none;color:#A79FCB;cursor:pointer;padding:0">⚑ Bildir</button>
+    </div>
+  </section>
+
+  <nav data-screen-label="Sekmeler" style="position:sticky;top:0;z-index:50;background:rgba(246,245,251,.95);backdrop-filter:blur(8px);display:flex;gap:8px;overflow-x:auto;padding:12px 16px;margin-top:12px">
+    <sc-for list="{{ sekmeler }}" as="t" hint-placeholder-count="8">
+      <button onClick="{{ t.git }}" class="mi-chip" style="flex:none;height:32px;padding:0 14px;border-radius:16px;border:1px solid {{ t.kenar }};background:{{ t.zemin }};color:{{ t.renk }};font:700 11.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer">{{ t.ad }}</button>
+    </sc-for>
+  </nav>
+
+  <section id="ozet" data-screen-label="Hızlı özellikler" style="margin:2px 16px 0">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif;padding:6px 2px 8px">Temel özellikler</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <sc-for list="{{ hizli }}" as="h" hint-placeholder-count="10">
+        <div class="mi-lift" style="background:#FFFFFF;border-radius:12px;padding:11px 13px;box-shadow:0 1px 2px rgba(27,24,48,.05);cursor:default">
+          <div style="font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">{{ h.k }}</div>
+          <div style="font:700 13px 'Plus Jakarta Sans',sans-serif;margin-top:2px">{{ h.v }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="AI" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="width:32px;height:32px;border-radius:16px;background:linear-gradient(135deg,#5B49E8,#8B5CF6);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px">✦</span>
+      <div style="flex:1"><b style="font:800 14px 'Plus Jakarta Sans',sans-serif">AI özeti ve soru-cevap</b><div style="font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">yanıtlar akarak gelir · kaynak gösterir</div></div>
+    </div>
+    <ul style="margin:12px 0 0;padding-left:18px;font:500 12px/1.7 'Plus Jakarta Sans',sans-serif;color:#413A63">
+      <li>Köşe parsel, 24 m cephe; <b>≈396 m² inşaat hakkı</b> (2 kat).</li>
+      <li>m² fiyatı medyanın <b>%7 altında</b>; bölge 90 günde +%12.</li>
+      <li>Altyapı parselde; doğalgaz 400 m.</li>
+    </ul>
+    <div style="display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.sor }}" class="mi-chip" style="flex:none;border:1px solid #E4E1F5;background:#F6F5FB;color:#4636C4;border-radius:15px;padding:7px 11px;font:700 10.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer">{{ c.q }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+        <div style="display:flex;justify-content:{{ m.hiza }}">
+          <div style="max-width:88%;border-radius:{{ m.radius }};padding:9px 12px;background:{{ m.zemin }};color:{{ m.renk }};font:500 12px/1.6 'Plus Jakarta Sans',sans-serif;animation:slideDown .28s ease">{{ m.metin }}
+            <sc-if value="{{ m.kaynak }}" hint-placeholder-val="{{ false }}"><div style="margin-top:6px;font:700 9px 'Plus Jakarta Sans',sans-serif;color:#4636C4;background:#ECEAFB;border-radius:6px;padding:3px 6px;display:inline-block">⌘ {{ m.kaynak }}</div></sc-if>
+          </div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:6px;padding:4px 2px">
+          <span style="width:6px;height:6px;border-radius:3px;background:#5B49E8;animation:dotPulse 1s infinite"></span>
+          <span style="width:6px;height:6px;border-radius:3px;background:#5B49E8;animation:dotPulse 1s infinite .15s"></span>
+          <span style="width:6px;height:6px;border-radius:3px;background:#5B49E8;animation:dotPulse 1s infinite .3s"></span>
+          <span style="font:500 10.5px 'Plus Jakarta Sans',sans-serif;color:#8B84BE;margin-left:2px">AI ilan verisini tarıyor</span>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Sorunuzu yazın…" style="flex:1;height:40px;border:1px solid #E4E1F5;border-radius:20px;padding:0 14px;font:500 12px 'Plus Jakarta Sans',sans-serif;background:#F6F5FB;outline-color:#5B49E8">
+      <button class="mi-press" onClick="{{ gonder }}" style="width:40px;height:40px;border:0;border-radius:20px;background:#1B1830;color:#FFFFFF;font-size:15px;cursor:pointer">↑</button>
+    </div>
+  </section>
+  </sc-if>
+
+  <section id="ozellikler" data-screen-label="Detaylı özellikler" style="margin:14px 16px 0">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif;padding:6px 2px 8px">Detaylı özellikler</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+        <div style="background:#FFFFFF;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(27,24,48,.05)">
+          <button onClick="{{ g.ac }}" class="mi-row" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:13px 14px;cursor:pointer">
+            <span style="font:700 12.5px 'Plus Jakarta Sans',sans-serif">{{ g.baslik }}</span>
+            <span style="width:24px;height:24px;border-radius:12px;background:#F0EEFB;color:#5B49E8;display:flex;align-items:center;justify-content:center;font-size:12px;transform:rotate({{ g.don }});transition:transform .25s cubic-bezier(.34,1.56,.64,1)">▾</span>
+          </button>
+          <sc-if value="{{ g.acikMi }}" hint-placeholder-val="{{ false }}">
+            <div style="border-top:1px solid #F2F0FB;padding:2px 14px 10px;animation:slideDown .25s ease">
+              <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #F6F5FB;font:500 11.5px 'Plus Jakarta Sans',sans-serif">
+                  <span style="color:#8B84BE">{{ s.k }}</span><b style="text-align:right">{{ s.v }}</b>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Açıklama" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif">Açıklama</div>
+    <p style="margin:8px 0 0;font:500 12px/1.75 'Plus Jakarta Sans',sans-serif;color:#413A63;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+    <button class="mi-under" onClick="{{ aciklamaDegis }}" style="margin-top:8px;border:0;background:none;color:#5B49E8;font:700 11px 'Plus Jakarta Sans',sans-serif;cursor:pointer;padding:0">{{ aciklamaBtn }}</button>
+  </section>
+
+  <section id="konum" data-screen-label="Konum" style="margin:14px 16px 0">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif;padding:6px 2px 8px">Konum ve çevre</div>
+    <div style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+      <div style="position:relative;height:170px;background:repeating-linear-gradient(0deg,#EEECFA 0 26px,#E5E2F5 26px 27px),repeating-linear-gradient(90deg,#EEECFA 0 26px,#E5E2F5 26px 27px)">
+        <div style="position:absolute;left:56%;top:32%;width:118px;height:76px;border:2px dashed #5B49E8;background:rgba(91,73,232,.1);border-radius:6px;transform:rotate(-4deg)"></div>
+        <div style="position:absolute;left:64%;top:44%;width:14px;height:14px;border-radius:50%;background:#5B49E8"><span style="position:absolute;inset:0;border-radius:50%;border:2px solid #5B49E8;animation:ring 2s ease-out infinite"></span></div>
+        <span style="position:absolute;left:12px;top:12px;background:#FFFFFF;border-radius:10px;padding:5px 10px;font:700 10px 'Plus Jakarta Sans',sans-serif;box-shadow:0 1px 4px rgba(27,24,48,.12)">Kesin konum · 37.0021, 30.5983</span>
+      </div>
+      <div style="padding:6px 14px">
+        <sc-for list="{{ poi }}" as="p" hint-placeholder-count="6">
+          <div class="mi-row" style="display:flex;justify-content:space-between;align-items:center;padding:9px 4px;border-bottom:1px solid #F4F3FB;border-radius:8px;font:500 12px 'Plus Jakarta Sans',sans-serif">
+            <span>{{ p.ad }} <span style="font:500 9.5px 'Plus Jakarta Sans',sans-serif;color:#A79FCB">{{ p.tip }}</span></span>
+            <b style="color:#605A85;white-space:nowrap">{{ p.mesafe }}</b>
+          </div>
+        </sc-for>
+        <div style="display:flex;gap:16px;padding:12px 4px 14px">
+          <div style="flex:1">
+            <div style="font:700 9px 'Plus Jakarta Sans',sans-serif;letter-spacing:.12em;color:#A79FCB;margin-bottom:7px">SKORLAR</div>
+            <sc-for list="{{ skorlar }}" as="sk" hint-placeholder-count="4">
+              <div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font:600 10px 'Plus Jakarta Sans',sans-serif;color:#413A63"><span>{{ sk.k }}</span><span style="color:#5B49E8">{{ sk.v }}</span></div>
+              <div style="height:5px;border-radius:3px;background:#EEECFA;margin-top:3px;overflow:hidden"><div style="height:5px;border-radius:3px;background:linear-gradient(90deg,#5B49E8,#8B5CF6);width:{{ sk.gen }};animation:barGrow 1s cubic-bezier(.22,1,.36,1)"></div></div></div>
+            </sc-for>
+          </div>
+          <div style="flex:1">
+            <div style="font:700 9px 'Plus Jakarta Sans',sans-serif;letter-spacing:.12em;color:#A79FCB;margin-bottom:7px">RİSKLER</div>
+            <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;gap:6px;font:600 10.5px/1.5 'Plus Jakarta Sans',sans-serif;padding:2px 0"><span style="color:#605A85">{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="piyasa" data-screen-label="Piyasa" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif">Piyasa karşılaştırması</div>
+    <div style="display:flex;justify-content:space-between;font:600 10.5px 'Plus Jakarta Sans',sans-serif;color:#605A85;margin-top:10px"><span>Bu ilan: <b style="color:#1B8A5A">₺6.401/m²</b></span><span>Medyan: <b>₺6.900/m²</b></span></div>
+    <div style="position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#2FB86E,#F5C33B,#EF5A50);margin-top:8px">
+      <div style="position:absolute;left:34%;top:-3px;width:4px;height:16px;border-radius:2px;background:#1B1830;box-shadow:0 0 0 2px #FFFFFF;transition:left .5s cubic-bezier(.34,1.56,.64,1)"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font:500 9px 'Plus Jakarta Sans',sans-serif;color:#A79FCB;margin-top:4px"><span>₺5.200</span><span>₺6.900</span><span>₺9.100</span></div>
+    <div style="display:flex;align-items:flex-end;gap:14px;margin-top:12px">
+      <svg viewBox="0 0 100 36" style="flex:1;height:42px" preserveAspectRatio="none"><polyline points="0,33 14,27 29,30 43,21 57,15 71,18 86,9 100,3" fill="none" stroke="#5B49E8" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="200" stroke-dashoffset="200"><animate attributeName="stroke-dashoffset" from="200" to="0" dur="1.1s" fill="freeze"></animate></polyline></svg>
+      <b style="font:800 18px 'Plus Jakarta Sans',sans-serif;color:#1B8A5A">+%12</b>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+      <div style="background:#F6F5FB;border-radius:10px;padding:9px 11px;font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Satış süresi<br><b style="font:700 12.5px 'Plus Jakarta Sans',sans-serif;color:#1B1830">74 gün</b></div>
+      <div style="background:#F6F5FB;border-radius:10px;padding:9px 11px;font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Arz<br><b style="font:700 12.5px 'Plus Jakarta Sans',sans-serif;color:#1B1830">23 ilan</b></div>
+      <div style="background:#F6F5FB;border-radius:10px;padding:9px 11px;font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">İlan yaşı<br><b style="font:700 12.5px 'Plus Jakarta Sans',sans-serif;color:#1B1830">26 gün</b></div>
+      <div style="background:#F6F5FB;border-radius:10px;padding:9px 11px;font:500 10px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Pazarlık<br><b style="font:700 12.5px 'Plus Jakarta Sans',sans-serif;color:#1B1830">%3–5</b></div>
+    </div>
+  </section>
+
+  <section id="finans" data-screen-label="Finans" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif">Finansal analiz</div>
+    <div style="display:flex;justify-content:space-between;font:600 11px 'Plus Jakarta Sans',sans-serif;color:#413A63;margin-top:10px"><span>Peşinat %{{ pesinat }} (₺{{ pesinatTL }})</span><span>{{ vade }} ay</span></div>
+    <input type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#5B49E8;margin-top:8px">
+    <input type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#5B49E8">
+    <div style="display:flex;background:#F0EEFB;border-radius:12px;padding:3px;margin-top:8px">
+      <sc-for list="{{ faizler }}" as="f" hint-placeholder-count="3">
+        <button onClick="{{ f.sec }}" class="mi-press" style="flex:1;height:36px;border:0;border-radius:9px;background:{{ f.zemin }};color:{{ f.renk }};font:700 11px 'Plus Jakarta Sans',sans-serif;cursor:pointer;box-shadow:{{ f.golge }};transition:all .2s">%{{ f.v }}</button>
+      </sc-for>
+    </div>
+    <div style="text-align:center;margin-top:14px;background:linear-gradient(135deg,#5B49E8,#8B5CF6);border-radius:14px;padding:14px">
+      <div style="font:500 11px 'Plus Jakarta Sans',sans-serif;color:#D8D2FA">Aylık taksit</div>
+      <div style="font:800 28px/1.15 'Plus Jakarta Sans',sans-serif;color:#FFFFFF">₺{{ taksitTL }}</div>
+      <div style="font:500 10.5px 'Plus Jakarta Sans',sans-serif;color:#D8D2FA;margin-top:2px">kredi ₺{{ krediTL }} · toplam ₺{{ toplamTL }}</div>
+    </div>
+    <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FFF6E5;border-radius:10px;padding:9px 11px;font:600 10.5px/1.5 'Plus Jakarta Sans',sans-serif;color:#9A6A00;animation:slideDown .3s ease">Arsada tipik kredi limiti ekspertizin %50'si — peşinatı artırın.</div>
+    </sc-if>
+    <div style="margin-top:12px">
+      <sc-for list="{{ masraflar }}" as="m" hint-placeholder-count="5">
+        <div style="display:flex;justify-content:space-between;font:500 11px 'Plus Jakarta Sans',sans-serif;color:#413A63;padding:4px 0"><span>{{ m.k }}</span><b>{{ m.v }}</b></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <sc-for list="{{ senaryolar }}" as="s" hint-placeholder-count="3">
+        <div class="mi-lift" style="flex:1;background:#F6F5FB;border-radius:10px;padding:10px;text-align:center;cursor:default"><div style="font:600 9.5px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">{{ s.ad }}</div><b style="font:800 13px 'Plus Jakarta Sans',sans-serif">{{ s.deger }}</b><div style="font:500 9px 'Plus Jakarta Sans',sans-serif;color:#A79FCB">{{ s.yil }}</div></div>
+      </sc-for>
+    </div>
+    <button class="mi-press" onClick="{{ pdf }}" style="margin-top:12px;width:100%;height:42px;border:0;border-radius:12px;background:#F0EEFB;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#4636C4;cursor:pointer">⤓ PDF rapor indir</button>
+  </section>
+
+  <section id="belgeler" data-screen-label="Belgeler" style="margin:14px 16px 0">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif;padding:6px 2px 8px">Belgeler ve doğrulama</div>
+    <div style="background:#FFFFFF;border-radius:16px;padding:6px 14px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+      <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+        <div class="mi-row" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #F4F3FB;border-radius:8px">
+          <div><b style="font:600 12px 'Plus Jakarta Sans',sans-serif">{{ b.ikon }} {{ b.ad }}</b><div style="font:500 9.5px 'Plus Jakarta Sans',sans-serif;color:{{ b.durumRenk }}">{{ b.durumYazi }}</div></div>
+          <button class="mi-press" onClick="{{ b.tik }}" style="height:32px;border:1px solid #E4E1F5;border-radius:16px;background:#F6F5FB;font:700 10px 'Plus Jakarta Sans',sans-serif;color:#413A63;padding:0 12px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+        </div>
+      </sc-for>
+      <div style="margin:8px 0 10px;background:#E3F6EC;border-radius:10px;padding:9px 11px;font:600 10px/1.5 'Plus Jakarta Sans',sans-serif;color:#1B8A5A">✓ EİDS kaydıyla eşleştirildi (28 Haz) · kimlikler maskelenir</div>
+    </div>
+  </section>
+
+  <section id="danisman" data-screen-label="Danışman" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:52px;height:52px;border-radius:26px;background:linear-gradient(135deg,#5B49E8,#8B5CF6);color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:800 17px 'Plus Jakarta Sans',sans-serif">AD</div>
+      <div style="flex:1">
+        <div style="font:800 14px 'Plus Jakarta Sans',sans-serif">Ayşe Demir <span style="font:700 9px 'Plus Jakarta Sans',sans-serif;color:#1B8A5A;background:#E3F6EC;border-radius:5px;padding:2px 6px;vertical-align:2px">✓</span></div>
+        <div style="font:500 11px 'Plus Jakarta Sans',sans-serif;color:#605A85">Akdeniz Gayrimenkul · TB 0700123 · EİDS</div>
+      </div>
+      <button class="mi-press" onClick="{{ takipDegis }}" style="height:36px;border:0;border-radius:18px;background:{{ takipZemin }};color:{{ takipRenk }};font:700 11px 'Plus Jakarta Sans',sans-serif;padding:0 14px;cursor:pointer">{{ takipYazi }}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;text-align:center">
+      <div class="mi-lift" style="background:#F6F5FB;border-radius:10px;padding:10px 4px;cursor:default"><div style="font:800 13px 'Plus Jakarta Sans',sans-serif">46</div><div style="font:500 9px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Portföy</div></div>
+      <div class="mi-lift" style="background:#F6F5FB;border-radius:10px;padding:10px 4px;cursor:default"><div style="font:800 13px 'Plus Jakarta Sans',sans-serif">28 dk</div><div style="font:500 9px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Yanıt</div></div>
+      <div class="mi-lift" style="background:#F6F5FB;border-radius:10px;padding:10px 4px;cursor:default"><div style="font:800 13px 'Plus Jakarta Sans',sans-serif">4,8★</div><div style="font:500 9px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">212</div></div>
+      <div class="mi-lift" style="background:#F6F5FB;border-radius:10px;padding:10px 4px;cursor:default"><div style="font:800 13px 'Plus Jakarta Sans',sans-serif">2019</div><div style="font:500 9px 'Plus Jakarta Sans',sans-serif;color:#8B84BE">Üyelik</div></div>
+    </div>
+    <button class="mi-press" onClick="{{ tumIlanlar }}" style="margin-top:12px;width:100%;height:42px;border:0;border-radius:12px;background:#F0EEFB;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#4636C4;cursor:pointer">Tüm ilanları gör (46) ›</button>
+  </section>
+
+  <section id="guvenlik" data-screen-label="Güvenlik" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif">Güvenlik</div>
+    <div style="margin-top:10px;background:#FDECEC;border-radius:10px;padding:11px 13px;font:600 11.5px/1.6 'Plus Jakarta Sans',sans-serif;color:#C0362F">⚠ Görmeden kapora göndermeyin; ödemeleri platform dışına taşımayın.</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="mi-press" onClick="{{ bildir }}" style="flex:1;height:38px;border:0;border-radius:10px;background:#F6F5FB;font:600 11px 'Plus Jakarta Sans',sans-serif;color:#605A85;cursor:pointer">İlanı bildir</button>
+      <button class="mi-press" onClick="{{ bildir }}" style="flex:1;height:38px;border:0;border-radius:10px;background:#F6F5FB;font:600 11px 'Plus Jakarta Sans',sans-serif;color:#605A85;cursor:pointer">Konum hatası</button>
+      <button class="mi-press" onClick="{{ bildir }}" style="flex:1;height:38px;border:0;border-radius:10px;background:#F6F5FB;font:600 11px 'Plus Jakarta Sans',sans-serif;color:#605A85;cursor:pointer">Fiyat hatası</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px;font:700 12px 'Plus Jakarta Sans',sans-serif"><span style="color:#605A85">Kalite skoru</span><span style="color:#1B8A5A">92/100</span></div>
+  </section>
+
+  <section id="benzer" data-screen-label="Benzer" style="margin:14px 0 0 16px">
+    <div style="font:800 12px 'Plus Jakarta Sans',sans-serif;padding:6px 2px 8px">Benzer ilanlar</div>
+    <div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px 0">
+      <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+        <div class="mi-lift" style="flex:none;width:200px;background:#FFFFFF;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(27,24,48,.06);cursor:pointer">
+          <div style="height:96px;background:{{ b.bg }};position:relative">
+            <sc-if value="{{ b.rozet }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:8px;top:8px;background:rgba(27,24,48,.78);color:#FFFFFF;font:700 8.5px 'Plus Jakarta Sans',sans-serif;border-radius:6px;padding:3px 6px">{{ b.rozet }}</span></sc-if>
+          </div>
+          <div style="padding:10px 12px">
+            <div style="font:700 11.5px/1.4 'Plus Jakarta Sans',sans-serif;height:32px;overflow:hidden">{{ b.ad }}</div>
+            <b style="font:800 14px 'Plus Jakarta Sans',sans-serif;color:#5B49E8">{{ b.fiyat }}</b>
+            <div style="font:500 9.5px 'Plus Jakarta Sans',sans-serif;color:#8B84BE;margin-top:2px">{{ b.m2 }} · {{ b.m2f }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="SEO" style="margin:14px 16px 0;background:#FFFFFF;border-radius:16px;padding:6px 14px;box-shadow:0 1px 3px rgba(27,24,48,.06)">
+    <sc-for list="{{ rehber }}" as="r" hint-placeholder-count="4">
+      <a href="#" class="mi-row" style="display:flex;justify-content:space-between;align-items:center;padding:11px 4px;border-bottom:1px solid #F4F3FB;border-radius:8px;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#1B1830"><span>{{ r.ad }}</span><span style="color:#A79FCB">›</span></a>
+    </sc-for>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 0 14px">
+      <sc-for list="{{ aramalar }}" as="a" hint-placeholder-count="5">
+        <a href="#" class="mi-chip" style="font:700 10.5px 'Plus Jakarta Sans',sans-serif;color:#4636C4;background:#F0EEFB;border-radius:14px;padding:6px 11px">{{ a.ad }}</a>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer" style="margin-top:16px;background:#1B1830;color:#948EC0;padding:20px 16px">
+    <div style="font:800 15px 'Plus Jakarta Sans',sans-serif;color:#FFFFFF">emlaktr<span style="color:#9C8BFF">.com</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font:500 11px/2 'Plus Jakarta Sans',sans-serif">
+      <div><b style="font:700 9.5px 'Plus Jakarta Sans',sans-serif;letter-spacing:.1em;color:#FFFFFF">KURUMSAL</b><a href="#" class="mi-under" style="display:block;color:#948EC0">Hakkımızda</a><a href="#" class="mi-under" style="display:block;color:#948EC0">Kariyer</a><a href="#" class="mi-under" style="display:block;color:#948EC0">İletişim</a></div>
+      <div><b style="font:700 9.5px 'Plus Jakarta Sans',sans-serif;letter-spacing:.1em;color:#FFFFFF">GÜVEN</b><a href="#" class="mi-under" style="display:block;color:#948EC0">Güvenli alışveriş</a><a href="#" class="mi-under" style="display:block;color:#948EC0">Dolandırıcılık uyarıları</a><a href="#" class="mi-under" style="display:block;color:#948EC0">Yardım</a></div>
+      <div><b style="font:700 9.5px 'Plus Jakarta Sans',sans-serif;letter-spacing:.1em;color:#FFFFFF">YASAL</b><a href="#" class="mi-under" style="display:block;color:#948EC0">Koşullar</a><a href="#" class="mi-under" style="display:block;color:#948EC0">KVKK</a><a href="#" class="mi-under" style="display:block;color:#948EC0">Çerezler</a></div>
+      <div><b style="font:700 9.5px 'Plus Jakarta Sans',sans-serif;letter-spacing:.1em;color:#FFFFFF">PRO</b><a href="#" class="mi-under" style="display:block;color:#948EC0">Ofisler için</a><a href="#" class="mi-under" style="display:block;color:#948EC0">Geliştiriciler</a><a href="#" class="mi-under" style="display:block;color:#948EC0">API</a></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;border-top:1px solid #35305A;padding-top:10px;font:600 10px 'Plus Jakarta Sans',sans-serif"><span>TR · ₺ TRY</span><span>© 2026 emlaktr.com</span></div>
+    <div style="margin-top:6px;font:500 8.5px 'Plus Jakarta Sans',sans-serif;color:#5C5685">Amaçlı mikro-animasyonlar · prefers-reduced-motion desteği · LCP 1,9s / INP 140ms / CLS 0,03</div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #EEECF9;box-shadow:0 -4px 16px rgba(27,24,48,.08);display:flex;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <button class="mi-press" onClick="{{ telGoster }}" style="flex:1.5;height:44px;border:0;border-radius:12px;background:#5B49E8;color:#FFFFFF;font:700 12.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer;box-shadow:0 6px 16px rgba(91,73,232,.32)">{{ telYazi }}</button>
+    <button class="mi-press" onClick="{{ mesajAc }}" style="flex:1;height:44px;border:1px solid #5B49E8;border-radius:12px;background:#FFFFFF;color:#5B49E8;font:700 12.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer">Mesaj</button>
+    <button class="mi-press" onClick="{{ favDegis }}" style="width:46px;height:44px;border:1px solid #E4E1F5;border-radius:12px;background:#FFFFFF;font-size:16px;color:#E5484D;cursor:pointer;position:relative">{{ favIkon }}<sc-if value="{{ kalpBurst }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;inset:0;border-radius:12px;border:2px solid #E5484D;animation:heartburst .5s ease forwards"></span></sc-if></button>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#1B1830;display:flex;gap:10px;align-items:center;padding:12px 16px;box-sizing:border-box">
+    <span style="flex:1;font:700 12px 'Plus Jakarta Sans',sans-serif;color:#FFFFFF">Bu ilan satıldı.</span>
+    <button class="mi-press" onClick="{{ benzereGit }}" style="height:38px;padding:0 16px;border:0;border-radius:19px;background:#FFFFFF;color:#1B1830;font:700 11.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer">Benzer ilanlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(27,24,48,.5);z-index:80;animation:slideDown .2s ease"></div>
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:#FFFFFF;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(27,24,48,.3);animation:sheetIn .28s cubic-bezier(.22,1,.36,1);box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="width:36px;height:5px;border-radius:3px;background:#E4E1F5;margin:8px auto 0"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 18px 8px">
+      <b style="font:800 16px 'Plus Jakarta Sans',sans-serif">{{ leadBaslik }}</b>
+      <button class="mi-press" onClick="{{ leadKapat }}" style="width:32px;height:32px;border:0;border-radius:16px;background:#F0EEFB;cursor:pointer;color:#605A85">✕</button>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:14px 18px 30px;text-align:center">
+        <div style="width:60px;height:60px;border-radius:30px;background:#E3F6EC;color:#1B8A5A;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto;animation:checkPop .5s cubic-bezier(.34,1.56,.64,1)">✓</div>
+        <b style="display:block;font:800 17px 'Plus Jakarta Sans',sans-serif;margin-top:12px">Talebiniz iletildi</b>
+        <div style="font:500 12px/1.6 'Plus Jakarta Sans',sans-serif;color:#605A85;margin-top:4px">CRM #L-88412 · ortalama yanıt 28 dk</div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="mi-press" onClick="{{ leadKapatBenzer }}" style="flex:1;height:44px;border:0;border-radius:12px;background:#F0EEFB;font:700 11.5px 'Plus Jakarta Sans',sans-serif;color:#4636C4;cursor:pointer">Benzer ilanlar</button>
+          <button class="mi-press" onClick="{{ leadKapatBelge }}" style="flex:1;height:44px;border:0;border-radius:12px;background:#F0EEFB;font:700 11.5px 'Plus Jakarta Sans',sans-serif;color:#4636C4;cursor:pointer">Belgeleri incele</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ leadFormGoster }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:4px 18px 26px">
+        <input value="{{ fAd }}" onChange="{{ fAdDegis }}" placeholder="Ad Soyad *" aria-label="Ad Soyad" style="width:100%;height:48px;border:1px solid #E4E1F5;border-radius:12px;padding:0 14px;font:500 14px 'Plus Jakarta Sans',sans-serif;box-sizing:border-box;background:#F6F5FB;outline-color:#5B49E8">
+        <input value="{{ fTel }}" onChange="{{ fTelDegis }}" placeholder="Telefon *" aria-label="Telefon" style="margin-top:8px;width:100%;height:48px;border:1px solid #E4E1F5;border-radius:12px;padding:0 14px;font:500 14px 'Plus Jakarta Sans',sans-serif;box-sizing:border-box;background:#F6F5FB;outline-color:#5B49E8">
+        <select value="{{ fNiyet }}" onChange="{{ fNiyetDegis }}" aria-label="Niyet" style="margin-top:8px;width:100%;height:48px;border:1px solid #E4E1F5;border-radius:12px;padding:0 10px;font:500 14px 'Plus Jakarta Sans',sans-serif;background:#F6F5FB;color:#1B1830">
+          <option>Yatırım</option><option>Konut inşa etmek</option><option>Ticari değerlendirme</option><option>Sadece bilgi</option>
+        </select>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" style="margin-top:2px;accent-color:#5B49E8;width:18px;height:18px">
+          <span style="font:500 10.5px/1.6 'Plus Jakarta Sans',sans-serif;color:#605A85"><a href="#" style="text-decoration:underline">KVKK aydınlatma metnini</a> okudum; bilgilerimin danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <button class="mi-press" onClick="{{ leadGonder }}" style="margin-top:14px;width:100%;height:52px;border:0;border-radius:14px;background:#5B49E8;color:#FFFFFF;font:800 15px 'Plus Jakarta Sans',sans-serif;cursor:pointer">Gönder</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:90;background:#1B1830;color:#FFFFFF;border-radius:12px;padding:11px 18px;font:700 11.5px 'Plus Jakarta Sans',sans-serif;box-shadow:0 8px 24px rgba(27,24,48,.4);animation:toastIn .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, medyaHazirMi:false, sekme:"ozet", acik:{0:true}, fav:false, kalpBurst:false, karsi:false, takip:false,
+    tel:false, alarm:false, alarmRing:false, mesajlar:[], dusunuyor:false, yazi:"",
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false, kompakt:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, kvkk:false, fAd:"", fTel:"", fNiyet:"Yatırım", fNot:"", toast:""
+  };
+  componentDidMount(){
+    import("./arsa-data.js").then(m => this.setState({D: m.D}));
+    this._mt = setTimeout(() => this.setState({medyaHazirMi:true}), 1100);
+    this._sc = () => { const k = window.scrollY > 620; if(k !== this.state.kompakt) this.setState({kompakt:k}); };
+    window.addEventListener("scroll", this._sc, {passive:true});
+  }
+  componentWillUnmount(){ clearTimeout(this._mt); window.removeEventListener("scroll", this._sc); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2400); }
+  git(id){ const el = document.getElementById(id); if(el){ window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 60, behavior:"smooth"}); this.setState({sekme:id}); } }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){
+        const t = q.toLowerCase();
+        c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback;
+      }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak}], dusunuyor:false});
+    }, 1100);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const ids = [["Özet","ozet"],["Özellikler","ozellikler"],["Konum","konum"],["Piyasa","piyasa"],["Finans","finans"],["Belgeler","belgeler"],["Danışman","danisman"],["Benzer","benzer"]];
+    const acik = s.aciklamaAcik;
+    return {
+      D, kompakt: s.kompakt, baslikKisa: "Yeniköy'de 24 m cepheli köşe parsel",
+      rezerve: durum === "rezerve", satildi: durum === "satildi", satilmadi: durum !== "satildi",
+      aiAcik: this.props.aiPaneli ?? true,
+      foto: s.foto, fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#E5E2F5",
+      fotoSay: (s.foto+1) + " / " + ((D.medya||[]).length || 5),
+      medyaYukleniyor: !s.medyaHazirMi, medyaHazir: s.medyaHazirMi,
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      noktalar: (D.medya||[]).map((m,i) => ({sec: () => this.setState({foto:i}), gen: i === s.foto ? "22px" : "6px", renk: i === s.foto ? "#5B49E8" : "#D5D0EE"})),
+      sekmeler: ids.map(([ad,id]) => ({ad, git: () => this.git(id),
+        kenar: s.sekme === id ? "#5B49E8" : "#E4E1F5", zemin: s.sekme === id ? "#5B49E8" : "#FFFFFF", renk: s.sekme === id ? "#FFFFFF" : "#413A63"})),
+      hizli: D.hizli || [],
+      gruplar: (D.gruplar||[]).map((g,i) => ({...g, ac: () => this.setState({acik:{...s.acik, [i]: !s.acik[i]}}), acikMi: !!s.acik[i], don: s.acik[i] ? "180deg" : "0deg"})),
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map(m => m.rol === "k"
+        ? {...m, hiza:"flex-end", zemin:"#5B49E8", renk:"#FFFFFF", radius:"16px 16px 5px 16px"}
+        : {...m, hiza:"flex-start", zemin:"#F0EEFB", renk:"#2A2547", radius:"16px 16px 16px 5px"}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()) this.sor(s.yazi.trim()); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favIkon: s.fav ? "♥" : "♡", kalpBurst: s.kalpBurst,
+      favDegis: () => { const v = !s.fav; this.setState({fav:v, kalpBurst:v}); if(v) setTimeout(() => this.setState({kalpBurst:false}), 500); this.t(v ? "Favorilere eklendi ♥" : "Favorilerden çıkarıldı"); },
+      karsiDegis: () => this.t("Karşılaştırma listesine eklendi (1/4)"),
+      paylas: () => this.t("İlan linki kopyalandı"),
+      qr: () => this.t("QR kod oluşturuldu"),
+      sikayet: () => this.git("guvenlik"),
+      telYazi: s.tel ? "0532 481 07 00" : "Ara — numarayı göster",
+      telGoster: () => { if(!s.tel){ this.setState({tel:true}); this.t("Numara gösterildi · aramalar kayıtlıdır"); } },
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false}),
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk, leadFormGoster: !s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Gösterim randevusu" : "Danışmana mesaj",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false}); this.git("benzer"); },
+      leadKapatBelge: () => { this.setState({leadAcik:false}); this.git("belgeler"); },
+      fAd: s.fAd, fTel: s.fTel, fNiyet: s.fNiyet, kvkk: s.kvkk,
+      fAdDegis: e => this.setState({fAd: e.target.value}), fTelDegis: e => this.setState({fTel: e.target.value}),
+      fNiyetDegis: e => this.setState({fNiyet: e.target.value}),
+      kvkkDegis: e => this.setState({kvkk: e.target.checked}),
+      leadGonder: () => {
+        if(!s.fAd.trim() || !s.fTel.trim()) return this.t("Ad ve telefon zorunlu");
+        if(!s.kvkk) return this.t("KVKK iznini onaylayın");
+        this.setState({leadOk:true});
+      },
+      alarm: s.alarm, alarmRing: s.alarmRing,
+      alarmKenar: s.alarm ? "#5B49E8" : "#E4E1F5", alarmZemin: s.alarm ? "#ECEAFB" : "#FFFFFF", alarmRenk: s.alarm ? "#5B49E8" : "#605A85",
+      alarmDegis: () => { const v = !s.alarm; this.setState({alarm:v, alarmRing:v}); if(v) setTimeout(() => this.setState({alarmRing:false}), 560); this.t(v ? "Fiyat düşünce haber vereceğiz" : "Alarm kapatıldı"); },
+      takip: s.takip, takipYazi: s.takip ? "✓ Takipte" : "Takip et",
+      takipZemin: s.takip ? "#E3F6EC" : "#F0EEFB", takipRenk: s.takip ? "#1B8A5A" : "#4636C4",
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acik ? 99 : 4,
+      aciklamaBtn: acik ? "Daralt ↑" : "Devamını oku ↓",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acik}),
+      poi: D.poi || [], skorlar: (D.skorlar||[]).map(x => ({...x, gen: x.p + "%"})),
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#9A6A00" : "#1B8A5A"})),
+      pesinat: s.pesinat, vade: s.vade,
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      faizler: [2.59, 2.79, 3.09].map(x => ({v: x.toFixed(2).replace(".", ","), sec: () => this.setState({faiz:x}),
+        zemin: s.faiz === x ? "#FFFFFF" : "transparent", renk: s.faiz === x ? "#4636C4" : "#8B84BE",
+        golge: s.faiz === x ? "0 1px 4px rgba(27,24,48,.14)" : "none"})),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      pdf: () => this.t("Finansal rapor PDF hazırlanıyor…"),
+      masraflar: D.masraflar || [], senaryolar: D.senaryolar || [],
+      belgeler: (D.belgeler||[]).map(b => ({...b,
+        ikon: b.kilit ? "🔒" : "▤",
+        durumYazi: b.tarih ? b.durum + " · " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#1B8A5A" : "#9A6A00",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi ✓") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı · #R-1042"),
+      benzer: D.benzer || [],
+      aramalar: ((D.seo||{}).aramalar||[]).map(a => ({ad:a})),
+      rehber: ((D.seo||{}).rehber||[]).map(r => ({ad:r})),
+      benzereGit: () => this.git("benzer"),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

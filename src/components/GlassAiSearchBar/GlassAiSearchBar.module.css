@@ -2,8 +2,9 @@
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
   --dot-size: 6px;
   --feedback-size: 28px;
-  --remove-size: 20px;
-  --remove-size-coarse: 28px;
+  /* Kaldır düğmesi gerçek dokunma hedefidir (AAA 2.5.5); chip artık aynı
+     kontrol yüksekliğinde olduğu için daire chip'in içine tam oturur. */
+  --remove-size: var(--lg-control-md, 44px);
   --chip-gap: 6px;
   --gap-tight: 2px;
   --suggestion-height: 36px;
@@ -50,6 +51,10 @@
 .input {
   flex: 1;
   min-width: 0;
+  /* Dokunma hedefi input'un kendi kutusudur, onu saran ray değil: yalnız
+     satır yüksekliği kadar (25px) olduğunda WCAG 2.2 AAA 2.5.5'in altında
+     kalıyordu. Ray --lg-control-xl (56px) olduğu için 44px içeride sığar. */
+  min-block-size: var(--lg-control-md, 44px);
   border: 0;
   background: transparent;
   font: inherit;
@@ -294,6 +299,9 @@
   color: var(--lg-label, #24211b);
 }
 
+/* Kaldır düğmesi gerçek bir dokunma hedefidir (WCAG 2.2 AAA 2.5.5).
+   Görünmez ::after ile genişletme denendi; chip'in kendi köşe kırpması
+   pseudo-elemanı kestiği için ölçü doğrudan kontrol ölçeğine bağlandı. */
 .filterRemove {
   appearance: none;
   border: 0;
@@ -310,12 +318,6 @@
   line-height: 1;
   cursor: pointer;
   transition: background-color 0.16s ease-out;
-}
-@media (pointer: coarse) {
-  .filterRemove {
-    width: var(--remove-size-coarse);
-    height: var(--remove-size-coarse);
-  }
 }
 @media (hover: hover) {
   .filterRemove:hover {

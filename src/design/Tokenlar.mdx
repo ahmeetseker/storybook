@@ -9,19 +9,34 @@ raw px/hex kullanmaz (fallback değeri hariç: `var(--lg-accent, #0a84ff)`).
 
 ## Renk — tema başına değişir
 
+Palet **WCAG 2.2 AAA (1.4.6, 7:1)** hedefine göre kalibre edilmiştir.
+
 | Token | Kağıt (açık) | Grafit (koyu) | Kullanım |
 |---|---|---|---|
 | `--lg-bg` | `#FAF8F4` | `#121316` | Sayfa zemini |
 | `--lg-surface` | `#FFFFFF` | `#1B1C20` | Flat kart zemini |
 | `--lg-label` | `#24211B` | `#F2F2F3` | Birincil metin |
-| `--lg-label-secondary` | `#79726A` | `#9D9DA4` | İkincil metin |
+| `--lg-label-secondary` | `#4F4B45` | `#BCBCC1` | İkincil metin |
 | `--lg-hairline` | `rgba(36,33,27,.09)` | `rgba(255,255,255,.10)` | Ayraç, kart kenarı |
-| `--lg-accent` | `#B45309` | `#E09143` | Vurgu (amber) |
+| `--lg-accent` | `#7C3806` | `#E9B179` | Vurgu (amber) |
 | `--lg-accent-contrast` | `#FFFFFF` | `#1A140C` | Vurgu üstü metin |
 
-Semantic tone renkleri (rozet, uyarı vb. için component'e `tint` olarak verilir):
-`danger #FF453A` · `warning #FF9F0A` · `success #30D158`. Bunlar şimdilik prop
-değeridir; sık kullanım artarsa `--lg-danger` vb. token'a yükseltilir (bkz. Açık Kararlar).
+Semantic tone renkleri token'dır (rozet, uyarı, doğrulama):
+
+| Token | Kağıt | Grafit |
+|---|---|---|
+| `--lg-danger` | `#911E17` | `#FFA49E` |
+| `--lg-warning` | `#703F00` | `#FFB44C` |
+| `--lg-success` | `#12572C` | `#58D478` |
+
+**Kontrast ölçümü düz zeminle sınırlı değildir.** Component'ler rozet/uyarı
+zeminlerini `color-mix(… %7–12, --lg-surface)` ile üretir; bu tonlu yüzeyler
+kontrastı yaklaşık yarım puan düşürür. Palet, `--lg-bg` · `--lg-surface` ve her
+semantic rengin %12'ye kadar tonlanmış yüzeyi dahil **tüm kombinasyonlarda**
+≥ 7:1 verecek şekilde çözülmüştür (en kötü durum 7.00).
+
+Yeni bir renk eklemeden veya `color-mix` oranını yükseltmeden önce ölçüm
+tekrarlanır — tonlu zemin oranını %12'nin üstüne çıkarmak AAA'yı bozar.
 
 ## Tipografi
 
@@ -74,19 +89,54 @@ parçasıdır ve `GlassSurface`'ta yaşar — bu ölçeğin dışındadır.)
 
 ## Boşluk
 
-`--lg-space-1..7` → 4 · 8 · 12 · 16 · 20 · 24 · 32. Kart içi 16–20,
-kartlar arası 16, bölümler arası 32.
+`--lg-space-1..7` → 4 · 8 · 12 · 16 · 20 · 24 · 32 — öğe ve grup içi ritim.
+Kart içi 16–20, kartlar arası 16, bölümler arası 32.
 
-## Kontrol yükseklikleri — responsive
+`--lg-space-8..10` → 40 · 48 · 64 — sayfa ve bölüm ölçeği. Üst uç, daha önce
+`calc(--lg-space-7 + --lg-space-6)` gibi elle toplanan ritmi token'a çevirir;
+component'te iki space token'ı toplanmaz.
 
-| Token | Masaüstü | Dokunmatik (`pointer: coarse`) |
+## Sayfa container'ı
+
+| Token | Değer | Kullanım |
 |---|---|---|
-| `--lg-control-sm` | 32px | 36px |
-| `--lg-control-md` | 40px | 44px |
-| `--lg-control-lg` | 48px | 50px |
-| `--lg-control-xl` | 56px | 56px |
+| `--lg-container-narrow` | `72rem` (1152px) | Okuma, tek kolonlu karar akışı |
+| `--lg-container-base` | `88rem` (1408px) | Liste, dizin, hesap ekranları |
+| `--lg-container-wide` | `104rem` (1664px) | Panelli çalışma masaları, harita |
+| `--lg-container-gutter` | `clamp(16px, 4vw, 40px)` | Sayfa kenar boşluğu |
 
-Dokunma hedefi kuralı: etkileşimli öğe dokunmatikte **min. 44px**.
+Sayfa **kendi genişliğini tanımlamaz**, yalnız kademesini seçer. Genişlik,
+kenar boşluğu, yüzen kabuk payı ve container-query kabı tek bir yerdedir
+(`apps/web`'de `PageContainer`). Bir feature CSS'inde `inline-size: min(100%, …)`,
+`margin-inline: auto` veya `--lg-shell-*-offset` görürseniz o sorumluluk
+sızmıştır.
+
+## Okuma genişliği
+
+`--lg-measure: 54ch` — gövde metni satırı. WCAG 2.2 AAA 1.4.8 satırın 80
+karakteri aşmamasını ister; `ch` birimi "0" rakamının genişliği olduğu ve
+Manrope'ta "0" ortalama harften geniş olduğu için 54ch ≈ 77 karakterdir.
+
+Kartın veya kolonun kendi genişliği değil, **içindeki gövde metni** bunu okur.
+
+## Kontrol yükseklikleri
+
+| Token | Değer |
+|---|---|
+| `--lg-control-sm` | 44px |
+| `--lg-control-md` | 44px |
+| `--lg-control-lg` | 48px |
+| `--lg-control-xl` | 56px |
+
+Dokunma hedefi kuralı: etkileşimli öğe **her cihazda min. 44px** — WCAG 2.2 AAA
+2.5.5 (Target Size, Enhanced) giriş yöntemi ayrımı tanımaz, bu yüzden
+`pointer: coarse` altında ayrıca büyütme yapılmaz.
+
+Hedef, tıklandığında eylemi tetikleyen **kutunun kendisidir**; onu saran
+sarmalayıcı değil. Bir `<input>` 56px'lik bir ray içinde 24px yüksekse hedef
+24px'tir. Görünmez `::after` ile hedef genişletmek yalnız kapsayıcı
+`overflow: hidden` taşımıyorsa çalışır — cam yüzeyler köşe kırpması için bunu
+taşıdığından çoğu yerde ölçü gerçekten büyütülür.
 
 ## Kurallar
 

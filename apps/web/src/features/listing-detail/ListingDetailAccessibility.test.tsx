@@ -19,28 +19,39 @@ async function renderPage(
 }
 
 describe('ilan detayı erişilebilirlik geçidi', () => {
+  // Başlık sahnenin cam plakasındadır; bölümler h2 taşır. Soru omurgasının
+  // satırları başlık DEĞİLDİR — onlar açılır kontrollerdir ve h2 sayısını
+  // şişirip başlık listesini gezinilmez hale getirmezler.
   it('başlık hiyerarşisi tek h1 ve h2 bölümlerinden oluşur', async () => {
     await renderPage()
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
-    expect(screen.getAllByRole('heading', { level: 2 }).length).toBeGreaterThanOrEqual(7)
+    const level2 = screen.getAllByRole('heading', { level: 2 })
+    expect(level2.length).toBeGreaterThanOrEqual(2)
+    expect(level2.map((node) => node.textContent)).toContain('Alıcıların sorduğu sırayla')
+    expect(level2.map((node) => node.textContent)).toContain('Neyi, ne zaman doğruladık')
   })
 
-  it('her bölüm indeksi bağlantısının hedefi sayfada mevcuttur', async () => {
+  // Sayfa içi çapa gezinmesi yerini soru omurgasına bıraktı; yine de sayfada
+  // duran her `#` bağlantısının hedefi bulunmalıdır — kırık çapa kalmaz.
+  it('sayfa içi bağlantıların hedefi mevcuttur', async () => {
     const { container } = await renderPage()
-    const nav = screen.getByRole('navigation', { name: 'Bölümler' })
-    for (const link of Array.from(nav.querySelectorAll('a'))) {
-      const id = link.getAttribute('href')?.slice(1)
-      expect(container.querySelector(`#${id}`)).toBeTruthy()
+    for (const anchor of Array.from(container.querySelectorAll('a[href^="#"]'))) {
+      const id = anchor.getAttribute('href')?.slice(1)
+      if (!id) continue
+      expect(container.querySelector(`#${CSS.escape(id)}`)).toBeTruthy()
     }
   })
 
-  it('kanıt bölümlerine bağlanan her dayanak bağlantısının hedefi mevcuttur', async () => {
-    const { container } = await renderPage()
-    const anchors = Array.from(container.querySelectorAll('a[href^="#"]'))
-    expect(anchors.length).toBeGreaterThan(0)
-    for (const anchor of anchors) {
-      const id = anchor.getAttribute('href')?.slice(1)
-      expect(container.querySelector(`#${id}`)).toBeTruthy()
+  // Her soru kapalıyken de cevaplıdır ve açılır kontrol olarak duyurulur.
+  it('soru omurgası aria-expanded taşır ve kapalıyken de cevaplıdır', async () => {
+    await renderPage()
+    const spine = screen.getByRole('heading', { name: 'Alıcıların sorduğu sırayla' })
+      .parentElement!
+    const triggers = Array.from(spine.querySelectorAll('[aria-expanded]'))
+    expect(triggers.length).toBeGreaterThanOrEqual(5)
+    for (const trigger of triggers) {
+      // Kapalı satır da metin taşır: cevap açılır katmanda saklanmaz.
+      expect(trigger.textContent?.trim().length ?? 0).toBeGreaterThan(20)
     }
   })
 

@@ -5,7 +5,7 @@
   --glass-comparetable-label-col: 140px;
   --glass-comparetable-listing-col: 160px;
   --glass-comparetable-image-max: 160px;
-  --glass-comparetable-remove-size: 24px;
+  --glass-comparetable-remove-size: var(--lg-control-md, 44px); /* AAA 2.5.5 dokunma hedefi */
   --glass-comparetable-remove-font: 16px;
   box-sizing: border-box;
   overflow-x: auto;
@@ -29,7 +29,14 @@
   color: var(--lg-label);
 }
 
+/* Hücreler konumlandırma çapasıdır.
+
+   `.srOnly` mutlak konumlanır; hücre `static` kalırsa çapasını tablonun ve
+   `overflow-x: auto` taşıyan `.wrapper`'ın DIŞINDA arar, sayfa koordinatlarına
+   düşer ve kaydırma kabınca kırpılamaz. Dar ekranda bu, sayfanın tamamına
+   131px'lik yatay kayma olarak yansıyordu. */
 .th {
+  position: relative;
   padding: var(--lg-space-3) var(--lg-space-4);
   text-align: left;
   vertical-align: top;
@@ -147,6 +154,7 @@
 }
 
 .td {
+  position: relative; /* .srOnly çapası — bkz. .th üstündeki not */
   padding: var(--lg-space-3) var(--lg-space-4);
   font-size: var(--lg-text-body, 15px);
   box-sizing: border-box;

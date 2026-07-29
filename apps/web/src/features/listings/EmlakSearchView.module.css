@@ -1,9 +1,8 @@
+/* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır;
+   kabın adı `page`. 96rem eşiği bu sayfada uzun süre ölüydü: kap 92rem'de
+   sınırlıyken min-width: 96rem hiç eşleşmiyordu. Kademe `wide` (104rem)
+   olunca dört kolonlu ızgara ilk kez gerçekten açılıyor. */
 .page {
-  container-name: search;
-  container-type: inline-size;
-  width: min(100%, 92rem);
-  margin-inline: auto;
-  padding: var(--lg-space-7);
   color: var(--lg-label);
 }
 
@@ -405,7 +404,16 @@
   background: color-mix(in srgb, var(--lg-warning) 12%, transparent);
 }
 
+/* İlan başlığı karta giden birincil bağlantıdır; kutusu tek satır metin
+   yüksekliğinde (21px) kalıyordu — WCAG 2.2 AAA 2.5.5'in altında.
+   Görünmez ::after ile genişletme burada işe yaramaz: kural `overflow: hidden`
+   taşır (ellipsis için gerekli) ve pseudo-eleman kırpılır. Bu yüzden kutunun
+   kendisi kontrol yüksekliğine çıkar ve metin dikeyde ortalanır; tipografi
+   değişmez, yalnız tıklanabilir alan büyür. */
 .listingTitle {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--lg-control-md);
   overflow: hidden;
   color: var(--lg-label);
   font-size: var(--lg-text-headline);
@@ -550,7 +558,7 @@
 }
 
 /* bp-2xl: geniş sonuç alanında daha yüksek tarama yoğunluğu. */
-@container search (min-width: 96rem) {
+@container page (min-width: 96rem) {
   .gridList {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -561,7 +569,7 @@
 }
 
 /* bp-lg: layout breakpoint, capability queries continue to govern interaction. */
-@container search (max-width: 64rem) {
+@container page (max-width: 64rem) {
   .page {
     padding: var(--lg-space-5);
   }
@@ -594,7 +602,7 @@
 }
 
 /* bp-md: filter sidebar becomes the mobile drawer. */
-@container search (max-width: 48rem) {
+@container page (max-width: 48rem) {
   .page {
     padding: var(--lg-space-4);
   }

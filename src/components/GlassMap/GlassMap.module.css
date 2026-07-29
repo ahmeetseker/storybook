@@ -7,10 +7,11 @@
   --map-toggle-pad: 3px;
   --map-toggle-btn-pad: 5px 11px;
   --map-toggle-btn-pad-coarse: 10px 13px;
-  --map-pin-price-h: 26px;
+  /* Pin bir dokunma hedefidir; ölçü kontrol ölçeğinden okunur (AAA 2.5.5). */
+  --map-pin-price-h: var(--lg-control-md, 44px);
   --map-pin-price-pad: 5px 10px;
   --map-pin-price-pad-inline-coarse: 14px;
-  --map-pin-cluster-size: 30px;
+  --map-pin-cluster-size: var(--lg-control-md, 44px);
   --map-pin-cluster-pad-inline: 6px;
   --map-popup-close-size: 22px;
   --map-popup-close-glyph: 15px;
@@ -20,7 +21,9 @@
   --map-popup-offset: 10px;
   --map-popup-in-shift: 4px;
   --map-panel-min-h: 420px;
-  --map-zoom-btn-size: 30px;
+  /* Zoom düğmeleri gerçek dokunma hedefidir; 30px WCAG 2.2 AAA 2.5.5'in
+     altında kalıyordu. Ölçü kontrol ölçeğinden okunur. */
+  --map-zoom-btn-size: var(--lg-control-md, 44px);
   --map-zoom-radius: 10px;
   --map-attr-pad: 2px 7px;
   --map-corner-surface-max-w: calc(50% - var(--lg-space-2) * 1.5);
@@ -195,10 +198,10 @@
   color: var(--lg-surface);
 }
 
-/* Dokunmatikte 44px hedef — --lg-control-md coarse'ta 44px'e yükselir */
+/* Hedef ölçüsü artık her girişte 44px (yukarıdaki token'lar); dokunmatikte
+   yalnız yatay nefes bir adım açılır. */
 @media (pointer: coarse) {
-  .pinPrice { min-height: var(--lg-control-md); padding: var(--lg-space-2) var(--map-pin-price-pad-inline-coarse); }
-  .pinCluster { min-width: var(--lg-control-md); height: var(--lg-control-md); }
+  .pinPrice { padding: var(--lg-space-2) var(--map-pin-price-pad-inline-coarse); }
 }
 
 /* ── popup ──

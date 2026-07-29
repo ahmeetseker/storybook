@@ -14,6 +14,7 @@ import {
   GlassSkeleton,
 } from '@repo/ui'
 import { withBase } from '@/config/base-path'
+import { PageContainer } from '@/components/PageContainer'
 import type {
   AiFilterProposal,
   ListingSearchResponse,
@@ -619,7 +620,7 @@ export function EmlakSearchView({
     onStateChange(next, { history: 'replace' })
 
   return (
-    <main id="main-content" className={styles.page}>
+    <PageContainer size="wide" className={styles.page}>
       <header className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>Türkiye emlak pazarı</p>
@@ -995,6 +996,6 @@ export function EmlakSearchView({
           }
         />
       </GlassDrawer>
-    </main>
+    </PageContainer>
   )
 }

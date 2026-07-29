@@ -1,0 +1,164 @@
+/* Soru omurgası — kart yok, kutu yok: satırlar yalnız hairline ile ayrılır.
+   Sayfa bir kart yığını değil, okunan bir akıştır (rules.md §2). */
+.spine {
+  display: block;
+}
+
+.qa {
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.trigger {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--lg-space-6);
+  gap: var(--lg-space-2);
+  align-items: start;
+  inline-size: 100%;
+  /* Satırın tamamı dokunma hedefidir (AAA 2.5.5). */
+  min-block-size: var(--lg-control-md);
+  padding-block: var(--lg-space-3);
+  padding-inline: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/* Dayanağı olmayan soru açılmaz — tıklanabilir görünmez de. */
+.trigger:disabled {
+  cursor: default;
+}
+
+.trigger:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
+}
+
+.copy {
+  display: block;
+  min-inline-size: 0;
+}
+
+.question {
+  display: block;
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Kapalıyken görünen cevap: sorunun karşılığı burada, açılır katmanda değil. */
+.answer {
+  display: block;
+  /* Okuma ölçüsü — AAA 1.4.8. */
+  max-inline-size: var(--lg-measure);
+  margin-block-start: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.answer strong {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+/* Cevaplanamayan soru uyarı tonundadır; boş bırakılmaz. */
+.warn {
+  color: var(--lg-warning);
+}
+
+.chevron {
+  justify-self: end;
+  padding-block-start: 2px;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  transition: transform 0.18s ease-out;
+}
+
+.trigger[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.body {
+  padding-block-end: var(--lg-space-4);
+}
+
+/* Gövde içi açıklama — kanıtın altında duran görünür sınırlama notu. */
+.note {
+  max-inline-size: var(--lg-measure);
+  margin: var(--lg-space-3) 0 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.55;
+}
+
+.mapWrap {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+/* Madde satırı: durum noktası + cümle. Kart değildir. */
+.check {
+  display: flex;
+  gap: var(--lg-space-2);
+  align-items: flex-start;
+  padding-block: var(--lg-space-2);
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
+.check:last-child {
+  border-block-end: 0;
+}
+
+.dot {
+  flex: none;
+  inline-size: var(--lg-space-2);
+  block-size: var(--lg-space-2);
+  margin-block-start: 6px;
+  border-radius: var(--lg-radius-capsule);
+}
+
+.dotOk {
+  background: var(--lg-success);
+}
+
+.dotWarn {
+  background: var(--lg-warning);
+}
+
+.dotNone {
+  background: var(--lg-label-secondary);
+}
+
+@container page (min-width: 700px) {
+  .question {
+    font-size: var(--lg-text-headline);
+  }
+
+  /* Soru bandı okuma ölçüsünü aşmaz; kap genişledikçe satır uzamaz. */
+  .spine {
+    max-inline-size: 68ch;
+  }
+}
+
+@container page (min-width: 1100px) {
+  .spine {
+    max-inline-size: none;
+  }
+
+  .body {
+    max-inline-size: 74ch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

@@ -1,5 +1,5 @@
+/* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır. */
 .page {
-  container-type: inline-size;
   min-block-size: 100%;
   background-color: var(--lg-bg);
   color: var(--lg-label);
@@ -7,12 +7,7 @@
 
 .frame {
   display: grid;
-  inline-size: min(100%, 92rem);
   min-inline-size: 0;
-  margin-inline: auto;
-  padding: var(--lg-space-7);
-  padding-block-end:
-    calc(var(--lg-shell-dock-offset, var(--lg-control-xl)) + var(--lg-space-7) + env(safe-area-inset-bottom, 0rem));
   gap: var(--lg-space-5);
 }
 
@@ -173,9 +168,6 @@
 
 @container (inline-size <= 52rem) {
   .frame {
-    padding: var(--lg-space-4);
-    padding-block-end:
-      calc(var(--lg-shell-dock-offset, var(--lg-control-xl)) + var(--lg-space-5) + env(safe-area-inset-bottom, 0rem));
     gap: var(--lg-space-4);
   }
 

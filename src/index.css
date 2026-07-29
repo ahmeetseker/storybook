@@ -6,23 +6,39 @@
 :root {
   color-scheme: light dark;
 
-  /* Renk — Kağıt (açık) */
+  /* Renk — Kağıt (açık)
+     Metin taşıyan her token WCAG 2.2 AAA (1.4.6, 7:1) hedefine göre seçilir.
+     Ölçüm düz zeminlerle sınırlı değildir: component'ler rozet ve uyarı
+     zeminlerini `color-mix(… %7–12, --lg-surface)` ile üretir ve bu tonlu
+     zeminler kontrastı yaklaşık yarım puan düşürür. Aşağıdaki değerler
+     --lg-bg, --lg-surface ve her semantic rengin %12'ye kadar tonlanmış
+     yüzeyi dahil olmak üzere TÜM kombinasyonlarda ≥ 7:1 verir; parantez
+     içindeki sayı en kötü durumdur (Chrome + axe-core ile doğrulandı). */
   --lg-bg: #faf8f4;                          /* fildişi zemin */
   --lg-surface: #ffffff;                     /* flat kart */
-  --lg-label: #24211b;
-  --lg-label-secondary: #756e66;
+  --lg-label: #24211b;                       /* 12.98 : 1 */
+  --lg-label-secondary: #4f4b45;             /*  7.00 : 1 */
   --lg-hairline: rgba(36, 33, 27, 0.09);
-  --lg-accent: #b45309;                      /* amber */
-  --lg-accent-contrast: #ffffff;             /* amber üstü metin */
+  --lg-accent: #7c3806;                      /* amber —  7.00 : 1 */
+  --lg-accent-contrast: #ffffff;             /* amber üstü metin — 8.66 : 1 */
 
   /* Hero showcase overlay: medya üstü karartma + üzerindeki metin rengi */
   --lg-scrim: rgba(10, 12, 16, 0.55);
   --lg-on-scrim: #ffffff;
 
-  /* Semantic tone'lar — küçük metin/ikon kullanımında AA kontrastlı */
-  --lg-danger: #c92a20;
-  --lg-warning: #9a5700;
-  --lg-success: #18743a;
+  /* Metin taşıyan cam yüzey (medyanın üstünde duran künye/kontrol katmanı).
+     Opaklık estetik değil erişilebilirlik kararıdır: altındaki fotoğraf
+     bilinmeyen bir zemindir ve saydamlık arttıkça kontrast fotoğrafın
+     rengine bağlı hale gelir. 0.92'de en kötü fotoğraf (düz siyah veya düz
+     beyaz) altında bile ikincil metin 7.26:1 verir — AAA 1.4.6 korunur.
+     Blur ve saturate malzemeyi taşımayı sürdürür. */
+  --lg-glass: rgba(255, 255, 255, 0.92);
+  --lg-glass-line: rgba(36, 33, 27, 0.12);
+
+  /* Semantic tone'lar — gövde metni ölçeğinde AAA kontrastlı */
+  --lg-danger: #911e17;                      /*  7.07 : 1 */
+  --lg-warning: #703f00;                     /*  7.08 : 1 */
+  --lg-success: #12572c;                     /*  7.00 : 1 */
 
   /* Tipografi ölçeği */
   --lg-font: 'Manrope Variable', 'Manrope', -apple-system, BlinkMacSystemFont,
@@ -46,7 +62,9 @@
   --lg-focus-ring-width: 2px;
   --lg-focus-ring-offset: 2px;
 
-  /* Boşluk ölçeği */
+  /* Boşluk ölçeği — 1..7 öğe ve grup içi, 8..10 sayfa/bölüm ölçeği.
+     Üst uç, daha önce component'lerde `calc(--lg-space-7 + --lg-space-6)`
+     gibi elle toplanan bölüm ritmini token'a çevirir. */
   --lg-space-1: 4px;
   --lg-space-2: 8px;
   --lg-space-3: 12px;
@@ -54,10 +72,35 @@
   --lg-space-5: 20px;
   --lg-space-6: 24px;
   --lg-space-7: 32px;
+  --lg-space-8: 40px;
+  --lg-space-9: 48px;
+  --lg-space-10: 64px;
 
-  /* Kontrol yükseklikleri (masaüstü) */
-  --lg-control-sm: 32px;
-  --lg-control-md: 40px;
+  /* Okuma genişliği (measure) — WCAG 2.2 AAA 1.4.8 gövde metni satırının
+     80 karakteri aşmamasını ister.
+
+     Değer 54ch'tir, 80 değil: CSS'in `ch` birimi "0" rakamının genişliğidir ve
+     Manrope'ta "0" ortalama harften belirgin biçimde geniştir. Chrome'da Türkçe
+     gövde metniyle ölçülen karşılık ≈ 1.44 karakter/ch, yani 62ch gerçekte 89
+     karakterlik satır veriyordu. 54ch ≈ 77 karakter — sınırın altında kalır.
+     Kartın veya kolonun kendi genişliği değil, İÇİNDEKİ gövde metni bunu okur. */
+  --lg-measure: 54ch;
+
+  /* Sayfa container ölçeği — içerik rolüne göre üç kademe.
+     Kademe seçimi sayfanın işidir; kenar boşluğu ve ortalama tek kaynaktan. */
+  --lg-container-narrow: 72rem;              /* 1152px — okuma, tek kolonlu karar akışı */
+  --lg-container-base: 88rem;                /* 1408px — liste, dizin, hesap ekranları */
+  --lg-container-wide: 104rem;               /* 1664px — panelli çalışma masaları, harita */
+  --lg-container-gutter: clamp(
+    var(--lg-space-4),
+    4vw,
+    var(--lg-space-8)
+  );
+
+  /* Kontrol yükseklikleri — WCAG 2.2 AAA 2.5.5 (Target Size, Enhanced)
+     gereği giriş yönteminden bağımsız olarak min. 44px. */
+  --lg-control-sm: 44px;
+  --lg-control-md: 44px;
   --lg-control-lg: 48px;
   --lg-control-xl: 56px;
 
@@ -75,18 +118,24 @@
 /* Koyu tema — Grafit */
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Koyu temada da ölçüm tonlu zeminleri kapsar; en kötü durum genellikle
+       rengin kendi %12 tonlu yüzeyidir, düz --lg-surface değil. */
     --lg-bg: #121316;
     --lg-surface: #1b1c20;
-    --lg-label: #f2f2f3;
-    --lg-label-secondary: #9d9da4;
+    --lg-label: #f2f2f3;                     /* 11.92 : 1 */
+    --lg-label-secondary: #bcbcc1;           /*  7.05 : 1 */
     --lg-hairline: rgba(255, 255, 255, 0.1);
-    --lg-accent: #e09143;                    /* amber koyuda açılır */
-    --lg-accent-contrast: #1a140c;
+    --lg-accent: #e9b179;                    /* amber koyuda açılır — 7.01 : 1 */
+    --lg-accent-contrast: #1a140c;           /* amber üstü metin — 9.60 : 1 */
     --lg-scrim: rgba(4, 5, 8, 0.62);
     --lg-on-scrim: #ffffff;
-    --lg-danger: #ff6961;
-    --lg-warning: #ffb44c;
-    --lg-success: #52d273;
+    /* Koyu camda en kötü durum beyaz fotoğraftır; surface tonu 0.92 ile
+       ikincil metne 7.17:1 bırakır. */
+    --lg-glass: rgba(27, 28, 32, 0.92);
+    --lg-glass-line: rgba(255, 255, 255, 0.14);
+    --lg-danger: #ffa49e;                    /*  7.02 : 1 */
+    --lg-warning: #ffb44c;                   /*  7.55 : 1 */
+    --lg-success: #58d478;                   /*  7.05 : 1 */
     --lg-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
     --lg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
     --lg-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
@@ -94,15 +143,9 @@
   }
 }
 
-/* Dokunmatik cihazlar: minimum 44px dokunma hedefi */
-@media (pointer: coarse) {
-  :root {
-    --lg-control-sm: 36px;
-    --lg-control-md: 44px;
-    --lg-control-lg: 50px;
-    --lg-control-xl: 56px;
-  }
-}
+/* Dokunma hedefi artık giriş yönteminden bağımsız: ölçeğin tabanı her cihazda
+   44px olduğu için `pointer: coarse` altında ayrıca büyütme yapılmaz.
+   WCAG 2.2 AAA 2.5.5 kriteri fare/dokunmatik ayrımı tanımaz. */
 
 * {
   box-sizing: border-box;

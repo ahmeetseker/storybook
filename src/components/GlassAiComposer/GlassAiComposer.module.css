@@ -6,7 +6,9 @@
   --chip-gap: 6px;
   --textarea-min-lg: 72px;
   --textarea-max-lg: 160px;
-  --textarea-min-md: 24px;
+  /* Tek satırlık md kompozitörde giriş alanı da bir dokunma hedefidir:
+     24px'lik satır yüksekliği WCAG 2.2 AAA 2.5.5'in altında kalıyordu. */
+  --textarea-min-md: var(--lg-control-md, 44px);
   --textarea-max-md: 120px;
   display: flex;
   flex-direction: column;

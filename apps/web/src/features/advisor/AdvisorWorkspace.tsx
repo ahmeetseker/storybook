@@ -6,6 +6,7 @@ import {
   useReducer,
   useRef,
 } from 'react'
+import { PageContainer } from '@/components/PageContainer'
 import type { ListingSummary } from '../listings/data/listing-adapter'
 import { AdvisorComposer } from './components/AdvisorComposer'
 import { AdvisorDecisionRail } from './components/AdvisorDecisionRail'
@@ -329,7 +330,7 @@ export function AdvisorWorkspace({
   )
 
   return (
-    <main id="main-content" className={styles.page}>
+    <PageContainer size="wide" className={styles.page}>
       <div
         className={styles.pageFrame}
         data-advisor-page-frame=""
@@ -489,6 +490,6 @@ export function AdvisorWorkspace({
           dispatch({ type: 'OVERLAY_CLOSED' })
         }}
       />
-    </main>
+    </PageContainer>
   )
 }

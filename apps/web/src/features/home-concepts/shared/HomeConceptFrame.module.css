@@ -1,18 +1,14 @@
+/* Genişlik, kenar boşluğu ve kabuk payları PageContainer'dadır. Bu dosya
+   daha önce `--lg-shell-header-offset`'i tanımsız bir token olarak okuyup
+   7rem fallback'ine düşüyordu; token artık kabukta gerçekten tanımlı. */
 .main {
   box-sizing: border-box;
-  width: 100%;
   color: var(--lg-label);
 }
 
 .inner {
   box-sizing: border-box;
   display: flex;
-  width: min(100%, var(--lg-page-max-width, 90rem));
-  margin-inline: auto;
-  padding:
-    calc(var(--lg-shell-header-offset, 7rem) + env(safe-area-inset-top, 0px))
-    var(--lg-space-6)
-    calc(var(--lg-shell-dock-offset, 7.5rem) + env(safe-area-inset-bottom, 0px));
   flex-direction: column;
   gap: var(--home-shell-gap, var(--lg-space-7));
 }

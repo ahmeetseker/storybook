@@ -10,8 +10,21 @@ import { Meta } from '@storybook/addon-docs/blocks'
 - İkon-tek butonlarda `label` prop'u zorunludur (`aria-label` + `title`).
 - Kalıcı durumlar ARIA'ya yansır: `aria-pressed`, `aria-selected`, `aria-current`,
   `aria-expanded`, `role="tablist|tab|tabpanel"`, lightbox `role="dialog"` + `aria-modal`.
-- Kontrast: metin/zemin çiftleri WCAG AA (amber koyu temada bu yüzden `#E09143`'e açılır,
-  üstü koyu kahve metin alır).
+- **Hedef seviye WCAG 2.2 AAA.** Karşılanan kriterler ve karşılıkları:
+
+  | Kriter | Karşılık |
+  |---|---|
+  | 1.4.6 Contrast (Enhanced) | Palet 7:1'e kalibre — tonlu `color-mix` zeminleri dahil (bkz. Token'lar) |
+  | 1.4.8 Visual Presentation | Gövde metni `--lg-measure` (≈77 karakter), satır aralığı ≥ 1.5 |
+  | 2.5.5 Target Size (Enhanced) | Kontrol ölçeğinin tabanı her cihazda 44px |
+  | 2.4.12 Focus Not Obscured (Enhanced) | Odak, yüzen header/dock altında kalmaz (`scroll-margin-block`) |
+
+  Amber koyu temada `#E9B179`'a açılır, üstü koyu kahve metin alır.
+
+  Denetim otomatiktir ama tek başına yetmez: `axe-core` `color-contrast-enhanced`
+  kuralını ölçer, **2.5.5 ve 1.4.8'i ölçmez**. Dokunma hedefi doğrulaması
+  `elementFromPoint` ile gerçek tıklanabilir alan taranarak yapılır —
+  `getBoundingClientRect()` görünmez `::after` genişletmelerini görmez.
 - `prefers-reduced-transparency` → cam donuklaşır (refraction kapanır, blur kalır).
 - `prefers-reduced-motion` → spring/lift animasyonları kapanır; yalnız renk geçişi kalır.
 
@@ -30,9 +43,12 @@ tetiklemez) · kesilebilir (spring) · exit tamamlanmadan DOM kaldırılmaz.
 
 # Responsive
 
-- Breakpoint yerine **yetenek sorguları**: `@media (pointer: coarse)` kontrol
-  yüksekliklerini 44px+ yapar; `@media (hover: hover)` hover'ı yalnız imleçli
-  cihazlara verir.
+- Breakpoint yerine **yetenek sorguları**: `@media (hover: hover)` hover'ı yalnız
+  imleçli cihazlara verir. `@media (pointer: coarse)` artık kontrol yüksekliği
+  büyütmez — ölçeğin tabanı zaten 44px'tir (AAA 2.5.5); coarse yalnız yatay
+  nefes gibi ikincil ayarlar için kalır.
+- Sayfa genişliği ve kenar boşluğu container kademesinden gelir; sayfa kendi
+  `max-width`'ini yazmaz (bkz. Token'lar → Sayfa container'ı).
 - Genişlik davranışı container'a göre: kartlar `minmax()` grid'de akar,
   thumb şeritleri ve carousel yatay scroll'a düşer (`scrollbar-width: none`).
 - Cam yüzeyler büyüdüğünde refraction alan sınırıyla otomatik düz blur'a iner —

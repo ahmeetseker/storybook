@@ -1,0 +1,76 @@
+.ledger {
+  display: block;
+}
+
+.title {
+  margin: 0 0 var(--lg-space-3);
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Durum kelimesi — renk tek başına bilgi taşımaz (WCAG 1.4.1). */
+.state {
+  font-weight: 700;
+}
+
+.source {
+  color: var(--lg-label-secondary);
+}
+
+/* Üç sayı: kart değil, hairline ızgara. Dar yerleşimde sayfa dolgusundan
+   taşarak kenara dayanır; kap genişleyince çerçevelenir. */
+.tally {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--lg-stroke-hairline);
+  margin: 0 calc(-1 * var(--lg-container-gutter)) var(--lg-space-3);
+  border-block: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  background: var(--lg-hairline);
+}
+
+.tally > div {
+  padding: var(--lg-space-3);
+  background: var(--lg-bg);
+}
+
+.tally dt {
+  margin: 0 0 3px;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+}
+
+.tally dd {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.ok {
+  color: var(--lg-success);
+}
+
+.warn {
+  color: var(--lg-warning);
+}
+
+.muted {
+  color: var(--lg-label-secondary);
+}
+
+@container page (min-width: 700px) {
+  .tally {
+    margin-inline: 0;
+    border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+    border-radius: var(--lg-radius-chip);
+    overflow: hidden;
+  }
+}

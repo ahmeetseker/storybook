@@ -32,12 +32,20 @@ function initialsOf(name: string): string {
   return (first + last).toLocaleUpperCase('tr')
 }
 
-/** name'den deterministik pastel: basit hash → hue; doygunluk/açıklık sabit (her zaman açık zemin) */
+/**
+ * name'den deterministik pastel: basit hash → hue; açıklık/kroma sabit.
+ *
+ * Ölçek `oklch`tir, `hsl` değil: HSL'in açıklığı algısal değildir, aynı
+ * `L %74` sarıda parlak mavide koyu bir zemin üretir. Baş harflerin kontrastı
+ * bu yüzden hue'ya göre 4.2 ile 5.5 arasında geziniyor ve AAA'yı (7:1) hiçbir
+ * hue'da tutturamıyordu. `oklch(88% 0.05 h)` algısal olarak sabit açıklıkta
+ * kalır: aynı mürekkeple kontrast tüm hue'larda 9.6–10.0 bandındadır.
+ */
 function pastelOf(name: string): string {
   let h = 0
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0
   const hue = Math.abs(h) % 360
-  return `hsl(${hue} 48% 74%)`
+  return `oklch(88% 0.05 ${hue})`
 }
 
 export function GlassAvatar({

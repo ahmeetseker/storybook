@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode } from "react";
 import { withBase } from "@/config/base-path";
+import { PageContainer } from "@/components/PageContainer";
 import { homeConcepts, type HomeConceptId } from "../concepts";
 import styles from "./HomeConceptFrame.module.css";
 
@@ -26,9 +27,8 @@ export function HomeConceptFrame({
 
   return (
     <>
-      <main
+      <PageContainer
         {...rest}
-        id="main-content"
         className={[styles.main, className].filter(Boolean).join(" ")}
       >
         <div className={styles.inner}>
@@ -63,7 +63,7 @@ export function HomeConceptFrame({
           ) : null}
           <div className={styles.content}>{children}</div>
         </div>
-      </main>
+      </PageContainer>
       {footer}
     </>
   );

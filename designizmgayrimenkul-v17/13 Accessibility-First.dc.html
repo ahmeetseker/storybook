@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#DCE3EC}
+a{color:#0B4FBF;text-decoration:underline} a:hover{color:#08307A}
+input,select,textarea,button{font-family:'Atkinson Hyperlegible',sans-serif}
+*:focus-visible{outline:3px solid #0B4FBF;outline-offset:2px;border-radius:3px}
+.a11y-skip{position:absolute;left:8px;top:-48px;z-index:100;background:#0B4FBF;color:#FFFFFF;padding:10px 16px;border-radius:8px;font:700 13px 'Atkinson Hyperlegible',sans-serif;transition:top .18s ease;text-decoration:none}
+.a11y-skip:focus{top:8px;color:#FFFFFF}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes sheetIn{from{transform:translate(-50%,44px)}to{transform:translate(-50%,0)}}
+</style>
+</helmet>
+
+<div data-screen-label="13 Accessibility-First" style="max-width:430px;margin:0 auto;min-height:100vh;background:{{ zemin }};font-family:'Atkinson Hyperlegible',sans-serif;color:{{ metin }};box-shadow:0 0 40px rgba(11,32,64,.16);padding-bottom:96px;box-sizing:border-box;font-size:{{ fontPx }}">
+
+  <a href="#main" class="a11y-skip">İçeriğe atla</a>
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#08214A;color:#B6C6E0;padding:8px 16px;font:700 11px/1 'Atkinson Hyperlegible',sans-serif;letter-spacing:.06em;text-transform:uppercase;text-decoration:none">
+    <span style="color:#FFFFFF">13 · Accessibility-first</span><span>← Tüm akımlar</span>
+  </a>
+
+  <header role="banner" style="background:{{ kart }};border-bottom:2px solid {{ kenar }};padding:12px 16px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;font:700 18px/1 'Atkinson Hyperlegible',sans-serif">emlaktr<span style="color:#0B4FBF">.com</span></div>
+    <button onClick="{{ a11yDegis }}" aria-label="Erişilebilirlik ayarları" aria-expanded="{{ a11yAcikStr }}" style="height:40px;padding:0 12px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px">♿ Erişilebilirlik</button>
+    <button onClick="{{ favDegis }}" aria-label="{{ favAria }}" aria-pressed="{{ favStr }}" style="width:40px;height:40px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font-size:15px;color:#C0392B;cursor:pointer">{{ favIkon }}</button>
+  </header>
+
+  <sc-if value="{{ a11yAcik }}" hint-placeholder-val="{{ false }}">
+    <div role="region" aria-label="Erişilebilirlik tercihleri" style="background:#EAF1FB;border-bottom:2px solid {{ kenar }};padding:12px 16px">
+      <div style="font:700 12px 'Atkinson Hyperlegible',sans-serif;margin-bottom:8px">Görüntü tercihleri (bu görünüme uygulanır)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button onClick="{{ buyukDegis }}" aria-pressed="{{ buyukStr }}" style="height:40px;padding:0 14px;border:2px solid {{ buyukKenar }};border-radius:10px;background:{{ buyukZemin }};color:{{ buyukRenk }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">A+ Büyük metin</button>
+        <button onClick="{{ kontrastDegis }}" aria-pressed="{{ kontrastStr }}" style="height:40px;padding:0 14px;border:2px solid {{ kontrastKenar }};border-radius:10px;background:{{ kontrastZemin }};color:{{ kontrastRenk }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">◑ Yüksek kontrast</button>
+        <button onClick="{{ hareketDegis }}" aria-pressed="{{ hareketStr }}" style="height:40px;padding:0 14px;border:2px solid {{ hareketKenar }};border-radius:10px;background:{{ hareketZemin }};color:{{ hareketRenk }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">⏸ Hareketi azalt</button>
+      </div>
+      <div style="margin-top:8px;font:400 11px/1.5 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Ayrıca sayfa klavye ile tam gezilebilir; her etkileşimli öğede görünür odak halkası ve ARIA etiketleri bulunur.</div>
+    </div>
+  </sc-if>
+
+  <nav aria-label="Konum yolu" style="padding:10px 16px;font:400 12px/1.5 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }};white-space:nowrap;overflow-x:auto">
+    <a href="#" style="color:{{ ikincil }}">Ana sayfa</a> › <a href="#" style="color:{{ ikincil }}">Arsa</a> › <a href="#" style="color:{{ ikincil }}">Antalya</a> › <a href="#" style="color:{{ ikincil }}">Döşemealtı</a> › <span style="color:{{ metin }};font-weight:700">Yeniköy</span>
+  </nav>
+
+  <main id="main" role="main">
+  <section data-screen-label="Başlık" aria-labelledby="ilan-baslik" style="padding:8px 16px 16px;border-bottom:2px solid {{ kenar }}">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+      <span style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#0A5A2E;background:#D6F0DE;border:1px solid #7FC496;border-radius:6px;padding:4px 8px">✓ Doğrulanmış ilan</span>
+      <span style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF;background:#E1EBFB;border:1px solid #9CBCF0;border-radius:6px;padding:4px 8px">Yetkili portföy</span>
+      <span style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#7A2E0E;background:#FBE6D8;border:1px solid #E4A681;border-radius:6px;padding:4px 8px">↓ Fiyat düştü</span>
+    </div>
+    <h1 id="ilan-baslik" style="margin:0;font:700 23px/1.35 'Atkinson Hyperlegible',sans-serif">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+    <p style="margin:8px 0 0;font:400 14px/1.6 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Antalya, Döşemealtı, Yeniköy Mahallesi. İlan numarası 2470931. Yayın 12 Haziran 2026, güncelleme 3 Temmuz 2026. Durum: aktif.</p>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="margin-top:12px;background:#FBE6D8;border:2px solid #E4A681;border-radius:8px;padding:10px 12px;font:700 12.5px/1.5 'Atkinson Hyperlegible',sans-serif;color:#7A2E0E">◆ Bu ilan rezerve edildi — danışman benzer portföyler önerebilir.</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="margin-top:12px;background:#F7DDDA;border:2px solid #D89A94;border-radius:8px;padding:10px 12px;font:700 12.5px/1.5 'Atkinson Hyperlegible',sans-serif;color:#7A1B12">■ Bu ilan satıldı. <a href="#benzer">Benzer ilanlara bakın</a>.</div>
+    </sc-if>
+  </section>
+
+  <section data-screen-label="Medya" aria-label="Fotoğraf galerisi" style="border-bottom:2px solid {{ kenar }}">
+    <div role="img" aria-label="{{ fotoAria }}" style="position:relative;height:250px;background:{{ fotoBg }}">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center">
+        <div style="font:700 11px 'Atkinson Hyperlegible',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:rgba(11,32,64,.6)">{{ fotoKat }}</div>
+        <div style="font:700 17px 'Atkinson Hyperlegible',sans-serif;color:rgba(11,32,64,.82)">{{ fotoAd }}</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:{{ kart }}">
+      <button onClick="{{ geri }}" aria-label="Önceki fotoğraf" style="width:44px;height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font-size:18px;cursor:pointer">‹</button>
+      <div style="flex:1;text-align:center;font:700 13px 'Atkinson Hyperlegible',sans-serif" aria-live="polite">{{ fotoSay }} — {{ fotoAd }}</div>
+      <button onClick="{{ ileri }}" aria-label="Sonraki fotoğraf" style="width:44px;height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font-size:18px;cursor:pointer">›</button>
+    </div>
+  </section>
+
+  <section data-screen-label="Fiyat" aria-labelledby="fiyat-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="fiyat-bas" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Fiyat ve iletişim</h2>
+    <div style="font:700 34px/1 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF">₺8.450.000</div>
+    <p style="margin:8px 0 0;font:400 14px/1.6 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Eski fiyat 8.900.000 TL, yüzde 5,1 indirim. Metrekare fiyatı 6.401 TL. Krediye uygun. <span style="color:#0B4FBF;font-weight:700">Yapay zekâ değerlendirmesi:</span> metrekare fiyatı mahalle medyanının yüzde 7 altında.</p>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onClick="{{ telGoster }}" style="flex:1.5;min-height:52px;border:0;border-radius:10px;background:#0B4FBF;color:#FFFFFF;font:700 15px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ telYazi }}</button>
+      <button onClick="{{ mesajAc }}" style="flex:1;min-height:52px;border:2px solid #0B4FBF;border-radius:10px;background:{{ kart }};color:#0B4FBF;font:700 15px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Mesaj</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onClick="{{ randevu }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Randevu al</button>
+      <button onClick="{{ alarmDegis }}" aria-pressed="{{ alarmStr }}" style="flex:1;min-height:44px;border:2px solid {{ alarmKenar }};border-radius:10px;background:{{ alarmZemin }};color:{{ alarmRenk }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ alarmYazi }}</button>
+      <button onClick="{{ paylas }}" aria-label="Paylaş" style="min-width:52px;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font-size:15px;cursor:pointer">↗</button>
+    </div>
+  </section>
+
+  <nav data-screen-label="Sekmeler" aria-label="Sayfa bölümleri" style="position:sticky;top:0;z-index:50;background:{{ zemin }};border-bottom:2px solid {{ kenar }};display:flex;gap:6px;overflow-x:auto;padding:10px 16px">
+    <sc-for list="{{ sekmeler }}" as="t" hint-placeholder-count="8">
+      <button onClick="{{ t.git }}" aria-current="{{ t.aria }}" style="flex:none;min-height:38px;padding:0 14px;border-radius:10px;border:2px solid {{ t.kenar }};background:{{ t.zemin }};color:{{ t.renk }};font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ t.ad }}</button>
+    </sc-for>
+  </nav>
+
+  <section id="ozet" data-screen-label="Hızlı özellikler" aria-labelledby="ozet-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="ozet-bas" style="margin:0 0 12px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Temel özellikler</h2>
+    <dl style="margin:0;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <sc-for list="{{ hizli }}" as="h" hint-placeholder-count="10">
+        <div style="background:{{ kart }};border:1px solid {{ kenar }};border-radius:8px;padding:10px 12px">
+          <dt style="font:400 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">{{ h.k }}</dt>
+          <dd style="margin:2px 0 0;font:700 14px 'Atkinson Hyperlegible',sans-serif">{{ h.v }}</dd>
+        </div>
+      </sc-for>
+    </dl>
+  </section>
+
+  <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="AI" aria-labelledby="ai-bas" style="padding:16px;border-bottom:2px solid {{ kenar }};background:#EAF1FB">
+    <h2 id="ai-bas" style="margin:0;font:700 16px 'Atkinson Hyperlegible',sans-serif">✦ Yapay zekâ özeti ve soru-cevap</h2>
+    <ul style="margin:10px 0 0;padding-left:20px;font:400 14px/1.7 'Atkinson Hyperlegible',sans-serif;color:{{ metin }}">
+      <li>Köşe parsel, 24 m cephe; yaklaşık 396 m² inşaat hakkı (2 kat).</li>
+      <li>Metrekare fiyatı medyanın yüzde 7 altında; bölge 90 günde yüzde 12 arttı.</li>
+      <li>Altyapı parselde; doğal gaz hattı 400 m.</li>
+    </ul>
+    <div style="display:flex;gap:8px;overflow-x:auto;margin-top:12px;padding-bottom:2px" role="group" aria-label="Hazır sorular">
+      <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+        <button onClick="{{ c.sor }}" style="flex:none;min-height:40px;border:2px solid #9CBCF0;background:{{ kart }};color:#0B4FBF;border-radius:10px;padding:0 12px;font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ c.q }}</button>
+      </sc-for>
+    </div>
+    <div aria-live="polite" style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+      <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+        <div style="border-left:4px solid {{ m.kenar }};padding:2px 0 2px 12px">
+          <div style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:{{ m.kenar }}">{{ m.etiket }}</div>
+          <div style="font:400 14px/1.65 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};margin-top:2px">{{ m.metin }}</div>
+          <sc-if value="{{ m.kaynak }}" hint-placeholder-val="{{ false }}"><div style="margin-top:4px;font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF">Kaynak: {{ m.kaynak }}</div></sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}"><div style="font:400 13px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Yapay zekâ ilan verisini tarıyor…</div></sc-if>
+    </div>
+    <form onSubmit="{{ formGonder }}" style="display:flex;gap:8px;margin-top:12px">
+      <label for="ai-in" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Sorunuzu yazın</label>
+      <input id="ai-in" value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Sorunuzu yazın…" style="flex:1;min-height:46px;border:2px solid {{ kenar }};border-radius:10px;padding:0 14px;font:400 14px 'Atkinson Hyperlegible',sans-serif;background:{{ kart }};color:{{ metin }}">
+      <button onClick="{{ gonder }}" type="button" style="min-height:46px;padding:0 18px;border:0;border-radius:10px;background:#08214A;color:#FFFFFF;font:700 13px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Sor</button>
+    </form>
+  </section>
+  </sc-if>
+
+  <section id="ozellikler" data-screen-label="Detaylı özellikler" aria-labelledby="ozk-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="ozk-bas" style="margin:0 0 12px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Detaylı özellikler</h2>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+        <div style="background:{{ kart }};border:1px solid {{ kenar }};border-radius:8px;overflow:hidden">
+          <button onClick="{{ g.ac }}" aria-expanded="{{ g.acikStr }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:{{ kart }};border:0;padding:13px 14px;cursor:pointer;min-height:48px">
+            <span style="font:700 14px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }}">{{ g.baslik }}</span>
+            <span aria-hidden="true" style="font:700 18px 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF">{{ g.ikon }}</span>
+          </button>
+          <sc-if value="{{ g.acikMi }}" hint-placeholder-val="{{ false }}">
+            <dl style="margin:0;border-top:1px solid {{ kenar }};padding:4px 14px 10px">
+              <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid {{ ayrac }}">
+                  <dt style="font:400 13px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">{{ s.k }}</dt><dd style="margin:0;font:700 13px 'Atkinson Hyperlegible',sans-serif;text-align:right">{{ s.v }}</dd>
+                </div>
+              </sc-for>
+            </dl>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="Açıklama" aria-labelledby="ack-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="ack-bas" style="margin:0 0 8px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Açıklama</h2>
+    <p style="margin:0;font:400 14px/1.8 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+    <button onClick="{{ aciklamaDegis }}" aria-expanded="{{ aciklamaStr }}" style="margin-top:10px;min-height:44px;padding:0 16px;border:2px solid #0B4FBF;border-radius:10px;background:{{ kart }};color:#0B4FBF;font:700 13px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ aciklamaBtn }}</button>
+  </section>
+
+  <section id="konum" data-screen-label="Konum" aria-labelledby="knm-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="knm-bas" style="margin:0 0 12px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Konum ve çevre</h2>
+    <div role="img" aria-label="Harita: parsel Yeniköy Mahallesi'nde, koordinat 37.0021, 30.5983. Parsel sınırı işaretli." style="position:relative;height:170px;border:2px solid {{ kenar }};border-radius:8px;background:repeating-linear-gradient(0deg,#D3DCE8 0 26px,#C7D2E0 26px 27px),repeating-linear-gradient(90deg,#D3DCE8 0 26px,#C7D2E0 26px 27px)">
+      <div style="position:absolute;left:56%;top:32%;width:118px;height:76px;border:3px dashed #0B4FBF;background:rgba(11,79,191,.12);border-radius:4px;transform:rotate(-4deg)"></div>
+      <div style="position:absolute;left:64%;top:44%;width:14px;height:14px;border-radius:50%;background:#0B4FBF"></div>
+      <span style="position:absolute;left:10px;top:10px;background:#FFFFFF;border:1px solid #9CBCF0;border-radius:6px;padding:4px 9px;font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#08307A">Kesin konum · 37.0021, 30.5983</span>
+    </div>
+    <p style="margin:8px 0 0;font:400 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Metinsel özet: D650 kavşağı 2,4 km, Antalya merkez 22 km, havalimanı 28 km.</p>
+    <ul style="margin:10px 0 0;padding:0;list-style:none">
+      <sc-for list="{{ poi }}" as="p" hint-placeholder-count="6">
+        <li style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid {{ ayrac }};font:400 13px 'Atkinson Hyperlegible',sans-serif"><span>{{ p.ad }} <span style="color:{{ ikincil }}">({{ p.tip }})</span></span><b style="white-space:nowrap">{{ p.mesafe }}</b></li>
+      </sc-for>
+    </ul>
+    <div style="display:flex;gap:16px;margin-top:14px">
+      <div style="flex:1">
+        <h3 style="margin:0 0 8px;font:700 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Bölge skorları</h3>
+        <sc-for list="{{ skorlar }}" as="sk" hint-placeholder-count="4">
+          <div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font:400 12px 'Atkinson Hyperlegible',sans-serif"><span>{{ sk.k }}</span><b style="color:#0B4FBF">{{ sk.v }}</b></div>
+          <div role="img" aria-label="{{ sk.k }}: {{ sk.v }} / 10" style="height:6px;border-radius:3px;background:{{ ayrac }};margin-top:3px"><div style="height:6px;border-radius:3px;background:#0B4FBF;width:{{ sk.gen }}"></div></div></div>
+        </sc-for>
+      </div>
+      <div style="flex:1">
+        <h3 style="margin:0 0 8px;font:700 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Risk katmanları</h3>
+        <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;gap:6px;font:400 12px/1.5 'Atkinson Hyperlegible',sans-serif;padding:3px 0"><span>{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="piyasa" data-screen-label="Piyasa" aria-labelledby="pys-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="pys-bas" style="margin:0 0 10px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Piyasa karşılaştırması</h2>
+    <p style="margin:0;font:400 14px/1.65 'Atkinson Hyperlegible',sans-serif;color:{{ metin }}">Bu ilan 6.401 TL/m²; mahalle medyanı 6.900 TL/m². Fiyat medyanın yüzde 7 altında. Son 90 günde bölge metrekare fiyatı yüzde 12 arttı. Mahallede 23 aktif ilan var; ortalama satış süresi 74 gün.</p>
+    <div role="img" aria-label="Fiyat konumu: minimum 5.200, medyan 6.900, maksimum 9.100 TL/m² aralığında; bu ilan 6.401 TL/m² ile alt bölgede." style="position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#2E8B57,#D4A017,#C0392B);margin-top:12px">
+      <div style="position:absolute;left:34%;top:-3px;width:4px;height:16px;border-radius:2px;background:#08214A;box-shadow:0 0 0 2px #FFFFFF"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font:400 11px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }};margin-top:5px"><span>5.200</span><span>medyan 6.900</span><span>9.100</span></div>
+  </section>
+
+  <section id="finans" data-screen-label="Finans" aria-labelledby="fin-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="fin-bas" style="margin:0 0 12px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Finansal analiz</h2>
+    <label for="pesinat-r" style="display:block;font:700 13px 'Atkinson Hyperlegible',sans-serif;margin-bottom:4px">Peşinat: %{{ pesinat }} (₺{{ pesinatTL }})</label>
+    <input id="pesinat-r" type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#0B4FBF;height:32px">
+    <label for="vade-r" style="display:block;font:700 13px 'Atkinson Hyperlegible',sans-serif;margin:6px 0 4px">Vade: {{ vade }} ay</label>
+    <input id="vade-r" type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#0B4FBF;height:32px">
+    <div style="margin-top:14px;background:#EAF1FB;border:2px solid #9CBCF0;border-radius:10px;padding:14px">
+      <div style="font:400 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Tahmini aylık taksit</div>
+      <div style="font:700 30px/1.1 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF">₺{{ taksitTL }}</div>
+      <div style="font:400 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }};margin-top:4px">Kredi ₺{{ krediTL }} · toplam geri ödeme ₺{{ toplamTL }} · aylık faiz %{{ faizYazi }}</div>
+    </div>
+    <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+      <div role="note" style="margin-top:10px;background:#FBE6D8;border:2px solid #E4A681;border-radius:8px;padding:10px 12px;font:700 12px/1.55 'Atkinson Hyperlegible',sans-serif;color:#7A2E0E">İmarlı arsada bankalar tipik olarak ekspertizin %50'sine kadar kredi verir — peşinatı artırın.</div>
+    </sc-if>
+    <div style="margin-top:14px">
+      <sc-for list="{{ masraflar }}" as="m" hint-placeholder-count="5">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid {{ ayrac }};font:400 13px 'Atkinson Hyperlegible',sans-serif"><span style="color:{{ ikincil }}">{{ m.k }}</span><b>{{ m.v }}</b></div>
+      </sc-for>
+    </div>
+    <button onClick="{{ pdf }}" style="margin-top:12px;width:100%;min-height:46px;border:2px solid #0B4FBF;border-radius:10px;background:{{ kart }};color:#0B4FBF;font:700 13px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">⤓ Finansal raporu PDF indir</button>
+  </section>
+
+  <section id="belgeler" data-screen-label="Belgeler" aria-labelledby="blg-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="blg-bas" style="margin:0 0 10px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Belgeler ve doğrulama</h2>
+    <ul style="margin:0;padding:0;list-style:none">
+      <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+        <li style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid {{ ayrac }}">
+          <div><b style="font:700 13px 'Atkinson Hyperlegible',sans-serif">{{ b.ad }}</b><div style="font:400 11px 'Atkinson Hyperlegible',sans-serif;color:{{ b.durumRenk }}">{{ b.durumYazi }}</div></div>
+          <button onClick="{{ b.tik }}" style="min-height:40px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 12px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};padding:0 12px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+        </li>
+      </sc-for>
+    </ul>
+    <p style="margin:10px 0 0;font:400 12px/1.6 'Atkinson Hyperlegible',sans-serif;color:#0A5A2E">Belgeler 28 Haziran 2026'da EİDS kaydı ve yetki belgesiyle eşleştirildi. Kimlik bilgileri maskelenir.</p>
+  </section>
+
+  <section id="danisman" data-screen-label="Danışman" aria-labelledby="dns-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="dns-bas" style="margin:0 0 12px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Danışman ve ofis</h2>
+    <div style="display:flex;gap:12px;align-items:center">
+      <div aria-hidden="true" style="width:52px;height:52px;border-radius:50%;background:#0B4FBF;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:700 17px 'Atkinson Hyperlegible',sans-serif">AD</div>
+      <div style="flex:1"><div style="font:700 15px 'Atkinson Hyperlegible',sans-serif">Ayşe Demir <span style="font:700 10px 'Atkinson Hyperlegible',sans-serif;color:#0A5A2E;background:#D6F0DE;border-radius:5px;padding:2px 6px">✓ Doğrulandı</span></div><div style="font:400 12px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}">Akdeniz Gayrimenkul · TB Yetki 0700123 · EİDS · üyelik 2019</div></div>
+      <button onClick="{{ takipDegis }}" aria-pressed="{{ takipStr }}" style="min-height:40px;border:2px solid {{ takipKenar }};background:{{ takipZemin }};color:{{ takipRenk }};border-radius:10px;font:700 12px 'Atkinson Hyperlegible',sans-serif;padding:0 12px;cursor:pointer">{{ takipYazi }}</button>
+    </div>
+    <p style="margin:12px 0 0;font:400 13px/1.7 'Atkinson Hyperlegible',sans-serif;color:{{ metin }}">46 aktif portföy · ortalama yanıt 28 dakika · 4,8 / 5 (212 değerlendirme). Ofis: Yeniköy Mah. Atatürk Cad. No:41. Hafta içi 09.00–18.30, cumartesi 10.00–16.00.</p>
+    <button onClick="{{ tumIlanlar }}" style="margin-top:12px;width:100%;min-height:46px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};color:{{ metin }};font:700 13px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Danışmanın tüm ilanları (46)</button>
+  </section>
+
+  <section id="guvenlik" data-screen-label="Güvenlik" aria-labelledby="gvn-bas" style="padding:16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="gvn-bas" style="margin:0 0 10px;font:700 17px 'Atkinson Hyperlegible',sans-serif">Güvenlik ve şikayet</h2>
+    <div role="note" style="background:#F7DDDA;border:2px solid #D89A94;border-radius:8px;padding:11px 13px;font:400 13px/1.6 'Atkinson Hyperlegible',sans-serif;color:#7A1B12"><b>Kapora uyarısı:</b> Taşınmazı yerinde görmeden ve tapu kontrolü yapmadan kapora göndermeyin. Ödemeleri platform dışına taşımayın.</div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button onClick="{{ bildir }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 11px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};cursor:pointer">İlanı bildir</button>
+      <button onClick="{{ bildir }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 11px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};cursor:pointer">Konum hatası</button>
+      <button onClick="{{ bildir }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 11px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};cursor:pointer">Fiyat hatası</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px;font:700 14px 'Atkinson Hyperlegible',sans-serif"><span style="color:{{ ikincil }}">İlan kalite skoru</span><span style="color:#0A5A2E">92 / 100</span></div>
+  </section>
+
+  <section id="benzer" data-screen-label="Benzer" aria-labelledby="bnz-bas" style="padding:16px 0 16px 16px;border-bottom:2px solid {{ kenar }}">
+    <h2 id="bnz-bas" style="margin:0 16px 12px 0;font:700 17px 'Atkinson Hyperlegible',sans-serif">Benzer ilanlar</h2>
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-right:16px">
+      <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+        <a href="#" style="flex:none;width:200px;background:{{ kart }};border:1px solid {{ kenar }};border-radius:10px;overflow:hidden;text-decoration:none;color:{{ metin }}">
+          <div style="height:90px;background:{{ b.bg }}"></div>
+          <div style="padding:10px 12px">
+            <div style="font:700 12.5px/1.4 'Atkinson Hyperlegible',sans-serif;height:34px;overflow:hidden">{{ b.ad }}</div>
+            <b style="font:700 15px 'Atkinson Hyperlegible',sans-serif;color:#0B4FBF">{{ b.fiyat }}</b>
+            <div style="font:400 11px 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }};margin-top:2px">{{ b.m2 }} · {{ b.m2f }}</div>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+  </main>
+
+  <footer role="contentinfo" data-screen-label="Footer" style="background:#08214A;color:#B6C6E0;padding:20px 16px">
+    <div style="font:700 16px 'Atkinson Hyperlegible',sans-serif;color:#FFFFFF">emlaktr<span style="color:#7FA8F0">.com</span></div>
+    <nav aria-label="Alt bilgi bağlantıları" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font:400 12px/2 'Atkinson Hyperlegible',sans-serif">
+      <div><b style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#FFFFFF">Kurumsal</b><a href="#" style="display:block;color:#B6C6E0">Hakkımızda</a><a href="#" style="display:block;color:#B6C6E0">İletişim</a><a href="#" style="display:block;color:#B6C6E0">Erişilebilirlik bildirimi</a></div>
+      <div><b style="font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#FFFFFF">Güven ve yasal</b><a href="#" style="display:block;color:#B6C6E0">Güvenli alışveriş</a><a href="#" style="display:block;color:#B6C6E0">KVKK aydınlatma</a><a href="#" style="display:block;color:#B6C6E0">Çerez tercihleri</a></div>
+    </nav>
+    <div style="margin-top:14px;border-top:1px solid #1C3A6E;padding-top:10px;font:700 11px 'Atkinson Hyperlegible',sans-serif;display:flex;justify-content:space-between"><span>TR · ₺ TRY</span><span>© 2026 emlaktr.com</span></div>
+    <div style="margin-top:6px;font:400 10px 'Atkinson Hyperlegible',sans-serif;color:#6D86AE">WCAG 2.2 AA hedefi · skip link · görünür focus · ARIA landmark · min 16px metin · dokunma hedefi ≥44px</div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:{{ kart }};border-top:2px solid {{ kenar }};display:flex;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <button onClick="{{ telGoster }}" style="flex:1.5;min-height:48px;border:0;border-radius:10px;background:#0B4FBF;color:#FFFFFF;font:700 14px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">{{ telYazi }}</button>
+    <button onClick="{{ mesajAc }}" style="flex:1;min-height:48px;border:2px solid #0B4FBF;border-radius:10px;background:{{ kart }};color:#0B4FBF;font:700 14px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Mesaj</button>
+    <button onClick="{{ favDegis }}" aria-label="{{ favAria }}" style="min-width:50px;min-height:48px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font-size:17px;color:#C0392B;cursor:pointer">{{ favIkon }}</button>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#08214A;display:flex;gap:10px;align-items:center;padding:12px 16px;box-sizing:border-box">
+    <span style="flex:1;font:700 13px 'Atkinson Hyperlegible',sans-serif;color:#FFFFFF">Bu ilan satıldı.</span>
+    <button onClick="{{ benzereGit }}" style="min-height:44px;padding:0 16px;border:0;border-radius:10px;background:#FFFFFF;color:#08214A;font:700 12px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Benzer ilanlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(8,33,74,.55);z-index:80"></div>
+  <div role="dialog" aria-label="{{ leadBaslik }}" aria-modal="true" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:{{ kart }};border-radius:16px 16px 0 0;box-shadow:0 -8px 40px rgba(8,33,74,.3);animation:sheetIn .22s ease;box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:2px solid {{ kenar }}">
+      <b style="font:700 16px 'Atkinson Hyperlegible',sans-serif">{{ leadBaslik }}</b>
+      <button onClick="{{ leadKapat }}" aria-label="Kapat" style="width:40px;height:40px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};cursor:pointer;color:{{ metin }};font-size:16px">✕</button>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="padding:22px 16px;text-align:center">
+        <div style="width:56px;height:56px;border-radius:28px;background:#D6F0DE;color:#0A5A2E;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto">✓</div>
+        <b style="display:block;font:700 17px 'Atkinson Hyperlegible',sans-serif;margin-top:10px">Talebiniz danışmana iletildi</b>
+        <div style="font:400 13px/1.6 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }};margin-top:4px">CRM takip numarası L-88412 · ortalama yanıt süresi 28 dakika</div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button onClick="{{ leadKapatBenzer }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 12px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};cursor:pointer">Benzer ilanlar</button>
+          <button onClick="{{ leadKapatBelge }}" style="flex:1;min-height:44px;border:2px solid {{ kenar }};border-radius:10px;background:{{ kart }};font:700 12px 'Atkinson Hyperlegible',sans-serif;color:{{ metin }};cursor:pointer">Belgeler</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ leadFormGoster }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:14px 16px 20px">
+        <label for="l-ad" style="display:block;font:700 12px 'Atkinson Hyperlegible',sans-serif;margin-bottom:5px">Ad Soyad <span style="color:#C0392B">*</span></label>
+        <input id="l-ad" value="{{ fAd }}" onChange="{{ fAdDegis }}" aria-required="true" aria-invalid="{{ adHataStr }}" placeholder="Adınız Soyadınız" style="width:100%;min-height:48px;border:2px solid {{ adKenar }};border-radius:10px;padding:0 14px;font:400 14px 'Atkinson Hyperlegible',sans-serif;box-sizing:border-box;background:{{ zemin }};color:{{ metin }}">
+        <sc-if value="{{ adHata }}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin-top:4px;font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#C0392B">⚠ Ad Soyad alanı zorunludur.</div></sc-if>
+        <label for="l-tel" style="display:block;font:700 12px 'Atkinson Hyperlegible',sans-serif;margin:12px 0 5px">Telefon <span style="color:#C0392B">*</span></label>
+        <input id="l-tel" value="{{ fTel }}" onChange="{{ fTelDegis }}" aria-required="true" aria-invalid="{{ telHataStr }}" placeholder="05__ ___ __ __" style="width:100%;min-height:48px;border:2px solid {{ telKenar }};border-radius:10px;padding:0 14px;font:400 14px 'Atkinson Hyperlegible',sans-serif;box-sizing:border-box;background:{{ zemin }};color:{{ metin }}">
+        <sc-if value="{{ telHata }}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin-top:4px;font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#C0392B">⚠ Telefon alanı zorunludur.</div></sc-if>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" aria-invalid="{{ kvkkHataStr }}" style="margin-top:2px;width:22px;height:22px;accent-color:#0B4FBF">
+          <span style="font:400 12px/1.6 'Atkinson Hyperlegible',sans-serif;color:{{ ikincil }}"><a href="#">KVKK aydınlatma metnini</a> okudum; bilgilerimin bu talep için danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <sc-if value="{{ kvkkHata }}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin-top:4px;font:700 11px 'Atkinson Hyperlegible',sans-serif;color:#C0392B">⚠ Devam etmek için KVKK onayı gerekir.</div></sc-if>
+        <button onClick="{{ leadGonder }}" style="margin-top:14px;width:100%;min-height:52px;border:0;border-radius:10px;background:#0B4FBF;color:#FFFFFF;font:700 15px 'Atkinson Hyperlegible',sans-serif;cursor:pointer">Gönder</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:90;background:#08214A;color:#FFFFFF;border-radius:10px;padding:12px 18px;font:700 12.5px 'Atkinson Hyperlegible',sans-serif;box-shadow:0 8px 24px rgba(8,33,74,.4);animation:toastIn .2s ease;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, sekme:"ozet", acik:{0:true}, fav:false, takip:false,
+    tel:false, alarm:false, mesajlar:[], dusunuyor:false, yazi:"",
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false,
+    a11yAcik:false, buyuk:false, kontrast:false, hareket:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, kvkk:false, fAd:"", fTel:"", adHata:false, telHata:false, kvkkHata:false, toast:""
+  };
+  componentDidMount(){ import("./arsa-data.js").then(m => this.setState({D: m.D})); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2600); }
+  git(id){ const el = document.getElementById(id); if(el){ window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 56, behavior: this.state.hareket ? "auto" : "smooth"}); this.setState({sekme:id}); } }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){ const t = q.toLowerCase(); c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback; }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak}], dusunuyor:false});
+    }, 900);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const kon = s.kontrast;
+    const zemin = kon ? "#000000" : "#F4F7FB", kart = kon ? "#0A0A0A" : "#FFFFFF", metin = kon ? "#FFFFFF" : "#0B2040",
+          ikincil = kon ? "#C8C8C8" : "#4A5A72", kenar = kon ? "#FFFFFF" : "#C3D0E2", ayrac = kon ? "#333333" : "#EAF0F7";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const ids = [["Özet","ozet"],["Özellikler","ozellikler"],["Konum","konum"],["Piyasa","piyasa"],["Finans","finans"],["Belgeler","belgeler"],["Danışman","danisman"],["Benzer","benzer"]];
+    const acik = s.aciklamaAcik;
+    return {
+      D, zemin, kart, metin, ikincil, kenar, ayrac, fontPx: s.buyuk ? "18px" : "16px",
+      satilmadi: durum !== "satildi", satildi: durum === "satildi", rezerve: durum === "rezerve",
+      aiAcik: this.props.aiPaneli ?? true,
+      a11yAcik: s.a11yAcik, a11yAcikStr: String(s.a11yAcik),
+      a11yDegis: () => this.setState({a11yAcik: !s.a11yAcik}),
+      buyuk: s.buyuk, buyukStr: String(s.buyuk), buyukKenar: s.buyuk ? "#0B4FBF" : kenar, buyukZemin: s.buyuk ? "#0B4FBF" : kart, buyukRenk: s.buyuk ? "#FFFFFF" : metin,
+      buyukDegis: () => this.setState({buyuk: !s.buyuk}),
+      kontrast: s.kontrast, kontrastStr: String(s.kontrast), kontrastKenar: kon ? "#FFE500" : kenar, kontrastZemin: kon ? "#FFE500" : kart, kontrastRenk: kon ? "#000000" : metin,
+      kontrastDegis: () => this.setState({kontrast: !s.kontrast}),
+      hareket: s.hareket, hareketStr: String(s.hareket), hareketKenar: s.hareket ? "#0B4FBF" : kenar, hareketZemin: s.hareket ? "#0B4FBF" : kart, hareketRenk: s.hareket ? "#FFFFFF" : metin,
+      hareketDegis: () => this.setState({hareket: !s.hareket}),
+      fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#C7D2E0", fotoAria: "İlan fotoğrafı " + (s.foto+1) + ": " + (med.ad || ""),
+      fotoSay: "Fotoğraf " + (s.foto+1) + " / " + ((D.medya||[]).length || 5),
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      sekmeler: ids.map(([ad,id]) => ({ad, git: () => this.git(id), aria: s.sekme === id ? "true" : "false",
+        kenar: s.sekme === id ? "#0B4FBF" : kenar, zemin: s.sekme === id ? "#0B4FBF" : kart, renk: s.sekme === id ? "#FFFFFF" : metin})),
+      hizli: D.hizli || [],
+      gruplar: (D.gruplar||[]).map((g,i) => ({...g, ac: () => this.setState({acik:{...s.acik, [i]: !s.acik[i]}}), acikMi: !!s.acik[i], acikStr: String(!!s.acik[i]), ikon: s.acik[i] ? "−" : "+"})),
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map(m => m.rol === "k" ? {...m, kenar:"#4A5A72", etiket:"Siz sordunuz"} : {...m, kenar:"#0B4FBF", etiket:"✦ AI cevabı"}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()){ e.preventDefault(); this.sor(s.yazi.trim()); } },
+      formGonder: e => { e.preventDefault(); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favStr: String(s.fav), favIkon: s.fav ? "♥" : "♡", favAria: s.fav ? "Favorilerden çıkar" : "Favorilere ekle",
+      favDegis: () => { const v = !s.fav; this.setState({fav:v}); this.t(v ? "Favorilere eklendi" : "Favorilerden çıkarıldı"); },
+      paylas: () => this.t("İlan linki kopyalandı"),
+      telYazi: s.tel ? "0532 481 07 00" : "Ara — numarayı göster",
+      telGoster: () => { if(!s.tel){ this.setState({tel:true}); this.t("Numara gösterildi. Aramalar güvenlik için kayıtlıdır."); } },
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false, adHata:false, telHata:false, kvkkHata:false}),
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false, adHata:false, telHata:false, kvkkHata:false}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk, leadFormGoster: !s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Yerinde gösterim randevusu" : "Danışmana mesaj gönder",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false}); this.git("benzer"); },
+      leadKapatBelge: () => { this.setState({leadAcik:false}); this.git("belgeler"); },
+      fAd: s.fAd, fTel: s.fTel, kvkk: s.kvkk,
+      adHata: s.adHata, adHataStr: String(s.adHata), adKenar: s.adHata ? "#C0392B" : kenar,
+      telHata: s.telHata, telHataStr: String(s.telHata), telKenar: s.telHata ? "#C0392B" : kenar,
+      kvkkHata: s.kvkkHata, kvkkHataStr: String(s.kvkkHata),
+      fAdDegis: e => this.setState({fAd: e.target.value, adHata:false}), fTelDegis: e => this.setState({fTel: e.target.value, telHata:false}),
+      kvkkDegis: e => this.setState({kvkk: e.target.checked, kvkkHata:false}),
+      leadGonder: () => {
+        const adH = !s.fAd.trim(), telH = !s.fTel.trim(), kH = !s.kvkk;
+        if(adH || telH || kH){ this.setState({adHata:adH, telHata:telH, kvkkHata:kH}); this.t("Lütfen zorunlu alanları doldurun."); return; }
+        this.setState({leadOk:true});
+      },
+      alarm: s.alarm, alarmStr: String(s.alarm), alarmYazi: s.alarm ? "✓ Alarm açık" : "Fiyat alarmı",
+      alarmKenar: s.alarm ? "#0A5A2E" : kenar, alarmZemin: s.alarm ? "#D6F0DE" : kart, alarmRenk: s.alarm ? "#0A5A2E" : metin,
+      alarmDegis: () => { const v = !s.alarm; this.setState({alarm:v}); this.t(v ? "Fiyat düşünce haber vereceğiz" : "Alarm kapatıldı"); },
+      takip: s.takip, takipStr: String(s.takip), takipYazi: s.takip ? "✓ Takipte" : "Takip et",
+      takipKenar: s.takip ? "#0A5A2E" : kenar, takipZemin: s.takip ? "#D6F0DE" : kart, takipRenk: s.takip ? "#0A5A2E" : metin,
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acik ? 99 : 4, aciklamaStr: String(acik),
+      aciklamaBtn: acik ? "Daralt" : "Devamını oku",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acik}),
+      poi: D.poi || [], skorlar: (D.skorlar||[]).map(x => ({...x, gen: x.p + "%"})),
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#7A2E0E" : "#0A5A2E"})),
+      pesinat: s.pesinat, vade: s.vade, faizYazi: s.faiz.toFixed(2).replace(".", ","),
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      pdf: () => this.t("Finansal rapor PDF hazırlanıyor…"),
+      masraflar: D.masraflar || [],
+      belgeler: (D.belgeler||[]).map(b => ({...b,
+        durumYazi: b.tarih ? b.durum + " · " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#0A5A2E" : "#7A2E0E",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı. Takip numarası R-1042."),
+      benzer: D.benzer || [],
+      benzereGit: () => this.git("benzer"),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

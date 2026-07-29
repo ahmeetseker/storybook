@@ -4,6 +4,7 @@ import {
   GlassSkeleton,
 } from '@repo/ui'
 
+import { PageContainer } from '@/components/PageContainer'
 import { AccountActivityList } from './components/AccountActivityList'
 import { AccountAttentionQueue } from './components/AccountAttentionQueue'
 import { AccountListingsPreview } from './components/AccountListingsPreview'
@@ -212,8 +213,7 @@ export function AccountWorkspace({
     })
 
   return (
-    <main
-      id="main-content"
+    <PageContainer
       className={styles.page}
       aria-busy={resolvedMode === 'loading' || undefined}
     >
@@ -229,6 +229,6 @@ export function AccountWorkspace({
           newAccount={resolvedMode === 'new-account'}
         />
       )}
-    </main>
+    </PageContainer>
   )
 }

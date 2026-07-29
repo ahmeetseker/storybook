@@ -24,6 +24,7 @@ import { LocationStep } from './LocationStep'
 import { MediaStudioStep } from './MediaStudioStep'
 import { PropertyStep } from './PropertyStep'
 import { VerificationReviewStep } from './VerificationReviewStep'
+import { PageContainer } from '@/components/PageContainer'
 import styles from './ListingCreateWorkspace.module.css'
 
 export interface ListingCreateWorkspaceProps {
@@ -504,19 +505,19 @@ export function ListingCreateWorkspace({
 
   if (!draft.entryMode) {
     return (
-      <main id="main-content" className={styles.page}>
+      <PageContainer shellInsets={false} className={styles.page}>
         <ListingCreateHeader meta={draft.meta} />
         <ListingEntryChoice
           adapters={adapters}
           onManualStart={startManual}
           onApplyProposal={applyProposal}
         />
-      </main>
+      </PageContainer>
     )
   }
 
   return (
-    <main id="main-content" className={styles.page}>
+    <PageContainer shellInsets={false} className={styles.page}>
       <ListingCreateHeader meta={draft.meta} />
       <div className={styles.shell}>
         {draft.meta.published ? (
@@ -639,6 +640,6 @@ export function ListingCreateWorkspace({
           </>
         )}
       </div>
-    </main>
+    </PageContainer>
   )
 }

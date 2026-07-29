@@ -15,6 +15,7 @@ import {
 } from '@tanstack/react-query'
 
 import { withBase } from '@/config/base-path'
+import { PageContainer } from '@/components/PageContainer'
 import { ConversationRail } from './components/ConversationRail'
 import type { ComposerSubmission } from './components/MessageComposer'
 import {
@@ -789,13 +790,13 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
 
   if (!ready) {
     return (
-      <main
-        id="main-content"
+      <PageContainer
+        size="wide"
         className={styles.page}
         aria-busy={mode === 'loading' || undefined}
       >
         <AccessState mode={mode} />
-      </main>
+      </PageContainer>
     )
   }
 
@@ -833,7 +834,7 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
       : undefined
 
   return (
-    <main id="main-content" className={styles.page}>
+    <PageContainer size="wide" className={styles.page}>
       <div className={styles.frame}>
         <header className={styles.pageHeader}>
           <div>
@@ -1066,6 +1067,6 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
         onReportMessage={dataSource.capabilities?.reportMessage}
         onBlockParticipant={dataSource.capabilities?.blockParticipant}
       />
-    </main>
+    </PageContainer>
   )
 }

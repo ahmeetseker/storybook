@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#EBE6E0}
+a{color:#E05323;text-decoration:none} a:hover{color:#B63D14}
+input,select,textarea,button{font-family:'Manrope',sans-serif}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes sheetIn{from{transform:translate(-50%,44px)}to{transform:translate(-50%,0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ctaGlow{0%,100%{box-shadow:0 6px 18px rgba(224,83,35,.32)}50%{box-shadow:0 6px 26px rgba(224,83,35,.5)}}
+</style>
+</helmet>
+
+<div data-screen-label="16 E-commerce Conversion" style="max-width:430px;margin:0 auto;min-height:100vh;background:#FFFFFF;font-family:'Manrope',sans-serif;color:#1F1B18;box-shadow:0 0 40px rgba(0,0,0,.16);padding-bottom:92px;box-sizing:border-box">
+
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#1F1B18;color:#A69E96;padding:7px 16px;font:700 10px/1 'Manrope',sans-serif;letter-spacing:.12em;text-transform:uppercase">
+    <span style="color:#FFFFFF">16 · E-commerce Conversion</span><span>← Tüm akımlar</span>
+  </a>
+
+  <div style="background:#E05323;color:#FFFFFF;padding:7px 16px;display:flex;align-items:center;gap:8px;font:700 11px 'Manrope',sans-serif">
+    <span style="animation:pulse 1.4s infinite">🔥</span><span>Fiyat 18 Haz'da <b>₺450.000 düştü</b> — bu fırsat sınırlı</span>
+  </div>
+
+  <header style="background:#FFFFFF;border-bottom:1px solid #EDE8E2;padding:10px 16px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;font:800 17px/1 'Manrope',sans-serif">emlaktr<span style="color:#E05323">.com</span></div>
+    <button onClick="{{ favDegis }}" style="width:34px;height:34px;border:1px solid #E4DED7;border-radius:9px;background:#FFFFFF;font-size:14px;color:#E0234A;cursor:pointer">{{ favIkon }}</button>
+    <button onClick="{{ paylas }}" style="width:34px;height:34px;border:1px solid #E4DED7;border-radius:9px;background:#FFFFFF;font-size:13px;color:#57504A;cursor:pointer">↗</button>
+  </header>
+
+  <section data-screen-label="Medya" style="position:relative">
+    <div style="position:relative;height:250px;background:{{ fotoBg }}">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center">
+        <div style="font:700 9.5px 'Manrope',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(31,27,24,.5)">{{ fotoKat }}</div>
+        <div style="font:800 17px 'Manrope',sans-serif;color:rgba(31,27,24,.78)">{{ fotoAd }}</div>
+      </div>
+      <div style="position:absolute;left:10px;top:10px;display:flex;gap:5px;flex-wrap:wrap">
+        <span style="font:800 10px 'Manrope',sans-serif;color:#FFFFFF;background:#1B9A5B;border-radius:6px;padding:4px 8px">✓ Doğrulanmış</span>
+        <span style="font:800 10px 'Manrope',sans-serif;color:#FFFFFF;background:#E0234A;border-radius:6px;padding:4px 8px">−%5,1 indirim</span>
+      </div>
+      <button onClick="{{ geri }}" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;border-radius:17px;background:rgba(255,255,255,.94);box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:16px;cursor:pointer">‹</button>
+      <button onClick="{{ ileri }}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;border-radius:17px;background:rgba(255,255,255,.94);box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:16px;cursor:pointer">›</button>
+      <span style="position:absolute;right:10px;bottom:10px;background:rgba(31,27,24,.78);color:#FFFFFF;font:700 10.5px 'Manrope',sans-serif;border-radius:12px;padding:4px 9px">{{ fotoSay }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;background:#FFF3E9;padding:7px 16px;font:700 11px 'Manrope',sans-serif;color:#B63D14">
+      <span style="width:8px;height:8px;border-radius:50%;background:#E05323;animation:pulse 1.2s infinite"></span>
+      Şu anda <b>{{ izleyen }} kişi</b> bu ilanı görüntülüyor · son 24 saatte <b>142</b> görüntülenme
+    </div>
+  </section>
+
+  <section data-screen-label="Başlık + Fiyat" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <h1 style="margin:0;font:800 19px/1.3 'Manrope',sans-serif">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+    <div style="margin-top:4px;font:600 12px 'Manrope',sans-serif;color:#8A8178">Antalya · Döşemealtı · Yeniköy · İlan 2470931</div>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:8px">
+      <span style="color:#F5A623;font-size:14px;letter-spacing:1px">★★★★★</span>
+      <span style="font:700 12px 'Manrope',sans-serif">4,8</span>
+      <span style="font:600 11px 'Manrope',sans-serif;color:#8A8178">· danışman 212 değerlendirme · %97 yanıt</span>
+    </div>
+    <div style="margin-top:12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+      <div style="font:800 32px/1 'Manrope',sans-serif;color:#E05323">₺8.450.000</div>
+      <div style="font:600 13px 'Manrope',sans-serif;color:#A69E96;text-decoration:line-through">₺8.900.000</div>
+    </div>
+    <div style="margin-top:4px;font:700 12px 'Manrope',sans-serif;color:#1B9A5B">₺6.401/m² · ₺450.000 tasarruf · krediye uygun</div>
+    <div style="margin-top:10px;background:#FBF0E8;border:1px solid #F1D6C2;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:8px;font:700 11.5px 'Manrope',sans-serif;color:#B63D14">
+      <span>⏳</span><span>Bu fiyata benzer arsalar mahallede ort. <b>74 günde</b> satılıyor — 12 gündür listede</span>
+    </div>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FFF4DE;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Manrope',sans-serif;color:#9A6A00">◆ Rezerve edildi — sıraya girmek için danışmana ulaşın</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FDE7E7;border-radius:10px;padding:9px 12px;font:700 11.5px/1.5 'Manrope',sans-serif;color:#C0362F">■ Satıldı — <a href="#benzer" style="color:#C0362F;text-decoration:underline">benzer fırsatlar</a></div>
+    </sc-if>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onClick="{{ telGoster }}" style="flex:1.6;height:50px;border:0;border-radius:12px;background:#E05323;color:#FFFFFF;font:800 14px 'Manrope',sans-serif;cursor:pointer;animation:ctaGlow 2.2s infinite">{{ telYazi }}</button>
+      <button onClick="{{ whatsapp }}" style="flex:1;height:50px;border:0;border-radius:12px;background:#1FA855;color:#FFFFFF;font:800 13px 'Manrope',sans-serif;cursor:pointer">WhatsApp</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onClick="{{ mesajAc }}" style="flex:1;height:42px;border:1.5px solid #E05323;border-radius:10px;background:#FFFFFF;color:#E05323;font:700 12.5px 'Manrope',sans-serif;cursor:pointer">Mesaj gönder</button>
+      <button onClick="{{ randevu }}" style="flex:1;height:42px;border:1.5px solid #E4DED7;border-radius:10px;background:#FFFFFF;color:#57504A;font:700 12.5px 'Manrope',sans-serif;cursor:pointer">Randevu al</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;justify-content:center;font:600 11px 'Manrope',sans-serif;color:#8A8178">
+      <span>🔒 Güvenli iletişim</span><span>·</span><span>✓ EİDS doğrulamalı</span><span>·</span><span>Kapora yok</span>
+    </div>
+  </section>
+
+  <section data-screen-label="Sosyal kanıt" style="padding:12px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:#F4F1EC;border-radius:10px;padding:10px;text-align:center"><div style="font:800 17px 'Manrope',sans-serif;color:#E05323">{{ favSayi }}</div><div style="font:600 9.5px 'Manrope',sans-serif;color:#8A8178">favoriye ekledi</div></div>
+      <div style="flex:1;background:#F4F1EC;border-radius:10px;padding:10px;text-align:center"><div style="font:800 17px 'Manrope',sans-serif;color:#E05323">9</div><div style="font:600 9.5px 'Manrope',sans-serif;color:#8A8178">talep gönderildi</div></div>
+      <div style="flex:1;background:#F4F1EC;border-radius:10px;padding:10px;text-align:center"><div style="font:800 17px 'Manrope',sans-serif;color:#E05323">3</div><div style="font:600 9.5px 'Manrope',sans-serif;color:#8A8178">randevu planlandı</div></div>
+    </div>
+    <div style="margin-top:8px;background:#F0FAF4;border:1px solid #C6EAD5;border-radius:10px;padding:8px 12px;font:600 11px 'Manrope',sans-serif;color:#177A47;animation:slideDown .4s ease" key="{{ aktiviteKey }}">✓ {{ aktivite }}</div>
+  </section>
+
+  <nav data-screen-label="Sekmeler" style="position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);display:flex;gap:6px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid #EDE8E2">
+    <sc-for list="{{ sekmeler }}" as="t" hint-placeholder-count="8">
+      <button onClick="{{ t.git }}" style="flex:none;height:32px;padding:0 14px;border-radius:16px;border:0;background:{{ t.zemin }};color:{{ t.renk }};font:700 11.5px 'Manrope',sans-serif;cursor:pointer">{{ t.ad }}</button>
+    </sc-for>
+  </nav>
+
+  <section id="ozet" data-screen-label="Hızlı özellikler" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:10px">Bir bakışta</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <sc-for list="{{ hizli }}" as="h" hint-placeholder-count="10">
+        <div style="background:#F9F7F4;border-radius:10px;padding:10px 12px"><div style="font:600 10px 'Manrope',sans-serif;color:#8A8178">{{ h.k }}</div><div style="font:800 13px 'Manrope',sans-serif;margin-top:2px">{{ h.v }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="AI" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="background:linear-gradient(135deg,#FFF3E9,#FDECE5);border:1px solid #F1D6C2;border-radius:14px;padding:14px">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;border-radius:15px;background:#E05323;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:14px">✦</span><b style="font:800 14px 'Manrope',sans-serif">AI: Bu fırsat sana uygun mu?</b></div>
+      <ul style="margin:10px 0 0;padding-left:18px;font:500 12px/1.7 'Manrope',sans-serif;color:#4A423C">
+        <li><b>≈396 m² inşaat hakkı</b> (2 kat) — villa geliştirmeye uygun.</li>
+        <li>Fiyat medyanın <b>%7 altında</b>; bölge 90 günde +%12.</li>
+        <li>Altyapı parselde; doğalgaz 400 m.</li>
+      </ul>
+      <div style="display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.sor }}" style="flex:none;border:1px solid #E4C3B0;background:#FFFFFF;color:#B63D14;border-radius:15px;padding:7px 11px;font:700 10.5px 'Manrope',sans-serif;cursor:pointer">{{ c.q }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+          <div style="display:flex;justify-content:{{ m.hiza }}">
+            <div style="max-width:88%;border-radius:{{ m.radius }};padding:9px 12px;background:{{ m.zemin }};color:{{ m.renk }};font:500 12px/1.6 'Manrope',sans-serif">{{ m.metin }}
+              <sc-if value="{{ m.kaynak }}" hint-placeholder-val="{{ false }}"><div style="margin-top:5px;font:700 9px 'Manrope',sans-serif;color:#B63D14;background:#FBEADF;border-radius:5px;padding:2px 6px;display:inline-block">⌘ {{ m.kaynak }}</div></sc-if>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}"><div style="font:600 11px 'Manrope',sans-serif;color:#8A8178">✦ tarıyor…</div></sc-if>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Sorunuzu yazın…" style="flex:1;height:40px;border:1px solid #E4C3B0;border-radius:20px;padding:0 14px;font:500 12px 'Manrope',sans-serif;background:#FFFFFF;outline-color:#E05323">
+        <button onClick="{{ gonder }}" style="width:40px;height:40px;border:0;border-radius:20px;background:#1F1B18;color:#FFFFFF;font-size:15px;cursor:pointer">↑</button>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section id="ozellikler" data-screen-label="Detaylı özellikler" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:8px">Detaylı özellikler</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+        <div style="background:#F9F7F4;border-radius:10px;overflow:hidden">
+          <button onClick="{{ g.ac }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:12px 14px;cursor:pointer">
+            <span style="font:700 12.5px 'Manrope',sans-serif">{{ g.baslik }}</span><span style="font:800 15px 'Manrope',sans-serif;color:#E05323">{{ g.ikon }}</span>
+          </button>
+          <sc-if value="{{ g.acikMi }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 14px 10px">
+              <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #EDE8E2;font:500 11.5px 'Manrope',sans-serif"><span style="color:#8A8178">{{ s.k }}</span><b style="text-align:right">{{ s.v }}</b></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:12px 0 0;font:500 12px/1.7 'Manrope',sans-serif;color:#4A423C;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+    <button onClick="{{ aciklamaDegis }}" style="margin-top:6px;border:0;background:none;color:#E05323;font:700 11px 'Manrope',sans-serif;cursor:pointer;padding:0">{{ aciklamaBtn }}</button>
+  </section>
+
+  <section id="konum" data-screen-label="Konum" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:10px">Konum ve çevre</div>
+    <div style="position:relative;height:160px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(0deg,#EDE8E2 0 24px,#E4DED7 24px 25px),repeating-linear-gradient(90deg,#EDE8E2 0 24px,#E4DED7 24px 25px)">
+      <div style="position:absolute;left:56%;top:32%;width:112px;height:72px;border:2px dashed #E05323;background:rgba(224,83,35,.1);border-radius:5px;transform:rotate(-4deg)"></div>
+      <div style="position:absolute;left:63%;top:44%;width:13px;height:13px;border-radius:50%;background:#E05323;box-shadow:0 0 0 5px rgba(224,83,35,.2)"></div>
+      <span style="position:absolute;left:10px;bottom:10px;background:#FFFFFF;border-radius:8px;padding:4px 9px;font:700 10px 'Manrope',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.12)">Kesin konum · 37.0021, 30.5983</span>
+    </div>
+    <div style="margin-top:10px">
+      <sc-for list="{{ poi }}" as="p" hint-placeholder-count="6">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #EDE8E2;font:500 12px 'Manrope',sans-serif"><span>{{ p.ad }} <span style="font:500 9.5px 'Manrope',sans-serif;color:#A69E96">{{ p.tip }}</span></span><b style="color:#57504A;white-space:nowrap">{{ p.mesafe }}</b></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:12px">
+      <div style="flex:1">
+        <div style="font:700 9px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#A69E96;margin-bottom:6px">Skorlar</div>
+        <sc-for list="{{ skorlar }}" as="sk" hint-placeholder-count="4">
+          <div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font:600 10px 'Manrope',sans-serif;color:#4A423C"><span>{{ sk.k }}</span><b style="color:#E05323">{{ sk.v }}</b></div>
+          <div style="height:4px;border-radius:2px;background:#EDE8E2;margin-top:3px"><div style="height:4px;border-radius:2px;background:#E05323;width:{{ sk.gen }}"></div></div></div>
+        </sc-for>
+      </div>
+      <div style="flex:1">
+        <div style="font:700 9px 'Manrope',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#A69E96;margin-bottom:6px">Riskler</div>
+        <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;gap:6px;font:600 10.5px/1.5 'Manrope',sans-serif;padding:2px 0"><span style="color:#4A423C">{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="piyasa" data-screen-label="Piyasa" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:10px">Neden iyi fiyat?</div>
+    <div style="display:flex;justify-content:space-between;font:600 10.5px 'Manrope',sans-serif;color:#57504A"><span>Bu ilan: <b style="color:#1B9A5B">₺6.401/m²</b></span><span>Medyan: <b>₺6.900/m²</b></span></div>
+    <div style="position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#2FA96B,#E6B33E,#E0234A);margin-top:8px">
+      <div style="position:absolute;left:34%;top:-3px;width:4px;height:16px;border-radius:2px;background:#1F1B18;box-shadow:0 0 0 2px #FFFFFF"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font:600 9px 'Manrope',sans-serif;color:#A69E96;margin-top:4px"><span>₺5.200</span><span>medyan ₺6.900</span><span>₺9.100</span></div>
+    <div style="margin-top:10px;background:#F0FAF4;border-radius:10px;padding:10px 12px;font:700 11.5px/1.5 'Manrope',sans-serif;color:#177A47">✓ Mahalle medyanının %7 altında + son 90 günde bölge %12 değerlendi = yatırım için avantajlı giriş.</div>
+  </section>
+
+  <section id="finans" data-screen-label="Finans" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:8px">Ne kadara alırım?</div>
+    <div style="display:flex;justify-content:space-between;font:600 11px 'Manrope',sans-serif;color:#57504A"><span>Peşinat %{{ pesinat }} (₺{{ pesinatTL }})</span><span>{{ vade }} ay</span></div>
+    <input type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#E05323;margin-top:8px">
+    <input type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#E05323">
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <sc-for list="{{ faizler }}" as="f" hint-placeholder-count="3">
+        <button onClick="{{ f.sec }}" style="border:1px solid {{ f.kenar }};background:{{ f.zemin }};color:{{ f.renk }};border-radius:14px;padding:6px 11px;font:700 10.5px 'Manrope',sans-serif;cursor:pointer">%{{ f.v }}</button>
+      </sc-for>
+    </div>
+    <div style="margin-top:12px;background:#FFF3E9;border:1px solid #F1D6C2;border-radius:12px;padding:14px;text-align:center">
+      <div style="font:600 11px 'Manrope',sans-serif;color:#B63D14">Tahmini aylık taksit</div>
+      <div style="font:800 28px/1.1 'Manrope',sans-serif;color:#E05323">₺{{ taksitTL }}</div>
+      <div style="font:600 10px 'Manrope',sans-serif;color:#8A8178;margin-top:2px">kredi ₺{{ krediTL }} · toplam ₺{{ toplamTL }}</div>
+    </div>
+    <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FFF4DE;border-radius:10px;padding:9px 11px;font:600 10.5px/1.5 'Manrope',sans-serif;color:#9A6A00">Arsada tipik kredi limiti ekspertizin %50'si — peşinatı artırın.</div>
+    </sc-if>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <sc-for list="{{ senaryolar }}" as="s" hint-placeholder-count="3">
+        <div style="flex:1;background:#F9F7F4;border-radius:10px;padding:10px;text-align:center"><div style="font:600 9.5px 'Manrope',sans-serif;color:#8A8178">{{ s.ad }}</div><b style="font:800 13px 'Manrope',sans-serif">{{ s.deger }}</b></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="belgeler" data-screen-label="Belgeler" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:8px">Güvenle al: belgeler hazır</div>
+    <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #EDE8E2">
+        <div><b style="font:600 12px 'Manrope',sans-serif">{{ b.ikon }} {{ b.ad }}</b><div style="font:500 9.5px 'Manrope',sans-serif;color:{{ b.durumRenk }}">{{ b.durumYazi }}</div></div>
+        <button onClick="{{ b.tik }}" style="height:32px;border:1px solid #E4DED7;border-radius:16px;background:#FFFFFF;font:700 10px 'Manrope',sans-serif;color:#57504A;padding:0 12px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+      </div>
+    </sc-for>
+    <div style="margin-top:10px;background:#F0FAF4;border-radius:10px;padding:9px 12px;font:700 10.5px/1.6 'Manrope',sans-serif;color:#177A47">✓ EİDS kaydıyla eşleştirildi (28 Haz) · kimlikler maskelenir</div>
+  </section>
+
+  <section id="danisman" data-screen-label="Danışman" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin-bottom:10px">Yetkili danışman</div>
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:52px;height:52px;border-radius:26px;background:#E05323;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:800 17px 'Manrope',sans-serif">AD</div>
+      <div style="flex:1"><div style="font:800 14px 'Manrope',sans-serif">Ayşe Demir <span style="font:700 9px 'Manrope',sans-serif;color:#177A47;background:#DCF3E5;border-radius:5px;padding:2px 6px">✓</span></div><div style="font:500 11px 'Manrope',sans-serif;color:#8A8178">Akdeniz Gayrimenkul · ~28 dk yanıt · 4,8★</div></div>
+      <button onClick="{{ takipDegis }}" style="height:36px;border:0;border-radius:18px;background:{{ takipZemin }};color:{{ takipRenk }};font:700 11px 'Manrope',sans-serif;padding:0 14px;cursor:pointer">{{ takipYazi }}</button>
+    </div>
+    <button onClick="{{ tumIlanlar }}" style="margin-top:12px;width:100%;height:42px;border:1px solid #E4DED7;border-radius:10px;background:#FFFFFF;font:700 12px 'Manrope',sans-serif;color:#57504A;cursor:pointer">Tüm ilanları gör (46) ›</button>
+  </section>
+
+  <section id="guvenlik" data-screen-label="Güvenlik" style="padding:14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="background:#FDE7E7;border-radius:10px;padding:11px 13px;font:600 11.5px/1.6 'Manrope',sans-serif;color:#B02A24"><b>⚠ Kapora uyarısı:</b> görmeden kapora göndermeyin; ödemeleri platform dışına taşımayın.</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onClick="{{ bildir }}" style="flex:1;height:38px;border:1px solid #E4DED7;border-radius:10px;background:#FFFFFF;font:600 11px 'Manrope',sans-serif;color:#57504A;cursor:pointer">İlanı bildir</button>
+      <button onClick="{{ bildir }}" style="flex:1;height:38px;border:1px solid #E4DED7;border-radius:10px;background:#FFFFFF;font:600 11px 'Manrope',sans-serif;color:#57504A;cursor:pointer">Konum</button>
+      <button onClick="{{ bildir }}" style="flex:1;height:38px;border:1px solid #E4DED7;border-radius:10px;background:#FFFFFF;font:600 11px 'Manrope',sans-serif;color:#57504A;cursor:pointer">Fiyat</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px;font:700 12px 'Manrope',sans-serif"><span style="color:#57504A">İlan kalite skoru</span><span style="color:#177A47">92/100</span></div>
+  </section>
+
+  <section id="benzer" data-screen-label="Benzer" style="padding:14px 0 14px 16px;border-bottom:8px solid #F4F1EC">
+    <div style="font:800 13px 'Manrope',sans-serif;margin:0 16px 10px 0">Bunları da kaçırma</div>
+    <div style="display:flex;gap:10px;overflow-x:auto;padding-right:16px">
+      <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+        <div style="flex:none;width:196px;background:#FFFFFF;border:1px solid #EDE8E2;border-radius:12px;overflow:hidden">
+          <div style="height:90px;background:{{ b.bg }};position:relative">
+            <sc-if value="{{ b.rozet }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;left:8px;top:8px;background:#E0234A;color:#FFFFFF;font:800 8.5px 'Manrope',sans-serif;border-radius:6px;padding:3px 6px">{{ b.rozet }}</span></sc-if>
+          </div>
+          <div style="padding:10px 12px">
+            <div style="font:700 11.5px/1.4 'Manrope',sans-serif;height:32px;overflow:hidden">{{ b.ad }}</div>
+            <b style="font:800 14px 'Manrope',sans-serif;color:#E05323">{{ b.fiyat }}</b>
+            <div style="font:500 9.5px 'Manrope',sans-serif;color:#8A8178;margin-top:2px">{{ b.m2 }} · {{ b.m2f }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="SEO" style="padding:14px 16px">
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ aramalar }}" as="a" hint-placeholder-count="5">
+        <a href="#" style="border:1px solid #E4DED7;border-radius:14px;padding:6px 11px;font:600 10.5px 'Manrope',sans-serif;color:#57504A;background:#F9F7F4">{{ a.ad }}</a>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer" style="background:#1F1B18;color:#A69E96;padding:20px 16px">
+    <div style="font:800 15px 'Manrope',sans-serif;color:#FFFFFF">emlaktr<span style="color:#FF7A4D">.com</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font:500 11px/2 'Manrope',sans-serif">
+      <div><b style="font:700 9.5px 'Manrope',sans-serif;letter-spacing:.1em;color:#FFFFFF">KURUMSAL</b><a href="#" style="display:block;color:#A69E96">Hakkımızda</a><a href="#" style="display:block;color:#A69E96">İletişim</a></div>
+      <div><b style="font:700 9.5px 'Manrope',sans-serif;letter-spacing:.1em;color:#FFFFFF">GÜVEN</b><a href="#" style="display:block;color:#A69E96">Güvenli alışveriş</a><a href="#" style="display:block;color:#A69E96">KVKK · Çerezler</a></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;border-top:1px solid #35302B;padding-top:10px;font:600 10px 'Manrope',sans-serif"><span>TR · ₺ TRY</span><span>© 2026 emlaktr.com</span></div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#FFFFFF;border-top:1px solid #EDE8E2;box-shadow:0 -6px 20px rgba(0,0,0,.1);padding:8px 16px calc(8px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font:800 15px 'Manrope',sans-serif;color:#E05323">₺8.450.000 <span style="font:600 10px 'Manrope',sans-serif;color:#8A8178;text-decoration:line-through">₺8.900.000</span></span><span style="font:700 10px 'Manrope',sans-serif;color:#B63D14"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E05323;animation:pulse 1.2s infinite;margin-right:4px"></span>{{ izleyen }} kişi izliyor</span></div>
+    <div style="display:flex;gap:8px">
+      <button onClick="{{ telGoster }}" style="flex:1.6;height:46px;border:0;border-radius:11px;background:#E05323;color:#FFFFFF;font:800 13.5px 'Manrope',sans-serif;cursor:pointer">{{ telYazi }}</button>
+      <button onClick="{{ whatsapp }}" style="flex:1;height:46px;border:0;border-radius:11px;background:#1FA855;color:#FFFFFF;font:800 13px 'Manrope',sans-serif;cursor:pointer">WhatsApp</button>
+      <button onClick="{{ favDegis }}" style="width:48px;height:46px;border:1px solid #E4DED7;border-radius:11px;background:#FFFFFF;font-size:17px;color:#E0234A;cursor:pointer">{{ favIkon }}</button>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#1F1B18;display:flex;gap:10px;align-items:center;padding:12px 16px;box-sizing:border-box">
+    <span style="flex:1;font:700 12px 'Manrope',sans-serif;color:#FFFFFF">Bu ilan satıldı.</span>
+    <button onClick="{{ benzereGit }}" style="height:40px;padding:0 16px;border:0;border-radius:11px;background:#E05323;color:#FFFFFF;font:800 12px 'Manrope',sans-serif;cursor:pointer">Benzer fırsatlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(31,27,24,.55);z-index:80"></div>
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:#FFFFFF;border-radius:18px 18px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.3);animation:sheetIn .22s ease;box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px">
+      <div><b style="font:800 15px 'Manrope',sans-serif">{{ leadBaslik }}</b><div style="font:600 10px 'Manrope',sans-serif;color:#8A8178;margin-top:2px">Ortalama yanıt 28 dk · ücretsiz</div></div>
+      <button onClick="{{ leadKapat }}" style="width:32px;height:32px;border:1px solid #EDE8E2;border-radius:16px;background:#FFFFFF;cursor:pointer;color:#8A8178">✕</button>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px;text-align:center">
+        <div style="width:56px;height:56px;border-radius:28px;background:#DCF3E5;color:#177A47;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto">✓</div>
+        <b style="display:block;font:800 16px 'Manrope',sans-serif;margin-top:10px">Talebiniz gönderildi!</b>
+        <div style="font:500 12px/1.6 'Manrope',sans-serif;color:#8A8178;margin-top:4px">CRM #L-88412 · danışman 28 dk içinde dönecek</div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button onClick="{{ leadKapatBenzer }}" style="flex:1;height:44px;border:1px solid #E4DED7;border-radius:11px;background:#FFFFFF;font:700 11.5px 'Manrope',sans-serif;color:#57504A;cursor:pointer">Benzer fırsatlar</button>
+          <button onClick="{{ leadKapatBelge }}" style="flex:1;height:44px;border:1px solid #E4DED7;border-radius:11px;background:#FFFFFF;font:700 11.5px 'Manrope',sans-serif;color:#57504A;cursor:pointer">Belgeler</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ leadFormGoster }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:4px 16px 22px">
+        <input value="{{ fAd }}" onChange="{{ fAdDegis }}" placeholder="Ad Soyad *" aria-label="Ad Soyad" style="width:100%;height:48px;border:1px solid #E4DED7;border-radius:11px;padding:0 14px;font:500 14px 'Manrope',sans-serif;box-sizing:border-box;background:#F9F7F4;outline-color:#E05323">
+        <input value="{{ fTel }}" onChange="{{ fTelDegis }}" placeholder="Telefon *" aria-label="Telefon" style="margin-top:8px;width:100%;height:48px;border:1px solid #E4DED7;border-radius:11px;padding:0 14px;font:500 14px 'Manrope',sans-serif;box-sizing:border-box;background:#F9F7F4;outline-color:#E05323">
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" style="margin-top:2px;accent-color:#E05323">
+          <span style="font:500 10.5px/1.6 'Manrope',sans-serif;color:#8A8178"><a href="#" style="text-decoration:underline">KVKK aydınlatma metnini</a> okudum; danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <button onClick="{{ leadGonder }}" style="margin-top:14px;width:100%;height:52px;border:0;border-radius:13px;background:#E05323;color:#FFFFFF;font:800 15px 'Manrope',sans-serif;cursor:pointer">Talebi gönder →</button>
+        <div style="margin-top:8px;font:600 9.5px 'Manrope',sans-serif;color:#A69E96;text-align:center">🔒 Numaranız maskelenir · spam koruması aktif</div>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:90;background:#1F1B18;color:#FFFFFF;border-radius:11px;padding:11px 17px;font:700 11.5px 'Manrope',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:toastIn .2s ease;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, sekme:"ozet", acik:{0:true}, fav:false, favSayi:38, takip:false,
+    tel:false, mesajlar:[], dusunuyor:false, yazi:"", izleyen:7, aktiviteIdx:0,
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, kvkk:false, fAd:"", fTel:"", toast:""
+  };
+  componentDidMount(){
+    import("./arsa-data.js").then(m => this.setState({D: m.D}));
+    this._iz = setInterval(() => { const d = Math.random() < .5 ? -1 : 1; this.setState(st => ({izleyen: Math.max(5, Math.min(14, st.izleyen + d))})); }, 3200);
+    this._ak = setInterval(() => this.setState(st => ({aktiviteIdx: (st.aktiviteIdx + 1) % 4})), 4200);
+  }
+  componentWillUnmount(){ clearInterval(this._iz); clearInterval(this._ak); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2400); }
+  git(id){ const el = document.getElementById(id); if(el){ window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 56, behavior:"smooth"}); this.setState({sekme:id}); } }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){ const t = q.toLowerCase(); c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback; }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak}], dusunuyor:false});
+    }, 900);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const ids = [["Özet","ozet"],["Özellik","ozellikler"],["Konum","konum"],["Piyasa","piyasa"],["Finans","finans"],["Belge","belgeler"],["Danışman","danisman"],["Benzer","benzer"]];
+    const acik = s.aciklamaAcik;
+    const aktiviteler = ["Mehmet A. az önce talep gönderdi","Zeynep K. bu ilanı favoriledi","Ahmet Y. randevu planladı","Elif D. WhatsApp'tan yazdı"];
+    return {
+      D, satilmadi: durum !== "satildi", satildi: durum === "satildi", rezerve: durum === "rezerve",
+      aiAcik: this.props.aiPaneli ?? true,
+      izleyen: s.izleyen, favSayi: s.favSayi,
+      aktivite: aktiviteler[s.aktiviteIdx], aktiviteKey: "ak" + s.aktiviteIdx,
+      fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#D6CFC0",
+      fotoSay: (s.foto+1) + " / " + ((D.medya||[]).length || 5),
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      sekmeler: ids.map(([ad,id]) => ({ad, git: () => this.git(id),
+        zemin: s.sekme === id ? "#E05323" : "#F4F1EC", renk: s.sekme === id ? "#FFFFFF" : "#57504A"})),
+      hizli: D.hizli || [],
+      gruplar: (D.gruplar||[]).map((g,i) => ({...g, ac: () => this.setState({acik:{...s.acik, [i]: !s.acik[i]}}), acikMi: !!s.acik[i], ikon: s.acik[i] ? "−" : "+"})),
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map(m => m.rol === "k"
+        ? {...m, hiza:"flex-end", zemin:"#E05323", renk:"#FFFFFF", radius:"14px 14px 4px 14px"}
+        : {...m, hiza:"flex-start", zemin:"#FFFFFF", renk:"#1F1B18", radius:"14px 14px 14px 4px"}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()) this.sor(s.yazi.trim()); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favIkon: s.fav ? "♥" : "♡",
+      favDegis: () => { const v = !s.fav; this.setState({fav:v, favSayi: s.favSayi + (v?1:-1)}); this.t(v ? "Favorilere eklendi ♥" : "Favorilerden çıkarıldı"); },
+      paylas: () => this.t("İlan linki kopyalandı"),
+      whatsapp: () => this.t("WhatsApp konuşması hazırlanıyor…"),
+      telYazi: s.tel ? "0532 481 07 00" : "Hemen ara — numarayı gör",
+      telGoster: () => { if(!s.tel){ this.setState({tel:true}); this.t("Numara gösterildi · aramalar kayıtlıdır"); } },
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false}),
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk, leadFormGoster: !s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Ücretsiz gösterim randevusu" : "Danışmana ulaş",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false}); this.git("benzer"); },
+      leadKapatBelge: () => { this.setState({leadAcik:false}); this.git("belgeler"); },
+      fAd: s.fAd, fTel: s.fTel, kvkk: s.kvkk,
+      fAdDegis: e => this.setState({fAd: e.target.value}), fTelDegis: e => this.setState({fTel: e.target.value}),
+      kvkkDegis: e => this.setState({kvkk: e.target.checked}),
+      leadGonder: () => { if(!s.fAd.trim() || !s.fTel.trim()) return this.t("Ad ve telefon zorunlu"); if(!s.kvkk) return this.t("KVKK iznini onaylayın"); this.setState({leadOk:true}); },
+      takip: s.takip, takipYazi: s.takip ? "✓ Takipte" : "Takip et", takipZemin: s.takip ? "#DCF3E5" : "#F4F1EC", takipRenk: s.takip ? "#177A47" : "#57504A",
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acik ? 99 : 3,
+      aciklamaBtn: acik ? "Daralt ↑" : "Devamını oku ↓",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acik}),
+      poi: D.poi || [], skorlar: (D.skorlar||[]).map(x => ({...x, gen: x.p + "%"})),
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#9A6A00" : "#177A47"})),
+      pesinat: s.pesinat, vade: s.vade,
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      faizler: [2.59, 2.79, 3.09].map(x => ({v: x.toFixed(2).replace(".", ","), sec: () => this.setState({faiz:x}),
+        kenar: s.faiz === x ? "#E05323" : "#E4DED7", zemin: s.faiz === x ? "#FBEADF" : "#FFFFFF", renk: s.faiz === x ? "#B63D14" : "#8A8178"})),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      masraflar: D.masraflar || [], senaryolar: D.senaryolar || [],
+      belgeler: (D.belgeler||[]).map(b => ({...b, ikon: b.kilit ? "🔒" : "▤",
+        durumYazi: b.tarih ? b.durum + " · " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#177A47" : "#9A6A00",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi ✓") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı · #R-1042"),
+      benzer: D.benzer || [],
+      aramalar: ((D.seo||{}).aramalar||[]).map(a => ({ad:a})),
+      benzereGit: () => this.git("benzer"),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

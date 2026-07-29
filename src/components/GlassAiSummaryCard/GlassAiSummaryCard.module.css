@@ -53,6 +53,9 @@
 }
 
 .summary {
+  /* Özet gövde metnidir: kart ne kadar genişlerse genişlesin satır 72ch'te
+     durur (AAA 1.4.8). Kartın kendi genişliği kısıtlanmaz. */
+  max-inline-size: var(--lg-measure);
   margin: 0;
   font-size: var(--lg-text-body);
   line-height: 1.55;

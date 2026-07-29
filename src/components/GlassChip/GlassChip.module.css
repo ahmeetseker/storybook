@@ -1,8 +1,7 @@
 .chip {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
-     sm chip yüksekliği kontrol ölçeğinin altında; yatay padding'ler
-     space token'larının arasında (10/14px). */
-  --chip-h-sm: 26px;
+     yatay padding'ler space token'larının arasında (10/14px). Yükseklikler
+     artık kontrol ölçeğinden gelir (bkz. .sm/.md). */
   --chip-pad-x-sm: 10px;
   --chip-pad-x-md: 14px;
   display: inline-flex;
@@ -20,18 +19,14 @@
   outline-offset: 2px;
 }
 
-/* Chip ölçüleri buton kontrol ölçeğinden bir kademe küçük: sm yerel değişken
-   (26px — --lg-control-sm bile sm chip için yüksek kalır, bkz. rules.md);
-   md tam olarak --lg-control-sm (32px, coarse'ta 36'ya büyür — istenen davranış). */
-.sm { min-height: var(--chip-h-sm); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
-.md { min-height: var(--lg-control-sm); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
-
-/* Dokunmatikte minimum 36px dokunma hedefi: coarse'ta --lg-control-sm = 36px
-   (birebir; 44px'lik buton ölçeği chip'e ağır) */
-@media (pointer: coarse) {
-  .sm,
-  .md { min-height: var(--lg-control-sm); }
-}
+/* Chip yüksekliği kontrol ölçeğidir: chip seçilebilir olduğunda gerçek bir
+   dokunma hedefidir ve WCAG 2.2 AAA 2.5.5 giriş yönteminden bağımsız olarak
+   44px ister. Görünmez bir ::after ile hedefi büyütmek denendi ve çalışmadı —
+   GlassSurface kendi köşe kırpması için `overflow: hidden` taşır, pseudo-eleman
+   kutunun dışına taşamıyor. Bu yüzden ölçü gerçekten büyütülür; yatay dolgu
+   (chip'in dar görünmesini sağlayan asıl oran) korunur. */
+.sm { min-height: var(--lg-control-sm); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
+.md { min-height: var(--lg-control-md); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
 
 /* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 30%, transparent); }

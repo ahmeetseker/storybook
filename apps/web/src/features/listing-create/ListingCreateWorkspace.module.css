@@ -1,17 +1,12 @@
+/* Odaklı akış: kabuğun header'ı ve dock'u bu rotada gizlidir, bu yüzden
+   PageContainer `shellInsets={false}` ile kullanılır ve dikey payı sayfa
+   kendisi verir. Yatay ölçü ile dış sorgu kabı yine container'ındır;
+   `.shell` kendi iç kabı olmayı sürdürür. */
 .page {
   min-height: 100dvh;
-  padding: clamp(var(--lg-space-3), 3vw, var(--lg-space-5));
-  padding-bottom: calc(var(--lg-space-7) * 3);
+  padding-block: var(--lg-space-5) calc(var(--lg-space-10) + var(--lg-space-7));
   color: var(--lg-label);
   background: var(--lg-bg);
-  container-type: inline-size;
-}
-
-.topbar,
-.shell,
-.entry {
-  width: min(100%, 90rem);
-  margin-inline: auto;
 }
 
 .topbar {
@@ -137,8 +132,7 @@
 }
 
 .exitNotice {
-  width: min(100%, 90rem);
-  margin: var(--lg-space-3) auto 0;
+  margin: var(--lg-space-3) 0 0;
   padding: var(--lg-space-3) var(--lg-space-4);
   color: var(--lg-label);
   border-inline-start: calc(var(--lg-stroke-hairline) * 3) solid var(--lg-success);
@@ -185,7 +179,8 @@
 
 .entryIntro > p:last-child,
 .publishedState > p {
-  max-width: 42rem;
+  /* Gövde metni okuma ölçüsünde durur (AAA 1.4.8); 42rem 92 karakter veriyordu. */
+  max-width: var(--lg-measure);
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-headline);
@@ -238,7 +233,7 @@
 
 .entryChoicePrimary > p:not(.choiceEyebrow),
 .entryChoiceSecondary > p {
-  max-width: 36rem;
+  max-width: var(--lg-measure);
   margin: 0 0 var(--lg-space-6);
   color: var(--lg-label-secondary);
 }

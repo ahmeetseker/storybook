@@ -1,0 +1,82 @@
+/* Yapışkan karar dock'u — cam bütçesinin üçüncü (ve son) yüzeyi.
+   Sahne kapsülü + sahne plakası + bu dock = 3; geniş yerleşimde dock
+   düştüğü için sayı 2'ye iner (rules.md §1). */
+.dock {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: 4;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+  align-items: center;
+  margin-block-start: var(--lg-space-6);
+  /* Sayfa dolgusundan taşar: dock kabın kenarına dayanır. */
+  margin-inline: calc(-1 * var(--lg-container-gutter));
+  padding: var(--lg-space-3) var(--lg-container-gutter)
+    calc(var(--lg-space-4) + env(safe-area-inset-bottom, 0px));
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-glass-line);
+  background: var(--lg-glass);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+}
+
+.anchor {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.unit {
+  color: var(--lg-label-secondary);
+  font-weight: 400;
+}
+
+.action {
+  flex: 0 1 auto;
+  min-block-size: var(--lg-control-md);
+  padding-inline: var(--lg-space-5);
+  border: 0;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.action:disabled {
+  background: color-mix(in srgb, var(--lg-label) 12%, transparent);
+  color: var(--lg-label-secondary);
+  cursor: not-allowed;
+}
+
+.action:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.reason {
+  flex: 1 0 100%;
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Geniş yerleşimde karar kolonu devralır; iki birincil eylem yan yana durmaz. */
+@container page (min-width: 1100px) {
+  .dock {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .dock {
+    background: var(--lg-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

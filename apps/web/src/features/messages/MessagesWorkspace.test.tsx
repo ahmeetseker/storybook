@@ -1345,10 +1345,6 @@ describe('MessagesWorkspace', () => {
       'utf8',
     )
     const css = `${workspaceCss}\n${panelsCss}`
-    const compact = workspaceCss.slice(
-      workspaceCss.indexOf('@container'),
-      workspaceCss.indexOf('@media (hover: hover)'),
-    )
     const coarse = panelsCss.slice(
       panelsCss.indexOf('@media (pointer: coarse)'),
       panelsCss.indexOf('@media (prefers-reduced-motion: reduce)'),
@@ -1360,11 +1356,21 @@ describe('MessagesWorkspace', () => {
 
     expect(css).not.toMatch(/\b\d+px\b|#[\da-f]{3,8}\b|rgba?\(|hsla?\(/i)
     expect(css).not.toMatch(/\bgradient\s*\(|!important|box-shadow\s*:/i)
-    expect(workspaceCss).toMatch(
-      /padding-block-end:\s*calc\(var\(--lg-shell-dock-offset,\s*var\(--lg-control-xl\)\)\s*\+\s*var\(--lg-space-7\)\s*\+\s*env\(safe-area-inset-bottom,\s*0rem\)\)/,
-    )
-    expect(compact).toMatch(
-      /padding-block-end:\s*calc\(var\(--lg-shell-dock-offset,\s*var\(--lg-control-xl\)\)\s*\+\s*var\(--lg-space-5\)\s*\+\s*env\(safe-area-inset-bottom,\s*0rem\)\)/,
+    // Dock payı ve sayfa genişliği artık PageContainer'ın sözleşmesidir;
+    // çalışma alanı bunları tekrarlamaz.
+    expect(workspaceCss).not.toMatch(/--lg-shell-dock-offset/)
+    expect(workspaceCss).not.toMatch(/inline-size:\s*min\(100%/)
+    expect(workspaceCss).not.toMatch(/container-type/)
+    expect(
+      readFileSync(
+        resolve(
+          process.cwd(),
+          'apps/web/src/components/PageContainer.module.css',
+        ),
+        'utf8',
+      ),
+    ).toMatch(
+      /padding-block-end:\s*calc\([^;]*--lg-shell-dock-offset[^;]*env\(safe-area-inset-bottom[^;]*\)/,
     )
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
     expect(css).toContain('@media (prefers-reduced-transparency: reduce)')

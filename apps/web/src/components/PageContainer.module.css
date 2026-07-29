@@ -1,0 +1,48 @@
+/* Sayfa container'ı — sitenin tek yatay ölçü kaynağı.
+
+   Buradan önce her sayfa kendi genişliğini ve kenar boşluğunu tanımlıyordu:
+   88rem/92rem/sınırsız üç ayrı genişlik, 16px/32px iki ayrı sabit dolgu.
+   Sonuç, rotalar arasında gezerken içeriğin yatay eksende kaymasıydı.
+   Ölçü artık tek yerde durur; sayfa yalnız kademesini seçer.
+
+   Sorgu kabı da burasıdır (`container-name: page`). Sayfaların kendi
+   `@container` kuralları isimsiz yazıldığı sürece en yakın kap olarak bunu
+   bulur; ada gerek duyan kurallar `@container page (...)` yazar. */
+.container {
+  /* Kabuk payının üstüne binen nefes. Kendi sorgu kabını sorgulayamayacağı
+     için (bir öğe kendi `@container`'ına yanıt veremez) eşik yerine akışkan
+     bir clamp kullanılır: dar ekranda 20px, geniş ekranda 32px. */
+  --page-breath: clamp(var(--lg-space-5), 3vw, var(--lg-space-7));
+
+  container: page / inline-size;
+  inline-size: min(100%, var(--lg-container-base));
+  margin-inline: auto;
+  padding-inline: var(--lg-container-gutter);
+  color: var(--lg-label);
+}
+
+.narrow {
+  inline-size: min(100%, var(--lg-container-narrow));
+}
+
+.wide {
+  inline-size: min(100%, var(--lg-container-wide));
+}
+
+/* Yüzen kabuk katmanlarının payı.
+
+   GlassIslandHeader ve GlassDock viewport'a sabitlenmiştir ve sayfanın
+   ızgarasını tanımaz; ilk ve son ekran içeriği onların altında kalırdı.
+   Pay, kabuğun kendi token'larından okunur (`--lg-shell-*-offset`), böylece
+   header veya dock ölçüsü değişince sayfa kendiliğinden hizada kalır.
+   Fallback'ler kabuk dışında (Storybook, izole test) sıfır pay verir. */
+.shellInsets {
+  padding-block-start: calc(
+    var(--lg-shell-header-offset, 0px) + var(--page-breath) +
+      env(safe-area-inset-top, 0px)
+  );
+  padding-block-end: calc(
+    var(--lg-shell-dock-offset, 0px) + var(--page-breath) +
+      env(safe-area-inset-bottom, 0px)
+  );
+}

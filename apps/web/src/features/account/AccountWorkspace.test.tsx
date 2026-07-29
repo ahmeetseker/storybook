@@ -252,7 +252,7 @@ describe('AccountWorkspace', () => {
     ).toBe(true)
   })
 
-  it('owns responsive outer padding on the frame and reserves dock safe area', () => {
+  it('dış dolgu ile dock payını PageContainer`a bırakır, kendisi tekrarlamaz', () => {
     const css = readFileSync(
       resolve(
         process.cwd(),
@@ -260,18 +260,24 @@ describe('AccountWorkspace', () => {
       ),
       'utf8',
     )
-    const compactRule = css.slice(
-      css.indexOf('@container (inline-size <= 40rem)'),
-      css.indexOf('@media (hover: hover)'),
-    )
 
-    expect(css).toMatch(
-      /\.frame\s*\{[^}]*padding:\s*var\(--lg-space-7\)[^}]*padding-block-end:\s*calc\([^;]*env\(safe-area-inset-bottom,\s*0rem\)[^;]*\)/,
+    // Sayfanın yatay ölçüsü ve kabuk payı tek kaynaktan gelir; burada
+    // tekrarlanırsa rotalar arasında yatay kayma geri döner.
+    expect(css).not.toMatch(/inline-size:\s*min\(100%/)
+    expect(css).not.toMatch(/margin-inline:\s*auto/)
+    expect(css).not.toMatch(/--lg-shell-dock-offset/)
+    expect(css).not.toMatch(/container-type/)
+
+    const containerCss = readFileSync(
+      resolve(
+        process.cwd(),
+        'apps/web/src/components/PageContainer.module.css',
+      ),
+      'utf8',
     )
-    expect(compactRule).toMatch(
-      /\.frame\s*\{[^}]*padding:\s*var\(--lg-space-4\)[^}]*padding-block-end:\s*calc\([^;]*env\(safe-area-inset-bottom,\s*0rem\)[^;]*\)/,
+    expect(containerCss).toMatch(
+      /padding-block-end:\s*calc\([^;]*--lg-shell-dock-offset[^;]*env\(safe-area-inset-bottom[^;]*\)/,
     )
-    expect(compactRule).not.toMatch(/\.page\s*\{[^}]*padding/)
   })
 
   it('keeps the account glass surface opaque when transparency is reduced', () => {

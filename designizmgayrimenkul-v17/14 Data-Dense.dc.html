@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#C8CDD6}
+a{color:#1157C4;text-decoration:none} a:hover{color:#0C3E8F}
+input,select,textarea,button{font-family:'Inter',sans-serif}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes sheetIn{from{transform:translate(-50%,40px)}to{transform:translate(-50%,0)}}
+.dd-row:hover{background:#EEF2F7}
+</style>
+</helmet>
+
+<sc-if value="{{ kompakt }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:70;background:#0E1420;border-bottom:1px solid #2A3446;display:flex;align-items:center;gap:8px;padding:7px 12px;box-sizing:border-box">
+    <div style="flex:1;min-width:0"><div style="font:600 11px/1.2 'Inter',sans-serif;color:#C9D2E0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">#2470931 · Yeniköy köşe parsel</div><div class="mono" style="font:600 13px/1.2 'IBM Plex Mono',monospace;color:#3FCF8E">₺8.450.000 <span style="color:#E8B84B">−5.1%</span></div></div>
+    <button onClick="{{ telGoster }}" style="height:30px;padding:0 12px;border:0;border-radius:5px;background:#1157C4;color:#FFFFFF;font:600 11px 'Inter',sans-serif;cursor:pointer">Ara</button>
+  </div>
+</sc-if>
+
+<div data-screen-label="14 Data-Dense" style="max-width:430px;margin:0 auto;min-height:100vh;background:#F0F2F5;font-family:'Inter',sans-serif;color:#14181F;box-shadow:0 0 40px rgba(0,0,0,.2);padding-bottom:84px;box-sizing:border-box">
+
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#0E1420;color:#6E7A8F;padding:6px 12px;font:600 9.5px/1 'Inter',sans-serif;letter-spacing:.1em;text-transform:uppercase">
+    <span style="color:#FFFFFF">14 · Data-dense UI</span><span>← Tüm akımlar</span>
+  </a>
+
+  <header style="background:#0E1420;padding:8px 12px;display:flex;align-items:center;gap:8px">
+    <div style="flex:1;font:700 15px/1 'Inter',sans-serif;color:#FFFFFF;letter-spacing:-.01em">emlaktr<span style="color:#4B8BF5">.com</span></div>
+    <div style="display:flex;align-items:center;gap:6px;background:#1A2333;border:1px solid #2A3446;border-radius:5px;padding:5px 9px">
+      <span style="font-size:11px;color:#6E7A8F">⌕</span><span style="font:400 11px 'Inter',sans-serif;color:#6E7A8F">AI arama…</span>
+    </div>
+    <button onClick="{{ favDegis }}" style="width:30px;height:30px;border:1px solid #2A3446;border-radius:5px;background:#1A2333;font-size:13px;color:#E5555E;cursor:pointer">{{ favIkon }}</button>
+  </header>
+
+  <div style="background:#111826;display:flex;overflow-x:auto;border-bottom:1px solid #2A3446">
+    <sc-for list="{{ ribbon }}" as="r" hint-placeholder-count="6">
+      <div style="flex:none;min-width:78px;padding:7px 12px;border-right:1px solid #222C3D">
+        <div style="font:600 8px 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6E7A8F">{{ r.k }}</div>
+        <div class="mono" style="font:600 13px 'IBM Plex Mono',monospace;color:{{ r.renk }};margin-top:2px">{{ r.v }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <nav style="background:#E4E8EE;padding:5px 12px;font:500 10px/1.4 'Inter',sans-serif;color:#5A6373;white-space:nowrap;overflow-x:auto;border-bottom:1px solid #D2D8E0">
+    Arsa / Antalya / Döşemealtı / <b style="color:#14181F">Yeniköy</b> · İlan #2470931 · Yayın 12.06 · Günc. 03.07 · <span style="color:#1A8A54;font-weight:600">AKTİF</span>
+  </nav>
+
+  <section data-screen-label="Başlık" style="background:#FFFFFF;padding:10px 12px;border-bottom:1px solid #D2D8E0">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <h1 style="margin:0;font:700 15px/1.35 'Inter',sans-serif;flex:1">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+      <div class="mono" style="font:600 18px/1.1 'IBM Plex Mono',monospace;text-align:right;white-space:nowrap">₺8.450.000<div style="font:500 10px 'IBM Plex Mono',monospace;color:#1A8A54;margin-top:2px">−5.1% · ₺6.401/m²</div></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+      <span style="font:600 9.5px 'Inter',sans-serif;color:#0A5A2E;background:#DCF3E5;border:1px solid #9FD8B8;border-radius:3px;padding:2px 6px">✓ Doğrulanmış</span>
+      <span style="font:600 9.5px 'Inter',sans-serif;color:#1157C4;background:#DEEAFB;border:1px solid #9CBEF0;border-radius:3px;padding:2px 6px">Yetkili portföy</span>
+      <span style="font:600 9.5px 'Inter',sans-serif;color:#9A5B00;background:#FBEFD6;border:1px solid #E4C588;border-radius:3px;padding:2px 6px">↓ Fiyat düştü</span>
+      <span style="font:600 9.5px 'Inter',sans-serif;color:#5A3FB8;background:#EAE4FA;border:1px solid #BFAEF0;border-radius:3px;padding:2px 6px">✦ AI</span>
+      <span style="font:600 9.5px 'Inter',sans-serif;color:#5A6373;background:#EDF0F4;border:1px solid #D2D8E0;border-radius:3px;padding:2px 6px">Ekspertiz</span>
+    </div>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;background:#FBEFD6;border:1px solid #E4C588;border-radius:4px;padding:6px 9px;font:600 11px 'Inter',sans-serif;color:#8A5200">◆ REZERVE — benzer portföyler önerilebilir</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:8px;background:#FBE0E1;border:1px solid #E9A6AB;border-radius:4px;padding:6px 9px;font:600 11px 'Inter',sans-serif;color:#A11B24">■ SATILDI — <a href="#benzer" style="color:#A11B24;text-decoration:underline">benzer ilanlar</a></div>
+    </sc-if>
+  </section>
+
+  <section data-screen-label="Medya + fiyat" style="display:grid;grid-template-columns:1.3fr 1fr;gap:1px;background:#D2D8E0;border-bottom:1px solid #D2D8E0">
+    <div style="position:relative;height:170px;background:{{ fotoBg }}">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center">
+        <div style="font:600 8px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(20,24,31,.55)">{{ fotoKat }}</div>
+        <div style="font:600 12px 'Inter',sans-serif;color:rgba(20,24,31,.8)">{{ fotoAd }}</div>
+      </div>
+      <button onClick="{{ geri }}" style="position:absolute;left:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:0;border-radius:4px;background:rgba(255,255,255,.92);font-size:13px;cursor:pointer">‹</button>
+      <button onClick="{{ ileri }}" style="position:absolute;right:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:0;border-radius:4px;background:rgba(255,255,255,.92);font-size:13px;cursor:pointer">›</button>
+      <span class="mono" style="position:absolute;right:5px;bottom:5px;background:rgba(14,20,32,.8);color:#FFFFFF;font:500 9px 'IBM Plex Mono',monospace;border-radius:3px;padding:2px 5px">{{ fotoSay }}</span>
+    </div>
+    <div style="background:#FFFFFF;padding:9px 11px">
+      <div style="font:600 8px 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#5A6373">Price intel</div>
+      <sc-for list="{{ fiyatSatir }}" as="p" hint-placeholder-count="6">
+        <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #EDF0F4;font-size:10.5px"><span style="color:#5A6373">{{ p.k }}</span><b class="mono" style="font:600 10.5px 'IBM Plex Mono',monospace;color:{{ p.renk }}">{{ p.v }}</b></div>
+      </sc-for>
+      <div style="margin-top:6px;font:500 9.5px/1.4 'Inter',sans-serif;color:#5A3FB8">✦ medyanın %7 altında; 90g +%12</div>
+    </div>
+  </section>
+
+  <section style="display:flex;gap:6px;padding:9px 12px;background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <button onClick="{{ telGoster }}" style="flex:1.5;height:36px;border:0;border-radius:5px;background:#1157C4;color:#FFFFFF;font:600 12px 'Inter',sans-serif;cursor:pointer">{{ telYazi }}</button>
+    <button onClick="{{ mesajAc }}" style="flex:1;height:36px;border:1px solid #1157C4;border-radius:5px;background:#FFFFFF;color:#1157C4;font:600 12px 'Inter',sans-serif;cursor:pointer">Mesaj</button>
+    <button onClick="{{ randevu }}" style="flex:1;height:36px;border:1px solid #C3CCD8;border-radius:5px;background:#FFFFFF;color:#3A424F;font:600 12px 'Inter',sans-serif;cursor:pointer">Randevu</button>
+    <button onClick="{{ alarmDegis }}" title="Fiyat alarmı" style="width:36px;height:36px;border:1px solid {{ alarmKenar }};border-radius:5px;background:{{ alarmZemin }};color:{{ alarmRenk }};font-size:14px;cursor:pointer">⊙</button>
+    <button onClick="{{ karsiDegis }}" title="Karşılaştır" style="width:36px;height:36px;border:1px solid #C3CCD8;border-radius:5px;background:#FFFFFF;color:#3A424F;font-size:13px;cursor:pointer">⇄</button>
+  </section>
+
+  <nav data-screen-label="Sekmeler" style="position:sticky;top:0;z-index:50;background:#E4E8EE;display:flex;overflow-x:auto;border-bottom:1px solid #C3CCD8">
+    <sc-for list="{{ sekmeler }}" as="t" hint-placeholder-count="8">
+      <button onClick="{{ t.git }}" style="flex:none;height:34px;padding:0 12px;border:0;border-right:1px solid #D2D8E0;background:{{ t.zemin }};color:{{ t.renk }};font:600 10.5px 'Inter',sans-serif;cursor:pointer">{{ t.ad }}</button>
+    </sc-for>
+  </nav>
+
+  <section id="ozet" data-screen-label="Hızlı özellikler" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Temel Özellikler · 10 alan</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <sc-for list="{{ hizli }}" as="h" hint-placeholder-count="10">
+        <div class="dd-row" style="display:flex;justify-content:space-between;gap:8px;padding:5px 12px;border-bottom:1px solid #EDF0F4;border-right:1px solid #EDF0F4;font-size:11px"><span style="color:#5A6373">{{ h.k }}</span><b class="mono" style="font:500 11px 'IBM Plex Mono',monospace;text-align:right">{{ h.v }}</b></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="AI" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A3FB8;background:#EFECFA;border-bottom:1px solid #D8CFF2">✦ AI Özet + Soru-Cevap</div>
+    <div style="padding:9px 12px">
+      <div style="display:grid;grid-template-columns:1fr;gap:3px;font:400 11px/1.5 'Inter',sans-serif;color:#2A303B">
+        <div>▸ Köşe parsel, 24 m cephe; <b>≈396 m² inşaat hakkı</b> (2 kat).</div>
+        <div>▸ m² fiyatı medyanın <b>%7 altında</b>; bölge 90g +%12.</div>
+        <div>▸ Altyapı parselde; doğalgaz 400 m.</div>
+      </div>
+      <div style="display:flex;gap:5px;overflow-x:auto;margin-top:8px;padding-bottom:2px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.sor }}" style="flex:none;border:1px solid #C3CCD8;background:#F0F2F5;color:#1157C4;border-radius:4px;padding:5px 9px;font:500 10px 'Inter',sans-serif;cursor:pointer">{{ c.q }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-top:8px">
+        <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+          <div style="border-left:2px solid {{ m.kenar }};padding:1px 0 1px 9px">
+            <div style="font:600 8.5px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ m.kenar }}">{{ m.etiket }}</div>
+            <div style="font:400 11px/1.5 'Inter',sans-serif;color:#2A303B;margin-top:1px">{{ m.metin }}</div>
+            <sc-if value="{{ m.kaynak }}" hint-placeholder-val="{{ false }}"><div style="margin-top:2px;font:600 8.5px 'Inter',sans-serif;color:#5A3FB8">⌘ {{ m.kaynak }}</div></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}"><div style="font:500 10px 'Inter',sans-serif;color:#5A6373">✦ tarıyor…</div></sc-if>
+      </div>
+      <div style="display:flex;gap:5px;margin-top:8px">
+        <input value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Soru…" style="flex:1;height:32px;border:1px solid #C3CCD8;border-radius:4px;padding:0 10px;font:400 11px 'Inter',sans-serif;background:#F7F8FA;outline-color:#1157C4">
+        <button onClick="{{ gonder }}" style="height:32px;padding:0 12px;border:0;border-radius:4px;background:#0E1420;color:#FFFFFF;font:600 11px 'Inter',sans-serif;cursor:pointer">Sor</button>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section id="ozellikler" data-screen-label="Detaylı özellikler" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Detaylı Özellikler</div>
+    <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+      <div style="padding:5px 12px;font:600 10.5px 'Inter',sans-serif;color:#1157C4;background:#F7F9FC;border-bottom:1px solid #EDF0F4;border-top:1px solid #EDF0F4">{{ g.baslik }}</div>
+      <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+        <div class="dd-row" style="display:flex;justify-content:space-between;gap:8px;padding:5px 12px;border-bottom:1px solid #F2F4F7;font-size:11px"><span style="color:#5A6373">{{ s.k }}</span><b class="mono" style="font:500 11px 'IBM Plex Mono',monospace;text-align:right">{{ s.v }}</b></div>
+      </sc-for>
+    </sc-for>
+    <div style="padding:9px 12px">
+      <p style="margin:0;font:400 11px/1.65 'Inter',sans-serif;color:#3A424F;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+      <button onClick="{{ aciklamaDegis }}" style="margin-top:5px;border:0;background:none;color:#1157C4;font:600 10px 'Inter',sans-serif;cursor:pointer;padding:0">{{ aciklamaBtn }}</button>
+    </div>
+  </section>
+
+  <section id="konum" data-screen-label="Konum" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Konum · POI · Skor · Risk</div>
+    <div style="position:relative;height:130px;background:repeating-linear-gradient(0deg,#E4E8EE 0 22px,#DBE0E8 22px 23px),repeating-linear-gradient(90deg,#E4E8EE 0 22px,#DBE0E8 22px 23px);border-bottom:1px solid #D2D8E0">
+      <div style="position:absolute;left:56%;top:30%;width:100px;height:62px;border:2px dashed #1157C4;background:rgba(17,87,196,.1);transform:rotate(-4deg)"></div>
+      <div style="position:absolute;left:63%;top:42%;width:10px;height:10px;border-radius:50%;background:#1157C4"></div>
+      <span class="mono" style="position:absolute;left:6px;bottom:6px;background:rgba(14,20,32,.8);color:#FFFFFF;border-radius:3px;padding:2px 6px;font:500 9px 'IBM Plex Mono',monospace">37.0021, 30.5983</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr">
+      <sc-for list="{{ poi }}" as="p" hint-placeholder-count="6">
+        <div class="dd-row" style="display:flex;justify-content:space-between;gap:6px;padding:4px 12px;border-bottom:1px solid #F2F4F7;border-right:1px solid #F2F4F7;font-size:10.5px"><span style="color:#5A6373;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.ad }}</span><b class="mono" style="font:500 10px 'IBM Plex Mono',monospace;white-space:nowrap">{{ p.kisa }}</b></div>
+      </sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+      <div style="padding:8px 12px;border-right:1px solid #EDF0F4">
+        <div style="font:600 8.5px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A6373;margin-bottom:5px">Skorlar</div>
+        <sc-for list="{{ skorlar }}" as="sk" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="flex:1;font:400 10px 'Inter',sans-serif;color:#3A424F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sk.k }}</span><div style="width:44px;height:4px;background:#E4E8EE;border-radius:2px"><div style="height:4px;border-radius:2px;background:#1157C4;width:{{ sk.gen }}"></div></div><b class="mono" style="font:600 10px 'IBM Plex Mono',monospace;width:24px;text-align:right">{{ sk.v }}</b></div>
+        </sc-for>
+      </div>
+      <div style="padding:8px 12px">
+        <div style="font:600 8.5px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A6373;margin-bottom:5px">Riskler</div>
+        <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;justify-content:space-between;gap:6px;font:400 10px/1.5 'Inter',sans-serif;padding:1px 0"><span style="color:#3A424F">{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="piyasa" data-screen-label="Piyasa" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Piyasa · m² dağılımı</div>
+    <div style="padding:10px 12px">
+      <div style="position:relative;height:9px;border-radius:2px;background:linear-gradient(90deg,#2FA96B,#E0B33E,#D0555C)">
+        <div style="position:absolute;left:34%;top:-3px;width:3px;height:15px;background:#0E1420"></div>
+        <div style="position:absolute;left:56%;top:-3px;width:1px;height:15px;background:#5A6373"></div>
+      </div>
+      <div class="mono" style="display:flex;justify-content:space-between;font:500 8.5px 'IBM Plex Mono',monospace;color:#5A6373;margin-top:4px"><span>5.200</span><span>▲bu 6.401</span><span>med 6.900</span><span>9.100</span></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:10px;background:#EDF0F4;border:1px solid #EDF0F4">
+        <sc-for list="{{ piyasaKut }}" as="p" hint-placeholder-count="8">
+          <div style="background:#FFFFFF;padding:6px 8px"><div style="font:500 8px 'Inter',sans-serif;color:#5A6373">{{ p.k }}</div><b class="mono" style="font:600 12px 'IBM Plex Mono',monospace;color:{{ p.renk }}">{{ p.v }}</b></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="finans" data-screen-label="Finans" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Finansal Model</div>
+    <div style="padding:10px 12px">
+      <div style="display:flex;justify-content:space-between;font:500 10.5px 'Inter',sans-serif;color:#3A424F"><span>Peşinat %{{ pesinat }} · ₺{{ pesinatTL }}</span><span>{{ vade }} ay · %{{ faizYazi }}</span></div>
+      <input type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#1157C4;margin-top:6px;height:22px">
+      <input type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#1157C4;height:22px">
+      <div style="display:flex;gap:5px;margin-top:4px">
+        <sc-for list="{{ faizler }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.sec }}" style="border:1px solid {{ f.kenar }};background:{{ f.zemin }};color:{{ f.renk }};border-radius:4px;padding:4px 9px;font:600 10px 'Inter',sans-serif;cursor:pointer">%{{ f.v }}</button>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:10px;background:#EDF0F4;border:1px solid #EDF0F4">
+        <div style="background:#FFFFFF;padding:7px 9px"><div style="font:500 8px 'Inter',sans-serif;color:#5A6373">KREDİ</div><b class="mono" style="font:600 12px 'IBM Plex Mono',monospace">₺{{ krediTL }}</b></div>
+        <div style="background:#0E1420;padding:7px 9px"><div style="font:500 8px 'Inter',sans-serif;color:#7E8AA0">TAKSİT/AY</div><b class="mono" style="font:600 12px 'IBM Plex Mono',monospace;color:#3FCF8E">₺{{ taksitTL }}</b></div>
+        <div style="background:#FFFFFF;padding:7px 9px"><div style="font:500 8px 'Inter',sans-serif;color:#5A6373">TOPLAM</div><b class="mono" style="font:600 12px 'IBM Plex Mono',monospace">₺{{ toplamTL }}</b></div>
+      </div>
+      <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:8px;background:#FBEFD6;border:1px solid #E4C588;border-radius:4px;padding:6px 9px;font:500 10px/1.5 'Inter',sans-serif;color:#8A5200">LTV uyarısı: arsada tipik kredi limiti ekspertizin %50'si — peşinatı artırın.</div>
+      </sc-if>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:10px">
+        <div>
+          <div style="font:600 8px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A6373;padding:0 0 3px">Masraflar</div>
+          <sc-for list="{{ masraflar }}" as="m" hint-placeholder-count="5">
+            <div style="display:flex;justify-content:space-between;gap:6px;padding:3px 8px 3px 0;border-bottom:1px solid #F2F4F7;font-size:10px"><span style="color:#5A6373">{{ m.k }}</span><b class="mono" style="font:500 10px 'IBM Plex Mono',monospace">{{ m.v }}</b></div>
+          </sc-for>
+        </div>
+        <div style="padding-left:10px;border-left:1px solid #EDF0F4">
+          <div style="font:600 8px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5A6373;padding:0 0 3px">3Y senaryo</div>
+          <sc-for list="{{ senaryolar }}" as="sn" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-bottom:1px solid #F2F4F7;font-size:10px"><span style="color:#5A6373">{{ sn.ad }}</span><b class="mono" style="font:500 10px 'IBM Plex Mono',monospace">{{ sn.deger }}</b></div>
+          </sc-for>
+          <button onClick="{{ pdf }}" style="margin-top:6px;width:100%;height:28px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 10px 'Inter',sans-serif;color:#3A424F;cursor:pointer">⤓ PDF</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="belgeler" data-screen-label="Belgeler" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Belgeler · Doğrulama</div>
+    <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+      <div class="dd-row" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid #F2F4F7">
+        <div style="min-width:0"><b style="font:600 11px 'Inter',sans-serif">{{ b.ikon }} {{ b.ad }}</b><span style="font:400 9.5px 'Inter',sans-serif;color:{{ b.durumRenk }}"> · {{ b.durumYazi }}</span></div>
+        <button onClick="{{ b.tik }}" style="border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 9.5px 'Inter',sans-serif;color:#3A424F;padding:4px 8px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+      </div>
+    </sc-for>
+    <div style="padding:6px 12px;font:500 9.5px 'Inter',sans-serif;color:#0A5A2E;background:#F2FAF5">✓ EİDS kaydıyla eşleştirildi (28.06) · kimlikler maskelenir</div>
+  </section>
+
+  <section id="danisman" data-screen-label="Danışman" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0;padding:10px 12px">
+    <div style="display:flex;gap:9px;align-items:center">
+      <div style="width:38px;height:38px;border-radius:5px;background:#1157C4;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:600 13px 'Inter',sans-serif">AD</div>
+      <div style="flex:1;min-width:0"><div style="font:600 12px 'Inter',sans-serif">Ayşe Demir <span style="color:#0A5A2E;font-size:9px">✓</span></div><div style="font:400 10px 'Inter',sans-serif;color:#5A6373">Akdeniz GMD · TB 0700123 · EİDS</div></div>
+      <button onClick="{{ takipDegis }}" style="height:30px;border:1px solid {{ takipKenar }};background:{{ takipZemin }};color:{{ takipRenk }};border-radius:4px;font:600 10px 'Inter',sans-serif;padding:0 10px;cursor:pointer">{{ takipYazi }}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:9px;background:#EDF0F4;border:1px solid #EDF0F4">
+      <div style="background:#FFFFFF;padding:5px 7px;text-align:center"><b class="mono" style="font:600 13px 'IBM Plex Mono',monospace">46</b><div style="font:500 7.5px 'Inter',sans-serif;color:#5A6373">PORTFÖY</div></div>
+      <div style="background:#FFFFFF;padding:5px 7px;text-align:center"><b class="mono" style="font:600 13px 'IBM Plex Mono',monospace">28dk</b><div style="font:500 7.5px 'Inter',sans-serif;color:#5A6373">YANIT</div></div>
+      <div style="background:#FFFFFF;padding:5px 7px;text-align:center"><b class="mono" style="font:600 13px 'IBM Plex Mono',monospace">4.8</b><div style="font:500 7.5px 'Inter',sans-serif;color:#5A6373">212 OY</div></div>
+      <div style="background:#FFFFFF;padding:5px 7px;text-align:center"><b class="mono" style="font:600 13px 'IBM Plex Mono',monospace">2019</b><div style="font:500 7.5px 'Inter',sans-serif;color:#5A6373">ÜYE</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <button onClick="{{ tumIlanlar }}" style="flex:1;height:32px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 10.5px 'Inter',sans-serif;color:#3A424F;cursor:pointer">Tüm ilanlar (46)</button>
+      <button onClick="{{ mesajAc }}" style="flex:1;height:32px;border:0;border-radius:4px;background:#1157C4;color:#FFFFFF;font:600 10.5px 'Inter',sans-serif;cursor:pointer">Mesaj</button>
+    </div>
+  </section>
+
+  <section id="guvenlik" data-screen-label="Güvenlik" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0;padding:10px 12px">
+    <div style="background:#FBE0E1;border:1px solid #E9A6AB;border-radius:4px;padding:7px 10px;font:500 10.5px/1.55 'Inter',sans-serif;color:#8A1B22"><b>⚠ Kapora uyarısı:</b> görmeden kapora göndermeyin; ödemeleri platform dışına taşımayın.</div>
+    <div style="display:flex;gap:6px;margin-top:7px">
+      <button onClick="{{ bildir }}" style="flex:1;height:30px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 9.5px 'Inter',sans-serif;color:#3A424F;cursor:pointer">İlanı bildir</button>
+      <button onClick="{{ bildir }}" style="flex:1;height:30px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 9.5px 'Inter',sans-serif;color:#3A424F;cursor:pointer">Konum</button>
+      <button onClick="{{ bildir }}" style="flex:1;height:30px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 9.5px 'Inter',sans-serif;color:#3A424F;cursor:pointer">Fiyat</button>
+      <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;font:600 10.5px 'Inter',sans-serif;color:#0A5A2E">Kalite <b class="mono" style="font:600 11px 'IBM Plex Mono',monospace;margin-left:4px">92/100</b></div>
+    </div>
+  </section>
+
+  <section id="benzer" data-screen-label="Benzer" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0">
+    <div style="padding:7px 12px;font:700 10px 'Inter',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#3A424F;background:#EDF0F4;border-bottom:1px solid #D2D8E0">Benzer İlanlar · karşılaştırma</div>
+    <div style="display:flex;padding:5px 12px;border-bottom:1px solid #D2D8E0;font:600 8.5px 'Inter',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#5A6373">
+      <span style="flex:2">İlan</span><span style="flex:1;text-align:right">m²</span><span style="flex:1.3;text-align:right">Fiyat</span><span style="flex:1.1;text-align:right">₺/m²</span>
+    </div>
+    <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+      <div class="dd-row" style="display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid #F2F4F7;cursor:pointer">
+        <span style="flex:2;min-width:0;font:500 10.5px 'Inter',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.ad }}</span>
+        <span class="mono" style="flex:1;text-align:right;font:500 10px 'IBM Plex Mono',monospace;color:#5A6373">{{ b.m2sade }}</span>
+        <span class="mono" style="flex:1.3;text-align:right;font:600 10.5px 'IBM Plex Mono',monospace">{{ b.fiyatSade }}</span>
+        <span class="mono" style="flex:1.1;text-align:right;font:500 10px 'IBM Plex Mono',monospace;color:#1157C4">{{ b.m2fSade }}</span>
+      </div>
+    </sc-for>
+    <div class="dd-row" style="display:flex;align-items:center;padding:6px 12px;background:#F2F6FC">
+      <span style="flex:2;font:700 10.5px 'Inter',sans-serif;color:#1157C4">◆ Bu ilan</span>
+      <span class="mono" style="flex:1;text-align:right;font:600 10px 'IBM Plex Mono',monospace">1.320</span>
+      <span class="mono" style="flex:1.3;text-align:right;font:700 10.5px 'IBM Plex Mono',monospace">8.45M</span>
+      <span class="mono" style="flex:1.1;text-align:right;font:600 10px 'IBM Plex Mono',monospace;color:#0A5A2E">6.401</span>
+    </div>
+  </section>
+
+  <section data-screen-label="SEO" style="background:#FFFFFF;border-bottom:1px solid #D2D8E0;padding:9px 12px">
+    <div style="display:flex;flex-wrap:wrap;gap:5px">
+      <sc-for list="{{ aramalar }}" as="a" hint-placeholder-count="5">
+        <a href="#" style="border:1px solid #C3CCD8;border-radius:4px;padding:4px 8px;font:500 9.5px 'Inter',sans-serif;color:#3A424F;background:#F7F8FA">{{ a.ad }}</a>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer" style="background:#0E1420;color:#7E8AA0;padding:14px 12px">
+    <div style="font:700 14px 'Inter',sans-serif;color:#FFFFFF">emlaktr<span style="color:#4B8BF5">.com</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font:400 10px/1.8 'Inter',sans-serif">
+      <a href="#" style="color:#7E8AA0">Hakkımızda</a><a href="#" style="color:#7E8AA0">Yardım</a><a href="#" style="color:#7E8AA0">Güvenli alışveriş</a><a href="#" style="color:#7E8AA0">KVKK</a><a href="#" style="color:#7E8AA0">Çerezler</a><a href="#" style="color:#7E8AA0">Koşullar</a><a href="#" style="color:#7E8AA0">API</a>
+    </div>
+    <div class="mono" style="margin-top:8px;border-top:1px solid #222C3D;padding-top:8px;font:400 8.5px 'IBM Plex Mono',monospace;color:#525E73">© 2026 emlaktr.com · TR · ₺ · SSR+JSON-LD · LCP 1.9s / INP 140ms / CLS 0.03</div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#FFFFFF;border-top:1px solid #C3CCD8;display:flex;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <button onClick="{{ telGoster }}" style="flex:1.5;height:42px;border:0;border-radius:5px;background:#1157C4;color:#FFFFFF;font:600 13px 'Inter',sans-serif;cursor:pointer">{{ telYazi }}</button>
+    <button onClick="{{ mesajAc }}" style="flex:1;height:42px;border:1px solid #1157C4;border-radius:5px;background:#FFFFFF;color:#1157C4;font:600 13px 'Inter',sans-serif;cursor:pointer">Mesaj</button>
+    <button onClick="{{ favDegis }}" style="width:44px;height:42px;border:1px solid #C3CCD8;border-radius:5px;background:#FFFFFF;font-size:15px;color:#E5555E;cursor:pointer">{{ favIkon }}</button>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#0E1420;display:flex;gap:8px;align-items:center;padding:10px 12px;box-sizing:border-box">
+    <span style="flex:1;font:600 12px 'Inter',sans-serif;color:#FFFFFF">Bu ilan satıldı.</span>
+    <button onClick="{{ benzereGit }}" style="height:36px;padding:0 14px;border:0;border-radius:5px;background:#4B8BF5;color:#FFFFFF;font:600 11px 'Inter',sans-serif;cursor:pointer">Benzer ilanlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(14,20,32,.55);z-index:80"></div>
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:#FFFFFF;border-radius:10px 10px 0 0;box-shadow:0 -8px 40px rgba(14,20,32,.35);animation:sheetIn .2s ease;box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #D2D8E0;background:#EDF0F4">
+      <b style="font:700 13px 'Inter',sans-serif">{{ leadBaslik }}</b>
+      <button onClick="{{ leadKapat }}" style="width:28px;height:28px;border:1px solid #C3CCD8;border-radius:4px;background:#FFFFFF;cursor:pointer;color:#5A6373">✕</button>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:20px 14px;text-align:center">
+        <div style="width:48px;height:48px;border-radius:24px;background:#DCF3E5;color:#0A5A2E;font-size:22px;display:flex;align-items:center;justify-content:center;margin:0 auto">✓</div>
+        <b style="display:block;font:700 14px 'Inter',sans-serif;margin-top:8px">Talep iletildi</b>
+        <div class="mono" style="font:500 11px 'IBM Plex Mono',monospace;color:#5A6373;margin-top:4px">CRM #L-88412 · yanıt ~28dk</div>
+        <div style="display:flex;gap:6px;margin-top:14px">
+          <button onClick="{{ leadKapatBenzer }}" style="flex:1;height:36px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 10.5px 'Inter',sans-serif;cursor:pointer">Benzer ilanlar</button>
+          <button onClick="{{ leadKapatBelge }}" style="flex:1;height:36px;border:1px solid #C3CCD8;border-radius:4px;background:#F7F8FA;font:600 10.5px 'Inter',sans-serif;cursor:pointer">Belgeler</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ leadFormGoster }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:12px 14px 18px">
+        <input value="{{ fAd }}" onChange="{{ fAdDegis }}" placeholder="Ad Soyad *" aria-label="Ad Soyad" style="width:100%;height:38px;border:1px solid #C3CCD8;border-radius:4px;padding:0 11px;font:400 12px 'Inter',sans-serif;box-sizing:border-box;background:#F7F8FA;outline-color:#1157C4">
+        <input value="{{ fTel }}" onChange="{{ fTelDegis }}" placeholder="Telefon *" aria-label="Telefon" style="margin-top:7px;width:100%;height:38px;border:1px solid #C3CCD8;border-radius:4px;padding:0 11px;font:400 12px 'Inter',sans-serif;box-sizing:border-box;background:#F7F8FA;outline-color:#1157C4">
+        <select value="{{ fNiyet }}" onChange="{{ fNiyetDegis }}" aria-label="Niyet" style="margin-top:7px;width:100%;height:38px;border:1px solid #C3CCD8;border-radius:4px;padding:0 8px;font:400 12px 'Inter',sans-serif;background:#F7F8FA">
+          <option>Yatırım</option><option>Konut inşa etmek</option><option>Ticari değerlendirme</option><option>Sadece bilgi</option>
+        </select>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" style="margin-top:2px;accent-color:#1157C4">
+          <span style="font:400 9.5px/1.5 'Inter',sans-serif;color:#5A6373"><a href="#" style="text-decoration:underline">KVKK aydınlatma metnini</a> okudum; danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <button onClick="{{ leadGonder }}" style="margin-top:12px;width:100%;height:42px;border:0;border-radius:5px;background:#1157C4;color:#FFFFFF;font:600 13px 'Inter',sans-serif;cursor:pointer">Gönder</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:88px;left:50%;transform:translateX(-50%);z-index:90;background:#0E1420;color:#FFFFFF;border-radius:5px;padding:9px 15px;font:500 11px 'Inter',sans-serif;box-shadow:0 8px 24px rgba(14,20,32,.4);animation:toastIn .18s ease;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, sekme:"ozet", fav:false, takip:false,
+    tel:false, alarm:false, mesajlar:[], dusunuyor:false, yazi:"", kompakt:false,
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, kvkk:false, fAd:"", fTel:"", fNiyet:"Yatırım", toast:""
+  };
+  componentDidMount(){
+    import("./arsa-data.js").then(m => this.setState({D: m.D}));
+    this._sc = () => { const k = window.scrollY > 500; if(k !== this.state.kompakt) this.setState({kompakt:k}); };
+    window.addEventListener("scroll", this._sc, {passive:true});
+  }
+  componentWillUnmount(){ window.removeEventListener("scroll", this._sc); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2400); }
+  git(id){ const el = document.getElementById(id); if(el){ window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 40, behavior:"smooth"}); this.setState({sekme:id}); } }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){ const t = q.toLowerCase(); c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback; }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak}], dusunuyor:false});
+    }, 850);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const ids = [["Özet","ozet"],["Özellik","ozellikler"],["Konum","konum"],["Piyasa","piyasa"],["Finans","finans"],["Belge","belgeler"],["Danışman","danisman"],["Benzer","benzer"]];
+    const acik = s.aciklamaAcik;
+    return {
+      D, kompakt: s.kompakt,
+      satilmadi: durum !== "satildi", satildi: durum === "satildi", rezerve: durum === "rezerve",
+      aiAcik: this.props.aiPaneli ?? true,
+      ribbon: [
+        {k:"Fiyat", v:"₺8.45M", renk:"#FFFFFF"}, {k:"₺/m²", v:"6.401", renk:"#3FCF8E"},
+        {k:"Alan", v:"1.320", renk:"#FFFFFF"}, {k:"Emsal", v:"0.30", renk:"#FFFFFF"},
+        {k:"90g trend", v:"+12%", renk:"#3FCF8E"}, {k:"Medyan", v:"6.900", renk:"#C9D2E0"},
+        {k:"Satış", v:"74g", renk:"#E8B84B"}, {k:"Kalite", v:"92", renk:"#3FCF8E"}
+      ],
+      fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#CBD3C2",
+      fotoSay: (s.foto+1) + "/" + ((D.medya||[]).length || 5),
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      fiyatSatir: [
+        {k:"Liste", v:"₺8.450.000", renk:"#14181F"}, {k:"Önceki", v:"₺8.900.000", renk:"#8A93A0"},
+        {k:"Δ", v:"−5.1%", renk:"#0A5A2E"}, {k:"₺/m²", v:"₺6.401", renk:"#14181F"},
+        {k:"Kredi", v:"Uygun", renk:"#0A5A2E"}, {k:"Takas", v:"Hayır", renk:"#14181F"}
+      ],
+      sekmeler: ids.map(([ad,id]) => ({ad, git: () => this.git(id),
+        zemin: s.sekme === id ? "#0E1420" : "#E4E8EE", renk: s.sekme === id ? "#FFFFFF" : "#3A424F"})),
+      hizli: D.hizli || [],
+      gruplar: D.gruplar || [],
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map(m => m.rol === "k" ? {...m, kenar:"#8A93A0", etiket:"Soru"} : {...m, kenar:"#5A3FB8", etiket:"✦ AI"}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()) this.sor(s.yazi.trim()); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favIkon: s.fav ? "♥" : "♡",
+      favDegis: () => { const v = !s.fav; this.setState({fav:v}); this.t(v ? "Favorilere eklendi" : "Favorilerden çıkarıldı"); },
+      karsiDegis: () => this.t("Karşılaştırmaya eklendi (1/4)"),
+      telYazi: s.tel ? "0532 481 07 00" : "Ara — no. göster",
+      telGoster: () => { if(!s.tel){ this.setState({tel:true}); this.t("Numara gösterildi · aramalar kayıtlıdır"); } },
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false}),
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk, leadFormGoster: !s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Gösterim randevusu" : "Danışmana mesaj",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false}); this.git("benzer"); },
+      leadKapatBelge: () => { this.setState({leadAcik:false}); this.git("belgeler"); },
+      fAd: s.fAd, fTel: s.fTel, fNiyet: s.fNiyet, kvkk: s.kvkk,
+      fAdDegis: e => this.setState({fAd: e.target.value}), fTelDegis: e => this.setState({fTel: e.target.value}),
+      fNiyetDegis: e => this.setState({fNiyet: e.target.value}), kvkkDegis: e => this.setState({kvkk: e.target.checked}),
+      leadGonder: () => { if(!s.fAd.trim() || !s.fTel.trim()) return this.t("Ad ve telefon zorunlu"); if(!s.kvkk) return this.t("KVKK iznini onaylayın"); this.setState({leadOk:true}); },
+      alarm: s.alarm, alarmKenar: s.alarm ? "#9FD8B8" : "#C3CCD8", alarmZemin: s.alarm ? "#DCF3E5" : "#FFFFFF", alarmRenk: s.alarm ? "#0A5A2E" : "#3A424F",
+      alarmDegis: () => { const v = !s.alarm; this.setState({alarm:v}); this.t(v ? "Fiyat düşünce haber vereceğiz" : "Alarm kapatıldı"); },
+      takip: s.takip, takipYazi: s.takip ? "✓ Takip" : "Takip et", takipKenar: s.takip ? "#9FD8B8" : "#C3CCD8", takipZemin: s.takip ? "#DCF3E5" : "#F7F8FA", takipRenk: s.takip ? "#0A5A2E" : "#3A424F",
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acik ? 99 : 3,
+      aciklamaBtn: acik ? "− Daralt" : "+ Açıklamanın tamamı",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acik}),
+      poi: (D.poi||[]).map(p => ({...p, kisa: (p.mesafe||"").split(" · ")[0]})),
+      skorlar: (D.skorlar||[]).map(x => ({...x, gen: x.p + "%"})),
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#9A5B00" : "#0A5A2E"})),
+      piyasaKut: [
+        {k:"Bu ilan ₺/m²", v:"6.401", renk:"#0A5A2E"}, {k:"Medyan", v:"6.900", renk:"#14181F"},
+        {k:"Min", v:"5.200", renk:"#14181F"}, {k:"Max", v:"9.100", renk:"#14181F"},
+        {k:"90g trend", v:"+12%", renk:"#0A5A2E"}, {k:"Satış süresi", v:"74g", renk:"#14181F"},
+        {k:"Arz", v:"23", renk:"#14181F"}, {k:"Pazarlık", v:"%3–5", renk:"#14181F"}
+      ],
+      pesinat: s.pesinat, vade: s.vade, faizYazi: s.faiz.toFixed(2).replace(".", ","),
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      faizler: [2.59, 2.79, 3.09].map(x => ({v: x.toFixed(2).replace(".", ","), sec: () => this.setState({faiz:x}),
+        kenar: s.faiz === x ? "#1157C4" : "#C3CCD8", zemin: s.faiz === x ? "#DEEAFB" : "#FFFFFF", renk: s.faiz === x ? "#1157C4" : "#5A6373"})),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      pdf: () => this.t("Finansal rapor PDF hazırlanıyor…"),
+      masraflar: D.masraflar || [], senaryolar: D.senaryolar || [],
+      belgeler: (D.belgeler||[]).map(b => ({...b, ikon: b.kilit ? "🔒" : "▤",
+        durumYazi: b.tarih ? b.durum + " " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#0A5A2E" : "#9A5B00",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi ✓") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı · #R-1042"),
+      benzer: (D.benzer||[]).map(b => ({...b, m2sade: (b.m2||"").replace(" m²",""), fiyatSade: (b.fiyat||"").replace("₺","").replace(".000.000","M").replace(".000","K"), m2fSade: (b.m2f||"").replace("₺","").replace("/m²","")})),
+      aramalar: ((D.seo||{}).aramalar||[]).map(a => ({ad:a})),
+      benzereGit: () => this.git("benzer"),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

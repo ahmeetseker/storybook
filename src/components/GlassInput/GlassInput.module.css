@@ -42,6 +42,11 @@
 .input {
   flex: 1;
   min-width: 0;
+  /* Dokunma hedefi input'un kendi kutusudur: `.inner` kontrol yüksekliğinde
+     olsa bile ona tıklamak alanı odaklamaz, yalnız input'un kendi satırı
+     tıklanabilirdir (ölçülen 24px). Input sarmalayıcının yüksekliğini alarak
+     hedefi kontrol ölçeğine taşır — WCAG 2.2 AAA 2.5.5. */
+  align-self: stretch;
   border: none;
   outline: none;
   background: transparent;

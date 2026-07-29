@@ -25,6 +25,7 @@ import type {
   OfficeMatch,
   OfficeSummary,
 } from './domain/office-types'
+import { PageContainer } from '@/components/PageContainer'
 import styles from './OfficeDirectoryView.module.css'
 
 type HistoryMode = 'push' | 'replace'
@@ -453,7 +454,7 @@ export function OfficeDirectoryView({
   const handleAiSearch = (query: string) => onAiSearch(query)
 
   return (
-    <main className={styles.page}>
+    <PageContainer className={styles.page}>
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.eyebrow}>OFİS EŞLEŞTİRME</p>
@@ -640,6 +641,6 @@ export function OfficeDirectoryView({
           </div>
         ) : null}
       </GlassDrawer>
-    </main>
+    </PageContainer>
   )
 }

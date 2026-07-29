@@ -53,6 +53,8 @@
 
 .welcomeExplanation,
 .supportingText {
+  /* Gövde metni okuma ölçüsünde durur — AAA 1.4.8. */
+  max-inline-size: var(--lg-measure);
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-body);
   line-height: 1.6;

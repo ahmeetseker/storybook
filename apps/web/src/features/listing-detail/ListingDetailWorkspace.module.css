@@ -1,70 +1,72 @@
-/* İlan detayı — Yön A yerleşimi.
-   Yanıt verme yalnız container sorgularıyla: viewport breakpoint'i yok.
-   Tüm ölçüler --lg-* token'larından gelir; mikro-geometri adlandırılmış
-   yerel özelliklerde toplanır ve gerekçesiyle birlikte yazılır. */
+/* İlan detayı — "sahne açar, sorular taşır" yerleşimi.
 
-/* Sorgu kabı `.shell`'in DIŞINDADIR.
+   Tek markup, üç yerleşim. Kırılmalar container query'dir (700 / 1100):
+   davranış kabın genişliğine bağlıdır, viewport'a değil. Tüm ölçüler
+   --lg-* token'larından gelir; mikro-geometri adlandırılmış yerel
+   özelliklerde toplanır ve gerekçesiyle birlikte yazılır.
 
-   Bir öğe kendi sorgu kabı olamaz: `container-type` `.shell` üzerindeyken
-   `@container` içindeki `.shell` kuralları hiçbir zaman eşleşmez ve dar
-   genişlikteki dolgu azaltması sessizce uygulanmaz. Kap dışarı alınınca
-   `.shell`'in kendi dolgusu da sorguya yanıt verir. Ölçülen genişlik artık
-   `.shell`'in dış kutusudur (içerik kutusu değil); eşikler bu farkı
-   (yaklaşık iki dolguluk) hesaba katar. */
+   Sorgu kabı bu öğenin DIŞINDADIR — PageContainer'dır (`container-name: page`).
+   Bir öğe kendi sorgu kabı olamaz. */
 .page {
-  container-type: inline-size;
-}
-
-.shell {
-  /* Mikro-geometri — token karşılığı yok:
-     bölümler arası ritim ölçek üstü tek bir adımdır (32 + 24 = 56px).
-     Token ölçeği --lg-space-7'de bittiği için iki adım toplanır; grup içi
-     ritim (--lg-space-3/4) ile arasındaki fark bilinçlidir. */
+  /* Bölümler arası ritim ölçek üstü tek bir adımdır (32 + 24 = 56px);
+     grup içi ritim (--lg-space-3/4) ile arasındaki fark bilinçlidir. */
   --section-rhythm: calc(var(--lg-space-7) + var(--lg-space-6));
   /* Ortak dikey eksen: kanıt satırlarının etiket ve kaynak sütunları sayfanın
-     ilk bölümünden sonuncusuna kadar aynı genişliktedir. Sabit değerdir,
-     çünkü hizanın kaynağı içerik uzunluğu değil sayfanın kendisidir. */
+     ilk bölümünden sonuncusuna kadar aynı genişliktedir. */
   --evidence-label-col: 200px;
   --evidence-source-col: 176px;
-  /* Kabuğun yüzen alt dock'u içerik kolonunun üstüne biner (viewport'un
-     ortasına sabitlenmiştir, sayfanın ızgarasını tanımaz). Sayfa kendi
-     tarafından pay ayırır: dock'un kabukta tanımlı yüksekliği + güvenli alan.
-     Tek kaynak burasıdır — hem gövdenin alt dolgusu hem karar rayının sticky
-     hareket alanı bunu okur, sabit bir sayı hiçbir yerde yazılmaz. */
+  /* Kabuğun yüzen alt dock'u sayfanın ızgarasını tanımaz; pay tek kaynaktan
+     okunur. Sayfanın kendi yapışkan dock'u bunun ÜSTÜNE oturur. */
   --dock-clearance: calc(
     var(--lg-shell-dock-offset, var(--lg-control-xl)) + env(safe-area-inset-bottom, 0px)
   );
-  /* Sticky bölüm indeksinin altı: indeks --lg-space-3'te yapışır, yüksekliği
-     kontrol yüksekliği + kendi dolgusudur; karar rayı onun altından başlar. */
-  --rail-sticky-top: calc(
-    var(--lg-space-3) + var(--lg-control-sm) + (2 * var(--lg-space-1)) + var(--lg-space-4)
-  );
+  --rail-sticky-top: var(--lg-space-5);
+
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: var(--lg-space-5);
-  inline-size: min(100%, 88rem);
-  margin-inline: auto;
-  padding: var(--lg-space-5);
-  /* Sayfanın son etkileşimli öğesi (satıcı bölümündeki numara kontrolü)
-     dock'un altında kalmaz. */
-  padding-block-end: calc(var(--dock-clearance) + var(--lg-space-7));
   color: var(--lg-label);
 }
 
-.crumbs {
-  justify-self: start;
+/* ── Akış: fiyat ikilisi, soru omurgası, defter ── */
+.flow {
+  min-inline-size: 0;
 }
 
-/* Başlık künyesi: fiyat taşımaz, kart da değildir — yalnız hairline ile
-   sayfadan ayrılır. */
-/* Seçici bilinçli olarak iki kez yazıldı: `GlassSurface`'in düz malzeme
-   kuralı (`.flat`) aynı özgüllükte olduğu için sıralamaya bağlı kalmadan
-   ezilmesi gerekir. */
-.header.header {
-  padding-inline: 0;
-  padding-block: 0 var(--lg-space-5);
-  border: 0;
-  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  background: transparent;
+/* Fiyat + dosyanın durumu. Dar yerleşimde alt alta, orta ve geniş
+   yerleşimde yan yana. */
+.duo {
+  display: grid;
+  gap: var(--lg-space-5);
+  padding-block-start: var(--lg-space-5);
+}
+
+.flowPrice {
+  min-inline-size: 0;
+}
+
+.kicker {
+  margin: 0 0 var(--lg-space-2);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.priceNote {
+  max-inline-size: var(--lg-measure);
+  margin: var(--lg-space-2) 0 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.55;
+}
+
+/* Satıcı ızgaranın ikinci satırında; karar kolonuyla yan yana gelmez. */
+.seller {
+  grid-column: 1 / -1;
+  min-inline-size: 0;
 }
 
 /* ── Bölüm indeksi (cam yüzey) ───────────────────────────────── */
@@ -115,51 +117,22 @@
   }
 }
 
-/* ── Gövde: içerik akışı + karar kolonu ──────────────────────── */
-
-.body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.62fr) minmax(19rem, 1fr);
-  align-items: start;
-  column-gap: var(--lg-space-7);
-  /* Satır boşluğu yok: satıcı bölümü kendi üst hairline'ı ve bölüm ritmiyle
-     ayrılır, ızgara boşluğu eklemek ritmi iki kez saymak olurdu. */
-  row-gap: 0;
-}
-
-.flow {
-  grid-column: 1;
-  grid-row: 1;
-  display: grid;
-  min-inline-size: 0;
-  /* Bölümler kendi üst hairline'ı ve ritmiyle ayrılır; ızgara boşluğu
-     eklemek ritmi iki kez saymak olurdu. */
-  gap: 0;
-}
-
-/* Satıcı bölümü ızgaranın ikinci satırında, içerik kolonunun genişliğinde
-   durur: ortak dikey eksen (etiket/kaynak sütunları) bozulmaz, ama karar
-   rayının hareket alanının dışında kalır. */
-.body > .section {
-  grid-column: 1;
-  grid-row: 2;
-}
-
 /* ── Karar kolonu ────────────────────────────────────────────── */
 
-/* Ray kendisi yapışkan değildir: ızgara satırının tamamını kaplayan bir kap
+/* Ray yalnız GENİŞ yerleşimde vardır; altında yerini yapışkan dock alır.
+   Dar ve orta yerleşimde DOM'da kalır ama ızgaradan düşer — iki birincil
+   eylem aynı anda görünmez.
+
+   Ray kendisi yapışkan değildir: ızgara satırının tamamını kaplayan bir kap
    olur ve içindeki eşlikçiye hareket alanı verir. Satır kanıt akışıyla
    birlikte biter — satıcı bölümü ikinci satırdadır — dolayısıyla eşlikçi
    satıcı bölümünden önce serbest kalır ve onunla asla yan yana durmaz. */
 .rail {
-  grid-column: 2;
-  grid-row: 1;
+  display: none;
   align-self: stretch;
-  display: grid;
   grid-template-rows: auto 1fr;
   /* İki parça arasındaki boşluk grup içi değil bölüm arası ritmidir: giriş
-     bloğu okunup biter, eşlikçi ayrı bir şey olarak başlar. Yan etkisi de
-     istenendir — ilk ekranda eylem çubuğu yüzen dock'un bandına düşmez. */
+     bloğu okunup biter, eşlikçi ayrı bir şey olarak başlar. */
   gap: var(--section-rhythm);
   min-inline-size: 0;
   /* Eşlikçinin son durağı dock payı kadar yukarıda biter. */
@@ -639,56 +612,63 @@
 
 /* ── Container sorguları ─────────────────────────────────────── */
 
-@container (inline-size <= 64rem) {
-  .body {
-    grid-template-columns: 1fr;
-  }
-
-  /* Tek kolonda açık yerleşim çözülür: sıra `order` ile kurulur, sabit
-     satır/sütun ataması kalmaz. */
-  .flow,
-  .rail,
-  .body > .section {
-    grid-column: auto;
-    grid-row: auto;
-  }
-
-  /* Tek kolonda karar kolonu içeriğin önüne geçer: fiyat, doğrulama sonucu ve
-     görüşme öncesi çözülmesi gerekenler kanıt akışından önce okunur. Bu sayfa
-     bir vitrin değil karar dosyasıdır ve medyası kayda ait değil temsilîdir
-     (`rules.md` §1c) — telefonda ilk ekranı temsilî bir fotoğrafa vermek
-     kanıtı geciktirirdi. */
-  .rail {
-    order: -1;
-    align-self: start;
-    grid-template-rows: auto;
-    gap: var(--lg-space-5);
-    padding-block-end: 0;
-  }
-
-  /* Yapışma yalnız iki kolonlu yerleşimin sorunudur: tek kolonda eşlikçi
-     akışın parçasıdır. */
-  .railSticky {
-    position: static;
-  }
-
-  /* Fiyat çapası tek kolonda gereksizdir: fiyat bloğu birkaç satır yukarıda,
-     aynı akışın içinde duruyor. */
-  .railAnchor {
-    display: none;
+/* ═══ Orta yerleşim: kap ≥ 700px ═══
+   Fiyat ile dosya durumu yan yana gelir. Ray hâlâ yok; bu genişlikte kalıcı
+   bir karar kolonu içeriği sıkıştırırdı, karar dock'ta kalır. */
+@container page (min-width: 700px) {
+  .duo {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--lg-space-6);
+    align-items: start;
   }
 }
 
-@container (inline-size <= 40rem) {
-  .shell {
-    --section-rhythm: var(--lg-space-7);
-    padding: var(--lg-space-4);
+/* ═══ Geniş yerleşim: kap ≥ 1100px ═══
+   Dock düşer, yerini 340px'lik karar kolonu alır. Fiyat akıştan kalkar ve
+   yalnız rayda büyür — sayfanın en büyük sayısı tek yerde durur. */
+@container page (min-width: 1100px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    column-gap: var(--lg-space-7);
+    row-gap: 0;
   }
 
-  .priceFacts {
+  /* Satır 1 sahnenindir (tam genişlik, otomatik yerleşir); akış ve ray
+     satır 2'de yan yana, satıcı satır 3'te içerik kolonunun genişliğinde.
+     Satırlar açıkça yazılmazsa sahne otomatik yerleşimde boş satır arar ve
+     ızgaranın SONUNA düşer. */
+  .flow {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .rail {
+    display: grid;
+    grid-column: 2;
+    grid-row: 2;
+    padding-block-start: var(--lg-space-5);
+  }
+
+  .seller {
+    grid-column: 1 / 2;
+    grid-row: 3;
+  }
+
+  /* Fiyat karar kolonuna taşındı: akıştaki blok ikinci kez büyümez, yerini
+     dosya durumuna bırakır. Yalnız AKIŞTAKİ blok gizlenir — `.priceBlock`
+     rayın kendi fiyatıdır ve burada görünür kalmalıdır. */
+  .flowPrice {
+    display: none;
+  }
+
+  .duo {
     grid-template-columns: minmax(0, 1fr);
   }
+}
 
+/* Dar yerleşimde kanıt satırları tek kolona düşer. */
+@container page (max-width: 640px) {
+  .priceFacts,
   .docItem {
     grid-template-columns: minmax(0, 1fr);
   }

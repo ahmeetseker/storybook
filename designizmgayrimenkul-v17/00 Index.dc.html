@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0D12}
+a{text-decoration:none}
+.hub-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.hub-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+</style>
+</helmet>
+
+<div data-screen-label="00 Index / Hub" style="min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,#161A24 0%,#0B0D12 60%);font-family:'Inter',sans-serif;color:#E7E9EE;padding-bottom:60px">
+
+  <header style="max-width:1180px;margin:0 auto;padding:34px 24px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div style="font:700 22px/1 'Space Grotesk',sans-serif;letter-spacing:-.02em">emlaktr<span style="color:#6E8BFF">.com</span></div>
+    <span style="font:600 10px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6B7488;border:1px solid #262B38;border-radius:20px;padding:5px 11px">Design Movements Lab</span>
+    <span style="flex:1"></span>
+    <span style="font:500 12px 'Inter',sans-serif;color:#8A93A7">Tek ilan · 20 tasarım akımı</span>
+  </header>
+
+  <section style="max-width:1180px;margin:0 auto;padding:28px 24px 0">
+    <div style="font:600 11px 'Inter',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6E8BFF">Enterprise · AI-first · Waterfall katalog</div>
+    <h1 style="margin:12px 0 0;font:700 clamp(30px,6vw,52px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.03em;max-width:16ch;text-wrap:balance">Aynı gayrimenkul ilanı, 20 farklı tasarım akımıyla</h1>
+    <p style="margin:16px 0 0;font:400 15px/1.65 'Inter',sans-serif;color:#A5ADBF;max-width:60ch">Her sayfa aynı satılık arsa ilanını (Antalya · Döşemealtı · Yeniköy) tam bir enterprise omurgayla işler: global header, breadcrumb, AI destekli modüller, finansal analiz, doğrulama, danışman paneli ve footer. Amaç; tek içeriğin farklı görsel dillerde nasıl davrandığını yan yana görmek.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:22px;margin-top:22px">
+      <div><div style="font:700 24px 'Space Grotesk',sans-serif">20<span style="color:#6B7488">/20</span></div><div style="font:500 11px 'Inter',sans-serif;color:#8A93A7">canlı sayfa · tümü hazır</div></div>
+      <div style="width:1px;background:#262B38"></div>
+      <div><div style="font:700 24px 'Space Grotesk',sans-serif">1</div><div style="font:500 11px 'Inter',sans-serif;color:#8A93A7">ortak ilan · arsa-data.js</div></div>
+      <div style="width:1px;background:#262B38"></div>
+      <div><div style="font:700 24px 'Space Grotesk',sans-serif">32</div><div style="font:500 11px 'Inter',sans-serif;color:#8A93A7">bölümlük spec omurgası</div></div>
+      <div style="width:1px;background:#262B38"></div>
+      <div><div style="font:700 24px 'Space Grotesk',sans-serif;color:#6E8BFF">Mobile-first</div><div style="font:500 11px 'Inter',sans-serif;color:#8A93A7">+ AI soru-cevap prototipi</div></div>
+    </div>
+  </section>
+
+  <section style="max-width:1180px;margin:0 auto;padding:30px 24px 0">
+    <div style="display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #1F2430;padding-bottom:12px">
+      <h2 style="margin:0;font:600 14px 'Space Grotesk',sans-serif;letter-spacing:.02em">20 tasarım akımı — Canlı</h2>
+      <span style="font:500 11px 'Inter',sans-serif;color:#6B7488">01–20 · tıklayıp açın</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:16px;margin-top:20px">
+      <sc-for list="{{ canli }}" as="c" hint-placeholder-count="10">
+        <a href="{{ c.href }}" class="hub-card" style="display:block;background:{{ c.bg }};border:1px solid {{ c.kenar }};border-radius:16px;overflow:hidden">
+          <div style="height:96px;background:{{ c.onizleme }};position:relative;border-bottom:1px solid {{ c.kenar }}">
+            <span style="position:absolute;left:12px;top:12px;font:700 11px 'Space Grotesk',sans-serif;color:{{ c.noRenk }};background:{{ c.noPil }};border-radius:8px;padding:4px 9px">{{ c.no }}</span>
+            <span style="position:absolute;right:12px;top:12px;font:600 9px 'Inter',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:{{ c.etiketRenk }}">{{ c.etiket }}</span>
+          </div>
+          <div style="padding:14px 15px 16px">
+            <div style="font:600 15px/1.25 'Space Grotesk',sans-serif;color:{{ c.baslikRenk }}">{{ c.ad }}</div>
+            <div style="margin-top:6px;font:400 11.5px/1.5 'Inter',sans-serif;color:{{ c.aciklamaRenk }}">{{ c.aciklama }}</div>
+            <div style="margin-top:12px;display:flex;align-items:center;gap:6px;font:600 11px 'Inter',sans-serif;color:{{ c.linkRenk }}">Sayfayı aç <span>→</span></div>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1180px;margin:0 auto;padding:30px 24px 0">
+    <div style="display:flex;align-items:center;gap:10px;background:#0E1A14;border:1px solid #1C3327;border-radius:14px;padding:14px 18px">
+      <span style="width:30px;height:30px;border-radius:15px;background:#123522;color:#4FD08C;display:flex;align-items:center;justify-content:center;font:700 14px 'Space Grotesk',sans-serif">✓</span>
+      <div style="flex:1"><div style="font:600 13px 'Space Grotesk',sans-serif;color:#EAF6EE">İki parti de tamamlandı — 20/20 akım canlı</div><div style="font:500 11px 'Inter',sans-serif;color:#6E8B7C;margin-top:2px">1. parti 01–10 · 2. parti 11–20 · hepsi yukarıdaki ızgaradan açılır</div></div>
+    </div>
+  </section>
+
+  <section style="max-width:1180px;margin:34px auto 0;padding:0 24px">
+    <div style="background:#101319;border:1px solid #1F2430;border-radius:16px;padding:20px 22px;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+      <div style="flex:1;min-width:240px">
+        <div style="font:600 11px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6E8BFF">Ortak omurga · her sayfada</div>
+        <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ omurga }}" as="o" hint-placeholder-count="12">
+            <span style="font:500 11px 'Inter',sans-serif;color:#C4CAD6;background:#181C25;border:1px solid #262B38;border-radius:8px;padding:5px 10px">{{ o.ad }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="width:260px;min-width:220px">
+        <div style="font:600 11px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6E8BFF">Not</div>
+        <p style="margin:8px 0 0;font:400 12px/1.65 'Inter',sans-serif;color:#8A93A7">Sayfalar tek bir tarayıcı ortamında ayrı dosyalar olarak açılır; bu ortamda farklı portlarda sunucu çalıştırılamadığı için hub üzerinden gezinme sağlanır. Görsel alanlar stilize placeholder'dır — kendi fotoğraflarınız sonradan yerleştirilebilir.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer style="max-width:1180px;margin:30px auto 0;padding:20px 24px 0;border-top:1px solid #1F2430;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <span style="font:500 11px 'Inter',sans-serif;color:#6B7488">© 2026 emlaktr.com · Tasarım akımları laboratuvarı</span>
+    <span style="font:500 11px 'Inter',sans-serif;color:#556071">Ortak veri: arsa-data.js · TR arayüz · ₺ TRY</span>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1200, &quot;height&quot;: 900}}">
+class Component extends DCLogic {
+  renderVals(){
+    const canliData = [
+      {no:"01", ad:"Flat 2.0 / Semi-flat", aciklama:"Yumuşak gölge, temiz katman ayrımı, mavi vurgu. Klasik enterprise netliği.", href:"01 Flat 2.0.dc.html", onizleme:"linear-gradient(135deg,#EFF4FF,#DCE7FB)", vurgu:"#1866D6"},
+      {no:"02", ad:"Material Design 3", aciklama:"Teal renk sistemi, geniş radius, tonal yüzeyler, Material Symbols.", href:"02 Material Design.dc.html", onizleme:"linear-gradient(135deg,#CCE8E7,#E9F2F1)", vurgu:"#00696D"},
+      {no:"03", ad:"Card UI", aciklama:"Her bölüm ayrı kart; başlık şeritleri, ikon rozetleri, yüzen sticky bar.", href:"03 Card UI.dc.html", onizleme:"linear-gradient(135deg,#EEF1FD,#E0E6F5)", vurgu:"#3B5BDB"},
+      {no:"04", ad:"Content-first UI", aciklama:"Serif tipografi, editöryel akış, açıklama ve konum anlatısı öne çıkar.", href:"04 Content-First.dc.html", onizleme:"linear-gradient(135deg,#F7F4EC,#EDE7DA)", vurgu:"#A3512B"},
+      {no:"05", ad:"Typography-first UI", aciklama:"Archivo, keskin ızgara, numaralı bölümler, yüksek kontrast siyah-kırmızı.", href:"05 Typography-First.dc.html", onizleme:"linear-gradient(135deg,#FFFFFF,#E8E8E6)", vurgu:"#D92D20"},
+      {no:"06", ad:"Minimalism", aciklama:"Bol beyaz alan, ince ayraçlar, ortalanmış fiyat, sessiz yeşil vurgu.", href:"06 Minimalism.dc.html", onizleme:"linear-gradient(135deg,#FCFCFC,#EDEDEB)", vurgu:"#2F6F4F"},
+      {no:"07", ad:"Mobile-first / Thumb", aciklama:"iOS dili, alt tab bar + sticky CTA, büyük dokunma hedefleri, bottom sheet.", href:"07 Mobile-First.dc.html", onizleme:"linear-gradient(135deg,#E5F0FF,#F2F2F7)", vurgu:"#0A84FF"},
+      {no:"08", ad:"Responsive / Adaptive", aciklama:"Canlı breakpoint anahtarı; 1/2 kolon + sticky lead rail, container queries.", href:"08 Responsive.dc.html", onizleme:"linear-gradient(135deg,#EEEAFC,#E3DEF7)", vurgu:"#6E56CF"},
+      {no:"09", ad:"Progressive Disclosure", aciklama:"Katman katman açılan bölümler, 3 adımlı lead sihirbazı, kaynak göster.", href:"09 Progressive Disclosure.dc.html", onizleme:"linear-gradient(135deg,#F6EFE3,#EBE0CC)", vurgu:"#B45309"},
+      {no:"10", ad:"Microinteractions", aciklama:"Basış-yaylanma, skeleton→içerik, animasyonlu grafik, kalp burst, dot-typing.", href:"10 Microinteractions.dc.html", onizleme:"linear-gradient(135deg,#ECEAFB,#E0DCF6)", vurgu:"#5B49E8"},
+      {no:"11", ad:"Motion Design", aciklama:"Paralaks hero, kaydırmada sahnelenen bölümler, akan grafik çizimi.", href:"11 Motion Design.dc.html", onizleme:"linear-gradient(135deg,#1A1330,#2A1C22)", vurgu:"#FF5C39"},
+      {no:"12", ad:"High-contrast UI", aciklama:"Siyah/sarı, 3px kenarlar, görünür focus, maksimum okunabilirlik.", href:"12 High-Contrast.dc.html", onizleme:"linear-gradient(135deg,#000000,#1A1A00)", vurgu:"#FFE500"},
+      {no:"13", ad:"Accessibility-first", aciklama:"Skip link, ARIA, hata mesajlı form, çalışan erişilebilirlik araç çubuğu.", href:"13 Accessibility-First.dc.html", onizleme:"linear-gradient(135deg,#E1EBFB,#D3DCE8)", vurgu:"#0B4FBF"},
+      {no:"14", ad:"Data-dense UI", aciklama:"Metrik şeridi, sıkışık tablolar, monospace sayılar, terminal hissi.", href:"14 Data-Dense.dc.html", onizleme:"linear-gradient(135deg,#0E1420,#1A2333)", vurgu:"#4B8BF5"},
+      {no:"15", ad:"Split-screen UI", aciklama:"Üstte sabit medya/harita paneli, altta kayan içerik; ikili görünüm.", href:"15 Split-Screen.dc.html", onizleme:"linear-gradient(135deg,#12241D,#1E3A2E)", vurgu:"#1E7A54"},
+      {no:"16", ad:"E-commerce Conversion", aciklama:"Canlı izleyici sayacı, sosyal kanıt, aciliyet bandı, güçlü CTA.", href:"16 E-commerce Conversion.dc.html", onizleme:"linear-gradient(135deg,#FFF3E9,#FDECE5)", vurgu:"#E05323"},
+      {no:"17", ad:"Personalized / Adaptive", aciklama:"Persona seçici; içerik, eşleşme skoru ve öneriler profile göre değişir.", href:"17 Personalized Adaptive.dc.html", onizleme:"linear-gradient(135deg,#EDE9FA,#E1DAF5)", vurgu:"#5B4BD6"},
+      {no:"18", ad:"Dark UI / Dark Mode", aciklama:"Koyu yüzeyler, neon teal vurgu, çalışan açık/koyu tema anahtarı.", href:"18 Dark Mode.dc.html", onizleme:"linear-gradient(135deg,#0B0F14,#141A22)", vurgu:"#2DD4BF"},
+      {no:"19", ad:"Bento Grid", aciklama:"Farklı boyutta modüler kutucuklar, ritmik ızgara, bento genel bakış.", href:"19 Bento Grid.dc.html", onizleme:"linear-gradient(135deg,#F4F0E8,#E9E0CF)", vurgu:"#D2542A"},
+      {no:"20", ad:"Dashboard UI", aciklama:"KPI şeridi, mini grafikler, widget kartları, yönetim paneli netliği.", href:"20 Dashboard UI.dc.html", onizleme:"linear-gradient(135deg,#101426,#1C2340)", vurgu:"#3D5AF1"}
+    ];
+    const canli = canliData.map(c => ({...c,
+      bg:"#12151C", kenar:"#242A38",
+      noPil: c.vurgu, noRenk:"#FFFFFF",
+      etiket:"Canlı", etiketRenk:"#5B9C6E",
+      baslikRenk:"#F3F5F9", aciklamaRenk:"#93A0B4", linkRenk: c.vurgu
+    }));
+    const sirada = [];
+    const omurga = ["Global header","Breadcrumb","Hero medya","Fiyat zekâsı","Sticky sekmeler","AI özet","AI soru-cevap","Temel + detaylı özellik","Açıklama","Konum & risk","Piyasa analizi","Finansal analiz","Belgeler & doğrulama","Danışman paneli","Güvenlik & şikayet","Benzer ilanlar","SEO içerik","Footer","Lead formu","İlan durumları"].map(ad => ({ad}));
+    return { canli, sirada, siradaVar: sirada.length > 0, omurga };
+  }
+}
+</script>
+</body>
+</html>

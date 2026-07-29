@@ -13,6 +13,7 @@ import {
   createComparisonListings,
   type CompareProperty,
 } from './comparison-listing-adapter'
+import { PageContainer } from '@/components/PageContainer'
 import styles from './ComparisonWorkbench.module.css'
 
 const START: CompareProperty[] = [
@@ -180,7 +181,7 @@ export function ComparisonWorkbench({
     : FIELDS
 
   return (
-    <main className={styles.page}>
+    <PageContainer className={styles.page}>
       <header className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>KARAR DESTEK WORKSPACE</p>
@@ -265,6 +266,7 @@ export function ComparisonWorkbench({
           </GlassChip>
           <GlassSelect
             size="sm"
+            aria-label="Karşılaştırma sıralaması"
             options={routeDriven ? ROUTE_SORTS : SORTS}
             value={sort}
             onChange={setSort}
@@ -347,6 +349,6 @@ export function ComparisonWorkbench({
           </article>
         ))}
       </section>
-    </main>
+    </PageContainer>
   )
 }

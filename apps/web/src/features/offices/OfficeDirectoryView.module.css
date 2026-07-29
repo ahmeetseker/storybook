@@ -1,11 +1,6 @@
+/* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır. */
 .page {
-  container-type: inline-size;
   color: var(--lg-label);
-  padding: var(--lg-space-4);
-  padding-bottom: calc(
-    var(--lg-shell-dock-offset, var(--lg-space-4)) +
-      env(safe-area-inset-bottom, 0px)
-  );
 }
 
 .hero {
@@ -98,13 +93,6 @@
 @container (width > 76rem) {
   .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); }
   .desktopFilters { display: block; position: sticky; top: var(--lg-space-5); }
-  .page {
-    padding: var(--lg-space-7);
-    padding-bottom: calc(
-      var(--lg-shell-dock-offset, var(--lg-space-7)) +
-        env(safe-area-inset-bottom, 0px)
-    );
-  }
 }
 
 @container (width < 48rem) {

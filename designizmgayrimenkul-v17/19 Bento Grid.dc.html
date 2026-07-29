@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E0D4}
+a{color:#D2542A;text-decoration:none} a:hover{color:#A93E1C}
+input,select,textarea,button{font-family:'Inter',sans-serif}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes sheetIn{from{transform:translate(-50%,44px)}to{transform:translate(-50%,0)}}
+.bento{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.b-lift{transition:transform .18s ease,box-shadow .18s ease}
+.b-lift:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(60,45,30,.12)}
+</style>
+</helmet>
+
+<div data-screen-label="19 Bento Grid" style="max-width:430px;margin:0 auto;min-height:100vh;background:#F4F0E8;font-family:'Inter',sans-serif;color:#2A2419;box-shadow:0 0 40px rgba(60,45,30,.16);padding-bottom:92px;box-sizing:border-box">
+
+  <a href="00 Index.dc.html" style="display:flex;justify-content:space-between;align-items:center;background:#241F16;color:#8C8371;padding:7px 16px;font:600 10px/1 'Inter',sans-serif;letter-spacing:.12em;text-transform:uppercase">
+    <span style="color:#FFFFFF">19 · Bento Grid</span><span>← Tüm akımlar</span>
+  </a>
+
+  <header style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+    <div style="flex:1;font:800 18px/1 'Bricolage Grotesque',sans-serif;letter-spacing:-.02em">emlaktr<span style="color:#D2542A">.com</span></div>
+    <button title="AI arama" style="width:36px;height:36px;border:0;border-radius:12px;background:#FFFFFF;font-size:14px;color:#5A5140;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.08)">⌕</button>
+    <button onClick="{{ favDegis }}" style="width:36px;height:36px;border:0;border-radius:12px;background:#FFFFFF;font-size:15px;color:#D2542A;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.08)">{{ favIkon }}</button>
+  </header>
+
+  <div style="padding:0 14px;font:500 10.5px/1.5 'Inter',sans-serif;color:#8C8371;white-space:nowrap;overflow-x:auto">Arsa · Antalya · Döşemealtı · <b style="color:#2A2419">Yeniköy</b> · #2470931</div>
+
+  <section data-screen-label="Bento genel bakış" style="padding:12px 14px 0">
+    <div class="bento">
+      <div class="b-lift" style="grid-column:span 2;position:relative;height:190px;border-radius:18px;overflow:hidden;background:{{ fotoBg }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center">
+          <div style="font:600 9.5px 'Inter',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(42,36,25,.5)">{{ fotoKat }}</div>
+          <div style="font:700 17px 'Bricolage Grotesque',sans-serif;color:rgba(42,36,25,.78)">{{ fotoAd }}</div>
+        </div>
+        <div style="position:absolute;left:10px;top:10px;display:flex;gap:5px"><span style="font:700 10px 'Inter',sans-serif;color:#0C3B24;background:#8BE0B0;border-radius:8px;padding:4px 8px">✓ Doğrulanmış</span></div>
+        <button onClick="{{ geri }}" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;border-radius:16px;background:rgba(255,255,255,.92);font-size:15px;cursor:pointer">‹</button>
+        <button onClick="{{ ileri }}" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;border-radius:16px;background:rgba(255,255,255,.92);font-size:15px;cursor:pointer">›</button>
+        <span style="position:absolute;right:10px;bottom:10px;background:rgba(36,31,22,.78);color:#FFFFFF;font:700 10px 'Inter',sans-serif;border-radius:10px;padding:3px 8px">{{ fotoSay }}</span>
+      </div>
+
+      <div class="b-lift" style="grid-column:span 2;background:#241F16;color:#FFFFFF;border-radius:18px;padding:16px">
+        <div style="font:600 9.5px 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#B8A67F">Fiyat · −%5,1</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:4px;flex-wrap:wrap"><div style="font:800 28px/1 'Bricolage Grotesque',sans-serif;color:#F5A623">₺8.450.000</div><span style="font:500 12px 'Inter',sans-serif;color:#8C8371;text-decoration:line-through">₺8.900.000</span></div>
+        <div style="font:600 11.5px 'Inter',sans-serif;color:#D8CDB5;margin-top:4px">₺6.401/m² · krediye uygun · ✦ medyanın %7 altında</div>
+      </div>
+
+      <div class="b-lift" style="background:#FFFFFF;border-radius:18px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <div style="font:800 22px 'Bricolage Grotesque',sans-serif">1.320<span style="font:600 12px 'Inter',sans-serif;color:#8C8371"> m²</span></div>
+        <div style="font:500 10px 'Inter',sans-serif;color:#8C8371;margin-top:2px">Alan · köşe parsel</div>
+        <div style="height:1px;background:#EFEAE0;margin:10px 0"></div>
+        <div style="font:800 18px 'Bricolage Grotesque',sans-serif;color:#D2542A">0,30</div>
+        <div style="font:500 10px 'Inter',sans-serif;color:#8C8371;margin-top:2px">Emsal · 2 kat · ≈396 m²</div>
+      </div>
+
+      <div class="b-lift" style="background:#FCEEE7;border-radius:18px;padding:14px">
+        <div style="font:600 9.5px 'Inter',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#B04521">Gelişim</div>
+        <div style="font:800 26px 'Bricolage Grotesque',sans-serif;color:#D2542A;margin-top:2px">+%12</div>
+        <div style="font:500 10px 'Inter',sans-serif;color:#A9663F;margin-top:2px">90 günlük bölge trendi</div>
+        <svg viewBox="0 0 100 28" style="width:100%;height:30px;margin-top:6px" preserveAspectRatio="none"><polyline points="0,25 16,20 32,22 48,15 64,11 80,13 100,3" fill="none" stroke="#D2542A" stroke-width="3" stroke-linecap="round"></polyline></svg>
+      </div>
+
+      <div class="b-lift" style="grid-column:span 2;background:#FFFFFF;border-radius:18px;padding:6px;box-shadow:0 1px 3px rgba(60,45,30,.06);display:flex;gap:6px">
+        <button onClick="{{ telGoster }}" style="flex:1.5;height:46px;border:0;border-radius:13px;background:#D2542A;color:#FFFFFF;font:700 12.5px 'Inter',sans-serif;cursor:pointer">{{ telYazi }}</button>
+        <button onClick="{{ mesajAc }}" style="flex:1;height:46px;border:0;border-radius:13px;background:#F4EDE3;color:#B04521;font:700 12.5px 'Inter',sans-serif;cursor:pointer">Mesaj</button>
+        <button onClick="{{ alarmDegis }}" title="Alarm" style="width:48px;height:46px;border:0;border-radius:13px;background:{{ alarmZemin }};color:{{ alarmRenk }};font-size:15px;cursor:pointer">⊙</button>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="Başlık" style="padding:14px 14px 0">
+    <h1 style="margin:0;font:700 20px/1.3 'Bricolage Grotesque',sans-serif">Yeniköy'de 24 m yol cepheli, konut imarlı köşe parsel</h1>
+    <div style="margin-top:4px;font:500 12px 'Inter',sans-serif;color:#8C8371">Antalya · Döşemealtı · Yeniköy · Yayın 12 Haz · <span style="color:#1B8A55;font-weight:600">● Aktif</span></div>
+    <sc-if value="{{ rezerve }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FBF0DA;border-radius:12px;padding:9px 12px;font:600 11.5px/1.5 'Inter',sans-serif;color:#8A6410">◆ Rezerve — benzer portföyler önerilebilir</div>
+    </sc-if>
+    <sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:10px;background:#FCE4E0;border-radius:12px;padding:9px 12px;font:600 11.5px/1.5 'Inter',sans-serif;color:#B23726">■ Satıldı — <a href="#benzer" style="color:#B23726;text-decoration:underline">benzer ilanlar</a></div>
+    </sc-if>
+  </section>
+
+  <nav data-screen-label="Sekmeler" style="position:sticky;top:0;z-index:50;background:rgba(244,240,232,.96);backdrop-filter:blur(8px);display:flex;gap:6px;overflow-x:auto;padding:12px 14px;margin-top:12px">
+    <sc-for list="{{ sekmeler }}" as="t" hint-placeholder-count="8">
+      <button onClick="{{ t.git }}" style="flex:none;height:32px;padding:0 13px;border-radius:16px;border:0;background:{{ t.zemin }};color:{{ t.renk }};font:600 11px 'Inter',sans-serif;cursor:pointer;box-shadow:{{ t.golge }}">{{ t.ad }}</button>
+    </sc-for>
+  </nav>
+
+  <section id="ozet" data-screen-label="Hızlı özellikler" style="padding:2px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:6px 2px 10px">Temel özellikler</div>
+    <div class="bento">
+      <sc-for list="{{ hizli }}" as="h" hint-placeholder-count="10">
+        <div class="b-lift" style="grid-column:span {{ h.span }};background:#FFFFFF;border-radius:14px;padding:11px 13px;box-shadow:0 1px 3px rgba(60,45,30,.06)"><div style="font:500 10px 'Inter',sans-serif;color:#8C8371">{{ h.k }}</div><div style="font:700 14px 'Bricolage Grotesque',sans-serif;margin-top:2px">{{ h.v }}</div></div>
+      </sc-for>
+    </div>
+  </section>
+
+  <sc-if value="{{ aiAcik }}" hint-placeholder-val="{{ true }}">
+  <section data-screen-label="AI" style="padding:14px 14px 0">
+    <div style="background:linear-gradient(135deg,#241F16,#2E2519);border-radius:18px;padding:16px;color:#FFFFFF">
+      <div style="display:flex;align-items:center;gap:8px"><span style="width:30px;height:30px;border-radius:15px;background:#F5A623;color:#241F16;display:flex;align-items:center;justify-content:center;font-size:14px">✦</span><b style="font:700 14px 'Bricolage Grotesque',sans-serif">AI özeti ve soru-cevap</b></div>
+      <div class="bento" style="margin-top:12px">
+        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px"><div style="font:700 9px 'Inter',sans-serif;letter-spacing:.1em;color:#8BE0B0">İNŞAAT HAKKI</div><div style="font:700 15px 'Bricolage Grotesque',sans-serif;margin-top:3px">≈396 m²</div><div style="font:400 9.5px 'Inter',sans-serif;color:#B8A67F">2 kat · villa</div></div>
+        <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:10px 12px"><div style="font:700 9px 'Inter',sans-serif;letter-spacing:.1em;color:#F5A623">FİYAT KONUMU</div><div style="font:700 15px 'Bricolage Grotesque',sans-serif;margin-top:3px">%7 altında</div><div style="font:400 9.5px 'Inter',sans-serif;color:#B8A67F">medyana göre</div></div>
+      </div>
+      <div style="margin-top:10px;font:400 11.5px/1.6 'Inter',sans-serif;color:#D8CDB5">Altyapı parselde; doğalgaz 400 m. Villa geliştirme ve 2–4 yıllık değer artışı için uygun; imar çapı teyidi önerilir.</div>
+      <div style="display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.sor }}" style="flex:none;border:1px solid #4A4030;background:rgba(255,255,255,.05);color:#F5D9A8;border-radius:15px;padding:7px 11px;font:600 10.5px 'Inter',sans-serif;cursor:pointer">{{ c.q }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <sc-for list="{{ mesajlar }}" as="m" hint-placeholder-count="0">
+          <div style="display:flex;justify-content:{{ m.hiza }}">
+            <div style="max-width:88%;border-radius:{{ m.radius }};padding:9px 12px;background:{{ m.zemin }};color:{{ m.renk }};font:400 12px/1.6 'Inter',sans-serif">{{ m.metin }}
+              <sc-if value="{{ m.kaynak }}" hint-placeholder-val="{{ false }}"><div style="margin-top:5px;font:700 9px 'Inter',sans-serif;color:#241F16;background:#F5A623;border-radius:5px;padding:2px 6px;display:inline-block">⌘ {{ m.kaynak }}</div></sc-if>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ dusunuyor }}" hint-placeholder-val="{{ false }}"><div style="font:600 11px 'Inter',sans-serif;color:#B8A67F">✦ tarıyor…</div></sc-if>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input value="{{ yazi }}" onChange="{{ yaziDegis }}" onKeyDown="{{ enterTus }}" placeholder="Sorunuzu yazın…" style="flex:1;height:40px;border:1px solid #4A4030;border-radius:20px;padding:0 14px;font:400 12px 'Inter',sans-serif;background:rgba(255,255,255,.05);color:#FFFFFF;outline-color:#F5A623">
+        <button onClick="{{ gonder }}" style="width:40px;height:40px;border:0;border-radius:20px;background:#F5A623;color:#241F16;font-size:15px;cursor:pointer">↑</button>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section id="ozellikler" data-screen-label="Detaylı özellikler" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Detaylı özellikler</div>
+    <div class="bento">
+      <sc-for list="{{ gruplar }}" as="g" hint-placeholder-count="4">
+        <div class="b-lift" style="grid-column:span 2;background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+          <button onClick="{{ g.ac }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:12px 14px;cursor:pointer">
+            <span style="font:700 12.5px 'Bricolage Grotesque',sans-serif">{{ g.baslik }}</span><span style="width:24px;height:24px;border-radius:12px;background:#F4EDE3;color:#D2542A;display:flex;align-items:center;justify-content:center;font-size:13px">{{ g.ikon }}</span>
+          </button>
+          <sc-if value="{{ g.acikMi }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 14px 10px">
+              <sc-for list="{{ g.satirlar }}" as="s" hint-placeholder-count="5">
+                <div style="display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #F1ECE2;font:400 11.5px 'Inter',sans-serif"><span style="color:#8C8371">{{ s.k }}</span><b style="text-align:right">{{ s.v }}</b></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:10px;background:#FFFFFF;border-radius:16px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+      <p style="margin:0;font:400 12px/1.7 'Inter',sans-serif;color:#4A4234;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:{{ aciklamaSatir }}">{{ aciklamaMetin }}</p>
+      <button onClick="{{ aciklamaDegis }}" style="margin-top:6px;border:0;background:none;color:#D2542A;font:700 11px 'Inter',sans-serif;cursor:pointer;padding:0">{{ aciklamaBtn }}</button>
+    </div>
+  </section>
+
+  <section id="konum" data-screen-label="Konum" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Konum ve çevre</div>
+    <div class="bento">
+      <div class="b-lift" style="grid-column:span 2;position:relative;height:150px;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(0deg,#E9E3D6 0 24px,#DFD8C8 24px 25px),repeating-linear-gradient(90deg,#E9E3D6 0 24px,#DFD8C8 24px 25px)">
+        <div style="position:absolute;left:56%;top:30%;width:112px;height:70px;border:2px dashed #D2542A;background:rgba(210,84,42,.1);border-radius:5px;transform:rotate(-4deg)"></div>
+        <div style="position:absolute;left:63%;top:42%;width:13px;height:13px;border-radius:50%;background:#D2542A;box-shadow:0 0 0 5px rgba(210,84,42,.2)"></div>
+        <span style="position:absolute;left:10px;bottom:10px;background:#FFFFFF;border-radius:9px;padding:4px 9px;font:700 10px 'Inter',sans-serif;box-shadow:0 1px 4px rgba(60,45,30,.12)">37.0021, 30.5983</span>
+      </div>
+      <sc-for list="{{ poiKart }}" as="p" hint-placeholder-count="4">
+        <div class="b-lift" style="background:#FFFFFF;border-radius:14px;padding:11px 12px;box-shadow:0 1px 3px rgba(60,45,30,.06)"><div style="font:700 15px 'Bricolage Grotesque',sans-serif;color:#D2542A">{{ p.kisa }}</div><div style="font:600 11px 'Inter',sans-serif;margin-top:2px">{{ p.ad }}</div><div style="font:400 9.5px 'Inter',sans-serif;color:#8C8371">{{ p.tip }}</div></div>
+      </sc-for>
+      <div class="b-lift" style="background:#FFFFFF;border-radius:14px;padding:11px 13px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <div style="font:700 9px 'Inter',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8C8371;margin-bottom:6px">Skorlar</div>
+        <sc-for list="{{ skorlar }}" as="sk" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;font:600 10px 'Inter',sans-serif;padding:2px 0"><span style="color:#4A4234">{{ sk.k }}</span><b style="color:#D2542A">{{ sk.v }}</b></div></sc-for>
+      </div>
+      <div class="b-lift" style="background:#FFFFFF;border-radius:14px;padding:11px 13px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <div style="font:700 9px 'Inter',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#8C8371;margin-bottom:6px">Riskler</div>
+        <sc-for list="{{ riskler }}" as="r" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:6px;font:600 10px/1.4 'Inter',sans-serif;padding:2px 0"><span style="color:#4A4234">{{ r.k }}</span><b style="color:{{ r.renk }};text-align:right">{{ r.v }}</b></div></sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="piyasa" data-screen-label="Piyasa" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Piyasa</div>
+    <div class="bento">
+      <div class="b-lift" style="background:#EAF6EE;border-radius:16px;padding:14px"><div style="font:800 20px 'Bricolage Grotesque',sans-serif;color:#1B8A55">₺6.401</div><div style="font:500 10px 'Inter',sans-serif;color:#4A6B58">bu ilan/m²</div></div>
+      <div class="b-lift" style="background:#FFFFFF;border-radius:16px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)"><div style="font:800 20px 'Bricolage Grotesque',sans-serif">₺6.900</div><div style="font:500 10px 'Inter',sans-serif;color:#8C8371">mahalle medyanı</div></div>
+      <div class="b-lift" style="grid-column:span 2;background:#FFFFFF;border-radius:16px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <div style="position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,#3FAE72,#E6B33E,#DE5A45)"><div style="position:absolute;left:34%;top:-3px;width:4px;height:16px;border-radius:2px;background:#241F16;box-shadow:0 0 0 2px #FFFFFF"></div></div>
+        <div style="display:flex;justify-content:space-between;font:500 9px 'Inter',sans-serif;color:#8C8371;margin-top:4px"><span>₺5.200</span><span>medyan</span><span>₺9.100</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font:500 10.5px 'Inter',sans-serif;color:#8C8371"><span>Satış <b style="color:#2A2419">74g</b></span><span>Arz <b style="color:#2A2419">23</b></span><span>Yaş <b style="color:#2A2419">26g</b></span><span>Pazarlık <b style="color:#2A2419">%3–5</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="finans" data-screen-label="Finans" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Finansal analiz</div>
+    <div style="background:#FFFFFF;border-radius:18px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+      <div style="display:flex;justify-content:space-between;font:500 11px 'Inter',sans-serif;color:#4A4234"><span>Peşinat %{{ pesinat }} (₺{{ pesinatTL }})</span><span>{{ vade }} ay</span></div>
+      <input type="range" min="50" max="90" step="5" value="{{ pesinat }}" onChange="{{ pesinatDegis }}" style="width:100%;accent-color:#D2542A;margin-top:8px">
+      <input type="range" min="12" max="120" step="12" value="{{ vade }}" onChange="{{ vadeDegis }}" style="width:100%;accent-color:#D2542A">
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <sc-for list="{{ faizler }}" as="f" hint-placeholder-count="3">
+          <button onClick="{{ f.sec }}" style="border:1px solid {{ f.kenar }};background:{{ f.zemin }};color:{{ f.renk }};border-radius:14px;padding:6px 11px;font:600 10.5px 'Inter',sans-serif;cursor:pointer">%{{ f.v }}</button>
+        </sc-for>
+      </div>
+      <div class="bento" style="margin-top:12px">
+        <div style="grid-column:span 2;background:#241F16;border-radius:14px;padding:14px;text-align:center"><div style="font:500 11px 'Inter',sans-serif;color:#B8A67F">Aylık taksit</div><div style="font:800 28px/1.1 'Bricolage Grotesque',sans-serif;color:#F5A623">₺{{ taksitTL }}</div></div>
+        <div style="background:#F4EDE3;border-radius:14px;padding:11px 12px"><div style="font:500 9px 'Inter',sans-serif;color:#8C8371">KREDİ</div><b style="font:700 13px 'Bricolage Grotesque',sans-serif">₺{{ krediTL }}</b></div>
+        <div style="background:#F4EDE3;border-radius:14px;padding:11px 12px"><div style="font:500 9px 'Inter',sans-serif;color:#8C8371">TOPLAM</div><b style="font:700 13px 'Bricolage Grotesque',sans-serif">₺{{ toplamTL }}</b></div>
+      </div>
+      <sc-if value="{{ ltvUyari }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:10px;background:#FBF0DA;border-radius:12px;padding:9px 11px;font:600 10.5px/1.5 'Inter',sans-serif;color:#8A6410">Arsada tipik kredi limiti ekspertizin %50'si — peşinatı artırın.</div>
+      </sc-if>
+      <div class="bento" style="margin-top:10px">
+        <sc-for list="{{ senaryolar }}" as="s" hint-placeholder-count="3">
+          <div style="background:#F9F5EE;border-radius:12px;padding:9px 10px;text-align:center"><div style="font:600 9px 'Inter',sans-serif;color:#8C8371">{{ s.ad }}</div><b style="font:700 13px 'Bricolage Grotesque',sans-serif">{{ s.deger }}</b></div>
+        </sc-for>
+        <div style="background:#F9F5EE;border-radius:12px;padding:9px 10px;display:flex;align-items:center;justify-content:center"><button onClick="{{ pdf }}" style="border:0;background:none;color:#D2542A;font:700 10.5px 'Inter',sans-serif;cursor:pointer;padding:0">⤓ PDF</button></div>
+      </div>
+      <div style="margin-top:10px">
+        <sc-for list="{{ masraflar }}" as="m" hint-placeholder-count="5">
+          <div style="display:flex;justify-content:space-between;font:400 11px 'Inter',sans-serif;color:#4A4234;padding:4px 0"><span>{{ m.k }}</span><b>{{ m.v }}</b></div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="belgeler" data-screen-label="Belgeler" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Belgeler ve doğrulama</div>
+    <div class="bento">
+      <sc-for list="{{ belgeler }}" as="b" hint-placeholder-count="5">
+        <div class="b-lift" style="grid-column:span {{ b.span }};background:#FFFFFF;border-radius:14px;padding:12px 13px;box-shadow:0 1px 3px rgba(60,45,30,.06);display:flex;justify-content:space-between;align-items:center;gap:8px">
+          <div><b style="font:600 11.5px 'Inter',sans-serif">{{ b.ikon }} {{ b.ad }}</b><div style="font:400 9.5px 'Inter',sans-serif;color:{{ b.durumRenk }}">{{ b.durumYazi }}</div></div>
+          <button onClick="{{ b.tik }}" style="height:30px;border:0;border-radius:15px;background:#F4EDE3;font:700 10px 'Inter',sans-serif;color:#B04521;padding:0 11px;cursor:pointer;white-space:nowrap">{{ b.aksiyon }}</button>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:10px;background:#EAF6EE;border-radius:12px;padding:9px 12px;font:600 10.5px/1.6 'Inter',sans-serif;color:#1B7A4A">✓ EİDS kaydıyla eşleştirildi (28 Haz) · kimlikler maskelenir</div>
+  </section>
+
+  <section id="danisman" data-screen-label="Danışman" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Danışman</div>
+    <div style="background:#FFFFFF;border-radius:18px;padding:14px;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+      <div style="display:flex;gap:12px;align-items:center">
+        <div style="width:52px;height:52px;border-radius:16px;background:#D2542A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:800 17px 'Bricolage Grotesque',sans-serif">AD</div>
+        <div style="flex:1"><div style="font:800 14px 'Bricolage Grotesque',sans-serif">Ayşe Demir <span style="font:600 9px 'Inter',sans-serif;color:#1B7A4A;background:#DEF3E6;border-radius:5px;padding:2px 6px">✓</span></div><div style="font:500 11px 'Inter',sans-serif;color:#8C8371">Akdeniz Gayrimenkul · TB 0700123 · EİDS</div></div>
+        <button onClick="{{ takipDegis }}" style="height:36px;border:0;border-radius:18px;background:{{ takipZemin }};color:{{ takipRenk }};font:700 11px 'Inter',sans-serif;padding:0 14px;cursor:pointer">{{ takipYazi }}</button>
+      </div>
+      <div class="bento" style="margin-top:12px">
+        <div style="background:#F9F5EE;border-radius:12px;padding:10px;text-align:center"><div style="font:800 15px 'Bricolage Grotesque',sans-serif">46</div><div style="font:400 9px 'Inter',sans-serif;color:#8C8371">Portföy</div></div>
+        <div style="background:#F9F5EE;border-radius:12px;padding:10px;text-align:center"><div style="font:800 15px 'Bricolage Grotesque',sans-serif">28dk</div><div style="font:400 9px 'Inter',sans-serif;color:#8C8371">Yanıt</div></div>
+        <div style="background:#F9F5EE;border-radius:12px;padding:10px;text-align:center"><div style="font:800 15px 'Bricolage Grotesque',sans-serif">4,8★</div><div style="font:400 9px 'Inter',sans-serif;color:#8C8371">212</div></div>
+        <div style="background:#F9F5EE;border-radius:12px;padding:10px;text-align:center"><div style="font:800 15px 'Bricolage Grotesque',sans-serif">2019</div><div style="font:400 9px 'Inter',sans-serif;color:#8C8371">Üye</div></div>
+      </div>
+      <button onClick="{{ tumIlanlar }}" style="margin-top:12px;width:100%;height:42px;border:0;border-radius:13px;background:#F4EDE3;font:700 12px 'Inter',sans-serif;color:#B04521;cursor:pointer">Tüm ilanları gör (46) ›</button>
+    </div>
+  </section>
+
+  <section id="guvenlik" data-screen-label="Güvenlik" style="padding:14px 14px 0">
+    <div style="background:#FCE4E0;border-radius:16px;padding:14px">
+      <b style="font:700 12px 'Bricolage Grotesque',sans-serif;color:#B23726">⚠ Kapora uyarısı</b>
+      <div style="font:500 11px/1.6 'Inter',sans-serif;color:#8A2C1E;margin-top:4px">Görmeden kapora göndermeyin; ödemeleri platform dışına taşımayın.</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onClick="{{ bildir }}" style="flex:1;height:36px;border:0;border-radius:11px;background:#FFFFFF;font:600 10.5px 'Inter',sans-serif;color:#8A2C1E;cursor:pointer">İlanı bildir</button>
+        <button onClick="{{ bildir }}" style="flex:1;height:36px;border:0;border-radius:11px;background:#FFFFFF;font:600 10.5px 'Inter',sans-serif;color:#8A2C1E;cursor:pointer">Konum</button>
+        <button onClick="{{ bildir }}" style="flex:1;height:36px;border:0;border-radius:11px;background:#FFFFFF;font:600 10.5px 'Inter',sans-serif;color:#8A2C1E;cursor:pointer">Fiyat</button>
+        <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;font:700 11px 'Inter',sans-serif;color:#1B7A4A">92/100</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="benzer" data-screen-label="Benzer" style="padding:14px 14px 0">
+    <div style="font:700 13px 'Bricolage Grotesque',sans-serif;padding:0 2px 10px">Benzer ilanlar</div>
+    <div class="bento">
+      <sc-for list="{{ benzer }}" as="b" hint-placeholder-count="4">
+        <div class="b-lift" style="background:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+          <div style="height:78px;background:{{ b.bg }}"></div>
+          <div style="padding:10px 12px">
+            <div style="font:600 11px/1.35 'Inter',sans-serif;height:30px;overflow:hidden">{{ b.ad }}</div>
+            <b style="font:700 13px 'Bricolage Grotesque',sans-serif;color:#D2542A">{{ b.fiyat }}</b>
+            <div style="font:400 9px 'Inter',sans-serif;color:#8C8371;margin-top:2px">{{ b.m2 }} · {{ b.m2f }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section data-screen-label="SEO" style="padding:14px 14px 0">
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ aramalar }}" as="a" hint-placeholder-count="5">
+        <a href="#" style="border:0;border-radius:14px;padding:7px 12px;font:600 10.5px 'Inter',sans-serif;color:#5A5140;background:#FFFFFF;box-shadow:0 1px 3px rgba(60,45,30,.06)">{{ a.ad }}</a>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer" style="margin-top:14px;background:#241F16;color:#8C8371;padding:20px 16px">
+    <div style="font:800 16px 'Bricolage Grotesque',sans-serif;color:#FFFFFF">emlaktr<span style="color:#F5A623">.com</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font:400 11px/2 'Inter',sans-serif">
+      <div><b style="font:600 9.5px 'Inter',sans-serif;letter-spacing:.1em;color:#FFFFFF">KURUMSAL</b><a href="#" style="display:block;color:#8C8371">Hakkımızda</a><a href="#" style="display:block;color:#8C8371">İletişim</a></div>
+      <div><b style="font:600 9.5px 'Inter',sans-serif;letter-spacing:.1em;color:#FFFFFF">GÜVEN</b><a href="#" style="display:block;color:#8C8371">Güvenli alışveriş</a><a href="#" style="display:block;color:#8C8371">KVKK · Çerezler</a></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:14px;border-top:1px solid #3A3324;padding-top:10px;font:600 10px 'Inter',sans-serif"><span>TR · ₺ TRY</span><span>© 2026 emlaktr.com</span></div>
+  </footer>
+</div>
+
+<sc-if value="{{ satilmadi }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:rgba(244,240,232,.96);backdrop-filter:blur(10px);border-top:1px solid #E4DCCC;display:flex;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));box-sizing:border-box">
+    <button onClick="{{ telGoster }}" style="flex:1.5;height:44px;border:0;border-radius:13px;background:#D2542A;color:#FFFFFF;font:700 12.5px 'Inter',sans-serif;cursor:pointer">{{ telYazi }}</button>
+    <button onClick="{{ mesajAc }}" style="flex:1;height:44px;border:0;border-radius:13px;background:#FFFFFF;color:#B04521;font:700 12.5px 'Inter',sans-serif;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.1)">Mesaj</button>
+    <button onClick="{{ favDegis }}" style="width:46px;height:44px;border:0;border-radius:13px;background:#FFFFFF;font-size:16px;color:#D2542A;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.1)">{{ favIkon }}</button>
+  </div>
+</sc-if>
+<sc-if value="{{ satildi }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:60;background:#241F16;display:flex;gap:10px;align-items:center;padding:12px 14px;box-sizing:border-box">
+    <span style="flex:1;font:600 12px 'Inter',sans-serif;color:#FFFFFF">Bu ilan satıldı.</span>
+    <button onClick="{{ benzereGit }}" style="height:38px;padding:0 16px;border:0;border-radius:13px;background:#F5A623;color:#241F16;font:700 11.5px 'Inter',sans-serif;cursor:pointer">Benzer ilanlar</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ leadAcik }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ leadKapat }}" style="position:fixed;inset:0;background:rgba(36,31,22,.5);z-index:80"></div>
+  <div style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);z-index:81;background:#F4F0E8;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(36,31,22,.3);animation:sheetIn .22s ease;box-sizing:border-box;max-height:84vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px">
+      <b style="font:800 15px 'Bricolage Grotesque',sans-serif">{{ leadBaslik }}</b>
+      <button onClick="{{ leadKapat }}" style="width:32px;height:32px;border:0;border-radius:16px;background:#FFFFFF;cursor:pointer;color:#8C8371;box-shadow:0 1px 3px rgba(60,45,30,.1)">✕</button>
+    </div>
+    <sc-if value="{{ leadOk }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:16px;text-align:center">
+        <div style="width:56px;height:56px;border-radius:28px;background:#DEF3E6;color:#1B7A4A;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto">✓</div>
+        <b style="display:block;font:800 16px 'Bricolage Grotesque',sans-serif;margin-top:10px">Talebiniz iletildi</b>
+        <div style="font:500 12px/1.6 'Inter',sans-serif;color:#8C8371;margin-top:4px">CRM #L-88412 · ortalama yanıt 28 dk</div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button onClick="{{ leadKapatBenzer }}" style="flex:1;height:44px;border:0;border-radius:13px;background:#FFFFFF;font:700 11.5px 'Inter',sans-serif;color:#B04521;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.1)">Benzer ilanlar</button>
+          <button onClick="{{ leadKapatBelge }}" style="flex:1;height:44px;border:0;border-radius:13px;background:#FFFFFF;font:700 11.5px 'Inter',sans-serif;color:#B04521;cursor:pointer;box-shadow:0 1px 3px rgba(60,45,30,.1)">Belgeler</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ leadFormGoster }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:4px 16px 22px">
+        <input value="{{ fAd }}" onChange="{{ fAdDegis }}" placeholder="Ad Soyad *" aria-label="Ad Soyad" style="width:100%;height:48px;border:0;border-radius:13px;padding:0 14px;font:500 14px 'Inter',sans-serif;box-sizing:border-box;background:#FFFFFF;outline-color:#D2542A;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <input value="{{ fTel }}" onChange="{{ fTelDegis }}" placeholder="Telefon *" aria-label="Telefon" style="margin-top:8px;width:100%;height:48px;border:0;border-radius:13px;padding:0 14px;font:500 14px 'Inter',sans-serif;box-sizing:border-box;background:#FFFFFF;outline-color:#D2542A;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+        <select value="{{ fNiyet }}" onChange="{{ fNiyetDegis }}" aria-label="Niyet" style="margin-top:8px;width:100%;height:48px;border:0;border-radius:13px;padding:0 10px;font:500 14px 'Inter',sans-serif;background:#FFFFFF;box-shadow:0 1px 3px rgba(60,45,30,.06)">
+          <option>Yatırım</option><option>Konut inşa etmek</option><option>Ticari değerlendirme</option><option>Sadece bilgi</option>
+        </select>
+        <label style="display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer">
+          <input type="checkbox" checked="{{ kvkk }}" onChange="{{ kvkkDegis }}" style="margin-top:2px;accent-color:#D2542A">
+          <span style="font:500 10.5px/1.6 'Inter',sans-serif;color:#8C8371"><a href="#" style="text-decoration:underline">KVKK aydınlatma metnini</a> okudum; danışmana iletilmesine izin veriyorum.</span>
+        </label>
+        <button onClick="{{ leadGonder }}" style="margin-top:14px;width:100%;height:52px;border:0;border-radius:14px;background:#D2542A;color:#FFFFFF;font:800 15px 'Inter',sans-serif;cursor:pointer">Gönder</button>
+      </div>
+    </sc-if>
+  </div>
+</sc-if>
+
+<sc-if value="{{ toastVar }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:96px;left:50%;transform:translateX(-50%);z-index:90;background:#241F16;color:#FFFFFF;border-radius:13px;padding:11px 17px;font:600 11.5px 'Inter',sans-serif;box-shadow:0 8px 24px rgba(36,31,22,.4);animation:toastIn .2s ease;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis">{{ toast }}</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 430, &quot;height&quot;: 900}, &quot;ilanDurumu&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;aktif&quot;, &quot;rezerve&quot;, &quot;satildi&quot;], &quot;default&quot;: &quot;aktif&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;İlan&quot;}, &quot;aiPaneli&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Modüller&quot;}}">
+class Component extends DCLogic {
+  state = {
+    D:null, foto:0, sekme:"ozet", acik:{0:true}, fav:false, takip:false,
+    tel:false, alarm:false, mesajlar:[], dusunuyor:false, yazi:"",
+    pesinat:60, vade:48, faiz:2.79, aciklamaAcik:false,
+    leadAcik:false, leadTip:"mesaj", leadOk:false, kvkk:false, fAd:"", fTel:"", fNiyet:"Yatırım", toast:""
+  };
+  componentDidMount(){ import("./arsa-data.js").then(m => this.setState({D: m.D})); }
+  t(m){ clearTimeout(this._tt); this.setState({toast:m}); this._tt = setTimeout(() => this.setState({toast:""}), 2400); }
+  git(id){ const el = document.getElementById(id); if(el){ window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 60, behavior:"smooth"}); this.setState({sekme:id}); } }
+  sor(s){
+    const q = typeof s === "string" ? s : s.q;
+    this.setState({mesajlar:[...this.state.mesajlar, {rol:"k", metin:q}], dusunuyor:true, yazi:""});
+    setTimeout(() => {
+      const D = this.state.D; let c = typeof s === "object" ? s : null;
+      if(!c && D){ const t = q.toLowerCase(); c = D.sorular.find(x => t.split(/[\s?.,]+/).some(w => w.length > 3 && x.q.toLowerCase().includes(w))) || D.fallback; }
+      c = c || {a:"Danışmana iletildi.", kaynak:""};
+      this.setState({mesajlar:[...this.state.mesajlar, {rol:"a", metin:c.a, kaynak:c.kaynak}], dusunuyor:false});
+    }, 900);
+  }
+  renderVals(){
+    const s = this.state, D = s.D || {}, fmt = n => n.toLocaleString("tr-TR");
+    const durum = this.props.ilanDurumu ?? "aktif";
+    const f = s.faiz/100, kredi = Math.round(8450000*(1-s.pesinat/100)), taksit = Math.round(kredi*f/(1-Math.pow(1+f,-s.vade)));
+    const med = (D.medya||[])[s.foto] || {};
+    const ids = [["Özet","ozet"],["Özellik","ozellikler"],["Konum","konum"],["Piyasa","piyasa"],["Finans","finans"],["Belge","belgeler"],["Danışman","danisman"],["Benzer","benzer"]];
+    const acik = s.aciklamaAcik;
+    const spanMap = [2,1,1,2,1,1,1,1,2,1];
+    return {
+      D, satilmadi: durum !== "satildi", satildi: durum === "satildi", rezerve: durum === "rezerve",
+      aiAcik: this.props.aiPaneli ?? true,
+      fotoAd: med.ad || "", fotoKat: med.kat || "", fotoBg: med.bg || "#D6CFC0",
+      fotoSay: (s.foto+1) + " / " + ((D.medya||[]).length || 5),
+      geri: () => this.setState({foto: (s.foto+4) % 5}), ileri: () => this.setState({foto: (s.foto+1) % 5}),
+      sekmeler: ids.map(([ad,id]) => ({ad, git: () => this.git(id),
+        zemin: s.sekme === id ? "#D2542A" : "#FFFFFF", renk: s.sekme === id ? "#FFFFFF" : "#5A5140",
+        golge: s.sekme === id ? "0 4px 10px rgba(210,84,42,.3)" : "0 1px 3px rgba(60,45,30,.08)"})),
+      hizli: (D.hizli||[]).map((h,i) => ({...h, span: spanMap[i] || 1})),
+      gruplar: (D.gruplar||[]).map((g,i) => ({...g, ac: () => this.setState({acik:{...s.acik, [i]: !s.acik[i]}}), acikMi: !!s.acik[i], ikon: s.acik[i] ? "−" : "+"})),
+      chips: (D.sorular||[]).map(q => ({...q, sor: () => this.sor(q)})),
+      mesajlar: s.mesajlar.map(m => m.rol === "k"
+        ? {...m, hiza:"flex-end", zemin:"#F5A623", renk:"#241F16", radius:"14px 14px 4px 14px"}
+        : {...m, hiza:"flex-start", zemin:"rgba(255,255,255,.1)", renk:"#F4F0E8", radius:"14px 14px 14px 4px"}),
+      dusunuyor: s.dusunuyor, yazi: s.yazi,
+      yaziDegis: e => this.setState({yazi: e.target.value}),
+      enterTus: e => { if(e.key === "Enter" && s.yazi.trim()) this.sor(s.yazi.trim()); },
+      gonder: () => { if(s.yazi.trim()) this.sor(s.yazi.trim()); },
+      fav: s.fav, favIkon: s.fav ? "♥" : "♡",
+      favDegis: () => { const v = !s.fav; this.setState({fav:v}); this.t(v ? "Favorilere eklendi" : "Favorilerden çıkarıldı"); },
+      telYazi: s.tel ? "0532 481 07 00" : "Ara — numarayı göster",
+      telGoster: () => { if(!s.tel){ this.setState({tel:true}); this.t("Numara gösterildi · aramalar kayıtlıdır"); } },
+      mesajAc: () => this.setState({leadAcik:true, leadTip:"mesaj", leadOk:false}),
+      randevu: () => this.setState({leadAcik:true, leadTip:"randevu", leadOk:false}),
+      leadAcik: s.leadAcik, leadOk: s.leadOk, leadFormGoster: !s.leadOk,
+      leadBaslik: s.leadTip === "randevu" ? "Gösterim randevusu" : "Danışmana mesaj",
+      leadKapat: () => this.setState({leadAcik:false}),
+      leadKapatBenzer: () => { this.setState({leadAcik:false}); this.git("benzer"); },
+      leadKapatBelge: () => { this.setState({leadAcik:false}); this.git("belgeler"); },
+      fAd: s.fAd, fTel: s.fTel, fNiyet: s.fNiyet, kvkk: s.kvkk,
+      fAdDegis: e => this.setState({fAd: e.target.value}), fTelDegis: e => this.setState({fTel: e.target.value}),
+      fNiyetDegis: e => this.setState({fNiyet: e.target.value}), kvkkDegis: e => this.setState({kvkk: e.target.checked}),
+      leadGonder: () => { if(!s.fAd.trim() || !s.fTel.trim()) return this.t("Ad ve telefon zorunlu"); if(!s.kvkk) return this.t("KVKK iznini onaylayın"); this.setState({leadOk:true}); },
+      alarm: s.alarm, alarmZemin: s.alarm ? "#FDECC9" : "#F4EDE3", alarmRenk: s.alarm ? "#8A6410" : "#B04521",
+      alarmDegis: () => { const v = !s.alarm; this.setState({alarm:v}); this.t(v ? "Fiyat düşünce haber vereceğiz" : "Alarm kapatıldı"); },
+      takip: s.takip, takipYazi: s.takip ? "✓ Takipte" : "Takip et", takipZemin: s.takip ? "#DEF3E6" : "#F4EDE3", takipRenk: s.takip ? "#1B7A4A" : "#B04521",
+      takipDegis: () => this.setState({takip: !s.takip}),
+      tumIlanlar: () => this.t("Danışman portföyü açılıyor… (46 ilan)"),
+      aciklamaMetin: D.aciklama || "", aciklamaSatir: acik ? 99 : 3,
+      aciklamaBtn: acik ? "Daralt ↑" : "Devamını oku ↓",
+      aciklamaDegis: () => this.setState({aciklamaAcik: !acik}),
+      poiKart: (D.poi||[]).slice(0,4).map(p => ({...p, kisa: (p.mesafe||"").split(" · ")[0]})),
+      skorlar: D.skorlar || [],
+      riskler: (D.riskler||[]).map(r => ({...r, renk: r.n >= 2 ? "#8A6410" : "#1B7A4A"})),
+      pesinat: s.pesinat, vade: s.vade,
+      pesinatDegis: e => this.setState({pesinat: Number(e.target.value)}),
+      vadeDegis: e => this.setState({vade: Number(e.target.value)}),
+      faizler: [2.59, 2.79, 3.09].map(x => ({v: x.toFixed(2).replace(".", ","), sec: () => this.setState({faiz:x}),
+        kenar: s.faiz === x ? "#D2542A" : "#E4DCCC", zemin: s.faiz === x ? "#FCEEE7" : "#F9F5EE", renk: s.faiz === x ? "#B04521" : "#8C8371"})),
+      pesinatTL: fmt(Math.round(8450000*s.pesinat/100)), krediTL: fmt(kredi), taksitTL: fmt(taksit), toplamTL: fmt(taksit*s.vade),
+      ltvUyari: (1 - s.pesinat/100) > 0.5,
+      pdf: () => this.t("Finansal rapor PDF hazırlanıyor…"),
+      masraflar: D.masraflar || [], senaryolar: D.senaryolar || [],
+      belgeler: (D.belgeler||[]).map((b,i) => ({...b, ikon: b.kilit ? "🔒" : "▤", span: i === 0 ? 2 : 1,
+        durumYazi: b.tarih ? b.durum + " · " + b.tarih : b.durum,
+        durumRenk: b.durum === "Doğrulandı" ? "#1B7A4A" : "#8A6410",
+        tik: () => b.kilit ? this.t("Görüntülemek için giriş yapın") : (b.aksiyon === "Danışmandan iste" ? this.t("Zemin etüdü talep edildi ✓") : this.t("Belge görüntüleyici açılıyor…"))})),
+      bildir: () => this.t("Bildiriminiz alındı · #R-1042"),
+      benzer: D.benzer || [],
+      aramalar: ((D.seo||{}).aramalar||[]).map(a => ({ad:a})),
+      benzereGit: () => this.git("benzer"),
+      toast: s.toast, toastVar: !!s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

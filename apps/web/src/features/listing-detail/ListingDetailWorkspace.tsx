@@ -1,30 +1,18 @@
-import {
-  GlassBreadcrumb,
-  GlassListingDetailHeader,
-  GlassMetricStrip,
-  type GlassBreadcrumbItem,
-  type GlassListingMetaItem,
-} from '@repo/ui'
-
-import { DeclaredFeaturesSection } from './components/DeclaredFeaturesSection'
+import { PageContainer } from '@/components/PageContainer'
 import { DocumentsSection } from './components/DocumentsSection'
-import { HazardSection } from './components/HazardSection'
-import { InfrastructureSection } from './components/InfrastructureSection'
 import { ListingDecisionRail } from './components/ListingDecisionRail'
+import { ListingDock } from './components/ListingDock'
 import { ListingEvidenceBrief } from './components/ListingEvidenceBrief'
-import { ListingIntro } from './components/ListingIntro'
-import { ListingSectionIndex } from './components/ListingSectionIndex'
-import { MarketSection } from './components/MarketSection'
-import { ParcelSection } from './components/ParcelSection'
-import { PlanningAndLegalSection } from './components/PlanningAndLegalSection'
+import { ListingLedger, ListingTally } from './components/ListingLedger'
+import { ListingQuestions } from './components/ListingQuestions'
+import { ListingStage } from './components/ListingStage'
+import { listingQuestions } from './components/listing-question-set'
 import { SellerSection, type SellerPhoneAnalyticsEvent } from './components/SellerSection'
-import { sectionsFor } from './components/listing-sections'
 import { hasSellerRevealControl, SELLER_REVEAL_CONTROL_ID } from './components/seller-reveal'
 import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
 import type { ListingDetail } from './domain/listing-detail-types'
-import { metricStripItems } from './domain/listing-detail-view-model'
-import { formatArea, formatDate, lifecycleStatus } from './format'
+import { formatArea, formatDate, formatPrice, formatUnitPrice } from './format'
 import styles from './ListingDetailWorkspace.module.css'
 
 export interface ListingDetailWorkspaceProps {
@@ -47,56 +35,6 @@ export interface ListingDetailWorkspaceProps {
   onReportIssue?: () => void
   /** Numara açma olayları (yalnız olay adı; numara asla gönderilmez) */
   onAnalyticsEvent?: (event: SellerPhoneAnalyticsEvent) => void
-}
-
-function breadcrumbItems(detail: ListingDetail): GlassBreadcrumbItem[] {
-  const root = detail.kind === 'land' ? 'Arsa ilanları' : `${detail.categoryLabel} ilanları`
-  return [
-    { label: root },
-    { label: detail.location.city },
-    { label: detail.location.district },
-    // Mahalle bilinmiyorsa yol kısalır; boş bir basamak veya ilçe tekrarı
-    // uydurulmaz.
-    ...(detail.location.neighbourhood ? [{ label: detail.location.neighbourhood }] : []),
-    { label: `İlan ${detail.listingNumber}` },
-  ]
-}
-
-/** Konum satırı yalnız kayıtta bulunan basamakları yazar. */
-function locationText(detail: ListingDetail): string {
-  const place = `${detail.location.district} / ${detail.location.city}`
-  return detail.location.neighbourhood ? `${detail.location.neighbourhood}, ${place}` : place
-}
-
-function headerMeta(detail: ListingDetail): GlassListingMetaItem[] {
-  const items: GlassListingMetaItem[] = [
-    { id: 'location', label: 'Konum', value: locationText(detail) },
-  ]
-
-  if (detail.kind === 'generic') {
-    items.push({
-      id: 'category',
-      label: 'Kategori',
-      value: `${detail.categoryLabel} · ${detail.transactionLabel}`,
-    })
-  }
-
-  items.push(
-    { id: 'listing-number', label: 'İlan numarası', value: detail.listingNumber },
-    { id: 'published', label: 'Yayın tarihi', value: formatDate(detail.publishedAt) },
-    {
-      id: 'updated',
-      label: 'Son güncelleme',
-      // Güncelleme kaydı yoksa yayın tarihi "son güncelleme" diye tekrar
-      // edilmez: olmayan bir olay bildirilmiş olurdu.
-      value: detail.updatedAt
-        ? formatDate(detail.updatedAt)
-        : 'Bu kayıtta güncelleme tarihi yok',
-    },
-    { id: 'cutoff', label: 'Kanıt kesiti', value: formatDate(detail.evidenceCutoff) },
-  )
-
-  return items
 }
 
 /** Birim fiyatın hangi alana dayandığı gizlenmez; çelişki varsa aynı cümlede söylenir. */
@@ -129,13 +67,27 @@ function goToSellerRevealControl(): void {
 }
 
 /**
- * İlan detayının Yön A yerleşimi.
+ * İlan detayı — "sahne açar, sorular taşır" yerleşimi.
  *
- * Cam bütçesi sayfa başına altı yüzeydir; bu çalışma alanı üçünü açar
- * (kategori yolu, bölüm indeksi, karar rayı). Başlık, gösterge şeridi ve
- * bütün kanıt bölümleri içerik katmanındadır — düz yüzey kullanır.
+ * Sayfa üç parçadan oluşur:
  *
- * Bölümler DOM'da kalır: indeks bir tab seti değil, çapa gezinmesidir.
+ * 1. **Sahne** — tam genişlik medya, üstünde cam künye kapsülü, altında cam
+ *    plaka içinde başlık ve konum. Fiyat burada değildir.
+ * 2. **Akış** — fiyat/durum ikilisi, ardından soru omurgası (bölüm başlığı
+ *    yerine alıcının sorduğu cümle), ardından doğrulama defteri. Defter en
+ *    sondadır çünkü o bir soru değil, sayfanın zeminidir.
+ * 3. **Karar** — dar ve orta yerleşimde yapışkan dock, geniş yerleşimde
+ *    340px'lik karar kolonu. İkisi asla birlikte görünmez.
+ *
+ * Üç yerleşim TEK markup'tan doğar ve kırılmalar container query'dir
+ * (700px / 1100px): davranış kabın genişliğine bağlıdır, viewport'a değil.
+ *
+ * Cam bütçesi: sahne kapsülü + sahne plakası + dock = 3 yüzey; geniş
+ * yerleşimde dock düştüğü için 2'ye iner. Sayfa sınırı 6'dır.
+ *
+ * Fiyat sayfada yalnız bir kez büyür: dar yerleşimde akıştaki fiyat bloğunda,
+ * geniş yerleşimde karar kolonunda. Dock'taki çapa `body` ölçeğinde tek
+ * satırdır — ikinci bir vurgu değil, kaydırılıp gitmiş değerin referansı.
  */
 export function ListingDetailWorkspace({
   result,
@@ -145,79 +97,81 @@ export function ListingDetailWorkspace({
   onAnalyticsEvent,
 }: ListingDetailWorkspaceProps) {
   const { detail, sections, aiBrief } = result
+  const questions = listingQuestions(detail, sections.map)
 
   return (
-    // `.page` yalnız sorgu kabıdır: `.shell` kendi kabı olsaydı kendi dolgusunu
-    // `@container` ile daraltamazdı (bkz. ListingDetailWorkspace.module.css).
-    <div className={styles.page}>
-      <main className={styles.shell}>
-        <GlassBreadcrumb items={breadcrumbItems(detail)} className={styles.crumbs} />
+    // Sorgu kabı PageContainer'dır: `.page` kendi kabı olsaydı kendi
+    // yerleşimini `@container` ile değiştiremezdi.
+    // Kademe `base`: karar kolonu 1100px'lik kap eşiğinde açılır; `narrow`
+    // (72rem) kabı gutter düştükten sonra 1072px'te kaldığı için o eşiği
+    // hiçbir zaman geçemezdi ve ray sessizce hiç görünmezdi.
+    <PageContainer size="base">
+      {/* Izgara kabın KENDİSİNDE değil, içinde duran bu sarmalayıcıdadır:
+          bir öğe kendi `@container` sorgusuna yanıt veremez, kap üzerine
+          yazılan kolon kuralı hiçbir genişlikte eşleşmezdi. */}
+      <div className={styles.page}>
+        <ListingStage detail={detail} />
 
-        {/* Fiyat başlıkta değil karar kolonundadır: sayfanın en büyük sayısı
-            tek bir yerde durur, künye bloğu onu ikinci kez yazmaz. */}
-        <GlassListingDetailHeader
-          title={detail.title}
-          status={lifecycleStatus(detail.lifecycle)}
-          meta={headerMeta(detail)}
-          className={styles.header}
-        />
+        <div className={styles.flow}>
+          {/* Fiyat + dosyanın durumu. Geniş yerleşimde fiyat karar kolonuna
+              taşınır ve buradaki blok gizlenir — sayfanın en büyük sayısı tek
+              bir yerde durur. */}
+          <div className={styles.duo}>
+            <div className={styles.flowPrice}>
+              <p className={styles.kicker}>Fiyat</p>
+              <p className={styles.price}>{formatPrice(detail.price.amount)}</p>
+              <p className={styles.priceNote}>
+                {formatUnitPrice(detail.price.unitPrice)} · {priceNote(detail)}
+              </p>
+            </div>
+            <div>
+              <p className={styles.kicker}>Bu dosyanın durumu</p>
+              <ListingTally rows={detail.verification} />
+            </div>
+          </div>
 
-        <ListingSectionIndex sections={sectionsFor(detail)} />
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Alıcıların sorduğu sırayla</h2>
+            <p className={styles.sectionNote}>
+              Her soru kapalıyken de cevaplı. Açmak cevabı değil, dayanağını getirir.
+            </p>
+            <ListingQuestions questions={questions} />
+          </div>
 
-        {/* Sayfanın tamamı tek ızgaradadır: solda kanıt akışı, sağda karar
-            kolonu. Ortak eksen buradan gelir — her bölüm aynı içerik
-            kolonunun genişliğini paylaşır.
-
-            Satıcı bölümü ızgaranın **ikinci satırındadır** (içerik kolonunun
-            genişliğinde, ama `.flow`'un dışında). Sebep yerleşimseldir: karar
-            rayının sticky eşlikçisi kendi ızgara alanı içinde hareket eder;
-            satıcı bölümü o alanın dışında kaldığı için ray kanıt akışı
-            biterken serbest kalır ve satıcı bölümüyle hiçbir zaman yan yana
-            durmaz (`rules.md` §1). */}
-        <div className={styles.body}>
-          <div className={styles.flow}>
-            <ListingIntro detail={detail} mapSection={sections.map} />
+          <div className={styles.section}>
             <ListingEvidenceBrief brief={aiBrief} detail={detail} onReportIssue={onReportIssue} />
-            <section className={styles.section} aria-labelledby="gostergeler-baslik">
-              <h2 id="gostergeler-baslik" className={styles.sectionTitle}>
-                Temel göstergeler
-              </h2>
-              <GlassMetricStrip
-                items={metricStripItems(detail)}
-                label="Temel göstergeler"
-                className={styles.metrics}
-              />
-            </section>
-            {/* Arsa kanıt paketi yalnız defteri olan ilanda açılır; yansıtılmış
-                ilanda o bölümler render edilmez, boş kabuk olarak da durmaz. */}
-            {detail.kind === 'land' ? (
-              <>
-                <ParcelSection detail={detail} mapSection={sections.map} />
-                <PlanningAndLegalSection detail={detail} />
-                <InfrastructureSection detail={detail} />
-                <HazardSection detail={detail} />
-                <MarketSection detail={detail} />
-              </>
-            ) : (
-              <DeclaredFeaturesSection detail={detail} />
-            )}
+          </div>
+
+          <div className={styles.section}>
+            <ListingLedger detail={detail} />
+          </div>
+
+          <div className={styles.section}>
             <DocumentsSection detail={detail} />
           </div>
-          <ListingDecisionRail
-            detail={detail}
-            priceNote={priceNote(detail)}
-            onContact={onContact}
-            onGoToSeller={
-              hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
-            }
-          />
+        </div>
+
+        <ListingDecisionRail
+          detail={detail}
+          priceNote={priceNote(detail)}
+          onContact={onContact}
+          onGoToSeller={
+            hasSellerRevealControl(detail, onRevealPhone) ? goToSellerRevealControl : undefined
+          }
+        />
+
+        {/* Satıcı ızgaranın ikinci satırındadır: karar kolonu kanıt akışıyla
+            birlikte biter, satıcı bölümüyle hiçbir zaman yan yana durmaz. */}
+        <div className={styles.seller}>
           <SellerSection
             detail={detail}
             onRevealPhone={onRevealPhone}
             onAnalyticsEvent={onAnalyticsEvent}
           />
         </div>
-      </main>
-    </div>
+
+        <ListingDock detail={detail} onContact={onContact} />
+      </div>
+    </PageContainer>
   )
 }

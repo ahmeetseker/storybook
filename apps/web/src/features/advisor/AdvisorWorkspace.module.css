@@ -1,19 +1,15 @@
+/* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır. */
 .page {
-  container-type: inline-size;
   min-inline-size: 0;
   color: var(--lg-label);
 }
 
 .pageFrame {
-  padding: var(--lg-space-4);
-  padding-block-end:
-    calc(
-      var(--lg-shell-dock-offset, var(--lg-space-7)) +
-      env(safe-area-inset-bottom, 0) +
-      var(--lg-space-4)
-    );
+  min-inline-size: 0;
 }
 
+/* Karşılama ekranı bir okuma kolonudur: çalışma masasının genişliğine
+   yayılmaz, kendi dar ölçüsünde ortada durur. */
 .idleStage {
   inline-size: min(100%, 52rem);
   margin-inline: auto;
@@ -22,13 +18,10 @@
 .resultsContainer {
   display: grid;
   gap: var(--lg-space-6);
-  inline-size: min(100%, 88rem);
-  margin-inline: auto;
 }
 
 .statusOutlet {
-  inline-size: min(100%, 88rem);
-  margin: 0 auto var(--lg-space-4);
+  margin: 0 0 var(--lg-space-4);
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip);
   background: var(--lg-surface);
@@ -145,19 +138,6 @@
   }
 }
 
-@container (inline-size > 76rem) {
-  .pageFrame {
-    padding: var(--lg-space-7);
-    padding-block-end:
-      calc(
-        var(--lg-shell-dock-offset, var(--lg-space-7)) +
-        env(safe-area-inset-bottom, 0) +
-        var(--lg-space-7)
-      );
-  }
-
-}
-
 @container (inline-size <= 64rem) {
   .profileRail,
   .actionsRail,
@@ -181,16 +161,6 @@
 }
 
 @container (inline-size <= 40rem) {
-  .pageFrame {
-    padding: var(--lg-space-3);
-    padding-block-end:
-      calc(
-        var(--lg-shell-dock-offset, var(--lg-space-6)) +
-        env(safe-area-inset-bottom, 0) +
-        var(--lg-space-3)
-      );
-  }
-
   .resultsContainer {
     gap: var(--lg-space-5);
   }
