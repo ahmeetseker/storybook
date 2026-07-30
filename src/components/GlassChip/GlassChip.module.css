@@ -1,9 +1,6 @@
 .chip {
-  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
-     yatay padding'ler space token'larının arasında (10/14px). Yükseklikler
-     artık kontrol ölçeğinden gelir (bkz. .sm/.md). */
-  --chip-pad-x-sm: 10px;
-  --chip-pad-x-md: 14px;
+  --chip-pad-x-sm: var(--lg-space-3);
+  --chip-pad-x-md: var(--lg-space-4);
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -19,14 +16,21 @@
   outline-offset: 2px;
 }
 
-/* Chip yüksekliği kontrol ölçeğidir: chip seçilebilir olduğunda gerçek bir
-   dokunma hedefidir ve WCAG 2.2 AAA 2.5.5 giriş yönteminden bağımsız olarak
-   44px ister. Görünmez bir ::after ile hedefi büyütmek denendi ve çalışmadı —
+/* Fare ortamında chip görsel bir etikettir — kontrol yüksekliği (44px) burada
+   şişkinlik yaratır, ölçü kompakt (32px) kalır. Dokunmatikte ise chip
+   seçilebilir olduğunda gerçek bir dokunma hedefidir ve WCAG 2.2 AAA 2.5.5
+   giriş yönteminden bağımsız olarak 44px ister (aşağıdaki `pointer: coarse`
+   bloğu). Görünmez bir ::after ile hedefi büyütmek denendi ve çalışmadı —
    GlassSurface kendi köşe kırpması için `overflow: hidden` taşır, pseudo-eleman
-   kutunun dışına taşamıyor. Bu yüzden ölçü gerçekten büyütülür; yatay dolgu
-   (chip'in dar görünmesini sağlayan asıl oran) korunur. */
-.sm { min-height: var(--lg-control-sm); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
-.md { min-height: var(--lg-control-md); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
+   kutunun dışına taşamıyor. Bu yüzden coarse'ta ölçü gerçekten büyütülür;
+   yatay dolgu (chip'in dar görünmesini sağlayan asıl oran) korunur. */
+.sm { min-height: var(--lg-space-7); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
+.md { min-height: var(--lg-space-7); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
+
+@media (pointer: coarse) {
+  .sm,
+  .md { min-height: var(--lg-control-md); }
+}
 
 /* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 30%, transparent); }

@@ -1,9 +1,9 @@
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
-  --root-gap: 14px;
+  --root-gap: var(--lg-space-3);
   --list-gap: 2px;
-  --tab-pad-inline: 18px;
-  --tab-font-size: 14px;
+  --tab-pad-inline: var(--lg-space-4);
+  --tab-font-size: var(--lg-text-footnote);
   display: flex;
   flex-direction: column;
   gap: var(--root-gap);
@@ -28,6 +28,7 @@
   border: none;
   background: none;
   margin: 0;
+  min-height: var(--lg-control-md);
   padding: var(--lg-space-2) var(--tab-pad-inline);
   font: inherit;
   font-size: var(--tab-font-size);

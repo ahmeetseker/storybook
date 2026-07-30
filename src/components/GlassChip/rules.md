@@ -57,7 +57,7 @@ Chip kullanıcı girdisi alır.
 | onRemove | event | `() => void` | — | × butonu ve Delete/Backspace |
 | onClick | event | `MouseEventHandler` | — | Toggle'dan bağımsız da çalışır (filtre chip'i) |
 | icon | prop | `ReactNode` | — | Dekoratif inline ikon |
-| size | prop | `'sm'\|'md'` | `'md'` | 26/32px; coarse pointer'da 36px |
+| size | prop | `'sm'\|'md'` | `'md'` | 32px; coarse pointer'da 44px (dokunma hedefi) |
 | tint | prop | `string` | — | `--glass-tint`; seçiliyken dolgu rengi olur |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | GlassSurface'a geçer |
 | disabled | prop | `boolean` | `false` | `aria-disabled`; focus almaz, handler çalışmaz |
@@ -94,8 +94,9 @@ Varsayılan kombinasyon: `size=md`, seçimsiz, nötr cam.
   `onRemove` çağırır; × butonu Tab sırasında ayrı durak.
 - `prefers-reduced-motion`: basınç spring'i kapanır (useGlassPress), renk
   geçişleri anlık olur.
-- Touch: coarse pointer'da min-height 36px'e çıkar (`/* pointer: coarse */`
-  media query, CSS'te).
+- Touch: fare ortamında min-height 32px kompakt kalır; coarse pointer'da
+  gerçek dokunma hedefi olarak 44px'e çıkar (`@media (pointer: coarse)`,
+  CSS'te).
 - Controlled kullanımda tıklama yalnız `onSelectedChange` çağırır; görünüm
   dışarıdan gelen `selected`'a kilitlidir.
 
@@ -116,20 +117,19 @@ Varsayılan kombinasyon: `size=md`, seçimsiz, nötr cam.
 | hover (nötr) | background | `color-mix(--lg-label 8%, transparent)` |
 | root | radius | capsule (`shape="capsule"`) |
 
-**Borç (raw / mikro-geometri):** sm chip yüksekliği ve yatay padding'ler
-token karşılığı olmadığından kökte yerel değişkende toplandı
-(`.chip { --chip-h-sm: 26px; --chip-pad-x-sm: 10px; --chip-pad-x-md: 14px; }`).
-md min-height tam olarak `--lg-control-sm`'e bağlandı (32px; coarse'ta 36px'e
-büyür — dokunmatik hedef zaten 36 olarak tasarlanmıştı, birebir).
-Coarse'taki 36px minimumu da `--lg-control-sm` (coarse değeri 36 — birebir).
-sm chip için `--lg-control-sm` bile yüksek kaldığından chip ölçeği yerel
-kalır (açık karar). Geçiş süreleri `0.16s ease-out` raw (süre token'ı yok).
+**Borç (raw / mikro-geometri):** `--chip-pad-x-sm`/`--chip-pad-x-md` kökte
+yerel değişken olarak kalır ama artık ikisi de birebir token'a bağlı
+(`--lg-space-3` / `--lg-space-4`) — raw değer değil, yalnız isimlendirme
+kolaylığı. `.sm`/`.md` görsel yüksekliği `--lg-space-7` (32px, fare); coarse
+pointer'da ikisi de `--lg-control-md`'ye (44px) büyür — gerçek dokunma
+hedefi, kontrol ölçeğinden birebir. Geçiş süreleri `0.16s ease-out` raw
+kalır (süre token'ı yok).
 
 ## 10. Storybook kapsamı
 
 Var: Default, Secilebilir (uncontrolled), Kaldirilabilir, Disabled, Boyutlar
 (+ikon), FiltreGrubu (controlled, useState), TintliSecim, MobilFiltreSatiri
-(responsive: sarma + 36px hedef, mobile1 viewport). **Eksik:** forced
+(responsive: sarma + 44px hedef, mobile1 viewport). **Eksik:** forced
 hover/focus görselleri, RTL.
 
 ## 11. Test kabul kriterleri
@@ -142,7 +142,7 @@ hover/focus görselleri, RTL.
 - [x] disabled: aria-disabled + handler çalışmaz + focus almaz
 - [x] etkileşimsizken rol verilmez
 - [x] tint CSS var'a yazılır
-- [ ] coarse pointer'da 36px (visual)
+- [ ] coarse pointer'da 44px (visual)
 
 ## 12. Do / Don't
 
@@ -153,10 +153,13 @@ hover/focus görselleri, RTL.
 - ❌ `onRemove`'u onay gerektiren yıkıcı aksiyona bağlama (chip anında kaldırılır varsayımı).
 
 **Açık kararlar:** tekli seçim grubu (radiogroup semantiği) ihtiyacı ·
-chip ölçeği token'ları · iç içe etkileşim yerine "chip = tek buton +
-Delete kısayolu" modeline geçiş değerlendirmesi.
+iç içe etkileşim yerine "chip = tek buton + Delete kısayolu" modeline geçiş
+değerlendirmesi.
 
 ## Changelog
 
 - 2026-07-16: İlk sürüm — toggle (controlled/uncontrolled), onRemove (× +
   Delete/Backspace), icon, tint/tone, coarse pointer 36px hedefi, useGlassPress.
+- 2026-07-30: Görsel yükseklik ölçeğe indirildi (`.sm`/`.md` 32px,
+  `--lg-space-7`); 44px dokunma hedefi yalnız `@media (pointer: coarse)`
+  altına taşındı. Yatay padding'ler token'a bağlandı (`--lg-space-3`/`-4`).

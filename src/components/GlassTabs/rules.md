@@ -94,6 +94,9 @@ Katman sırası: value (selected `background`) → interaction (hover opacity).
 - Dar container: `.list` yatay kayar (`overflow-x: auto`, scrollbar gizli);
   bar `max-width: 100%` ile taşmaz.
 - Async / overlay: N/A — senkron, portal yok.
+- Touch: `.tab` her ortamda `min-height: var(--lg-control-md)` (44px) taşır —
+  fare/dokunmatik ayrımı yok, sekme her zaman gerçek bir dokunma hedefidir
+  (Chip'in aksine, sekme yoğunluk kaygısı taşımaz).
 
 ## 8. İçerik kuralları
 
@@ -112,10 +115,14 @@ Katman sırası: value (selected `background`) → interaction (hover opacity).
 | bar/panel | cam görünümü | GlassSurface'ten (`thickness`, `tone`) | — |
 | tab | font | miras (`font: inherit`) | — |
 
-**Borç (raw değerler):** token karşılığı olmayanlar component kökünde yerel
-değişkene toplandı — `.root { --root-gap: 14px; --list-gap: 2px;
---tab-pad-inline: 18px; --tab-font-size: 14px; }` (14px `--lg-text-*`
-ölçeğinde, 14/18px boşluk ölçeğinde yok). Bağlananlar: bar `padding` →
+**Borç (raw değerler):** `.root { --root-gap: var(--lg-space-3);
+--list-gap: 2px; --tab-pad-inline: var(--lg-space-4);
+--tab-font-size: var(--lg-text-footnote); }` — `--root-gap`/`--tab-pad-inline`/
+`--tab-font-size` artık birebir token'a bağlı (2026-07-30); yerel değişken
+yalnız isimlendirme kolaylığı için kalır. `--list-gap: 2px` token karşılığı
+olmadığından raw kalır (ölçek en küçük adımı 4px, 2px daha ince bir ayrım).
+`.tab` artık `min-height: var(--lg-control-md)` taşır — dokunma hedefi her
+ortamda garanti (bkz. §7 Davranış). Bağlananlar: bar `padding` →
 `--lg-space-1`, tab dikey padding → `--lg-space-2`, tab radius →
 `--lg-radius-capsule`, panel `padding` → `--lg-space-5`, panel font →
 `--lg-text-body`. Aktif zemin `rgba(255,255,255,0.28)` bilinçli beyaz-alfa
@@ -161,3 +168,7 @@ bastırılmalı mı · `size` ekseni gerekli mi.
 - 2026-07-15 — ilk sözleşme, koddan çıkarıldı.
 - 2026-07-15 — ok tuşu navigasyonu eklendi (ArrowLeft/Right/Up/Down sarmalı,
   Home/End; seçim focus'u izler) + test.
+- 2026-07-30 — `.tab`'a `min-height: var(--lg-control-md)` eklendi (dokunma
+  hedefi eksikti, ~37px'te kalıyordu); `--tab-font-size`/`--root-gap`/
+  `--tab-pad-inline` token'a bağlandı (`--lg-text-footnote`/`--lg-space-3`/
+  `--lg-space-4`).

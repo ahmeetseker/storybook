@@ -53,10 +53,10 @@
 
 /* Yükseklikler kontrol token'larından gelir (dokunmatikte otomatik büyür);
    letter-spacing SF tracking tablosuna yakın, boyuta özel */
-.sm { min-height: var(--lg-control-sm); padding: 0 calc(var(--lg-space-3) + var(--lg-stroke-hairline) + var(--lg-stroke-hairline)); font-size: var(--lg-text-footnote); letter-spacing: 0; }
+.sm { min-height: var(--lg-control-sm); padding: 0 var(--lg-space-3); font-size: var(--lg-text-footnote); letter-spacing: 0; }
 .md { min-height: var(--lg-control-md); padding: 0 var(--lg-space-5); font-size: var(--lg-text-body); letter-spacing: -0.01em; }
-.lg { min-height: var(--lg-control-lg); padding: 0 calc(var(--lg-space-6) + var(--lg-space-1)); font-size: var(--lg-text-headline); letter-spacing: -0.022em; }
-.xl { min-height: var(--lg-control-xl); padding: 0 calc(var(--lg-space-7) + var(--lg-space-1)); font-size: calc(var(--lg-text-headline) + var(--lg-focus-ring-width)); letter-spacing: -0.022em; } /* Apple extra-large boyutu */
+.lg { min-height: var(--lg-control-lg); padding: 0 var(--lg-space-6); font-size: var(--lg-text-headline); letter-spacing: -0.022em; }
+.xl { min-height: var(--lg-control-xl); padding: 0 var(--lg-space-7); font-size: var(--lg-text-headline); letter-spacing: -0.022em; } /* Apple extra-large boyutu */
 
 /* Dokunmatikte yalnız küçük boyut bir üst kontrol token'ına yükselir. */
 @media (pointer: coarse) {

@@ -94,11 +94,17 @@ Tek satır; uzun metin taşarsa buton büyür, kırpma yapılmaz — çağıran 
 | prominent | background | `--glass-tint` ← `--lg-accent` |
 | root | font | miras (`--lg-font`) |
 
-Boyut rampası `--lg-space-*`, `--lg-text-*`, `--lg-control-*` ve
-`--lg-focus-ring-width` bileşimlerinden üretilir. Prominent durumda normal,
-hover ve loading metni daima `--lg-accent-contrast` kullanır; hover arka planı
-opak `--glass-tint` / `--lg-accent` olur. Böylece Kağıt ve Grafit temada metin
-kontrastı durum değişiminde bozulmaz.
+Boyut rampası `--lg-space-*`, `--lg-text-*` ve `--lg-control-*`
+birebir değerlerinden üretilir — yatay padding `sm` `--lg-space-3`, `md`
+`--lg-space-5`, `lg` `--lg-space-6`, `xl` `--lg-space-7`; font-size `sm`
+`--lg-text-footnote`, `md` `--lg-text-body`, `lg`/`xl` `--lg-text-headline`.
+`--lg-focus-ring-width` yalnız `:focus-visible` outline kalınlığında
+kullanılır — tipografi/boyut hesabına karışmaz (önceki `xl` font-size'ı
+`calc(--lg-text-headline + --lg-focus-ring-width)` idi, token sözleşmesi
+ihlaliydi; kaldırıldı). Prominent durumda normal, hover ve loading metni
+daima `--lg-accent-contrast` kullanır; hover arka planı opak `--glass-tint` /
+`--lg-accent` olur. Böylece Kağıt ve Grafit temada metin kontrastı durum
+değişiminde bozulmaz.
 
 ## 10. Storybook kapsamı
 
@@ -130,3 +136,7 @@ pseudo-state story'leri için addon değerlendirmesi.
   `type="button"` default'u eklendi; story matrisi tamamlandı.
 - 2026-07-15: basınçtaki radial glow (parmak ucu ışıma) katmanı kaldırıldı —
   metnin arkasında beliren beyaz parlama istenmiyordu.
+- 2026-07-30: `sm`/`lg`/`xl` yatay padding'lerindeki `calc()` ek terimleri
+  kaldırıldı, birebir `--lg-space-*` token'ına bağlandı; `xl` font-size'ı
+  `--lg-focus-ring-width` içeren hesaptan `--lg-text-headline`'a (17px)
+  indirgendi — focus halkası token'ı artık yalnız outline'da kullanılıyor.
