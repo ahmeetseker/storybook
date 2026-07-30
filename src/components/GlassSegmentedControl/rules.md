@@ -44,6 +44,8 @@ altındaki cam damla FLIP ile segmentler arasında süzülür.
 | defaultValue | `string` | ilk seçenek | — | Uncontrolled başlangıç |
 | onChange | `(value: string) => void` | — | — | Yeni değeri döner |
 | size | `'sm'\|'md'` | `'md'` | — | `--lg-control-*` yüksekliği |
+| variant | `'capsule'\|'bar'` | `'capsule'` | — | Yerleşim: bağımsız kapsül · kapsayıcı kartın başlık şeridi |
+| fill | `'equal'\|'content'` | `'equal'` | — | Yalnız `bar`: segment eşit payı mı, etiket kadar mı (sola hizalı) |
 | tone | `'light'\|'dark'\|'auto'` | `'auto'` | — | GlassSurface'e geçer |
 | label | `string` | — | — | radiogroup aria-label; fiilen zorunlu |
 | disabled | `boolean` | `false` | — | Tüm kontrol; segment bazında `options[].disabled` |
@@ -53,8 +55,30 @@ Ref hedefi yok; event yalnız seçim değişince çalışır (aynı segmente tı
 
 ## 5. Seçenek eksenleri
 
-Varsayılan: `md`, ilk seçenek seçili. `lg` bilinçli yok — segmented control
-yoğun kontrol satırlarına aittir. Birleşik variant yok.
+Varsayılan: `md`, `capsule`, ilk seçenek seçili. `lg` bilinçli yok — segmented
+control yoğun kontrol satırlarına aittir. Eksenler bağımsızdır; birleşik
+variant yok.
+
+**variant** — yerleşim ekseni, malzeme kararını da taşır:
+
+| Değer | Kök | Genişlik | Ne zaman |
+|---|---|---|---|
+| `capsule` | `GlassSurface` kapsül | içerik kadar | Kendi başına duran kontrol (toolbar, sayfa üstü) |
+| `bar` | düz `div`, cam yok | `100%`, segment genişliği `fill`'e bağlı | Bir kart/panelin başlık şeridi |
+
+`bar` cam kurmaz: kapsayıcı yüzey zaten bir katman olduğu için cam üstüne cam
+yasağı (GenelBakis.mdx) geçerlidir. Kök payı da olmadığından şerit yüksekliği
+tam olarak `--lg-control-*`'a eşittir — kapsülde oluşan `2 × --root-pad`
+kaçığı `bar`'da yoktur, aynı satırdaki alan ve butonlarla hizalanır.
+
+**fill** — `bar`'da segment genişliği. Eşit paylaşım (`equal`) yalnızca şerit
+dar olduğunda ve etiketler benzer uzunluktayken doğrudur. Geniş kartlarda
+(≈ >720px) eşit paylaşım tek bir kelime için yüzlerce piksellik seçim damlası
+üretir: tıklama hedefi etiketten kopar, seçili segment "buton" gibi değil "boş
+alan" gibi okunur ve şerit kartın geri kalanındaki sola hizalı grid ile
+çelişir. Bu durumda `content` kullan — segment etiketi kadar yer kaplar, şerit
+sola, altındaki ilk alanla aynı dikey çizgiye hizalanır. Ortalamak bir seçenek
+değildir: kartın hiçbir başka satırı ortalı değildir.
 
 ## 6. State modeli
 
@@ -85,7 +109,9 @@ yatay scroll'a düşer (scrollbar gizli). Boş `options` render etmez (radiogrou
 
 | Part | Property | Token |
 |---|---|---|
-| segment yüksekliği | height | `--lg-control-sm/md` − kök padding |
+| segment yüksekliği | height | `--lg-control-sm/md` (kapsülde kök payı dışarıya eklenir) |
+| bar alt ayracı | border-bottom | `--lg-stroke-hairline` + `--lg-hairline` |
+| bar alt payı | padding-bottom | `--lg-space-3` |
 | segment font | font-size | `--lg-text-footnote` (sm) |
 | damla, segment | border-radius | `--lg-radius-capsule` |
 | focus | outline | `--lg-accent` |
@@ -103,8 +129,8 @@ karar (bkz. Tokenlar.mdx); damla gölgesi `0 1px 4px rgba(0,0,0,.12),
 
 ## 10. Storybook kapsamı
 
-Var: Default, WithDefaultValue, Sizes, States, Controlled, LongContent,
-Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
+Var: Default, WithDefaultValue, Sizes, Variants, States, Controlled,
+LongContent, Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
 
 ## 11. Test kabul kriterleri
 
@@ -115,12 +141,18 @@ Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
 - [x] Home/End
 - [x] controlled dışarıdan yönetilir
 - [x] disabled etkileşim almaz
+- [x] `variant="bar"` cam yüzey kurmaz, radiogroup ve seçim korunur
+- [x] `fill="content"` eşit paylaşımı kapatır, semantik korunur
 - [ ] damla FLIP geçişi (visual)
 
 ## 12. Do / Don't
 
 - ✅ Görünür bağlam yoksa `label` ver ("Görünüm", "Dönem").
 - ✅ Toolbar içinde `size="sm"` kullan.
+- ✅ Geniş kartın başlık şeridinde `fill="content"` kullan; `equal` dar şeritler
+  içindir.
+- ✅ Kart/panel içindeki şerit için `variant="bar"` kullan — kapsülü kartın
+  içine koymak cam üstüne cam yapar ve yükseklik ritmini 2px kaydırır.
 - ❌ İçerik panellerini bununla yönetme — `GlassTabs` kullan.
 - ❌ Segment etiketine ikonu tek başına koyma.
 
@@ -131,3 +163,8 @@ Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
 - 2026-07-16: İlk sürüm — radiogroup semantiği, layoutId damla, roving tabindex.
 - 2026-07-30: Damla geçişi `layout="position"`a alındı — boyut morph'u (scale)
   kaldırıldı; seçim değişiminde pil büyümeden, sabit boyutta kayar.
+- 2026-07-30: `fill` ekseni eklendi (`equal` | `content`). Geniş şeritte eşit
+  paylaşımın ürettiği devasa seçim damlası ve sola hizalı grid ile çelişki
+  giderildi.
+- 2026-07-30: `variant` ekseni eklendi (`capsule` | `bar`). `bar` cam kurmaz,
+  tam genişliğe yayılır ve kontrol yüksekliğini birebir korur.

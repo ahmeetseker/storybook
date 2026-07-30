@@ -72,6 +72,38 @@
   font-size: var(--font-md);
 }
 
+/* Yerleşim ekseni — bar: kapsayıcı kartın başlık şeridi.
+   Kök cam kurmaz (cam üstüne cam yok), tam genişliğe yayılır, segmentler eşit
+   payı alır ve şerit altta saç teli ayraçla içerikten ayrılır. Kök payı
+   olmadığı için segment yüksekliği = kontrol yüksekliği; şerit de aynı
+   ölçüde kalır, kapsüldeki 2×--root-pad kaçığı oluşmaz. */
+.root.bar {
+  display: flex;
+  width: 100%;
+  padding: 0 0 var(--lg-space-3);
+  border-bottom: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  border-radius: 0;
+  background: none;
+}
+.bar .list {
+  width: 100%;
+}
+.bar .segment {
+  flex: 1;
+  min-width: 0;
+}
+
+/* fill="content": segmentler etiketleri kadar yer kaplar, şerit sola hizalanır.
+   Geniş şeritte eşit paylaşım devasa bir seçim damlası üretir ve tıklama
+   hedefi etiketten kopar (bkz. rules.md §6). */
+.bar.barContent .list {
+  width: auto;
+  justify-content: flex-start;
+}
+.bar.barContent .segment {
+  flex: 0 0 auto;
+}
+
 /* Seçim damlası — segmentler arasında FLIP ile süzülen cam katman */
 .drop {
   position: absolute;

@@ -78,4 +78,31 @@ describe('GlassSegmentedControl', () => {
     fireEvent.keyDown(screen.getByRole('radiogroup'), { key: 'ArrowRight' })
     expect(onChange).not.toHaveBeenCalled()
   })
+
+  it('fill="content" bar segmentlerini eşit paylaşımdan çıkarır', () => {
+    const { container, rerender } = render(
+      <GlassSegmentedControl label="G" variant="bar" options={options} />,
+    )
+    const cls = () => container.firstElementChild!.className
+    expect(cls()).not.toMatch(/barContent/)
+    rerender(<GlassSegmentedControl label="G" variant="bar" fill="content" options={options} />)
+    expect(cls()).toMatch(/barContent/)
+    expect(screen.getAllByRole('radio')).toHaveLength(options.length)
+  })
+
+  it('variant="bar" cam yüzey kurmaz, semantik ve seçim korunur', () => {
+    const onChange = vi.fn()
+    const { container } = renderControl({ variant: 'bar', onChange })
+    // Cam katmanın imzası: GlassSurface refraction filtresini SVG olarak basar.
+    expect(container.querySelector('svg filter')).toBeNull()
+    expect(screen.getByRole('radiogroup', { name: 'Görünüm' })).not.toBeNull()
+    fireEvent.click(screen.getByRole('radio', { name: 'Harita' }))
+    expect(onChange).toHaveBeenCalledWith('map')
+  })
+
+  it('varsayılan variant kapsül cam yüzeyde kalır', () => {
+    const { container } = renderControl({})
+    expect(container.querySelector('[class*="root"]')).not.toBeNull()
+    expect(screen.getByRole('radiogroup')).not.toBeNull()
+  })
 })

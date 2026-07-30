@@ -223,6 +223,8 @@ export function MapFirstHome({
               >
                 <GlassSegmentedControl
                   label="İlan türü"
+                  variant="bar"
+                  fill="content"
                   options={HERO_TABS.map((item) => ({ value: item.id, label: item.label }))}
                   value={activeTabId}
                   onChange={selectTab}
@@ -234,7 +236,7 @@ export function MapFirstHome({
                       options={heroKonumSecenekleri}
                       defaultValue="tumu"
                       material="flat"
-                      size="lg"
+                      size="md"
                     />
                   </div>
                   <div className={styles.searchField}>
@@ -244,10 +246,10 @@ export function MapFirstHome({
                       placeholder={active.detailFilter.placeholder ?? active.detailFilter.label}
                       options={active.detailFilter.options}
                       material="flat"
-                      size="lg"
+                      size="md"
                     />
                   </div>
-                  <GlassButton type="submit" size="lg" prominent>
+                  <GlassButton className={styles.searchSubmit} type="submit" size="md" prominent>
                     <SearchIcon />
                     İlanları Gör
                   </GlassButton>

@@ -16,6 +16,10 @@
   --split-gap: clamp(1.5rem, 3vw, 2.25rem);
   --split-min: 19rem;
   --stack-gap: 1rem;
+  /* Sekmeye göre değişen alt başlıkların en uzunu iki satır sürüyor
+     (proje sekmesi). Rezerve edilmezse hero boyu sekme başına 26px oynuyor
+     ve arama kartı tıklama anında yerinden kayıyor. */
+  --subtitle-lines: 2;
 }
 
 .heroSearch {
@@ -28,25 +32,31 @@
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
   font-weight: 600;
-  letter-spacing: 0.28em;
+  /* 0.28em bu puntoda harf başına 3.4px demek ve kelime tanımayı bozuyordu. */
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
+/* Vurgu kutusu başlık ölçeğinde duruyor: chip yarıçapı 46px puntoda görünmez
+   kalıyordu, media ölçeği kutuya orantılı bir yumuşama veriyor. */
 .heroWord {
   display: inline-block;
-  padding-inline: 0.22em;
-  border-radius: var(--lg-radius-chip);
+  padding-inline: 0.18em;
+  border-radius: var(--lg-radius-media);
   background: var(--lg-label);
   color: var(--lg-bg);
 }
 
+/* Kart genişliği içeriğe göre büzülüyordu (550px) ve hero'nun arama slotu için
+   ayırdığı genişlik hiç devreye girmiyordu. Artık slotu doldurur. */
 .searchCard {
   display: flex;
+  width: 100%;
   min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: var(--lg-space-3);
-  padding: var(--lg-space-4);
+  padding: var(--lg-space-3);
   border: var(--lg-border-width, 1px) solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
   background: var(--lg-surface);
@@ -66,6 +76,18 @@
 .searchField {
   min-width: 10.5rem;
   flex: 1;
+}
+
+/* Dar ekranda alanlar tam genişliğe yayılınca buton sabit genişlikte kalıp
+   sola yaslanıyor ve satırın sağı boş kalıyordu. */
+.searchSubmit {
+  flex: none;
+}
+
+@media (max-width: 30rem) { /* bp-sm altı */
+  .searchSubmit {
+    flex: 1 0 100%;
+  }
 }
 
 .heroStat {

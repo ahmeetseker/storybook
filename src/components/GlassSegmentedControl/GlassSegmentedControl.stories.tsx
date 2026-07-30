@@ -16,6 +16,7 @@ const meta = {
   args: { options: viewOptions, label: 'Görünüm', onChange: fn() },
   argTypes: {
     size: { control: 'select', options: ['sm', 'md'] },
+    variant: { control: 'inline-radio', options: ['capsule', 'bar'] },
     value: { control: false, description: 'Controlled seçili değer' },
   },
 } satisfies Meta<typeof GlassSegmentedControl>
@@ -81,6 +82,60 @@ export const LongContent: Story = {
           { value: 'ticari', label: 'Minivan & Panelvan' },
         ]}
       />
+    </div>
+  ),
+}
+
+/**
+ * Yerleşim ekseni. `capsule` kendi cam kapsülünde duran bağımsız kontrol;
+ * `bar` bir kartın başlık şeridi — cam kurmaz, tam genişliğe yayılır,
+ * segmentler eşit payı alır ve altta saç teli ayraç bırakır.
+ */
+export const Variants: Story = {
+  render: (args) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 420, alignItems: 'flex-start' }}>
+      <GlassSegmentedControl {...args} variant="capsule" label="Kapsül" />
+      <div
+        style={{
+          alignSelf: 'stretch',
+          padding: 'var(--lg-space-3)',
+          border: '1px solid var(--lg-hairline)',
+          borderRadius: 'var(--lg-radius-card)',
+          background: 'var(--lg-surface)',
+        }}
+      >
+        <GlassSegmentedControl {...args} variant="bar" label="Kart başlığı" />
+        <p style={{ margin: 'var(--lg-space-3) 0 0', fontSize: 'var(--lg-text-footnote)', opacity: 0.7 }}>
+          Şeridin altındaki kart içeriği
+        </p>
+      </div>
+    </div>
+  ),
+}
+
+/**
+ * fill: geniş şeritte `equal` tek kelime için devasa seçim damlası üretir;
+ * `content` segmenti etiket kadar tutar ve şeridi sola hizalar.
+ */
+export const BarFill: Story = {
+  render: (args) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: 760 }}>
+      {(['equal', 'content'] as const).map((fill) => (
+        <div
+          key={fill}
+          style={{
+            padding: 'var(--lg-space-3)',
+            border: '1px solid var(--lg-hairline)',
+            borderRadius: 'var(--lg-radius-card)',
+            background: 'var(--lg-surface)',
+          }}
+        >
+          <GlassSegmentedControl {...args} variant="bar" fill={fill} label={`fill=${fill}`} />
+          <p style={{ margin: 'var(--lg-space-3) 0 0', fontSize: 'var(--lg-text-footnote)', opacity: 0.7 }}>
+            fill=&quot;{fill}&quot;
+          </p>
+        </div>
+      ))}
     </div>
   ),
 }
