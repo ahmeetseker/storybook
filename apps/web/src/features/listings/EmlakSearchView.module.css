@@ -21,7 +21,7 @@
 
 .hero h1 {
   margin-block: var(--lg-space-1);
-  font-size: var(--lg-text-display);
+  font-size: var(--lg-text-title);
   line-height: 1.08;
   letter-spacing: -0.035em;
 }

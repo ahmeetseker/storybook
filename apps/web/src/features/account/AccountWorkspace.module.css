@@ -28,13 +28,13 @@
 }
 
 .page [data-account-section] h1 {
-  font-size: var(--lg-text-display);
+  font-size: var(--lg-text-title);
   font-weight: 700;
   line-height: 1.2;
 }
 
 .page [data-account-section] h2 {
-  font-size: var(--lg-text-title);
+  font-size: var(--lg-text-headline);
   font-weight: 700;
   line-height: 1.25;
 }

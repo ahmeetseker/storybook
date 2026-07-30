@@ -59,7 +59,7 @@
 
 .queryStage h1 {
   color: var(--lg-label);
-  font-size: var(--lg-text-display);
+  font-size: var(--lg-text-title);
   line-height: 1.2;
 }
 
