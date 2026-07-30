@@ -9,6 +9,7 @@ import {
   GlassMap,
   GlassMetricStrip,
   GlassSegmentedControl,
+  GlassSelect,
   GlassVitrin,
 } from "@repo/ui";
 import { withBase } from "@/config/base-path";
@@ -92,8 +93,55 @@ const regions = [
   },
 ] as const;
 
+// Arama hero'sundaki konum seçici — bölge bağlantılarıyla aynı kaynaktan beslenir.
+const heroKonumSecenekleri = [
+  { value: "tumu", label: "Tüm Türkiye" },
+  ...regions.map((region) => ({ value: region.href, label: region.name })),
+];
+
+const SearchIcon = () => (
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+    <circle cx="11" cy="11" r="7" />
+    <path d="M20 20l-3.8-3.8" />
+  </svg>
+);
+
+const PinIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const CityIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M3 21h18M5 21V7l7-4v18M12 21V11l7 4v6" />
+  </svg>
+);
+
+const GridIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+  </svg>
+);
+
+const ShieldIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3Z" />
+    <path d="M9 12l2 2 4-4" />
+  </svg>
+);
+
 export interface MapFirstHomeProps {
   showConceptNavigation?: boolean;
+  /**
+   * Hero yerleşimi — "map": haritalı split hero (konsept galerisi),
+   * "search": Arsam yerleşimi (eyebrow + vurgulu başlık + yapılandırılmış arama kartı).
+   */
+  heroVariant?: "map" | "search";
   /** Controlled sekme */
   tab?: HeroTabId;
   /** Uncontrolled başlangıç sekmesi */
@@ -103,6 +151,7 @@ export interface MapFirstHomeProps {
 
 export function MapFirstHome({
   showConceptNavigation = true,
+  heroVariant = "map",
   tab,
   defaultTab = "arsa",
   onTabChange,
@@ -149,6 +198,80 @@ export function MapFirstHome({
       }
     >
       <div className={styles.hero}>
+        {heroVariant === "search" ? (
+          <GlassHero
+            variant="search"
+            titleAs="h1"
+            ambient
+            eyebrow={<span className={styles.heroEyebrow}>Türkiye'nin Arsa Rehberi</span>}
+            title={
+              <>
+                Hayal ettiğin{" "}
+                <span className={styles.heroWord}>{active.heroWord}</span> seni
+                bekliyor.
+              </>
+            }
+            subtitle={active.subtitle}
+            search={
+              <form
+                className={styles.searchCard}
+                role="search"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  goToSearch();
+                }}
+              >
+                <GlassSegmentedControl
+                  label="İlan türü"
+                  options={HERO_TABS.map((item) => ({ value: item.id, label: item.label }))}
+                  value={activeTabId}
+                  onChange={selectTab}
+                />
+                <div className={styles.searchRow}>
+                  <div className={styles.searchField}>
+                    <GlassSelect
+                      aria-label="Konum"
+                      options={heroKonumSecenekleri}
+                      defaultValue="tumu"
+                      material="flat"
+                      size="lg"
+                    />
+                  </div>
+                  <div className={styles.searchField}>
+                    <GlassSelect
+                      key={active.id}
+                      aria-label={active.detailFilter.label}
+                      placeholder={active.detailFilter.placeholder ?? active.detailFilter.label}
+                      options={active.detailFilter.options}
+                      material="flat"
+                      size="lg"
+                    />
+                  </div>
+                  <GlassButton type="submit" size="lg" prominent>
+                    <SearchIcon />
+                    İlanları Gör
+                  </GlassButton>
+                </div>
+              </form>
+            }
+            quickLinks={
+              <>
+                <span className={styles.heroStat}>
+                  <PinIcon /> {active.verifiedCount} {active.verifiedLabel}
+                </span>
+                <span className={styles.heroStat}>
+                  <CityIcon /> 81 il
+                </span>
+                <span className={styles.heroStat}>
+                  <GridIcon /> {regions.length} bölge
+                </span>
+                <span className={styles.heroStat}>
+                  <ShieldIcon /> EİDS yetki kontrolü
+                </span>
+              </>
+            }
+          />
+        ) : (
         <GlassHero
           variant="split"
           titleAs="h1"
@@ -200,17 +323,20 @@ export function MapFirstHome({
             </div>
           }
         />
-        <div className={styles.trustBand}>
-          <GlassMetricStrip
-            size="sm"
-            label="Doğrulama göstergeleri"
-            items={[
-              { id: "verified", label: "Doğrulanmış", value: active.verifiedCount, hint: active.verifiedLabel },
-              { id: "today", label: "Bugün doğrulanan", value: "12", hint: "EİDS ilan verme yetkisi" },
-              { id: "cities", label: "İl", value: "81", hint: "Türkiye geneli" },
-            ]}
-          />
-        </div>
+        )}
+        {heroVariant === "map" ? (
+          <div className={styles.trustBand}>
+            <GlassMetricStrip
+              size="sm"
+              label="Doğrulama göstergeleri"
+              items={[
+                { id: "verified", label: "Doğrulanmış", value: active.verifiedCount, hint: active.verifiedLabel },
+                { id: "today", label: "Bugün doğrulanan", value: "12", hint: "EİDS ilan verme yetkisi" },
+                { id: "cities", label: "İl", value: "81", hint: "Türkiye geneli" },
+              ]}
+            />
+          </div>
+        ) : null}
       </div>
 
       <section

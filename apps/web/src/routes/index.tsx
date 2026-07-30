@@ -18,6 +18,7 @@ function HomePage() {
   return (
     <MapFirstHome
       showConceptNavigation={false}
+      heroVariant="search"
       tab={tur ?? 'arsa'}
       onTabChange={(next) => {
         // Varsayılan sekmede (arsa) URL kirlenmesin diye arama parametresi tamamen kaldırılır.

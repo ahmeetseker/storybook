@@ -60,6 +60,29 @@ describe('MapFirstHome hero', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Teslim tarihinden önce yerini seç' })).toBeDefined()
   })
 
+  it('arama hero varyantı vurgulu başlığı, arama kartını ve istatistikleri gösterir', () => {
+    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Hayal ettiğin arsa seni bekliyor.' }),
+    ).toBeDefined()
+    expect(screen.getByRole('radiogroup', { name: 'İlan türü' })).toBeDefined()
+    expect(screen.getByRole('combobox', { name: 'Konum' })).toBeDefined()
+    expect(screen.getByRole('combobox', { name: 'Metrekare aralığı' })).toBeDefined()
+    expect(screen.getByRole('button', { name: /İlanları Gör/ })).toBeDefined()
+    expect(screen.getByText(/18\.412/)).toBeDefined()
+    expect(screen.getByText('EİDS yetki kontrolü')).toBeDefined()
+  })
+
+  it('arama hero varyantında sekme değişince vurgulu kelime ve ikinci seçici değişir', () => {
+    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    fireEvent.click(screen.getByRole('radio', { name: 'Konut' }))
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Hayal ettiğin ev seni bekliyor.' }),
+    ).toBeDefined()
+    expect(screen.getByRole('combobox', { name: 'Oda sayısı' })).toBeDefined()
+    expect(screen.queryByRole('combobox', { name: 'Metrekare aralığı' })).toBeNull()
+  })
+
   it('AI çıkarım chipi kaldırılınca listeden çıkar', () => {
     render(<MapFirstHome showConceptNavigation={false} />)
     expect(screen.getByText('Urla')).toBeDefined()

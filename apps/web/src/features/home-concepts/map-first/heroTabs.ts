@@ -21,11 +21,23 @@ export interface HeroParsedFilter {
   value: string
 }
 
+export interface HeroDetailFilter {
+  /** Erişilebilir ad ("Metrekare aralığı" gibi) */
+  label: string
+  /** Dar tetikleyiciye sığan kısa yer tutucu; verilmezse label kullanılır */
+  placeholder?: string
+  options: { value: string; label: string }[]
+}
+
 export interface HeroTab {
   id: HeroTabId
   label: string
   title: string
   subtitle: string
+  /** Arama hero'sunda "Hayal ettiğin ___ seni bekliyor." kalıbındaki vurgulu kelime */
+  heroWord: string
+  /** Arama kartındaki sekmeye özel ikinci seçici (arsa: m², konut: oda, proje: teslim) */
+  detailFilter: HeroDetailFilter
   placeholder: string
   suggestions: string[]
   quickFilters: string[]
@@ -43,6 +55,18 @@ export const HERO_TABS: HeroTab[] = [
     title: 'Önce haritada gör, sonra karar ver',
     subtitle:
       'Ada–parsel, imar durumu ve yol cephesi bilgisiyle birlikte doğrulanmış parseller.',
+    heroWord: 'arsa',
+    detailFilter: {
+      label: 'Metrekare aralığı',
+      placeholder: 'm² aralığı',
+      options: [
+        { value: 'tumu', label: 'Tüm m² aralıkları' },
+        { value: '0-500', label: "500 m²'ye kadar" },
+        { value: '500-1000', label: '500 – 1.000 m²' },
+        { value: '1000-5000', label: '1.000 – 5.000 m²' },
+        { value: '5000+', label: '5.000 m² üzeri' },
+      ],
+    },
     placeholder: 'Bölge, bütçe veya imar tercihini yaz',
     suggestions: [
       'Urla konut imarlı arsa',
@@ -72,6 +96,17 @@ export const HERO_TABS: HeroTab[] = [
     title: 'Evi mahallesiyle birlikte gör',
     subtitle:
       'Okul, ulaşım ve aidat bilgisi ilan kartının içinde; fiyat geçmişi harita üzerinde.',
+    heroWord: 'ev',
+    detailFilter: {
+      label: 'Oda sayısı',
+      options: [
+        { value: 'tumu', label: 'Tüm oda sayıları' },
+        { value: '1+1', label: '1+1' },
+        { value: '2+1', label: '2+1' },
+        { value: '3+1', label: '3+1' },
+        { value: '4+', label: '4+1 ve üzeri' },
+      ],
+    },
     placeholder: 'Semt, oda sayısı veya bütçeni yaz',
     suggestions: [
       'Çeşme 3+1 site içinde',
@@ -100,6 +135,16 @@ export const HERO_TABS: HeroTab[] = [
     title: 'Teslim tarihinden önce yerini seç',
     subtitle:
       'Devam eden projelerin etap planı, teslim takvimi ve müteahhit doğrulaması bir arada.',
+    heroWord: 'proje',
+    detailFilter: {
+      label: 'Teslim yılı',
+      options: [
+        { value: 'tumu', label: 'Tüm teslim yılları' },
+        { value: '2026', label: '2026' },
+        { value: '2027', label: '2027' },
+        { value: '2028+', label: '2028 ve sonrası' },
+      ],
+    },
     placeholder: 'Şehir, teslim yılı veya müteahhit yaz',
     suggestions: [
       '2027 teslim İstanbul projesi',

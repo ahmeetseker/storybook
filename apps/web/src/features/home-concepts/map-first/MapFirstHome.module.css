@@ -23,6 +23,59 @@
   min-width: 0;
 }
 
+/* ── Arama hero'su (Arsam yerleşimi) ── */
+.heroEyebrow {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.heroWord {
+  display: inline-block;
+  padding-inline: 0.22em;
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-label);
+  color: var(--lg-bg);
+}
+
+.searchCard {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-4);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-sm);
+  text-align: start;
+}
+
+.searchRow {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.searchField {
+  min-width: 10.5rem;
+  flex: 1;
+}
+
+.heroStat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
 /* Türkiye kabaca 3:1 yatık bir dikdörtgen; panel kareye yaklaştıkça ülkeyi
    sığdırmak için uzaklaşmak gerekir ve kadraj komşu ülkelerle dolar. Bu yüzden
    panel bilinçli olarak yatay tutulur ve zoom yükseltilir. */

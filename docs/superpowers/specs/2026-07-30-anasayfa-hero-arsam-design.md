@@ -1,12 +1,23 @@
-# AnaSayfa Hero — Arsam Yerleşimine Geçiş
+# Ana Sayfa Hero — Arsam Yerleşimine Geçiş
 
 Tarih: 2026-07-30 · Durum: Onaylandı (içerik: arsa'ya uyarla · arama: yapılandırılmış kart)
 
 ## Amaç
 
-`src/pages/AnaSayfa.tsx` hero bölümünü, Arsam projesinin (github.com/aliiball/Arsam)
-ana sayfa hero yerleşimine taşımak — ancak liquid-glass-ui componentleriyle ve
-ArsaPazar'ın arsa odaklı içeriğiyle. Referans ekran görüntüsündeki yapı:
+Ana sayfa hero'sunu, Arsam projesinin (github.com/aliiball/Arsam) hero
+yerleşimine taşımak — ancak liquid-glass-ui componentleriyle ve platformun arsa
+odaklı içeriğiyle. İki yüzey güncellenir:
+
+1. **`apps/web` (asıl uygulama):** `MapFirstHome`'a `heroVariant="search"`
+   eklenir; `/` rotası bu varyantı kullanır, `konseptler/harita-kesfi` haritalı
+   hero'yu korur. Sekme sözleşmesi (Arsa/Konut/Proje, `?tur=` URL parametresi)
+   aynen sürer; sekmeler arama kartının içine taşınır ve başlıktaki vurgulu
+   kelimeyi (arsa/ev/proje), alt başlığı ve ikinci seçiciyi (m² aralığı /
+   Oda sayısı / Teslim yılı) birlikte değiştirir.
+2. **`src/pages/AnaSayfa.tsx` (Storybook demo sayfası):** aynı yerleşimin
+   statik karşılığı.
+
+Referans ekran görüntüsündeki yapı:
 
 1. Eyebrow: küçük, harf aralıklı, büyük harf tanıtım satırı
 2. Büyük başlık; bir kelime koyu zeminli yuvarlatılmış çip içinde vurgulu
