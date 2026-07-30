@@ -148,3 +148,12 @@ dile taşındı. Etkileşimsiz rozetlerdeki (`.demoTag`, `.requiredNote`,
 `.privacyNote`, `.mediaOrder`, `.coverBadge`) dokunma hedefi yüksekliği
 (`--lg-control-sm`) kaldırıldı — bunlar `<span>` olup asla dokunma hedefi
 değildi.
+
+Changelog: 2026-07-31 — İlerleme şeridindeki iki kalan `--lg-control-*` yanlış
+kullanımı giderildi (denetim A5, "adım numarası" ve "adım şeridi 76px"):
+`.progressIndex` (`aria-hidden` dekoratif adım numarası `<span>`'i) dokunma
+hedefi ölçeğinden (`--lg-control-sm`, 44px) saf boyut token'ına
+(`--lg-space-7`, 32px) taşındı; `.progressButton` off-scale birleşik
+yüksekliği (`calc(var(--lg-control-xl) + var(--lg-space-5))`, 76px) tek
+token'a (`--lg-control-xl`, 56px) indirildi. `.progressButton` gerçek bir
+`<button>` olduğu için kontrol yüksekliği token'ı burada doğru kullanım.

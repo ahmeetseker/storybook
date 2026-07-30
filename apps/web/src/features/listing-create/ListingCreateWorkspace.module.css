@@ -447,7 +447,7 @@
   gap: var(--lg-space-3);
   align-items: center;
   width: 100%;
-  min-height: calc(var(--lg-control-xl) + var(--lg-space-5));
+  min-height: var(--lg-control-xl);
   padding: var(--lg-space-3);
   color: var(--lg-label-secondary);
   border: 0;
@@ -472,10 +472,10 @@
 
 .progressIndex {
   display: grid;
-  flex: 0 0 var(--lg-control-sm);
+  flex: 0 0 var(--lg-space-7);
   place-items: center;
-  width: var(--lg-control-sm);
-  height: var(--lg-control-sm);
+  width: var(--lg-space-7);
+  height: var(--lg-space-7);
   color: var(--lg-label-secondary);
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule);
