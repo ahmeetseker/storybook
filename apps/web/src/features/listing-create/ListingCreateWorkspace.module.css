@@ -159,10 +159,9 @@
 
 .entry {
   display: grid;
-  gap: calc(var(--lg-space-7) * 2);
+  gap: var(--lg-space-7);
   align-content: center;
-  min-height: calc(100dvh - var(--lg-space-7) * 4);
-  padding-block: calc(var(--lg-space-7) * 2);
+  padding-block: var(--lg-space-7);
 }
 
 .entryIntro {
@@ -198,8 +197,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-height: 22rem;
-  padding: calc(var(--lg-space-7) + var(--lg-space-2));
+  padding: var(--lg-space-6);
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
   background: var(--lg-surface);
@@ -213,28 +211,28 @@
 .choiceMark {
   display: grid;
   place-items: center;
-  width: var(--lg-control-xl);
-  height: var(--lg-control-xl);
-  margin-bottom: calc(var(--lg-space-7) + var(--lg-space-2));
+  width: var(--lg-space-8);
+  height: var(--lg-space-8);
+  margin-bottom: var(--lg-space-4);
   color: var(--lg-accent);
   border: var(--lg-stroke-hairline) solid
     color-mix(in srgb, var(--lg-accent) 35%, var(--lg-hairline));
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-surface);
-  font-size: var(--lg-text-title);
+  font-size: var(--lg-text-headline);
 }
 
 .entryChoicePrimary h2,
 .entryChoiceSecondary h2 {
-  margin: var(--lg-space-3) 0;
-  font-size: var(--lg-text-title);
+  margin: 0 0 var(--lg-space-2);
+  font-size: var(--lg-text-headline);
   line-height: 1.2;
 }
 
 .entryChoicePrimary > p:not(.choiceEyebrow),
 .entryChoiceSecondary > p {
   max-width: var(--lg-measure);
-  margin: 0 0 var(--lg-space-6);
+  margin: 0 0 var(--lg-space-4);
   color: var(--lg-label-secondary);
 }
 
@@ -288,14 +286,14 @@
 .privacyNote {
   display: inline-flex;
   align-items: center;
-  min-height: var(--lg-control-sm);
-  padding-inline: var(--lg-space-3);
+  min-height: 0;
+  padding: var(--lg-space-1) var(--lg-space-3);
   color: var(--lg-accent);
   border: var(--lg-stroke-hairline) solid
     color-mix(in srgb, var(--lg-accent) 28%, var(--lg-hairline));
   border-radius: var(--lg-radius-capsule);
   background: color-mix(in srgb, var(--lg-accent) 7%, var(--lg-surface));
-  font-size: var(--lg-text-caption);
+  font-size: var(--lg-text-badge);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -726,7 +724,7 @@
 
 .segmentChoices {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, max-content));
   gap: var(--lg-space-3);
 }
 
@@ -746,10 +744,8 @@
 }
 
 .segmentChoice {
-  align-items: center;
-  justify-content: center;
-  min-height: var(--lg-control-xl);
-  text-align: center;
+  align-items: flex-start;
+  min-height: var(--lg-control-md);
 }
 
 .segmentChoice input,
@@ -1052,12 +1048,12 @@
   inset-block-start: var(--lg-space-3);
   display: inline-flex;
   align-items: center;
-  min-height: var(--lg-control-sm);
-  padding-inline: var(--lg-space-3);
+  min-height: 0;
+  padding: var(--lg-space-1) var(--lg-space-2);
   color: var(--lg-on-scrim);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-scrim);
-  font-size: var(--lg-text-caption);
+  font-size: var(--lg-text-badge);
   font-weight: 700;
 }
 

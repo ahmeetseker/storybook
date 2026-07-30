@@ -136,3 +136,15 @@ maskelenerek saklanacaktır.
 
 Changelog: 2026-07-25 — Beş adımlı enterprise akış, medya stüdyosu, kontrollü AI,
 EİDS demo kapısı, otomatik kayıt ve yayın sonrası durum eklendi.
+
+Changelog: 2026-07-30 — Giriş ekranındaki dikey şişkinlik giderildi: `.entry`
+sabit `min-height` ve ikiye katlanmış boşluk kaldırıldı; giriş kartlarının
+`min-height: 22rem` kuralı ve fazla dolgusu kaldırılarak içerik yüksekliği
+belirleyici oldu; ikon rozeti dokunma hedefi token'ından (`--lg-control-xl`)
+saf boyut token'ına (`--lg-space-8`) taşındı. "İlan amacı" seçim kartları
+(`.segmentChoice`) ortalanmış/tam sütun genişliğindeki hizadan "Yayınlama
+yetkisi" kartlarıyla (`.roleChoice`) aynı sola hizalı, içerik genişliğinde
+dile taşındı. Etkileşimsiz rozetlerdeki (`.demoTag`, `.requiredNote`,
+`.privacyNote`, `.mediaOrder`, `.coverBadge`) dokunma hedefi yüksekliği
+(`--lg-control-sm`) kaldırıldı — bunlar `<span>` olup asla dokunma hedefi
+değildi.

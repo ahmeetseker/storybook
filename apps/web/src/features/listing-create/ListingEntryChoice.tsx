@@ -123,7 +123,7 @@ export function ListingEntryChoice({
               AI; kategori, konum ve öne çıkan özellikleri bir öneri halinde
               hazırlasın. Siz incelemeden hiçbir alan değişmez.
             </p>
-            <GlassButton prominent size="lg" onClick={() => setMode('ai')}>
+            <GlassButton prominent size="md" onClick={() => setMode('ai')}>
               AI ile hızlı başla
             </GlassButton>
           </article>
