@@ -3,8 +3,11 @@
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
   --content-max: 1120px;
-  --pad-y: 56px;
-  --showcase-pad-top: 150px;
+  /* Akışkan tip: 22px (mobil) → 28px (masaüstü), ölçek tavanı --lg-text-display'i aşmaz.
+     Çağıran `.root` üzerinden ezebilir. */
+  --title-size: clamp(var(--lg-text-title), 3vw, var(--lg-text-display));
+  --pad-y: clamp(var(--lg-space-5), 2.4vw, var(--lg-space-7));
+  --showcase-pad-top: var(--lg-space-10);
   --stack-gap: 18px;
   --actions-gap: 10px;
   --bento-offset: 14px;
@@ -16,7 +19,13 @@
   --split-min: 400px;
   --split-gap: 36px;
   --blob-size: 640px;
-  --blob-blur: 90px;
+  --blob-blur: 110px;
+  /* Alt başlık satır yüksekliği + çağıranın rezerve edebileceği satır sayısı.
+     Sekmeye göre içeriği değişen hero'larda 1↔2 satır farkı tüm sayfayı
+     dikeyde oynatıyordu; `--subtitle-lines` en uzun metnin satır sayısına
+     ayarlanınca blok sabit kalır (varsayılan 0 = rezerve yok). */
+  --subtitle-lh: 1.55;
+  --subtitle-lines: 0;
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -36,7 +45,16 @@
   align-items: inherit;
   text-align: inherit;
 }
-.block { display: flex; flex-direction: column; align-items: inherit; text-align: inherit; min-width: 0; }
+/* Bloklar sarmalayıcı genişliğini alır; daralma tek tek slotların kendi
+   max-width'leriyle olur. Shrink-to-fit bırakıldığında arama slotu için
+   ayrılan `--search-max-w` hiç devreye girmiyor, kart içeriği kadar
+   büzülüyordu. */
+.block { display: flex; flex-direction: column; align-items: inherit; text-align: inherit; width: 100%; min-width: 0; }
+/* Blok tam genişlik olunca yatay dizilen slotların kendi hizalaması gerekir. */
+.alignCenter .eyebrow,
+.alignCenter .actionsRow,
+.alignCenter .quickLinks { justify-content: center; }
+.alignCenter .searchSlot { margin-inline: auto; }
 .bentoSlot { width: 100%; margin-top: var(--bento-offset); text-align: start; }
 
 .inner {
@@ -54,7 +72,7 @@
 .title {
   margin: 0;
   max-width: var(--title-max-w);
-  font-size: clamp(30px, 4.5vw, 46px); /* akışkan tip — token ölçeğinde karşılığı yok (borç notu) */
+  font-size: var(--title-size);
   line-height: 1.12;
   font-weight: 700;
   letter-spacing: -0.028em;
@@ -63,8 +81,9 @@
 .subtitle {
   margin: 0;
   max-width: var(--subtitle-max-w);
+  min-height: calc(var(--subtitle-lines) * var(--subtitle-lh) * 1em);
   font-size: var(--lg-text-headline);
-  line-height: 1.55;
+  line-height: var(--subtitle-lh);
   color: var(--lg-label-secondary);
 }
 .actionsRow { display: flex; flex-wrap: wrap; gap: var(--actions-gap); }
@@ -120,7 +139,24 @@
 /* ── Ambient aurora (opsiyonel): düşük opaklıkta süzülen renk lekeleri ──
    Konum/sürüklenme px'leri dekoratif animasyon geometrisi — keyframe içinde
    var() güvenilir çalışmadığından raw bırakıldı (bkz. rules.md §9 borç notu). */
-.ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+/* Kırpma kenarı görünmemeli: leke hero kutusundan büyük olduğu için
+   `overflow: hidden` daha önce blur'ü düz bir kenarda kesiyor ve zeminde
+   dikdörtgen bir bant bırakıyordu. Katmanın kendisi sınırına doğru
+   sönümlendirilir; kesim artık sıfır opaklıkta gerçekleşir. */
+.ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%),
+    linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-composite: intersect;
+}
 .blobA,
 .blobB {
   position: absolute;
@@ -128,7 +164,7 @@
   height: var(--blob-size);
   border-radius: var(--lg-radius-capsule, 999px);
   filter: blur(var(--blob-blur));
-  opacity: 0.32;
+  opacity: 0.28;
 }
 .blobA {
   top: -280px;
