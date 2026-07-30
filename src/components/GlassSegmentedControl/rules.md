@@ -68,6 +68,9 @@ yoğun kontrol satırlarına aittir. Birleşik variant yok.
 ## 7. Davranış
 
 - Pointer: tıklama seçer; seçim damlası spring (`presets.springs.sidebar`) ile kayar.
+  Kayış **yalnız konum** animasyonudur (`layout="position"`): damla ilk kareden
+  hedef segmentin boyutunu alır, boyut morph'u (scale) yapılmaz — farklı
+  genişlikte segmentler arasında pil büyüyüp esniyormuş gibi görünmez.
 - Keyboard (radiogroup deseni): Ok tuşları önceki/sonraki **etkin** segmente
   sarar; Home/End ilk/son; seçim focus'u izler (roving tabindex).
 - Controlled/uncontrolled: `value` verilirse iç state yazılmaz.
@@ -126,3 +129,5 @@ Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
 ## Changelog
 
 - 2026-07-16: İlk sürüm — radiogroup semantiği, layoutId damla, roving tabindex.
+- 2026-07-30: Damla geçişi `layout="position"`a alındı — boyut morph'u (scale)
+  kaldırıldı; seçim değişiminde pil büyümeden, sabit boyutta kayar.

@@ -97,9 +97,13 @@ export function GlassSegmentedControl({
               onClick={() => !isDisabled && select(option.value)}
             >
               {selected ? (
-                // Seçim damlası: layout FLIP ile segmentler arasında süzülür
+                // Seçim damlası: layout FLIP ile segmentler arasında süzülür.
+                // layout="position" — damla yalnız KONUM animasyonu yapar; boyut anında
+                // yeni segmente oturur. Boyut morph'u (scale) segment genişlikleri
+                // farklıyken pili büyüyüp esniyormuş gibi gösteriyordu.
                 <motion.span
                   layoutId={`${baseId}-drop`}
+                  layout="position"
                   className={styles.drop}
                   transition={reduced ? { duration: 0 } : { type: 'spring', ...presets.springs.sidebar }}
                   aria-hidden
