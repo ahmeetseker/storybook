@@ -110,7 +110,7 @@ kökünde yerel değişkende toplandı (`.root { --content-max: 1120px; --stack-
 18px; --actions-gap: 10px; --bento-offset: 14px; --quicklink-gap: 14px;
 --text-sm: 14px; --title-max-w: 760px; --subtitle-max-w: 640px; --search-max-w:
 660px; --split-min: 400px; --split-gap: 36px; --blob-size: 640px; --blob-blur:
-90px; }`). `--pad-y`, `--showcase-pad-top` ve başlık punto'su (`--title-size`)
+110px; }`). `--pad-y`, `--showcase-pad-top` ve başlık punto'su (`--title-size`)
 artık token'a bağlı — borç listesinden çıkarıldı. Aurora blob konumları
 (−280/−160/−320/−120px) ve keyframe sürüklenme mesafeleri (70/50/−60/−70px)
 dekoratif animasyon geometrisi — keyframe içinde `var()` güvenilir
