@@ -14,6 +14,11 @@ import type { AuthAdapters } from './data/auth-adapters'
 import { GirisPage } from './pages/GirisPage'
 import { GirisKodPage } from './pages/GirisKodPage'
 import { GirisParolaPage } from './pages/GirisParolaPage'
+import {
+  BaglantiGecersizPage,
+  BaglantiGonderildiPage,
+  GirisHataPage,
+} from './pages/girisDurumSayfalari'
 
 function bosAdapters(): AuthAdapters {
   return {
@@ -53,12 +58,48 @@ const SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
   ['GirisParolaPage', GirisParolaPage],
 ]
 
+/** Durum sayfaları form taşımaz — yalnız landmark/heading/alert sözleşmesi test edilir. */
+const DURUM_SAYFALARI: ReadonlyArray<[string, () => ReactElement]> = [
+  ['BaglantiGonderildiPage', BaglantiGonderildiPage],
+  ['BaglantiGecersizPage', BaglantiGecersizPage],
+  ['GirisHataPage', GirisHataPage],
+]
+
+const TUM_SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
+  ...SAYFALAR,
+  ...DURUM_SAYFALARI,
+]
+
+const HATA_TONLU_SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
+  ['BaglantiGecersizPage', BaglantiGecersizPage],
+  ['GirisHataPage', GirisHataPage],
+]
+
 describe('auth erişilebilirlik geçidi', () => {
   it.each(SAYFALAR)('%s tek h1 taşır', async (_ad, Component) => {
     render(<RouterProvider router={sayfaRouter(Component)} />)
     await screen.findByRole('heading', { level: 1 })
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
+
+  it.each(TUM_SAYFALAR)('%s tam olarak bir main landmark taşır', async (_ad, Component) => {
+    render(<RouterProvider router={sayfaRouter(Component)} />)
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.getAllByRole('main')).toHaveLength(1)
+  })
+
+  it.each(HATA_TONLU_SAYFALAR)(
+    '%s hata tonunda alert main landmark\'ı değil yalnız açıklamayı kapsar',
+    async (_ad, Component) => {
+      render(<RouterProvider router={sayfaRouter(Component)} />)
+      await screen.findByRole('heading', { level: 1 })
+      const main = screen.getByRole('main')
+      const alert = screen.getByRole('alert')
+      expect(alert).not.toBe(main)
+      expect(main.getAttribute('role')).not.toBe('alert')
+      expect(main.contains(alert)).toBe(true)
+    },
+  )
 
   it.each(SAYFALAR)('%s içindeki her form alanı erişilebilir isim taşır', async (_ad, Component) => {
     const { container } = render(<RouterProvider router={sayfaRouter(Component)} />)

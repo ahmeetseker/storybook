@@ -30,17 +30,14 @@ export function AuthStatusPage({
   ikincilBaglanti,
 }: AuthStatusPageProps) {
   return (
-    <main
-      id="main-content"
-      className={styles.page}
-      data-tone={tone}
-      role={tone === 'error' ? 'alert' : undefined}
-    >
+    <main id="main-content" className={styles.page} data-tone={tone}>
       <span className={styles.mark} aria-hidden="true">
         {TON_ISARETI[tone]}
       </span>
       <h1 className={styles.title}>{baslik}</h1>
-      <p className={styles.description}>{aciklama}</p>
+      <p className={styles.description} role={tone === 'error' ? 'alert' : undefined}>
+        {aciklama}
+      </p>
 
       {birincilEylem || ikincilBaglanti ? (
         <div className={styles.actions}>

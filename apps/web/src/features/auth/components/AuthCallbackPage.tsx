@@ -14,12 +14,14 @@ export interface AuthCallbackPageProps {
 export function AuthCallbackPage({ durum, baslik, hataMesaji }: AuthCallbackPageProps) {
   if (durum === 'error') {
     return (
-      <main id="main-content" className={styles.page} data-tone="error" role="alert">
+      <main id="main-content" className={styles.page} data-tone="error">
         <span className={styles.mark} aria-hidden="true">
           !
         </span>
         <h1 className={styles.title}>{baslik}</h1>
-        <p className={styles.description}>{hataMesaji}</p>
+        <p className={styles.description} role="alert">
+          {hataMesaji}
+        </p>
       </main>
     )
   }
