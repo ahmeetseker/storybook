@@ -23,6 +23,8 @@ import { Route as IlanVerRouteImport } from './routes/ilan-ver'
 import { Route as KarsilastirRouteImport } from './routes/karsilastir'
 import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
+import { Route as GirisBaglantiGonderildiRouteImport } from './routes/giris_.baglanti-gonderildi'
+import { Route as GirisHataRouteImport } from './routes/giris_.hata'
 import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
@@ -33,6 +35,7 @@ import { Route as KonseptlerAiKesifRouteImport } from './routes/konseptler.ai-ke
 import { Route as KonseptlerGuvenMerkeziRouteImport } from './routes/konseptler.guven-merkezi'
 import { Route as KonseptlerHaritaKesfiRouteImport } from './routes/konseptler.harita-kesfi'
 import { Route as KonseptlerPazarVitriniRouteImport } from './routes/konseptler.pazar-vitrini'
+import { Route as GirisBaglantiGecersizRouteImport } from './routes/giris_.baglanti_.gecersiz'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -104,6 +107,16 @@ const OfislerRoute = OfislerRouteImport.update({
   path: '/ofisler',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GirisBaglantiGonderildiRoute = GirisBaglantiGonderildiRouteImport.update({
+  id: '/giris_/baglanti-gonderildi',
+  path: '/giris/baglanti-gonderildi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GirisHataRoute = GirisHataRouteImport.update({
+  id: '/giris_/hata',
+  path: '/giris/hata',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GirisKodRoute = GirisKodRouteImport.update({
   id: '/giris_/kod',
   path: '/giris/kod',
@@ -154,6 +167,11 @@ const KonseptlerPazarVitriniRoute = KonseptlerPazarVitriniRouteImport.update({
   path: '/pazar-vitrini',
   getParentRoute: () => KonseptlerRoute,
 } as any)
+const GirisBaglantiGecersizRoute = GirisBaglantiGecersizRouteImport.update({
+  id: '/giris_/baglanti_/gecersiz',
+  path: '/giris/baglanti/gecersiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -170,6 +188,8 @@ export interface FileRoutesByFullPath {
   '/karsilastir': typeof KarsilastirRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
+  '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
@@ -180,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/konseptler/': typeof KonseptlerIndexRoute
+  '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,6 +216,8 @@ export interface FileRoutesByTo {
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/ofisler': typeof OfislerRoute
+  '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
@@ -205,6 +228,7 @@ export interface FileRoutesByTo {
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/konseptler': typeof KonseptlerIndexRoute
+  '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,6 +246,8 @@ export interface FileRoutesById {
   '/karsilastir': typeof KarsilastirRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
+  '/giris_/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/giris_/hata': typeof GirisHataRoute
   '/giris_/kod': typeof GirisKodRoute
   '/giris_/parola': typeof GirisParolaRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
@@ -232,6 +258,7 @@ export interface FileRoutesById {
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/konseptler/': typeof KonseptlerIndexRoute
+  '/giris_/baglanti_/gecersiz': typeof GirisBaglantiGecersizRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -250,6 +277,8 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/konseptler'
     | '/ofisler'
+    | '/giris/baglanti-gonderildi'
+    | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
     | '/hesabim/mesajlar'
@@ -260,6 +289,7 @@ export interface FileRouteTypes {
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
     | '/konseptler/'
+    | '/giris/baglanti/gecersiz'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -275,6 +305,8 @@ export interface FileRouteTypes {
     | '/ilan-ver'
     | '/karsilastir'
     | '/ofisler'
+    | '/giris/baglanti-gonderildi'
+    | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
     | '/hesabim/mesajlar'
@@ -285,6 +317,7 @@ export interface FileRouteTypes {
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
     | '/konseptler'
+    | '/giris/baglanti/gecersiz'
   id:
     | '__root__'
     | '/'
@@ -301,6 +334,8 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/konseptler'
     | '/ofisler'
+    | '/giris_/baglanti-gonderildi'
+    | '/giris_/hata'
     | '/giris_/kod'
     | '/giris_/parola'
     | '/hesabim_/mesajlar'
@@ -311,6 +346,7 @@ export interface FileRouteTypes {
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
     | '/konseptler/'
+    | '/giris_/baglanti_/gecersiz'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -328,10 +364,13 @@ export interface RootRouteChildren {
   KarsilastirRoute: typeof KarsilastirRoute
   KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
+  GirisBaglantiGonderildiRoute: typeof GirisBaglantiGonderildiRoute
+  GirisHataRoute: typeof GirisHataRoute
   GirisKodRoute: typeof GirisKodRoute
   GirisParolaRoute: typeof GirisParolaRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
+  GirisBaglantiGecersizRoute: typeof GirisBaglantiGecersizRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -434,6 +473,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfislerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/giris_/baglanti-gonderildi': {
+      id: '/giris_/baglanti-gonderildi'
+      path: '/giris/baglanti-gonderildi'
+      fullPath: '/giris/baglanti-gonderildi'
+      preLoaderRoute: typeof GirisBaglantiGonderildiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giris_/hata': {
+      id: '/giris_/hata'
+      path: '/giris/hata'
+      fullPath: '/giris/hata'
+      preLoaderRoute: typeof GirisHataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/giris_/kod': {
       id: '/giris_/kod'
       path: '/giris/kod'
@@ -504,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KonseptlerPazarVitriniRouteImport
       parentRoute: typeof KonseptlerRoute
     }
+    '/giris_/baglanti_/gecersiz': {
+      id: '/giris_/baglanti_/gecersiz'
+      path: '/giris/baglanti/gecersiz'
+      fullPath: '/giris/baglanti/gecersiz'
+      preLoaderRoute: typeof GirisBaglantiGecersizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -544,10 +604,13 @@ const rootRouteChildren: RootRouteChildren = {
   KarsilastirRoute: KarsilastirRoute,
   KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
+  GirisBaglantiGonderildiRoute: GirisBaglantiGonderildiRoute,
+  GirisHataRoute: GirisHataRoute,
   GirisKodRoute: GirisKodRoute,
   GirisParolaRoute: GirisParolaRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
   IlanListingIdRoute: IlanListingIdRoute,
+  GirisBaglantiGecersizRoute: GirisBaglantiGecersizRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
