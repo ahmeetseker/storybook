@@ -31,7 +31,7 @@
 
 /* Yüzen kabuk katmanlarının payı.
 
-   GlassIslandHeader ve GlassDock viewport'a sabitlenmiştir ve sayfanın
+   GlassSiteHeader ve GlassDock viewport'a sabitlenmiştir ve sayfanın
    ızgarasını tanımaz; ilk ve son ekran içeriği onların altında kalırdı.
    Pay, kabuğun kendi token'larından okunur (`--lg-shell-*-offset`), böylece
    header veya dock ölçüsü değişince sayfa kendiliğinden hizada kalır.

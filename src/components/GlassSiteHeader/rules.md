@@ -170,8 +170,21 @@ morfu canlı denenebilir.
 - [x] Escape kapatır + focus hamburger'a döner
 - [x] dış `pointerdown` kapatır, iç kapatmaz
 - [x] panelden link seçimi `onClick` + kapatma
-- [ ] kapsülün daralma morfu (visual, Chrome)
-- [ ] `.material`'ın opacity ile belirişi (visual, Chrome)
+- [x] kapsülün daralma morfu (visual, Chromium — 1152px/radius 0 → 880px/radius 20px)
+- [x] `.material`'ın opacity ile belirişi (visual, Chromium — rest'te
+      `opacity: 0; visibility: hidden`, condensed'te `opacity: 1; visible`)
+- [x] reduced-motion'da `.material` geçişi kapanıyor (`transition-property: none`)
+- [x] panel tepede açıldığında da malzeme görünür (`data-menu-open`, radius 20px)
+- [x] header yüksekliği 76px — `--lg-shell-header-offset` ile birebir
+
+**Bilinen görsel kısıt (açık):** refraction katmanında `.material`'ın zemini
+`rgba(255,255,255,0.06)` ve `backdrop-filter` bir SVG kırılma filtresidir —
+içeriği bozar ama bulanıklaştırmaz. Küçük kontrollerde doğru davranış; ancak
+mobil panel metin taşıyan büyük bir yüzey olduğu için altından geçen sayfa
+içeriği net okunur ve panel metniyle kontrast yarışına girer. Boş/sakin zeminde
+sorun görünmez. Çözüm bir tasarım kararıdır (scrim eklemek, `thickness`
+yükseltmek ya da paneli `GlassTierProvider tier="fallback"` ile düz blur'a
+indirmek) ve bu planın kapsamı dışında bırakıldı.
 
 ## 12. Do / Don't
 
