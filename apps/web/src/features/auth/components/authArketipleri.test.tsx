@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
 import userEvent from '@testing-library/user-event'
 import { AuthFormPage } from './AuthFormPage'
 import { AuthStatusPage } from './AuthStatusPage'
@@ -45,6 +46,37 @@ describe('AuthFormPage', () => {
       </AuthFormPage>,
     )
     expect(screen.getByRole('button', { name: 'Devam et' })).toHaveProperty('disabled', true)
+  })
+
+  it('sunucu taraflı işlenen markette gönder butonu devre dışıdır — hidrasyon öncesi tıklama native form gönderimini tetiklemesin', () => {
+    // Bu uygulama TanStack Start ile sunucuda render edilir. `renderToString`
+    // hiçbir efekt çalıştırmaz — bu yüzden gerçek tarayıcıda kullanıcının JS
+    // yüklenmeden/hidrasyon bitmeden ÖNCE göreceği markup budur. Buton bu
+    // anda devre dışı değilse, erken bir tıklama React'in onSubmit'ini hiç
+    // çalıştırmadan tarayıcının native form gönderimini tetikler (input'ta
+    // `name` yok, form'da `action` yok → mevcut yola boş sorgu dizesiyle GET
+    // atılır ve `donus` parametresi sessizce kaybolur).
+    const html = renderToString(
+      <AuthFormPage baslik="Giriş yapın" onSubmit={vi.fn()} gonderEtiketi="Devam et">
+        <input aria-label="Telefon" />
+      </AuthFormPage>,
+    )
+    const dom = document.createElement('div')
+    dom.innerHTML = html
+    const buton = dom.querySelector<HTMLButtonElement>('button[type="submit"]')
+    expect(buton, 'gönder butonu bulunamadı').toBeTruthy()
+    expect(buton?.disabled).toBe(true)
+  })
+
+  it('hidrasyon tamamlandıktan sonra gönder butonu etkinleşir', async () => {
+    render(
+      <AuthFormPage baslik="Giriş yapın" onSubmit={vi.fn()} gonderEtiketi="Devam et">
+        <input aria-label="Telefon" />
+      </AuthFormPage>,
+    )
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Devam et' })).toHaveProperty('disabled', false),
+    )
   })
 })
 

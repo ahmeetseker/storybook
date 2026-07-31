@@ -1,4 +1,4 @@
-import type { FormEvent, ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { GlassButton } from '@repo/ui'
 import styles from './AuthFormPage.module.css'
@@ -31,6 +31,20 @@ export function AuthFormPage({
   ikincilBaglantilar = [],
   children,
 }: AuthFormPageProps) {
+  // Uygulama sunucuda render edilir (TanStack Start). Hidrasyon tamamlanana
+  // kadar React'in `onSubmit`'i DOM'a bağlanmamış olur; bu sırada gönder
+  // butonuna basılırsa tarayıcı native form gönderimi yapar (input'ta `name`,
+  // form'da `action`/`method` olmadığından mevcut yola boş sorgu dizesiyle
+  // GET atılır) ve `donus` parametresi sessizce kaybolur — güvenlik açığı
+  // değil ama sessiz veri kaybı. `useEffect` yalnız client'ta ve hidrasyon
+  // sonrası çalıştığından, butonu o âna kadar devre dışı tutmak erken
+  // tıklamaları güvenle yutar; alternatifi sessiz veri kaybı olduğundan
+  // butonun ilk anda kısaca devre dışı görünmesi kabul edilebilir.
+  const [hidrasyonTamam, setHidrasyonTamam] = useState(false)
+  useEffect(() => {
+    setHidrasyonTamam(true)
+  }, [])
+
   return (
     <main id="main-content" className={styles.page}>
       <header className={styles.header}>
@@ -52,7 +66,7 @@ export function AuthFormPage({
           prominent
           size="md"
           loading={gonderiliyor}
-          disabled={gonderiliyor}
+          disabled={!hidrasyonTamam || gonderiliyor}
         >
           {gonderEtiketi}
         </GlassButton>
