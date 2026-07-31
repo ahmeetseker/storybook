@@ -39,7 +39,9 @@ export function GirisParolaPage() {
       gonderEtiketi="Giriş yap"
       gonderiliyor={gonderiliyor}
       ikincilBaglantilar={[
-        { etiket: 'Parolanızı mı unuttunuz?', hedef: '/parola-sifirla' },
+        // "Parolanızı mı unuttunuz?" → /parola-sifirla henüz yazılmadı
+        // (Faz 3). Ölü bağlantı bırakmamak için parola sıfırlama akışı
+        // gelene kadar bu satır kaldırılmıştır.
         { etiket: 'Telefonla giriş yapın', hedef: '/giris' },
       ]}
     >

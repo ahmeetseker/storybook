@@ -98,8 +98,14 @@ describe('GirisParolaPage', () => {
     )
   })
 
-  it('parola sıfırlama bağlantısı sunar', async () => {
+  it('parola sıfırlama sayfası henüz yokken o bağlantıyı sunmaz — ölü buton yasağı', async () => {
     render(<RouterProvider router={parolaRouter(sahteAdapters())} />)
-    expect(await screen.findByRole('link', { name: /parolanızı mı unuttunuz/i })).toBeTruthy()
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.queryByRole('link', { name: /parolanızı mı unuttunuz/i })).toBeNull()
+  })
+
+  it('telefonla giriş bağlantısı sunar', async () => {
+    render(<RouterProvider router={parolaRouter(sahteAdapters())} />)
+    expect(await screen.findByRole('link', { name: /telefonla giriş yapın/i })).toBeTruthy()
   })
 })
