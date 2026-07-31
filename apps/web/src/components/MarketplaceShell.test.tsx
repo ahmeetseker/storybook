@@ -100,7 +100,11 @@ describe('MarketplaceShell hesap eylemi', () => {
 })
 
 describe('MarketplaceShell tema eylemi', () => {
-  it('tema butonu header’da kalır — tek erişim noktası', () => {
+  // Not: jsdom her zaman scrollY = 0'da kalır, bu yüzden bu test yalnız rest
+  // durumunu kanıtlar — condensed durumda tema butonunun görünür kaldığına
+  // dair bir iddia içermez. Gerçek düğüm: `utility` header'ın `utility` slotuna
+  // render ediliyor (condensedAction artık verilmiyor, bkz. rules.md/PR notu).
+  it('tema butonu header’ın utility slotuna render edilir', () => {
     routerState.pathname = '/emlak'
 
     render(

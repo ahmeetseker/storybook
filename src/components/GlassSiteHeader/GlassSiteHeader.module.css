@@ -146,7 +146,10 @@
 
 /* Dar kapsül: satır aksiyonları panele iner — çift accessible kontrol olmaz. */
 .actions { display: none; }
-.burger { display: inline-flex; }
+/* .actions gizliyken satırda logo + hamburger kalır; hamburger'ı kapsülün
+   sonuna iter (yalnız dar kapsülde etkili — geniş kapsülde `.burger` zaten
+   `display: none`, bkz. @container bloğu). */
+.burger { display: inline-flex; margin-inline-start: auto; }
 
 /* ── Mobil panel: kapsülün kendisi büyür, ayrı yüzey değil ────────────── */
 .panel {
@@ -157,6 +160,13 @@
   margin-top: var(--lg-space-3);
   padding-top: var(--lg-space-4);
   border-top: 1px solid var(--lg-hairline);
+  /* Refraction katmanı zemini bulanıklaştırmaz — panel kendi opak yüzeyini
+     taşır ki metin altındaki sayfa içeriğiyle kontrast yarışına girmesin.
+     Bkz. rules.md §7. */
+  background: var(--lg-surface);
+  border-radius: var(--lg-radius-media);
+  padding-inline: var(--lg-space-3);
+  padding-bottom: var(--lg-space-3);
 }
 .panelList {
   display: flex;

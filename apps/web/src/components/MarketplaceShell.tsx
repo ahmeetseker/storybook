@@ -186,7 +186,6 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
           utility={themeAction}
           secondaryAction={accountAction}
           action={createAction}
-          condensedAction={createAction}
         />
       ) : null}
       {children}

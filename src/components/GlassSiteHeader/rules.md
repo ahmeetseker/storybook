@@ -109,6 +109,26 @@ görsel geçişler CSS ve motion layout'ta.
   (specificity) katmaz; `transition`'ı yeniden bildiren her seçici, guard
   içinde de aynı özgüllükte tekrarlanmazsa scrolled/menu-open durumundaki
   daha özgül kural kazanır ve geçiş sıfırlanmaz — bu yüzden üçü de listede.
+- **Bilinçli sapma — panel kendi zeminini taşır:** refraction katmanında
+  `.material`'ın `backdrop-filter`'ı bir SVG kırılma filtresidir; zemini
+  bulanıklaştırmaz, yalnız bozar. Mobil panel (~343×353px) 160.000px²
+  kırılma eşiğinin altında kaldığı için bu filtreden çıkamaz — `thickness`
+  yükseltmek de çözmez, çünkü kırılma dalında hesaplanan blur zaten atılır.
+  Panel metin taşıyan büyük bir yüzey olduğundan altından geçen sayfa
+  içeriği net okunur kalıp panel metniyle kontrast yarışına girerdi (WCAG
+  1.4.3 garanti edilemezdi). Bu yüzden `.panel` kendi `--lg-surface`
+  zeminini + `--lg-radius-media` köşesini taşır: panel artık kapsülün camı
+  içinde duran opak bir kart, "panel = kapsülün camının bir parçası"
+  ilkesinden bu noktada bilinçli olarak ayrılır.
+- **DOM'da aksiyon tekrarı:** panel açıkken (`data-menu-open`) `.actions`
+  içindeki `utility`/`secondaryAction`/`action` React örnekleri satırdan
+  kaldırılmaz — yalnız `display: none` ile gizlenir (dar kapsülde zaten
+  gizli, bkz. yukarı). Panelin `.panelActions`'ı bu slotların **ikinci**
+  bir örneğini render eder. Erişilebilirlik ağacı temizdir (gizli kopya
+  `display: none` ile ağaçtan düşer) ama DOM'da iki örnek bulunur; tüketici
+  bu slotlara sabit bir `id` verirse (örn. `apps/web`'de
+  `id="shell-account-action"`), o `id` DOM'da tekilliğini kaybeder.
+  Tüketiciler bu slotlara verdikleri öğelerin `id`'sine güvenmemeli.
 
 ## 8. İçerik
 
@@ -177,14 +197,14 @@ morfu canlı denenebilir.
 - [x] panel tepede açıldığında da malzeme görünür (`data-menu-open`, radius 20px)
 - [x] header yüksekliği 76px — `--lg-shell-header-offset` ile birebir
 
-**Bilinen görsel kısıt (açık):** refraction katmanında `.material`'ın zemini
+**Çözüldü:** refraction katmanında `.material`'ın zemini
 `rgba(255,255,255,0.06)` ve `backdrop-filter` bir SVG kırılma filtresidir —
 içeriği bozar ama bulanıklaştırmaz. Küçük kontrollerde doğru davranış; ancak
 mobil panel metin taşıyan büyük bir yüzey olduğu için altından geçen sayfa
-içeriği net okunur ve panel metniyle kontrast yarışına girer. Boş/sakin zeminde
-sorun görünmez. Çözüm bir tasarım kararıdır (scrim eklemek, `thickness`
-yükseltmek ya da paneli `GlassTierProvider tier="fallback"` ile düz blur'a
-indirmek) ve bu planın kapsamı dışında bırakıldı.
+içeriği net okunup panel metniyle kontrast yarışına giriyordu. Çözüm: `.panel`
+artık kendi `--lg-surface` zeminini taşıyor (bkz. §7 "Bilinçli sapma — panel
+kendi zeminini taşır"), böylece panel metni her zaman bilinen bir yüzeyin
+üstünde okunur.
 
 ## 12. Do / Don't
 
