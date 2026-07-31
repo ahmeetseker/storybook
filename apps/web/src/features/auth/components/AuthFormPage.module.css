@@ -1,0 +1,72 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+/* Sayfa başlığı title ölçeğinde — display (28px) marka/hero ölçüsüdür. */
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  max-inline-size: var(--lg-measure);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.error {
+  margin: 0;
+  padding: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-danger);
+  border-radius: var(--lg-radius-chip);
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-danger);
+}
+
+.error:empty {
+  display: none;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2) var(--lg-space-4);
+  font-size: var(--lg-text-footnote);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lg-control-md);
+  color: var(--lg-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
