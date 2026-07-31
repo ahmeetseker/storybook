@@ -1,0 +1,76 @@
+/* Auth kabuğu — oturumu olmayan kullanıcı için dar, odaklanmış yüzey.
+   Cam yok: gezinme sunmayan bu katmanda cam yüzey bütçesi harcanmaz. */
+.shell {
+  min-block-size: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--lg-space-6);
+  padding-block: var(--lg-space-6);
+  padding-inline: var(--lg-container-gutter);
+  background: var(--lg-bg);
+  color: var(--lg-label);
+}
+
+.masthead {
+  display: flex;
+  justify-content: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-control-md);
+  padding-inline: var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  color: var(--lg-label);
+  text-decoration: none;
+}
+
+.brand:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.inner {
+  inline-size: 100%;
+  max-inline-size: 26rem;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--lg-space-2) var(--lg-space-4);
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.footerLink {
+  color: inherit;
+  text-decoration: none;
+  min-height: var(--lg-control-md);
+  display: inline-flex;
+  align-items: center;
+}
+
+.footerLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .brand:hover,
+  .footerLink:hover {
+    color: var(--lg-accent);
+  }
+}

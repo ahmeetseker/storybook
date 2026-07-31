@@ -257,3 +257,23 @@ export function createPageHead(key: AppRouteKey) {
     links: [{ rel: 'canonical', href: `${siteOrigin}${route.href}` }],
   }
 }
+
+/**
+ * Kimlik doğrulama rotaları — `MarketplaceShell` yerine `AuthShell` kullanır.
+ *
+ * `/hesabim/*` bu listede DEĞİLDİR: oturum gerektiren sayfalar pazaryeri
+ * kabuğunda kalır. Buradaki rotalar oturumu olmayan kullanıcı içindir.
+ */
+export const authRoutePaths = [
+  '/giris',
+  '/kayit',
+  '/parola-sifirla',
+  '/oturum-suresi-doldu',
+  '/yetkisiz',
+  '/hesap',
+] as const
+
+export function isAuthPath(pathname: string): boolean {
+  const yol = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+  return authRoutePaths.some((onek) => yol === onek || yol.startsWith(`${onek}/`))
+}

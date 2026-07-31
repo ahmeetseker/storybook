@@ -6,11 +6,15 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useRouterState,
 } from '@tanstack/react-router'
 import '@fontsource-variable/manrope/index.css'
 import '@repo/ui/styles'
 import '@/styles/app.css'
 import { MarketplaceShell } from '@/components/MarketplaceShell'
+import { isAuthPath } from '@/config/routes'
+import { AuthSessionProvider } from '@/features/auth'
+import { AuthShell } from '@/features/auth/components/AuthShell'
 import type { RouterContext } from '@/router-context'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -40,13 +44,23 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   const { initialTime } = Route.useLoaderData()
   const { queryClient } = Route.useRouteContext()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const authSayfasi = isAuthPath(pathname)
 
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <MarketplaceShell initialTime={initialTime}>
-          <Outlet />
-        </MarketplaceShell>
+        <AuthSessionProvider>
+          {authSayfasi ? (
+            <AuthShell>
+              <Outlet />
+            </AuthShell>
+          ) : (
+            <MarketplaceShell initialTime={initialTime}>
+              <Outlet />
+            </MarketplaceShell>
+          )}
+        </AuthSessionProvider>
       </QueryClientProvider>
     </RootDocument>
   )

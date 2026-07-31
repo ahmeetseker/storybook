@@ -4,6 +4,7 @@ import {
   dockRouteKeys,
   getRouteByPath,
   headerRouteKeys,
+  isAuthPath,
   nonNavRoutes,
   siteOrigin,
 } from './routes'
@@ -70,5 +71,28 @@ describe('uygulama rota kaydı', () => {
     expect(
       Object.values(dockRouteKeys).flat().every((key) => keys.has(key)),
     ).toBe(true)
+  })
+})
+
+describe('isAuthPath', () => {
+  it('auth rotalarını tanır', () => {
+    expect(isAuthPath('/giris')).toBe(true)
+    expect(isAuthPath('/giris/kod')).toBe(true)
+    expect(isAuthPath('/kayit')).toBe(true)
+    expect(isAuthPath('/parola-sifirla')).toBe(true)
+    expect(isAuthPath('/oturum-suresi-doldu')).toBe(true)
+    expect(isAuthPath('/yetkisiz')).toBe(true)
+    expect(isAuthPath('/hesap/dogrula')).toBe(true)
+  })
+
+  it('pazaryeri rotalarını auth saymaz', () => {
+    expect(isAuthPath('/')).toBe(false)
+    expect(isAuthPath('/emlak')).toBe(false)
+    expect(isAuthPath('/hesabim')).toBe(false)
+    expect(isAuthPath('/hesabim/parola')).toBe(false)
+  })
+
+  it('sondaki eğik çizgiyi yok sayar', () => {
+    expect(isAuthPath('/giris/')).toBe(true)
   })
 })
