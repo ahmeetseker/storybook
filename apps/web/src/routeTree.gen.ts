@@ -16,6 +16,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BolgelerRouteImport } from './routes/bolgeler'
 import { Route as EmlakRouteImport } from './routes/emlak'
 import { Route as FavorilerRouteImport } from './routes/favoriler'
+import { Route as GirisRouteImport } from './routes/giris'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as HesabimRouteImport } from './routes/hesabim'
 import { Route as IlanVerRouteImport } from './routes/ilan-ver'
@@ -64,6 +65,11 @@ const EmlakRoute = EmlakRouteImport.update({
 const FavorilerRoute = FavorilerRouteImport.update({
   id: '/favoriler',
   path: '/favoriler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GirisRoute = GirisRouteImport.update({
+  id: '/giris',
+  path: '/giris',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/bolgeler': typeof BolgelerRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
+  '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/bolgeler': typeof BolgelerRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
+  '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/bolgeler': typeof BolgelerRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
+  '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
@@ -216,6 +225,7 @@ export interface FileRouteTypes {
     | '/bolgeler'
     | '/emlak'
     | '/favoriler'
+    | '/giris'
     | '/health'
     | '/hesabim'
     | '/ilan-ver'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/bolgeler'
     | '/emlak'
     | '/favoriler'
+    | '/giris'
     | '/health'
     | '/hesabim'
     | '/ilan-ver'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/bolgeler'
     | '/emlak'
     | '/favoriler'
+    | '/giris'
     | '/health'
     | '/hesabim'
     | '/ilan-ver'
@@ -285,6 +297,7 @@ export interface RootRouteChildren {
   BolgelerRoute: typeof BolgelerRoute
   EmlakRoute: typeof EmlakRoute
   FavorilerRoute: typeof FavorilerRoute
+  GirisRoute: typeof GirisRoute
   HealthRoute: typeof HealthRoute
   HesabimRoute: typeof HesabimRoute
   IlanVerRoute: typeof IlanVerRoute
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/favoriler'
       fullPath: '/favoriler'
       preLoaderRoute: typeof FavorilerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giris': {
+      id: '/giris'
+      path: '/giris'
+      fullPath: '/giris'
+      preLoaderRoute: typeof GirisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -477,6 +497,7 @@ const rootRouteChildren: RootRouteChildren = {
   BolgelerRoute: BolgelerRoute,
   EmlakRoute: EmlakRoute,
   FavorilerRoute: FavorilerRoute,
+  GirisRoute: GirisRoute,
   HealthRoute: HealthRoute,
   HesabimRoute: HesabimRoute,
   IlanVerRoute: IlanVerRoute,
