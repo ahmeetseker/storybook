@@ -22,7 +22,7 @@
 - **Placeholder sayfa yok.** Yazılmayan sayfa rotaya bağlanmaz.
 - **Dil:** Kullanıcıya görünen her metin Türkçe. Kod tanımlayıcıları İngilizce.
 - **Test baseline:** `npm test` şu an 1733 testin **18'i kırık** (hepsi `apps/web/src/features/listing-detail/`). Bu sayı artmamalıdır.
-- **Doğrulama komutları:** `npx tsc -b` · `npm run lint` · `npm test`. Üçü de her task'ın sonunda çalışır.
+- **Doğrulama komutları:** `npm run typecheck` · `npm run lint` · `npm test`. Üçü de her task'ın sonunda çalışır.
 - **Dev sunucu `http://127.0.0.1:3000` üzerinde zaten ayakta.** Yeniden başlatmayın, `npm run dev` çalıştırmayın (port dolu, hata verir).
 - **Commit:** Türkçe conventional commit, mesaj sonunda `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`. Push YOK.
 
@@ -454,9 +454,9 @@ Expected: PASS — 16/16 (8 session + 8 adapter)
 - [ ] **Step 10: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
-Expected: tsc 0 hata, lint 0 hata, test 18 kırık (baseline korunuyor).
+Expected: typecheck 0 hata, lint 0 hata, test 18 kırık (baseline korunuyor).
 
 ```bash
 git add apps/web/src/features/auth
@@ -688,7 +688,7 @@ Expected: PASS — 4/4
 - [ ] **Step 6: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -991,7 +991,7 @@ function RootComponent() {
 - [ ] **Step 9: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 Expected: baseline 18 kırık korunuyor. `MarketplaceShell.test.tsx` ve `PageContainer.test.tsx` geçmeli — geçmiyorsa provider sarmalaması bir testin beklentisini bozmuştur, düzeltin.
 
@@ -1482,7 +1482,7 @@ Expected: PASS — 10/10
 - [ ] **Step 9: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -1783,7 +1783,7 @@ Script ve görüntüleri `/private/tmp/claude-501/-Users-ahmet-Desktop-storybook
 - [ ] **Step 8: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -2035,7 +2035,7 @@ export const Route = createFileRoute('/giris/kod')({
 - [ ] **Step 6: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -2288,7 +2288,7 @@ export const Route = createFileRoute('/giris/parola')({
 - [ ] **Step 6: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -2485,7 +2485,7 @@ export const Route = createFileRoute('/giris/hata')({
 - [ ] **Step 6: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
@@ -2777,7 +2777,7 @@ Bulguları raporunuza yazın. Herhangi biri tutmuyorsa düzeltin.
 - [ ] **Step 7: Tam doğrulama ve commit**
 
 ```bash
-npx tsc -b && npm run lint && npm test
+npm run typecheck && npm run lint && npm test
 ```
 Expected: baseline 18 kırık korunuyor, auth testlerinin tamamı geçiyor.
 
