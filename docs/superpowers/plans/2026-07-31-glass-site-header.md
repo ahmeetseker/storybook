@@ -166,7 +166,6 @@ Expected: FAIL — `Failed to resolve import "./GlassSiteHeader"`
   --nav-font: 14px;
   --link-gap: 2px;
   --link-pad-x: 13px;
-  --focus-radius: 4px;
   --pill-inset: 3px 1px;
   --morph-dur: 0.3s;
 
@@ -258,7 +257,7 @@ Expected: FAIL — `Failed to resolve import "./GlassSiteHeader"`
 @media (hover: hover) { .link:hover { color: var(--lg-label); } }
 .link:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: 2px;
+  outline-offset: var(--lg-focus-ring-offset, 2px);
 }
 .linkActive { color: var(--lg-label); font-weight: 600; }
 .linkLabel { position: relative; z-index: 1; }
@@ -938,7 +937,7 @@ Kök `<header>` ve satır bloğunu güncelle — `data-menu-open` ekle, `capsule
 @media (hover: hover) { .panelLink:hover { color: var(--lg-label); } }
 .panelLink:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: 2px;
+  outline-offset: var(--lg-focus-ring-offset, 2px);
 }
 .panelLinkActive { color: var(--lg-label); font-weight: 600; }
 .panelActions {
@@ -1263,7 +1262,7 @@ görsel geçişler CSS ve motion layout'ta.
 değişkenlerde toplandı: `--capsule-max-scrolled: 55rem` (condensed genişlik —
 container ölçeğinde karşılığı yok), `--zone-gap: 18px`, `--actions-gap: 12px`,
 `--wordmark-gap: 9px`, `--nav-font: 14px`, `--link-gap: 2px`,
-`--link-pad-x: 13px`, `--focus-radius: 4px`, `--pill-inset: 3px 1px`,
+`--link-pad-x: 13px`, `--pill-inset: 3px 1px`,
 `--morph-dur: 0.3s`. Bilinçli bırakılanlar: cam pill reçetesi
 `blur(8px) + saturate(150%)` ve `color-mix`'li ışıma (token gölge kalıplarıyla
 birebir değil), geçiş easing'i (token yok), `z-index: 30` (z ölçeği yok —
@@ -1586,7 +1585,7 @@ O blokta `.route-capabilities` kuralı kalır — blok boşalmaz, silme.
 
 .shell-brand:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: var(--lg-space-1);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
   border-radius: var(--lg-radius-chip);
 }
 ```
