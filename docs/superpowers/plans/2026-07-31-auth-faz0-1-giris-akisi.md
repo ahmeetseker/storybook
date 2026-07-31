@@ -885,9 +885,9 @@ export function AuthShell({ children }: { children: ReactNode }) {
         </Link>
       </header>
 
-      <main id="main-content" className={styles.content}>
+      <div className={styles.content}>
         <div className={styles.inner}>{children}</div>
-      </main>
+      </div>
 
       <footer className={styles.footer}>
         <Link to="/" className={styles.footerLink}>
@@ -934,16 +934,15 @@ function shellIleRouter() {
 }
 
 describe('AuthShell', () => {
-  it('içeriği main landmark içinde gösterir', async () => {
+  it('çocuklarını çizer', async () => {
     render(<RouterProvider router={shellIleRouter()} />)
-    const main = await screen.findByRole('main')
-    expect(main.querySelector('h1')?.textContent).toBe('Giriş')
+    expect(await screen.findByRole('heading', { name: 'Giriş' })).toBeTruthy()
   })
 
-  it('içeriğe geç bağlantısının hedefi olan main-content kimliğini taşır', async () => {
-    render(<RouterProvider router={shellIleRouter()} />)
-    const main = await screen.findByRole('main')
-    expect(main.id).toBe('main-content')
+  it('kendi main landmark öğesini üretmez — o sayfanın sorumluluğudur', async () => {
+    const { container } = render(<RouterProvider router={shellIleRouter()} />)
+    await screen.findByRole('heading', { name: 'Giriş' })
+    expect(container.querySelectorAll('main')).toHaveLength(0)
   })
 
   it('markayı ana sayfaya bağlar', async () => {
@@ -1232,7 +1231,7 @@ export function AuthFormPage({
   children,
 }: AuthFormPageProps) {
   return (
-    <div className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>{baslik}</h1>
         {aciklama ? <p className={styles.description}>{aciklama}</p> : null}
@@ -1267,10 +1266,12 @@ export function AuthFormPage({
           ))}
         </nav>
       ) : null}
-    </div>
+    </main>
   )
 }
 ```
+
+**Not — landmark sözleşmesi:** Bu repoda `<main id="main-content">` **sayfanın** sorumluluğudur, kabuğun değil (`PageContainer.tsx:55` bunu böyle üretiyor ve tüm pazaryeri sayfaları oradan alıyor). `AuthShell` bu yüzden `main` sağlamaz; arketipler sağlar. Böylece root'un `notFoundComponent`'i kendi `<main id="main-content">`'ini render ettiğinde iç içe landmark ve yinelenen `id` oluşmaz.
 
 - [ ] **Step 5: `AuthStatusPage.module.css` yaz**
 
@@ -1379,7 +1380,8 @@ export function AuthStatusPage({
   ikincilBaglanti,
 }: AuthStatusPageProps) {
   return (
-    <div
+    <main
+      id="main-content"
       className={styles.page}
       data-tone={tone}
       role={tone === 'error' ? 'alert' : undefined}
@@ -1404,7 +1406,7 @@ export function AuthStatusPage({
           ) : null}
         </div>
       ) : null}
-    </div>
+    </main>
   )
 }
 ```
@@ -1452,24 +1454,24 @@ export interface AuthCallbackPageProps {
 export function AuthCallbackPage({ durum, baslik, hataMesaji }: AuthCallbackPageProps) {
   if (durum === 'error') {
     return (
-      <div className={styles.page} data-tone="error" role="alert">
+      <main id="main-content" className={styles.page} data-tone="error" role="alert">
         <span className={styles.mark} aria-hidden="true">
           !
         </span>
         <h1 className={styles.title}>{baslik}</h1>
         <p className={styles.description}>{hataMesaji}</p>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className={styles.page} data-tone="info" role="status" aria-live="polite">
+    <main id="main-content" className={styles.page} data-tone="info" role="status" aria-live="polite">
       <span className={styles.mark} aria-hidden="true">
         i
       </span>
       <h1 className={styles.title}>{baslik}</h1>
       <p className={styles.description}>Bu işlem birkaç saniye sürebilir.</p>
-    </div>
+    </main>
   )
 }
 ```
