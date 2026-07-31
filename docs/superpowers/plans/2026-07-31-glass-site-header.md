@@ -23,7 +23,7 @@ Bunlar `CLAUDE.md` ve `src/design/*.mdx`'ten gelir; **her task'ın gereksinimler
 - Birleşik variant yasak; `hover`/`focus`/`active` asla prop olmaz.
 - Cam yalnız navigasyon/kontrol katmanında; sayfa başına en fazla 6 cam yüzey; **cam üstüne cam yok**.
 - Kod tanımlayıcıları İngilizce, yorumlar/JSDoc/dokümanlar **Türkçe**.
-- Doğrulama komutları: `npx tsc -b` · `npm test` · `npm run lint`.
+- Doğrulama komutları: `npm run typecheck` · `npm test` · `npm run lint`.
 
 ---
 
@@ -438,7 +438,7 @@ Expected: PASS — 6 test
 
 - [ ] **Step 6: Typecheck ve lint**
 
-Run: `npx tsc -b && npm run lint`
+Run: `npm run typecheck && npm run lint`
 Expected: hata yok.
 
 - [ ] **Step 7: Commit**
@@ -979,7 +979,7 @@ Expected: PASS — 17 test
 
 - [ ] **Step 6: Typecheck ve lint**
 
-Run: `npx tsc -b && npm run lint`
+Run: `npm run typecheck && npm run lint`
 Expected: hata yok
 
 - [ ] **Step 7: Commit**
@@ -1138,8 +1138,8 @@ export const Erisilebilirlik: Story = {
 
 - [ ] **Step 2: Storybook'ta story'lerin yüklendiğini doğrula**
 
-Run: `npx tsc -b`
-Expected: hata yok. (Görsel doğrulama Task 7'de `npm run dev` ile.)
+Run: `npm run typecheck`
+Expected: hata yok. (Görsel doğrulama Task 6'da.)
 
 - [ ] **Step 3: `rules.md` yaz**
 
@@ -1340,7 +1340,7 @@ export {
 
 - [ ] **Step 6: Tüm testleri, typecheck ve lint'i çalıştır**
 
-Run: `npm test && npx tsc -b && npm run lint`
+Run: `npm test && npm run typecheck && npm run lint`
 Expected: tümü PASS
 
 - [ ] **Step 7: Commit**
@@ -1422,7 +1422,7 @@ describe('MarketplaceShell tema eylemi', () => {
 
 - [ ] **Step 2: Testi çalıştır, başarısız olduğunu doğrula**
 
-Run: `npx vitest run --root apps/web src/components/MarketplaceShell.test.tsx`
+Run: `npx vitest run apps/web/src/components/MarketplaceShell.test.tsx`
 Expected: FAIL — `GlassIslandHeader is not a function` ve `initialTime` zorunlu prop eksik
 
 - [ ] **Step 3: `MarketplaceShell`'i geçir**
@@ -1599,7 +1599,7 @@ O blokta `.route-capabilities` kuralı kalır — blok boşalmaz, silme.
 
 - [ ] **Step 6: Testleri, typecheck ve lint'i çalıştır**
 
-Run: `npx vitest run --root apps/web && npm test && npx tsc -b && npm run lint`
+Run: `npm test && npm run typecheck && npm run lint`
 Expected: tümü PASS. `apps/web` tarafı 5 test (1 odaklı akış + 3 hesap eylemi + 1 tema eylemi). `GlassAiComposer` ve `GlassIslandHeader` artık `apps/web`'de referanssız; ikisi de kütüphanede duruyor (silinmiyor).
 
 - [ ] **Step 7: `statusTrail` tüketicisinin kalmadığını doğrula**
@@ -1624,7 +1624,7 @@ Otomatik testlerin yakalayamadığı morf ve malzeme davranışı.
 
 - [ ] **Step 1: Storybook'ta bileşeni denetle**
 
-Run: `npm run dev`
+Run: `npm run dev:storybook`
 Kontrol listesi (`Bileşenler/Navigasyon/GlassSiteHeader`):
 - `Default`: tepede kapsül şeffaf, kenarlıksız, gölgesiz.
 - Kaydır: kapsül daralıyor, köşeleniyor, cam beliriyor — sıçrama/zıplama yok.
@@ -1641,7 +1641,7 @@ Kontrol listesi (`Bileşenler/Navigasyon/GlassSiteHeader`):
 
 - [ ] **Step 2: `apps/web`'de denetle**
 
-Run: `npm run dev --workspace apps/web` (veya `npx vite --config apps/web/vite.config.ts`)
+Run: `npm run dev:web` (workspace adı `@arsam/web`; `npm run dev` ikisini birden açar)
 Kontrol listesi:
 - Header sayfa içeriğini örtmüyor (`--lg-shell-header-offset` doğru).
 - `/ilan-ver` rotasında header ve dock gizli.

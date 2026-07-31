@@ -216,4 +216,4 @@ Controls default'ları implementasyon default'larıyla birebir aynı olur (`menu
 
 ## 8. Doğrulama
 
-`npx tsc -b` · `npm test` · `npm run lint` · `apps/web` kendi testleri. Storybook'ta yeni story'ler ve `apps/web` dev sunucusunda scroll morfu ile mobil panel gözle doğrulanır.
+`npm run typecheck` (kök `tsc -b` + `apps/web`) · `npm test` (kök vitest config'i `src/**` ve `apps/web/src/**` testlerini birlikte kapsar) · `npm run lint`. Storybook'ta yeni story'ler (`npm run dev:storybook`) ve `apps/web` dev sunucusunda (`npm run dev:web`) scroll morfu ile mobil panel gözle doğrulanır.
