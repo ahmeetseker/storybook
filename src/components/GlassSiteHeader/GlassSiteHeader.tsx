@@ -2,7 +2,7 @@
 // site header'ı. Kaynak: Tailark hero-section-1'in HeroHeader'ı; Liquid Glass
 // uyarlaması (bkz. rules.md §1). Cam tek yüzeyde ve yalnız condensed/açık
 // durumda; genişlik/radius değişimi motion layout (FLIP) ile transform'a çevrilir.
-import { useId, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useState, type MouseEvent, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { GlassSurface, GlassTierProvider } from '../GlassSurface'
 import { prefersReducedMotion } from '../../core/tier'
@@ -39,6 +39,21 @@ export interface GlassSiteHeaderProps {
 }
 
 /**
+ * Scroll eşiği geçildi mi — görsel geçişler CSS'te, JS yalnız attribute
+ * değiştirir. Listener passive; her karede ölçüm yapılmaz.
+ */
+function useScrolled(threshold: number): boolean {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [threshold])
+  return scrolled
+}
+
+/**
  * Sade sol tıkta SPA gezinmesine devret; modifier'lı ve orta tıkta tarayıcıya
  * bırak (yeni sekme davranışı korunur).
  */
@@ -52,19 +67,22 @@ function linkClick(link: GlassSiteHeaderLink) {
   }
 }
 
-// `menuLabel`, `condensedAction` ve `scrollThreshold` prop'ları arayüzde tanımlı
-// ama bu task'ta henüz destructure EDİLMEZ — Task 2 ve 3'te bağlanacaklar.
-// Kullanılmayan değişken lint uyarısı böylece hiç doğmaz.
 export function GlassSiteHeader({
   logo,
   links = [],
   utility,
   secondaryAction,
   action,
+  condensedAction,
+  scrollThreshold = 24,
 }: GlassSiteHeaderProps) {
   const glassId = useId()
   const reduced = prefersReducedMotion()
+  const scrolled = useScrolled(scrollThreshold)
   const hasLinks = links.length > 0
+  const morphTransition = reduced
+    ? { duration: 0 }
+    : { type: 'spring' as const, ...presets.springs.sidebar }
 
   const nav = hasLinks ? (
     <nav aria-label="Site" className={styles.nav}>
@@ -97,8 +115,8 @@ export function GlassSiteHeader({
   )
 
   return (
-    <header className={styles.root}>
-      <div className={styles.capsule}>
+    <header className={styles.root} data-scrolled={scrolled || undefined}>
+      <motion.div layout transition={morphTransition} className={styles.capsule}>
         <GlassSurface
           aria-hidden
           material="glass"
@@ -108,17 +126,23 @@ export function GlassSiteHeader({
         />
         {/* Kapsülün içi düz katman — cam üstüne cam yok. */}
         <GlassTierProvider tier="fallback">
-          <div className={styles.row}>
+          <motion.div layout="position" transition={morphTransition} className={styles.row}>
             <span className={styles.wordmark}>{logo}</span>
             {nav}
             <span className={styles.actions}>
-              {utility}
-              {secondaryAction}
-              {action}
+              {condensedAction && scrolled ? (
+                condensedAction
+              ) : (
+                <>
+                  {utility}
+                  {secondaryAction}
+                  {action}
+                </>
+              )}
             </span>
-          </div>
+          </motion.div>
         </GlassTierProvider>
-      </div>
+      </motion.div>
     </header>
   )
 }

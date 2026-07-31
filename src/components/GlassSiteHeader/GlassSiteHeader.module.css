@@ -43,6 +43,13 @@
   container-type: inline-size;
 }
 
+/* Condensed: kapsül daralır ve köşelenir. Genişlik/radius değişimini motion
+   layout (FLIP) transform'a çevirir — CSS transition YOK (layout tetiklerdi). */
+.root[data-scrolled] .capsule {
+  max-width: var(--capsule-max-scrolled);
+  border-radius: var(--lg-radius-card);
+}
+
 /* ── Malzeme katmanı: tek cam yüzey, opacity ile belirir ─────────────── */
 .material {
   position: absolute;
@@ -52,6 +59,12 @@
   visibility: hidden;
   transition: opacity var(--morph-dur) ease,
     visibility 0s linear var(--morph-dur);
+}
+
+.root[data-scrolled] .material {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--morph-dur) ease, visibility 0s;
 }
 
 /* ── Satır ────────────────────────────────────────────────────────────── */

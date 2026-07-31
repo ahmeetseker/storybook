@@ -71,3 +71,58 @@ describe('GlassSiteHeader — semantik ve slotlar', () => {
     expect(screen.queryByRole('button', { name: 'Menü' })).toBeNull()
   })
 })
+
+describe('GlassSiteHeader — scroll morfu', () => {
+  const setScroll = (value: number) => {
+    Object.defineProperty(window, 'scrollY', { value, configurable: true })
+    fireEvent.scroll(window)
+  }
+
+  it('scroll eşiği geçilince kök data-scrolled işaretlenir, dönünce kalkar', () => {
+    renderHeader()
+    const header = screen.getByRole('banner')
+    expect(header.getAttribute('data-scrolled')).toBeNull()
+    setScroll(200)
+    expect(header.getAttribute('data-scrolled')).toBe('true')
+    setScroll(0)
+    expect(header.getAttribute('data-scrolled')).toBeNull()
+  })
+
+  it('scrollThreshold eşiği belirler', () => {
+    renderHeader({ scrollThreshold: 400 })
+    const header = screen.getByRole('banner')
+    setScroll(200)
+    expect(header.getAttribute('data-scrolled')).toBeNull()
+    setScroll(500)
+    expect(header.getAttribute('data-scrolled')).toBe('true')
+    setScroll(0)
+  })
+
+  it('condensedAction verilince scroll sonrası üçlü aksiyonun yerine geçer', () => {
+    renderHeader({
+      utility: <button>Tema</button>,
+      secondaryAction: <button>Üye girişi</button>,
+      action: <button>İlan ver</button>,
+      condensedAction: <button>Hemen başla</button>,
+    })
+    expect(screen.getByRole('button', { name: 'Üye girişi' })).toBeDefined()
+    expect(screen.queryByRole('button', { name: 'Hemen başla' })).toBeNull()
+
+    setScroll(200)
+    expect(screen.getByRole('button', { name: 'Hemen başla' })).toBeDefined()
+    expect(screen.queryByRole('button', { name: 'Üye girişi' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Tema' })).toBeNull()
+    setScroll(0)
+  })
+
+  it('condensedAction verilmezse scroll sonrası üçlü aksiyon korunur', () => {
+    renderHeader({
+      secondaryAction: <button>Üye girişi</button>,
+      action: <button>İlan ver</button>,
+    })
+    setScroll(200)
+    expect(screen.getByRole('button', { name: 'Üye girişi' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'İlan ver' })).toBeDefined()
+    setScroll(0)
+  })
+})
