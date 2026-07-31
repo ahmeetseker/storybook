@@ -1093,7 +1093,7 @@ const CreateButton = () => (
 )
 
 /** Scroll morfu canlı denenebilsin diye sahne uzun tutulur. */
-const Sahne = ({ children }: { children: ReactNode }) => (
+const Stage = ({ children }: { children: ReactNode }) => (
   <div style={{ minHeight: '220vh', background: 'var(--lg-bg)' }}>
     {children}
     <div style={{ paddingTop: '30vh', textAlign: 'center', color: 'var(--lg-label-secondary)' }}>
@@ -1116,7 +1116,7 @@ const meta = {
     menuLabel: 'Menü',
     scrollThreshold: 24,
   },
-  decorators: [(Story) => <Sahne><Story /></Sahne>],
+  decorators: [(Story) => <Stage><Story /></Stage>],
 } satisfies Meta<typeof GlassSiteHeader>
 
 export default meta
