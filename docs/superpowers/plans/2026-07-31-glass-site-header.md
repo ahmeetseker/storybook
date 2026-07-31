@@ -1526,30 +1526,38 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
 
 - [ ] **Step 4: `__root.tsx`'ten `initialTime` loader'ını kaldır**
 
-`apps/web/src/routes/__root.tsx` — `createRootRouteWithContext` çağrısından `loader` alanını sil:
+> ⚠️ **Bu dosya paralel olarak auth işi tarafından da değiştiriliyor.**
+> `f72819d` commit'i `RootComponent`'e `AuthSessionProvider` sarmalayıcısı ve
+> `isAuthPath(pathname)` ile auth/marketplace kabuk dallanması ekledi.
+> **Dosyanın tamamını yeniden yazma** — aşağıdaki üç cerrahi düzenlemeyi yap ve
+> auth'a ait her şeye dokunma. Dosyanın güncel hâlini önce oku.
+
+`apps/web/src/routes/__root.tsx`:
+
+**(a)** `createRootRouteWithContext` çağrısından yalnız `loader` alanını sil:
 
 ```tsx
 export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
 ```
 
-`RootComponent`'i güncelle:
+**(b)** `RootComponent` içinden yalnız şu satırı sil:
 
 ```tsx
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext()
-
-  return (
-    <RootDocument>
-      <QueryClientProvider client={queryClient}>
-        <MarketplaceShell>
-          <Outlet />
-        </MarketplaceShell>
-      </QueryClientProvider>
-    </RootDocument>
-  )
-}
+  const { initialTime } = Route.useLoaderData()
 ```
+
+**(c)** `MarketplaceShell` açılış etiketinden yalnız prop'u kaldır — sarmalayıcı
+yapıyı (`AuthSessionProvider`, `authSayfasi` üçlüsü, `AuthShell`) olduğu gibi bırak:
+
+```tsx
+            <MarketplaceShell>
+              <Outlet />
+            </MarketplaceShell>
+```
+
+`useRouterState`, `isAuthPath`, `AuthSessionProvider`, `AuthShell` importları
+**kalır**; hiçbiri bu task'ın konusu değil.
 
 - [ ] **Step 5: `.shell-brand` stilini ekle, dil/extras stillerini sil, offset yorumunu güncelle**
 
