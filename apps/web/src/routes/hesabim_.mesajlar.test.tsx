@@ -4,12 +4,15 @@ import {
   RouterProvider,
   createMemoryHistory,
   createRootRouteWithContext,
+  createRoute,
   createRouter,
 } from '@tanstack/react-router'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createPageHead } from '@/config/routes'
+import { AuthSessionProvider } from '@/features/auth'
+import type { AuthAdapters, Oturum } from '@/features/auth'
 import type { MessagesWorkspaceProps } from '@/features/messages/domain/message-types'
 import type { RouterContext } from '@/router-context'
 
@@ -114,12 +117,33 @@ function freshQueryClient() {
   })
 }
 
-function renderRoute(initialEntry: string) {
+const ORNEK_OTURUM: Oturum = {
+  kullaniciId: 'test-1',
+  adSoyad: 'Ayşe Kaya',
+  telefon: '5551112233',
+  ePosta: 'ayse@arsam.net',
+  hesapTipi: 'bireysel',
+  eidsDurumu: 'dogrulandi',
+}
+
+function adapters(oturum: Oturum | null): AuthAdapters {
+  return {
+    girisBaslat: vi.fn(),
+    koduDogrula: vi.fn(),
+    parolaIleGiris: vi.fn(),
+    oturumuGetir: () => oturum,
+    cikisYap: vi.fn(),
+  } as AuthAdapters
+}
+
+function renderRoute(initialEntry: string, oturum: Oturum | null = ORNEK_OTURUM) {
   const queryClient = freshQueryClient()
   const rootRoute = createRootRouteWithContext<RouterContext>()({
     component: () => (
       <QueryClientProvider client={queryClient}>
-        <Outlet />
+        <AuthSessionProvider adapters={adapters(oturum)}>
+          <Outlet />
+        </AuthSessionProvider>
       </QueryClientProvider>
     ),
   })
@@ -128,11 +152,19 @@ function renderRoute(initialEntry: string) {
     path: '/hesabim/mesajlar',
     getParentRoute: () => rootRoute,
   } as never)
+  const girisRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/giris',
+    validateSearch: (search: Record<string, unknown>) => ({
+      donus: typeof search.donus === 'string' ? search.donus : undefined,
+    }),
+    component: () => <h1>Giriş yapın</h1>,
+  })
   const history = createMemoryHistory({ initialEntries: [initialEntry] })
   const push = vi.spyOn(history, 'push')
   const replace = vi.spyOn(history, 'replace')
   const router = createRouter({
-    routeTree: rootRoute.addChildren([messagesRoute]),
+    routeTree: rootRoute.addChildren([messagesRoute, girisRoute]),
     history,
     context: { queryClient },
   })
@@ -374,5 +406,13 @@ describe('/hesabim/mesajlar route', () => {
       await screen.findByRole('heading', { level: 1, name: 'Mesajlar' }),
     ).toBeTruthy()
     expect(screen.queryByText(/bu alana yerleşecek/i)).toBeNull()
+  })
+
+  it('oturumsuz erişimde girişe yönlendirir', async () => {
+    renderRoute('/hesabim/mesajlar', null)
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Giriş yapın' })).toBeTruthy(),
+    )
   })
 })

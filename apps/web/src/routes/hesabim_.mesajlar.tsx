@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createPageHead } from '@/config/routes'
+import { useAuthSession, useKorumaliRota } from '@/features/auth'
 import {
   MessagesWorkspace,
   createMessagesFixtureDataSource,
@@ -85,6 +86,8 @@ export const Route = createFileRoute('/hesabim_/mesajlar')({
 })
 
 function MessagesRoutePage() {
+  useKorumaliRota()
+  const { girisYapildi } = useAuthSession()
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const [dataSource] = useState<MessagesDataSource>(
@@ -92,6 +95,8 @@ function MessagesRoutePage() {
   )
   const routeState = parseMessagesRouteSearch(search)
   const currentSearch = serializeMessagesRouteSearch(routeState)
+
+  if (!girisYapildi) return null
 
   return (
     <MessagesWorkspace
