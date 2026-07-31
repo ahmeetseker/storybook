@@ -27,16 +27,15 @@ function shellIleRouter() {
 }
 
 describe('AuthShell', () => {
-  it('içeriği main landmark içinde gösterir', async () => {
+  it('çocuklarını çizer', async () => {
     render(<RouterProvider router={shellIleRouter()} />)
-    const main = await screen.findByRole('main')
-    expect(main.querySelector('h1')?.textContent).toBe('Giriş')
+    expect(await screen.findByRole('heading', { name: 'Giriş' })).toBeTruthy()
   })
 
-  it('içeriğe geç bağlantısının hedefi olan main-content kimliğini taşır', async () => {
-    render(<RouterProvider router={shellIleRouter()} />)
-    const main = await screen.findByRole('main')
-    expect(main.id).toBe('main-content')
+  it('kendi main landmark öğesini üretmez — o sayfanın sorumluluğudur', async () => {
+    const { container } = render(<RouterProvider router={shellIleRouter()} />)
+    await screen.findByRole('heading', { name: 'Giriş' })
+    expect(container.querySelectorAll('main')).toHaveLength(0)
   })
 
   it('markayı ana sayfaya bağlar', async () => {

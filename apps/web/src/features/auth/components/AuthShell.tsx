@@ -16,9 +16,9 @@ export function AuthShell({ children }: { children: ReactNode }) {
         </Link>
       </header>
 
-      <main id="main-content" className={styles.content}>
+      <div className={styles.content}>
         <div className={styles.inner}>{children}</div>
-      </main>
+      </div>
 
       <footer className={styles.footer}>
         <Link to="/" className={styles.footerLink}>
