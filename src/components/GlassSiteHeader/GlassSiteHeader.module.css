@@ -151,5 +151,6 @@
 
 /* ── Motion koruması — kullanıcı hareket azaltmayı tercih ettiğinde ─────── */
 @media (prefers-reduced-motion: reduce) {
-  .material { transition: none; }
+  .material,
+  .root[data-scrolled] .material { transition: none; }
 }
