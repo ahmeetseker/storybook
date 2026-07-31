@@ -126,3 +126,69 @@ describe('GlassSiteHeader — scroll morfu', () => {
     setScroll(0)
   })
 })
+
+describe('GlassSiteHeader — mobil panel', () => {
+  const openMenu = () => {
+    const burger = screen.getByRole('button', { name: 'Menü' })
+    fireEvent.click(burger)
+    return burger
+  }
+
+  it('hamburger aria-expanded/aria-controls sözleşmesini taşır', () => {
+    renderHeader()
+    const burger = screen.getByRole('button', { name: 'Menü' })
+    expect(burger.getAttribute('aria-expanded')).toBe('false')
+    const panelId = burger.getAttribute('aria-controls')
+    expect(panelId).toBeTruthy()
+    expect(document.getElementById(panelId as string)).toBeNull()
+
+    fireEvent.click(burger)
+    expect(burger.getAttribute('aria-expanded')).toBe('true')
+    expect(document.getElementById(panelId as string)).not.toBeNull()
+  })
+
+  it('panel açıkken kök data-menu-open işaretlenir', () => {
+    renderHeader()
+    openMenu()
+    expect(screen.getByRole('banner').getAttribute('data-menu-open')).toBe('true')
+  })
+
+  it('Escape paneli kapatır ve focus hamburger’a döner', () => {
+    renderHeader()
+    const burger = openMenu()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(burger.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(burger)
+  })
+
+  it('kapsül dışına pointerdown paneli kapatır', () => {
+    renderHeader()
+    const burger = openMenu()
+    fireEvent.pointerDown(document.body)
+    expect(burger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('kapsül içine pointerdown paneli kapatmaz', () => {
+    renderHeader()
+    const burger = openMenu()
+    fireEvent.pointerDown(screen.getByText('arsam.net'))
+    expect(burger.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('panelden link seçimi onClick çağırır ve paneli kapatır', () => {
+    const links = makeLinks()
+    renderHeader({}, links)
+    const burger = openMenu()
+    const panelId = burger.getAttribute('aria-controls') as string
+    const panel = document.getElementById(panelId) as HTMLElement
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
+    ;(panel.querySelector('a[href="#ofisler"]') as HTMLElement).dispatchEvent(event)
+    expect(links[1].onClick).toHaveBeenCalledTimes(1)
+    expect(burger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('menuLabel hamburger’ın accessible name’ini belirler', () => {
+    renderHeader({ menuLabel: 'Gezinme' })
+    expect(screen.getByRole('button', { name: 'Gezinme' })).toBeDefined()
+  })
+})

@@ -144,13 +144,69 @@
   flex: none;
 }
 
+.burger { display: inline-flex; }
+
+/* ── Mobil panel: kapsülün kendisi büyür, ayrı yüzey değil ────────────── */
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  margin-top: var(--lg-space-3);
+  padding-top: var(--lg-space-4);
+  border-top: 1px solid var(--lg-hairline);
+}
+.panelList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.panelLink {
+  display: flex;
+  align-items: center;
+  min-height: var(--lg-control-md);
+  padding: 0 var(--link-pad-x);
+  border-radius: var(--lg-radius-chip);
+  color: var(--lg-label-secondary);
+  text-decoration: none;
+  font-size: var(--lg-text-body);
+  font-weight: 500;
+}
+@media (hover: hover) { .panelLink:hover { color: var(--lg-label); } }
+.panelLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+.panelLinkActive { color: var(--lg-label); font-weight: 600; }
+.panelActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--actions-gap);
+}
+
+/* Panel tepede de açılabilir — o hâlde de zemin gerekir, yoksa metin
+   sayfa içeriğinin üstünde okunmaz kalır. */
+.root[data-menu-open] .capsule { border-radius: var(--lg-radius-card); }
+.root[data-menu-open] .material {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--morph-dur) ease, visibility 0s;
+}
+
 /* ── Container query: kapsül genişse linkler açılır ───────────────────── */
 @container (min-width: 48rem) {
   .nav { display: flex; }
+  .burger { display: none; }
+  .panel { display: none; }
 }
 
 /* ── Motion koruması — kullanıcı hareket azaltmayı tercih ettiğinde ─────── */
 @media (prefers-reduced-motion: reduce) {
   .material,
-  .root[data-scrolled] .material { transition: none; }
+  .root[data-scrolled] .material,
+  .root[data-menu-open] .material { transition: none; }
 }

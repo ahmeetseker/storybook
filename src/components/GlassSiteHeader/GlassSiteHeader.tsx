@@ -2,9 +2,11 @@
 // site header'ı. Kaynak: Tailark hero-section-1'in HeroHeader'ı; Liquid Glass
 // uyarlaması (bkz. rules.md §1). Cam tek yüzeyde ve yalnız condensed/açık
 // durumda; genişlik/radius değişimi motion layout (FLIP) ile transform'a çevrilir.
-import { useEffect, useId, useState, type MouseEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 import { motion } from 'motion/react'
 import { GlassSurface, GlassTierProvider } from '../GlassSurface'
+import { GlassIconButton } from '../GlassIconButton'
 import { prefersReducedMotion } from '../../core/tier'
 import { presets } from '../../motion/presets'
 import styles from './GlassSiteHeader.module.css'
@@ -67,6 +69,12 @@ function linkClick(link: GlassSiteHeaderLink) {
   }
 }
 
+const MenuIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+)
+
 export function GlassSiteHeader({
   logo,
   links = [],
@@ -74,6 +82,7 @@ export function GlassSiteHeader({
   secondaryAction,
   action,
   condensedAction,
+  menuLabel = 'Menü',
   scrollThreshold = 24,
 }: GlassSiteHeaderProps) {
   const glassId = useId()
@@ -83,6 +92,32 @@ export function GlassSiteHeader({
   const morphTransition = reduced
     ? { duration: 0 }
     : { type: 'spring' as const, ...presets.springs.sidebar }
+
+  const [menuOpen, setMenuOpen] = useState(false)
+  const capsuleRef = useRef<HTMLDivElement>(null)
+  const burgerId = `${glassId}-burger`
+  const panelId = `${glassId}-panel`
+
+  // Escape kapatır ve focus hamburger'a döner; kapsül dışına pointerdown kapatır.
+  // Focus trap YOK — panel modal değil, sayfa akışının parçası (rules.md §2).
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      setMenuOpen(false)
+      document.getElementById(burgerId)?.focus()
+    }
+    const onPointerDown = (e: PointerEvent) => {
+      if (capsuleRef.current?.contains(e.target as Node)) return
+      setMenuOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('pointerdown', onPointerDown, true)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('pointerdown', onPointerDown, true)
+    }
+  }, [menuOpen, burgerId])
 
   const nav = hasLinks ? (
     <nav aria-label="Site" className={styles.nav}>
@@ -114,9 +149,65 @@ export function GlassSiteHeader({
     <span className={styles.grow} aria-hidden />
   )
 
+  const burger = hasLinks ? (
+    <span className={styles.burger}>
+      <GlassIconButton
+        id={burgerId}
+        label={menuLabel}
+        aria-expanded={menuOpen}
+        aria-controls={panelId}
+        onClick={() => setMenuOpen((open) => !open)}
+      >
+        <MenuIcon />
+      </GlassIconButton>
+    </span>
+  ) : null
+
+  const panel =
+    hasLinks && menuOpen ? (
+      <motion.div
+        id={panelId}
+        layout
+        transition={morphTransition}
+        className={styles.panel}
+      >
+        <nav aria-label={menuLabel}>
+          <ul className={styles.panelList}>
+            {links.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href ?? '#'}
+                  aria-current={link.active ? 'page' : undefined}
+                  className={link.active ? `${styles.panelLink} ${styles.panelLinkActive}` : styles.panelLink}
+                  onClick={(e) => {
+                    linkClick(link)(e)
+                    // flushSync: link seçimi genelde SPA gezinmesini de tetikler
+                    // (onClick), panelin hemen kapanmış olması gerekir — bir
+                    // sonraki task'a kadar beklemeye bırakılmaz.
+                    flushSync(() => setMenuOpen(false))
+                  }}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className={styles.panelActions}>
+          {utility}
+          {secondaryAction}
+          {action}
+        </div>
+      </motion.div>
+    ) : null
+
   return (
-    <header className={styles.root} data-scrolled={scrolled || undefined}>
-      <motion.div layout transition={morphTransition} className={styles.capsule}>
+    <header
+      className={styles.root}
+      data-scrolled={scrolled || undefined}
+      data-menu-open={menuOpen || undefined}
+    >
+      <motion.div ref={capsuleRef} layout transition={morphTransition} className={styles.capsule}>
         <GlassSurface
           aria-hidden
           material="glass"
@@ -139,8 +230,12 @@ export function GlassSiteHeader({
                   {action}
                 </>
               )}
+              {burger}
             </span>
           </motion.div>
+          {/* AnimatePresence yok: panelin exit varyantı yok, kapanışta kapsülün
+              `layout`'u yükseklik farkını zaten FLIP ile sürüyor. */}
+          {panel}
         </GlassTierProvider>
       </motion.div>
     </header>
