@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import {
-  GlassAiComposer,
   GlassButton,
   GlassDock,
-  GlassIslandHeader,
-  type GlassAiComposerAttachment,
-  type GlassAiComposerTool,
+  GlassSiteHeader,
   type GlassDockItem,
-  type GlassIslandHeaderPage,
+  type GlassSiteHeaderLink,
 } from '@repo/ui'
 import {
   dockRouteKeys,
@@ -24,13 +21,6 @@ type ViewportTier = keyof typeof dockRouteKeys
 type ThemeChoice = 'system' | 'light' | 'dark'
 
 const viewportTiers = ['desktop', 'tablet', 'mobile'] as const
-
-// Header kompozitörünün bağlam ekleme araçları — seçiciler parent'ın işi.
-const COMPOSER_TOOLS: GlassAiComposerTool[] = [
-  { id: 'map', label: 'Haritadan alan', icon: <NavigationIcon name="pin" size={16} /> },
-  { id: 'image', label: 'Görselle', icon: <NavigationIcon name="image" size={16} /> },
-  { id: 'voice', label: 'Sesli', icon: <NavigationIcon name="mic" size={16} /> },
-]
 
 function getViewportTier(): ViewportTier {
   if (typeof window === 'undefined') return 'desktop'
@@ -50,13 +40,9 @@ function applyTheme(theme: ThemeChoice) {
 
 export interface MarketplaceShellProps {
   children: ReactNode
-  initialTime: string
 }
 
-export function MarketplaceShell({
-  children,
-  initialTime,
-}: MarketplaceShellProps) {
+export function MarketplaceShell({ children }: MarketplaceShellProps) {
   const router = useRouter()
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -65,8 +51,6 @@ export function MarketplaceShell({
   const isFocusedListingFlow = currentRoute.key === 'create-listing'
   const [viewport, setViewport] = useState<ViewportTier | null>(null)
   const [theme, setTheme] = useState<ThemeChoice>('system')
-  const [brief, setBrief] = useState('')
-  const [briefContext, setBriefContext] = useState<GlassAiComposerAttachment[]>([])
 
   useEffect(() => {
     const update = () => setViewport(getViewportTier())
@@ -102,18 +86,18 @@ export function MarketplaceShell({
     window.localStorage.setItem('arsam-theme', next)
   }
 
-  const headerPages = useMemo<GlassIslandHeaderPage[]>(
+  const headerLinks = useMemo<GlassSiteHeaderLink[]>(
     () =>
       headerRouteKeys.map((key) => {
         const route = getRouteByKey(key)
         return {
-          key: route.key,
           label: route.key === 'offices' ? 'Ofisler' : route.label,
           href: withBase(route.href),
-          icon: <NavigationIcon name={route.icon} size={22} />,
+          active: route.key === currentRoute.key,
+          onClick: () => routeTo(withBase(route.href)),
         }
       }),
-    [],
+    [currentRoute.key, routeTo],
   )
 
   const dockItems = useMemo<Record<ViewportTier, GlassDockItem[]>>(() => {
@@ -142,90 +126,38 @@ export function MarketplaceShell({
     }
   }, [currentRoute.key])
 
-  const extras = (
-    <div className="shell-extras">
-      <div className="shell-language" role="group" aria-label="Dil">
-        <GlassButton
-          size="sm"
-          tint="var(--lg-accent)"
-          aria-pressed="true"
-          onClick={() => undefined}
-        >
-          🇹🇷 TR
-        </GlassButton>
-        <GlassButton size="sm" aria-pressed="false" onClick={() => undefined}>
-          🇬🇧 EN
-        </GlassButton>
-      </div>
-      <GlassButton
-        size="sm"
-        aria-label={`Tema: ${theme}`}
-        title={`Tema: ${theme}`}
-        onClick={cycleTheme}
-      >
-        <NavigationIcon name="theme" size={18} />
-      </GlassButton>
-      <GlassButton
-        size="sm"
-        aria-label="Geçmiş"
-        title="Geçmiş"
-        onClick={() => routeTo('/favoriler')}
-      >
-        <NavigationIcon name="clock" size={18} />
-      </GlassButton>
-      <GlassButton
-        id="shell-account-action"
-        size="sm"
-        onClick={() => routeTo('/hesabim')}
-      >
-        {currentRoute.scope === 'account' ? 'Hesabım' : 'Üye girişi'}
-      </GlassButton>
-      <GlassButton
-        size="sm"
-        prominent
-        onClick={() => routeTo('/ilan-ver')}
-      >
-        İlan ver
-      </GlassButton>
-    </div>
+  const logo = (
+    <a className="shell-brand" href={withBase('/')}>
+      <NavigationIcon name="sparkles" size={22} />
+      arsam.net
+    </a>
   )
 
-  // Bağlamı zaten eklenmiş araç tekrar tıklanamaz — chip'i kaldırınca geri açılır.
-  const composerTools = COMPOSER_TOOLS.map((tool) => ({
-    ...tool,
-    disabled: briefContext.some((c) => c.id === tool.id),
-  }))
+  const themeAction = (
+    <GlassButton
+      size="sm"
+      aria-label={`Tema: ${theme}`}
+      title={`Tema: ${theme}`}
+      onClick={cycleTheme}
+    >
+      <NavigationIcon name="theme" size={18} />
+    </GlassButton>
+  )
 
-  const search = (
-    <GlassAiComposer
-      size="md"
-      value={brief}
-      onValueChange={setBrief}
-      placeholder="Aradığını anlat — “Urla’da bahçeli, 6 milyona kadar…”"
-      tools={composerTools}
-      attachments={briefContext}
-      onToolSelect={(id) => {
-        const tool = COMPOSER_TOOLS.find((t) => t.id === id)
-        // Harita/dosya/ses seçicileri henüz bağlı değil; şimdilik seçim niyeti
-        // kaldırılabilir bir bağlam chip'i olarak kaydedilir.
-        if (!tool || briefContext.some((c) => c.id === id)) return
-        setBriefContext((prev) => [
-          ...prev,
-          { id, label: tool.label, kind: 'Bağlam', icon: tool.icon },
-        ])
-      }}
-      onRemoveAttachment={(id) =>
-        setBriefContext((prev) => prev.filter((c) => c.id !== id))
-      }
-      onSubmit={(query) => {
-        setBrief('')
-        setBriefContext([])
-        void router.navigate({
-          to: '/emlak',
-          search: query ? ({ q: query } as never) : ({} as never),
-        })
-      }}
-    />
+  const accountAction = (
+    <GlassButton
+      id="shell-account-action"
+      size="sm"
+      onClick={() => routeTo('/hesabim')}
+    >
+      {currentRoute.scope === 'account' ? 'Hesabım' : 'Üye girişi'}
+    </GlassButton>
+  )
+
+  const createAction = (
+    <GlassButton size="sm" prominent onClick={() => routeTo('/ilan-ver')}>
+      İlan ver
+    </GlassButton>
   )
 
   const renderDock = (tier: ViewportTier) => (
@@ -248,22 +180,13 @@ export function MarketplaceShell({
         İçeriğe geç
       </a>
       {!isFocusedListingFlow ? (
-        <GlassIslandHeader
-          brandIcon={<NavigationIcon name="sparkles" size={25} />}
-          brandLabel="arsam.net"
-          brandHref={withBase('/')}
-          pages={headerPages}
-          activeKey={currentRoute.key}
-          statusTrail={currentRoute.statusTrail}
-          statusVisibility="auto"
-          showClock
-          initialTime={initialTime}
-          timeZone="Europe/Istanbul"
-          notificationCount={0}
-          onNotificationsClick={() => routeTo('/hesabim/mesajlar')}
-          onRoute={routeTo}
-          extras={extras}
-          search={search}
+        <GlassSiteHeader
+          logo={logo}
+          links={headerLinks}
+          utility={themeAction}
+          secondaryAction={accountAction}
+          action={createAction}
+          condensedAction={createAction}
         />
       ) : null}
       {children}

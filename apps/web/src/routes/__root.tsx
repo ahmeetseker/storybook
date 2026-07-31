@@ -18,9 +18,6 @@ import { AuthShell } from '@/features/auth/components/AuthShell'
 import type { RouterContext } from '@/router-context'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  loader: () => ({
-    initialTime: new Date().toISOString(),
-  }),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -42,7 +39,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  const { initialTime } = Route.useLoaderData()
   const { queryClient } = Route.useRouteContext()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const authSayfasi = isAuthPath(pathname)
@@ -56,7 +52,7 @@ function RootComponent() {
               <Outlet />
             </AuthShell>
           ) : (
-            <MarketplaceShell initialTime={initialTime}>
+            <MarketplaceShell>
               <Outlet />
             </MarketplaceShell>
           )}
