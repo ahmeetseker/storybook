@@ -23,6 +23,7 @@ import { Route as IlanVerRouteImport } from './routes/ilan-ver'
 import { Route as KarsilastirRouteImport } from './routes/karsilastir'
 import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
+import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KonseptlerIndexRouteImport } from './routes/konseptler.index'
@@ -102,6 +103,11 @@ const OfislerRoute = OfislerRouteImport.update({
   path: '/ofisler',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GirisKodRoute = GirisKodRouteImport.update({
+  id: '/giris_/kod',
+  path: '/giris/kod',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HesabimMesajlarRoute = HesabimMesajlarRouteImport.update({
   id: '/hesabim_/mesajlar',
   path: '/hesabim/mesajlar',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/karsilastir': typeof KarsilastirRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
+  '/giris/kod': typeof GirisKodRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/ofisler': typeof OfislerRoute
+  '/giris/kod': typeof GirisKodRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/karsilastir': typeof KarsilastirRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
+  '/giris_/kod': typeof GirisKodRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/konseptler'
     | '/ofisler'
+    | '/giris/kod'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/ilan-ver'
     | '/karsilastir'
     | '/ofisler'
+    | '/giris/kod'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/konseptler'
     | '/ofisler'
+    | '/giris_/kod'
     | '/hesabim_/mesajlar'
     | '/ilan/$listingId'
     | '/konseptler/ai-danisman'
@@ -304,6 +316,7 @@ export interface RootRouteChildren {
   KarsilastirRoute: typeof KarsilastirRoute
   KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
+  GirisKodRoute: typeof GirisKodRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
 }
@@ -408,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfislerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/giris_/kod': {
+      id: '/giris_/kod'
+      path: '/giris/kod'
+      fullPath: '/giris/kod'
+      preLoaderRoute: typeof GirisKodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hesabim_/mesajlar': {
       id: '/hesabim_/mesajlar'
       path: '/hesabim/mesajlar'
@@ -504,6 +524,7 @@ const rootRouteChildren: RootRouteChildren = {
   KarsilastirRoute: KarsilastirRoute,
   KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
+  GirisKodRoute: GirisKodRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
   IlanListingIdRoute: IlanListingIdRoute,
 }

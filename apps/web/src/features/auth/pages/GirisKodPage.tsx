@@ -5,12 +5,17 @@ import { useAuthSession } from '../AuthSessionProvider'
 import { guvenliDonusYolu } from '../domain/auth-session'
 import styles from './GirisPage.module.css'
 
-/** Giriş akışının tek kapısı — telefon birincil, diğer yöntemler bağlantı. */
-export function GirisPage() {
-  const { adapters } = useAuthSession()
+/**
+ * Tek kullanımlık kod ekranı.
+ *
+ * Kod alanı bilinçli olarak TEK `<input>`: altı ayrı kutulu desen
+ * yapıştırmayı, ekran okuyucu deneyimini ve SMS otomatik doldurmayı bozar.
+ */
+export function GirisKodPage() {
+  const { adapters, oturumuTazele } = useAuthSession()
   const navigate = useNavigate()
   const { donus } = useSearch({ strict: false }) as { donus?: string }
-  const [telefon, setTelefon] = useState('')
+  const [kod, setKod] = useState('')
   const [hata, setHata] = useState<string | undefined>()
   const [gonderiliyor, setGonderiliyor] = useState(false)
 
@@ -18,7 +23,7 @@ export function GirisPage() {
     event.preventDefault()
     setHata(undefined)
     setGonderiliyor(true)
-    const sonuc = await adapters.girisBaslat('telefon', telefon)
+    const sonuc = await adapters.koduDogrula(kod)
     setGonderiliyor(false)
 
     if (sonuc.durum === 'hata') {
@@ -26,37 +31,36 @@ export function GirisPage() {
       return
     }
 
-    navigate({ to: '/giris/kod', search: { donus: guvenliDonusYolu(donus) } })
+    oturumuTazele()
+    navigate({ to: guvenliDonusYolu(donus), replace: true })
   }
 
   return (
     <AuthFormPage
-      baslik="Giriş yapın"
-      aciklama="Telefon numaranıza tek kullanımlık bir kod göndereceğiz."
+      baslik="Kodu girin"
+      aciklama="Telefonunuza gönderdiğimiz altı haneli kodu yazın."
       hata={hata}
       onSubmit={gonder}
-      gonderEtiketi="Kod gönder"
+      gonderEtiketi="Doğrula"
       gonderiliyor={gonderiliyor}
-      ikincilBaglantilar={[
-        { etiket: 'Parola ile giriş yapın', hedef: '/giris/parola' },
-        { etiket: 'Hesap oluşturun', hedef: '/kayit' },
-      ]}
+      ikincilBaglantilar={[{ etiket: 'Numarayı değiştirin', hedef: '/giris' }]}
     >
       <div className={styles.field}>
-        <label className={styles.label} htmlFor="giris-telefon">
-          Telefon numarası
+        <label className={styles.label} htmlFor="giris-kod">
+          Doğrulama kodu
         </label>
         <input
-          id="giris-telefon"
+          id="giris-kod"
           className={styles.input}
-          type="tel"
+          type="text"
           inputMode="numeric"
-          autoComplete="tel"
-          placeholder="5XX XXX XX XX"
-          value={telefon}
-          onChange={(event) => setTelefon(event.target.value)}
+          autoComplete="one-time-code"
+          maxLength={6}
+          placeholder="000000"
+          value={kod}
+          onChange={(event) => setKod(event.target.value)}
         />
-        <p className={styles.hint}>Numaranız yalnız giriş doğrulaması için kullanılır.</p>
+        <p className={styles.hint}>Kod 3 dakika geçerlidir.</p>
       </div>
     </AuthFormPage>
   )
