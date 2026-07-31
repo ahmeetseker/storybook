@@ -636,6 +636,18 @@ export function GlassSiteHeader({
 }
 ```
 
+Stil sayfasının sonuna reduced-motion korumasını ekle. `.material`'ın geçişi
+Task 1'de yazıldı ama `data-scrolled`'ı JS hiç set etmediği için ölü koddu;
+bu task onu canlandırıyor, dolayısıyla koruma da burada doğuyor. Motion
+tarafındaki `morphTransition` zaten `duration: 0`'a düşüyor — bu, onun CSS
+tarafındaki karşılığı (emsal: `GlassHeader.module.css` `.overlayRay`):
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .material { transition: none; }
+}
+```
+
 - [ ] **Step 5: Testi çalıştır, geçtiğini doğrula**
 
 Run: `npx vitest run src/components/GlassSiteHeader/GlassSiteHeader.test.tsx`
