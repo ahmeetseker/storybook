@@ -77,8 +77,7 @@ export function useKorumaliRota(): void {
   useEffect(() => {
     if (girisYapildi) return
     navigate({
-      to: '/giris',
-      search: { donus: yol },
+      href: `/giris?donus=${encodeURIComponent(yol)}`,
       replace: true,
     })
   }, [girisYapildi, navigate, yol])
