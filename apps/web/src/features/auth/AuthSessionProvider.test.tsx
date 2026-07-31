@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AuthSessionProvider, useAuthSession } from './AuthSessionProvider'
+import {
+  Outlet,
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router'
+import { AuthSessionProvider, useAuthSession, useKorumaliRota } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
 
@@ -79,5 +87,89 @@ describe('AuthSessionProvider', () => {
 
   it('provider dışında kullanılırsa açık hata verir', () => {
     expect(() => render(<Sonda />)).toThrow(/AuthSessionProvider/)
+  })
+})
+
+function KorumaliBilesen() {
+  useKorumaliRota()
+  return <h1>Korumalı içerik</h1>
+}
+
+const arama = (search: Record<string, unknown>) => ({
+  donus: typeof search.donus === 'string' ? search.donus : undefined,
+})
+
+function korumaRouter(baslangicYolu: string) {
+  const rootRoute = createRootRoute({
+    component: () => (
+      <AuthSessionProvider adapters={sahteAdapters(null)}>
+        <Outlet />
+      </AuthSessionProvider>
+    ),
+  })
+  const rotalar = [
+    createRoute({ getParentRoute: () => rootRoute, path: '/hesabim', component: KorumaliBilesen }),
+    createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/giris',
+      validateSearch: arama,
+      component: () => <h1>Giriş yapın</h1>,
+    }),
+  ]
+  return createRouter({
+    routeTree: rootRoute.addChildren(rotalar),
+    history: createMemoryHistory({ initialEntries: [baslangicYolu] }),
+  })
+}
+
+describe('useKorumaliRota', () => {
+  it('oturumsuz erişimde donus parametresiyle /girise yönlendirir', async () => {
+    const router = korumaRouter('/hesabim')
+    render(<RouterProvider router={router} />)
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Giriş yapın' })).toBeTruthy(),
+    )
+    expect(router.state.location.pathname).toBe('/giris')
+    expect(router.state.location.search).toEqual({ donus: '/hesabim' })
+  })
+
+  // Task 9 sırasında gerçek tarayıcıda (dev VE production build) bulundu:
+  // SSR hidrasyonu tamamlanırken `useKorumaliRota`'ya bağlı bileşen bazen
+  // AYRI bir mount olarak ikinci kez de çalışıyor. O ikinci çalışmada konum
+  // ARTIK ilk yönlendirmenin hedefi (`/giris?donus=...`) olduğundan, koruma
+  // olmasaydı `donus` bir kat daha encode edilip iç içe geçmiş bir
+  // yönlendirme zincirine dönüşürdü (`?donus=%2Fgiris%3Fdonus%3D...`).
+  //
+  // Bu senaryo, `useKorumaliRota`'ya bağlı bir bileşenin konum ZATEN
+  // `/giris` iken çalıştırılmasıyla doğrudan simüle edilir — hook'un asıl
+  // koruma kuralını (pathname `/giris` ile başlıyorsa tekrar yönlendirme)
+  // beyaz kutu olarak sınar. Koruma çalışıyorsa `navigate` hiç çağrılmaz ve
+  // bileşen kendi içeriğini göstermeye devam eder.
+  it('konum zaten /giris ise tekrar yönlendirmez — iç içe donus oluşmaz', async () => {
+    const rootRoute = createRootRoute({
+      component: () => (
+        <AuthSessionProvider adapters={sahteAdapters(null)}>
+          <Outlet />
+        </AuthSessionProvider>
+      ),
+    })
+    const girisRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/giris',
+      validateSearch: arama,
+      component: KorumaliBilesen,
+    })
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([girisRoute]),
+      history: createMemoryHistory({ initialEntries: ['/giris?donus=%2Fhesabim'] }),
+    })
+
+    render(<RouterProvider router={router} />)
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Korumalı içerik' })).toBeTruthy())
+    // Konum değişmedi — tekrar yönlendirme yapılmadı.
+    expect(router.state.location.pathname).toBe('/giris')
+    expect(router.state.location.search).toEqual({ donus: '/hesabim' })
   })
 })
