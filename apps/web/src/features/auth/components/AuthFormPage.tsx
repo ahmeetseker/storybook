@@ -75,7 +75,12 @@ export function AuthFormPage({
       {ikincilBaglantilar.length > 0 ? (
         <nav className={styles.links} aria-label="Diğer seçenekler">
           {ikincilBaglantilar.map((baglanti) => (
-            <Link key={baglanti.hedef} to={baglanti.hedef} className={styles.link}>
+            <Link
+              key={baglanti.hedef}
+              to={baglanti.hedef}
+              search={(onceki) => onceki}
+              className={styles.link}
+            >
               {baglanti.etiket}
             </Link>
           ))}

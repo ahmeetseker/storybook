@@ -35,12 +35,13 @@ function girisRouter(adapters: AuthAdapters, baslangicYolu = '/giris') {
       </AuthSessionProvider>
     ),
   })
+  const arama = (search: Record<string, unknown>) => ({
+    donus: typeof search.donus === 'string' ? search.donus : undefined,
+  })
   const girisRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/giris',
-    validateSearch: (search: Record<string, unknown>) => ({
-      donus: typeof search.donus === 'string' ? search.donus : undefined,
-    }),
+    validateSearch: arama,
     component: GirisPage,
   })
   const kodRoute = createRoute({
@@ -48,8 +49,14 @@ function girisRouter(adapters: AuthAdapters, baslangicYolu = '/giris') {
     path: '/giris/kod',
     component: () => <h1>Kod ekranı</h1>,
   })
+  const parolaRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/giris/parola',
+    validateSearch: arama,
+    component: () => <h1>Parola ekranı</h1>,
+  })
   return createRouter({
-    routeTree: rootRoute.addChildren([girisRoute, kodRoute]),
+    routeTree: rootRoute.addChildren([girisRoute, kodRoute, parolaRoute]),
     history: createMemoryHistory({ initialEntries: [baslangicYolu] }),
   })
 }
@@ -91,5 +98,21 @@ describe('GirisPage', () => {
   it('diğer yöntemlere bağlantı sunar', async () => {
     render(<RouterProvider router={girisRouter(sahteAdapters())} />)
     expect(await screen.findByRole('link', { name: /parola/i })).toBeTruthy()
+  })
+
+  it('kayıt sayfası henüz yokken o bağlantıyı sunmaz — ölü buton yasağı', async () => {
+    render(<RouterProvider router={girisRouter(sahteAdapters())} />)
+    await screen.findByRole('heading', { level: 1 })
+    expect(screen.queryByRole('link', { name: /hesap oluşturun/i })).toBeNull()
+  })
+
+  it('yöntem değiştirilirken donus parametresi kaybolmaz', async () => {
+    render(
+      <RouterProvider
+        router={girisRouter(sahteAdapters(), '/giris?donus=%2Fhesabim')}
+      />,
+    )
+    const baglanti = await screen.findByRole('link', { name: /parola/i })
+    expect(baglanti.getAttribute('href')).toBe('/giris/parola?donus=%2Fhesabim')
   })
 })
