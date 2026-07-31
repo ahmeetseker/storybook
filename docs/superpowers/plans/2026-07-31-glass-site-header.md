@@ -741,8 +741,11 @@ describe('GlassSiteHeader — mobil panel', () => {
     const burger = openMenu()
     const panelId = burger.getAttribute('aria-controls') as string
     const panel = document.getElementById(panelId) as HTMLElement
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
-    ;(panel.querySelector('a[href="#ofisler"]') as HTMLElement).dispatchEvent(event)
+    // fireEvent kullan, ham dispatchEvent DEĞİL: dispatchEvent React'in act()
+    // sarmalamasını atlar, state güncellemesi senkron akmaz ve testi geçirmek
+    // için üretim koduna flushSync eklemek gerekir. Burada defaultPrevented
+    // iddiası yok (o Task 1'in testinde), dolayısıyla fireEvent yeterli.
+    fireEvent.click(panel.querySelector('a[href="#ofisler"]') as HTMLElement)
     expect(links[1].onClick).toHaveBeenCalledTimes(1)
     expect(burger.getAttribute('aria-expanded')).toBe('false')
   })
@@ -991,15 +994,27 @@ genişlet (specificity gerekçesi: Task 2 Step 4). Mevcut bloğu şu hâle getir
 }
 ```
 
-Container query bloğunu güncelle (`@container (min-width: 48rem)` içine ekle):
+Container query bloğunu güncelle. Dar kapsülde satır aksiyonları **gizlenir** —
+aksi hâlde `utility`/`secondaryAction`/`action` hem satırda hem panelde render
+edilir ve erişilebilirlik ağacında çift kontrol oluşur (Tailark'ın orijinali de
+mobilde satır aksiyonlarını gizler). Dar kapsülde satırda yalnız logo +
+hamburger kalır:
 
 ```css
+/* Dar kapsül: satır aksiyonları panele iner — çift accessible kontrol olmaz. */
+.actions { display: none; }
+.burger { display: inline-flex; }
+
 @container (min-width: 48rem) {
   .nav { display: flex; }
+  .actions { display: inline-flex; }
   .burger { display: none; }
   .panel { display: none; }
 }
 ```
+
+`.burger`'ı `.actions`'ın dışında tut (satırda kardeşi olarak) — yoksa `.actions`
+gizlenince hamburger de kaybolur ve menü açılamaz hâle gelir.
 
 - [ ] **Step 5: Testi çalıştır, geçtiğini doğrula**
 
