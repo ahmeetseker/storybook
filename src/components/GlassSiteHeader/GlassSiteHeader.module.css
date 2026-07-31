@@ -144,6 +144,8 @@
   flex: none;
 }
 
+/* Dar kapsül: satır aksiyonları panele iner — çift accessible kontrol olmaz. */
+.actions { display: none; }
 .burger { display: inline-flex; }
 
 /* ── Mobil panel: kapsülün kendisi büyür, ayrı yüzey değil ────────────── */
@@ -200,6 +202,7 @@
 /* ── Container query: kapsül genişse linkler açılır ───────────────────── */
 @container (min-width: 48rem) {
   .nav { display: flex; }
+  .actions { display: inline-flex; }
   .burger { display: none; }
   .panel { display: none; }
 }

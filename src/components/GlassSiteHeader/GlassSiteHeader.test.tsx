@@ -181,8 +181,11 @@ describe('GlassSiteHeader — mobil panel', () => {
     const burger = openMenu()
     const panelId = burger.getAttribute('aria-controls') as string
     const panel = document.getElementById(panelId) as HTMLElement
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
-    ;(panel.querySelector('a[href="#ofisler"]') as HTMLElement).dispatchEvent(event)
+    // fireEvent kullan, ham dispatchEvent DEĞİL: dispatchEvent React'in act()
+    // sarmalamasını atlar, state güncellemesi senkron akmaz ve testi geçirmek
+    // için üretim koduna flushSync eklemek gerekir. Burada defaultPrevented
+    // iddiası yok (o Task 1'in testinde), dolayısıyla fireEvent yeterli.
+    fireEvent.click(panel.querySelector('a[href="#ofisler"]') as HTMLElement)
     expect(links[1].onClick).toHaveBeenCalledTimes(1)
     expect(burger.getAttribute('aria-expanded')).toBe('false')
   })

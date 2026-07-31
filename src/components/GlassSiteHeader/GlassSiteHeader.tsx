@@ -3,7 +3,6 @@
 // uyarlaması (bkz. rules.md §1). Cam tek yüzeyde ve yalnız condensed/açık
 // durumda; genişlik/radius değişimi motion layout (FLIP) ile transform'a çevrilir.
 import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from 'react'
-import { flushSync } from 'react-dom'
 import { motion } from 'motion/react'
 import { GlassSurface, GlassTierProvider } from '../GlassSurface'
 import { GlassIconButton } from '../GlassIconButton'
@@ -181,10 +180,7 @@ export function GlassSiteHeader({
                   className={link.active ? `${styles.panelLink} ${styles.panelLinkActive}` : styles.panelLink}
                   onClick={(e) => {
                     linkClick(link)(e)
-                    // flushSync: link seçimi genelde SPA gezinmesini de tetikler
-                    // (onClick), panelin hemen kapanmış olması gerekir — bir
-                    // sonraki task'a kadar beklemeye bırakılmaz.
-                    flushSync(() => setMenuOpen(false))
+                    setMenuOpen(false)
                   }}
                 >
                   {link.label}
@@ -230,8 +226,8 @@ export function GlassSiteHeader({
                   {action}
                 </>
               )}
-              {burger}
             </span>
+            {burger}
           </motion.div>
           {/* AnimatePresence yok: panelin exit varyantı yok, kapanışta kapsülün
               `layout`'u yükseklik farkını zaten FLIP ile sürüyor. */}
