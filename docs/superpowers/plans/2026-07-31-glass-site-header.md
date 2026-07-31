@@ -642,9 +642,16 @@ bu task onu canlandırıyor, dolayısıyla koruma da burada doğuyor. Motion
 tarafındaki `morphTransition` zaten `duration: 0`'a düşüyor — bu, onun CSS
 tarafındaki karşılığı (emsal: `GlassHeader.module.css` `.overlayRay`):
 
+**Specificity tuzağı:** guard'ı yalnız `.material`'a yazmak yetmez.
+`.root[data-scrolled] .material` (0-3-0) media query içindeki `.material`'ı
+(0-1-0) yener — yani koruma tam da scroll edilmiş durumda, geçişin gerçekten
+oynadığı anda etkisiz kalır. Transition'ı yeniden tanımlayan **her** seçici
+guard'da tekrarlanmalı:
+
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .material { transition: none; }
+  .material,
+  .root[data-scrolled] .material { transition: none; }
 }
 ```
 
@@ -970,6 +977,17 @@ Kök `<header>` ve satır bloğunu güncelle — `data-menu-open` ekle, `capsule
   opacity: 1;
   visibility: visible;
   transition: opacity var(--morph-dur) ease, visibility 0s;
+}
+```
+
+Yeni bir seçici daha transition tanımladığı için reduced-motion guard'ını da
+genişlet (specificity gerekçesi: Task 2 Step 4). Mevcut bloğu şu hâle getir:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .material,
+  .root[data-scrolled] .material,
+  .root[data-menu-open] .material { transition: none; }
 }
 ```
 
