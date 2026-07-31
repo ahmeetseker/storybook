@@ -12,6 +12,8 @@
 
 ## Global Constraints
 
+> **Rota dosyası adlandırma — Task 6'da bir hatadan öğrenildi.** TanStack Router file-based routing'de `giris.kod.tsx` gibi noktalı ad, rotayı `/giris`'in **çocuğu** yapar; ebeveyn bileşende `<Outlet/>` yoksa yanlış sayfa render edilir ve **unit testler bunu yakalamaz** (kendi düz route tree'lerini kurarlar) — yalnız tarayıcı doğrulaması yakalar. Bu yüzden `/giris` altındaki kardeş rotalar `_` sonekiyle yazılır: `giris_.kod.tsx`, `giris_.parola.tsx`. Repo'da yerleşik örnek: `hesabim_.mesajlar.tsx`. Rota dosyası oluşturan her task, sayfayı **tarayıcıda açıp** doğru bileşenin geldiğini doğrulamalıdır.
+
 - **Token tek kaynak:** `src/index.css`. Tipografi `--lg-text-badge` 11 / `-caption` 12 / `-footnote` 13 / `-body` 15 / `-headline` 17 / `-title` 22 / `-display` 28. Spacing `--lg-space-1..10` = 4/8/12/16/20/24/32/40/48/64. Radius chip 10 / media 14 / card 20 / capsule 999. Kontrol yükseklikleri `--lg-control-sm/md` 44, `-lg` 48, `-xl` 56.
 - **`--lg-text-display` (28px) KULLANILMAZ.** Sayfa başlığı `--lg-text-title` (22px), bölüm başlığı `--lg-text-headline` (17px).
 - **Raw px/hex yasak.** Yalnız `var(--lg-*)`. Fallback yazılacaksa gerçek token değeriyle birebir aynı olmalı.
@@ -1805,7 +1807,7 @@ EOF
 **Files:**
 - Create: `apps/web/src/features/auth/pages/GirisKodPage.tsx`
 - Create: `apps/web/src/features/auth/pages/GirisKodPage.test.tsx`
-- Create: `apps/web/src/routes/giris.kod.tsx`
+- Create: `apps/web/src/routes/giris_.kod.tsx`
 
 **Interfaces:**
 - Consumes: `AuthFormPage`, `useAuthSession`, `guvenliDonusYolu`, `GirisPage.module.css` (aynı alan stilleri)
@@ -2014,7 +2016,7 @@ Expected: PASS — 4/4
 
 - [ ] **Step 5: Rota dosyasını oluştur**
 
-`apps/web/src/routes/giris.kod.tsx`:
+`apps/web/src/routes/giris_.kod.tsx`:
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -2041,7 +2043,7 @@ npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
-git add apps/web/src/features/auth apps/web/src/routes/giris.kod.tsx apps/web/src/routeTree.gen.ts
+git add apps/web/src/features/auth apps/web/src/routes/giris_.kod.tsx apps/web/src/routeTree.gen.ts
 git commit -m "$(cat <<'EOF'
 feat(auth): /giris/kod tek kullanımlık kod doğrulama sayfası
 
@@ -2057,7 +2059,7 @@ EOF
 **Files:**
 - Create: `apps/web/src/features/auth/pages/GirisParolaPage.tsx`
 - Create: `apps/web/src/features/auth/pages/GirisParolaPage.test.tsx`
-- Create: `apps/web/src/routes/giris.parola.tsx`
+- Create: `apps/web/src/routes/giris_.parola.tsx`
 
 **Interfaces:**
 - Consumes: `AuthFormPage`, `useAuthSession`, `guvenliDonusYolu`, `GirisPage.module.css`
@@ -2267,7 +2269,7 @@ Expected: PASS — 4/4
 
 - [ ] **Step 5: Rota dosyasını oluştur**
 
-`apps/web/src/routes/giris.parola.tsx`:
+`apps/web/src/routes/giris_.parola.tsx`:
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -2294,7 +2296,7 @@ npm run typecheck && npm run lint && npm test
 ```
 
 ```bash
-git add apps/web/src/features/auth apps/web/src/routes/giris.parola.tsx apps/web/src/routeTree.gen.ts
+git add apps/web/src/features/auth apps/web/src/routes/giris_.parola.tsx apps/web/src/routeTree.gen.ts
 git commit -m "$(cat <<'EOF'
 feat(auth): /giris/parola sayfası
 
@@ -2310,9 +2312,9 @@ EOF
 **Files:**
 - Create: `apps/web/src/features/auth/pages/girisDurumSayfalari.tsx`
 - Create: `apps/web/src/features/auth/pages/girisDurumSayfalari.test.tsx`
-- Create: `apps/web/src/routes/giris.baglanti-gonderildi.tsx`
-- Create: `apps/web/src/routes/giris.baglanti.gecersiz.tsx`
-- Create: `apps/web/src/routes/giris.hata.tsx`
+- Create: `apps/web/src/routes/giris_.baglanti-gonderildi.tsx`
+- Create: `apps/web/src/routes/giris_.baglanti_.gecersiz.tsx`
+- Create: `apps/web/src/routes/giris_.hata.tsx`
 
 **Interfaces:**
 - Consumes: Task 4'ten `AuthStatusPage`
@@ -2433,7 +2435,7 @@ Expected: PASS — 3/3
 
 - [ ] **Step 5: Üç rota dosyasını oluştur**
 
-`apps/web/src/routes/giris.baglanti-gonderildi.tsx`:
+`apps/web/src/routes/giris_.baglanti-gonderildi.tsx`:
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -2450,7 +2452,7 @@ export const Route = createFileRoute('/giris/baglanti-gonderildi')({
 })
 ```
 
-`apps/web/src/routes/giris.baglanti.gecersiz.tsx`:
+`apps/web/src/routes/giris_.baglanti_.gecersiz.tsx`:
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
@@ -2467,7 +2469,7 @@ export const Route = createFileRoute('/giris/baglanti/gecersiz')({
 })
 ```
 
-`apps/web/src/routes/giris.hata.tsx`:
+`apps/web/src/routes/giris_.hata.tsx`:
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
