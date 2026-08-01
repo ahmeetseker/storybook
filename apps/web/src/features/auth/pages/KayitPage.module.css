@@ -59,6 +59,13 @@
   color: var(--lg-danger);
 }
 
+/* Form grubu başlığı — sayfa başlığının (title) bir altı. */
+.grupBasligi {
+  margin: var(--lg-space-2) 0 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+}
+
 @media (pointer: coarse) {
   .tipSecenek,
   .onayRow {
