@@ -30,6 +30,7 @@ import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
+import { Route as KayitHesapVarRouteImport } from './routes/kayit_.hesap-var'
 import { Route as KayitKurumsalRouteImport } from './routes/kayit_.kurumsal'
 import { Route as KayitProfilRouteImport } from './routes/kayit_.profil'
 import { Route as KonseptlerIndexRouteImport } from './routes/konseptler.index'
@@ -145,6 +146,11 @@ const IlanListingIdRoute = IlanListingIdRouteImport.update({
   path: '/ilan/$listingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KayitHesapVarRoute = KayitHesapVarRouteImport.update({
+  id: '/kayit_/hesap-var',
+  path: '/kayit/hesap-var',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KayitKurumsalRoute = KayitKurumsalRouteImport.update({
   id: '/kayit_/kurumsal',
   path: '/kayit/kurumsal',
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
   '/kayit/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -244,6 +251,7 @@ export interface FileRoutesByTo {
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
   '/kayit/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/giris_/parola': typeof GirisParolaRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit_/hesap-var': typeof KayitHesapVarRoute
   '/kayit_/kurumsal': typeof KayitKurumsalRoute
   '/kayit_/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/giris/parola'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit/hesap-var'
     | '/kayit/kurumsal'
     | '/kayit/profil'
     | '/konseptler/ai-danisman'
@@ -342,6 +352,7 @@ export interface FileRouteTypes {
     | '/giris/parola'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit/hesap-var'
     | '/kayit/kurumsal'
     | '/kayit/profil'
     | '/konseptler/ai-danisman'
@@ -374,6 +385,7 @@ export interface FileRouteTypes {
     | '/giris_/parola'
     | '/hesabim_/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit_/hesap-var'
     | '/kayit_/kurumsal'
     | '/kayit_/profil'
     | '/konseptler/ai-danisman'
@@ -407,6 +419,7 @@ export interface RootRouteChildren {
   GirisParolaRoute: typeof GirisParolaRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
+  KayitHesapVarRoute: typeof KayitHesapVarRoute
   KayitKurumsalRoute: typeof KayitKurumsalRoute
   KayitProfilRoute: typeof KayitProfilRoute
   GirisBaglantiGecersizRoute: typeof GirisBaglantiGecersizRoute
@@ -561,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IlanListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kayit_/hesap-var': {
+      id: '/kayit_/hesap-var'
+      path: '/kayit/hesap-var'
+      fullPath: '/kayit/hesap-var'
+      preLoaderRoute: typeof KayitHesapVarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kayit_/kurumsal': {
       id: '/kayit_/kurumsal'
       path: '/kayit/kurumsal'
@@ -671,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   GirisParolaRoute: GirisParolaRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
   IlanListingIdRoute: IlanListingIdRoute,
+  KayitHesapVarRoute: KayitHesapVarRoute,
   KayitKurumsalRoute: KayitKurumsalRoute,
   KayitProfilRoute: KayitProfilRoute,
   GirisBaglantiGecersizRoute: GirisBaglantiGecersizRoute,
