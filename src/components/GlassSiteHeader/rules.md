@@ -119,7 +119,22 @@ görsel geçişler CSS ve motion layout'ta.
 - **`prefers-reduced-transparency: reduce`** karşılanır: blur bileşen tarafında
   sıfırlanır (`prefersReducedTransparency()`), ton CSS'te `--material-tint`
   %100'e çıkar. Doğrulandı (CDP): `blur(0px)` + zemin `rgb(255 255 255 / 0.92)`.
-- **Spring bilinçli olarak değiştirilmedi.** `presets.springs.sidebar`
+- **İç içe `layout` projeksiyonu zorunlu.** `.capsule` FLIP ederken `.row`,
+  `.wordmark` ve `.actions` da `layout` taşımak ZORUNDA. `.row`'da yalnız
+  `layout="position"` kullanıldığı sürümde satır son (geniş) kutusunda kalıyor,
+  kapsül ise hâlâ dar olduğu için sağdaki aksiyonlar camın **dışına taşıyordu**
+  (ölçüldü: kapsül sağ kenarı 1213px iken satır 1363px — 150px taşma; "İlan ver"
+  boşlukta duruyordu). Tam `layout` ile satır kendi kutusunu da projekte eder ve
+  her karede kapsülün içinde kalır (ölçüm: taşma sabit −16px = `--capsule-pad-x`).
+  Kural: kapsüle `layout` eklenirse, kenara kenetlenen her çocuk da almalıdır.
+- **Morf ASİMETRİK.** Daralma `presets.springs.sidebar` (response 0.39s),
+  büyüme `presets.springs.settle` (response 0.50s). Gerekçe: daralma sisteme
+  yanıttır (snappy doğru), büyüme yüzeyin dinlenme durumuna dönüşüdür — aynı
+  hızda yapıldığında ani hissettiriyordu. Emil'in "exit'i enter'dan hızlı yap"
+  kuralı burada UYGULANMAZ: o kural *dismissal* içindir, tepeye dönmek header'ı
+  reddetmek değil, kapsülün evine dönmesidir. Ölçüm: daralma 532ms, büyüme
+  628ms (±3px yaklaşma).
+- **Spring karakteri bilinçli olarak değiştirilmedi.** `presets.springs.sidebar`
   (`stiffness 260 / damping 32`) Apple parametrelerine çevrildiğinde sönüm
   oranı **0.992**, response **0.390s** — Apple'ın "Move/reposition" reçetesi
   (damping 1.0, response 0.4) ile pratikte aynı. Header bir jest taşımadığı

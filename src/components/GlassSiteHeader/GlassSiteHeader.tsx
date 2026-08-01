@@ -96,9 +96,15 @@ export function GlassSiteHeader({
   const reduced = prefersReducedMotion()
   const scrolled = useScrolled(scrollThreshold)
   const hasLinks = links.length > 0
+  // Morf asimetrik: DARALMA sisteme yanıt (snappy, `sidebar` — response 0.39s),
+  // BÜYÜME yüzeyin dinlenme durumuna dönüşü (yumuşak, `settle` — response 0.50s).
+  // Aynı spring iki yönde de kullanıldığında büyüme ani hissettiriyordu.
   const morphTransition = reduced
     ? { duration: 0 }
-    : { type: 'spring' as const, ...presets.springs.sidebar }
+    : {
+        type: 'spring' as const,
+        ...(scrolled ? presets.springs.sidebar : presets.springs.settle),
+      }
   // Saydamlığı azalt tercihinde cam örtücüye döner: blur kalkar, ton opaklaşır
   // (ton tarafı CSS'te, aynı adlı media query'de).
   const materialBlur = prefersReducedTransparency() ? 0 : MATERIAL_BLUR
@@ -264,10 +270,10 @@ export function GlassSiteHeader({
         </GlassTierProvider>
         {/* Kapsülün içi düz katman — cam üstüne cam yok. */}
         <GlassTierProvider tier="fallback">
-          <motion.div layout="position" transition={morphTransition} className={styles.row}>
-            <span className={styles.wordmark}>{logo}</span>
+          <motion.div layout transition={morphTransition} className={styles.row}>
+            <motion.span layout transition={morphTransition} className={styles.wordmark}>{logo}</motion.span>
             {nav}
-            <span className={styles.actions}>
+            <motion.span layout transition={morphTransition} className={styles.actions}>
               {condensedAction && scrolled ? (
                 condensedAction
               ) : (
@@ -277,7 +283,7 @@ export function GlassSiteHeader({
                   {action}
                 </>
               )}
-            </span>
+            </motion.span>
             {burger}
           </motion.div>
           {/* AnimatePresence yok: panelin exit varyantı yok, kapanışta kapsülün
