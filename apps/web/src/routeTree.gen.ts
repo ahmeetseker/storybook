@@ -30,6 +30,7 @@ import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
+import { Route as KayitProfilRouteImport } from './routes/kayit_.profil'
 import { Route as KonseptlerIndexRouteImport } from './routes/konseptler.index'
 import { Route as KonseptlerAiDanismanRouteImport } from './routes/konseptler.ai-danisman'
 import { Route as KonseptlerAiKesifRouteImport } from './routes/konseptler.ai-kesif'
@@ -143,6 +144,11 @@ const IlanListingIdRoute = IlanListingIdRouteImport.update({
   path: '/ilan/$listingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KayitProfilRoute = KayitProfilRouteImport.update({
+  id: '/kayit_/profil',
+  path: '/kayit/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KonseptlerIndexRoute = KonseptlerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/giris_/parola': typeof GirisParolaRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
+  '/kayit_/profil': typeof KayitProfilRoute
   '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
   '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/giris/parola'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit/profil'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/giris/parola'
     | '/hesabim/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit/profil'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/giris_/parola'
     | '/hesabim_/mesajlar'
     | '/ilan/$listingId'
+    | '/kayit_/profil'
     | '/konseptler/ai-danisman'
     | '/konseptler/ai-kesif'
     | '/konseptler/guven-merkezi'
@@ -383,6 +395,7 @@ export interface RootRouteChildren {
   GirisParolaRoute: typeof GirisParolaRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
+  KayitProfilRoute: typeof KayitProfilRoute
   GirisBaglantiGecersizRoute: typeof GirisBaglantiGecersizRoute
 }
 
@@ -535,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IlanListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kayit_/profil': {
+      id: '/kayit_/profil'
+      path: '/kayit/profil'
+      fullPath: '/kayit/profil'
+      preLoaderRoute: typeof KayitProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/konseptler/': {
       id: '/konseptler/'
       path: '/'
@@ -631,6 +651,7 @@ const rootRouteChildren: RootRouteChildren = {
   GirisParolaRoute: GirisParolaRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
   IlanListingIdRoute: IlanListingIdRoute,
+  KayitProfilRoute: KayitProfilRoute,
   GirisBaglantiGecersizRoute: GirisBaglantiGecersizRoute,
 }
 export const routeTree = rootRouteImport
