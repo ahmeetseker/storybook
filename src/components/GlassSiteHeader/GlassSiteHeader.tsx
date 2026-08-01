@@ -6,7 +6,7 @@ import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } f
 import { motion } from 'motion/react'
 import { GlassSurface, GlassTierProvider, type GlassSurfaceProps } from '../GlassSurface'
 import { GlassIconButton } from '../GlassIconButton'
-import { prefersReducedMotion } from '../../core/tier'
+import { prefersReducedMotion, prefersReducedTransparency } from '../../core/tier'
 import { presets } from '../../motion/presets'
 import styles from './GlassSiteHeader.module.css'
 
@@ -68,6 +68,14 @@ function linkClick(link: GlassSiteHeaderLink) {
   }
 }
 
+/**
+ * Malzemenin tam kalınlıktaki backdrop blur'u, px.
+ * `GlassSurface`'in fallback dalındaki `2 + thickness * 10` formülünün
+ * `thickness={0.9}` karşılığı — blur'u burada animasyona soktuğumuz için
+ * değeri açıkça yazıyoruz (bkz. rules.md §7).
+ */
+const MATERIAL_BLUR = 11
+
 const MenuIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
     <path d="M4 7h16M4 12h16M4 17h16" />
@@ -91,6 +99,9 @@ export function GlassSiteHeader({
   const morphTransition = reduced
     ? { duration: 0 }
     : { type: 'spring' as const, ...presets.springs.sidebar }
+  // Saydamlığı azalt tercihinde cam örtücüye döner: blur kalkar, ton opaklaşır
+  // (ton tarafı CSS'te, aynı adlı media query'de).
+  const materialBlur = prefersReducedTransparency() ? 0 : MATERIAL_BLUR
 
   const [menuOpen, setMenuOpen] = useState(false)
   const capsuleRef = useRef<HTMLDivElement>(null)
@@ -218,13 +229,35 @@ export function GlassSiteHeader({
             thickness={0.9}
             shape={20}
             className={styles.material}
-            // Opacity CSS transition'ıyla değil, kapsülle AYNI spring'le
-            // sürülür — yoksa şekil ve cam iki ayrı saatte ilerler ve cam
-            // arkadan yetişir (ölçüldü: t=217ms'de şekil %89, cam %11).
+            // backdrop-filter'ı GlassSurface'in sabit değeri yerine kendimiz
+            // veriyoruz: `style` surfaceStyle'a EN SON yayıldığı için kazanır.
+            // Değişmeyen bir string yazıp blur'u CSS değişkeninden okuyoruz —
+            // böylece React her yeniden render'da aynı değeri yazar ve
+            // motion'ın her karede güncellediği değişkenle çakışmaz.
+            style={{
+              backdropFilter: 'blur(calc(var(--hdr-blur, 0) * 1px)) saturate(180%)',
+              WebkitBackdropFilter: 'blur(calc(var(--hdr-blur, 0) * 1px)) saturate(180%)',
+            }}
+            // Apple "materialize, don't just fade": cam yüzey solarak değil,
+            // blur + ölçek + opacity BİRLİKTE gelerek belirir — malzeme
+            // kalınlaşarak yerine oturur. Üçü de kapsülle aynı spring'te.
+            // visibility artık sabit gecikmeli CSS transition'ıyla değil
+            // `transitionEnd` ile kapanıyor: hızlı geri kaydırmada spring
+            // yeniden hedeflenirken yüzey yarı görünürken kaybolmaz
+            // (Apple §3 — kesilebilirlik).
             // GlassSurfaceProps motion prop'larını tanımaz; cast projede
             // yerleşik desen (bkz. GlassIconButton).
             {...({
-              animate: { opacity: scrolled || menuOpen ? 1 : 0 },
+              initial: false,
+              animate:
+                scrolled || menuOpen
+                  ? { opacity: 1, scale: 1, '--hdr-blur': materialBlur, visibility: 'visible' }
+                  : {
+                      opacity: 0,
+                      scale: 0.98,
+                      '--hdr-blur': 0,
+                      transitionEnd: { visibility: 'hidden' },
+                    },
               transition: morphTransition,
             } as unknown as GlassSurfaceProps)}
           />

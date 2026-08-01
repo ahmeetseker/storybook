@@ -61,10 +61,12 @@
   position: absolute;
   inset: 0;
   --lg-surface-shadow: var(--lg-shadow-md);
-  /* opacity motion'a devredildi (aynı spring, şekille eşzamanlı belirir);
-     visibility burada kalır ki rest'te compositor maliyeti sıfır olsun. */
+  /* opacity/scale/blur ve visibility'nin tamamı motion'a devredildi — hepsi
+     kapsülle aynı spring'te. visibility'yi sabit gecikmeli bir CSS
+     transition'ı yerine motion'ın `transitionEnd`'i kapatır; böylece hızlı
+     geri kaydırmada yüzey yarı görünürken kaybolmaz. Rest'te compositor
+     maliyeti yine sıfır (visibility: hidden + blur 0). */
   visibility: hidden;
-  transition: visibility 0s linear var(--morph-dur);
 }
 
 /* Cam tonu — GlassSurface'in kendi %6'lık zeminini yener (ata seçici, 0-2-0).
@@ -72,11 +74,6 @@
    sürüyor. `--lg-glass` tema duyarlıdır (Kağıt beyaz / Grafit koyu). */
 .root .material {
   background: color-mix(in srgb, var(--lg-glass) var(--material-tint), transparent);
-}
-
-.root[data-scrolled] .material {
-  visibility: visible;
-  transition: visibility 0s;
 }
 
 /* ── Satır ────────────────────────────────────────────────────────────── */
@@ -212,11 +209,10 @@
   gap: var(--actions-gap);
 }
 
-/* Panel tepede de açılabilir — o hâlde de zemin gerekir, yoksa metin
-   sayfa içeriğinin üstünde okunmaz kalır. */
-.root[data-menu-open] .material {
-  visibility: visible;
-  transition: visibility 0s;
+/* Saydamlığı azalt tercihi: cam örtücüye döner. Blur bileşen tarafında
+   sıfırlanır (prefersReducedTransparency), ton burada tam opaklığa çıkar. */
+@media (prefers-reduced-transparency: reduce) {
+  .root { --material-tint: 100%; }
 }
 
 /* ── Container query: kapsül genişse linkler açılır ───────────────────── */

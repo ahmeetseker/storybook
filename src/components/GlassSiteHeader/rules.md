@@ -96,13 +96,34 @@ görsel geçişler CSS ve motion layout'ta.
   ölçek kadar gerilip elipse döner (ölçüldü: t=217ms'de `scaleX` 1.114 iken
   `radius` çoktan 20px'ti). Rest'te malzeme görünmediği için sabit yarıçap
   görsel olarak bedelsizdir.
-- **Malzemenin opacity'si de aynı spring'le sürülür**, CSS transition'ıyla
-  değil (`GlassSurface as={motion.div}` + `animate`). Ayrı saatlerde
-  ilerledikleri sürümde şekil t=217ms'de %89 tamamlanmışken cam %11'deydi —
-  kapsül yerine oturuyor, cam arkadan yetişiyordu. Şimdi birlikte gelirler
-  (ölçüm: t=161ms şekil erken/cam 0.67 · t=317ms 1.014/0.95 · t=629ms oturdu).
-  Reduced-motion'da `morphTransition` `{ duration: 0 }` olduğu için ikisi de
-  anında yerine geçer (doğrulandı: transform hiç uygulanmıyor).
+- **Malzeme solmaz, "kalınlaşarak" belirir** (Apple: *materialize, don't just
+  fade*). `opacity` (0→1), `scale` (0.98→1) ve backdrop `blur` (0→11px) —
+  üçü de kapsülün FLIP'iyle **aynı spring'te** sürülür, CSS transition'ıyla
+  değil (`GlassSurface as={motion.div}` + `animate`). Yalnız opacity'nin CSS
+  ease'iyle sürüldüğü sürümde şekil t=217ms'de %89 tamamlanmışken cam
+  %11'deydi — kapsül yerine oturuyor, cam arkadan yetişiyordu.
+  Ölçüm (şimdi): t=207ms kapsülX 1.061 / camScale 0.996 / op 0.77 /
+  blur 8.8px · t=386ms 1.008 / 1.000 / 0.98 / 10.7px · t=569ms oturdu.
+- Blur, `--hdr-blur` CSS değişkeni üzerinden sürülür; `backdrop-filter`
+  bileşenin `style`'ında **sabit bir string** olarak yazılır
+  (`blur(calc(var(--hdr-blur,0) * 1px)) saturate(180%)`). Gerekçe: `style`
+  `GlassSurface`'in `surfaceStyle`'ına en son yayıldığı için kazanır, ve
+  string sabit olduğundan React'in her yeniden render'ı (ör. `useElementSize`
+  resize) motion'ın her karede yazdığı değeri ezmez.
+- **`visibility` motion'ın `transitionEnd`'iyle kapanır**, sabit gecikmeli bir
+  CSS transition'ıyla değil. Sabit gecikme kesilebilirliği bozardı (Apple §3):
+  hızlı geri kaydırmada spring yeniden hedeflenirken yüzey, opacity daha
+  sıfıra inmeden `--morph-dur` dolduğu için yarı görünürken kaybolurdu.
+- Reduced-motion'da `morphTransition` `{ duration: 0 }` olduğu için dört kanal
+  da anında yerine geçer (doğrulandı: transform hiç uygulanmıyor).
+- **`prefers-reduced-transparency: reduce`** karşılanır: blur bileşen tarafında
+  sıfırlanır (`prefersReducedTransparency()`), ton CSS'te `--material-tint`
+  %100'e çıkar. Doğrulandı (CDP): `blur(0px)` + zemin `rgb(255 255 255 / 0.92)`.
+- **Spring bilinçli olarak değiştirilmedi.** `presets.springs.sidebar`
+  (`stiffness 260 / damping 32`) Apple parametrelerine çevrildiğinde sönüm
+  oranı **0.992**, response **0.390s** — Apple'ın "Move/reposition" reçetesi
+  (damping 1.0, response 0.4) ile pratikte aynı. Header bir jest taşımadığı
+  için overshoot (`damping ~0.8`) İSTENMEZ; kritik sönüm doğru seçim.
 - Panel tepede açılırsa da `.material` görünür olur; yoksa panel metni sayfa
   içeriğinin üstünde okunmaz kalırdı.
 - Dar kapsülde (`@container (min-width: 48rem)` altı) `.actions` gizli,
@@ -183,7 +204,10 @@ container ölçeğinde karşılığı yok), `--zone-gap: 18px`, `--actions-gap: 
 `--wordmark-gap: 9px`, `--nav-font: 14px`, `--link-gap: 2px`,
 `--link-pad-x: 13px`, `--pill-inset: 3px 1px`,
 `--morph-dur: 0.3s`, `--material-tint: 62%` (cam tonunun örtme gücü — token
-ölçeğinde karşılığı yok, blur'u tamamlar). Bilinçli bırakılanlar: cam pill reçetesi
+ölçeğinde karşılığı yok, blur'u tamamlar; `prefers-reduced-transparency`'de
+%100'e çıkar), `--hdr-blur` (motion'ın sürdüğü birimsiz blur değeri),
+`MATERIAL_BLUR = 11` (TSX; `GlassSurface`'in `2 + thickness * 10` formülünün
+`thickness={0.9}` karşılığı — blur animasyona girdiği için açıkça yazılı). Bilinçli bırakılanlar: cam pill reçetesi
 `blur(8px) + saturate(150%)` ve `color-mix`'li ışıma (token gölge kalıplarıyla
 birebir değil), geçiş easing'i (token yok), `z-index: 30` (z ölçeği yok —
 `GlassHeader` ile aynı kademe), container query eşiği `48rem` (bp ölçeği dışı),
