@@ -166,7 +166,6 @@ Expected: FAIL — `Failed to resolve import "./GlassSiteHeader"`
   --nav-font: 14px;
   --link-gap: 2px;
   --link-pad-x: 13px;
-  --focus-radius: 4px;
   --pill-inset: 3px 1px;
   --morph-dur: 0.3s;
 
@@ -258,7 +257,7 @@ Expected: FAIL — `Failed to resolve import "./GlassSiteHeader"`
 @media (hover: hover) { .link:hover { color: var(--lg-label); } }
 .link:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: 2px;
+  outline-offset: var(--lg-focus-ring-offset, 2px);
 }
 .linkActive { color: var(--lg-label); font-weight: 600; }
 .linkLabel { position: relative; z-index: 1; }
@@ -637,6 +636,25 @@ export function GlassSiteHeader({
 }
 ```
 
+Stil sayfasının sonuna reduced-motion korumasını ekle. `.material`'ın geçişi
+Task 1'de yazıldı ama `data-scrolled`'ı JS hiç set etmediği için ölü koddu;
+bu task onu canlandırıyor, dolayısıyla koruma da burada doğuyor. Motion
+tarafındaki `morphTransition` zaten `duration: 0`'a düşüyor — bu, onun CSS
+tarafındaki karşılığı (emsal: `GlassHeader.module.css` `.overlayRay`):
+
+**Specificity tuzağı:** guard'ı yalnız `.material`'a yazmak yetmez.
+`.root[data-scrolled] .material` (0-3-0) media query içindeki `.material`'ı
+(0-1-0) yener — yani koruma tam da scroll edilmiş durumda, geçişin gerçekten
+oynadığı anda etkisiz kalır. Transition'ı yeniden tanımlayan **her** seçici
+guard'da tekrarlanmalı:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  .material,
+  .root[data-scrolled] .material { transition: none; }
+}
+```
+
 - [ ] **Step 5: Testi çalıştır, geçtiğini doğrula**
 
 Run: `npx vitest run src/components/GlassSiteHeader/GlassSiteHeader.test.tsx`
@@ -723,8 +741,11 @@ describe('GlassSiteHeader — mobil panel', () => {
     const burger = openMenu()
     const panelId = burger.getAttribute('aria-controls') as string
     const panel = document.getElementById(panelId) as HTMLElement
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 })
-    ;(panel.querySelector('a[href="#ofisler"]') as HTMLElement).dispatchEvent(event)
+    // fireEvent kullan, ham dispatchEvent DEĞİL: dispatchEvent React'in act()
+    // sarmalamasını atlar, state güncellemesi senkron akmaz ve testi geçirmek
+    // için üretim koduna flushSync eklemek gerekir. Burada defaultPrevented
+    // iddiası yok (o Task 1'in testinde), dolayısıyla fireEvent yeterli.
+    fireEvent.click(panel.querySelector('a[href="#ofisler"]') as HTMLElement)
     expect(links[1].onClick).toHaveBeenCalledTimes(1)
     expect(burger.getAttribute('aria-expanded')).toBe('false')
   })
@@ -938,7 +959,7 @@ Kök `<header>` ve satır bloğunu güncelle — `data-menu-open` ekle, `capsule
 @media (hover: hover) { .panelLink:hover { color: var(--lg-label); } }
 .panelLink:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: 2px;
+  outline-offset: var(--lg-focus-ring-offset, 2px);
 }
 .panelLinkActive { color: var(--lg-label); font-weight: 600; }
 .panelActions {
@@ -962,15 +983,38 @@ Kök `<header>` ve satır bloğunu güncelle — `data-menu-open` ekle, `capsule
 }
 ```
 
-Container query bloğunu güncelle (`@container (min-width: 48rem)` içine ekle):
+Yeni bir seçici daha transition tanımladığı için reduced-motion guard'ını da
+genişlet (specificity gerekçesi: Task 2 Step 4). Mevcut bloğu şu hâle getir:
 
 ```css
+@media (prefers-reduced-motion: reduce) {
+  .material,
+  .root[data-scrolled] .material,
+  .root[data-menu-open] .material { transition: none; }
+}
+```
+
+Container query bloğunu güncelle. Dar kapsülde satır aksiyonları **gizlenir** —
+aksi hâlde `utility`/`secondaryAction`/`action` hem satırda hem panelde render
+edilir ve erişilebilirlik ağacında çift kontrol oluşur (Tailark'ın orijinali de
+mobilde satır aksiyonlarını gizler). Dar kapsülde satırda yalnız logo +
+hamburger kalır:
+
+```css
+/* Dar kapsül: satır aksiyonları panele iner — çift accessible kontrol olmaz. */
+.actions { display: none; }
+.burger { display: inline-flex; }
+
 @container (min-width: 48rem) {
   .nav { display: flex; }
+  .actions { display: inline-flex; }
   .burger { display: none; }
   .panel { display: none; }
 }
 ```
+
+`.burger`'ı `.actions`'ın dışında tut (satırda kardeşi olarak) — yoksa `.actions`
+gizlenince hamburger de kaybolur ve menü açılamaz hâle gelir.
 
 - [ ] **Step 5: Testi çalıştır, geçtiğini doğrula**
 
@@ -1049,7 +1093,7 @@ const CreateButton = () => (
 )
 
 /** Scroll morfu canlı denenebilsin diye sahne uzun tutulur. */
-const Sahne = ({ children }: { children: ReactNode }) => (
+const Stage = ({ children }: { children: ReactNode }) => (
   <div style={{ minHeight: '220vh', background: 'var(--lg-bg)' }}>
     {children}
     <div style={{ paddingTop: '30vh', textAlign: 'center', color: 'var(--lg-label-secondary)' }}>
@@ -1072,7 +1116,7 @@ const meta = {
     menuLabel: 'Menü',
     scrollThreshold: 24,
   },
-  decorators: [(Story) => <Sahne><Story /></Sahne>],
+  decorators: [(Story) => <Stage><Story /></Stage>],
 } satisfies Meta<typeof GlassSiteHeader>
 
 export default meta
@@ -1263,7 +1307,7 @@ görsel geçişler CSS ve motion layout'ta.
 değişkenlerde toplandı: `--capsule-max-scrolled: 55rem` (condensed genişlik —
 container ölçeğinde karşılığı yok), `--zone-gap: 18px`, `--actions-gap: 12px`,
 `--wordmark-gap: 9px`, `--nav-font: 14px`, `--link-gap: 2px`,
-`--link-pad-x: 13px`, `--focus-radius: 4px`, `--pill-inset: 3px 1px`,
+`--link-pad-x: 13px`, `--pill-inset: 3px 1px`,
 `--morph-dur: 0.3s`. Bilinçli bırakılanlar: cam pill reçetesi
 `blur(8px) + saturate(150%)` ve `color-mix`'li ışıma (token gölge kalıplarıyla
 birebir değil), geçiş easing'i (token yok), `z-index: 30` (z ölçeği yok —
@@ -1586,7 +1630,7 @@ O blokta `.route-capabilities` kuralı kalır — blok boşalmaz, silme.
 
 .shell-brand:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
-  outline-offset: var(--lg-space-1);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
   border-radius: var(--lg-radius-chip);
 }
 ```

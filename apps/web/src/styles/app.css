@@ -56,14 +56,14 @@ select {
   isolation: isolate;
   /* Fixed GlassDock için diğer alt overlay'lerin kullanacağı ortak rezerv. */
   --lg-shell-dock-offset: calc(var(--lg-control-xl) + var(--lg-space-7));
-  /* Fixed GlassIslandHeader'ın kapladığı dikey alan: adanın üst boşluğu
-     (--lg-space-4, GlassIslandHeader.module.css `.root { top }`) + kapalı
-     haldeki bar yüksekliği (bar dolgusu 2 × --lg-space-2 + içindeki kontrol
-     --lg-control-md). Chrome'da ölçülen değerle birebir: 16 + 16 + 44 = 76px.
+  /* Fixed GlassSiteHeader'ın kapladığı dikey alan: rayın üst boşluğu
+     (--lg-space-3, GlassSiteHeader.module.css `--rail-pad-y`) + kapsül dolgusu
+     (2 × --lg-space-2) + satır yüksekliği (--lg-control-lg).
+     12 + 16 + 48 = 76px — önceki ada ölçüsüyle birebir aynı.
      Sayfa dolgusu, sticky öğelerin yapışma noktası ve odak kaydırma payı bu
      tek kaynağı okur; hiçbir yerde sabit bir sayı yazılmaz. */
   --lg-shell-header-offset: calc(
-    var(--lg-space-4) + (2 * var(--lg-space-2)) + var(--lg-control-md)
+    var(--lg-space-3) + (2 * var(--lg-space-2)) + var(--lg-control-lg)
   );
 }
 
@@ -188,19 +188,18 @@ select {
   content: '';
 }
 
-.shell-extras {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--lg-space-2);
-  padding: var(--lg-space-3) var(--lg-space-4);
-}
-
-.shell-language {
+.shell-brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--lg-space-1);
+  gap: var(--lg-space-2);
+  color: var(--lg-label);
+  text-decoration: none;
+}
+
+.shell-brand:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+  border-radius: var(--lg-radius-chip);
 }
 
 .shell-dock-variant {
@@ -237,10 +236,6 @@ select {
 @media (max-width: 767px) {
   .route-capabilities {
     gap: var(--lg-space-2) var(--lg-space-3);
-  }
-
-  .shell-extras {
-    padding-inline: var(--lg-space-3);
   }
 }
 

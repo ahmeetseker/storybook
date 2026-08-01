@@ -162,6 +162,14 @@ const ENTRIES: CatalogEntry[] = [
   },
   // ── Navigasyon ──────────────────────────────────────────────────────────
   {
+    name: 'SiteHeader',
+    description:
+      'Tepede görünmez ray, scroll’da yüzen cam kapsüle morflanan site header’ı — mobilde kapsülün içinde açılan menü paneli.',
+    category: 'Navigasyon',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-navigasyon-glasssiteheader--default',
+  },
+  {
     name: 'Navbar',
     description: "Yüzen navigasyon barı — geri pill'i, başlık, paylaşımlı action grubu ve soft scroll edge.",
     category: 'Navigasyon',

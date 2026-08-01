@@ -1,0 +1,225 @@
+/* GlassSiteHeader — tepede görünmez ray, scroll'da yüzen cam kapsül.
+   Cam TEK yüzeyde (.material) ve yalnız condensed/açık durumda görünür;
+   kapsül içeriği GlassTierProvider ile düz katmana iner (cam üstüne cam yok). */
+.root {
+  /* Token karşılığı olmayan layout ölçüleri — bkz. rules.md §9 Borç */
+  --rail-pad-y: var(--lg-space-3);
+  --capsule-pad-y: var(--lg-space-2);
+  --capsule-pad-x: var(--lg-space-4);
+  --capsule-max: var(--lg-container-narrow);
+  --capsule-max-scrolled: 55rem;
+  --zone-gap: 18px;
+  --actions-gap: 12px;
+  --wordmark-gap: 9px;
+  --nav-font: 14px;
+  --link-gap: 2px;
+  --link-pad-x: 13px;
+  --pill-inset: 3px 1px;
+  --morph-dur: 0.3s;
+
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: calc(var(--rail-pad-y) + env(safe-area-inset-top, 0px))
+    var(--lg-container-gutter) 0;
+  /* Ray tıklamayı yutmaz; yalnız kapsül etkileşim alır. */
+  pointer-events: none;
+}
+
+.capsule {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--capsule-max);
+  padding: var(--capsule-pad-y) var(--capsule-pad-x);
+  border-radius: 0;
+  pointer-events: auto;
+  /* Link satırının açılması kapsül genişliğine bağlı — viewport'a değil.
+     Kök `fixed`, kapsül değil; containment burada sticky/fixed bozmaz. */
+  container-type: inline-size;
+}
+
+/* Condensed: kapsül daralır ve köşelenir. Genişlik/radius değişimini motion
+   layout (FLIP) transform'a çevirir — CSS transition YOK (layout tetiklerdi). */
+.root[data-scrolled] .capsule {
+  max-width: var(--capsule-max-scrolled);
+  border-radius: var(--lg-radius-card);
+}
+
+/* ── Malzeme katmanı: tek cam yüzey, opacity ile belirir ─────────────── */
+.material {
+  position: absolute;
+  inset: 0;
+  --lg-surface-shadow: var(--lg-shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--morph-dur) ease,
+    visibility 0s linear var(--morph-dur);
+}
+
+.root[data-scrolled] .material {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--morph-dur) ease, visibility 0s;
+}
+
+/* ── Satır ────────────────────────────────────────────────────────────── */
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--zone-gap);
+  min-height: var(--lg-control-lg);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wordmark-gap);
+  flex: none;
+  font-size: var(--lg-text-headline);
+  font-weight: 750;
+  letter-spacing: -0.032em;
+  color: var(--lg-label);
+}
+
+.grow { flex: 1; min-width: 0; }
+
+/* ── Linkler ──────────────────────────────────────────────────────────── */
+.nav { display: none; flex: 1; justify-content: center; min-width: 0; }
+.linkList {
+  display: flex;
+  align-items: center;
+  gap: var(--link-gap);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.linkItem { display: flex; }
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lg-control-sm);
+  padding: 0 var(--link-pad-x);
+  border-radius: var(--lg-radius-capsule);
+  color: var(--lg-label-secondary);
+  text-decoration: none;
+  font-size: var(--nav-font);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+@media (hover: hover) { .link:hover { color: var(--lg-label); } }
+.link:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+.linkActive { color: var(--lg-label); font-weight: 600; }
+.linkLabel { position: relative; z-index: 1; }
+
+/* Aktif linkin kayan cam göstergesi — tek küçük liquid-glass dokunuşu. */
+.glassPill {
+  position: absolute;
+  inset: var(--pill-inset);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-surface) 52%, transparent);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--lg-label) 9%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--lg-surface) 85%, transparent);
+}
+
+/* ── Aksiyonlar ───────────────────────────────────────────────────────── */
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--actions-gap);
+  flex: none;
+}
+
+/* Dar kapsül: satır aksiyonları panele iner — çift accessible kontrol olmaz. */
+.actions { display: none; }
+/* .actions gizliyken satırda logo + hamburger kalır; hamburger'ı kapsülün
+   sonuna iter (yalnız dar kapsülde etkili — geniş kapsülde `.burger` zaten
+   `display: none`, bkz. @container bloğu). */
+.burger { display: inline-flex; margin-inline-start: auto; }
+
+/* ── Mobil panel: kapsülün kendisi büyür, ayrı yüzey değil ────────────── */
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  margin-top: var(--lg-space-3);
+  padding-top: var(--lg-space-4);
+  border-top: 1px solid var(--lg-hairline);
+  /* Refraction katmanı zemini bulanıklaştırmaz — panel kendi opak yüzeyini
+     taşır ki metin altındaki sayfa içeriğiyle kontrast yarışına girmesin.
+     Bkz. rules.md §7. */
+  background: var(--lg-surface);
+  border-radius: var(--lg-radius-media);
+  padding-inline: var(--lg-space-3);
+  padding-bottom: var(--lg-space-3);
+}
+.panelList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.panelLink {
+  display: flex;
+  align-items: center;
+  min-height: var(--lg-control-md);
+  padding: 0 var(--link-pad-x);
+  border-radius: var(--lg-radius-chip);
+  color: var(--lg-label-secondary);
+  text-decoration: none;
+  font-size: var(--lg-text-body);
+  font-weight: 500;
+}
+@media (hover: hover) { .panelLink:hover { color: var(--lg-label); } }
+.panelLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+.panelLinkActive { color: var(--lg-label); font-weight: 600; }
+.panelActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--actions-gap);
+}
+
+/* Panel tepede de açılabilir — o hâlde de zemin gerekir, yoksa metin
+   sayfa içeriğinin üstünde okunmaz kalır. */
+.root[data-menu-open] .capsule { border-radius: var(--lg-radius-card); }
+.root[data-menu-open] .material {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--morph-dur) ease, visibility 0s;
+}
+
+/* ── Container query: kapsül genişse linkler açılır ───────────────────── */
+@container (min-width: 48rem) {
+  .nav { display: flex; }
+  .actions { display: inline-flex; }
+  .burger { display: none; }
+  .panel { display: none; }
+}
+
+/* ── Motion koruması — kullanıcı hareket azaltmayı tercih ettiğinde ─────── */
+@media (prefers-reduced-motion: reduce) {
+  .material,
+  .root[data-scrolled] .material,
+  .root[data-menu-open] .material { transition: none; }
+}

@@ -18,17 +18,33 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@repo/ui', () => ({
-  GlassAiComposer: () => <div data-testid="global-search" />,
   GlassButton: ({
     children,
     onClick,
+    ...rest
   }: {
     children: ReactNode
     onClick?: () => void
-  }) => <button onClick={onClick}>{children}</button>,
+  }) => (
+    <button onClick={onClick} {...rest}>
+      {children}
+    </button>
+  ),
   GlassDock: () => <nav data-testid="global-dock" />,
-  GlassIslandHeader: ({ extras }: { extras?: ReactNode }) => (
-    <header data-testid="global-header">{extras}</header>
+  GlassSiteHeader: ({
+    utility,
+    secondaryAction,
+    action,
+  }: {
+    utility?: ReactNode
+    secondaryAction?: ReactNode
+    action?: ReactNode
+  }) => (
+    <header data-testid="global-header">
+      {utility}
+      {secondaryAction}
+      {action}
+    </header>
   ),
 }))
 
@@ -43,7 +59,7 @@ describe('MarketplaceShell odaklı ilan akışı', () => {
     })
     routerState.pathname = '/ilan-ver'
     const { rerender } = render(
-      <MarketplaceShell initialTime="2026-07-25T12:00:00.000Z">
+      <MarketplaceShell>
         <main>İlan oluşturma çalışma alanı</main>
       </MarketplaceShell>,
     )
@@ -54,12 +70,13 @@ describe('MarketplaceShell odaklı ilan akışı', () => {
 
     routerState.pathname = '/emlak'
     rerender(
-      <MarketplaceShell initialTime="2026-07-25T12:00:00.000Z">
+      <MarketplaceShell>
         <main>Arama çalışma alanı</main>
       </MarketplaceShell>,
     )
 
     expect(screen.getByTestId('global-header')).toBeTruthy()
+    expect(screen.queryByTestId('global-search')).toBeNull()
     await waitFor(() => expect(screen.getByTestId('global-dock')).toBeTruthy())
   })
 })
@@ -73,11 +90,29 @@ describe('MarketplaceShell hesap eylemi', () => {
     routerState.pathname = pathname
 
     render(
-      <MarketplaceShell initialTime="2026-07-25T12:00:00.000Z">
+      <MarketplaceShell>
         <main>Rota içeriği</main>
       </MarketplaceShell>,
     )
 
     expect(screen.getByRole('button', { name: label })).toBeTruthy()
+  })
+})
+
+describe('MarketplaceShell tema eylemi', () => {
+  // Not: jsdom her zaman scrollY = 0'da kalır, bu yüzden bu test yalnız rest
+  // durumunu kanıtlar — condensed durumda tema butonunun görünür kaldığına
+  // dair bir iddia içermez. Gerçek düğüm: `utility` header'ın `utility` slotuna
+  // render ediliyor (condensedAction artık verilmiyor, bkz. rules.md/PR notu).
+  it('tema butonu header’ın utility slotuna render edilir', () => {
+    routerState.pathname = '/emlak'
+
+    render(
+      <MarketplaceShell>
+        <main>Rota içeriği</main>
+      </MarketplaceShell>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Tema: system' })).toBeTruthy()
   })
 })
