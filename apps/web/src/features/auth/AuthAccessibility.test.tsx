@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {
   Outlet,
   RouterProvider,
@@ -184,5 +185,69 @@ describe('auth erişilebilirlik geçidi', () => {
     const fieldset = container.querySelector('fieldset')
     expect(fieldset, 'hesap tipi grubu fieldset olmalı').toBeTruthy()
     expect(fieldset?.querySelector('legend')?.textContent, 'fieldset legend taşımalı').toBeTruthy()
+  })
+
+  // Finding 3 (2026-08-01 final inceleme): alan hataları `aria-invalid`/
+  // `aria-describedby` taşımıyordu ve odak ilk hatalı alana taşınmıyordu —
+  // ekran okuyucu kullanıcısı yalnız özeti duyup alanları elle aramak
+  // zorunda kalıyordu. Bu blok regresyonu kalıcı olarak engeller.
+  it('KayitPage başarısız gönderimde her hatalı alanı aria-invalid + aria-describedby ile işaretler ve ilk alana odaklanır', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
+    await screen.findByLabelText('Ad soyad')
+    await kullanici.click(screen.getByRole('button', { name: 'Hesap oluştur' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+
+    const ilkAlan = screen.getByLabelText('Ad soyad')
+    expect(document.activeElement, 'odak ilk hatalı alana (Ad soyad) taşınmalı').toBe(ilkAlan)
+
+    for (const etiket of ['Ad soyad', 'E-posta', 'Telefon', 'Parola']) {
+      const alan = screen.getByLabelText(etiket)
+      expect(alan.getAttribute('aria-invalid'), `${etiket} aria-invalid="true" taşımıyor`).toBe('true')
+      const describedBy = alan.getAttribute('aria-describedby')
+      expect(describedBy, `${etiket} aria-describedby taşımıyor`).toBeTruthy()
+      const hataElemani = document.getElementById(describedBy as string)
+      expect(hataElemani, `${etiket} aria-describedby "${describedBy}" hiçbir elemente çözülmüyor`).toBeTruthy()
+      expect(hataElemani?.textContent, `${etiket} hata metni boş`).toBeTruthy()
+    }
+
+    // KVKK onayı checkbox — label içine sarılı, id/describedby'ı ayrıca taşır.
+    const kvkk = screen.getByLabelText(/aydınlatma metnini/i)
+    expect(kvkk.getAttribute('aria-invalid')).toBe('true')
+    const kvkkHataId = kvkk.getAttribute('aria-describedby')
+    expect(kvkkHataId).toBeTruthy()
+    expect(document.getElementById(kvkkHataId as string)?.textContent).toBeTruthy()
+  })
+
+  it('KayitKurumsalPage başarısız gönderimde her hatalı alanı aria-invalid + aria-describedby ile işaretler ve ilk alana odaklanır', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitKurumsalPage, oturumluAdapters())} />)
+    await screen.findByLabelText('Ticaret ünvanı')
+    await kullanici.click(screen.getByRole('button', { name: 'Başvuruyu gönder' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+
+    const ilkAlan = screen.getByLabelText('Ticaret ünvanı')
+    expect(document.activeElement, 'odak ilk hatalı alana (Ticaret ünvanı) taşınmalı').toBe(ilkAlan)
+
+    const TUM_ETIKETLER = [
+      'Ticaret ünvanı',
+      'Vergi numarası',
+      'Vergi dairesi',
+      'İl',
+      'İlçe',
+      'Yetki belgesi numarası',
+      'Yetkili ad soyad',
+      'Yetkili e-posta',
+      'Yetkili telefon',
+    ]
+    for (const etiket of TUM_ETIKETLER) {
+      const alan = screen.getByLabelText(etiket)
+      expect(alan.getAttribute('aria-invalid'), `${etiket} aria-invalid="true" taşımıyor`).toBe('true')
+      const describedBy = alan.getAttribute('aria-describedby')
+      expect(describedBy, `${etiket} aria-describedby taşımıyor`).toBeTruthy()
+      const hataElemani = document.getElementById(describedBy as string)
+      expect(hataElemani, `${etiket} aria-describedby "${describedBy}" hiçbir elemente çözülmüyor`).toBeTruthy()
+      expect(hataElemani?.textContent, `${etiket} hata metni boş`).toBeTruthy()
+    }
   })
 })

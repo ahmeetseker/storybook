@@ -4,9 +4,19 @@ import { AuthFormPage } from '../components/AuthFormPage'
 import { useAuthSession } from '../AuthSessionProvider'
 import { guvenliDonusYolu } from '../domain/auth-session'
 import { kayitBilgileriniDogrula } from '../domain/kayit-dogrulama'
+import { alanHataId, ilkHataliAlanaOdaklan, type OdakAlani } from '../domain/form-erisilebilirlik'
 import type { HesapTipi, KayitAlanHatalari } from '../domain/auth-types'
 import alanStilleri from './GirisPage.module.css'
 import styles from './KayitPage.module.css'
+
+/** Görsel alan sırası — başarısız gönderimde ilk hataya bu sırayla odaklanılır. */
+const ALAN_SIRASI: readonly OdakAlani[] = [
+  { ad: 'adSoyad', id: 'kayit-ad' },
+  { ad: 'ePosta', id: 'kayit-eposta' },
+  { ad: 'telefon', id: 'kayit-telefon' },
+  { ad: 'parola', id: 'kayit-parola' },
+  { ad: 'kvkkOnayi', id: 'kayit-kvkk' },
+]
 
 /**
  * Kayıt sayfası. Hesap tipi ilk alandır: emlak ofisi seçilirse kayıt
@@ -36,6 +46,7 @@ export function KayitPage() {
     setAlanHatalari(hatalar)
     if (Object.keys(hatalar).length > 0) {
       setHata('Formda düzeltilmesi gereken alanlar var.')
+      ilkHataliAlanaOdaklan(ALAN_SIRASI, hatalar)
       return
     }
 
@@ -62,9 +73,10 @@ export function KayitPage() {
     oturumuTazele()
     if (sonuc.veri.hesapTipi === 'kurumsal') {
       // Bu dal `donus`'u taşımaz — kurumsal başvuru kendi akışını sürdürür,
-      // orijinal dönüş hedefine (`/hesabim` vb.) geri dönmez; bu yüzden
-      // `href` yeterli.
-      navigate({ href: '/kayit/kurumsal' })
+      // orijinal dönüş hedefine (`/hesabim` vb.) geri dönmez. `/kayit/kurumsal`
+      // artık `validateSearch` taşıdığından (Finding 5) `search` açıkça
+      // `undefined` verilir — elle taşımamak kasıtlıdır, unutulmuş değil.
+      navigate({ to: '/kayit/kurumsal', search: { donus: undefined } })
       return
     }
     navigate({ to: guvenliDonusYolu(donus), replace: true })
@@ -125,8 +137,14 @@ export function KayitPage() {
           autoComplete="name"
           value={adSoyad}
           onChange={(event) => setAdSoyad(event.target.value)}
+          aria-invalid={alanHatalari.adSoyad ? true : undefined}
+          aria-describedby={alanHatalari.adSoyad ? alanHataId('kayit-ad') : undefined}
         />
-        {alanHatalari.adSoyad ? <p className={styles.alanHatasi}>{alanHatalari.adSoyad}</p> : null}
+        {alanHatalari.adSoyad ? (
+          <p id={alanHataId('kayit-ad')} className={styles.alanHatasi}>
+            {alanHatalari.adSoyad}
+          </p>
+        ) : null}
       </div>
 
       <div className={alanStilleri.field}>
@@ -140,8 +158,14 @@ export function KayitPage() {
           autoComplete="email"
           value={ePosta}
           onChange={(event) => setEPosta(event.target.value)}
+          aria-invalid={alanHatalari.ePosta ? true : undefined}
+          aria-describedby={alanHatalari.ePosta ? alanHataId('kayit-eposta') : undefined}
         />
-        {alanHatalari.ePosta ? <p className={styles.alanHatasi}>{alanHatalari.ePosta}</p> : null}
+        {alanHatalari.ePosta ? (
+          <p id={alanHataId('kayit-eposta')} className={styles.alanHatasi}>
+            {alanHatalari.ePosta}
+          </p>
+        ) : null}
       </div>
 
       <div className={alanStilleri.field}>
@@ -157,8 +181,14 @@ export function KayitPage() {
           placeholder="5XX XXX XX XX"
           value={telefon}
           onChange={(event) => setTelefon(event.target.value)}
+          aria-invalid={alanHatalari.telefon ? true : undefined}
+          aria-describedby={alanHatalari.telefon ? alanHataId('kayit-telefon') : undefined}
         />
-        {alanHatalari.telefon ? <p className={styles.alanHatasi}>{alanHatalari.telefon}</p> : null}
+        {alanHatalari.telefon ? (
+          <p id={alanHataId('kayit-telefon')} className={styles.alanHatasi}>
+            {alanHatalari.telefon}
+          </p>
+        ) : null}
       </div>
 
       <div className={alanStilleri.field}>
@@ -172,22 +202,33 @@ export function KayitPage() {
           autoComplete="new-password"
           value={parola}
           onChange={(event) => setParola(event.target.value)}
+          aria-invalid={alanHatalari.parola ? true : undefined}
+          aria-describedby={alanHatalari.parola ? alanHataId('kayit-parola') : undefined}
         />
         <p className={alanStilleri.hint}>En az 8 karakter, bir büyük harf ve bir rakam.</p>
-        {alanHatalari.parola ? <p className={styles.alanHatasi}>{alanHatalari.parola}</p> : null}
+        {alanHatalari.parola ? (
+          <p id={alanHataId('kayit-parola')} className={styles.alanHatasi}>
+            {alanHatalari.parola}
+          </p>
+        ) : null}
       </div>
 
       <div>
-        <label className={styles.onayRow}>
+        <label className={styles.onayRow} htmlFor="kayit-kvkk">
           <input
+            id="kayit-kvkk"
             type="checkbox"
             checked={kvkkOnayi}
             onChange={(event) => setKvkkOnayi(event.target.checked)}
+            aria-invalid={alanHatalari.kvkkOnayi ? true : undefined}
+            aria-describedby={alanHatalari.kvkkOnayi ? alanHataId('kayit-kvkk') : undefined}
           />
           <span>Aydınlatma metnini ve kullanım koşullarını okudum, onaylıyorum.</span>
         </label>
         {alanHatalari.kvkkOnayi ? (
-          <p className={styles.alanHatasi}>{alanHatalari.kvkkOnayi}</p>
+          <p id={alanHataId('kayit-kvkk')} className={styles.alanHatasi}>
+            {alanHatalari.kvkkOnayi}
+          </p>
         ) : null}
       </div>
     </AuthFormPage>
