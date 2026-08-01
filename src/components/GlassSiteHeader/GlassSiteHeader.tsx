@@ -204,13 +204,21 @@ export function GlassSiteHeader({
       data-menu-open={menuOpen || undefined}
     >
       <motion.div ref={capsuleRef} layout transition={morphTransition} className={styles.capsule}>
-        <GlassSurface
-          aria-hidden
-          material="glass"
-          thickness={0.4}
-          shape={20}
-          className={styles.material}
-        />
+        {/* Malzeme bilinçli olarak fallback tier'da: refraction dalı bir mercek
+            etkisidir (SVG blur'u yalnız `0.4 + thickness * 1.2` px) ve altından
+            geçen metni net bırakır. Kapsül geniş bir gezinme rayı — alan eşiği
+            (160.000px²) onu kısa olduğu için "küçük yüzey" sayıyor ama görevi
+            büyük yüzey görevi. Fallback dalı gerçek gaussian blur verir
+            (`2 + thickness * 10` px). bkz. rules.md §7. */}
+        <GlassTierProvider tier="fallback">
+          <GlassSurface
+            aria-hidden
+            material="glass"
+            thickness={0.9}
+            shape={20}
+            className={styles.material}
+          />
+        </GlassTierProvider>
         {/* Kapsülün içi düz katman — cam üstüne cam yok. */}
         <GlassTierProvider tier="fallback">
           <motion.div layout="position" transition={morphTransition} className={styles.row}>

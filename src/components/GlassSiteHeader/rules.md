@@ -109,17 +109,27 @@ görsel geçişler CSS ve motion layout'ta.
   (specificity) katmaz; `transition`'ı yeniden bildiren her seçici, guard
   içinde de aynı özgüllükte tekrarlanmazsa scrolled/menu-open durumundaki
   daha özgül kural kazanır ve geçiş sıfırlanmaz — bu yüzden üçü de listede.
-- **Bilinçli sapma — panel kendi zeminini taşır:** refraction katmanında
-  `.material`'ın `backdrop-filter`'ı bir SVG kırılma filtresidir; zemini
-  bulanıklaştırmaz, yalnız bozar. Mobil panel (~343×353px) 160.000px²
-  kırılma eşiğinin altında kaldığı için bu filtreden çıkamaz — `thickness`
-  yükseltmek de çözmez, çünkü kırılma dalında hesaplanan blur zaten atılır.
-  Panel metin taşıyan büyük bir yüzey olduğundan altından geçen sayfa
-  içeriği net okunur kalıp panel metniyle kontrast yarışına girerdi (WCAG
-  1.4.3 garanti edilemezdi). Bu yüzden `.panel` kendi `--lg-surface`
-  zeminini + `--lg-radius-media` köşesini taşır: panel artık kapsülün camı
-  içinde duran opak bir kart, "panel = kapsülün camının bir parçası"
-  ilkesinden bu noktada bilinçli olarak ayrılır.
+- **Bilinçli sapma — malzeme fallback tier'a sabitlenir:** `GlassSurface`'in
+  refraction dalı bir *mercek* etkisidir; SVG filtresinin blur'u yalnız
+  `0.4 + thickness * 1.2` px olduğu için zemini bozar ama **bulanıklaştırmaz**
+  ve altından geçen metin net okunur kalır. `thickness` yükseltmek de çözmez.
+  Tier'ın alan eşiği (`REFRACTION_MAX_AREA`, 160.000px²) kapsülü kısa olduğu
+  için "küçük yüzey" sayar (condensed'de 880×76 ≈ 67.000px²) — oysa görevi
+  büyük yüzey görevidir: altından tüm sayfa akar. Bu yüzden `.material`
+  `GlassTierProvider tier="fallback"` ile sarılır ve gerçek gaussian blur'a
+  düşer (`2 + thickness * 10` px; `thickness={0.9}` → 11px). Blur tek başına
+  yetmediğinden `--material-tint` (62%) ile `--lg-glass` tonu eklenir —
+  `.root .material` ata seçicisi `GlassSurface`'in kendi %6'lık zeminini yener.
+  Sonuç: yazılar net, arkadaki içerik yumuşak renk lekesi (WCAG 1.4.3 güvence
+  altında). Doğrulandı: `blur(11px) saturate(1.8)` + `rgb(255 255 255 / 0.57)`.
+- **Bilinçli sapma — panel kendi zeminini taşır:** mobil panel metin taşıyan
+  büyük bir yüzeydir; `.panel` kendi `--lg-surface` zeminini + `--lg-radius-media`
+  köşesini taşır, yani kapsülün camı içinde duran opak bir karttır. **Not:**
+  bu karar malzeme henüz refraction'dayken (hiç blur yokken) alındı. Malzeme
+  fallback'e geçtikten sonra panelin opak zemini kontrast için artık *zorunlu
+  değil*; korunuyor çünkü kontrastı sayfa içeriğinden bağımsız olarak garanti
+  ediyor. Daha "camsı" bir mobil görünüm istenirse bu zemin kaldırılabilir —
+  bilinçli bir tasarım tercihi olur, düzeltme değil.
 - **DOM'da aksiyon tekrarı:** panel açıkken (`data-menu-open`) `.actions`
   içindeki `utility`/`secondaryAction`/`action` React örnekleri satırdan
   kaldırılmaz — yalnız `display: none` ile gizlenir (dar kapsülde zaten
@@ -155,7 +165,8 @@ değişkenlerde toplandı: `--capsule-max-scrolled: 55rem` (condensed genişlik 
 container ölçeğinde karşılığı yok), `--zone-gap: 18px`, `--actions-gap: 12px`,
 `--wordmark-gap: 9px`, `--nav-font: 14px`, `--link-gap: 2px`,
 `--link-pad-x: 13px`, `--pill-inset: 3px 1px`,
-`--morph-dur: 0.3s`. Bilinçli bırakılanlar: cam pill reçetesi
+`--morph-dur: 0.3s`, `--material-tint: 62%` (cam tonunun örtme gücü — token
+ölçeğinde karşılığı yok, blur'u tamamlar). Bilinçli bırakılanlar: cam pill reçetesi
 `blur(8px) + saturate(150%)` ve `color-mix`'li ışıma (token gölge kalıplarıyla
 birebir değil), geçiş easing'i (token yok), `z-index: 30` (z ölçeği yok —
 `GlassHeader` ile aynı kademe), container query eşiği `48rem` (bp ölçeği dışı),

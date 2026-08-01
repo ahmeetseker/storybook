@@ -16,6 +16,7 @@
   --link-pad-x: 13px;
   --pill-inset: 3px 1px;
   --morph-dur: 0.3s;
+  --material-tint: 62%; /* cam tonunun örtme gücü — blur'u tamamlar */
 
   position: fixed;
   top: 0;
@@ -59,6 +60,13 @@
   visibility: hidden;
   transition: opacity var(--morph-dur) ease,
     visibility 0s linear var(--morph-dur);
+}
+
+/* Cam tonu — GlassSurface'in kendi %6'lık zeminini yener (ata seçici, 0-2-0).
+   Blur tek başına yetmiyor: altından geçen metin bulanıklaşsa da kontrastı
+   sürüyor. `--lg-glass` tema duyarlıdır (Kağıt beyaz / Grafit koyu). */
+.root .material {
+  background: color-mix(in srgb, var(--lg-glass) var(--material-tint), transparent);
 }
 
 .root[data-scrolled] .material {
