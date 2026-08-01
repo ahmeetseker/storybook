@@ -174,9 +174,10 @@ ve erişilebilirlik (`AuthAccessibility.test.tsx`e yeni satır) kapsanmalı.
 - `guvenliDonusYolu`: açık yönlendirme payload'ları (protokol-bağıl,
   ters-bölü kaçışı, kodlanmış varyantlar, auth rotalarına dönüş) ana sayfaya
   düşer.
-- Ölü bağlantı yok: henüz yazılmamış hedefe (`/kayit`, `/parola-sifirla`)
-  giden link render edilmediğini kanıtlayan `queryByRole('link', ...)` ===
-  `null` testi.
+- Ölü bağlantı yok: henüz yazılmamış hedefe (`/parola-sifirla`) giden link
+  render edilmediğini kanıtlayan `queryByRole('link', ...)` === `null` testi.
+  (`/kayit` Faz 2 ile birlikte yazıldı ve `GirisPage`'deki "Hesap oluşturun"
+  bağlantısı geri eklendi — artık bu listede değil.)
 
 ## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
 
@@ -212,6 +213,17 @@ oluşturun" bağlantısı geri eklendi, beş yeni rota `auth-routes.test.tsx`
 smoke testine katıldı, erişilebilirlik geçidi genişletildi, uçtan uca
 `kayit-flow.test.tsx` eklendi. Bkz. §13.
 
+Changelog: 2026-08-01 — Faz 2'nin final incelemesinde altı bulgu
+giderildi: `guvenliDonusYolu` oturum gerektiren `/kayit/*`/`/hesap/*`
+sayfalarını artık dönüş hedefi olarak kabul ediyor (Finding 1);
+`components/KorumaliSayfa.tsx` ile hidrasyon uyuşmazlığı tek yerden
+çözüldü (Finding 2, bkz. §14); `KayitPage`/`KayitKurumsalPage` alan
+hataları `aria-invalid`/`aria-describedby` taşıyor ve başarısız gönderimde
+ilk hatalı alana odaklanıyor (Finding 3, `domain/form-erisilebilirlik.ts`);
+son tip-güvensiz `navigate` çağrısı düzeltildi (Finding 4); `kayit_.
+kurumsal.tsx`/`hesap.dogrula.tsx` diğer auth rotalarıyla aynı
+`validateSearch`'ü aldı (Finding 5).
+
 ## 13. Kayıt sözleşmesi (Faz 2)
 
 **Beş yeni sayfa:**
@@ -219,15 +231,26 @@ smoke testine katıldı, erişilebilirlik geçidi genişletildi, uçtan uca
 | Sayfa | Rota | Oturum gerekir mi |
 |---|---|---|
 | `KayitPage` | `/kayit` | Hayır — hesabı bu sayfa açar |
-| `KayitProfilPage` | `/kayit/profil` | Evet |
+| `KayitProfilPage` | `/kayit/profil` | Evet (*) |
 | `KayitKurumsalPage` | `/kayit/kurumsal` | Evet |
 | `HesapVarPage` (`kayitDurumSayfalari.tsx`) | `/kayit/hesap-var` | Hayır — durum sayfası |
 | `HesapDogrulaPage` | `/hesap/dogrula` | Evet |
 
-Oturum gerektiren üçü `useKorumaliRota` çağırır ve oturumsuzken `null`
-döner — bunları test ederken (`AuthAccessibility.test.tsx` gibi) **oturumlu**
-bir sahte adapter (`test-utils.ts` → `sahteAuthAdapters({ oturumuGetir: ()
-=> oturum })`) kullanılmazsa test hiçbir şey sınamaz, render boş kalır.
+Oturum gerektiren üçü kendi içeriklerini `components/KorumaliSayfa.tsx`
+sarmalayıcısına sarar; bu sarmalayıcı `useKorumaliRota` çağrısını VE
+hidrasyon-güvenli bekleme bayrağını tek yerde toplar (bkz. §14) — sayfalar
+kendi `useKorumaliRota`/`girisYapildi` kopyalarını çağırmaz. Oturumsuzken
+`KorumaliSayfa` `null` döner — bunları test ederken (`AuthAccessibility.
+test.tsx` gibi) **oturumlu** bir sahte adapter (`test-utils.ts` →
+`sahteAuthAdapters({ oturumuGetir: () => oturum })`) kullanılmazsa test
+hiçbir şey sınamaz, render boş kalır.
+
+(*) `/kayit/profil` teknik olarak deep-link edilebilir ve oturumlu bir
+kullanıcı doğrudan adresi ziyaret ederse çalışır, ama şu an HİÇBİR akıştan
+ona giden bir link yok — `kayitYap` her zaman tam bir profil döndürür
+(`adSoyad`/`ePosta` doludur), bu yüzden Faz 2 akışı bu sayfaya hiç uğramaz.
+İleride "eksik profil" senaryosu eklenirse (ör. telefonla hızlı kayıt) bu
+not kaldırılır ve sayfaya giden gerçek bir bağlantı eklenir.
 
 **Alan doğrulaması:** `domain/kayit-dogrulama.ts`
 (`kayitBilgileriniDogrula`, `kurumsalBasvuruyuDogrula`) yalnız anında
@@ -252,3 +275,26 @@ seviyesi doğrulama ilan akışının ön koşuludur.
 **Faz 3 notu:** `/parola-sifirla` geldiğinde `HesapVarPage`'e ("Bu hesap
 zaten var") parola sıfırlamaya giden bir ikincil bağlantı eklenmeli —
 şu an kullanıcının tek seçeneği "Giriş yapın".
+
+## 14. Korumalı sayfa hidrasyon deseni
+
+Oturum `sessionStorage`'dan okunur — sunucu bunu göremez. Bir sayfa
+`girisYapildi`'e göre doğrudan dallanırsa (`if (!girisYapildi) return null`),
+sunucu HER ZAMAN `null` render eder ama istemci hidrasyon ANINDA (henüz
+`useEffect` çalışmadan — `AuthSessionProvider`'ın `useState(() =>
+adapters.oturumuGetir())` lazy initializer'ı `sessionStorage`'ı senkron
+okur) oturumluysa dolu ağaç üretir. Bu, React'in "Hydration failed"
+hatasına yol açar: sunucu ve istemcinin hidrasyon eşleştirmesi yapılan İLK
+render'ı farklıdır, React sunucu ağacını atıp yeniden render eder.
+
+Çözüm `components/KorumaliSayfa.tsx`: `AuthFormPage`'in gönder butonunda
+kullandığı `hidrasyonTamam` deseniyle aynı — bayrak sunucuda VE istemcide
+ilk render'da `false` başlar, yalnız mount SONRASI `useEffect` `true` yapar.
+Bu bayrak `false` olduğu sürece hem sunucu hem istemci AYNI şeyi (`null`)
+render eder; mount sonrası gerçek `girisYapildi` değeriyle sıradan bir
+istemci re-render'ı (hidrasyon değil) tetiklenir. `useKorumaliRota` da bu
+sarmalayıcı içinde TEK yerde çağrılır.
+
+Oturum gerektiren yeni bir sayfa eklerken içeriği `<KorumaliSayfa>` ile
+sarmala; kendi `useKorumaliRota()`/`if (!girisYapildi) return null` kopyanı
+yazma — aynı hidrasyon hatasını yeniden üretirsin.
