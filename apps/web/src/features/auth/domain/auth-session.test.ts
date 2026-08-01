@@ -60,9 +60,20 @@ describe('guvenliDonusYolu', () => {
     expect(guvenliDonusYolu('/kayitlar')).toBe('/kayitlar')
   })
 
-  it('hesap auth alt rotalarını ve kökünü reddeder', () => {
-    expect(guvenliDonusYolu('/hesap')).toBe('/')
-    expect(guvenliDonusYolu('/hesap/dogrula')).toBe('/')
+  it('oturum gerektiren kayıt/hesap sayfalarını dönüş hedefi olarak kabul eder', () => {
+    // Faz 2: bu üç sayfa `useKorumaliRota` ile korunur — oturumsuzken
+    // `/giris?donus=<kendisi>`'ne yönlendirir, girişten sonra da BURAYA
+    // dönmesi gerekir (spec §4.3). `/kayit` ve `/hesap` öneki artık tam
+    // yol reddi kullanır, bu üçü öneke düşmez.
+    expect(guvenliDonusYolu('/kayit/profil')).toBe('/kayit/profil')
+    expect(guvenliDonusYolu('/kayit/kurumsal')).toBe('/kayit/kurumsal')
+    expect(guvenliDonusYolu('/hesap/dogrula')).toBe('/hesap/dogrula')
+  })
+
+  it('kayıt formunun kendisini ve durum sayfalarını dönüş hedefi olarak reddeder', () => {
+    expect(guvenliDonusYolu('/kayit')).toBe('/')
+    expect(guvenliDonusYolu('/kayit/hesap-var')).toBe('/')
     expect(guvenliDonusYolu('/hesap/askida')).toBe('/')
+    expect(guvenliDonusYolu('/giris/kod')).toBe('/')
   })
 })

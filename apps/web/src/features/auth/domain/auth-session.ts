@@ -1,5 +1,23 @@
-/** Giriş sonrası dönülecek yolların auth rotalarına düşmesini engeller. */
-const AUTH_YOL_ONEKLERI = ['/giris', '/kayit', '/parola-sifirla', '/oturum-suresi-doldu', '/yetkisiz', '/hesap']
+/**
+ * Giriş sonrası dönülecek yolların auth/durum rotalarına düşmesini engeller.
+ *
+ * İki liste kasıtlı olarak ayrı tutulur:
+ *
+ * - `AUTH_ONEK_REDDI`: bu öneklerin KENDİSİ ve TÜM çocukları reddedilir —
+ *   `/giris`, `/parola-sifirla` vb. tamamen oturumsuz kullanıcıya hitap eden
+ *   akışlardır; hiçbir alt sayfaları dönüş hedefi olamaz.
+ * - `AUTH_TAM_YOL_REDDI`: yalnız TAM eşleşen yol reddedilir — `/kayit` ve
+ *   `/hesap` altında Faz 2 ile birlikte OTURUM GEREKTİREN sayfalar
+ *   (`/kayit/profil`, `/kayit/kurumsal`, `/hesap/dogrula`) eklendi; bunlar
+ *   giriş sonrası dönüş hedefi olarak GEÇERLİDİR ("giriş sonrası geldiği
+ *   yere döner" — spec §4.3). Yalnız formun/durumun kendisi (`/kayit`) ve
+ *   durum sayfaları (`/kayit/hesap-var`, `/hesap/askida`) reddedilir — bunlara
+ *   dönmek ya döngü kurar ya da anlamsızdır. Faz 3/4 bu öneklerin altına yeni
+ *   sayfa eklerken hangi listeye gireceğine (oturum gerektirir mi, döngü
+ *   riski var mı) göre karar verilmeli.
+ */
+const AUTH_ONEK_REDDI = ['/giris', '/parola-sifirla', '/oturum-suresi-doldu', '/yetkisiz']
+const AUTH_TAM_YOL_REDDI = ['/kayit', '/kayit/hesap-var', '/hesap/askida']
 
 /**
  * `donus` parametresini güvenli bir uygulama içi yola indirger.
@@ -21,7 +39,10 @@ export function guvenliDonusYolu(ham: string | null | undefined): string {
   if (yol.includes('\\')) return '/'
   const kucukYol = yol.toLowerCase()
   if (kucukYol.includes('%2f%2f') || kucukYol.includes('%5c')) return '/'
-  if (AUTH_YOL_ONEKLERI.some((onek) => yol === onek || yol.startsWith(`${onek}/`))) {
+  if (AUTH_ONEK_REDDI.some((onek) => yol === onek || yol.startsWith(`${onek}/`))) {
+    return '/'
+  }
+  if (AUTH_TAM_YOL_REDDI.includes(yol)) {
     return '/'
   }
   return yol
