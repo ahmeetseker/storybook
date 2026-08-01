@@ -1,0 +1,67 @@
+/* Hesap tipi seçimi — sola hizalı, kompakt radio satırları.
+   Dokunma hedefi yalnız coarse pointer'da 44px'e çıkar; fare
+   ortamında satır yüksekliği içerikten gelir. */
+.tipSecimi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.tipSecenek {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  cursor: pointer;
+}
+
+.tipSecenek:has(input:focus-visible) {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.tipSecenek input {
+  margin: var(--lg-space-1) 0 0;
+}
+
+.tipMetin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.tipBaslik {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+}
+
+.tipAciklama {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.onayRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  font-size: var(--lg-text-footnote);
+}
+
+.onayRow input {
+  margin: var(--lg-space-1) 0 0;
+}
+
+.alanHatasi {
+  margin: var(--lg-space-1) 0 0;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-danger);
+}
+
+@media (pointer: coarse) {
+  .tipSecenek,
+  .onayRow {
+    min-height: var(--lg-control-md);
+  }
+}

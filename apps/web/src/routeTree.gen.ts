@@ -21,6 +21,7 @@ import { Route as HealthRouteImport } from './routes/health'
 import { Route as HesabimRouteImport } from './routes/hesabim'
 import { Route as IlanVerRouteImport } from './routes/ilan-ver'
 import { Route as KarsilastirRouteImport } from './routes/karsilastir'
+import { Route as KayitRouteImport } from './routes/kayit'
 import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
 import { Route as GirisBaglantiGonderildiRouteImport } from './routes/giris_.baglanti-gonderildi'
@@ -95,6 +96,11 @@ const IlanVerRoute = IlanVerRouteImport.update({
 const KarsilastirRoute = KarsilastirRouteImport.update({
   id: '/karsilastir',
   path: '/karsilastir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KayitRoute = KayitRouteImport.update({
+  id: '/kayit',
+  path: '/kayit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KonseptlerRoute = KonseptlerRouteImport.update({
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
+  '/kayit': typeof KayitRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
+  '/kayit': typeof KayitRoute
   '/ofisler': typeof OfislerRoute
   '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
   '/giris/hata': typeof GirisHataRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
+  '/kayit': typeof KayitRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/giris_/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/hesabim'
     | '/ilan-ver'
     | '/karsilastir'
+    | '/kayit'
     | '/konseptler'
     | '/ofisler'
     | '/giris/baglanti-gonderildi'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/hesabim'
     | '/ilan-ver'
     | '/karsilastir'
+    | '/kayit'
     | '/ofisler'
     | '/giris/baglanti-gonderildi'
     | '/giris/hata'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/hesabim'
     | '/ilan-ver'
     | '/karsilastir'
+    | '/kayit'
     | '/konseptler'
     | '/ofisler'
     | '/giris_/baglanti-gonderildi'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   HesabimRoute: typeof HesabimRoute
   IlanVerRoute: typeof IlanVerRoute
   KarsilastirRoute: typeof KarsilastirRoute
+  KayitRoute: typeof KayitRoute
   KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
   GirisBaglantiGonderildiRoute: typeof GirisBaglantiGonderildiRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/karsilastir'
       fullPath: '/karsilastir'
       preLoaderRoute: typeof KarsilastirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kayit': {
+      id: '/kayit'
+      path: '/kayit'
+      fullPath: '/kayit'
+      preLoaderRoute: typeof KayitRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/konseptler': {
@@ -602,6 +622,7 @@ const rootRouteChildren: RootRouteChildren = {
   HesabimRoute: HesabimRoute,
   IlanVerRoute: IlanVerRoute,
   KarsilastirRoute: KarsilastirRoute,
+  KayitRoute: KayitRoute,
   KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
   GirisBaglantiGonderildiRoute: GirisBaglantiGonderildiRoute,
