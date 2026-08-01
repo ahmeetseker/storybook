@@ -4,7 +4,7 @@
 // durumda; genişlik/radius değişimi motion layout (FLIP) ile transform'a çevrilir.
 import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { motion } from 'motion/react'
-import { GlassSurface, GlassTierProvider } from '../GlassSurface'
+import { GlassSurface, GlassTierProvider, type GlassSurfaceProps } from '../GlassSurface'
 import { GlassIconButton } from '../GlassIconButton'
 import { prefersReducedMotion } from '../../core/tier'
 import { presets } from '../../motion/presets'
@@ -212,11 +212,21 @@ export function GlassSiteHeader({
             (`2 + thickness * 10` px). bkz. rules.md §7. */}
         <GlassTierProvider tier="fallback">
           <GlassSurface
+            as={motion.div}
             aria-hidden
             material="glass"
             thickness={0.9}
             shape={20}
             className={styles.material}
+            // Opacity CSS transition'ıyla değil, kapsülle AYNI spring'le
+            // sürülür — yoksa şekil ve cam iki ayrı saatte ilerler ve cam
+            // arkadan yetişir (ölçüldü: t=217ms'de şekil %89, cam %11).
+            // GlassSurfaceProps motion prop'larını tanımaz; cast projede
+            // yerleşik desen (bkz. GlassIconButton).
+            {...({
+              animate: { opacity: scrolled || menuOpen ? 1 : 0 },
+              transition: morphTransition,
+            } as unknown as GlassSurfaceProps)}
           />
         </GlassTierProvider>
         {/* Kapsülün içi düz katman — cam üstüne cam yok. */}

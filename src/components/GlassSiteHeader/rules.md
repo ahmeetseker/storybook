@@ -82,13 +82,27 @@ görsel geçişler CSS ve motion layout'ta.
 
 ## 7. Davranış
 
-- **Rest:** kapsül `--lg-container-narrow` genişliğinde, şeffaf, köşesiz. Cam
-  yüzey maliyeti **0** (`.material` `visibility: hidden`).
-- **Condensed:** kapsül `55rem`'e daralır, `--lg-radius-card` köşelenir,
-  `.material` opacity ile belirir. Cam yüzey **1**.
-- Genişlik/radius değişimi **motion layout (FLIP)** ile transform'a çevrilir.
+- **Rest:** kapsül `--lg-container-narrow` genişliğinde ve tamamen şeffaf.
+  Cam yüzey maliyeti **0** (`.material` `visibility: hidden`). Yarıçap sabit
+  duruyor ama hiçbir şey çizilmediği için görünmez.
+- **Condensed:** kapsül `55rem`'e daralır, `.material` belirir. Cam yüzey **1**.
+- Genişlik değişimi **motion layout (FLIP)** ile transform'a çevrilir.
   CSS `max-width` transition'ı bilinçli olarak YOK — layout tetiklerdi
   (`ErisilebilirlikMotionResponsive.mdx`).
+- **Yarıçap animasyona SOKULMAZ.** `.capsule` her durumda `--lg-radius-card`
+  taşır. Gerekçe: FLIP `scaleX` uygular ve motion yalnız *inline style*'dan
+  gelen `borderRadius`'u ölçeğe karşı düzeltir; CSS sınıfından geleni
+  düzeltmez. Yarıçap durum kuralında değiştirilirse morf boyunca köşeler
+  ölçek kadar gerilip elipse döner (ölçüldü: t=217ms'de `scaleX` 1.114 iken
+  `radius` çoktan 20px'ti). Rest'te malzeme görünmediği için sabit yarıçap
+  görsel olarak bedelsizdir.
+- **Malzemenin opacity'si de aynı spring'le sürülür**, CSS transition'ıyla
+  değil (`GlassSurface as={motion.div}` + `animate`). Ayrı saatlerde
+  ilerledikleri sürümde şekil t=217ms'de %89 tamamlanmışken cam %11'deydi —
+  kapsül yerine oturuyor, cam arkadan yetişiyordu. Şimdi birlikte gelirler
+  (ölçüm: t=161ms şekil erken/cam 0.67 · t=317ms 1.014/0.95 · t=629ms oturdu).
+  Reduced-motion'da `morphTransition` `{ duration: 0 }` olduğu için ikisi de
+  anında yerine geçer (doğrulandı: transform hiç uygulanmıyor).
 - Panel tepede açılırsa da `.material` görünür olur; yoksa panel metni sayfa
   içeriğinin üstünde okunmaz kalırdı.
 - Dar kapsülde (`@container (min-width: 48rem)` altı) `.actions` gizli,
@@ -103,12 +117,15 @@ görsel geçişler CSS ve motion layout'ta.
   öğe değil.
 - `condensedAction` DOM'da tek örnek olarak yer değiştirir (display ile gizlenen
   ikinci kopya yok) — çift accessible name önlenir.
-- Reduced-motion korumasında geçiş (`transition`) üç seçicide ayrı ayrı
-  sıfırlanır: `.material`, `.root[data-scrolled] .material`,
-  `.root[data-menu-open] .material`. Medya sorgusu tek başına özgüllük
-  (specificity) katmaz; `transition`'ı yeniden bildiren her seçici, guard
-  içinde de aynı özgüllükte tekrarlanmazsa scrolled/menu-open durumundaki
-  daha özgül kural kazanır ve geçiş sıfırlanmaz — bu yüzden üçü de listede.
+- Reduced-motion artık malzemenin görünürlüğü için **motion tarafından**
+  karşılanır (`morphTransition` → `{ duration: 0 }`); opacity CSS'ten çıktığı
+  için `@media (prefers-reduced-motion: reduce)` bloğu savunma amaçlı duruyor.
+  **Blok korunuyor** çünkü kural hâlâ geçerli: `.material`'a bir gün yeniden
+  CSS `transition` eklenirse, medya sorgusu tek başına özgüllük katmadığı için
+  `transition`'ı bildiren HER seçici (`.material`,
+  `.root[data-scrolled] .material`, `.root[data-menu-open] .material`) guard
+  içinde de tekrarlanmalıdır; yoksa daha özgül durum kuralı kazanır ve geçiş
+  sıfırlanmaz. Bu hata bu bileşende iki kez yakalandı.
 - **Bilinçli sapma — malzeme fallback tier'a sabitlenir:** `GlassSurface`'in
   refraction dalı bir *mercek* etkisidir; SVG filtresinin blur'u yalnız
   `0.4 + thickness * 1.2` px olduğu için zemini bozar ama **bulanıklaştırmaz**

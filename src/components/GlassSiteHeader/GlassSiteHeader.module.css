@@ -37,18 +37,23 @@
   width: 100%;
   max-width: var(--capsule-max);
   padding: var(--capsule-pad-y) var(--capsule-pad-x);
-  border-radius: 0;
+  /* Yarıçap SABİT — animasyona sokulmaz. Rest'te malzeme görünmediği için
+     köşe zaten çizilmez; morf sırasında değiştirilirse motion'ın ölçek
+     düzeltmesi CSS sınıfından gelen yarıçapı düzeltemez ve köşeler
+     scaleX kadar gerilip elipse döner (ölçüldü: t=217ms'de scaleX 1.114
+     iken radius çoktan 20px'ti). */
+  border-radius: var(--lg-radius-card);
   pointer-events: auto;
   /* Link satırının açılması kapsül genişliğine bağlı — viewport'a değil.
      Kök `fixed`, kapsül değil; containment burada sticky/fixed bozmaz. */
   container-type: inline-size;
 }
 
-/* Condensed: kapsül daralır ve köşelenir. Genişlik/radius değişimini motion
-   layout (FLIP) transform'a çevirir — CSS transition YOK (layout tetiklerdi). */
+/* Condensed: kapsül daralır. Genişlik değişimini motion layout (FLIP)
+   transform'a çevirir — CSS transition YOK (layout tetiklerdi). Yarıçap
+   burada DEĞİŞMEZ; sabit olduğu için ölçek altında deforme olmaz. */
 .root[data-scrolled] .capsule {
   max-width: var(--capsule-max-scrolled);
-  border-radius: var(--lg-radius-card);
 }
 
 /* ── Malzeme katmanı: tek cam yüzey, opacity ile belirir ─────────────── */
@@ -56,10 +61,10 @@
   position: absolute;
   inset: 0;
   --lg-surface-shadow: var(--lg-shadow-md);
-  opacity: 0;
+  /* opacity motion'a devredildi (aynı spring, şekille eşzamanlı belirir);
+     visibility burada kalır ki rest'te compositor maliyeti sıfır olsun. */
   visibility: hidden;
-  transition: opacity var(--morph-dur) ease,
-    visibility 0s linear var(--morph-dur);
+  transition: visibility 0s linear var(--morph-dur);
 }
 
 /* Cam tonu — GlassSurface'in kendi %6'lık zeminini yener (ata seçici, 0-2-0).
@@ -70,9 +75,8 @@
 }
 
 .root[data-scrolled] .material {
-  opacity: 1;
   visibility: visible;
-  transition: opacity var(--morph-dur) ease, visibility 0s;
+  transition: visibility 0s;
 }
 
 /* ── Satır ────────────────────────────────────────────────────────────── */
@@ -210,11 +214,9 @@
 
 /* Panel tepede de açılabilir — o hâlde de zemin gerekir, yoksa metin
    sayfa içeriğinin üstünde okunmaz kalır. */
-.root[data-menu-open] .capsule { border-radius: var(--lg-radius-card); }
 .root[data-menu-open] .material {
-  opacity: 1;
   visibility: visible;
-  transition: opacity var(--morph-dur) ease, visibility 0s;
+  transition: visibility 0s;
 }
 
 /* ── Container query: kapsül genişse linkler açılır ───────────────────── */
