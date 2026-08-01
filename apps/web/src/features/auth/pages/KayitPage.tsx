@@ -45,13 +45,14 @@ export function KayitPage() {
 
     if (sonuc.durum === 'hata') {
       if (sonuc.kod === 'hesap-zaten-var') {
-        // `/kayit/hesap-var` rotası henüz yok (Task 5); `to` ile literal tip
-        // kontrolü bu yüzden derlemeyi kırar. Aynı problem daha önce
-        // useKorumaliRota'da çıktı ve tip susturma kullanılmadan `href`'e
-        // geçilerek çözüldü (bkz. commit b5507d0) — burada da aynı desen
-        // uygulanıyor. Hedef sayfa `donus`'u tüketmiyor (rotası
-        // validateSearch tanımlamıyor), bu yüzden taşınmıyor.
-        navigate({ href: '/kayit/hesap-var' })
+        // `/kayit/hesap-var` rotası artık var (Task 5) ve `donus`'u
+        // tüketiyor (validateSearch) — bu yüzden `href` yerine tip-güvenli
+        // `to`/`search` kullanılabiliyor. Var olan `donus`'u olduğu gibi
+        // taşıyoruz (yeniden inşa etmiyoruz, yalnız aynen aktarıyoruz);
+        // sanitizasyon zaten kullanıcı durum sayfasından "Giriş yapın"a
+        // tıklayıp gerçek hedefe geçerken bir kez uygulanacak (bkz.
+        // `AuthStatusPage`'in search passthrough'u).
+        navigate({ to: '/kayit/hesap-var', search: { donus } })
         return
       }
       setHata(sonuc.mesaj)
@@ -60,8 +61,9 @@ export function KayitPage() {
 
     oturumuTazele()
     if (sonuc.veri.hesapTipi === 'kurumsal') {
-      // `/kayit/kurumsal` rotası henüz yok (Task 4) — yukarıdaki notla aynı
-      // gerekçeyle `href` kullanılıyor.
+      // Bu dal `donus`'u taşımaz — kurumsal başvuru kendi akışını sürdürür,
+      // orijinal dönüş hedefine (`/hesabim` vb.) geri dönmez; bu yüzden
+      // `href` yeterli.
       navigate({ href: '/kayit/kurumsal' })
       return
     }

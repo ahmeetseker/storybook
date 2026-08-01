@@ -42,12 +42,12 @@ export function AuthStatusPage({
       {birincilEylem || ikincilBaglanti ? (
         <div className={styles.actions}>
           {birincilEylem ? (
-            <Link to={birincilEylem.hedef} className={styles.primaryLink}>
+            <Link to={birincilEylem.hedef} search={(onceki) => onceki} className={styles.primaryLink}>
               {birincilEylem.etiket}
             </Link>
           ) : null}
           {ikincilBaglanti ? (
-            <Link to={ikincilBaglanti.hedef} className={styles.link}>
+            <Link to={ikincilBaglanti.hedef} search={(onceki) => onceki} className={styles.link}>
               {ikincilBaglanti.etiket}
             </Link>
           ) : null}

@@ -59,6 +59,7 @@ function kayitRouter(adapters: AuthAdapters, yol = '/kayit') {
     createRoute({
       getParentRoute: () => rootRoute,
       path: '/kayit/hesap-var',
+      validateSearch: arama,
       component: () => <h1>Bu hesap zaten var</h1>,
     }),
   ]
@@ -151,6 +152,27 @@ describe('KayitPage', () => {
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Bu hesap zaten var' })).toBeTruthy(),
     )
+  })
+
+  it('hesap zaten varsa durum sayfasına giderken donus parametresini taşır', async () => {
+    const kullanici = userEvent.setup()
+    const adapters = sahteAdapters({
+      kayitYap: vi.fn(async () => ({
+        durum: 'hata' as const,
+        kod: 'hesap-zaten-var' as const,
+        mesaj: 'Bu e-posta adresiyle bir hesap zaten var.',
+      })),
+    })
+    const router = kayitRouter(adapters, '/kayit?donus=%2Fhesabim')
+    render(<RouterProvider router={router} />)
+    await screen.findByLabelText('Ad soyad')
+    await formuDoldur(kullanici)
+    await kullanici.click(screen.getByRole('button', { name: 'Hesap oluştur' }))
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Bu hesap zaten var' })).toBeTruthy(),
+    )
+    expect(router.state.location.pathname).toBe('/kayit/hesap-var')
+    expect(router.state.location.search).toEqual({ donus: '/hesabim' })
   })
 
   it('emlak ofisi seçiliyse kurumsal başvuruya yönlendirir', async () => {

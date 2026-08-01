@@ -2,6 +2,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { renderToString } from 'react-dom/server'
 import userEvent from '@testing-library/user-event'
+import {
+  Outlet,
+  RouterProvider,
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router'
 import { AuthFormPage } from './AuthFormPage'
 import { AuthStatusPage } from './AuthStatusPage'
 import { AuthCallbackPage } from './AuthCallbackPage'
@@ -100,6 +108,50 @@ describe('AuthStatusPage', () => {
   it('verilen tonu data özniteliğiyle yayınlar', () => {
     const { container } = render(<AuthStatusPage tone="success" baslik="Tamam" aciklama="Bitti." />)
     expect(container.querySelector('[data-tone="success"]')).toBeTruthy()
+  })
+
+  it('birincilEylem ve ikincilBaglanti mevcut search parametrelerini korur', async () => {
+    const arama = (search: Record<string, unknown>) => ({
+      donus: typeof search.donus === 'string' ? search.donus : undefined,
+    })
+    const rootRoute = createRootRoute({ component: () => <Outlet /> })
+    const durumRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/kayit/hesap-var',
+      validateSearch: arama,
+      component: () => (
+        <AuthStatusPage
+          tone="info"
+          baslik="Bu hesap zaten var"
+          aciklama="Giriş yaparak devam edebilirsiniz."
+          birincilEylem={{ etiket: 'Giriş yapın', hedef: '/giris' }}
+          ikincilBaglanti={{ etiket: 'Parolanızı mı unuttunuz?', hedef: '/parola-sifirla' }}
+        />
+      ),
+    })
+    const girisRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/giris',
+      validateSearch: arama,
+      component: () => <h1>Giriş</h1>,
+    })
+    const parolaRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/parola-sifirla',
+      validateSearch: arama,
+      component: () => <h1>Parola sıfırlama</h1>,
+    })
+    const router = createRouter({
+      routeTree: rootRoute.addChildren([durumRoute, girisRoute, parolaRoute]),
+      history: createMemoryHistory({ initialEntries: ['/kayit/hesap-var?donus=%2Fhesabim'] }),
+    })
+    render(<RouterProvider router={router} />)
+
+    const birincil = await screen.findByRole('link', { name: 'Giriş yapın' })
+    expect(birincil.getAttribute('href')).toBe('/giris?donus=%2Fhesabim')
+
+    const ikincil = screen.getByRole('link', { name: 'Parolanızı mı unuttunuz?' })
+    expect(ikincil.getAttribute('href')).toBe('/parola-sifirla?donus=%2Fhesabim')
   })
 })
 
