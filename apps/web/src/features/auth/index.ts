@@ -13,3 +13,10 @@ export type {
   AuthHataKodu,
   AuthSonuc,
 } from './domain/auth-types'
+export { kayitBilgileriniDogrula, kurumsalBasvuruyuDogrula } from './domain/kayit-dogrulama'
+export type {
+  KayitBilgileri,
+  KurumsalBasvuruBilgileri,
+  KayitAlanHatalari,
+  KurumsalAlanHatalari,
+} from './domain/auth-types'

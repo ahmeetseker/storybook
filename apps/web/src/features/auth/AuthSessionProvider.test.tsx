@@ -36,6 +36,19 @@ function sahteAdapters(baslangic: Oturum | null): AuthAdapters {
       oturum = ORNEK_OTURUM
       return { durum: 'basarili', veri: ORNEK_OTURUM }
     },
+    async kayitYap() {
+      oturum = ORNEK_OTURUM
+      return { durum: 'basarili', veri: ORNEK_OTURUM }
+    },
+    async profilTamamla() {
+      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
+    },
+    async kurumsalBasvuruGonder() {
+      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
+    },
+    async eidsDogrulamaBaslat() {
+      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
+    },
     oturumuGetir: () => oturum,
     cikisYap: () => {
       oturum = null

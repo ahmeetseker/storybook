@@ -36,6 +36,10 @@ function akisAdapters(): AuthAdapters {
       return { durum: 'basarili' as const, veri: ORNEK_OTURUM }
     }),
     parolaIleGiris: vi.fn(),
+    kayitYap: vi.fn(),
+    profilTamamla: vi.fn(),
+    kurumsalBasvuruGonder: vi.fn(),
+    eidsDogrulamaBaslat: vi.fn(),
     oturumuGetir: () => oturum,
     cikisYap: () => {
       oturum = null

@@ -1,4 +1,11 @@
-import type { AuthSonuc, GirisYontemi, Oturum } from '../domain/auth-types'
+import { kayitBilgileriniDogrula, kurumsalBasvuruyuDogrula } from '../domain/kayit-dogrulama'
+import type {
+  AuthSonuc,
+  GirisYontemi,
+  KayitBilgileri,
+  KurumsalBasvuruBilgileri,
+  Oturum,
+} from '../domain/auth-types'
 
 export interface GirisBaslatmaSonucu {
   /** Kodun/bağlantının hangi kanaldan gittiği — kullanıcıya gösterilir. */
@@ -14,6 +21,14 @@ export interface AuthAdapters {
   ): Promise<AuthSonuc<GirisBaslatmaSonucu>>
   koduDogrula(kod: string): Promise<AuthSonuc<Oturum>>
   parolaIleGiris(ePosta: string, parola: string): Promise<AuthSonuc<Oturum>>
+  /** Yeni hesap açar ve oturumu başlatır. */
+  kayitYap(bilgiler: KayitBilgileri): Promise<AuthSonuc<Oturum>>
+  /** Kayıt sonrası eksik profil alanlarını tamamlar. */
+  profilTamamla(adSoyad: string, ePosta: string): Promise<AuthSonuc<Oturum>>
+  /** Emlak ofisi başvurusunu iletir; EİDS durumunu beklemeye çeker. */
+  kurumsalBasvuruGonder(bilgiler: KurumsalBasvuruBilgileri): Promise<AuthSonuc<Oturum>>
+  /** Hesap seviyesinde EİDS yetki doğrulamasını yürütür. */
+  eidsDogrulamaBaslat(): Promise<AuthSonuc<Oturum>>
   oturumuGetir(): Oturum | null
   cikisYap(): void
 }
@@ -59,6 +74,21 @@ function oturumuYaz(oturum: Oturum | null) {
 function authAdaptersOlustur(): AuthAdapters {
   let bekleyenKimlik: string | null = null
   let aktifOturum: Oturum | null = null
+
+  /** Aktif oturumu döndürür; bellekte yoksa sessionStorage'dan okur. */
+  function mevcutOturum(): Oturum | null {
+    if (aktifOturum) return aktifOturum
+    if (typeof sessionStorage === 'undefined') return null
+    const ham = sessionStorage.getItem(OTURUM_ANAHTARI)
+    if (!ham) return null
+    try {
+      aktifOturum = JSON.parse(ham) as Oturum
+      return aktifOturum
+    } catch {
+      sessionStorage.removeItem(OTURUM_ANAHTARI)
+      return null
+    }
+  }
 
   return {
     async girisBaslat(yontem, kimlik) {
@@ -132,18 +162,90 @@ function authAdaptersOlustur(): AuthAdapters {
       return { durum: 'basarili', veri: aktifOturum }
     },
 
-    oturumuGetir() {
-      if (aktifOturum) return aktifOturum
-      if (typeof sessionStorage === 'undefined') return null
-      const ham = sessionStorage.getItem(OTURUM_ANAHTARI)
-      if (!ham) return null
-      try {
-        aktifOturum = JSON.parse(ham) as Oturum
-        return aktifOturum
-      } catch {
-        sessionStorage.removeItem(OTURUM_ANAHTARI)
-        return null
+    async kayitYap(bilgiler) {
+      const alanHatalari = kayitBilgileriniDogrula(bilgiler)
+      if (Object.keys(alanHatalari).length > 0) {
+        return {
+          durum: 'hata',
+          kod: 'eksik-alan',
+          mesaj: 'Formda düzeltilmesi gereken alanlar var.',
+        }
       }
+      // Fixture: yalnız demo hesabı "zaten kayıtlı" sayılır.
+      if (bilgiler.ePosta.trim().toLowerCase() === DEMO_OTURUM.ePosta) {
+        return {
+          durum: 'hata',
+          kod: 'hesap-zaten-var',
+          mesaj: 'Bu e-posta adresiyle bir hesap zaten var.',
+        }
+      }
+      aktifOturum = {
+        kullaniciId: `uye-${bilgiler.ePosta.trim().toLowerCase()}`,
+        adSoyad: bilgiler.adSoyad.trim(),
+        telefon: bilgiler.telefon.replace(/\s/g, ''),
+        ePosta: bilgiler.ePosta.trim(),
+        hesapTipi: bilgiler.hesapTipi,
+        eidsDurumu: 'yok',
+      }
+      oturumuYaz(aktifOturum)
+      return { durum: 'basarili', veri: aktifOturum }
+    },
+
+    async profilTamamla(adSoyad, ePosta) {
+      const oturum = mevcutOturum()
+      if (!oturum) {
+        return {
+          durum: 'hata',
+          kod: 'gecersiz-kimlik',
+          mesaj: 'Oturum bulunamadı. Yeniden giriş yapın.',
+        }
+      }
+      if (!adSoyad.trim() || !ePosta.trim()) {
+        return { durum: 'hata', kod: 'eksik-alan', mesaj: 'Ad soyad ve e-posta zorunludur.' }
+      }
+      aktifOturum = { ...oturum, adSoyad: adSoyad.trim(), ePosta: ePosta.trim() }
+      oturumuYaz(aktifOturum)
+      return { durum: 'basarili', veri: aktifOturum }
+    },
+
+    async kurumsalBasvuruGonder(bilgiler) {
+      const oturum = mevcutOturum()
+      if (!oturum) {
+        return {
+          durum: 'hata',
+          kod: 'gecersiz-kimlik',
+          mesaj: 'Oturum bulunamadı. Yeniden giriş yapın.',
+        }
+      }
+      const alanHatalari = kurumsalBasvuruyuDogrula(bilgiler)
+      if (Object.keys(alanHatalari).length > 0) {
+        return {
+          durum: 'hata',
+          kod: 'eksik-alan',
+          mesaj: 'Formda düzeltilmesi gereken alanlar var.',
+        }
+      }
+      aktifOturum = { ...oturum, hesapTipi: 'kurumsal', eidsDurumu: 'beklemede' }
+      oturumuYaz(aktifOturum)
+      return { durum: 'basarili', veri: aktifOturum }
+    },
+
+    async eidsDogrulamaBaslat() {
+      const oturum = mevcutOturum()
+      if (!oturum) {
+        return {
+          durum: 'hata',
+          kod: 'gecersiz-kimlik',
+          mesaj: 'Oturum bulunamadı. Yeniden giriş yapın.',
+        }
+      }
+      aktifOturum = { ...oturum, eidsDurumu: 'dogrulandi' }
+      oturumuYaz(aktifOturum)
+      return { durum: 'basarili', veri: aktifOturum }
+    },
+
+    oturumuGetir() {
+      return mevcutOturum()
     },
 
     cikisYap() {

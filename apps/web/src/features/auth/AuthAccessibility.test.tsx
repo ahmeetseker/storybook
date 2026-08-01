@@ -25,6 +25,10 @@ function bosAdapters(): AuthAdapters {
     girisBaslat: vi.fn(),
     koduDogrula: vi.fn(),
     parolaIleGiris: vi.fn(),
+    kayitYap: vi.fn(),
+    profilTamamla: vi.fn(),
+    kurumsalBasvuruGonder: vi.fn(),
+    eidsDogrulamaBaslat: vi.fn(),
     oturumuGetir: () => null,
     cikisYap: vi.fn(),
   } as AuthAdapters
