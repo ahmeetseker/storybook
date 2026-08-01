@@ -29,6 +29,7 @@ import { Route as GirisHataRouteImport } from './routes/giris_.hata'
 import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
+import { Route as HesapDogrulaRouteImport } from './routes/hesap.dogrula'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KayitHesapVarRouteImport } from './routes/kayit_.hesap-var'
 import { Route as KayitKurumsalRouteImport } from './routes/kayit_.kurumsal'
@@ -141,6 +142,11 @@ const HesabimMesajlarRoute = HesabimMesajlarRouteImport.update({
   path: '/hesabim/mesajlar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HesapDogrulaRoute = HesapDogrulaRouteImport.update({
+  id: '/hesap/dogrula',
+  path: '/hesap/dogrula',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IlanListingIdRoute = IlanListingIdRouteImport.update({
   id: '/ilan/$listingId',
   path: '/ilan/$listingId',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/giris_/kod': typeof GirisKodRoute
   '/giris_/parola': typeof GirisParolaRoute
   '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
+  '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit_/hesap-var': typeof KayitHesapVarRoute
   '/kayit_/kurumsal': typeof KayitKurumsalRoute
@@ -319,6 +328,7 @@ export interface FileRouteTypes {
     | '/giris/kod'
     | '/giris/parola'
     | '/hesabim/mesajlar'
+    | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
     | '/kayit/kurumsal'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/giris/kod'
     | '/giris/parola'
     | '/hesabim/mesajlar'
+    | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
     | '/kayit/kurumsal'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/giris_/kod'
     | '/giris_/parola'
     | '/hesabim_/mesajlar'
+    | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit_/hesap-var'
     | '/kayit_/kurumsal'
@@ -418,6 +430,7 @@ export interface RootRouteChildren {
   GirisKodRoute: typeof GirisKodRoute
   GirisParolaRoute: typeof GirisParolaRoute
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
+  HesapDogrulaRoute: typeof HesapDogrulaRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
   KayitHesapVarRoute: typeof KayitHesapVarRoute
   KayitKurumsalRoute: typeof KayitKurumsalRoute
@@ -567,6 +580,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HesabimMesajlarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hesap/dogrula': {
+      id: '/hesap/dogrula'
+      path: '/hesap/dogrula'
+      fullPath: '/hesap/dogrula'
+      preLoaderRoute: typeof HesapDogrulaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ilan/$listingId': {
       id: '/ilan/$listingId'
       path: '/ilan/$listingId'
@@ -690,6 +710,7 @@ const rootRouteChildren: RootRouteChildren = {
   GirisKodRoute: GirisKodRoute,
   GirisParolaRoute: GirisParolaRoute,
   HesabimMesajlarRoute: HesabimMesajlarRoute,
+  HesapDogrulaRoute: HesapDogrulaRoute,
   IlanListingIdRoute: IlanListingIdRoute,
   KayitHesapVarRoute: KayitHesapVarRoute,
   KayitKurumsalRoute: KayitKurumsalRoute,

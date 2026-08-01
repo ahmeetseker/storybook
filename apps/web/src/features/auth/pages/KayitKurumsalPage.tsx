@@ -83,10 +83,7 @@ export function KayitKurumsalPage() {
     }
 
     oturumuTazele()
-    // '/hesap/dogrula' Task 6'da eklenecek; router'ın literal tip birleşimi
-    // henüz onu tanımıyor. Faz 1/Task 2'de aynı durumda yerleşik çözüm olan
-    // `href` kullanılıyor (bkz. plan Task 4 notu) — tip susturması yok.
-    navigate({ href: '/hesap/dogrula' })
+    navigate({ to: '/hesap/dogrula' })
   }
 
   const alaniCiz = (alan: AlanTanimi) => (
