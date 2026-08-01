@@ -206,3 +206,49 @@ gerekmeyecek.
 Changelog: 2026-08-01 — Faz 0/1 giriş akışının final incelemesinde eksik
 `rules.md` tamamlandı; `donus` aktarım mekanizması, rota adlandırma tuzağı ve
 landmark sözleşmesi belgelendi (Finding 5).
+
+Changelog: 2026-08-01 — Faz 2 (kayıt) bağlandı: `/giris`'teki "Hesap
+oluşturun" bağlantısı geri eklendi, beş yeni rota `auth-routes.test.tsx`
+smoke testine katıldı, erişilebilirlik geçidi genişletildi, uçtan uca
+`kayit-flow.test.tsx` eklendi. Bkz. §13.
+
+## 13. Kayıt sözleşmesi (Faz 2)
+
+**Beş yeni sayfa:**
+
+| Sayfa | Rota | Oturum gerekir mi |
+|---|---|---|
+| `KayitPage` | `/kayit` | Hayır — hesabı bu sayfa açar |
+| `KayitProfilPage` | `/kayit/profil` | Evet |
+| `KayitKurumsalPage` | `/kayit/kurumsal` | Evet |
+| `HesapVarPage` (`kayitDurumSayfalari.tsx`) | `/kayit/hesap-var` | Hayır — durum sayfası |
+| `HesapDogrulaPage` | `/hesap/dogrula` | Evet |
+
+Oturum gerektiren üçü `useKorumaliRota` çağırır ve oturumsuzken `null`
+döner — bunları test ederken (`AuthAccessibility.test.tsx` gibi) **oturumlu**
+bir sahte adapter (`test-utils.ts` → `sahteAuthAdapters({ oturumuGetir: ()
+=> oturum })`) kullanılmazsa test hiçbir şey sınamaz, render boş kalır.
+
+**Alan doğrulaması:** `domain/kayit-dogrulama.ts`
+(`kayitBilgileriniDogrula`, `kurumsalBasvuruyuDogrula`) yalnız anında
+kullanıcı geri bildirimi içindir — **sunucu doğrulamasının yerine geçmez**.
+Gerçek backend geldiğinde adapter'ın döndürdüğü hata kodları (`eksik-alan`,
+`hesap-zaten-var`, `eids-reddedildi`) nihai karardır; istemci doğrulaması
+yalnız gecikmeyi azaltır.
+
+**Hesap tipi dallanması:** `KayitPage`'deki `fieldset`/`legend` ile
+gruplanmış radio (bireysel/kurumsal) akışı belirler. Bireysel → `kayitYap`
+başarılı olunca doğrudan `donus` hedefine (`guvenliDonusYolu` ile). Kurumsal
+→ `kayitYap` sonrası `/kayit/kurumsal`'a (bu geçiş `donus`'u taşımaz —
+kurumsal başvuru kendi akışını sürdürür); başvuru başarılı olunca
+`/hesap/dogrula`'ya.
+
+**EİDS kapsam ayrımı:** `/hesap/dogrula` **hesap seviyesinde** yetki
+doğrulaması kurar (`Oturum.eidsDurumu`) — kurumsal hesabın taşınmaz ticareti
+yetkisini bir kez doğrular. `listing-create` içindeki EİDS adımı **ilan
+özeldir** ve bu durumu okur ama ayrı bir akıştır; ikisi çakışmaz, hesap
+seviyesi doğrulama ilan akışının ön koşuludur.
+
+**Faz 3 notu:** `/parola-sifirla` geldiğinde `HesapVarPage`'e ("Bu hesap
+zaten var") parola sıfırlamaya giden bir ikincil bağlantı eklenmeli —
+şu an kullanıcının tek seçeneği "Giriş yapın".

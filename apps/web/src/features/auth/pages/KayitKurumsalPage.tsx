@@ -28,12 +28,22 @@ interface AlanTanimi {
 }
 
 const ISLETME_ALANLARI: readonly AlanTanimi[] = [
-  { ad: 'ticaretUnvani', etiket: 'Ticaret ünvanı', ipucu: 'Vergi levhasındaki şekliyle.' },
-  { ad: 'vergiNumarasi', etiket: 'Vergi numarası' },
-  { ad: 'vergiDairesi', etiket: 'Vergi dairesi' },
-  { ad: 'il', etiket: 'İl' },
-  { ad: 'ilce', etiket: 'İlçe' },
-  { ad: 'yetkiBelgesiNo', etiket: 'Yetki belgesi numarası', ipucu: 'Taşınmaz ticareti yetki belgesi.' },
+  {
+    ad: 'ticaretUnvani',
+    etiket: 'Ticaret ünvanı',
+    autoComplete: 'organization',
+    ipucu: 'Vergi levhasındaki şekliyle.',
+  },
+  { ad: 'vergiNumarasi', etiket: 'Vergi numarası', autoComplete: 'off' },
+  { ad: 'vergiDairesi', etiket: 'Vergi dairesi', autoComplete: 'off' },
+  { ad: 'il', etiket: 'İl', autoComplete: 'address-level1' },
+  { ad: 'ilce', etiket: 'İlçe', autoComplete: 'address-level2' },
+  {
+    ad: 'yetkiBelgesiNo',
+    etiket: 'Yetki belgesi numarası',
+    autoComplete: 'off',
+    ipucu: 'Taşınmaz ticareti yetki belgesi.',
+  },
 ]
 
 const YETKILI_ALANLARI: readonly AlanTanimi[] = [

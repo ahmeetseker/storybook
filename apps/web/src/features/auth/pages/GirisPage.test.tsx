@@ -55,8 +55,14 @@ function girisRouter(adapters: AuthAdapters, baslangicYolu = '/giris') {
     validateSearch: arama,
     component: () => <h1>Parola ekranı</h1>,
   })
+  const kayitRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/kayit',
+    validateSearch: arama,
+    component: () => <h1>Hesap oluşturun</h1>,
+  })
   return createRouter({
-    routeTree: rootRoute.addChildren([girisRoute, kodRoute, parolaRoute]),
+    routeTree: rootRoute.addChildren([girisRoute, kodRoute, parolaRoute, kayitRoute]),
     history: createMemoryHistory({ initialEntries: [baslangicYolu] }),
   })
 }
@@ -100,10 +106,10 @@ describe('GirisPage', () => {
     expect(await screen.findByRole('link', { name: /parola/i })).toBeTruthy()
   })
 
-  it('kayıt sayfası henüz yokken o bağlantıyı sunmaz — ölü buton yasağı', async () => {
+  it('kayıt sayfasına bağlantı sunar', async () => {
     render(<RouterProvider router={girisRouter(sahteAdapters())} />)
-    await screen.findByRole('heading', { level: 1 })
-    expect(screen.queryByRole('link', { name: /hesap oluşturun/i })).toBeNull()
+    const baglanti = await screen.findByRole('link', { name: /hesap oluştur/i })
+    expect(baglanti.getAttribute('href')).toContain('/kayit')
   })
 
   it('yöntem değiştirilirken donus parametresi kaybolmaz', async () => {

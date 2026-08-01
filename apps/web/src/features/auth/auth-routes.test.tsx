@@ -38,6 +38,11 @@ const BEKLENEN_AUTH_ROTALARI: ReadonlyArray<{ id: string; fullPath: string }> = 
   { id: '/giris_/baglanti-gonderildi', fullPath: '/giris/baglanti-gonderildi' },
   { id: '/giris_/baglanti_/gecersiz', fullPath: '/giris/baglanti/gecersiz' },
   { id: '/giris_/hata', fullPath: '/giris/hata' },
+  { id: '/kayit', fullPath: '/kayit' },
+  { id: '/kayit_/profil', fullPath: '/kayit/profil' },
+  { id: '/kayit_/kurumsal', fullPath: '/kayit/kurumsal' },
+  { id: '/kayit_/hesap-var', fullPath: '/kayit/hesap-var' },
+  { id: '/hesap/dogrula', fullPath: '/hesap/dogrula' },
 ]
 
 describe('auth rotaları — routeTree.gen.ts smoke testi', () => {
@@ -47,7 +52,7 @@ describe('auth rotaları — routeTree.gen.ts smoke testi', () => {
     expect(route.fullPath).toBe(fullPath)
   })
 
-  it.each(BEKLENEN_AUTH_ROTALARI.filter(({ id }) => id !== '/giris'))(
+  it.each(BEKLENEN_AUTH_ROTALARI.filter(({ id }) => id !== '/giris' && id !== '/kayit'))(
     '$id rotası GirisRoute değil, root rotasının doğrudan çocuğudur',
     ({ id }) => {
       const route = routesById[id]

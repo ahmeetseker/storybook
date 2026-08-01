@@ -39,8 +39,7 @@ export function GirisPage() {
       gonderiliyor={gonderiliyor}
       ikincilBaglantilar={[
         { etiket: 'Parola ile giriş yapın', hedef: '/giris/parola' },
-        // "Hesap oluşturun" → /kayit henüz yazılmadı (Faz 2). Ölü bağlantı
-        // bırakmamak için kayıt akışı gelene kadar bu satır kaldırılmıştır.
+        { etiket: 'Hesap oluşturun', hedef: '/kayit' },
       ]}
     >
       <div className={styles.field}>

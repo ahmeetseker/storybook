@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import {
   Outlet,
@@ -11,33 +11,44 @@ import {
 } from '@tanstack/react-router'
 import { AuthSessionProvider } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
+import type { Oturum } from './domain/auth-types'
+import { sahteAuthAdapters } from './test-utils'
 import { GirisPage } from './pages/GirisPage'
 import { GirisKodPage } from './pages/GirisKodPage'
 import { GirisParolaPage } from './pages/GirisParolaPage'
+import { KayitPage } from './pages/KayitPage'
+import { KayitProfilPage } from './pages/KayitProfilPage'
+import { KayitKurumsalPage } from './pages/KayitKurumsalPage'
+import { HesapDogrulaPage } from './pages/HesapDogrulaPage'
 import {
   BaglantiGecersizPage,
   BaglantiGonderildiPage,
   GirisHataPage,
 } from './pages/girisDurumSayfalari'
+import { HesapVarPage } from './pages/kayitDurumSayfalari'
 
 function bosAdapters(): AuthAdapters {
-  return {
-    girisBaslat: vi.fn(),
-    koduDogrula: vi.fn(),
-    parolaIleGiris: vi.fn(),
-    kayitYap: vi.fn(),
-    profilTamamla: vi.fn(),
-    kurumsalBasvuruGonder: vi.fn(),
-    eidsDogrulamaBaslat: vi.fn(),
-    oturumuGetir: () => null,
-    cikisYap: vi.fn(),
-  } as AuthAdapters
+  return sahteAuthAdapters()
 }
 
-function sayfaRouter(Component: () => ReactElement) {
+const OTURUMLU_KULLANICI: Oturum = {
+  kullaniciId: 'uye-1',
+  adSoyad: 'Ayşe Kaya',
+  telefon: '5551112233',
+  ePosta: 'ayse@arsam.net',
+  hesapTipi: 'kurumsal',
+  eidsDurumu: 'yok',
+}
+
+/** Oturum gerektiren sayfalar (`useKorumaliRota`) oturumsuz `null` döner — bu adapter onları render eder. */
+function oturumluAdapters(): AuthAdapters {
+  return sahteAuthAdapters({ oturumuGetir: () => OTURUMLU_KULLANICI })
+}
+
+function sayfaRouter(Component: () => ReactElement | null, adapters: AuthAdapters = bosAdapters()) {
   const rootRoute = createRootRoute({
     component: () => (
-      <AuthSessionProvider adapters={bosAdapters()}>
+      <AuthSessionProvider adapters={adapters}>
         <Outlet />
       </AuthSessionProvider>
     ),
@@ -56,46 +67,68 @@ function sayfaRouter(Component: () => ReactElement) {
   })
 }
 
-const SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
-  ['GirisPage', GirisPage],
-  ['GirisKodPage', GirisKodPage],
-  ['GirisParolaPage', GirisParolaPage],
+/** Alan (input) taşıyan form sayfaları — label/autocomplete kontrolleri bunlar üzerinde çalışır. */
+const ALANLI_FORM_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ['GirisPage', GirisPage, bosAdapters()],
+  ['GirisKodPage', GirisKodPage, bosAdapters()],
+  ['GirisParolaPage', GirisParolaPage, bosAdapters()],
+  ['KayitPage', KayitPage, bosAdapters()],
+  ['KayitProfilPage', KayitProfilPage, oturumluAdapters()],
+  ['KayitKurumsalPage', KayitKurumsalPage, oturumluAdapters()],
 ]
 
 /** Durum sayfaları form taşımaz — yalnız landmark/heading/alert sözleşmesi test edilir. */
-const DURUM_SAYFALARI: ReadonlyArray<[string, () => ReactElement]> = [
-  ['BaglantiGonderildiPage', BaglantiGonderildiPage],
-  ['BaglantiGecersizPage', BaglantiGecersizPage],
-  ['GirisHataPage', GirisHataPage],
+const DURUM_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ['BaglantiGonderildiPage', BaglantiGonderildiPage, bosAdapters()],
+  ['BaglantiGecersizPage', BaglantiGecersizPage, bosAdapters()],
+  ['GirisHataPage', GirisHataPage, bosAdapters()],
+  ['HesapVarPage', HesapVarPage, bosAdapters()],
 ]
 
-const TUM_SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
-  ...SAYFALAR,
+/**
+ * `HesapDogrulaPage`, `AuthFormPage` arketipini kullanır ama alan (input)
+ * içermez — yalnız gönder butonu. Bu yüzden `ALANLI_FORM_SAYFALARI`
+ * grubuna girmez (o grup `input.length > 0` varsayar); h1/main
+ * kontrollerine ayrı olarak katılır. Oturum gerektirir.
+ */
+const OTURUMLU_ALANSIZ_SAYFALAR: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ['HesapDogrulaPage', HesapDogrulaPage, oturumluAdapters()],
+]
+
+const TUM_SAYFALAR: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ...ALANLI_FORM_SAYFALARI,
   ...DURUM_SAYFALARI,
+  ...OTURUMLU_ALANSIZ_SAYFALAR,
 ]
 
-const HATA_TONLU_SAYFALAR: ReadonlyArray<[string, () => ReactElement]> = [
-  ['BaglantiGecersizPage', BaglantiGecersizPage],
-  ['GirisHataPage', GirisHataPage],
+const HATA_TONLU_SAYFALAR: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ['BaglantiGecersizPage', BaglantiGecersizPage, bosAdapters()],
+  ['GirisHataPage', GirisHataPage, bosAdapters()],
+]
+
+/** h1/main kontrolleri tüm sayfalar için geçerli — alanlı form + alansız oturumlu sayfalar. */
+const H1_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
+  ...ALANLI_FORM_SAYFALARI,
+  ...OTURUMLU_ALANSIZ_SAYFALAR,
 ]
 
 describe('auth erişilebilirlik geçidi', () => {
-  it.each(SAYFALAR)('%s tek h1 taşır', async (_ad, Component) => {
-    render(<RouterProvider router={sayfaRouter(Component)} />)
+  it.each(H1_SAYFALARI)('%s tek h1 taşır', async (_ad, Component, adapters) => {
+    render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
     await screen.findByRole('heading', { level: 1 })
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
   })
 
-  it.each(TUM_SAYFALAR)('%s tam olarak bir main landmark taşır', async (_ad, Component) => {
-    render(<RouterProvider router={sayfaRouter(Component)} />)
+  it.each(TUM_SAYFALAR)('%s tam olarak bir main landmark taşır', async (_ad, Component, adapters) => {
+    render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
     await screen.findByRole('heading', { level: 1 })
     expect(screen.getAllByRole('main')).toHaveLength(1)
   })
 
   it.each(HATA_TONLU_SAYFALAR)(
     '%s hata tonunda alert main landmark\'ı değil yalnız açıklamayı kapsar',
-    async (_ad, Component) => {
-      render(<RouterProvider router={sayfaRouter(Component)} />)
+    async (_ad, Component, adapters) => {
+      render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
       await screen.findByRole('heading', { level: 1 })
       const main = screen.getByRole('main')
       const alert = screen.getByRole('alert')
@@ -105,22 +138,33 @@ describe('auth erişilebilirlik geçidi', () => {
     },
   )
 
-  it.each(SAYFALAR)('%s içindeki her form alanı erişilebilir isim taşır', async (_ad, Component) => {
-    const { container } = render(<RouterProvider router={sayfaRouter(Component)} />)
+  it.each(ALANLI_FORM_SAYFALARI)('%s içindeki her form alanı erişilebilir isim taşır', async (_ad, Component, adapters) => {
+    const { container } = render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
     await screen.findByRole('heading', { level: 1 })
     const alanlar = Array.from(container.querySelectorAll('input'))
     expect(alanlar.length).toBeGreaterThan(0)
     for (const alan of alanlar) {
       const id = alan.getAttribute('id')
-      expect(id, 'her input id taşımalı').toBeTruthy()
-      expect(container.querySelector(`label[for="${id}"]`), `${id} için label bulunamadı`).toBeTruthy()
+      // Metin alanları açık `id` + `label[for]` taşır. Seçenek girdileri
+      // (radio/checkbox — ör. KayitPage hesap tipi ve KVKK onayı) `<label>`
+      // içine sarılarak örtük isim taşıyabilir; bu da geçerli bir erişilebilir
+      // isimlendirme deseni (testing-library `getByLabelText` de bunu kabul eder).
+      if (id) {
+        expect(container.querySelector(`label[for="${id}"]`), `${id} için label bulunamadı`).toBeTruthy()
+      } else {
+        expect(alan.closest('label'), 'id taşımayan input bir <label> içine sarılmalı').toBeTruthy()
+      }
     }
   })
 
-  it.each(SAYFALAR)('%s içindeki her form alanı autocomplete taşır', async (_ad, Component) => {
-    const { container } = render(<RouterProvider router={sayfaRouter(Component)} />)
+  it.each(ALANLI_FORM_SAYFALARI)('%s içindeki her form alanı autocomplete taşır', async (_ad, Component, adapters) => {
+    const { container } = render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
     await screen.findByRole('heading', { level: 1 })
     for (const alan of Array.from(container.querySelectorAll('input'))) {
+      // radio/checkbox seçenek girdileridir, tarayıcı otomatik doldurma
+      // semantiği taşımaz — autocomplete zorunluluğu yalnız metin/parola/
+      // e-posta gibi doldurulabilir alanlar için geçerli.
+      if (alan.type === 'radio' || alan.type === 'checkbox') continue
       expect(
         alan.getAttribute('autocomplete'),
         `${alan.getAttribute('id')} autocomplete taşımıyor`,
@@ -129,8 +173,16 @@ describe('auth erişilebilirlik geçidi', () => {
   })
 
   it('kod alanı tek input olarak sunulur — altı kutulu desen kullanılmaz', async () => {
-    const { container } = render(<RouterProvider router={sayfaRouter(GirisKodPage)} />)
+    const { container } = render(<RouterProvider router={sayfaRouter(GirisKodPage, bosAdapters())} />)
     await screen.findByRole('heading', { level: 1 })
     expect(container.querySelectorAll('input')).toHaveLength(1)
+  })
+
+  it('KayitPage hesap tipi seçimi fieldset + legend ile gruplanır', async () => {
+    const { container } = render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
+    await screen.findByRole('heading', { level: 1 })
+    const fieldset = container.querySelector('fieldset')
+    expect(fieldset, 'hesap tipi grubu fieldset olmalı').toBeTruthy()
+    expect(fieldset?.querySelector('legend')?.textContent, 'fieldset legend taşımalı').toBeTruthy()
   })
 })

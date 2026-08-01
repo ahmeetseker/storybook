@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { varsayilanAuthAdapters } from './auth-adapters'
-import type { KayitBilgileri, KurumsalBasvuruBilgileri } from '../domain/auth-types'
+import type { KayitBilgileri } from '../domain/auth-types'
 
 describe('varsayilanAuthAdapters', () => {
   beforeEach(() => {
