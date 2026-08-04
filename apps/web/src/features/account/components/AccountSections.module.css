@@ -1,0 +1,559 @@
+/* Hesap bölümlerinin TEK görsel kaynağı.
+
+   Sayfa kabuğu (AccountWorkspace) yalnız ızgarayı ve dış boşluğu kurar;
+   bölümlerin kutusu, tipografisi ve iç yerleşimi buradan gelir. Katman
+   modeli: bölümler FLAT'tır — cam yalnız navigasyon/kontrol katmanındadır
+   (sayfadaki tek cam yüzey birincil aksiyondur).
+
+   Yüzey dili iki kademedir:
+   - Bölüm kartı  → `--lg-surface` (kağıt)
+   - Kart içi kutu → `--lg-bg` (oyuk/gömülü kutu: gündem satırı, metrik
+     karosu, ilan kartı, boş durum). Her iki temada da doğru yönde ayrışır.
+
+   Kart kendi sorgu kabıdır (`container: account-section / inline-size`):
+   bölümün iç yerleşimi, kabuğun onu 12'lik ızgarada kaç kolona koyduğundan
+   bağımsız olarak KENDİ genişliğine tepki verir. Kartın kendi dolgusu bir
+   öğe kendi kabını sorgulayamayacağı için `page` kabından okunur. */
+
+.card {
+  /* Yerel mikro-geometri — tasarım sisteminde token karşılığı yok.
+     `--account-rail`: önem şeridi kalınlığı; hairline (1px) anlam taşıyacak
+     kadar okunmuyor, en küçük space token'ı (4px) ise şerit değil blok olur.
+     GlassListingManagementCard'ın `--card-strip-w` değeriyle bilinçli olarak
+     aynıdır — iki bileşen aynı satırda yan yana durur.
+     `--account-dot`: durum noktası çapı (dekoratif, kontrol değil).
+     `--account-chip-pad-block`: çip dikey dolgusu; space-1 (4px) kapsülü
+     şişirir, 0 ise metni sıkıştırır. GlassBadge de aynı aralıkta yerel
+     değişken kullanır. */
+  --account-rail: 3px;
+  --account-dot: 8px;
+  --account-chip-pad-block: 3px;
+
+  container: account-section / inline-size;
+  display: grid;
+  min-inline-size: 0;
+  align-content: start;
+  gap: var(--lg-space-4);
+  padding: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+/* Sıfır özgüllük: kütüphane bileşenlerinin kendi tipografisi bozulmaz. */
+.card :where(h1, h2, h3, p, ul, ol, dl, dt, dd, figure) {
+  margin: 0;
+}
+
+.card :where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+
+/* Bölüm bir kısayol hedefidir (AccountNav odağı taşır); odak halkası
+   yalnız klavyede görünür. */
+.card:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* ---------- Kart başlığı ---------- */
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2) var(--lg-space-4);
+}
+
+.cardHeadText {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+}
+
+.cardTitle {
+  color: var(--lg-label);
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.cardSubtitle {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.cardMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cardFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+  align-items: center;
+  padding-block-start: var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.mutedText {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.mutedMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Kimlik bandı ---------- */
+
+.identity {
+  /* Band: diğer kartlardan daha kompakt bir dikey ritim taşır. */
+  padding-block: var(--lg-space-4);
+}
+
+.identityGrid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--lg-space-5);
+  row-gap: var(--lg-space-4);
+}
+
+.identityAvatar {
+  flex: none;
+}
+
+.identityBody {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-3);
+}
+
+.identityDetails {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+}
+
+/* h1 sayfanın tek birinci seviye başlığıdır ama görsel olarak üst etikettir:
+   bandın vurgusu hesabın adıdır. */
+.identityEyebrow {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.identityName {
+  color: var(--lg-label);
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.identityMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  align-items: baseline;
+}
+
+.identityMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+/* Kurum adı rolün devamıdır; ayraç dekoratiftir, metin kendi başına okunur. */
+.identityMeta + .identityMeta::before {
+  content: '·';
+  margin-inline-end: var(--lg-space-2);
+}
+
+.identityBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.identityNotice {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+.identityAction {
+  justify-self: end;
+}
+
+/* Durum çipi: renk ikincil kanaldır, durum her zaman metinle de yazılır. */
+.verifyChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding: var(--account-chip-pad-block) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.verifyChip::before {
+  content: '';
+  flex: none;
+  inline-size: var(--account-dot);
+  block-size: var(--account-dot);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-label-secondary);
+}
+
+.verifyChip[data-state='verified']::before {
+  background-color: var(--lg-success);
+}
+
+.verifyChip[data-state='pending']::before {
+  background-color: var(--lg-warning);
+}
+
+.verifyChip[data-state='missing']::before {
+  background-color: var(--lg-danger);
+}
+
+/* ---------- Gündem ---------- */
+
+.attentionList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+.attentionItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--lg-space-3) var(--lg-space-5);
+  padding: var(--lg-space-4);
+  padding-inline-start: calc(var(--lg-space-4) + var(--account-rail));
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+/* Önem şeridi dekoratiftir: aynı bilgi başlık ve gerekçe metninde durur. */
+.attentionItem::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--lg-space-3);
+  inset-inline-start: var(--lg-space-3);
+  inline-size: var(--account-rail);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-label-secondary);
+}
+
+.attentionItem[data-severity='critical']::before {
+  background-color: var(--lg-danger);
+}
+
+.attentionItem[data-severity='high']::before {
+  background-color: var(--lg-warning);
+}
+
+.attentionItem > a {
+  align-self: center;
+  justify-self: end;
+}
+
+.attentionBody {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+}
+
+.attentionTitle {
+  /* Gündem satırı sayfa genişliğinde akmaz; gövde okuma ölçüsünde durur
+     (AAA 1.4.8). */
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.attentionReason {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.attentionFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+  margin-block-start: var(--lg-space-1);
+}
+
+.attentionTime {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Açıklamanın kaynağı (kural motoru / AI) küçük bir etikettir; kaybolmaz. */
+.sourceChip {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--account-chip-pad-block) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.sourceChip[data-source='ai'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 34%, var(--lg-hairline));
+  background-color: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 76%, var(--lg-label));
+}
+
+/* ---------- Metrikler ----------
+   Kabuk (AccountWorkspace) `metrics` bölümüne `.card` + bu sınıfı verir.
+   Kolon sayısı içsel eşikten türetilir: geniş kapta 4'lü, ~20rem altındaki
+   kartta 2'li. Böylece ızgarada kaç kolon işgal ettiğinden bağımsızdır. */
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--lg-space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* GlassMetricStrip her metriği bir `div` sarmalayıcıda verir — karo olur. */
+.metricGrid > div {
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.metricGrid strong {
+  font-size: var(--lg-text-display);
+  letter-spacing: -0.02em;
+}
+
+/* ---------- İlanlar ---------- */
+
+.listingList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+/* Kart içi kutu kademesi: ilan kartı bölüm kartının üstünde okunur kalır. */
+.listingList > article {
+  background-color: var(--lg-bg);
+}
+
+.emptyState {
+  display: grid;
+}
+
+/* Boş durum kart içinde ikinci bir "kağıt" olmaz: gömülü, kesik çerçeveli
+   bir yuva olarak okunur. */
+.emptyState > div {
+  border-style: dashed;
+  background-color: var(--lg-bg);
+}
+
+/* ---------- Bilgi listesi (güvenlik) ---------- */
+
+.infoList {
+  display: grid;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--lg-space-3);
+  padding-block: var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.infoRow:first-child {
+  padding-block-start: 0;
+  border-block-start: none;
+}
+
+.infoRow:last-child {
+  padding-block-end: 0;
+}
+
+.infoTerm {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.infoValue {
+  display: grid;
+  justify-items: end;
+  gap: var(--lg-space-1);
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.infoNote {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 400;
+}
+
+/* Durum metni + nokta: nokta dekoratif, durum her zaman yazıyla okunur. */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-weight: 600;
+}
+
+.status::before {
+  content: '';
+  flex: none;
+  inline-size: var(--account-dot);
+  block-size: var(--account-dot);
+  border-radius: var(--lg-radius-capsule);
+  background-color: currentcolor;
+}
+
+.status[data-state='verified'] {
+  color: var(--lg-success);
+}
+
+.status[data-state='pending'] {
+  color: var(--lg-warning);
+}
+
+.status[data-state='missing'] {
+  color: var(--lg-danger);
+}
+
+.status[data-state='not-applicable'],
+.status[data-state='unavailable'] {
+  color: var(--lg-label-secondary);
+}
+
+/* ---------- Kayıtlı arama ---------- */
+
+.savedSearch {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+}
+
+.savedSearchTitle {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.savedSearchMatches {
+  display: inline-flex;
+  align-items: baseline;
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  background-color: color-mix(in srgb, var(--lg-accent) 10%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 78%, var(--lg-label));
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Yerleşim eşikleri ---------- */
+
+/* Kartın KENDİ dolgusu: bir öğe kendi kabını sorgulayamaz, sayfa kabından
+   okunur. */
+@container page (inline-size <= 40rem) {
+  .card {
+    padding: var(--lg-space-4);
+  }
+}
+
+/* Bölüm içi yerleşim kartın kendi genişliğine tepki verir. */
+@container account-section (inline-size <= 34rem) {
+  .identityGrid {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .identityAction {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .identityAction > *,
+  .identityAction a {
+    inline-size: 100%;
+  }
+
+  .attentionItem {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .attentionItem > a {
+    justify-self: start;
+  }
+}
+
+/* Terim/değer satırı ancak gerçekten sıkıştığında alt alta iner: 4 kolonluk
+   yan sütunda bile özet tablo okunuşunu korur. */
+@container account-section (inline-size <= 16rem) {
+  .infoRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--lg-space-1);
+  }
+
+  .infoValue {
+    justify-items: start;
+    text-align: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card [data-variant] {
+    transition: none;
+  }
+}
+
+/* Şeffaflık azaltıldığında kart zaten flat'tır; yalnız kart içi gömülü
+   kutuların color-mix'li tonları düz yüzeye sabitlenir. */
+@media (prefers-reduced-transparency: reduce) {
+  .sourceChip[data-source='ai'],
+  .savedSearchMatches {
+    background-color: var(--lg-surface);
+  }
+}

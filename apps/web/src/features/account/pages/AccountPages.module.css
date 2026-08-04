@@ -1,0 +1,749 @@
+/* Hesap alt sayfalarının (İlanlarım · Güvenlik · Hareketler · Kayıtlı arama)
+   ORTAK görsel dili.
+
+   Bölüm kutusunun kendisi `components/AccountSections.module.css`ten gelir
+   (`.card`, `.cardHead`, `.cardTitle`, `.cardFooter`); burada yalnız o kutunun
+   İÇİNDEKİ yerleşimler tanımlanır. Yüzey kademesi aynıdır:
+   - Bölüm kartı  → `--lg-surface`
+   - Kart içi kutu → `--lg-bg` (metrik karosu, ilan kartı, adım kutusu,
+     zaman çizelgesi grubu, boş durum)
+
+   Katman modeli: alt sayfaların tamamı FLAT'tır — cam yalnız kabuktadır
+   (sol ray + üst şerit). Bu dosyada backdrop-filter/cam yüzey YOKTUR.
+
+   Yerleşim eşikleri viewport'a değil, `.card`in kurduğu `account-section`
+   sorgu kabına bağlıdır: bölüm kabuğun ızgarasında kaç kolon işgal ederse
+   etsin kendi genişliğine tepki verir. */
+
+/* ---------- Sayfa başlığı ---------- */
+
+/* Alt sayfanın tek `h1`i. Kabuk kartları sarmalar; başlık kartların dışında,
+   doğrudan içerik akışının ilk öğesi olarak durur. */
+.pageTitle {
+  margin: 0;
+  color: var(--lg-label);
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Kart başlığı yardımcıları ---------- */
+
+.headText {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-1);
+}
+
+.subtitle {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.meta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.muted {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+/* ---------- Sayaç karoları (ilan özeti / hareket özeti) ---------- */
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--lg-space-3);
+}
+
+.statTile {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.statLabel {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.3;
+}
+
+.statValue {
+  color: var(--lg-label);
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Filtre şeridi ---------- */
+
+/* Dar ekranda beş kova min-content genişliğiyle kartı taşırıyordu; şerit
+   kendi içinde yatay kayar, sayfa yatay kaymaz. */
+.filterBar {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--lg-space-2);
+}
+
+.filterBar > * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+}
+
+.filterBar > *::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- İlan listesi ---------- */
+
+.listingList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+/* Kart içi kutu kademesi: ilan kartı bölüm kartının üstünde okunur kalır. */
+.listingList > article {
+  background-color: var(--lg-bg);
+}
+
+.listingActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+/* ---------- Boş durum ---------- */
+
+/* Kart içinde ikinci bir "kağıt" olmaz: gömülü, kesik çerçeveli yuva. */
+.emptyState {
+  display: grid;
+  gap: var(--lg-space-3);
+  justify-items: center;
+}
+
+.emptyState > div {
+  border-style: dashed;
+  background-color: var(--lg-bg);
+}
+
+/* ---------- Terim/değer listesi ---------- */
+
+.infoList {
+  display: grid;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--lg-space-3);
+  padding-block: var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.infoRow:first-child {
+  padding-block-start: 0;
+  border-block-start: none;
+}
+
+.infoRow:last-child {
+  padding-block-end: 0;
+}
+
+.infoTerm {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.infoValue {
+  display: grid;
+  justify-items: end;
+  gap: var(--lg-space-1);
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.infoNote {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Durum metni + nokta: nokta dekoratif, durum HER ZAMAN yazıyla okunur. */
+.statusText {
+  /* Yerel mikro-geometri — tasarım sisteminde token karşılığı yok; durum
+     noktası çapı (dekoratif, kontrol değil). AccountSections'taki
+     `--account-dot` ile bilinçli olarak aynı değerdedir: iki yüzey aynı
+     sayfada yan yana okunur. */
+  --account-page-dot: 8px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-weight: 600;
+}
+
+.statusText::before {
+  content: '';
+  flex: none;
+  inline-size: var(--account-page-dot);
+  block-size: var(--account-page-dot);
+  border-radius: var(--lg-radius-capsule);
+  background-color: currentcolor;
+}
+
+.statusText[data-state='verified'] {
+  color: var(--lg-success);
+}
+
+.statusText[data-state='pending'] {
+  color: var(--lg-warning);
+}
+
+.statusText[data-state='missing'] {
+  color: var(--lg-danger);
+}
+
+.statusText[data-state='not-applicable'],
+.statusText[data-state='unavailable'] {
+  color: var(--lg-label-secondary);
+}
+
+/* ---------- Adım kutuları (güvenlik: sonraki adımlar) ---------- */
+
+.stepList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+.stepItem {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.stepHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+.stepTitle {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.stepText {
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+/* ---------- Tarih grupları (hesap hareketleri) ---------- */
+
+.groupList {
+  display: grid;
+  gap: var(--lg-space-5);
+}
+
+.group {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+.groupHeading {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Zaman çizelgesi kart içi gömülü kutudur: bölüm kartından ayrışır. */
+.groupTimeline {
+  background-color: var(--lg-bg);
+}
+
+/* ---------- Kayıtlı arama ---------- */
+
+.savedSearchCard {
+  background-color: var(--lg-bg);
+}
+
+.matchBox {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.matchValue {
+  color: var(--lg-label);
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Kart içi düz kontrol (filtre sıfırlama) ---------- */
+
+/* Kontrol katmanı olsa da bu sayfalarda cam yoktur; kabuğun camıyla
+   yarışmayan düz bir kapsül. Dokunma hedefi 44px (`--lg-control-md`). */
+.plainButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--lg-control-md);
+  padding-inline: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+  font-family: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms ease-out;
+}
+
+.plainButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* ---------- Ekran okuyucuya özel metin ---------- */
+
+/* Görsel olarak zaten okunan bağlamı (fatura numarası, tablo başlığı)
+   erişilebilir ada taşır; düzeni etkilemez. */
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Para karosu ---------- */
+
+/* Tutar karosu sayaç karosundan daha uzun bir metin taşır: display ölçüsü
+   dar kapta taşar, title ölçüsü aynı ritmi bozmadan sığar. */
+.statMoney {
+  font-size: var(--lg-text-title);
+}
+
+/* ---------- Çipler (varsayılan yöntem · ödeme/fatura durumu) ---------- */
+
+.chip {
+  /* Yerel mikro-geometri — tasarım sisteminde token karşılığı yok; çip dikey
+     dolgusu. AccountSections'taki `--account-chip-pad-block` ile bilinçli
+     olarak aynı değerdedir: iki yüzeydeki çipler aynı sayfada yan yana
+     okunur. */
+  --account-page-chip-pad: 3px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding: var(--account-page-chip-pad) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Durum çipi: renk İKİNCİL kanaldır, durum her zaman yazıyla da okunur.
+   Nokta dekoratiftir. */
+.statusChip::before {
+  content: '';
+  flex: none;
+  inline-size: var(--account-page-dot, 8px);
+  block-size: var(--account-page-dot, 8px);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-label-secondary);
+}
+
+.statusChip[data-status='paid']::before,
+.statusChip[data-status='issued']::before {
+  background-color: var(--lg-success);
+}
+
+.statusChip[data-status='pending']::before {
+  background-color: var(--lg-warning);
+}
+
+.statusChip[data-status='failed']::before {
+  background-color: var(--lg-danger);
+}
+
+.statusChip[data-status='refunded']::before,
+.statusChip[data-status='cancelled']::before {
+  background-color: var(--lg-label-secondary);
+}
+
+/* Varsayılan yöntem rozeti: accent ipucu, metin yine "Varsayılan" der. */
+.defaultChip {
+  border-color: color-mix(in srgb, var(--lg-accent) 34%, var(--lg-hairline));
+  background-color: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 76%, var(--lg-label));
+}
+
+/* ---------- Kayıtlı ödeme yöntemleri ---------- */
+
+.methodList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--lg-space-3);
+}
+
+.methodItem {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.methodHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+.methodKind {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.methodLabel {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.methodMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- İşlem tablosu ---------- */
+
+/* Tablo semantiği korunur: dar kapta satırlar bloklaştırılmaz, tablo kendi
+   içinde yatay kayar (sayfa yatay kaymaz). Kaydırma alanı klavyeyle de
+   gezilebilsin diye odaklanabilirdir. */
+.tableScroll {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.tableScroll:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  text-align: start;
+}
+
+.table th,
+.table td {
+  padding-block: var(--lg-space-3);
+  padding-inline-end: var(--lg-space-4);
+  text-align: start;
+  vertical-align: top;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-inline-end: 0;
+}
+
+.table thead th {
+  padding-block-start: 0;
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody tr + tr td {
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.cellDate {
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cellMain {
+  display: grid;
+  gap: var(--lg-space-1);
+  min-inline-size: 12rem;
+}
+
+.cellTitle {
+  color: var(--lg-label);
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.cellNote {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.4;
+}
+
+.cellAmount {
+  color: var(--lg-label);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  white-space: nowrap;
+}
+
+.table th.cellAmount {
+  text-align: end;
+}
+
+/* ---------- Fatura listesi ---------- */
+
+.invoiceList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+.invoiceItem {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+  /* Ödemeler sayfasından çapayla gelindiğinde satır kabuğun üst şeridinin
+     altında kalmasın. */
+  scroll-margin-block: var(--lg-space-8);
+}
+
+/* Çapayla gelinen fatura kısa yoldan bulunur; işaret kalıcıdır, animasyon
+   yoktur. */
+.invoiceItem:target {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.invoiceHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+.invoiceTitle {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.invoiceFacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--lg-space-3);
+}
+
+.invoiceFact {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-1);
+  min-inline-size: 0;
+}
+
+.invoiceFactTerm {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.3;
+}
+
+.invoiceFactValue {
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.invoiceTotal {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.invoiceFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}
+
+.groupTotal {
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Kart içi metin bağlantısı ---------- */
+
+/* Kontrol katmanı olsa da bu sayfalarda cam yoktur. Dokunma hedefi
+   `--lg-control-md` (44px); satır içi görünmesi için yatay dolgu yok. */
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-md);
+  color: var(--lg-accent);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.textLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
+}
+
+/* ---------- Yetenek sorguları ---------- */
+
+@media (hover: hover) {
+  .plainButton:hover {
+    background-color: color-mix(in srgb, var(--lg-surface) 82%, var(--lg-label));
+  }
+}
+
+@media (pointer: coarse) {
+  .plainButton {
+    min-block-size: var(--lg-control-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plainButton {
+    transition: none;
+  }
+}
+
+/* ---------- Yerleşim eşikleri (bölüm kabı) ---------- */
+
+/* Terim/değer satırı ancak gerçekten sıkıştığında alt alta iner. */
+@container account-section (inline-size <= 20rem) {
+  .infoRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--lg-space-1);
+  }
+
+  .infoValue {
+    justify-items: start;
+    text-align: start;
+  }
+}
+
+@container account-section (inline-size <= 26rem) {
+  .listingActions > * {
+    inline-size: 100%;
+  }
+}
+
+/* Fatura satırındaki terim/değer ızgarası dar kartta tek kolona iner. */
+@container account-section (inline-size <= 22rem) {
+  .invoiceFacts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (hover: hover) {
+  .textLink:hover {
+    color: color-mix(in srgb, var(--lg-accent) 78%, var(--lg-label));
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .defaultChip {
+    background-color: var(--lg-surface);
+  }
+}

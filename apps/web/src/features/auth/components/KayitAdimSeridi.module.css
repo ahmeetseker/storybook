@@ -1,0 +1,168 @@
+/* Kayıt akışının ilerleme şeridi.
+
+   Katman modeli: şerit bir gezinme/kontrol öğesidir ama CAM DEĞİLDİR —
+   auth kabuğunun tamamı flat (bkz. AuthShell.module.css) ve sayfadaki cam
+   bütçesi gezinme butonlarına ayrılmıştır. Şerit yalnız hairline + yüzey
+   token'ları kullanır.
+
+   Durum yalnız renkle anlatılmaz: tamamlanan adım ✓ işareti, aktif adım
+   sıra numarası + `aria-current="step"` + görsel-gizli durum metni taşır. */
+
+.serit {
+  /* Yerel mikro-geometri — tasarım sisteminde token karşılığı yok.
+     `--serit-nokta`: adım diski çapı. space-6 (24px) iki haneli sayıyı
+     sıkıştırıyor, control-sm (imleçlide 36px, dokunmatikte 44px) ise dört adım
+     yan yana geldiğinde 26rem'lik auth kolonunu taşırıyor; 28px ikisinin
+     arasındaki tek okunur değer. Disk göstergedir, dokunma hedefi değil —
+     tıklanabilir adım düğmesi diski saran 44px'lik alandır. */
+  --serit-nokta: 28px;
+
+  container: kayit-serit / inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.liste {
+  display: grid;
+  grid-template-columns: repeat(var(--adim-sayisi), minmax(0, 1fr));
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.oge {
+  display: flex;
+  min-inline-size: 0;
+}
+
+/* Buton ve buton olmayan öğe aynı kutuyu paylaşır: tamamlanmamış adımlar
+   tıklanamaz, bu yüzden hiç buton olarak render edilmez (ölü kontrol
+   yasağı — devre dışı buton yerine düz metin). */
+.ogeIcerik {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-1);
+  border: 0;
+  background: none;
+  color: var(--lg-label-secondary);
+  font: inherit;
+  text-align: center;
+}
+
+button.ogeIcerik {
+  cursor: pointer;
+  border-radius: var(--lg-radius-chip);
+}
+
+.ogeIcerik:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.nokta {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--serit-nokta);
+  block-size: var(--serit-nokta);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.etiket {
+  max-inline-size: 100%;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Durumlar ---------- */
+
+.oge[data-durum='tamam'] .nokta {
+  border-color: transparent;
+  background-color: var(--lg-success);
+  color: var(--lg-accent-contrast);
+}
+
+.oge[data-durum='aktif'] .nokta {
+  border-color: transparent;
+  background-color: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.oge[data-durum='aktif'] .ogeIcerik {
+  color: var(--lg-label);
+}
+
+.oge[data-durum='tamam'] .ogeIcerik {
+  color: var(--lg-label);
+}
+
+/* Koyu temada success/accent zeminlerin üstündeki metin `--lg-accent-contrast`
+   ile zaten AAA; ayrıca ✓ işareti rengin tek kanal olmadığını garanti eder. */
+
+/* Çubuğun kendi kalınlığı `size="sm"` ile gelir; burada yalnız şeridin tam
+   genişliğine yayılması sabitlenir. Hareket azaltmada dolgu geçişini
+   GlassProgress kendi modülünde zaten kapatır. */
+.cubuk {
+  inline-size: 100%;
+}
+
+.srOnly {
+  position: absolute;
+  inline-size: var(--lg-stroke-hairline);
+  block-size: var(--lg-stroke-hairline);
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Adım sayacı — şeridin altında (devam sayfaları) veya gezinmenin altında
+   (çok adımlı kayıt formu) duran "Adım N / M: …" satırı. */
+.sayac {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* Dar kapta etiketler okunmuyor: yalnız aktif adımın etiketi kalır, diğer
+   adımlar disk + görsel-gizli adlarıyla temsil edilir. Sayaç satırı zaten
+   aktif adımın tam adını yazar. */
+@container kayit-serit (inline-size <= 20rem) {
+  .oge:not([data-durum='aktif']) .etiket {
+    position: absolute;
+    inline-size: var(--lg-stroke-hairline);
+    block-size: var(--lg-stroke-hairline);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (pointer: coarse) {
+  button.ogeIcerik {
+    min-block-size: var(--lg-control-md);
+  }
+}
+
+@media (hover: hover) {
+  button.ogeIcerik:hover .etiket {
+    color: var(--lg-accent);
+  }
+}

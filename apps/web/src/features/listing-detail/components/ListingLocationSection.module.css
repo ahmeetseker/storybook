@@ -1,0 +1,116 @@
+/* Konum bölümü — içerik katmanı FLAT: cam, backdrop-filter, gölge yok.
+   Tek cam yüzey ihtimali GlassMap'in kendi sözleşmesindedir (o da flat).
+   Bölüm kutusu/çerçevesi yoktur; ayrımı hairline ve boşluk yapar
+   (feature rules.md §1b, §2). Yalnız --lg-* token tüketilir. */
+
+/* İdari konum satırı: il · ilçe · mahalle. Ayraç dekoratiftir (aria-hidden),
+   bilgi kelimelerin kendisindedir. */
+.address {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  line-height: 1.4;
+}
+
+.addressPart {
+  font-weight: 600;
+}
+
+/* Harita çerçevesi: yalnız köşe yarıçapı ve hairline — yeni bir yüzey değil.
+   Yükseklik GlassMap'in kendi `inline` (16:9) sözleşmesinden gelir. */
+.mapFrame {
+  min-inline-size: 0;
+  border-radius: var(--lg-radius-media);
+  overflow: clip;
+}
+
+/* Yaklaşıklık künyesi: haritanın erişilebilir metin karşılığıdır
+   (GlassMap buna aria-describedby ile bağlanır), bu yüzden görünür kalır. */
+.mapSummary {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Çevredeki noktalar ─────────────────────────────────────── */
+
+.nearbyList {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Sayfanın ortak dikey ekseni: tür sütunu kanıt satırlarının etiket
+   sütunuyla aynı genişlikte (feature rules.md §1b). Satırlar etkileşimli
+   değildir — bağlanmamış bir kontrol açılmaz (§4) — ama dokunmatikte
+   rahat taranabilsin diye satır yüksekliği dokunma hedefi ölçüsündedir. */
+.nearbyRow {
+  display: grid;
+  grid-template-columns: var(--evidence-label-col, 200px) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--lg-space-3);
+  min-block-size: var(--lg-control-hit);
+  padding-block: var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.nearbyRow:first-child {
+  border-block-start: 0;
+}
+
+.nearbyKind {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nearbyLabel {
+  min-inline-size: 0;
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  overflow-wrap: anywhere;
+}
+
+.nearbyDistance {
+  justify-self: end;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Ekran okuyucuya özel ek: "kuş uçuşu" niteliği satır satır da duyulur;
+   görsel okuyucu aynı cümleyi listenin üstünde okur. */
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
+
+/* Dar kapta (viewport değil, sayfa kabı) satır iki katmana iner: tür üstte,
+   ad ve mesafe altta. Sabit etiket sütunu dar alanda adı sıkıştırırdı. */
+@container page (max-width: 640px) {
+  .nearbyRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--lg-space-1) var(--lg-space-3);
+  }
+
+  .nearbyKind {
+    grid-column: 1 / -1;
+  }
+}

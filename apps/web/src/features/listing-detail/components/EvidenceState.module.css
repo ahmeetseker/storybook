@@ -1,0 +1,49 @@
+/* Durum işareti — bandın tek durum dili.
+
+   Nokta ikincil kanaldır: durum her yerde kelimeyle de yazılır (WCAG 1.4.1).
+   Nokta yalnız tarama hızını artırır. Tüm ölçüler --lg-* token'larından gelir;
+   nokta çapı mikro-geometridir ve token karşılığı yoktur. */
+
+.state {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--lg-space-2);
+  margin: 0;
+  min-inline-size: 0;
+}
+
+/* Kapsül — yalnız dar kartlarda (karar kolonu). Bandın akışında kullanılmaz:
+   kutusuz bir bölümün içinde çerçeveli bir rozet kart içinde kart olurdu. */
+.chip {
+  padding-inline: var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dot {
+  /* Mikro-geometri — token karşılığı yok (durum noktasının çapı). */
+  --state-dot-size: 8px;
+  flex: none;
+  align-self: center;
+  inline-size: var(--state-dot-size);
+  block-size: var(--state-dot-size);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-label-secondary);
+}
+
+.state[data-tone='positive'] > .dot {
+  background: var(--lg-success);
+}
+
+.state[data-tone='negative'] > .dot {
+  background: var(--lg-danger);
+}
+
+.state[data-tone='unknown'] > .dot {
+  background: var(--lg-warning);
+}

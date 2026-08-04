@@ -1,0 +1,124 @@
+/* Hesap kabuğu — mobil-first: navigasyon varsayılan olarak çekmecede,
+   geniş ekranda yapışkan cam kenar çubuğuna terfi eder. */
+
+.accountShell {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-5);
+  min-height: 100vh;
+  max-width: var(--lg-container-base);
+  margin: 0 auto;
+  padding: var(--lg-space-4) var(--lg-container-gutter) var(--lg-space-10);
+  box-sizing: border-box;
+}
+
+/* Kalıcı kenar çubuğu yalnız geniş ekranda; dar ekranda çekmece kullanılır */
+.rail {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+/* Mobil-first: menü düğmesi üstte, başlık tam genişlikte alt satırda (kırpılmaz) */
+.pageHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-3);
+  min-height: var(--lg-control-md);
+}
+
+.menuButton {
+  flex: none;
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-control-md);
+  padding: 0 var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+.menuButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Okunmamış toplamı — çekmece kapalıyken de görünür kalır */
+.menuBadge {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--lg-space-2);
+  box-sizing: border-box;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pageTitle {
+  flex: 1 1 100%;
+  margin: 0;
+  min-width: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Çekmece içindeki nav: panel zaten flat yüzey — ikinci çerçeve çizilmez */
+.drawerNav.drawerNav {
+  flex: 1;
+  min-height: 0;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+/* bp-sm */
+@media (min-width: 640px) {
+  .pageTitle {
+    flex: 1 1 auto;
+    font-size: var(--lg-text-display);
+  }
+}
+
+/* bp-lg — kalıcı kenar çubuğu eşiği (nav + içerik yan yana sığar) */
+@media (min-width: 1024px) {
+  .accountShell {
+    padding-top: var(--lg-space-5);
+  }
+  .rail {
+    display: block;
+    position: sticky;
+    top: var(--lg-space-4);
+    flex: none;
+    max-height: calc(100vh - var(--lg-space-8));
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .menuButton {
+    display: none;
+  }
+}

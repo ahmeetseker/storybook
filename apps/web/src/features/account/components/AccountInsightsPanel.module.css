@@ -1,0 +1,129 @@
+/* Performans bölümünün YEREL görselleri.
+
+   Kart kabuğu (`.card` / `.cardHead` / `.cardTitle` / `.cardMeta`) ortak
+   `AccountSections.module.css` dosyasından gelir — burada yalnız özet şeridi,
+   grafik ızgarası ve grafik alt yazısı tanımlıdır.
+
+   Katman modeli: bölüm FLAT'tır, cam yoktur (GlassChart de flat bir içerik
+   kartıdır). Yüzey kademesi hesap dilinin geri kalanıyla aynıdır:
+   bölüm kartı `--lg-surface`, kart içi gömülü kutu (özet karosu ve grafik
+   kartı) `--lg-bg`.
+
+   Yerleşim eşiği `@container account-section`: kabın adını bölüm kartı
+   (`AccountSections.module.css` → `.card`) tanımlar, böylece grafik ızgarası
+   sayfa ızgarasındaki kolon sayısından değil KENDİ genişliğinden etkilenir. */
+
+/* ---------- Özet şeridi ---------- */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--lg-space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryItem {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-1);
+  min-inline-size: 0;
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.summaryTerm {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.4;
+}
+
+.summaryValue {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-1);
+}
+
+.summaryNumber {
+  color: var(--lg-label);
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Yön RENKTEN BAĞIMSIZ okunur: ok işareti dekoratiftir (aria-hidden), asıl
+   kanal "artış" / "azalış" / "değişim yok" metnidir. Renk yalnız destekler. */
+.summaryChange {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+}
+
+.summaryChange[data-direction='up'] {
+  color: var(--lg-success);
+}
+
+.summaryChange[data-direction='down'] {
+  color: var(--lg-danger);
+}
+
+.summaryNote {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.4;
+}
+
+/* ---------- Grafik ızgarası ---------- */
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--lg-space-4);
+}
+
+.chart {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-2);
+  min-inline-size: 0;
+}
+
+/* GlassChart kök kartı: bölüm kartının üstünde gömülü kutu kademesine iner
+   (kağıt üstüne kağıt olmasın). */
+.chart > div {
+  background-color: var(--lg-bg);
+  padding: var(--lg-space-4);
+}
+
+/* Grafik başlığı bölüm başlığının (h2) altındadır; aynı ölçüde okunmasın. */
+.chart h3 {
+  font-size: var(--lg-text-body);
+  letter-spacing: -0.01em;
+}
+
+/* Grafiğin metin özeti: grafiği dekoratif olmaktan çıkarır — ilk/son değer ve
+   yön kelimeyle yazılır, yalnız çizginin eğimine bakmak gerekmez. */
+.chartNote {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+
+/* ---------- Yerleşim eşikleri ---------- */
+
+/* Geniş kapta iki kolon; ana trend ve harcama grafikleri tam genişlik kalır. */
+@container account-section (inline-size > 40rem) {
+  .chartGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chartWide {
+    grid-column: 1 / -1;
+  }
+}

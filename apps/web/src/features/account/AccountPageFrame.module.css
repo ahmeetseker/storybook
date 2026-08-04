@@ -1,0 +1,31 @@
+/* Alt sayfa çerçevesi — PageContainer'ın ölçü kademesini pano akışına uydurur.
+   Yatay ölçünün tek kaynağı yine PageContainer'dır; burada yalnız pano
+   genişliği ve bölümler arası dikey ritim tanımlanır. */
+
+.page.page {
+  inline-size: 100%;
+  max-inline-size: none;
+  padding-block: 0;
+}
+
+.frame {
+  display: grid;
+  gap: var(--lg-space-5);
+  justify-self: center;
+  inline-size: 100%;
+  max-inline-size: var(--lg-container-base);
+}
+
+.frame > h1 {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+
+@container (inline-size > 48rem) {
+  .frame > h1 {
+    font-size: var(--lg-text-display);
+  }
+}

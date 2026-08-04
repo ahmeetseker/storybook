@@ -1,0 +1,16 @@
+/* Ray genişliğini kabuk verir; sidebar kapsayıcısına uyar. */
+.nav.nav {
+  inline-size: 100%;
+  padding-inline: var(--lg-space-2);
+}
+
+/* Sidebar başlığı ray içinde sayfa başlığıyla yarışmaz: kimlik satırı ölçüsünde */
+.nav.nav header {
+  padding-block-end: var(--lg-space-3);
+}
+
+.nav.nav header > div > span:first-child {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}

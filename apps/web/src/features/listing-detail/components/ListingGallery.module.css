@@ -1,0 +1,307 @@
+/* Hero galerisi — bento ızgarası.
+
+   Yerleşim sözleşmesi (bkz. rules.md §1c):
+   · Dar kap: yatay kaydırmalı tek şerit (scroll-snap) + sayaç.
+   · Geniş kap (≥52rem): solda büyük kapak, sağda iki küçük kare, altlarında
+     geniş bir kare; son karenin üstünde "Tümünü gör (N)" örtüsü.
+   · Eşik viewport değil KAP genişliğidir (`@container page`).
+   · Fotoğrafın üstünde açılan cam yüzeyler kontrol katmanıdır (ilan no
+     rozeti, favori/paylaş kapsülü, "Tümünü gör" örtüsü); cam üstüne cam
+     gelmez, hepsi doğrudan fotoğrafın üstünde durur. */
+
+.gallery {
+  display: grid;
+  gap: var(--lg-space-3);
+  min-inline-size: 0;
+}
+
+.viewport {
+  position: relative;
+  min-inline-size: 0;
+}
+
+/* Dar kap: kareler eşit genişlikte şerit hücreleridir ve tek tek yapışır.
+   Son kare kenardan görünür kalsın diye hücre kabın tamamını kaplamaz. */
+.frames {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 88%;
+  gap: var(--lg-space-2);
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  /* Klavyeyle gezinirken odaklanan kare kenara yapışmasın. */
+  scroll-padding-inline: var(--lg-space-2);
+}
+
+.frames::-webkit-scrollbar {
+  display: none;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+  scroll-snap-align: center;
+}
+
+/* Kare bir kontroldür: basınca tam ekran görünüm açılır. */
+.frameButton {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.frameButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-focus-ring-width));
+  border-radius: var(--lg-radius-media);
+}
+
+.image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* ── Kapak üstündeki işaretler ──────────────────────────────── */
+
+.number,
+.actions,
+.more {
+  border: var(--lg-stroke-hairline) solid var(--lg-glass-line);
+  background: var(--lg-glass);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  color: var(--lg-label);
+}
+
+.number {
+  position: absolute;
+  inset-block-start: var(--lg-space-3);
+  inset-inline-start: var(--lg-space-3);
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: calc(100% - 2 * var(--lg-space-3));
+  overflow: hidden;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* İki ikon-tek kontrol tek kapsülde: fotoğrafın üstünde tek cam yüzey. */
+.actions {
+  position: absolute;
+  inset-block-start: var(--lg-space-3);
+  inset-inline-end: var(--lg-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule);
+}
+
+.action {
+  display: grid;
+  place-items: center;
+  inline-size: var(--lg-control-sm);
+  block-size: var(--lg-control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--lg-radius-capsule);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.action:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-focus-ring-offset));
+}
+
+@media (hover: hover) {
+  .action:hover {
+    background: var(--lg-hairline);
+  }
+}
+
+.action[aria-pressed='true'] {
+  color: var(--lg-accent);
+}
+
+.icon {
+  inline-size: var(--lg-space-5);
+  block-size: var(--lg-space-5);
+}
+
+/* "Tümünü gör (N)" örtüsü — son karenin üstünde, dekoratif. */
+/* Örtü kareyi kapatmaz: altındaki fotoğraf okunur kalır, üstündeki cümle de
+   okunur olsun diye zemin yalnız yarı geçirgen bir cam perdedir. */
+.more {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--lg-glass) 52%, transparent);
+  backdrop-filter: blur(3px) saturate(1.1);
+  -webkit-backdrop-filter: blur(3px) saturate(1.1);
+  /* Dar yerleşimde şerit kareleri tek tek gösterir; örtü orada karenin
+     kendisini kapatırdı ve sayaç zaten aynı bilgiyi taşır — yalnız bento
+     ızgarasında açılır. */
+  display: none;
+  place-items: center;
+  border: 0;
+  border-radius: var(--lg-radius-media);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Sayaç yalnız kaydırmalı şeritte anlamlıdır. */
+.counter {
+  position: absolute;
+  inset-block-end: var(--lg-space-3);
+  inset-inline-end: var(--lg-space-4);
+  margin: 0;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-glass-line);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-glass);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  color: var(--lg-label);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Açıklama, durum ve döküm ───────────────────────────────── */
+
+.note,
+.status {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+}
+
+.status:empty {
+  display: none;
+}
+
+/* Döküm derli topludur: eksik fotoğraf bir kolonu baştan aşağı işgal etmez,
+   künyeyi ilk görünümün dışına itmez — satır olarak akar. */
+.inventory {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lg-space-1) var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-3);
+}
+
+.inventoryTitle {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+}
+
+.inventoryList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-1) var(--lg-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inventoryList li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lg-space-1) var(--lg-space-2);
+}
+
+.inventoryLabel {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.inventoryMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* ═══ Geniş kap: bento ızgarası ═══ */
+@container page (min-width: 52rem) {
+  .frames {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    /* Sahne oranı: künye ve karar kolonu ilk görünümde kalsın diye bento
+       ekranı doldurmaz — geniş kapta 12:5'lik bir bant açar. */
+    aspect-ratio: 12 / 5;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .frame {
+    aspect-ratio: auto;
+  }
+
+  .cover {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+  }
+
+  /* Kare sayısı azaldıkça ızgarada delik kalmaz: kalanlar yayılır. */
+  .frames[data-tiles='0'] .cover {
+    grid-column: 1 / -1;
+  }
+
+  .frames[data-tiles='1'] .tile {
+    grid-column: 3 / span 2;
+    grid-row: 1 / span 2;
+  }
+
+  .frames[data-tiles='2'] .tile {
+    grid-column: 3 / span 2;
+  }
+
+  /* Referans desen: iki küçük kare + altta geniş kare. */
+  .frames[data-tiles='3'] .tile:last-child {
+    grid-column: 3 / span 2;
+  }
+
+  .more {
+    display: grid;
+  }
+
+  .counter {
+    display: none;
+  }
+}
+
+/* Saydamlık azaltıldığında cam donuklaşır — malzeme kaybolur, katman kalır. */
+@media (prefers-reduced-transparency: reduce) {
+  .number,
+  .actions,
+  .counter,
+  .more {
+    background: var(--lg-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

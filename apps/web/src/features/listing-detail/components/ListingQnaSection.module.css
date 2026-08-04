@@ -1,0 +1,618 @@
+/* Sorular ve yanıtlar — içerik katmanı.
+
+   Bölüm bir YAPRAKTIR (2026-08-04, rules.md §1b): yüzeyi, hairline çerçevesi
+   ve en hafif gölge kademesi vardır; ayrımı kenarı ve komşusuyla arasındaki
+   pay yapar. Cam yalnız navigasyon/kontrol katmanına aittir — yaprak cam
+   değildir ve içinde ikinci bir kart açılmaz; soru alanı ve gönder butonu
+   dahil yaprağın içindeki her yüzey düzdür.
+
+   Bütün ölçüler --lg-* tokenlarından gelir. Yerleşim kırılmaları viewport
+   değil `@container page` sorgularıdır: bölüm hangi kolonda durduğunu
+   kabından öğrenir. */
+.section {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-4);
+  min-inline-size: 0;
+  /* Yaprak dolgusu sayfadan miras alınır; bölüm tek başına render
+     edildiğinde de aynı adım geçerli olsun diye token yedek değerdir. */
+  padding: var(--sheet-pad, var(--lg-space-5));
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-xs);
+  /* Yapışkan bölüm indeksinin altında kalmasın diye çapa hedefi aşağıdan başlar. */
+  scroll-margin-block-start: calc(var(--lg-control-lg) + var(--lg-space-4));
+  color: var(--lg-label);
+}
+
+.header {
+  display: grid;
+  gap: var(--lg-space-1);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+/* Sayaç yanıtsızlığı da söyler; başlığın yanında ikincil tondadır. */
+.count {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+
+.responseLabel {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+}
+
+/* ── Yazışma ─────────────────────────────────────────────────────
+   Ölçünün tek kaynağı: avatar kolonu + kolon arası. Yanıt kutusunun
+   girintisi de, katlama kontrolünün hizası da bu ikisinden türer. */
+.thread {
+  --avatar: var(--lg-space-8);
+  --avatar-reply: var(--lg-space-7);
+  --gutter: var(--lg-space-3);
+
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.turn {
+  padding-block: var(--lg-space-4);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.turn:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+/* Satır: avatar · gövde · işlemler. */
+.message {
+  display: grid;
+  grid-template-columns: var(--avatar) minmax(0, 1fr) auto;
+  gap: var(--gutter);
+  align-items: start;
+}
+
+.message[data-depth='reply'] {
+  grid-template-columns: var(--avatar-reply) minmax(0, 1fr) auto;
+}
+
+/* Avatar: fotoğraf taşınmaz, baş harfler çizilir. Zemin tonu ROLÜ söyler —
+   gri bir siluetin söylemediği şey budur. */
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: var(--avatar);
+  block-size: var(--avatar);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-label) 8%, var(--lg-surface));
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  user-select: none;
+}
+
+.avatar[data-size='reply'] {
+  inline-size: var(--avatar-reply);
+  block-size: var(--avatar-reply);
+  font-size: var(--lg-text-badge);
+}
+
+.avatar[data-kind='seller'] {
+  background: color-mix(in srgb, var(--lg-accent) 14%, var(--lg-surface));
+  color: var(--lg-accent);
+}
+
+/* Görüntüleyenin kendisi: aynı vurgu ailesi ama halkalı — "bu sensin". */
+.avatar[data-kind='self'] {
+  background: color-mix(in srgb, var(--lg-accent) 10%, var(--lg-surface));
+  color: var(--lg-accent);
+  box-shadow: inset 0 0 0 var(--lg-stroke-hairline) var(--lg-accent);
+}
+
+.body {
+  min-inline-size: 0;
+}
+
+/* Ad ve metin aynı satırda başlar: yazışma paragraf yığını değil, replik. */
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lg-space-1) var(--lg-space-2);
+  margin: 0;
+}
+
+.who {
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+  letter-spacing: -0.008em;
+}
+
+.text {
+  max-inline-size: var(--lg-measure);
+  font-size: var(--lg-text-body);
+  line-height: 1.5;
+}
+
+.message[data-depth='reply'] .text {
+  font-size: var(--lg-text-footnote);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-1) var(--lg-space-2);
+  margin: var(--lg-space-1) 0 0;
+}
+
+.when {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.roleChip {
+  padding: 0 var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, transparent);
+  color: var(--lg-accent);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pin {
+  padding: 0 var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Damga YALNIZ içeriğin sahibine görünür: kendi yazdığının yayında olup
+   olmadığını bilmeyen kullanıcı bırakılmaz. Gizleme başkalarında hiçbir iz
+   bırakmaz — o satır zaten hiç çizilmez (rules.md §7). */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  padding: 0 var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid currentColor;
+  border-radius: var(--lg-radius-capsule);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge[data-kind='hidden'] {
+  color: var(--lg-warning);
+}
+
+.badge[data-kind='masked'] {
+  color: var(--lg-label-secondary);
+}
+
+.message[data-visibility='hidden'] .text,
+.message[data-visibility='masked'] .text {
+  color: var(--lg-label-secondary);
+}
+
+/* Yanıtlar: yaprağın içinde bir ALT BÖLGE — kart değil. Bağı bir ray taşır;
+   çerçeve, zemin ve gölge yoktur (§1b: kart içinde kart açılmaz). */
+.replies {
+  display: grid;
+  gap: var(--lg-space-4);
+  margin: var(--lg-space-3) 0 0 calc(var(--avatar) / 2);
+  padding: 0 0 0 calc(var(--avatar) / 2);
+  list-style: none;
+  border-inline-start: 2px solid color-mix(in srgb, var(--lg-accent) 28%, transparent);
+}
+
+/* Katlama kontrolü gövde eksenine hizalanır: avatar kolonu + kolon arası. */
+.moreRow {
+  margin: var(--lg-space-3) 0 0 calc(var(--avatar) + var(--gutter));
+}
+
+.textLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lg-accent);
+  font: inherit;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  /* Görünür kutu küçük kalır; dokunma hedefi görünmez dolguyla büyür. */
+  position: relative;
+}
+
+.textLink::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--lg-control-hit) - 1lh) / -2) calc(var(--lg-space-2) * -1);
+}
+
+.textLink:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
+}
+
+@media (hover: hover) {
+  .textLink:hover {
+    color: var(--lg-label);
+  }
+}
+
+/* Yanıtsızlık renkle değil kelimeyle taşınır. */
+.pending {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  margin: var(--lg-space-3) 0 0 calc(var(--avatar) + var(--gutter));
+  color: var(--lg-warning);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.pending::before {
+  content: '';
+  flex: none;
+  inline-size: var(--lg-space-2);
+  block-size: var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: currentColor;
+}
+
+/* ── İşlemler menüsü ─────────────────────────────────────────── */
+
+.menuWrap {
+  position: relative;
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid transparent;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-label-secondary);
+  font: inherit;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.12s ease-out, color 0.12s ease-out, border-color 0.12s ease-out;
+}
+
+.menuButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.menuButton[aria-expanded='true'] {
+  border-color: var(--lg-hairline);
+  background: color-mix(in srgb, var(--lg-label) 5%, transparent);
+  color: var(--lg-label);
+}
+
+@media (hover: hover) {
+  .menuButton:hover {
+    border-color: var(--lg-hairline);
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+    color: var(--lg-label);
+  }
+}
+
+.menuButton:active {
+  background: color-mix(in srgb, var(--lg-label) 5%, transparent);
+}
+
+.caret {
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.menuButton[aria-expanded='true'] .caret {
+  transform: rotate(180deg);
+}
+
+/* Menü kontrol katmanındadır ama cam açmaz: sayfanın cam bütçesi
+   navigasyona ayrılmıştır (§2). Düz yüzey + gölge yeter. */
+.menu {
+  position: absolute;
+  z-index: 2;
+  inset-block-start: calc(100% + var(--lg-space-1));
+  inset-inline-end: 0;
+  min-inline-size: 13rem;
+  margin: 0;
+  padding: var(--lg-space-1);
+  list-style: none;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-md);
+}
+
+.menuItem {
+  display: grid;
+  gap: 2px;
+  inline-size: 100%;
+  min-block-size: var(--lg-control-sm);
+  padding: var(--lg-space-2);
+  border: 0;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color 0.12s ease-out;
+}
+
+.menuItem small {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.menuItem[data-tone='danger'] {
+  color: var(--lg-danger);
+}
+
+.menuItem:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: calc(var(--lg-focus-ring-offset) * -1);
+}
+
+@media (hover: hover) {
+  .menuItem:hover {
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+}
+
+.menuItem:active {
+  background: color-mix(in srgb, var(--lg-label) 5%, transparent);
+}
+
+/* ── Boş durum ───────────────────────────────────────────────── */
+
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.emptyNote {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
+/* ── Yazma ───────────────────────────────────────────────────── */
+
+/* Yazma satırı yazışmanın hizasını sürdürür: avatar kolonu + gövde.
+   Alan kendi odak halkasını taşıdığı için kolon arası halkanın payını
+   (genişlik + offset) da kapsayacak kadar açılır — daha dar bir boşlukta
+   halka avatara yapışır. */
+.compose,
+.replyBox {
+  display: grid;
+  grid-template-columns: var(--lg-space-8) minmax(0, 1fr);
+  gap: calc(var(--lg-space-3) + var(--lg-focus-ring-width) + var(--lg-focus-ring-offset));
+  align-items: start;
+}
+
+.compose {
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-5);
+}
+
+/* Yanıt kutusu yanıt ölçeğindedir: avatar küçülür ve kutu, altına
+   yerleştiği yanıtın gövde eksenine hizalanır. */
+.replyBox {
+  grid-template-columns: var(--lg-space-7) minmax(0, 1fr);
+  margin: var(--lg-space-4) 0 0 calc(var(--lg-space-8) + var(--lg-space-3));
+}
+
+.composeBody {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+  min-inline-size: 0;
+}
+
+.label {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Alan düz yüzeydir: cam değil, tokenlarla çizilmiş bir içerik kontrolü. */
+.field {
+  inline-size: 100%;
+  max-inline-size: var(--lg-measure);
+  min-block-size: var(--lg-control-xl);
+  padding: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+  color: inherit;
+  font: inherit;
+  font-size: var(--lg-text-body);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.field::placeholder {
+  color: var(--lg-label-secondary);
+}
+
+.field:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.hint {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-3);
+}
+
+.submit,
+.cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Dokunma hedefi tek kaynaktan: coarse işaretçide token zaten büyür. */
+  min-block-size: var(--lg-control-hit);
+  padding-inline: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid transparent;
+  border-radius: var(--lg-radius-capsule);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit {
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.cancel {
+  border-color: var(--lg-hairline);
+  background: none;
+  color: var(--lg-label);
+}
+
+.submit:focus-visible,
+.cancel:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .submit:hover {
+    background: color-mix(in srgb, var(--lg-accent) 88%, var(--lg-label));
+  }
+
+  .cancel:hover {
+    border-color: var(--lg-label-secondary);
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+}
+
+/* Canlı bölge her zaman DOM'dadır ve gizlenmez: `display: none` ile saklanan
+   bir bölgenin ilk mesajı ekran okuyucuda duyurulmayabilir. Boş bir paragraf
+   satır kutusu üretmediği için zaten yer kaplamaz. */
+.status {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
+.status[data-tone='error'] {
+  color: var(--lg-danger);
+  font-weight: 600;
+}
+
+.status[data-tone='success'] {
+  color: var(--lg-label);
+}
+
+/* ── Giriş kapısı ────────────────────────────────────────────────
+   Oturum kapalıyken yazma alanı hiç çizilmez: kimse boşuna yazmaz.
+   Kanal KAPALI olduğunda burası değil `.askClosed` çizilir — giriş yapmak
+   kapalı bir kanalı açmaz ve o kontrolü göstermek yalan olurdu. */
+.gate {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-5);
+}
+
+.gateTitle {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.gateNote {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
+/* Form yerine geçen gerekçe: kapalı bir kanal boş bırakılmaz, yazılır. */
+.askClosed {
+  max-inline-size: var(--lg-measure);
+  margin: 0;
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-4);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret,
+  .menuButton,
+  .menuItem {
+    transition: none;
+  }
+}

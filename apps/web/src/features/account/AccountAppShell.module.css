@@ -1,0 +1,239 @@
+/* Hesap bölümünün kalıcı kabuğu — ray + üst şerit + içerik yuvası.
+
+   Rota değişse de bu kabuk yeniden kurulmaz: yalnız `.content` içindeki
+   sayfa değişir. Sayfalar kendi `main`'ini (PageContainer) üretir; kabuk
+   yatay ölçüyü ona bırakır, kendisi yalnız dikey nefesi verir. */
+
+.app {
+  --rail-inline-size: 17rem;
+  --rail-collapsed-size: 4.5rem;
+  --topbar-block-size: 3.5rem;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-block-size: 100dvh;
+  background-color: var(--lg-bg);
+}
+
+/* Ray yalnız geniş viewport'ta; dar ekranda çekmeceye iner.
+   Kabuk `PageContainer` kabının DIŞINDA olduğu için burada container değil
+   viewport sorgusu kullanılır (sorgulanacak bir kap yok). */
+.rail {
+  display: none;
+}
+
+.column {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-inline-size: 0;
+}
+
+/* ---- Üst şerit ---- */
+
+.topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  min-block-size: var(--topbar-block-size);
+  padding-inline: var(--lg-space-4);
+  padding-block: var(--lg-space-2);
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  background-color: var(--lg-surface);
+}
+
+.iconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--lg-control-md);
+  block-size: var(--lg-control-md);
+  border: none;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+}
+
+.iconButton:focus-visible,
+.searchButton:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Ray daraltma düğmesi yalnız ray görünürken anlamlıdır */
+.topbar [data-part='rail-toggle'] {
+  display: none;
+}
+
+.crumbs {
+  display: flex;
+  min-inline-size: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--lg-space-2);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.crumbMuted,
+.crumbCurrent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dar ekranda konum izinin yalnız güncel adımı kalır */
+.crumbMuted,
+.crumbSep {
+  display: none;
+}
+
+.crumbCurrent {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+.searchButton {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--lg-space-2);
+  min-block-size: var(--lg-control-md);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  cursor: pointer;
+}
+
+.searchLabel {
+  display: none;
+}
+
+.kbd {
+  display: none;
+  padding-inline: var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  font-family: inherit;
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+}
+
+/* ---- İçerik yuvası ---- */
+
+.content {
+  min-inline-size: 0;
+  padding-block: var(--lg-space-5) var(--lg-space-9);
+}
+
+/* Tam yükseklik modu: sayfa kaydırması kapanır, kaydırma sayfanın kendi
+   panellerine devredilir (bkz. account-navigation → fillsViewport). */
+.app[data-account-shell='fill'] {
+  /* Satır yüksekliği de sınırlanmalı: yalnız `block-size` verilirse implicit
+     satır içeriğe göre büyür ve panel viewport'un altına taşar. */
+  grid-template-rows: minmax(0, 1fr);
+  block-size: 100dvh;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.app[data-account-shell='fill'] .column {
+  min-block-size: 0;
+}
+
+.app[data-account-shell='fill'] .content {
+  min-block-size: 0;
+  overflow: hidden;
+  padding-block: var(--lg-space-4);
+}
+
+/* Ray ve çekmece kendi yüzeyini çizer — nav ikinci bir çerçeve eklemez */
+.drawerNav.drawerNav,
+.railNav.railNav {
+  border: none;
+  border-radius: 0;
+  background: none;
+  padding-inline: 0;
+}
+
+@media (min-width: 48rem) {
+  .searchLabel,
+  .kbd {
+    display: inline;
+  }
+
+  .searchButton {
+    inline-size: min(22rem, 40%);
+  }
+
+  .searchLabel {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Kalıcı ray eşiği */
+@media (min-width: 64rem) {
+  .app {
+    grid-template-columns: var(--rail-inline-size) minmax(0, 1fr);
+  }
+
+  .app[data-collapsed] {
+    grid-template-columns: var(--rail-collapsed-size) minmax(0, 1fr);
+  }
+
+  .rail {
+    display: block;
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100dvh;
+    overflow: hidden auto;
+    /* Dikey nefes sıkı: ray alçak ekranlarda da (≈760px) kaydırmadan sığar */
+    padding: var(--lg-space-2);
+    border-inline-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+    background-color: var(--lg-surface);
+    scrollbar-width: none;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .menuButton {
+    display: none;
+  }
+
+  .topbar {
+    padding-inline: var(--lg-space-5);
+  }
+
+  .topbar [data-part='rail-toggle'] {
+    display: grid;
+  }
+
+  .crumbMuted,
+  .crumbSep {
+    display: inline;
+  }
+
+  .content {
+    padding-block: var(--lg-space-6) var(--lg-space-10);
+  }
+}
+
+@media (hover: hover) {
+  .iconButton:hover,
+  .searchButton:hover {
+    background-color: color-mix(in srgb, var(--lg-label) 6%, transparent);
+    color: var(--lg-label);
+  }
+}
