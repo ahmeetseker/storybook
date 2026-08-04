@@ -4,7 +4,10 @@
   --min-w-md: 200px;
   --min-w-lg: 232px;
   --grid-gap: 2px;
-  --day-size: 40px; /* mobile-first dokunma hedefi; bp-sm'de 36px'e iner */
+  /* Gün hücresi kontrol ölçeğinden: imleçli cihazda 36px, dokunmatikte token
+     kendiliğinden 44px'e çıkar. Böylece ekran genişliği yerine giriş yeteneği
+     belirleyici olur (bkz. ErisilebilirlikMotionResponsive). */
+  --day-size: var(--lg-control-sm);
   --today-ring: 1.5px;
   position: relative;
   display: inline-block;
@@ -108,6 +111,7 @@
   text-transform: capitalize;
 }
 .nav {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -126,6 +130,15 @@
   outline: 2px solid var(--lg-accent);
   outline-offset: 2px;
 }
+/* İkon-tek gezinme butonu: görünen daire 36px kalır, tıklanabilir alan her iki
+   eksende `--lg-control-hit`e (44px) uzanır. Genişleme panelin kendi
+   padding'i (--lg-space-3) içinde kaldığı için GlassSurface kırpmasına
+   takılmaz ve başlıkla çakışmaz. */
+.nav::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
+}
 @media (hover: hover) {
   .nav:hover { background: color-mix(in srgb, var(--lg-label) 8%, transparent); }
 }
@@ -143,7 +156,9 @@
   color: var(--lg-label-secondary);
 }
 
-/* Mobile-first: <640px'de dokunma hedefi ≥40px */
+/* Gün hücresi: imleçli cihazda 36px (AA 2.5.8'in 24px tabanının üstünde),
+   dokunmatikte 44px (AAA 2.5.5). Hedef ::after ile büyütülmez — hücreler
+   2px aralıkla dizildiği için genişletme komşu günlerle çakışırdı. */
 .day {
   display: flex;
   align-items: center;
@@ -179,11 +194,6 @@
   background: var(--lg-accent);
   color: var(--lg-accent-contrast);
   font-weight: 700;
-}
-
-/* bp-sm 640px */
-@media (min-width: 640px) {
-  .root { --day-size: 36px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

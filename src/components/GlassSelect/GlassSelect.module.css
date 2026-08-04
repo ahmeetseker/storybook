@@ -130,8 +130,9 @@
   overscroll-behavior: contain;
 }
 @media (pointer: fine) {
+  /* ~6 seçenek satırı; satır yüksekliği artık --lg-control-hit'ten geliyor */
   .list {
-    max-height: calc(var(--lg-control-xl) * 6);
+    max-height: calc(var(--lg-control-hit) * 6);
   }
 }
 
@@ -140,7 +141,9 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--lg-space-2);
-  min-height: var(--lg-control-sm);
+  /* Seçenek bir "dokunma satırı"dır, küçültülen kontrol ölçeğine bağlanmaz:
+     liste öğesi her cihazda 44px hedefte kalır (`--lg-control-hit`). */
+  min-height: var(--lg-control-hit);
   padding: var(--lg-space-2) var(--lg-space-3);
   border-radius: var(--lg-radius-chip);
   font-size: var(--lg-text-body);

@@ -188,11 +188,13 @@ describe('yansıtılmış ilan detayı sayfası', () => {
     expect(container.querySelectorAll('[data-material="glass"]').length).toBeLessThanOrEqual(6)
   })
 
-  it('bağlanmamış eylemler yansıtılan ilanda da devre dışı ve gerekçelidir', async () => {
+  it('bağlanmamış eylemler yansıtılan ilanda da çizilmez ya da devre dışıdır', async () => {
     await renderProjected()
-    for (const name of ['Mesaj gönder', 'Satıcı bilgilerine git']) {
-      expect(screen.getByRole('button', { name })).toHaveProperty('disabled', true)
-    }
-    expect(screen.getByText(/Mesaj gönderme bu sürümde bağlı değil/i)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Mesaj gönder' })).toBeNull()
+    expect(screen.getByText(/Mesajlaşma sonraki fazda açılacak/i)).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Satıcı bilgilerine git' })).toHaveProperty(
+      'disabled',
+      true,
+    )
   })
 })

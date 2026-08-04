@@ -38,6 +38,7 @@
 }
 
 .item {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -57,9 +58,23 @@
   transition: background-color 0.18s ease, color 0.18s ease, opacity 0.18s ease;
 }
 
-/* Boyutlar kontrol token'ından — dokunmatikte otomatik büyür */
-.sm .item { min-width: var(--lg-control-sm); min-height: var(--lg-control-sm); font-size: var(--lg-text-footnote); }
-.md .item { min-width: var(--lg-control-md); min-height: var(--lg-control-md); font-size: var(--lg-text-body); }
+/* Boyutlar kontrol token'ından — dokunmatikte otomatik büyür.
+   `--item-h` ayrı tutulur ki dokunma hedefi taşması ölçüyü izlesin. */
+.sm .item { --item-h: var(--lg-control-sm); font-size: var(--lg-text-footnote); }
+.md .item { --item-h: var(--lg-control-md); font-size: var(--lg-text-body); }
+.item { min-width: var(--item-h, var(--lg-control-md)); min-height: var(--item-h, var(--lg-control-md)); }
+
+/* Ok/sayfa karoları ikon ve rakam boyutunda: görünür ölçü 36/40px, dokunma
+   hedefi görünmez ::after ile dikeyde `--lg-control-hit`e (44px) taşar. Taşma
+   (2-4px) kabuğun `--lg-space-1` dolgusunun içinde kalır — `GlassSurface`'in
+   `overflow: hidden`'ı kırpmaz. Yatayda taşma YOK: karolar 2px aralıkla
+   dizildiği için yatay taşma komşu hedeflerle üst üste binerdi. */
+.item::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--item-h, var(--lg-control-md)) - var(--lg-control-hit)) / 2));
+}
 .sm .compact { font-size: var(--lg-text-footnote); }
 .md .compact { font-size: var(--lg-text-body); }
 

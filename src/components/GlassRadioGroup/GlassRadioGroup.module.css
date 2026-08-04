@@ -1,16 +1,18 @@
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
-     daire/nokta çapları, metin blok arası ve dokunmatik hedef sabiti.
+     daire/nokta çapları ve metin blok arası. Dokunma hedefi artık yerel bir
+     sabit değil, `--lg-control-hit` token'ıdır.
      pointer:coarse'ta daire/nokta değişkenleri aşağıda büyütülür. */
   --radio-circle-sm: 18px;
   --radio-circle-md: 20px;
   --radio-dot-sm: 7px;
   --radio-dot-md: 8px;
   --radio-text-gap: 2px;
-  --radio-touch-target: 44px;
+  /* Seçenekler arası dikey boşluk; hedef genişletmesi bunun yarısını kullanır */
+  --radio-gap: var(--lg-space-3, 12px);
   display: flex;
   flex-direction: column;
-  gap: var(--lg-space-3, 12px);
+  gap: var(--radio-gap);
   color: var(--lg-label, #24211b);
 }
 
@@ -25,12 +27,25 @@
 }
 
 .option {
+  position: relative;
   display: inline-flex;
   align-items: flex-start;
   gap: var(--lg-space-2, 8px);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Görünmez hedef genişletmesi: daire 18/20px kalır, tıklanabilir satır dikeyde
+   grup boşluğunun yarısı kadar taşar. Seçenek kökü <label>'dır (GlassSurface
+   değil) → `overflow: hidden` yok, pseudo-eleman gerçekten tıklanır. Taşma tam
+   olarak boşluğun yarısı olduğundan ardışık seçeneklerin hedefleri ne çakışır
+   ne de aralarında ölü bölge bırakır — yanlış seçenek seçme riski yok. */
+.option::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc(var(--radio-gap) / -2);
 }
 .disabled {
   opacity: 0.45;
@@ -96,8 +111,9 @@
   color: var(--lg-label-secondary, #79726a);
 }
 
-/* Dokunmatik: daire büyür, satır 44px dokunma hedefine ulaşır —
-   kök değişkenleri büyütülür, kural yapısı aynı kalır */
+/* Dokunmatik: daire parmakla görünür kalsın diye büyür ve satırın kendisi
+   dokunma hedefi tabanına oturur (`--lg-control-hit` = her cihazda 44px).
+   Bu, küçültülen kontrol ölçeğinden bağımsızdır: satır bir "dokunma satırı"dır. */
 @media (pointer: coarse) {
   .root {
     --radio-circle-sm: 22px;
@@ -105,7 +121,7 @@
     --radio-dot-sm: 9px;
     --radio-dot-md: 10px;
   }
-  .option { min-height: var(--radio-touch-target); }
+  .option { min-height: var(--lg-control-hit); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -3,8 +3,10 @@
   --root-pad: 3px;    /* iç çerçeve payı — segment yüksekliği bundan türetilir */
   --list-gap: 2px;    /* segmentler arası mikro boşluk */
   --segment-gap: 6px; /* ikon-etiket arası — 6px ölçekte yok */
-  --pad-x-sm: 14px;   /* segment yatay padding'leri — 14/18px ölçekte yok */
-  --pad-x-md: 18px;
+  /* Segment yatay dolguları token ölçeğinden: yükseklik 44→36/40'a inince
+     14/18px dolgu kapsülü fazla yayvan bırakıyordu. */
+  --pad-x-sm: var(--lg-space-3);
+  --pad-x-md: var(--lg-space-4);
   --font-md: 14px;    /* footnote(13) ile body(15) arası — ölçek dışı */
   display: inline-flex;
   padding: var(--root-pad);
@@ -59,15 +61,16 @@
 
 /* Boyut ekseni: dokunma hedefi segmentin kendisidir, kök değil — bu yüzden
    segment TAM kontrol yüksekliğini alır ve kök payı dışarıya eklenir.
-   (Önceden kök payı segmentten düşülüyordu: 44 − 3×2 = 38px, WCAG 2.2 AAA
-   2.5.5'in 44px eşiğinin altı.) */
+   İmleçli cihazda sm 36 / md 40px (kökle birlikte 42/46px), dokunmatikte
+   token 44'e çıkar ve AAA 2.5.5 sağlanır. Hedefi ::after ile büyütmek mümkün
+   değil: `.list` yatay kaydırma için `overflow-x: auto` taşır. */
 .sm .segment {
-  height: var(--lg-control-sm, 44px);
+  height: var(--lg-control-sm, 36px);
   padding: 0 var(--pad-x-sm);
   font-size: var(--lg-text-footnote, 13px);
 }
 .md .segment {
-  height: var(--lg-control-md, 44px);
+  height: var(--lg-control-md, 40px);
   padding: 0 var(--pad-x-md);
   font-size: var(--font-md);
 }

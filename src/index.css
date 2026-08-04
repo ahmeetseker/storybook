@@ -22,6 +22,26 @@
   --lg-accent: #7c3806;                      /* amber —  7.00 : 1 */
   --lg-accent-contrast: #ffffff;             /* amber üstü metin — 8.66 : 1 */
 
+  /* Eylem dili — dolu ve düz aksiyonların TEK kaynağı.
+     Sayfadaki her buton ve buton görünümlü bağlantı (`<a>`) zemini, metnini ve
+     ağırlığını buradan okur. Gerekçe: aynı işi yapan kontroller elle
+     yazıldığında sessizce ayrışıyordu — kabuğun "İlan ver" butonu accent'i
+     %85 saydamlıkla, karar rayının birincil eylemi ise DÜZ accent + ağırlık
+     700 ile çiziyordu; yan yana iki farklı kahve görünüyordu.
+
+     Zemin `transparent` ile değil `--lg-surface` ile karışır: saydam bir dolgu
+     rengini arkasındaki yüzeyden alır ve aynı buton beyaz kartta, fildişi
+     zeminde ve tonlu bantta üç ayrı renk olur. Karışım opaktır, dolayısıyla
+     zemin nereye konursa konsun aynıdır.
+
+     `--lg-action-tint` kancası boş bırakılır: bir kontrol kendi tonunu
+     vermek isterse (GlassButton `tint`) yalnız onu set eder, karışım oranı
+     ve kontrast kuralı burada kalır. */
+  --lg-action-prominent: color-mix(in srgb, var(--lg-action-tint, var(--lg-accent)) 85%, var(--lg-surface));
+  --lg-action-prominent-hover: var(--lg-action-tint, var(--lg-accent));
+  --lg-action-prominent-label: var(--lg-accent-contrast);
+  --lg-action-weight: 600;
+
   /* Hero showcase overlay: medya üstü karartma + üzerindeki metin rengi */
   --lg-scrim: rgba(10, 12, 16, 0.55);
   --lg-on-scrim: #ffffff;
@@ -97,12 +117,20 @@
     var(--lg-space-8)
   );
 
-  /* Kontrol yükseklikleri — WCAG 2.2 AAA 2.5.5 (Target Size, Enhanced)
-     gereği giriş yönteminden bağımsız olarak min. 44px. */
-  --lg-control-sm: 44px;
-  --lg-control-md: 44px;
-  --lg-control-lg: 48px;
-  --lg-control-xl: 56px;
+  /* Kontrol yükseklikleri — GÖRÜNÜR ölçü.
+
+     WCAG 2.2 AAA 2.5.5 (Target Size, Enhanced) dokunma HEDEFİNİ şart koşar,
+     kontrolün çizilen kutusunu değil. İmleçli cihazlarda görünür yükseklik
+     sıkı tutulur; hedef, kontrolün görünmez `::after` genişletmesiyle
+     `--lg-control-hit` değerinde kalır (bkz. Tokenlar → Kontrol ölçeği).
+     Dokunmatikte (pointer: coarse) görünür ölçü zaten hedefe eşitlenir. */
+  --lg-control-sm: 36px;
+  --lg-control-md: 40px;
+  --lg-control-lg: 44px;
+  --lg-control-xl: 52px;
+
+  /* Dokunma hedefinin tabanı — görünür ölçüden bağımsız, her cihazda 44px */
+  --lg-control-hit: 44px;
 
   /* Gölge ölçeği */
   --lg-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
@@ -116,6 +144,17 @@
 }
 
 /* Koyu tema — Grafit */
+/* Dokunmatik: görünür ölçü doğrudan dokunma hedefine eşitlenir; parmakla
+   kullanımda küçük kontrol yoktur. */
+@media (pointer: coarse) {
+  :root {
+    --lg-control-sm: 44px;
+    --lg-control-md: 44px;
+    --lg-control-lg: 48px;
+    --lg-control-xl: 56px;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     /* Koyu temada da ölçüm tonlu zeminleri kapsar; en kötü durum genellikle

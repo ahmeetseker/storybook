@@ -2,7 +2,7 @@
 name: GlassDatePicker
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassDatePicker Kuralları
@@ -110,15 +110,24 @@ eylem dilinde kısa tutulur ("Tarih seç", "Randevu tarihi").
 **Borç (raw / mikro-geometri):** Token'a bağlananlar: popover mobil taşma
 payı `calc(100vw - var(--lg-space-7))` (32px). Token karşılığı olmayanlar
 component kökünde yerel değişkene toplandı: trigger `--min-w-sm/md/lg:
-168/200/232px` (layout token'ı yok) · takvim `--grid-gap: 2px` ·
-`--day-size: 40px` (bp-sm 640px'te 36px'e iner) · bugün halkası
-`--today-ring: 1.5px`. `--day-size` bilinçli olarak `--lg-control-md`'ye
-BAĞLANMADI: control token'ı `pointer: coarse`'ta 44px'e büyür ve mevcut
-mobile-first tasarım (base 40px dokunma hedefi + ≥640px'te 36px breakpoint
-override'ı) ile çelişip görsel değişiklik yaratırdı; birebir görsel
-eşdeğerlik korundu. Bilinçli bırakılanlar: geçiş süreleri `0.16s`/`0.12s
-ease-out` (süre/easing token'ı yok) · invalid iç halka `outline: 1.5px`
-(focus/outline istisnası).
+168/200/232px` (layout token'ı yok) · takvim `--grid-gap: 2px` · bugün
+halkası `--today-ring: 1.5px`. `--day-size` artık raw değil:
+`--lg-control-sm`'e bağlandı — imleçli cihazda 36px, dokunmatikte token
+kendiliğinden 44px'e çıkar. Böylece ekran genişliği yerine giriş yeteneği
+belirleyici oldu (bkz. ErisilebilirlikMotionResponsive) ve `bp-sm` (640px)
+override'ına gerek kalmadı. Bilinçli bırakılanlar: geçiş süreleri
+`0.16s`/`0.12s ease-out` (süre/easing token'ı yok) · invalid iç halka
+`outline: 1.5px` (focus/outline istisnası).
+
+**Dokunma hedefi:** trigger yüksekliği kontrol ölçeğini izler (imleçli
+36/40/44, dokunmatik 44/44/48px). Ay gezinme butonları (`.nav`) ikon-tek
+kontroldür: görünen daire 36px kalır ama `::after` ile her iki eksende
+`--lg-control-hit`e (44px) uzanır — genişleme panelin kendi `--lg-space-3`
+padding'i içinde kaldığı için GlassSurface kırpmasına takılmaz ve başlıkla
+çakışmaz. Gün hücrelerine bu genişletme **uygulanmadı**: hücreler 2px
+aralıkla dizildiğinden ±4px taşma komşu günlerle çakışır, takvimde yanlış
+gün seçimi üretirdi. Gün hedefi imleçli cihazda 36px (AA 2.5.8 ✓),
+dokunmatikte 44px (AAA 2.5.5 ✓).
 
 ## 10. Storybook kapsamı
 
@@ -149,3 +158,9 @@ saat seçimi ayrı component mi.
 
 - 2026-07-16: İlk sürüm — Pazartesi başlangıçlı grid, elle yazılmış tarih
   yardımcıları (date-fns yok), klavye gezinme + min/max kıstırma.
+- 2026-08-03: Yeni kontrol ölçeği. Trigger imleçli cihazda 44/44/48 →
+  36/40/44px (token değişimi). `--day-size` raw 40px + bp-sm 36px
+  breakpoint'i kaldırıldı → `--lg-control-sm` (imleçli 36, dokunmatik 44px);
+  mobil dokunma hedefi 40→44px'e çıktı. `.nav` butonuna görünmez `::after`
+  hedef genişletmesi eklendi (36 → 44px); gün hücrelerine bilinçli olarak
+  eklenmedi (2px grid aralığında çakışırdı).

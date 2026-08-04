@@ -65,6 +65,10 @@ export function normalizeAccountDashboard(
     ),
     activities: [...(raw.activities ?? [])],
     savedSearch: hasInvalidSavedSearch ? undefined : savedSearch,
+    // Performans ve fatura verileri normalizasyon gerektirmez: kaynaktan
+    // geldiği gibi taşınır, yoksa ilgili bölümler kendi boş durumunu çizer.
+    insights: raw.insights,
+    billing: raw.billing,
     sectionErrors,
   }
 }

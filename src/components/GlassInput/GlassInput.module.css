@@ -1,7 +1,7 @@
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
   --pad-x-sm: 10px;   /* sm yatay padding — 10px ölçekte yok (space-2=8/space-3=12) */
-  --clear-size: 22px; /* temizle butonu kutusu */
+  --clear-size: var(--lg-space-6); /* temizle butonu kutusu — AA 2.5.8 tabanı (24px) */
   --ios-min-font: 16px; /* iOS Safari zoom eşiği — platform sabiti */
   display: block;
   /* Form kontrolleri default blok akışında tam genişlik */
@@ -71,10 +71,10 @@
   appearance: none;
 }
 
-/* Yükseklikler kontrol token'larından (dokunmatikte otomatik 44px+) */
-.sm .inner { min-height: var(--lg-control-sm, 32px); padding: 0 var(--pad-x-sm); }
+/* Yükseklikler kontrol token'larından (imleçli 36/40/44, dokunmatikte 44/44/48) */
+.sm .inner { min-height: var(--lg-control-sm, 36px); padding: 0 var(--pad-x-sm); }
 .md .inner { min-height: var(--lg-control-md, 40px); padding: 0 var(--lg-space-3); }
-.lg .inner { min-height: var(--lg-control-lg, 48px); padding: 0 var(--lg-space-4); }
+.lg .inner { min-height: var(--lg-control-lg, 44px); padding: 0 var(--lg-space-4); }
 
 /* iOS Safari, font-size < 16px olan input'a odaklanınca sayfaya zoom yapar.
    bp-sm altında tüm boyutlarda 16px kalır; ≥640px'te tipografi token ölçeğine iner. */
@@ -96,6 +96,7 @@
 }
 
 .clear {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -119,4 +120,14 @@
 .clear:focus-visible {
   outline: 2px solid var(--lg-accent, #0a84ff);
   outline-offset: 2px;
+}
+/* Görünmez hedef genişletmesi: daire 24px kalır, tıklanabilir alan dikeyde
+   `--lg-control-hit`e uzanır. Kök GlassSurface `overflow: hidden` taşıdığı için
+   taşma satır yüksekliğinde (36/40/44px) kırpılır — yine de 24px'ten belirgin
+   iyi. Yatayda genişletilmez: girdi metnine taşıp yanlış hedef üretirdi. */
+.clear::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--clear-size) - var(--lg-control-hit)) / 2));
 }

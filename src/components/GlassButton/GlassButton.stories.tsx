@@ -9,6 +9,7 @@ const meta = {
   args: { onClick: fn() },
   argTypes: {
     size: { control: 'select', options: ['sm', 'md', 'lg', 'xl'] },
+    material: { control: 'inline-radio', options: ['glass', 'flat'] },
     tint: { control: 'color', description: 'Semantik vurgu; tema rengi verme (tema token’dan gelir)' },
     loading: { control: 'boolean' },
     // hover/focus/active bilinçli olarak control değildir — CSS state'idir (bkz. rules.md)
@@ -24,6 +25,32 @@ export const Prominent: Story = { args: { children: 'Bitti', prominent: true } }
 export const ExtraLarge: Story = { args: { children: 'Başlayalım', size: 'xl' } }
 export const Disabled: Story = { args: { children: 'Devre Dışı', disabled: true } }
 export const Loading: Story = { args: { children: 'Gönderiliyor', prominent: true, loading: true } }
+
+/**
+ * Malzeme ekseni. `flat` bir stil tercihi değil **katman kararıdır**: sayfa
+ * başına cam bütçesi altıdır, içerik katmanındaki bir kartın içindeki buton bu
+ * payı hak etmez. Eylem dili (renk, metin, ağırlık) iki malzemede de aynıdır —
+ * fark yalnız yüzeyin kendisidir.
+ */
+export const Materials: Story = {
+  args: { children: '' },
+  render: () => (
+    <div style={{ display: 'grid', gap: 16 }}>
+      {(['glass', 'flat'] as const).map((material) => (
+        <div key={material} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <code style={{ inlineSize: '4rem', fontSize: 12 }}>{material}</code>
+          <GlassButton material={material} prominent>
+            Birincil
+          </GlassButton>
+          <GlassButton material={material}>İkincil</GlassButton>
+          <GlassButton material={material} disabled>
+            Devre dışı
+          </GlassButton>
+        </div>
+      ))}
+    </div>
+  ),
+}
 
 /** Boyut ekseni tek bakışta — yükseklikler kontrol token'larından gelir (dokunmatikte 44px+). */
 export const Sizes: Story = {

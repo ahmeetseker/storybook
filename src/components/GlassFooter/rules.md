@@ -78,16 +78,22 @@ Stateless. Link hover/focus CSS'te (`:focus-visible` halka, `hover: hover`).
 | focus halkası                          | `--lg-accent`                                             |
 | marka / sütun başlığı / yasal          | `--lg-text-headline` (17px) / `--lg-text-footnote` (13px) |
 | gap/padding'ler (4/8/12/16/20/24/32px) | `--lg-space-1..7`                                         |
-| link dokunma hedefi (coarse)           | `--lg-control-md` (coarse bağlamda birebir 44px)          |
+| link yüksekliği (imleçli)              | `--lg-space-6` (24px — WCAG 2.2 AA 2.5.8 tabanı)          |
+| link dokunma hedefi (coarse)           | `--lg-control-hit` (44px)                                 |
 
 **Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler component
 kökünde yerel değişkende toplandı (`.root { --content-max: 1120px; --pad-top:
 44px; --section-gap: 28px; --row-gap: 18px; --item-gap: 10px; --band-pad: 26px
-28px; --brand-col-min: 220px; --text-sm: 14px; --link-min-h:
-24px; }`) — 14px, footnote (13) ile body (15) arasında ara adım; 24px link
-yüksekliği kontrol ölçeği (32/40/48/56) dışında olduğundan control token'ı
-verilmedi. `pointer: coarse`'ta link `min-height: var(--lg-control-md)` —
-44px'e büyüme dokunmatikte tasarımın istediği davranış. Container eşikleri
+28px; --brand-col-min: 220px; --text-sm: 14px; }`) — 14px, footnote (13) ile
+body (15) arasında ara adım. `--link-min-h` 2026-08-03'te raw 24px olmaktan
+çıkıp `--lg-space-6`'ya bağlandı: footer linki bir metin hedefidir, kontrol
+ölçeğinin (36/40/44/52) bir kademesi değil; 24px WCAG 2.2 AA 2.5.8 tabanıdır.
+`pointer: coarse`'ta link `min-height: var(--lg-control-hit)` — dokunmatikte
+görünür ölçü doğrudan 44px hedefe çıkar (`--lg-control-md` yerine `hit`
+yazılıyor: niyet "kontrol boyu" değil "dokunma hedefi", ölçek değişse de 44px
+sabit kalmalı). Görünmez `::after` taşması kullanılmadı — footer linkleri
+`--lg-space-2` boşluklu bir kolon listesinde ve 20px'lik bir taşma komşu
+hedeflerle üst üste binerdi. Container eşikleri
 `64rem` ve `32rem`; CSS custom property media/container koşulunda
 kullanılamadığı için doğrudan yazılır. Letter-spacing değerleri (`-0.022em`,
 `-0.01em`) token'sız raw kalır.
@@ -121,3 +127,9 @@ Responsive (390px), Focus, Erisilebilirlik. Temalar toolbar'dan.
 **Açık kararlar:** app-store rozet slotu (v2) · dil seçici slotu (v2) ·
 `tone` ekseni bilinçli yok — flat zemin tema token'larından döner; ihtiyaç
 doğarsa v2.
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. `--link-min-h` raw 24px yerine
+  `--lg-space-6`e, `pointer: coarse` link hedefi `--lg-control-md` yerine
+  niyeti açık `--lg-control-hit`e bağlandı. Görsel ölçü değişmedi.

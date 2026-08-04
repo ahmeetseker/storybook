@@ -38,6 +38,34 @@ semantic rengin %12'ye kadar tonlanmış yüzeyi dahil **tüm kombinasyonlarda**
 Yeni bir renk eklemeden veya `color-mix` oranını yükseltmeden önce ölçüm
 tekrarlanır — tonlu zemin oranını %12'nin üstüne çıkarmak AAA'yı bozar.
 
+## Eylem dili
+
+Buton görünümü **component'te değil token'da** tanımlıdır. Sebep: aynı görünümü
+paylaşması gereken kontrollerin hepsi `<button>` değildir — dock'un
+`Satıcıya git` eylemi, kabuğun atlama bağlantısı ve vitrin CTA'ları `<a>`'dır ve
+`GlassButton`'ı kullanamaz. Ortak kaynak token seviyesinde olmazsa iki taraf
+kaçınılmaz olarak ayrışır; nitekim ayrışmıştı (bkz. changelog).
+
+| Token | Değer | Kullanım |
+|---|---|---|
+| `--lg-action-prominent` | `color-mix(--lg-action-tint ?? --lg-accent %85, --lg-surface)` | Dolu eylemin zemini |
+| `--lg-action-prominent-hover` | `--lg-action-tint ?? --lg-accent` | Hover'da tam güç |
+| `--lg-action-prominent-label` | `--lg-accent-contrast` | Dolu eylemin metni |
+| `--lg-action-weight` | `600` | Her eylemin metin ağırlığı |
+
+**Karışım `transparent` ile değil `--lg-surface` ile yapılır.** Saydam bir dolgu
+rengini arkasındaki yüzeyden alır: aynı buton beyaz kartta, fildişi zeminde ve
+tonlu bantta üç ayrı renk olur. Karışım opaktır, zemin nereye konursa konsun
+aynıdır.
+
+`--lg-action-tint` bilerek **tanımsız bırakılır**. Kendi tonunu veren bir
+kontrol (`GlassButton` `tint`) yalnız bu kancayı set eder; karışım oranı ve
+kontrast kuralı token'da kalır.
+
+Ağırlık neden token? Elle çizilen butonlar 600 ve 700 arasında gidip geliyordu
+ve fark yan yana okunuyordu. Ölçü ve dolgu ayrımı vurguyu zaten taşır; ağırlık
+sabit kalır.
+
 ## Tipografi
 
 Font: **Manrope Variable** (`--lg-font`, self-host `@fontsource-variable/manrope`).
@@ -121,16 +149,29 @@ Kartın veya kolonun kendi genişliği değil, **içindeki gövde metni** bunu o
 
 ## Kontrol yükseklikleri
 
-| Token | Değer |
-|---|---|
-| `--lg-control-sm` | 44px |
-| `--lg-control-md` | 44px |
-| `--lg-control-lg` | 48px |
-| `--lg-control-xl` | 56px |
+Ölçek **giriş yöntemine göre** iki kademelidir: görünür yükseklik imleçli
+cihazda sıkı, dokunmatikte hedef ölçüsüne eşit.
 
-Dokunma hedefi kuralı: etkileşimli öğe **her cihazda min. 44px** — WCAG 2.2 AAA
-2.5.5 (Target Size, Enhanced) giriş yöntemi ayrımı tanımaz, bu yüzden
-`pointer: coarse` altında ayrıca büyütme yapılmaz.
+| Token | İmleçli (varsayılan) | `pointer: coarse` |
+|---|---|---|
+| `--lg-control-sm` | 36px | 44px |
+| `--lg-control-md` | 40px | 44px |
+| `--lg-control-lg` | 44px | 48px |
+| `--lg-control-xl` | 52px | 56px |
+| `--lg-control-hit` | 44px | 44px |
+
+`--lg-control-hit` dokunma hedefinin tabanıdır ve cihazdan bağımsızdır: liste
+satırı gibi "parmakla basılan" öğeler bu token'a bağlanır, küçük kontroller
+görünür ölçek token'larına.
+
+**Erişilebilirlik seviyesi giriş yöntemine göre farklıdır — bilinçli karar:**
+dokunmatikte hedef 44px'tir (WCAG 2.2 **AAA** 2.5.5 Target Size, Enhanced);
+imleçli cihazda görünür kontrol 36–40px'e iner, bu da **AA** 2.5.8'in 24px
+tabanının belirgin üstündedir ama AAA eşiğini karşılamaz. Gerekçe: 44px'lik
+kontroller masaüstü yoğunluğunda iri duruyordu; fare hassasiyeti 36px hedefte
+sorun üretmiyor. AAA'nın her cihazda korunması gerekiyorsa `:root` altındaki
+imleçli kademeyi 44px'e geri çekmek yeterlidir — bileşenler ölçüyü doğrudan
+token'dan okur.
 
 Hedef, tıklandığında eylemi tetikleyen **kutunun kendisidir**; onu saran
 sarmalayıcı değil. Bir `<input>` 56px'lik bir ray içinde 24px yüksekse hedef

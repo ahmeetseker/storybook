@@ -20,7 +20,13 @@
   --dock-clearance: calc(
     var(--lg-shell-dock-offset, var(--lg-control-xl)) + env(safe-area-inset-bottom, 0px)
   );
-  --rail-sticky-top: var(--lg-space-5);
+  /* Yapışkan kartın durağı kabuğun yüzen başlığının ALTINDADIR: pay tek
+     kaynaktan (`--lg-shell-header-offset`) okunur, sabit sayı yazılmaz.
+     Kabuk yokken (Storybook) yalnız kendi boşluğu kalır. */
+  --rail-sticky-top: calc(var(--lg-shell-header-offset, 0px) + var(--lg-space-5));
+  /* Yaprak dolgusu — bölümlerin ortak iç payı. Karar kartıyla aynı kademe
+     (GlassAgencyCard da `--lg-space-5` kullanır); sayfa boyunca tek değer. */
+  --sheet-pad: var(--lg-space-5);
 
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -29,17 +35,34 @@
   color: var(--lg-label);
 }
 
-/* ── Akış: fiyat ikilisi, soru omurgası, defter ── */
+/* ── Akış: fiyat ikilisi, soru omurgası, defter ──
+   Ritim artık bölümün İÇİNDE değil, ARASINDA: her bölüm kendi yaprağıdır ve
+   yapraklar arası pay ızgaranın boşluğundan gelir (bkz. rules.md §1b). */
 .flow {
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-4);
   min-inline-size: 0;
 }
 
 /* Fiyat + dosyanın durumu. Dar yerleşimde alt alta, orta ve geniş
-   yerleşimde yan yana. */
+   yerleşimde yan yana. İkili de bandın bir bölümüdür — o da bir yapraktır. */
 .duo {
   display: grid;
   gap: var(--lg-space-5);
-  padding-block-start: var(--lg-space-5);
+}
+
+/* ── Yaprak: bölümlerin ortak malzemesi ──────────────────────────
+   Karar kartıyla AYNI malzeme: yüzey + hairline + kart yarıçapı + en hafif
+   gölge kademesi. Tek fark kartın yüzüyor, yaprağın akışta durması.
+   Gerekçe için bkz. rules.md §1b — bu kural 2026-08-04'te değişti. */
+.duo,
+.section {
+  padding: var(--sheet-pad);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-xs);
 }
 
 .flowPrice {
@@ -117,63 +140,47 @@
   }
 }
 
-/* ── Karar kolonu ────────────────────────────────────────────── */
+/* ── Karar kartı (Varyant D — sekmeli yoğunluk) ───────────────── */
 
-/* Ray yalnız GENİŞ yerleşimde vardır; altında yerini yapışkan dock alır.
-   Dar ve orta yerleşimde DOM'da kalır ama ızgaradan düşer — iki birincil
-   eylem aynı anda görünmez.
+/* Kart yalnız GENİŞ yerleşimde vardır; altında yerini yapışkan dock alır.
+   Dar ve orta yerleşimde DOM'da kalır ama ızgaradan düşer — kartın eylem
+   bölgesi ile dock aynı anda görünmez (rules.md §1b).
 
    Ray kendisi yapışkan değildir: ızgara satırının tamamını kaplayan bir kap
-   olur ve içindeki eşlikçiye hareket alanı verir. Satır kanıt akışıyla
-   birlikte biter — satıcı bölümü ikinci satırdadır — dolayısıyla eşlikçi
-   satıcı bölümünden önce serbest kalır ve onunla asla yan yana durmaz. */
+   olur ve içindeki karta hareket alanı verir. Satır kanıt akışıyla birlikte
+   biter — satıcı bölümü ikinci satırdadır — dolayısıyla kart satıcı
+   bölümünden önce serbest kalır ve onunla asla yan yana durmaz. */
 .rail {
   display: none;
   align-self: stretch;
-  grid-template-rows: auto 1fr;
-  /* İki parça arasındaki boşluk grup içi değil bölüm arası ritmidir: giriş
-     bloğu okunup biter, eşlikçi ayrı bir şey olarak başlar. */
-  gap: var(--section-rhythm);
+  /* Kart içeriği kadar yüksektir; ızgara satırının tamamına GERİLMEZ —
+     gerilirse `position: sticky` hiçbir zaman kilitlenmez (yapışacak bir
+     hareket alanı kalmaz). */
+  align-content: start;
   min-inline-size: 0;
-  /* Eşlikçinin son durağı dock payı kadar yukarıda biter. */
+  /* Kartın son durağı dock payı kadar yukarıda biter. */
   padding-block-end: var(--dock-clearance);
 }
 
-/* Bir kez okunup akıp giden parça. */
-.railIntro {
-  display: grid;
-  align-content: start;
-  gap: var(--lg-space-5);
-  min-inline-size: 0;
-}
-
-/* Okuyucuyla kalan parça: fiyat çapası · birincil eylem · satıcı satırı. */
-.railSticky {
+/* Tek yüzey, sabit iskelet: fiyat → sekmeler → panel → eylemler.
+   Hesap bölümleriyle aynı kart dili (hairline çerçeve, kart yarıçapı, kağıt
+   zemin); içinde ikinci bir kart açılmaz. */
+.railCard {
   position: sticky;
   inset-block-start: var(--rail-sticky-top);
-  align-self: start;
   display: grid;
   align-content: start;
   gap: var(--lg-space-4);
   min-inline-size: 0;
-}
-
-/* Kaydırılıp gitmiş fiyatın tek satırlık referansı — ikinci bir vurgu değil.
-   Bu yüzden `display` değil `body` ölçeğinde ve ikincil tondadır. */
-.railAnchor {
-  margin: 0;
-  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  padding-block-start: var(--lg-space-4);
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-body);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.4;
+  padding: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
 }
 
 .priceBlock {
   display: grid;
-  gap: var(--lg-space-3);
+  gap: var(--lg-space-1);
 }
 
 /* Sayfanın en büyük sayısı. Başlıkla aynı ölçek adımını paylaşır ama tek
@@ -187,41 +194,151 @@
   font-variant-numeric: tabular-nums;
 }
 
-.priceFacts {
+/* Fiyatın tek satırlık dayanağı: birim fiyat + hangi alana göre. */
+.priceBasis {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+
+/* ── Sekme şeridi ─────────────────────────────────────────────
+   Kartın başlık şeridi: cam açmaz (kart içerik katmanındadır), segmentler
+   şeridi eşit paylaşır, altında saç teli ayraç durur. Görsel dil
+   `GlassSegmentedControl` `bar` varyantıyla aynıdır; sözleşme ise sekmedir
+   (tablist/tab/tabpanel), o yüzden yerel yazılmıştır. */
+.tabStrip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--lg-control-sm);
+  margin: 0;
+  padding: 0 var(--lg-space-2);
+  border: 0;
+  /* Seçili sekmenin altındaki çizgi ayracın üstüne oturur. */
+  box-shadow: inset 0 -2px 0 0 transparent;
+  background: none;
+  color: var(--lg-label-secondary);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  box-shadow: inset 0 -2px 0 0 var(--lg-accent);
+  color: var(--lg-label);
+}
+
+.tab:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-focus-ring-offset));
+}
+
+@media (hover: hover) {
+  .tab:hover:not([aria-selected='true']) {
+    color: var(--lg-label);
+  }
+}
+
+@media (pointer: coarse) {
+  .tab {
+    min-block-size: var(--lg-control-hit);
+  }
+}
+
+/* Panelin yüksekliği SABİTTİR: sekme değişince kart zıplamaz ve kartın
+   yapışkan gövdesi hiçbir ekranda taşmaz.
+
+   Mikro-geometri (token karşılığı yok, ölçülerek bulundu):
+   - `--rail-panel-chrome`: kartın sabit iskeleti (fiyat + sekme şeridi +
+     eylem bölgesi + dolgular) artı yapışkan üst boşluk ve dock payı.
+   - `--rail-panel-max`: en uzun panelin rahat okunduğu üst sınır.
+   Ekran kısaldığında panel onunla birlikte küçülür; içerik sığmazsa panel
+   kendi içinde kayar — bilgi accordion arkasına saklanmaz, yalnız kaydırma
+   ile okunur. */
+.tabPanel {
+  --rail-panel-chrome: 33rem;
+  --rail-panel-max: 25rem;
+  display: grid;
+  align-content: start;
+  gap: var(--lg-space-3);
+  block-size: clamp(14rem, calc(100dvh - var(--rail-panel-chrome)), var(--rail-panel-max));
+  min-inline-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Kaydırma gölgesi: panel taşıyorsa altta ince bir gölge belirir, sona
+     gelindiğinde kaybolur. Kesilen metnin kesildiği görünür olmalı —
+     kaydırma çubuğu üstü kapalı (overlay) olduğu için tek başına yetmez.
+     Kapak katmanları `local`, gölge katmanları `scroll` bağlıdır. */
+  background:
+    linear-gradient(var(--lg-surface) 40%, transparent) top / 100% var(--lg-space-5) no-repeat
+      local,
+    linear-gradient(transparent, var(--lg-surface) 60%) bottom / 100% var(--lg-space-5) no-repeat
+      local,
+    radial-gradient(
+        farthest-side at 50% 0,
+        color-mix(in srgb, var(--lg-label) 14%, transparent),
+        transparent
+      )
+      top / 100% var(--lg-space-2) no-repeat,
+    radial-gradient(
+        farthest-side at 50% 100%,
+        color-mix(in srgb, var(--lg-label) 14%, transparent),
+        transparent
+      )
+      bottom / 100% var(--lg-space-2) no-repeat;
+}
+
+.tabPanel:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Olgu ızgarası: etiket üstte küçük ve ikincil, değer altta tabular. */
+.factGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--lg-space-3);
+  gap: var(--lg-space-3) var(--lg-space-4);
   margin: 0;
 }
 
-.priceFacts dt {
+.factGrid dt {
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
   line-height: 1.4;
 }
 
-.priceFacts dd {
+.factGrid dd {
   margin: 0;
-  font-size: var(--lg-text-headline);
+  font-size: var(--lg-text-body);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   line-height: 1.3;
 }
 
-.priceBasis {
+.panelNote {
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-.verificationSummary,
-.critical {
-  display: grid;
+.blockHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
   gap: var(--lg-space-2);
-  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  padding-block-start: var(--lg-space-4);
 }
 
 .railTitle {
@@ -232,52 +349,164 @@
   line-height: 1.3;
 }
 
-.railFact {
-  margin: 0;
-  font-size: var(--lg-text-body);
+/* Sayaç çipi: sayı kelimeyle birlikte okunur, renk taşımaz. */
+.countChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--lg-space-2);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Durum çipi buradan kalktı: kapsül artık `EvidenceState`'in `chip`
+   varyantıdır ve bandın tek durum dilinden gelir. */
+
+/* ── Açık konular (Özet paneli) ───────────────────────────────── */
+
+.issueBlock {
+  display: grid;
+  gap: var(--lg-space-2);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-3);
+}
+
+.issueList {
+  display: grid;
+  gap: var(--lg-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.issueItem {
+  display: grid;
+  gap: var(--lg-space-1);
+}
+
+/* ── Doğrulama paneli ─────────────────────────────────────────── */
+
+.checkList {
+  display: grid;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--lg-space-3);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  padding-block-start: var(--lg-space-2);
+}
+
+.checkRow:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.checkTitle {
+  font-size: var(--lg-text-footnote);
   line-height: 1.4;
 }
 
-.railState {
-  display: flex;
-  align-items: baseline;
-  gap: var(--lg-space-2);
-  margin: 0;
-  font-size: var(--lg-text-footnote);
-  line-height: 1.45;
-}
-
-.railLink {
+/* Ölçülü ikincil aksiyon — düz altı çizili bağlantı değil. */
+.cardLink {
   justify-self: start;
-  color: var(--lg-accent);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background-color: var(--lg-bg);
+  color: var(--lg-label);
   font-size: var(--lg-text-footnote);
   font-weight: 600;
+  text-decoration: none;
 }
 
-.railLink:focus-visible {
+.cardLink:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
 }
 
-.sellerSummary {
+@media (hover: hover) {
+  .cardLink:hover {
+    background-color: var(--lg-hairline);
+  }
+}
+
+/* ── Eylem bölgesi (kartın alt bölgesi — ayrı bir kutu değil) ─── */
+
+.cardActions {
   display: grid;
-  gap: var(--lg-space-1);
+  gap: var(--lg-space-3);
   border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
   padding-block-start: var(--lg-space-4);
 }
 
+.actionContext {
+  display: grid;
+  gap: var(--lg-space-1);
+}
+
 .sellerName {
   margin: 0;
-  font-size: var(--lg-text-headline);
+  font-size: var(--lg-text-body);
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .sellerMeta {
   margin: 0;
   color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+/* Kartın eylemleri `GlassButton`dır: zemin, metin rengi, ağırlık, yükseklik,
+   malzeme, odak halkası ve devre dışı hâli component'ten gelir. Burada YALNIZ
+   satırdaki yerleri kalır.
+
+   Önceden ikisi de elle çiziliyordu ve sessizce ayrışmıştı: birincil düz
+   accent + ağırlık 700 + 44px, ikincil beyaz + 600 + 40px — aynı satırda iki
+   farklı kahve ve iki farklı yükseklik. Vurgu artık ölçüden değil DOLGUdan
+   geldiği için ikisi de aynı ölçüdedir (`size="md"` varsayılanı).
+
+   Malzeme cam bırakıldı: sayfadaki her buton kabuktaki `İlan ver` ile aynı
+   görünsün diye (ürün kararı, §2 — bütçe bilerek aşıldı). */
+.primaryAction {
+  flex: 1 1 100%;
+}
+
+.secondaryAction {
+  flex: 1 1 auto;
+}
+
+/* "Kayıtlı" basılı bir DURUMdur, ayrı bir buton türü değil. */
+.secondaryAction[aria-pressed='true'] {
+  background-color: var(--lg-hairline);
+}
+
+.actionNote {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
   line-height: 1.45;
 }
 
@@ -297,36 +526,107 @@
   transform: translateY(calc(var(--state-dot-size) * -0.1));
 }
 
-[data-state='positive'] > .rowState > .stateDot,
-.railState[data-state='positive'] > .stateDot {
+[data-state='positive'] > .rowState > .stateDot {
   background: var(--lg-success);
 }
 
-[data-state='negative'] > .rowState > .stateDot,
-.railState[data-state='negative'] > .stateDot {
+[data-state='negative'] > .rowState > .stateDot {
   background: var(--lg-danger);
 }
 
-[data-state='unknown'] > .rowState > .stateDot,
-.railState[data-state='unknown'] > .stateDot {
+[data-state='unknown'] > .rowState > .stateDot {
   background: var(--lg-warning);
 }
 
-/* ── Satıcı bölümü ───────────────────────────────────────────── */
+/* ── Satıcı bölümü — görüşme kartı ───────────────────────────── */
 
-.sellerCard {
-  margin-block-start: var(--lg-space-4);
+/* Bölümün konusu satıcı değil, YAPILACAK GÖRÜŞMEdir: künye bandı → gündem →
+   ince baskı. Band cam değil düz tondur, §2 cam bütçesine girmez. */
+
+/* Künye bandı yaprağın iç dolgusunu negatif payla iptal eder ve kenardan
+   kenara uzanır. Kart içinde kart değildir: kendi yarıçapı, gölgesi ve
+   yüzeyi yoktur — yaprağın tonlanmış bir bölgesidir.
+
+   Yatay taşma güvenli: band bölümün ORTASINDA durur (üstünde başlık var),
+   yani yaprağın yalnız düz dikey kenarlarına değer, yuvarlatılmış köşelerine
+   değil. Yaprakta `overflow: hidden` yok — kontrolün odak halkası kırpılmaz. */
+.callBand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-4) var(--lg-space-6);
+  margin-inline: calc(var(--sheet-pad) * -1);
+  padding: var(--lg-space-5) var(--sheet-pad);
+  background: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+  border-block-end: var(--lg-stroke-hairline) solid
+    color-mix(in srgb, var(--lg-accent) 20%, transparent);
 }
 
-.sellerLicence {
-  margin-block-start: var(--lg-space-4);
+/* Numara kontrolünün yuvası. Geniş yerleşimde bandın sağ ucunda; band
+   sarıldığında künyenin altına düşer ve sola yaslanır — sağa yaslı tek
+   başına bir buton, altındaki künyeyle hizasız durur. */
+.callAction {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-1);
 }
 
-.reveal {
+/* Etiket, numaranın optik hizasına çekilir: `.phoneLink` hover/odak yüzeyi
+   için yatay dolgu taşır, etiket aynı dolguyu almazsa iki satır kayık durur. */
+.callActionLabel {
+  margin: 0;
+  padding-inline: var(--lg-space-2);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+/* Satıcı künyesi bir YAPRAĞIN içindedir; kendi yüzeyini bırakır.
+   Kart içinde kart açılmaz — yapraklar geldiğinde bu kuralın tek ihlali
+   burasıydı (`GlassAgencyCard` yüzey + hairline + kart yarıçapı taşır).
+
+   İki sınıf bilerek: kütüphanenin `.card[data-variant='inline']` kuralı da
+   iki özgüllük taşıyor; düzleştirme onu kesin olarak geçmeli.
+
+   Bandın içinde artık kendi payını taşımaz (pay bandın dolgusudur) ve
+   esneyerek kontrolün yerini bırakır. */
+.sellerCard.sellerCard {
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Kütüphane kartının eylem bölgesi BU sayfada boştur: satıcı eylemleri
+   (numara, satıcıya git) bölümün kendisinde ve karar kartında yaşar.
+   Boş bir `<div>` de ızgaranın boşluğunu tüketir — künye ile yetki belgesi
+   arasında ~40px'lik sahipsiz bir aralık bırakıyordu. */
+.sellerCard.sellerCard [data-part='actions']:empty {
+  display: none;
+}
+
+/* Satıcı bölümü yaprağın tam genişliğini kaplar ama İÇERİĞİ okuma ölçüsünü
+   aşmaz: aksi halde kanıt satırının kaynak sütunu değerinden ~1000px uzağa
+   düşüyordu — kontrol etkilediği şeyin yanında durur (§1b). */
+.revealStatus,
+.agenda,
+.sellerFinePrint {
+  max-inline-size: 58rem;
+}
+
+/* Numara durumunun sabit yuvası: kapalı iletişim gerekçesi, bağlı olmayan
+   servis notu ve hata uyarısı hep buraya gelir. Yuva band ile gündemin
+   ARASINDADIR — uyarı belirdiğinde künye yerinden oynamaz. */
+.revealStatus {
   display: grid;
   justify-items: start;
   gap: var(--lg-space-2);
-  margin-block-start: var(--lg-space-4);
 }
 
 .revealButton {
@@ -361,42 +661,133 @@
   }
 }
 
-.sellerAsk {
+/* Görüşme gündemi — bölümün gövdesi, eki değil. */
+.agenda {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+/* Numaralandırma burada süs değil: maddeler telefonda ilerlenecek SIRAdır ve
+   sıra `criticalIssues()` sırasından gelir. `<ol>` semantiği de bunu söyler;
+   görünür sayı CSS sayacından gelir, işaretleyici gizlenir. */
+.agendaList {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: agenda;
+}
+
+.agendaList li {
+  counter-increment: agenda;
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.agendaList li:first-child {
+  border-block-start: 0;
+}
+
+/* Satırın tamamı etikettir: kutucuğu değil, maddeyi işaretlersiniz.
+   Dokunma hedefi satır yüksekliğinden gelir, minimum `--lg-control-hit`.
+
+   Orta sütun okuma ölçüsünde DURUR, `1fr` değildir: kolon 900px'e açıldığında
+   `1fr` kutucuğu metnin ~840px sağına atıyordu ve işaret hangi maddeye ait
+   olduğunu söylemez oluyordu. Kutucuk metnin bittiği yerde durur; satırın
+   tıklanabilir alanı ve ayraç yine tam genişliktedir. */
+.agendaItem {
+  display: grid;
+  grid-template-columns: var(--lg-space-6) minmax(0, var(--lg-measure)) var(--lg-space-5);
+  gap: var(--lg-space-3);
+  align-items: start;
+  min-block-size: var(--lg-control-hit);
+  padding-block: var(--lg-space-3);
+  cursor: pointer;
+}
+
+.agendaItem::before {
+  content: counter(agenda, decimal-leading-zero);
+  color: var(--lg-accent);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  padding-block-start: 0.28em;
+}
+
+.agendaText {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.agendaAction {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Adımın gerekçesi: hangi açık konuyu kapattığını söyler (`issue.title`).
+   Soru gerekçesiyle taşınır — özetdeki konuyla bağı görünür kalır. */
+.agendaWhy {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+/* Kutucuk son sütunda: göz önce yapılacak işi, sonra işaretleme yerini görür.
+   `accent-color` vurgu token'ından gelir; kutucuk kendi rengini uydurmaz. */
+.agendaCheck {
+  grid-column: 3;
+  grid-row: 1;
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 0;
+  margin-block-start: 0.15em;
+  accent-color: var(--lg-accent);
+  cursor: pointer;
+}
+
+.agendaCheck:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* İşaretlenen madde silinmez, geri çekilir: satır kalır, ağırlık düşer.
+   Üstü çizili metin ekran okuyucuda okunur kalır, yalnız görsel durum değişir. */
+.agendaCheck:checked ~ .agendaText > .agendaAction {
+  color: var(--lg-label-secondary);
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
+@media (hover: hover) {
+  .agendaItem:hover {
+    background: color-mix(in srgb, var(--lg-label) 3%, transparent);
+  }
+}
+
+/* İnce baskı: kararın çerçevesi (TTBS kapsamı, mahremiyet notu) — kararı
+   taşıyan içerik değil. Gündemden hairline ile ayrılır. */
+.sellerFinePrint {
   display: grid;
   gap: var(--lg-space-2);
-  margin-block-start: var(--lg-space-5);
   border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
   padding-block-start: var(--lg-space-4);
 }
 
-.askList {
-  display: grid;
-  gap: var(--lg-space-1);
-  margin: 0;
-  padding-inline-start: var(--lg-space-5);
-  font-size: var(--lg-text-footnote);
-  line-height: 1.5;
-}
+/* ── Kanıt bölümleri (içerik katmanı — yaprak) ───────────────── */
 
-/* ── Kanıt bölümleri (içerik katmanı — kart değil) ───────────── */
-
-/* Bölümler kutu değildir: sayfanın zemini onları taşır, ayrımı hairline ve
-   boşluk yapar. İlk bölüm çizgisiz başlar. */
+/* Bölüm bir yapraktır: yüzeyi kendi taşır, ayrımı kenarı ve arasındaki pay
+   yapar. Yüzey/çerçeve/gölge tanımı yukarıdaki ortak `.duo, .section`
+   kuralındadır; burada yalnız bölümün kendi yerleşimi kalır. */
 .section {
   display: grid;
   gap: var(--lg-space-4);
   align-content: start;
   min-inline-size: 0;
-  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  /* Ritim iki bölüm arasında paylaşılır: hairline boşluğun ortasında kalır. */
-  padding-block: calc(var(--section-rhythm) / 2);
   /* Sticky indeksin altında kalmasın diye çapa hedefi aşağıdan başlar */
   scroll-margin-block-start: calc(var(--lg-control-lg) + var(--lg-space-4));
-}
-
-.section:first-child {
-  border-block-start: 0;
-  padding-block-start: var(--lg-space-5);
 }
 
 .sectionTitle {
@@ -416,12 +807,15 @@
 
 /* ── Bölüm içeriği: not blokları, piyasa ve belgeler ─────────── */
 
+/* Okuma ölçüsü tek kaynaktan gelir. Buradaki elle yazılmış 68ch, aynı kolonda
+   `--lg-measure` (54ch) ile duran notların yanında sağ kenarı 14 karakter
+   kaydırıyordu. */
 .blockNote {
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-footnote);
   line-height: 1.5;
-  max-inline-size: 68ch;
+  max-inline-size: var(--lg-measure);
 }
 
 .marketBlock {
@@ -437,70 +831,125 @@
   letter-spacing: -0.02em;
 }
 
-/* Belgeler: renkli şerit yerine durum noktası + kelime. */
-.docList {
+/* ── Kanıt ızgarası — bandın ortak satır şekli ────────────────
+   Belgeler ve doğrulama defteri bu ızgarayı paylaşır; `EvidenceRow` ile aynı
+   üç sütuna ve aynı çökme eşiğine oturur (`rules.md` → Ortak dikey eksen).
+   Kap sorgusu satır listesinin KENDİSİNDEDİR: bir öğe kendi kabı olamaz. */
+.evidenceGrid {
+  container-type: inline-size;
   display: grid;
-  gap: var(--lg-space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.docItem {
+.evidenceRow {
   display: grid;
-  grid-template-columns: var(--evidence-label-col, 200px) minmax(0, 1fr);
+  grid-template-columns:
+    var(--evidence-label-col, 200px)
+    minmax(0, 1fr)
+    var(--evidence-source-col, 176px);
   align-items: baseline;
   gap: var(--lg-space-2) var(--lg-space-5);
+  padding-block: var(--lg-space-3);
   border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  padding-block-end: var(--lg-space-4);
 }
 
-.docItem:last-child {
+.evidenceRow:last-child {
   border-block-end: 0;
-  padding-block-end: 0;
 }
 
-.docLabel {
+/* İlk sütun burada bir ALAN ADI değil, satırın KİMLİĞİDİR ("İmar durum
+   belgesi", "Platform moderasyonu") — satırlar arasında değişen tek şey odur.
+   Bu yüzden `rules.md`'nin "etiket ikincildir" kuralı burada TERSİNE çalışır:
+   vurgu tekrar edene değil değişene gider. Alan adı taşıyan satırlar için
+   kural olduğu gibi durur (bkz. `EvidenceRow.module.css`). */
+.evidenceLabel {
   margin: 0;
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-  font-weight: 500;
-  line-height: 1.45;
-}
-
-.docState {
-  display: flex;
-  align-items: baseline;
-  gap: var(--lg-space-2);
-  margin: 0;
+  color: var(--lg-label);
   font-size: var(--lg-text-body);
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
-.docItem[data-state='available'] > .docState > .stateDot {
-  background: var(--lg-success);
-}
-
-.docItem[data-state='critical'] > .docState > .stateDot {
-  background: var(--lg-danger);
-}
-
-.docItem[data-state='missing'] > .docState > .stateDot {
-  background: var(--lg-warning);
-}
-
-.docBody {
+.evidenceValue {
   display: grid;
   gap: var(--lg-space-1);
+  margin: 0;
   min-inline-size: 0;
 }
 
-.docMeta {
+/* Durum bir adım geri çekilir: nokta zaten en hızlı kanal, kelime WCAG için
+   orada durur — ama satırın en büyük yazısı olması gerekmez. */
+.evidenceState {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Nokta (8px) + boşluk (--lg-space-2): alt satırlar durum kelimesinin ilk
+   harfine hizalanır. */
+.evidenceScope,
+.evidenceSourceInline {
+  margin: 0;
+  padding-inline-start: calc(8px + var(--lg-space-2));
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.45;
+}
+
+.evidenceScope {
+  max-inline-size: var(--lg-measure);
+}
+
+/* Kaynak künyesi kendi sütununda, sağa hizalı — `EvidenceRow` ile aynı. */
+.evidenceSource {
   margin: 0;
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-caption);
   line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+/* Satır grubu — gruplama ikinci bir KOLON açmaz, ızgaranın üstünde bir başlık
+   olarak durur. İki kolona bölmek eşit olmayan dağılımda bir kolonu erken
+   bitirir ve ortak ekseni kırar. */
+.evidenceGroupBlock {
+  display: grid;
+  gap: var(--lg-space-2);
+  min-inline-size: 0;
+}
+
+.evidenceGroupTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.evidenceGroupCount {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dar kapta üç sütun tek kolona iner; kaynak künyesi değerin altına geçer ve
+   sağa hizası düşer. Eşik `EvidenceRow` ile aynıdır. */
+@container (inline-size <= 40rem) {
+  .evidenceRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evidenceSource {
+    padding-inline-start: calc(8px + var(--lg-space-2));
+    text-align: start;
+  }
 }
 
 /* ── Temel göstergeler ───────────────────────────────────────── */
@@ -570,20 +1019,7 @@
   line-height: 1.45;
 }
 
-/* ── Kritik eksikler ─────────────────────────────────────────── */
-
-.criticalList {
-  display: grid;
-  gap: var(--lg-space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.criticalItem {
-  display: grid;
-  gap: var(--lg-space-1);
-}
+/* ── Kritik eksikler (karar kartının Özet paneli) ─────────────── */
 
 .issueTitle {
   margin: 0;
@@ -624,8 +1060,8 @@
 }
 
 /* ═══ Geniş yerleşim: kap ≥ 1100px ═══
-   Dock düşer, yerini 340px'lik karar kolonu alır. Fiyat akıştan kalkar ve
-   yalnız rayda büyür — sayfanın en büyük sayısı tek yerde durur. */
+   Dock düşer, yerini 340px'lik karar kartı alır. Fiyat akıştan kalkar ve
+   yalnız kartta büyür — sayfanın en büyük sayısı tek yerde durur. */
 @container page (min-width: 1100px) {
   .page {
     grid-template-columns: minmax(0, 1fr) 340px;
@@ -649,14 +1085,18 @@
     padding-block-start: var(--lg-space-5);
   }
 
+  /* Bu yerleşimde `row-gap: 0`; satıcı yaprağının payı daha önce bölümün
+     kendi dikey dolgusundan geliyordu, o dolgu artık yaprağın İÇİNDE.
+     Pay akıştaki yaprak arası boşlukla aynı adımı okur. */
   .seller {
     grid-column: 1 / 2;
     grid-row: 3;
+    margin-block-start: var(--lg-space-4);
   }
 
-  /* Fiyat karar kolonuna taşındı: akıştaki blok ikinci kez büyümez, yerini
+  /* Fiyat karar kartına taşındı: akıştaki blok ikinci kez büyümez, yerini
      dosya durumuna bırakır. Yalnız AKIŞTAKİ blok gizlenir — `.priceBlock`
-     rayın kendi fiyatıdır ve burada görünür kalmalıdır. */
+     kartın kendi fiyatıdır ve burada görünür kalmalıdır. */
   .flowPrice {
     display: none;
   }
@@ -666,10 +1106,7 @@
   }
 }
 
-/* Dar yerleşimde kanıt satırları tek kolona düşer. */
-@container page (max-width: 640px) {
-  .priceFacts,
-  .docItem {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+/* Kanıt satırlarının çökme kuralı artık `.evidenceGrid`'in KENDİ kap
+   sorgusundadır: satır listesi sayfanın değil, içinde durduğu kolonun
+   genişliğine tepki verir — karar kolonu açıldığında akış daralır ve sayfa
+   ölçüsü bunu göremezdi. */

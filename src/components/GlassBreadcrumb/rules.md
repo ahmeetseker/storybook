@@ -101,12 +101,21 @@ yapışık hover kalabilir (borç).
 | link | focus outline | `--lg-accent` |
 | root | font | miras (`font: inherit` link'te) |
 
+**Dolgu dengesi (2026-08-03):** Yeni kontrol ölçeğiyle birlikte şerit dolgusu
+öğeye devredildi: `--bar-pad-block` 6px → `--lg-space-1` (4px), `--item-pad`
+`2px 6px` → `--lg-space-1 --lg-space-2` (4px 8px). Şeridin toplam yüksekliği
+değişmez (~35px) ama link dokunma hedefi 22px'ten ~27px'e çıkar — WCAG 2.2 AA
+2.5.8 tabanının (24px) üstü. Görünmez `::after` taşması UYGULANAMAZ: kök bir
+`GlassSurface` (`overflow: hidden`) ve 44px'e ulaşmak için gereken ~9px taşma
+yüzeyin dolgusunu (4px) aşıp kırpılırdı. Breadcrumb ikon-tek kontrol değil,
+metin hedefi taşır — AAA 44px hedefi bu şerit için sözleşme dışı.
+
 **Borç (raw / mikro-geometri):** token karşılığı olmayan değerler component
-kökünde yerel değişken olarak toplandı — `.breadcrumb { --bar-pad-block: 6px;
---gap-tight: 2px; --item-pad: 2px 6px; --link-radius: 8px; }`; `--link-radius`
-8px radius ölçeğinde yok (chip 10px'e yuvarlamak görsel değişiklik olurdu).
-Bağlananlar: kök yatay padding 16px → `--lg-space-4`, liste font'u 13px →
-`--lg-text-footnote`. Link hover zemini `rgba(255,255,255,.14)` bilinçli
+kökünde yerel değişken olarak toplandı — `.breadcrumb { --gap-tight: 2px; }`.
+Bağlananlar: kök yatay padding 16px → `--lg-space-4`, dikey dolgu ve öğe
+dolgusu → `--lg-space-1/2`, link radius 8px → `--lg-radius-chip` (10px, ölçek
+içi en yakın kademe), liste font'u 13px → `--lg-text-footnote`.
+Link hover zemini `rgba(255,255,255,.14)` bilinçli
 beyaz-alfa malzeme etkisi — token'a bağlanmadı; opacity değerleri (.75/.45)
 raw.
 
@@ -138,3 +147,10 @@ orta tık/yeni sekme/SEO çalışmaz. Öğe bazlı disabled yok. **Açık kararl
 `GlassBreadcrumbItem`'a `href` eklenip `<a>` render'ı desteklenmeli mi? ·
 default `aria-label`'ın i18n'i · link hover'ına `hover:hover` guard'ı ·
 derin hiyerarşi için collapse ("…") deseni.
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. Şerit/öğe dolgu dengesi
+  token'a bağlandı (`--bar-pad-block` 6px → `--lg-space-1`, `--item-pad`
+  `2px 6px` → `--lg-space-1 --lg-space-2`), link radius `--lg-radius-chip`e
+  geçti. Şerit yüksekliği sabit kaldı, link hedefi 22px → ~27px.

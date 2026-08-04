@@ -1,20 +1,22 @@
 .bar {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu):
-     scroll edge taşma/blur ölçüleri, chevron geometrisi, 44px spacer
-     (dokunma hedefi sabiti — geri pill'i / action grubu genişliğiyle simetri). */
+     scroll edge taşma/blur ölçüleri, chevron geometrisi. Spacer artık
+     `--lg-control-hit`e bağlı (geri pill'i / aksiyon grubuyla simetri). */
   --nav-edge-bleed: -28px;
   --nav-edge-blur: 14px;
   --nav-chevron-box: 10px;
   --nav-chevron-stroke: 2.5px;
   --nav-chevron-gap: 2px;
-  --nav-spacer: 44px;
+  --nav-spacer: var(--lg-control-hit);
   position: sticky;
   top: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   gap: var(--lg-space-3);
-  padding: var(--lg-space-3) var(--lg-space-4);
+  /* Şerit dolgusu kontrol ölçeğiyle birlikte alçaldı (space-3 → space-2):
+     44px'lik aksiyon grubuyla toplam bar 60px. */
+  padding: var(--lg-space-2) var(--lg-space-4);
 }
 
 /* Soft scroll edge effect: bar bölgesinde içerik kademeli blur ile arka plana erir (Apple kuralı: çizgi yok) */
@@ -46,7 +48,30 @@
   padding: var(--lg-space-1);
 }
 .actionGroup > * { display: inline-flex; align-items: center; gap: var(--lg-space-1); }
-.actionGroup button, .actionGroup a { border: none; background: none; font: inherit; color: inherit; padding: var(--lg-space-2) var(--lg-space-3); border-radius: var(--lg-radius-capsule); cursor: pointer; }
+.actionGroup button, .actionGroup a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--lg-control-sm);
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  padding: 0 var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  cursor: pointer;
+}
+/* Aksiyonlar ikon-tek olabilir: 36px görünür karo, görünmez ::after ile
+   `--lg-control-hit`e (44px) taşar. Taşma 4px — grup kabuğunun (`.actionGroup`)
+   `--lg-space-1` dolgusu tam bu kadar, dolayısıyla `GlassSurface`'in
+   `overflow: hidden`'ı hedefi kırpmaz. */
+.actionGroup button::after, .actionGroup a::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
+}
 @media (hover: hover) {
   .actionGroup button:hover, .actionGroup a:hover { background: rgba(255, 255, 255, 0.18); }
 }

@@ -1,20 +1,77 @@
-/* Hesap tipi seçimi — sola hizalı, kompakt radio satırları.
-   Dokunma hedefi yalnız coarse pointer'da 44px'e çıkar; fare
-   ortamında satır yüksekliği içerikten gelir. */
+/* Kayıt akışının adım kartı ve alan stilleri.
+
+   Katman modeli: kart FLAT'tır (hesap panosundaki bölüm kartıyla aynı ölçü
+   ve yüzey hissi — `--lg-surface` kağıt, hairline çerçeve, `--lg-radius-card`,
+   `--lg-space-5` dolgu). Cam yalnız kontrol katmanında, yani gezinme
+   butonlarındadır (GlassButton). Kart üstüne cam konmaz. */
+
+.adimKarti {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  padding: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+.adimBaslikBlogu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+/* Adım başlığı odak hedefidir (adım değişiminde odak buraya taşınır);
+   halka yalnız klavye/programatik odakta görünür. */
+.adimBaslik {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.adimBaslik:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.adimAciklama {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+/* ---------- Hesap tipi (radyo kartları) ---------- */
+
 .tipSecimi {
   display: flex;
   flex-direction: column;
-  gap: var(--lg-space-2);
+  gap: var(--lg-space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
+/* Seçili kart yalnız renkle ayrışmaz: çerçevesi kalınlaşır (accent), zemini
+   tonlanır ve radyo diskinin kendisi zaten seçili görünür. */
 .tipSecenek {
   display: flex;
   align-items: flex-start;
   gap: var(--lg-space-3);
-  padding: var(--lg-space-3);
+  padding: var(--lg-space-4);
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  border-radius: var(--lg-radius-chip);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
   cursor: pointer;
+}
+
+.tipSecenek[data-secili] {
+  border-color: var(--lg-accent);
+  background-color: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
 }
 
 .tipSecenek:has(input:focus-visible) {
@@ -24,6 +81,7 @@
 
 .tipSecenek input {
   margin: var(--lg-space-1) 0 0;
+  accent-color: var(--lg-accent);
 }
 
 .tipMetin {
@@ -42,6 +100,27 @@
   color: var(--lg-label-secondary);
 }
 
+/* ---------- Parola kuralları ---------- */
+
+.parolaKurallari {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-1) var(--lg-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Madde işareti dekoratif; kural metni kendi başına okunur. */
+.parolaKurallari li::before {
+  content: '·';
+  margin-inline-end: var(--lg-space-1);
+}
+
+/* ---------- Onay adımı ---------- */
+
 .onayRow {
   display: flex;
   align-items: flex-start;
@@ -51,6 +130,101 @@
 
 .onayRow input {
   margin: var(--lg-space-1) 0 0;
+  accent-color: var(--lg-accent);
+}
+
+.ozet {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+/* Özet kutusu kart içinde ikinci bir "kağıt" olmaz: gömülü kutu kademesi. */
+.ozetGrup {
+  display: grid;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.ozetBaslikSatiri {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.ozetBaslik {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+}
+
+.ozetDuzenle {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-md);
+  padding-inline: var(--lg-space-2);
+  border: 0;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-accent);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ozetDuzenle:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.ozetListe {
+  display: grid;
+  gap: var(--lg-space-1);
+  margin: 0;
+}
+
+.ozetSatir {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--lg-space-3);
+  align-items: baseline;
+}
+
+.ozetEtiket {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+.ozetDeger {
+  margin: 0;
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- Gezinme ---------- */
+
+.gezinme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.gezinmeButonlari {
+  display: flex;
+  gap: var(--lg-space-3);
+}
+
+/* Birincil eylem sağda ve baskın: "Geri" içeriğe göre daralır. */
+.gezinmeButonlari > :last-child {
+  flex: 1;
+  justify-content: center;
 }
 
 .alanHatasi {
@@ -66,9 +240,25 @@
   font-weight: 600;
 }
 
+.srOnly {
+  position: absolute;
+  inline-size: var(--lg-stroke-hairline);
+  block-size: var(--lg-stroke-hairline);
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 @media (pointer: coarse) {
   .tipSecenek,
   .onayRow {
     min-height: var(--lg-control-md);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .tipSecenek[data-secili] {
+    background-color: var(--lg-surface);
   }
 }

@@ -211,6 +211,30 @@ function normalizeFreshness(detail: ListingDetail, now: string): void {
   })
 }
 
+/**
+ * Herkese açık olmayan yanıtları YÜKTEN çıkarır.
+ *
+ * Görünürlük filtresi yalnız görünüm katmanında yaşayamaz: loader'ın döndürdüğü
+ * her şey sunucudan gelen HTML'e hidrasyon yükü olarak gömülür ve kaynağı açan
+ * herkes okur. Gizlenmiş bir yanıt ekranda çizilmese de metni orada dursaydı,
+ * "gizleme" yalnız bir CSS numarası olurdu.
+ *
+ * Bu, telefon numarası için zaten yazılı olan kuralın (§7 — "numara loader'da
+ * getirilmez") soru-cevap karşılığıdır. Şu anda **hiçbir** görünürlük
+ * kısıtlı yanıt istemciye gönderilmez; ilan sahibinin kendi gizlediğini
+ * okuyabilmesi, oturumu doğrulayan ayrı bir uç nokta işidir (bkz. rules.md
+ * §7b "kalan iş"). Bileşendeki `canSee` bu filtreyi tekrarlar — iki katman da
+ * bilerek korur, biri diğerinin yedeğidir.
+ */
+function redactQna(detail: ListingDetail): void {
+  if (!detail.qna) return
+  for (const entry of detail.qna.entries) {
+    entry.replies = entry.replies.filter(
+      (reply) => reply.visibility === undefined || reply.visibility === 'public',
+    )
+  }
+}
+
 function withScenario(base: LandListingDetail, scenario: ListingDetailScenario): LandListingDetail {
   // Derin kopya: dönen `detail` hem modül düzeyindeki fixture'dan hem her
   // çağrının kendi sonucundan bağımsız olmalı — aksi halde bir tüketicinin
@@ -242,7 +266,7 @@ function withScenario(base: LandListingDetail, scenario: ListingDetailScenario):
  * cümledir; sessizce boş bölüm bırakılmaz.
  */
 const PROJECTED_MAP_REASON =
-  'Bu ilan kaydında parsel geometrisi veya doğrulanmış koordinat yok; harita gösterilmiyor.'
+  'Bu ilan kaydında parsel geometrisi veya coğrafi koordinat yok; konum bölümünde yalnız şematik bir yerleşim çizilir, harita gösterilmiyor.'
 const PROJECTED_PLANNING_REASON =
   'Bu ilan için imar ve tapu sorgusu yapılmadı; alanlar Beyan Edilen Özellikler bölümünde gerekçeleriyle listelenir.'
 const PROJECTED_MARKET_REASON =
@@ -306,11 +330,17 @@ export async function loadListingDetail(input: {
   if (input.listingId !== OREN_LAND_LISTING.id) {
     const summary = LISTING_FIXTURES.find((item) => item.id === input.listingId)
     // Ne referans defter ne arama kaydı: ilan gerçekten yok.
-    return summary ? projectedResult(summary, scenario, input.now) : null
+    if (!summary) return null
+    const projected = projectedResult(summary, scenario, input.now)
+    redactQna(projected.detail)
+    return projected
   }
 
   const detail = withScenario(OREN_LAND_LISTING, scenario)
   normalizeFreshness(detail, input.now)
+  // Görünürlük filtresi loader'ın TEK çıkışında uygulanır: iki dönüş yolundan
+  // birini atlamak, gizlenmiş metni hidrasyon yüküne geri sokardı.
+  redactQna(detail)
 
   return {
     detail,

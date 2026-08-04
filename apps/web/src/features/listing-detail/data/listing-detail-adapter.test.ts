@@ -247,4 +247,21 @@ describe('loadListingDetail', () => {
     expect(fresh?.detail.documents).toHaveLength(5)
     expect(fresh?.detail.parcel.area.value).toBe(4712)
   })
+
+  // Görünürlük filtresi görünüm katmanında BIRAKILAMAZ: loader'ın döndürdüğü
+  // her şey hidrasyon yükü olarak sunucudan gelen HTML'e gömülür ve kaynağı
+  // açan herkes okur (aynı gerekçeyle numara da loader'da getirilmez, §7).
+  it('gizlenmiş ve maskelenmiş yanıtlar yüke hiç girmez', async () => {
+    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    const replies = (result?.detail.qna?.entries ?? []).flatMap((entry) => entry.replies)
+
+    expect(replies.length).toBeGreaterThan(0)
+    expect(replies.every((reply) => reply.visibility === undefined || reply.visibility === 'public')).toBe(true)
+
+    // Fixture'daki gizli yanıt ve maskeli numara serileştirilmiş çıktıda geçmez.
+    const payload = JSON.stringify(result)
+    expect(payload).not.toMatch(/Pazarlık payı var/)
+    expect(payload).not.toMatch(/0555 000 00 00/)
+  })
+
 })

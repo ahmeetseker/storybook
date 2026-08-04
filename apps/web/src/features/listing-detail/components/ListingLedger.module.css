@@ -24,6 +24,43 @@
   color: var(--lg-label-secondary);
 }
 
+/* Bölümlü ölçer — her kontrol bir segment, rengi durumunu söyler.
+   Sayıların görsel karşılığıdır; bilgiyi altındaki üç sayı taşır (bu yüzden
+   `aria-hidden`). Yığılmış dolgular birbirine değmez: aralarında yüzey
+   boşluğu kalır.
+
+   Mikro-geometri (token karşılığı yok): segment yüksekliği ve aradaki
+   boşluk — ikisi de ölçeğin en küçük adımının altındadır. */
+.meter {
+  --meter-segment-block: 8px;
+  --meter-segment-gap: 2px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--meter-segment-gap);
+  margin: 0 0 var(--lg-space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.meter > li {
+  block-size: var(--meter-segment-block);
+  border-radius: var(--meter-segment-gap);
+  background: var(--lg-hairline);
+}
+
+.meter > li[data-state='positive'] {
+  background: var(--lg-success);
+}
+
+.meter > li[data-state='negative'] {
+  background: var(--lg-danger);
+}
+
+.meter > li[data-state='unknown'] {
+  background: var(--lg-warning);
+}
+
 /* Üç sayı: kart değil, hairline ızgara. Dar yerleşimde sayfa dolgusundan
    taşarak kenara dayanır; kap genişleyince çerçevelenir. */
 .tally {

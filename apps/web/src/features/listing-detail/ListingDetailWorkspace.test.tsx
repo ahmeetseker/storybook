@@ -59,18 +59,21 @@ describe('ListingDetailWorkspace', () => {
     expect(within(rail).getByText('8.750.000 ₺')).toBeTruthy()
   })
 
-  // Doğrulama vektörü dar kolonda değil kendi ızgarasındadır; karar kolonunda
-  // yalnız özeti kalır ve özet vektöre bağlanır — bilgi kaybolmaz, taşınır.
-  it('doğrulama vektörü kendi bölümünde durur; karar kolonu özetini bağlar', async () => {
+  // Doğrulama vektörü dar kolonda değil kendi bölümünde durur; karar kartı
+  // yalnız sayacı taşır ve Doğrulama sekmesi vektöre bağlanır — bilgi
+  // kaybolmaz, taşınır.
+  it('doğrulama vektörü kendi bölümünde durur; karar kartı sekmesi vektöre bağlanır', async () => {
+    const user = userEvent.setup()
     const { container } = await renderWorkspace()
     const rail = screen.getByRole('complementary', { name: 'Karar kolonu' })
 
-    expect(within(rail).getByText('7 kontrolün 4 tanesi olumlu')).toBeTruthy()
-    expect(
-      within(rail).getByText(/Olumsuz: İlan yüzölçümü parsel kaydıyla eşleşmedi/),
-    ).toBeTruthy()
-    // Satır başlıklarının tamamı rayda değil, vektörün kendisindedir.
+    // Özet sekmesi açıkken kartta yalnız sayaç vardır, satır başlıkları değil.
+    expect(within(rail).getByText('4/7 olumlu')).toBeTruthy()
     expect(within(rail).queryByText('Platform moderasyonu tamamlandı')).toBeNull()
+
+    await user.click(within(rail).getByRole('tab', { name: 'Doğrulama' }))
+    expect(within(rail).getByText('7 kontrolün 4 tanesi olumlu')).toBeTruthy()
+    expect(within(rail).getByText('İlan yüzölçümü parsel kaydıyla eşleşmedi')).toBeTruthy()
 
     const link = within(rail).getByRole('link', { name: /Doğrulama vektörünün tamamı/ })
     const target = container.querySelector(link.getAttribute('href')!)
@@ -119,24 +122,32 @@ describe('ListingDetailWorkspace', () => {
     expect(screen.queryByText('Yetki belgesi doğrulanamadı.')).toBeNull()
   })
 
-  it('karar rayında tek prominent CTA bulunur', async () => {
-    await renderWorkspace()
-    const rail = screen.getByRole('group', { name: 'Karar ve iletişim' })
-    expect(within(rail).getByRole('button', { name: 'Mesaj gönder' })).toBeTruthy()
+  // Sayfada tek dolu buton vardır ve o buton gerçekten çalışan eylemdir.
+  it('karar kartında sayfanın tek birincil eylemi bulunur', async () => {
+    const { container } = await renderWorkspace(undefined, {
+      onRevealPhone: async () => '0 (252) 000 00 00',
+    })
+    const primaries = container.querySelectorAll('[data-variant="primary"]')
+    expect(primaries).toHaveLength(1)
+    expect(primaries[0].textContent).toBe('Satıcı bilgilerine git')
+    expect(primaries[0]).toHaveProperty('disabled', false)
   })
 
-  // rules.md §4: işleyicisi olmayan eylem etkin render edilmez. Test hem
-  // devre dışılığı hem gerekçenin görünürlüğünü arar — sessizce kaybolan
-  // veya sessizce ölü kalan kontrol ikisinde de kalmaz.
-  it('bağlanmamış eylem etkin render edilmez; gerekçesi görünür', async () => {
+  // rules.md §4: rotası olmayan kontrol çizilmez, gerekçesi yazılır; gerçekten
+  // var olabilen ama bu görünümde bulunmayan kontrol `disabled` durur ve
+  // gerekçesi yine görünür. İki durumda da yetenek sessizce yok sayılmaz.
+  it('bağlanmamış eylem çizilmez ya da devre dışı durur; gerekçesi görünür', async () => {
     await renderWorkspace()
 
-    const actions = ['Mesaj gönder', 'Satıcı bilgilerine git', 'Yanlış bilgi bildir']
-    for (const name of actions) {
+    // Mesajlaşmanın rotası yok → buton hiç çizilmez.
+    expect(screen.queryByRole('button', { name: 'Mesaj gönder' })).toBeNull()
+    expect(screen.getByText(/Mesajlaşma sonraki fazda açılacak/i)).toBeTruthy()
+
+    const disabled = ['Satıcı bilgilerine git', 'Yanlış bilgi bildir']
+    for (const name of disabled) {
       expect(screen.getByRole('button', { name })).toHaveProperty('disabled', true)
     }
 
-    expect(screen.getByText(/Mesaj gönderme bu sürümde bağlı değil/i)).toBeTruthy()
     expect(screen.getByText(/açılabilecek bir numara kontrolü yok/i)).toBeTruthy()
     expect(screen.getByText(/Geri bildirim akışı bu sürümde bağlı değil/i)).toBeTruthy()
   })
@@ -165,8 +176,13 @@ describe('ListingDetailWorkspace', () => {
 
   it('süresi dolmuş ilanda iletişim eylemleri kapanır ve gerekçe görünür', async () => {
     await renderWorkspace('inactive')
+    // Gerekçe sayfada TEK yerde yazılır: kartın uyarısı. Dock onu tekrar etmez.
     expect(screen.getByText(/İlan süresi doldu/i)).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Mesaj gönder' })).toHaveProperty('disabled', true)
+    expect(screen.getByRole('button', { name: 'Satıcı bilgilerine git' })).toHaveProperty(
+      'disabled',
+      true,
+    )
+    expect(screen.queryByRole('button', { name: 'Mesaj gönder' })).toBeNull()
   })
 
   it('harita kullanılamadığında konum bilgisi tablo olarak kalır', async () => {

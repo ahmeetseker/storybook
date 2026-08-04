@@ -16,7 +16,7 @@ import type { AuthAdapters, Oturum } from '@/features/auth'
 import type { MessagesWorkspaceProps } from '@/features/messages/domain/message-types'
 import type { RouterContext } from '@/router-context'
 
-import { Route } from './hesabim_.mesajlar'
+import { Route } from './hesabim.mesajlar'
 
 vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
 
@@ -152,7 +152,7 @@ function renderRoute(initialEntry: string, oturum: Oturum | null = ORNEK_OTURUM)
     ),
   })
   const messagesRoute = Route.update({
-    id: '/hesabim_/mesajlar',
+    id: '/hesabim/mesajlar',
     path: '/hesabim/mesajlar',
     getParentRoute: () => rootRoute,
   } as never)

@@ -7,6 +7,8 @@ import type {
   VerificationState,
 } from '../domain/account-types'
 
+import styles from './AccountSections.module.css'
+
 export interface AccountSecuritySummaryProps {
   /** E-posta, telefon ve EİDS doğrulama durumları. */
   verification: AccountVerification
@@ -50,7 +52,11 @@ function formatLoginDetails(login: NonNullable<SecuritySummary['lastSuccessfulLo
   return [login.deviceLabel, login.approximateLocation].filter(Boolean).join(' · ')
 }
 
-/** Hesap doğrulamalarını ve son giriş bilgisini yalnızca bilgilendirici olarak gösterir. */
+/**
+ * Hesap doğrulamalarını ve son giriş bilgisini yalnızca bilgilendirici
+ * olarak, ince ayraçlı bir terim/değer listesinde gösterir. Durum metni
+ * asıl kanaldır; noktanın rengi yalnız onu destekler.
+ */
 export function AccountSecuritySummary({
   verification,
   security,
@@ -62,57 +68,76 @@ export function AccountSecuritySummary({
     ? formatSecurityFreshness(security.dataUpdatedAt)
     : null
 
+  const verificationRows: Array<{
+    part: string
+    term: string
+    state: VerificationState
+  }> = [
+    { part: 'verification-email', term: 'E-posta', state: verification.email },
+    { part: 'verification-phone', term: 'Telefon', state: verification.phone },
+    { part: 'verification-eids', term: 'EİDS', state: verification.eids },
+  ]
+
   return (
     <section
       data-account-section="security"
       aria-labelledby="account-security-title"
       data-part={error ? 'section-error' : undefined}
+      className={styles.card}
     >
-      <h2 id="account-security-title">Hesap güvenliği</h2>
+      <div className={styles.cardHead}>
+        <div className={styles.cardHeadText}>
+          <h2 id="account-security-title" className={styles.cardTitle}>
+            Hesap güvenliği
+          </h2>
+        </div>
+      </div>
       {error ? (
         <GlassAlert severity="warning" title="Güvenlik bilgileri yüklenemedi">
           {error.message}
         </GlassAlert>
       ) : (
-      <dl data-part="verification-summary">
-        <div data-part="verification-email">
-          <dt>E-posta</dt>
-          <dd>{verificationStateLabels[verification.email]}</dd>
-        </div>
-        <div data-part="verification-phone">
-          <dt>Telefon</dt>
-          <dd>{verificationStateLabels[verification.phone]}</dd>
-        </div>
-        <div data-part="verification-eids">
-          <dt>EİDS</dt>
-          <dd>{verificationStateLabels[verification.eids]}</dd>
-        </div>
-        <div data-part="last-login">
-          <dt>Son giriş</dt>
-          <dd>
-            {login && loginTime ? (
-              <>
-                <time dateTime={login.occurredAt}>{loginTime}</time>
-                <p data-part="last-login-device-location" data-testid="last-login-device-location">
-                  {formatLoginDetails(login)}
-                </p>
-              </>
-            ) : (
-              'Son giriş bilgisi kullanılamıyor'
-            )}
-          </dd>
-        </div>
-        <div data-part="security-freshness">
-          <dt>Veri güncelliği</dt>
-          <dd>
-            {freshness && security.dataUpdatedAt ? (
-              <time dateTime={security.dataUpdatedAt}>{freshness}</time>
-            ) : (
-              'Güncellik bilgisi kullanılamıyor'
-            )}
-          </dd>
-        </div>
-      </dl>
+        <dl data-part="verification-summary" className={styles.infoList}>
+          {verificationRows.map((row) => (
+            <div key={row.part} data-part={row.part} className={styles.infoRow}>
+              <dt className={styles.infoTerm}>{row.term}</dt>
+              <dd className={styles.infoValue}>
+                <span className={styles.status} data-state={row.state}>
+                  {verificationStateLabels[row.state]}
+                </span>
+              </dd>
+            </div>
+          ))}
+          <div data-part="last-login" className={styles.infoRow}>
+            <dt className={styles.infoTerm}>Son giriş</dt>
+            <dd className={styles.infoValue}>
+              {login && loginTime ? (
+                <>
+                  <time dateTime={login.occurredAt}>{loginTime}</time>
+                  <p
+                    data-part="last-login-device-location"
+                    data-testid="last-login-device-location"
+                    className={styles.infoNote}
+                  >
+                    {formatLoginDetails(login)}
+                  </p>
+                </>
+              ) : (
+                'Son giriş bilgisi kullanılamıyor'
+              )}
+            </dd>
+          </div>
+          <div data-part="security-freshness" className={styles.infoRow}>
+            <dt className={styles.infoTerm}>Veri güncelliği</dt>
+            <dd className={styles.infoValue}>
+              {freshness && security.dataUpdatedAt ? (
+                <time dateTime={security.dataUpdatedAt}>{freshness}</time>
+              ) : (
+                'Güncellik bilgisi kullanılamıyor'
+              )}
+            </dd>
+          </div>
+        </dl>
       )}
     </section>
   )

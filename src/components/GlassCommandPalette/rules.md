@@ -187,7 +187,8 @@ Katman sırası: `open` (kapalıyken hiçbir şey render edilmez) → `query`
 - Fare: bir komut üzerine `onMouseEnter` geldiğinde `activeIndex` o komuta
   taşınır (klavye ve fare imleci arasında tutarlı vurgu); tıklama doğrudan
   seçer.
-- Dokunmatik: komut butonları `pointer: coarse`'ta ≥44px hedefe yükselir.
+- Dokunmatik: komut butonları tek token'dan ölçülenir — `--lg-control-md`
+  imleçlide 40px, dokunmatikte 44px.
 - Responsive: breakpoint yok — panel `min(560px, 100%)` genişlikte; üst
   boşluk `min(12vh, max(space-4, 100vw - 464px))` ile, dikey pay
   `min(70vh, 60vh + max(0px, 480px - 100vw), …)` ile viewport daraldıkça
@@ -217,7 +218,7 @@ Katman sırası: `open` (kapalıyken hiçbir şey render edilmez) → `query`
 | hover (aktif olmayan) | background | `color-mix(in srgb, var(--lg-label) 6%, var(--lg-surface))` | yalnız `@media (hover: hover)` |
 | hint chip çerçevesi | border | `--lg-hairline` | — |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
-| kontrol yüksekliği (komut satırı) | min-height | `--lg-control-md` (44px `pointer:coarse`'ta) | — |
+| kontrol yüksekliği (komut satırı) | min-height | `--lg-control-md` (imleçli 40px / dokunmatik 44px) | — |
 
 **Borç (raw):** `z-index: 80` (z token'ı yok, `GlassChatDock`/`GlassToast`
 ile aynı gerekçe, palet en üstte olmalı → onlardan daha yüksek), backdrop
@@ -228,9 +229,14 @@ ipucu çipi iç boşluğu), `--glass-palette-w: 560px` (panel maks. genişliği)
 `--glass-palette-pad-flow: 464px` (üst boşluk akış eşiği),
 `--glass-palette-narrow-vw: 480px` (dar viewport eşiği),
 `--glass-palette-max-h-wide/narrow: 480px/560px` (yükseklik payları) — spec
-sabitleri, tasarım sistemi ölçeğinde yok. `pointer: coarse` komut satırı
-hedefi `--lg-control-md`'ye bağlandı (coarse'ta 44px — birebir). Panel
-gölgesi `--lg-shadow-lg`.
+sabitleri, tasarım sistemi ölçeğinde yok. Panel gölgesi `--lg-shadow-lg`.
+
+**Dokunma hedefi (2026-08-03):** Komut satırı yüksekliği tek kaynaktan —
+`--lg-control-md` imleçli cihazda 40px, dokunmatikte 44px verdiği için aynı
+token'ı tekrar yazan `@media (pointer: coarse)` bloğu KALDIRILDI. Görünmez
+`::after` taşması gerekmez: komut satırı panel genişliğini kaplayan bir metin
+hedefidir ve `--lg-space-2` dolgulu listede dikey taşma komşu satırlarla
+çakışırdı.
 
 ## 10. Storybook kapsamı
 
@@ -297,3 +303,6 @@ boolean (controlled zorunlu)".
   sözleşmeye indirildi (panel kapalıyken `status` de DOM'da yok — ikisi
   TEK birim olarak açılıp kapanıyor, önceki metindeki "her zaman mount"
   ifadesi "kapalıyken DOM yok" cümlesiyle çelişiyormuş gibi okunuyordu).
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı — gereksizleşen
+  `pointer: coarse` komut satırı yüksekliği kaldırıldı (`--lg-control-md`
+  zaten imleçlide 40px, dokunmatikte 44px veriyor).

@@ -1,4 +1,9 @@
 .root {
+  /* Satır hedefinin dışa taşma payı (üst + alt toplamı). Üst üste dizilen
+     checkbox'larda komşu hedefler tam olarak bitişik kalsın diye çağıran
+     tarafın kullandığı boşlukla aynı değere ayarlanabilir. */
+  --checkbox-hit-bleed: var(--lg-space-3);
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--lg-space-2, 8px);
@@ -6,6 +11,17 @@
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   color: var(--lg-label, #24211b);
+}
+
+/* Görünmez hedef genişletmesi: kutu 18/22px kalır, tıklanabilir satır dikeyde
+   büyür. Kök bir <label>'dır (GlassSurface değil) → `overflow: hidden` yok,
+   pseudo-eleman gerçekten tıklanır. Taşma payının yarısı üstte yarısı altta
+   olduğu için ardışık satırların hedefleri çakışmaz, boşluk da kalmaz. */
+.root::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: calc(var(--checkbox-hit-bleed) / -2);
 }
 .disabled {
   opacity: 0.45;
@@ -81,10 +97,11 @@
   outline-offset: 2px;
 }
 
-/* Dokunmatik: kutu büyür, satır 44px dokunma hedefine ulaşır
-   (coarse'ta --lg-control-md birebir 44px) */
+/* Dokunmatik: kutu parmakla görünür kalsın diye büyür; satırın kendisi de
+   dokunma hedefi tabanına oturur (`--lg-control-hit` = her cihazda 44px).
+   Kök `align-items: center` olduğu için artan yükseklik boşluk bırakmaz. */
 @media (pointer: coarse) {
-  .root { min-height: var(--lg-control-md); }
+  .root { min-height: var(--lg-control-hit); }
   .sm { --box-size: 22px; }
   .md { --box-size: 26px; }
 }

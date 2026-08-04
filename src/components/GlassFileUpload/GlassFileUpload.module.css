@@ -118,6 +118,7 @@
   font-variant-numeric: tabular-nums;
 }
 .remove {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,8 +133,14 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-@media (pointer: coarse) {
-  .remove { width: var(--lg-control-sm); height: var(--lg-control-sm); } /* coarse'ta token 36px */
+/* İkon-tek kontrol: görünen kutu 28px kalır (dosya satırını şişirmez), hedef
+   her iki eksende `--lg-control-hit`e (44px) uzanır. Satır düz bir <li> —
+   `overflow: hidden` yok, pseudo-eleman gerçekten tıklanır. Bu sayede eskiden
+   coarse'ta butonu görünür şekilde büyüten kural gereksizleşti. */
+.remove::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, calc((var(--remove-size) - var(--lg-control-hit)) / 2));
 }
 @media (hover: hover) {
   .remove:hover {

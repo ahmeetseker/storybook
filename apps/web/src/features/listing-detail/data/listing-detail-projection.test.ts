@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { LISTING_FIXTURES } from '@/features/listings/data/listing-adapter'
+import {
+  getRepresentativeListingImage,
+  stockPhotoCount,
+} from '@/features/listings/data/listing-photos'
 import { EIDS_SCOPE_NOTE } from './listing-detail-fixtures'
 import { loadListingDetail } from './listing-detail-adapter'
 import type { GenericListingDetail } from '../domain/listing-detail-types'
@@ -159,11 +163,66 @@ describe('arama sonucundan yansıtılan ilan detayı', () => {
     expect(detail.documents).toEqual([])
   })
 
-  it('medya dökümü ilanda bildirilen görsel sayısını taşır', async () => {
+  it('medya dökümü birden çok temsili kare taşır ama kare başına künye uydurmaz', async () => {
+    const detail = await projected('listing-3-1')
+
+    expect(detail.media.length).toBeGreaterThan(1)
+    for (const item of detail.media) {
+      expect(item.kind).toBe('photo')
+      // Aynı nötr etiket: hangi karenin neyi gösterdiği bu kayıtta bilinmiyor.
+      expect(item.label).toBe('Temsili görsel')
+      expect(item.capturedAt).toBeUndefined()
+      expect(item.aiEdited).toBeUndefined()
+      expect(item.representative).toBeDefined()
+    }
+
+    // Kareler birbirinin kopyası değildir: havuz tükenirse sayı kısalır.
+    const sources = detail.media.map((item) => item.representative?.src)
+    expect(new Set(sources).size).toBe(sources.length)
+  })
+
+  it('kapak karesi arama kartıyla aynı kaynaktan gelir', async () => {
     const summary = summaryOf('listing-3-1')
     const detail = await projected('listing-3-1')
-    expect(detail.media).toHaveLength(1)
-    expect(detail.media[0].label).toContain(String(summary.imageCount))
+    expect(detail.media[0].representative?.src).toBe(
+      getRepresentativeListingImage(summary).src,
+    )
+  })
+
+  it('kare sayısı bildirilen görsel sayısını taklit etmez; sayı beyan olarak durur', async () => {
+    const summary = summaryOf('listing-3-1')
+    const detail = await projected('listing-3-1')
+
+    expect(detail.declaredMediaCount).toBe(summary.imageCount)
+    // Bildirilen sayı kadar kare üretilmez: gösterilemeyen dosya gösterilmiş
+    // gibi yapılmaz.
+    expect(detail.media.length).toBeLessThanOrEqual(
+      stockPhotoCount(summary.category),
+    )
+    expect(detail.media.length).toBeLessThan(summary.imageCount)
+  })
+
+  it('konum çizimi ŞEMATİKTİR: lat/lng taşımaz, arama kaydının yerleşimini taşır', async () => {
+    const summary = summaryOf('listing-1-4')
+    const detail = await projected('listing-1-4')
+
+    expect(detail.geo?.kind).toBe('schematic')
+    if (detail.geo?.kind !== 'schematic') throw new Error('şematik geo bekleniyordu')
+    expect(detail.geo.x).toBe(summary.map.x)
+    expect(detail.geo.y).toBe(summary.map.y)
+    expect(detail.geo.sourceLabel).toMatch(/şematik/i)
+    expect(detail.geo).not.toHaveProperty('lat')
+    expect(detail.geo).not.toHaveProperty('lng')
+    // Mahremiyet yarıçapı yalnız gerçek koordinat gizlenirken anlamlıdır.
+    expect(detail.geo).not.toHaveProperty('radiusMeters')
+  })
+
+  it('referans defterin coğrafi konumu yansıtmadan etkilenmez', async () => {
+    const result = await loadListingDetail({ listingId: 'arsa-214-7', now: NOW })
+    expect(result?.detail.geo?.kind).toBe('geographic')
+    if (result?.detail.geo?.kind !== 'geographic') throw new Error('coğrafi geo bekleniyordu')
+    expect(result.detail.geo.lat).toBe(37.2984)
+    expect(result.detail.geo.radiusMeters).toBe(250)
   })
 
   it('cevapsız kalan hiçbir kanıt değeri güncel sayılmaz', async () => {

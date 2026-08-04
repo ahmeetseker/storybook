@@ -206,12 +206,27 @@ görsel geçişler CSS ve motion layout'ta.
 | kapsül genişliği | `--lg-container-narrow` (rest) |
 | kenar boşluğu | `--lg-container-gutter` |
 | köşe | `--lg-radius-card` (kapsül) · `--lg-radius-capsule` (link) · `--lg-radius-chip` (panel linki) |
-| kontrol yükseklikleri | `--lg-control-sm` (link) · `--lg-control-md` (panel linki) · `--lg-control-lg` (satır) |
+| kontrol yükseklikleri | `--lg-control-sm` (link, 36/44) · `--lg-control-md` (panel linki + satır şeridi, 40/44) |
+| dokunma hedefi | `--lg-control-hit` (44px, her cihazda) — link/panel linki görünmez `::after` taşmasıyla bu ölçüye çıkar |
 | gölge | `--lg-shadow-md`, `GlassSurface`'in `--lg-surface-shadow` kancasına verilir |
 | metinler | `--lg-label` / `--lg-label-secondary`; `--lg-text-headline` / `--lg-text-body` |
 | çizgiler | `--lg-hairline` |
 | boşluklar | `--lg-space-1/2/3/4` |
 | focus | `--lg-focus-ring-width` + `--lg-focus-ring-offset` (fallback `2px`) + `--lg-accent` |
+
+**Şerit ölçüsü (2026-08-03):** Ray dolgusu `--rail-pad-y` `--lg-space-3`'ten
+`--lg-space-2`'ye indi, satır şeridi `--lg-control-lg`'den `--lg-control-md`'ye
+bağlandı. Kapsül yüksekliği imleçli cihazda 44+16=60px'ten 40+16=56px'e,
+üst şeridin toplam yüksekliği 72px'ten 64px'e düştü; dokunmatikte kapsül 60px
+(44+16), toplam 68px olarak korunur. Kural: kabuk, içindeki kontrolün görünür
+ölçüsünden büyük çizilmez.
+
+**Dokunma hedefi:** `.link` (36px) ve `.panelLink` (40px) görünmez `::after`
+taşmasıyla `--lg-control-hit`e (44px) genişler. Taşma sırasıyla 4px ve 2px;
+kapsülün `--capsule-pad-y` (8px) dolgusunun ve panel listesinin `--lg-space-1`
+(4px) boşluğunun içinde kalır, bu yüzden ne kapsül dışına çıkar ne de komşu
+hedefle çakışır. Kapsülde `overflow: hidden` yoktur — taşma kırpılmaz.
+Dokunmatikte token zaten 44px olduğu için `min()` taşmayı 0'a indirir.
 
 **Borç (raw / mikro-geometri):** Token karşılığı olmayan ölçüler kökte yerel
 değişkenlerde toplandı: `--capsule-max-scrolled: 55rem` (condensed genişlik —
@@ -289,3 +304,11 @@ kapsüle göre konumlanır. `aria-controls`'ın kapalı durumda DOM'da karşıl�
 olmayan bir `id`'ye işaret etmesi (§2) de bilinen, bilinçli bir kısıttır.
 **Açık kararlar:** arama slotu (v2+) · bildirim
 göstergesi (v2+) · megamenü (GlassMenu ile).
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine (`--lg-control-*` görünür ölçü +
+  `--lg-control-hit` dokunma tabanı) uyarlandı. Satır şeridi `--lg-control-lg`
+  → `--lg-control-md`, ray dolgusu `--lg-space-3` → `--lg-space-2`; üst şerit
+  imleçli cihazda 72px → 64px. Link ve panel linkine görünmez `::after`
+  dokunma hedefi taşması eklendi (44px korunur).

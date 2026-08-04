@@ -16,8 +16,18 @@ async function stabilizeClock(page: Page) {
   })
 }
 
-async function waitForHydratedShell(page: Page) {
-  await expect(page.locator('.shell-dock-variant')).toHaveCount(1)
+/**
+ * Hesap panosu kendi kabuğunu kurar: pazar yeri header'ı ve dock'u bu rotada
+ * render edilmez, gezinme sol raydan ve üst şeritten gelir.
+ */
+async function waitForAccountShell(page: Page) {
+  await expect(
+    page.getByRole('navigation', { name: 'Hesap bölümleri' }),
+  ).toBeVisible()
+  await expect(page.locator('.shell-dock-variant')).toHaveCount(0)
+  await expect(
+    page.getByRole('navigation', { name: 'Ana gezinme' }),
+  ).toHaveCount(0)
 }
 
 async function expectNoBlockingAxeViolations(page: Page) {
@@ -43,7 +53,7 @@ test('hesap merkezi masaüstünde erişilebilir ve cam bütçesine uyar', async 
   page,
 }) => {
   await page.goto('/hesabim')
-  await waitForHydratedShell(page)
+  await waitForAccountShell(page)
 
   await expect(page.getByRole('heading', { name: 'Hesabım' })).toBeVisible()
   await expectNoBlockingAxeViolations(page)
@@ -51,15 +61,21 @@ test('hesap merkezi masaüstünde erişilebilir ve cam bütçesine uyar', async 
     await page.locator('main#main-content [data-material="glass"]').count(),
   ).toBeLessThanOrEqual(1)
 
-  const headerSurface = page
-    .getByRole('button', { name: 'Hızlı gezinme' })
-    .locator('xpath=ancestor::*[@data-material][1]')
-  await expect(headerSurface).toHaveAttribute('data-material', 'glass')
+  // Ray daraltılıp genişletilebilir; daraltılmışken erişilebilir adlar korunur
+  const railToggle = page.getByRole('button', {
+    name: 'Kenar çubuğunu daralt',
+  })
+  await railToggle.click()
+  await expect(
+    page.getByRole('button', { name: 'Kenar çubuğunu genişlet' }),
+  ).toBeVisible()
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Hesap bölümleri' })
+      .getByRole('button', { name: /Hesap özeti/ }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Kenar çubuğunu genişlet' }).click()
 
-  const dockSurface = page
-    .getByRole('navigation', { name: 'Ana gezinme' })
-    .locator('[data-material="glass"]')
-  await expect(dockSurface).toHaveCount(1)
   expect(await page.locator('[data-variant="primary"]').count()).toBe(1)
   await expectNoHorizontalOverflow(page)
   await stabilizeClock(page)
@@ -69,12 +85,21 @@ test('hesap merkezi masaüstünde erişilebilir ve cam bütçesine uyar', async 
   })
 })
 
-test('hesap merkezi mobilde bölümleri DOM sırası ile sunar ve Dock odağı örtmez', async ({
+test('hesap merkezi mobilde bölümleri DOM sırası ile sunar ve gezinme çekmeceden gelir', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/hesabim')
-  await waitForHydratedShell(page)
+  await waitForAccountShell(page)
+
+  // Dar ekranda ray gizlidir; gezinme "Hesap menüsü" düğmesiyle açılan çekmecededir
+  const menuButton = page.getByRole('button', { name: 'Hesap menüsünü aç' })
+  await expect(menuButton).toBeVisible()
+  await menuButton.click()
+  const drawer = page.getByRole('dialog', { name: 'Hesabım' })
+  await expect(drawer).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(drawer).toHaveCount(0)
 
   await expect(page.getByRole('heading', { name: 'Hesabım' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
@@ -107,14 +132,12 @@ test('hesap merkezi mobilde bölümleri DOM sırası ile sunar ve Dock odağı �
     'Tab sırası son hesap bağlantısına ulaşmalı',
   ).toBe(true)
   await expect(lastAccountLink).toBeFocused()
-  const [lastFocusBox, dockBox] = await Promise.all([
-    lastAccountLink.boundingBox(),
-    page.getByRole('navigation', { name: 'Ana gezinme' }).boundingBox(),
-  ])
+  // Yüzen dock kalktığı için son odak viewport içinde ve kesilmeden görünür
+  const lastFocusBox = await lastAccountLink.boundingBox()
   expect(lastFocusBox).not.toBeNull()
-  expect(dockBox).not.toBeNull()
+  const viewportHeight = page.viewportSize()!.height
   expect(lastFocusBox!.y + lastFocusBox!.height).toBeLessThanOrEqual(
-    dockBox!.y,
+    viewportHeight,
   )
   await stabilizeClock(page)
 
@@ -128,7 +151,7 @@ test('hareket azaltıldığında hesap aksiyonları geçişsiz kalır', async ({
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/hesabim')
-  await waitForHydratedShell(page)
+  await waitForAccountShell(page)
 
   expect(
     await page.evaluate(

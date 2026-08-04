@@ -81,13 +81,14 @@
   outline-offset: 2px;
 }
 
-/* Dokunmatik: 24px kalınlıktaki peek şeridinin dokunma hedefi görünmez
-   ::after taşmasıyla ≥44px'e (--lg-control-md, coarse'ta 44px) genişletilir. */
+/* Dokunmatik: peek şeridinin GÖRÜNÜR kalınlığı hedef tabanına yükselir.
+   Görünmez ::after taşması burada MÜMKÜN DEĞİL — `.morphClosed` cam kabuğu
+   `overflow: hidden` taşır (morf sırasında içeriği kırpar) ve negatif inset'li
+   pseudo kırpılırdı. İmleçli cihazda 24px kalınlık WCAG 2.2 AA 2.5.8 tabanını
+   (24px) karşılar; bkz. rules.md §9. */
 @media (pointer: coarse) {
-  .peek::after {
-    content: '';
-    position: absolute;
-    inset: calc((var(--glass-dock-peek-thick) - var(--lg-control-md)) / 2) 0;
+  .morphClosed {
+    --glass-dock-peek-thick: var(--lg-control-hit);
   }
 }
 
@@ -168,13 +169,15 @@
   color: var(--lg-accent);
 }
 
-/* Dokunmatik: 38px karo görünmez ::after taşmasıyla ≥44px hedefe genişler. */
-@media (pointer: coarse) {
-  .item::after {
-    content: '';
-    position: absolute;
-    inset: calc((var(--glass-dock-icon) - var(--lg-control-md)) / 2);
-  }
+/* İkon-tek karo: 38px görünür, hedef her cihazda görünmez ::after taşmasıyla
+   `--lg-control-hit` (44px). Taşma 3px — karo aralığı (ICON_GAP 6px) tam iki
+   taşma kadar olduğu için komşu hedefler değer ama ÜST ÜSTE BİNMEZ; dikeyde de
+   ray dolgusunun (`--glass-dock-track-pad-block`, 6px) içinde kalır, bu yüzden
+   dar/dokunmatik bağlamdaki `overflow: auto` şeridi kırpmaz. */
+.item::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--glass-dock-icon) - var(--lg-control-hit)) / 2);
 }
 
 .itemIcon {

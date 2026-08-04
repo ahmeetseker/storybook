@@ -6,12 +6,19 @@ import {
   placeLabel,
   TRANSACTION_LABELS,
 } from '@/features/listings/data/listing-attributes'
-import { getRepresentativeListingImage } from '@/features/listings/data/listing-photos'
+import {
+  getCategoryStockPhoto,
+  getRepresentativeListingImage,
+  stockPhotoCount,
+} from '@/features/listings/data/listing-photos'
 import type { EvidenceValue, UnavailableReason } from '../domain/evidence'
 import type {
   DeclaredAttribute,
   GenericListingDetail,
   ListingMediaItem,
+  ListingQna,
+  ListingQnaAuthor,
+  ListingQnaEntry,
   VerificationRow,
 } from '../domain/listing-detail-types'
 import { EIDS_SCOPE_NOTE } from './listing-detail-fixtures'
@@ -142,24 +149,72 @@ function openQuestionsFor(retrievedAt: string): DeclaredAttribute[] {
   ]
 }
 
+/** Bento ızgarasının aldığı en fazla kare (kapak dahil). */
+const MAX_REPRESENTATIVE_FRAMES = 4
+
+/**
+ * Bütün temsili karelerin **ortak** etiketi.
+ *
+ * Kare başına ayrı bir başlık ("Salon", "Parselden deniz yönü") uydurulmaz:
+ * bu kayıtta hangi karenin neyi gösterdiğine dair bir bilgi yoktur ve
+ * kategoriyi temsil eden stok kareye içerik iddiası yazmak sahte bir künye
+ * olurdu. Aynı nedenle `capturedAt` da verilmez — çekim tarihi bilinmiyor.
+ */
+const REPRESENTATIVE_FRAME_LABEL = 'Temsili görsel'
+
 /**
  * Medya dökümü.
  *
- * Kaydın kendi fotoğrafları yoktur; kapak karesi arama tarafıyla **aynı
- * kaynaktan** gelen temsili (stok) bir fotoğraftır ve görünüm katmanı bunu
- * görünür bir cümleyle söyler. İlanda bildirilen görsel sayısı beyan olarak
- * yazılır; sayı kadar sahte başlık üretilmez.
+ * Kaydın kendi fotoğrafları yoktur; gösterilen kareler arama tarafıyla **aynı
+ * havuzdan** gelen temsili (stok) fotoğraflardır ve görünüm katmanı bunu
+ * görünür bir cümleyle söyler.
+ *
+ * Kareler **çoğaltılır** (ilk kare arama kartındaki kapakla aynıdır, kalanlar
+ * kategori havuzundan sırayla gelir) çünkü hero tek kareyle bir ızgara
+ * kuramıyordu. Çoğaltılan şey yalnız **kare**dir: hepsi aynı nötr etiketi
+ * taşır, çekim tarihi taşımaz ve hiçbirine içerik açıklaması yazılmaz.
+ * Uydurma yasağı burada kare sayısına değil, **künyeye** uygulanır — bir
+ * fotoğrafın neyi gösterdiğini bilmediğimiz halde söylemek iddia üretmek
+ * olurdu; kaç kare gösterildiği ise sayfada zaten görünür yazılıdır.
+ *
+ * İlanda bildirilen görsel sayısı bu diziye girmez: o bir beyandır ve
+ * `declaredMediaCount` alanında, sahnede künye satırı olarak durur.
  */
 function mediaFor(summary: ListingSummary): ListingMediaItem[] {
-  return [
-    {
-      id: 'cover',
-      kind: 'photo',
-      label: `Kapak görseli · ilanda toplam ${summary.imageCount} görsel bildirildi`,
-      representative: getRepresentativeListingImage(summary),
-    },
-  ]
+  const frames = Math.max(
+    1,
+    Math.min(
+      summary.imageCount,
+      stockPhotoCount(summary.category),
+      MAX_REPRESENTATIVE_FRAMES,
+    ),
+  )
+
+  return Array.from({ length: frames }, (_, index) => ({
+    id: `representative-${index + 1}`,
+    kind: 'photo' as const,
+    label: REPRESENTATIVE_FRAME_LABEL,
+    // İlk kare arama kartı ve karşılaştırma ile aynı kaynaktan gelir; kalanlar
+    // aynı kategori havuzunun sonraki kareleridir.
+    representative:
+      index === 0
+        ? getRepresentativeListingImage(summary)
+        : getCategoryStockPhoto(
+            summary.category,
+            index,
+            `${summary.title} için temsili ilan fotoğrafı`,
+          ),
+  }))
 }
+
+/**
+ * Şematik yerleşimin görünür kaynağı.
+ *
+ * Arama kaydının `map: {x, y}` alanı bir liste/harita çiziminin yerleşimidir;
+ * enlem/boylam değildir. Bu yüzden yansıtılmış ilanın konum çizimi coğrafi
+ * değil **şematik** varyanttır ve kaynağını adıyla söyler.
+ */
+const SCHEMATIC_GEO_SOURCE = 'Arama kaydının şematik yerleşimi'
 
 const VALUATION_REASON =
   'Bu ilan için emsal kesiti ve gerçekleşmiş işlem verisi derlenmedi; ArsaPazar fiyat tahmini üretilmedi.'
@@ -174,7 +229,8 @@ const VALUATION_REASON =
  * - `verified` → yalnız EİDS satırı
  * - `owner` / `sellerName` → satıcı bloğu (yetki belgesi değeri yoktur)
  * - `publishedDays` + `now` → yayın tarihi; güncelleme kaydı yoktur
- * - `image` / `imageCount` → medya dökümü
+ * - `image` / `imageCount` → medya dökümü + `declaredMediaCount` (beyan)
+ * - `map` → **şematik** geo (`kind: 'schematic'`); coğrafi koordinat değildir
  */
 export function projectListingDetail(
   summary: ListingSummary,
@@ -224,5 +280,165 @@ export function projectListingDetail(
       type: summary.owner === 'agency' ? 'agency' : 'individual',
     },
     media: mediaFor(summary),
+    // Dosya sayısı değil, ilanda BİLDİRİLEN sayı. Sahne bunu kare olarak
+    // değil, sayı olarak gösterir.
+    declaredMediaCount: summary.imageCount,
+    // Coğrafi koordinat kayıtta YOKTUR; taşınan şey arama kaydının şematik
+    // yerleşimidir ve tip düzeyinde de öyle işaretlenir (`kind: 'schematic'`),
+    // böylece görünüm katmanı onu lat/lng gibi sunamaz.
+    geo: {
+      kind: 'schematic',
+      x: summary.map.x,
+      y: summary.map.y,
+      sourceLabel: SCHEMATIC_GEO_SOURCE,
+    },
+    qna: projectQna(summary, now),
+  }
+}
+
+/* ── Soru-cevap projeksiyonu ────────────────────────────────────────────
+   Soru-cevap bir KANIT KAYNAĞI değildir: alıcıların yazdığı içeriktir ve
+   TAKBİS/kadastro sorgusu yapılmamış olmasıyla ilgisi yoktur. Bu yüzden
+   yansıtılmış ilanın "kanıt dosyası yok" bildirimi soru-cevabı kapsamaz —
+   yazışma her ilanda olabilir.
+
+   Üretim `summary.id`'den deterministiktir: aynı ilan her yüklemede aynı
+   yazışmayı gösterir, SSR ve hydration çıktıları ayrışmaz. `Math.random`
+   ve `Date.now` burada kullanılmaz. */
+
+/** Basit, kararlı dizgi hash'i — `GlassAvatar`'ın pastel seçimiyle aynı fikir. */
+function seedOf(value: string): number {
+  let hash = 0
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) | 0
+  }
+  return Math.abs(hash)
+}
+
+/** Türkçe locale ile baş harfler; tek kelimelik adda ikinci harf uydurulmaz. */
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  const first = parts[0]?.charAt(0) ?? ''
+  const last = parts.length > 1 ? (parts[parts.length - 1]?.charAt(0) ?? '') : ''
+  return `${first}${last}`.toLocaleUpperCase('tr')
+}
+
+const QNA_ASKERS: ReadonlyArray<string> = [
+  'K. Ö.',
+  'M. K.',
+  'S. Y.',
+  'B. E.',
+  'A. D.',
+  'Ö. A.',
+  'T. G.',
+  'N. Ç.',
+]
+
+/**
+ * Soru havuzu — kategoriden bağımsız, her taşınmazda sorulabilecek sorular.
+ * Yanıtlar ilan sahibinin **beyanıdır**; doğrulanmış kayıt değildir ve
+ * bölümün altındaki uyarı bunu zaten yazar.
+ */
+const QNA_POOL: ReadonlyArray<{ question: string; answer?: string }> = [
+  {
+    question: 'Fiyatta pazarlık payı var mı?',
+    answer: 'Ciddi alıcıyla görüşürüm; rakam konusunda bir miktar esneklik var.',
+  },
+  {
+    question: 'Tapu durumu nedir, hisseli mi?',
+    answer: 'Tapu müstakil. Belgeleri görüşmede gösterebilirim.',
+  },
+  {
+    question: 'Yerinde görmek için ne zaman uygun olursunuz?',
+    answer: 'Hafta içi öğleden sonra ve cumartesi sabah müsaitim.',
+  },
+  { question: 'Krediye uygun mu, ekspertiz yapıldı mı?' },
+  {
+    question: 'Ulaşım nasıl, yola cephesi var mı?',
+    answer: 'Asfalt yola cephesi var; toplu taşıma durağı yürüme mesafesinde.',
+  },
+  { question: 'İlan hâlâ güncel mi?', answer: 'Evet, satılık.' },
+  { question: 'Aynı bölgede başka portföyünüz var mı?' },
+]
+
+/**
+ * İlanın kendi kimliğinden türetilen yazışma.
+ *
+ * Her ilanda soru olması gerekmez: tohumun beşe bölümünden kalanı sıfırsa
+ * kayıt soru taşımaz ve bölüm kendi boş durumunu yazar. Boş durum gerçek bir
+ * hâldir, kaçınılacak bir şey değil.
+ */
+function projectQna(summary: ListingSummary, now: string): ListingQna | undefined {
+  const seed = seedOf(summary.id)
+  if (seed % 5 === 0) return undefined
+
+  const seller: ListingQnaAuthor = {
+    id: `seller-${summary.id}`,
+    label: summary.sellerName,
+    initials: initialsOf(summary.sellerName),
+    role: 'seller',
+  }
+
+  const count = 2 + (seed % 3)
+  const base = Date.parse(now)
+  const entries: ListingQnaEntry[] = []
+
+  for (let index = 0; index < count; index += 1) {
+    const pick = QNA_POOL[(seed + index * 3) % QNA_POOL.length]
+    if (!pick) continue
+    const askerLabel = QNA_ASKERS[(seed + index * 5) % QNA_ASKERS.length] ?? 'Alıcı'
+    const askedAt = new Date(base - (index + 2) * 3 * DAY_MS).toISOString()
+
+    const author: ListingQnaAuthor = {
+      id: `buyer-${summary.id}-${index}`,
+      label: askerLabel,
+      initials: askerLabel.replace(/[^\p{L}]/gu, '').toLocaleUpperCase('tr'),
+      role: 'buyer',
+    }
+
+    const replies: ListingQnaEntry['replies'] = []
+    if (pick.answer) {
+      replies.push({
+        id: `${summary.id}-q${index}-a0`,
+        author: seller,
+        answeredAt: new Date(base - ((index + 2) * 3 - 1) * DAY_MS).toISOString(),
+        body: pick.answer,
+      })
+    }
+
+    /* İlk soruda üç repliklik bir alışveriş: katlama ("Tüm cevapları gör")
+       ancak birden çok GÖRÜNEN yanıt varken devreye girer. Sonuncusu
+       maskelidir — kişisel iletişim bilgisi herkese açık alanda yayımlanmaz
+       ve yükten de çıkarılır (bkz. adapter `redactQna`). */
+    if (index === 0 && pick.answer) {
+      replies.push({
+        id: `${summary.id}-q${index}-a1`,
+        author,
+        answeredAt: new Date(base - ((index + 2) * 3 - 1) * DAY_MS + 3_600_000).toISOString(),
+        body: 'Teşekkürler, telefonla konuşmak benim için daha kolay olur.',
+      })
+      replies.push({
+        id: `${summary.id}-q${index}-a2`,
+        author: seller,
+        answeredAt: new Date(base - ((index + 2) * 3 - 1) * DAY_MS + 7_200_000).toISOString(),
+        body: '0555 000 00 00',
+        visibility: 'masked',
+      })
+    }
+
+    entries.push({
+      id: `${summary.id}-q${index}`,
+      askedAt,
+      author,
+      question: pick.question,
+      replies,
+      pinned: index === 0,
+    })
+  }
+
+  return {
+    entries,
+    responseLabel:
+      seed % 2 === 0 ? 'İlan sahibi soruları genelde gün içinde yanıtlıyor.' : undefined,
   }
 }

@@ -1,5 +1,7 @@
 import { PageContainer } from '@/components/PageContainer'
 import { DocumentsSection } from './components/DocumentsSection'
+import { ListingLocationSection } from './components/ListingLocationSection'
+import { ListingQnaSection } from './components/ListingQnaSection'
 import { ListingDecisionRail } from './components/ListingDecisionRail'
 import { ListingDock } from './components/ListingDock'
 import { ListingEvidenceBrief } from './components/ListingEvidenceBrief'
@@ -11,7 +13,7 @@ import { SellerSection, type SellerPhoneAnalyticsEvent } from './components/Sell
 import { hasSellerRevealControl, SELLER_REVEAL_CONTROL_ID } from './components/seller-reveal'
 import type { ListingDetailResult } from './data/listing-detail-adapter'
 import { hasConflict } from './domain/evidence'
-import type { ListingDetail } from './domain/listing-detail-types'
+import type { ListingDetail, ListingQnaViewer } from './domain/listing-detail-types'
 import { formatArea, formatDate, formatPrice, formatUnitPrice } from './format'
 import styles from './ListingDetailWorkspace.module.css'
 
@@ -35,6 +37,21 @@ export interface ListingDetailWorkspaceProps {
   onReportIssue?: () => void
   /** Numara açma olayları (yalnız olay adı; numara asla gönderilmez) */
   onAnalyticsEvent?: (event: SellerPhoneAnalyticsEvent) => void
+  /**
+   * Soru-cevap bölümünü görüntüleyen. Verilmezse oturum kapalı sayılır:
+   * yazışma okunur, işlem menüleri ve yazma alanı hiç çizilmez (§7b).
+   */
+  qnaViewer?: ListingQnaViewer
+  /**
+   * Oturum kapalıyken soru sorma kapısına basıldığında çağrılır. Giriş
+   * sayfasına `donus` yoluyla götürmek çağıranın işidir; verilmezse kapı
+   * hiç çizilmez (bağlanmamış eylem etkin render edilmez, §4).
+   */
+  onQnaGirisIste?: () => void
+  /** Yeni soru gönderimi. Verilmezse yazma alanı yerine gerekçe yazılır. */
+  onQnaSoruGonder?: (soru: string) => void
+  /** Bir soruya yanıt yazma */
+  onQnaYanitla?: (soruId: string, yanit: string) => void
 }
 
 /** Birim fiyatın hangi alana dayandığı gizlenmez; çelişki varsa aynı cümlede söylenir. */
@@ -95,6 +112,10 @@ export function ListingDetailWorkspace({
   onContact,
   onReportIssue,
   onAnalyticsEvent,
+  qnaViewer,
+  onQnaGirisIste,
+  onQnaSoruGonder,
+  onQnaYanitla,
 }: ListingDetailWorkspaceProps) {
   const { detail, sections, aiBrief } = result
   const questions = listingQuestions(detail, sections.map)
@@ -149,6 +170,26 @@ export function ListingDetailWorkspace({
           <div className={styles.section}>
             <DocumentsSection detail={detail} />
           </div>
+
+          {/* Konum kanıt akışının sonunda: parselin nerede olduğu, belgelerden
+              sonra sorulan son "nerede" sorusunun karşılığıdır. */}
+          <ListingLocationSection
+            location={detail.location}
+            geo={detail.geo}
+            nearby={detail.nearby}
+          />
+
+          {/* Soru-cevap en sonda: kanıt okunduktan sonra kalan soru sorulur.
+              Yansıtılmış kayıtta soru dosyası hiç yoktur; boş durumun metni
+              bunu adıyla söyler (`projected`). */}
+          <ListingQnaSection
+            qna={detail.qna}
+                      projected={detail.kind === 'generic'}
+                      viewer={qnaViewer}
+                      onGirisIste={onQnaGirisIste}
+                      onSoruGonder={onQnaSoruGonder}
+                      onYanitla={onQnaYanitla}
+                    />
         </div>
 
         <ListingDecisionRail
@@ -170,7 +211,9 @@ export function ListingDetailWorkspace({
           />
         </div>
 
-        <ListingDock detail={detail} onContact={onContact} />
+        {/* Dar yerleşimin tek kontrol yüzeyi. Kartın eylemlerini kopyalamaz:
+            fiyat çapası + satıcı bölümüne götüren tek bağlantı taşır. */}
+        <ListingDock detail={detail} />
       </div>
     </PageContainer>
   )

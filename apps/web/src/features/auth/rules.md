@@ -64,6 +64,9 @@ arketipler yalnız iskelet ve semantik sağlar.
 |---|---|---|---|---|
 | `ikincilBaglantilar` | `AuthFormPage` | `AuthIkincilBaglanti[]` | Hayır | `{ etiket, hedef }`; render eden `Link` mevcut search'ü (`donus` dahil) otomatik taşır (§ güvenlik) |
 | `hata` | `AuthFormPage` | `string?` | Hayır | Verilirse `role="alert"` ile duyurulur |
+| `ustSerit` | `AuthFormPage` | `ReactNode?` | Hayır | Başlığın ÜSTÜNDE duran şerit (çok adımlı ilerleme göstergesi) |
+| `aksiyonlar` | `AuthFormPage` | `(durum) => ReactNode` | Hayır | Varsayılan tek gönder butonunun yerine geçer; `{ hidrasyonTamam }` verilir (bkz. §15) |
+| `adimlar`/`aktifIndeks`/`onAdimSec` | `KayitAdimSeridi` | — | Hayır | İlerleme şeridi; yalnız TAMAMLANAN adım tıklanabilir |
 | `tone` | `AuthStatusPage` | `'info'\|'success'\|'error'` | Hayır | `error` mesaj paragrafını alert yapar |
 | `AuthAdapters` | `data/auth-adapters.ts` | interface | — | Bkz. §7 adapter sözleşmesi |
 | `useKorumaliRota()` | `AuthSessionProvider.tsx` | hook | — | Oturumsuz erişimde `/giris?donus=...`'a yönlendirir |
@@ -169,7 +172,7 @@ ve erişilebilirlik (`AuthAccessibility.test.tsx`e yeni satır) kapsanmalı.
   hata tonunda `alert` her zaman `main` değil, açıklama paragrafı üzerinde.
 - `useKorumaliRota` kullanan her `/hesabim/*` rotası: oturumsuzken
   `/giris?donus=...`'a yönlendirdiğini kanıtlayan bir test taşır (bkz.
-  `hesabim.test.tsx`, `hesabim_.mesajlar.test.tsx`).
+  `hesabim.test.tsx`, `hesabim.mesajlar.test.tsx`).
 - `donus`, ikincil bağlantılardan geçerken kaybolmaz (href assertion).
 - `guvenliDonusYolu`: açık yönlendirme payload'ları (protokol-bağıl,
   ters-bölü kaçışı, kodlanmış varyantlar, auth rotalarına dönüş) ana sayfaya
@@ -224,6 +227,15 @@ son tip-güvensiz `navigate` çağrısı düzeltildi (Finding 4); `kayit_.
 kurumsal.tsx`/`hesap.dogrula.tsx` diğer auth rotalarıyla aynı
 `validateSearch`'ü aldı (Finding 5).
 
+Changelog: 2026-08-02 — `/kayit` tek uzun formdan dört adımlı akışa
+çevrildi (bkz. §15): `domain/kayit-adimlari.ts` (adım/alan eşlemesi + hata
+süzgeci), `components/KayitAdimSeridi.tsx` (ilerleme şeridi + adım sayacı),
+`AuthFormPage`'e `ustSerit` ve `aksiyonlar` slotları eklendi. Doğrulama
+mantığı (`kayitBilgileriniDogrula`) ve gönderim/yönlendirme dalları
+değişmedi. `/kayit/profil` ve `/kayit/kurumsal` aynı şeridi devam eden adım
+olarak gösteriyor. Testler adım adım gezinen `kayitAdimlariniDoldur`
+(`test-utils.ts`) yardımcısına taşındı.
+
 ## 13. Kayıt sözleşmesi (Faz 2)
 
 **Beş yeni sayfa:**
@@ -259,8 +271,8 @@ Gerçek backend geldiğinde adapter'ın döndürdüğü hata kodları (`eksik-al
 `hesap-zaten-var`, `eids-reddedildi`) nihai karardır; istemci doğrulaması
 yalnız gecikmeyi azaltır.
 
-**Hesap tipi dallanması:** `KayitPage`'deki `fieldset`/`legend` ile
-gruplanmış radio (bireysel/kurumsal) akışı belirler. Bireysel → `kayitYap`
+**Hesap tipi dallanması:** `KayitPage`'in İLK ADIMINDAKİ `fieldset`/`legend`
+ile gruplanmış radio (bireysel/kurumsal) akışı belirler. Bireysel → `kayitYap`
 başarılı olunca doğrudan `donus` hedefine (`guvenliDonusYolu` ile). Kurumsal
 → `kayitYap` sonrası `/kayit/kurumsal`'a (bu geçiş `donus`'u taşımaz —
 kurumsal başvuru kendi akışını sürdürür); başvuru başarılı olunca
@@ -298,3 +310,57 @@ sarmalayıcı içinde TEK yerde çağrılır.
 Oturum gerektiren yeni bir sayfa eklerken içeriği `<KorumaliSayfa>` ile
 sarmala; kendi `useKorumaliRota()`/`if (!girisYapildi) return null` kopyanı
 yazma — aynı hidrasyon hatasını yeniden üretirsin.
+
+## 15. Çok adımlı kayıt (`/kayit`)
+
+`/kayit` tek uzun form değildir; dört adımlı bir akıştır. Adım tanımları
+`domain/kayit-adimlari.ts`'te; şerit `components/KayitAdimSeridi.tsx`'te.
+
+| # | Adım | Alanlar |
+|---|---|---|
+| 1 | Hesap tipi | `hesapTipi` (radyo kartları) |
+| 2 | Kimlik | `adSoyad`, `ePosta` |
+| 3 | İletişim ve güvenlik | `telefon`, `parola` |
+| 4 | Onay | özet + `kvkkOnayi` |
+
+**Doğrulama tek kaynaktan gelir.** `kayitBilgileriniDogrula` DEĞİŞMEZ ve her
+"Devam et"te TAM olarak çalışır; adım sözleşmesi yalnız sonucu SÜZER
+(`adimHatalari(hatalar, adim)`). Kullanıcı henüz görmediği bir adımın
+hatasını duymaz. Son adımda tam hata kümesine bakılır; bir hata kalmışsa
+`hataliAdimIndeksi` ile o adıma geri dönülür. `alanHatalari` state'i her
+zaman YALNIZ görünür adımın hatalarını taşır — bu yüzden
+`ilkHataliAlanaOdaklan` tüm alan sırasıyla çağrılsa bile daima görünür
+adımın ilk hatasına odaklanır. Adım eklerken/alan taşırken doğrulamaya
+dokunma, yalnız `KAYIT_ADIMLARI` eşlemesini güncelle
+(`kayit-adimlari.test.ts` her doğrulama alanının tam olarak bir adıma
+düştüğünü sınar).
+
+**Odak ve duyuru.** Adım değişimi ve hata odağı ancak yeni adım DOM'a
+yazıldıktan sonra uygulanabilir; bu yüzden odak render sırasında değil bir
+"bilet" state'i üzerinden `useEffect`'te taşınır (adım başlığı `h2`
+`tabIndex={-1}`, hata durumunda ilk hatalı alan). "Adım N / M: …" satırı
+`aria-live="polite"` taşır — duyuruyu yapan odak değil bu satırdır.
+
+**Gezinme.** İleri gitmek yalnız doğrulamadan geçen "Devam et" ile olur;
+şeritte SADECE tamamlanan adımlar butona dönüşür (ileri adım tıklanamaz,
+devre dışı buton da yazılmaz — düz metin kalır). "Geri" ilk adımda pasiftir
+ve girilen değerleri korur.
+
+**Şerit devam sayfalarında sürer.** `kayitSeridi(dal)` dalın tam listesini
+üretir: `/kayit` 4 adım, `/kayit/profil` 5 adım (5. adım aktif),
+`/kayit/kurumsal` 6 adım (5. adım aktif, 6. adım `/hesap/dogrula`). Bu iki
+sayfanın form mantığı değişmedi; yalnız `AuthFormPage`'in `ustSerit`
+slotunu doldururlar.
+
+**`aksiyonlar` slotu ve hidrasyon.** Çok adımlı akış varsayılan tek gönder
+butonunu `aksiyonlar` ile değiştirir. Slot `{ hidrasyonTamam }` alır ve
+BUNU KULLANMAK ZORUNDADIR: hidrasyon öncesi tıklama native form gönderimine
+düşer ve `donus` sessizce kaybolur (bkz. `AuthFormPage` içindeki uzun not).
+
+**Görsel sözleşme.** Adım kartı FLAT'tır ve hesap panosundaki bölüm kartıyla
+aynı ölçüyü taşır (`--lg-surface`, hairline, `--lg-radius-card`,
+`--lg-space-5`) — sınıf ithal edilmez, `KayitPage.module.css` kendi
+eşdeğerini yazar. Cam yalnız kontrol katmanındadır (gezinme `GlassButton`'ları).
+Adım geçişi `motion/react` ile yalnız `opacity` + `x`; `useReducedMotion()`
+doğruysa geçiş kapanır. Şeritteki durum renkten bağımsız da okunur
+(✓ işareti, sıra numarası, `aria-current="step"`, görsel-gizli durum metni).

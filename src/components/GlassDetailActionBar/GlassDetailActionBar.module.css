@@ -12,14 +12,14 @@
   justify-content: center;
   box-sizing: border-box;
   width: 100%;
-  min-height: var(--lg-control-lg, 48px);
+  min-height: var(--lg-control-lg, 44px);
   padding: 0 var(--lg-space-4, 16px);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
   border: 0;
   border-radius: var(--lg-radius-chip, 10px);
   font: inherit;
-  font-weight: 600;
+  font-weight: var(--lg-action-weight);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -142,8 +142,6 @@
   flex: 1;
 }
 
-@media (pointer: coarse) {
-  .utility {
-    min-height: var(--lg-control-md, 44px);
-  }
-}
+/* `pointer: coarse` yükseltmesi kaldırıldı: `--lg-control-md` ölçeğin kendisi
+   sayesinde imleçlide 40px, dokunmatikte 44px. Aynı token'ı tekrar yazan blok
+   gereksizdi. */

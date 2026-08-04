@@ -42,10 +42,18 @@
   }
 }
 
-/* Kare gövde + capsule shape = daire; boyutlar kontrol token'larından */
-.sm { width: var(--lg-control-sm, 32px); height: var(--lg-control-sm, 32px); font-size: var(--icon-font-sm); }
+/* Kare gövde + capsule shape = daire; boyutlar kontrol token'larından.
+   Genişlik = yükseklik aynı token'dan okunur → oran her ölçekte kare kalır. */
+.sm { width: var(--lg-control-sm, 36px); height: var(--lg-control-sm, 36px); font-size: var(--icon-font-sm); }
 .md { width: var(--lg-control-md, 40px); height: var(--lg-control-md, 40px); font-size: var(--lg-text-headline); }
-.lg { width: var(--lg-control-lg, 48px); height: var(--lg-control-lg, 48px); font-size: var(--icon-font-lg); }
+.lg { width: var(--lg-control-lg, 44px); height: var(--lg-control-lg, 44px); font-size: var(--icon-font-lg); }
+
+/* Not: dokunma hedefi görünmez bir `::after` ile büyütülemez — kök GlassSurface'tir
+   ve kendi köşe kırpması için `overflow: hidden` taşır; taşan pseudo-eleman hem
+   boyanmaz hem tıklanmaz (aynı kısıt GlassButton'da da geçerli). Hedef bu yüzden
+   doğrudan kontrol token'ından gelir: dokunmatikte 44/44/48px (AAA 2.5.5),
+   imleçli cihazda 36/40/44px (AA 2.5.8'in 24px tabanının belirgin üstünde).
+   Böylece ikon buton, yanındaki GlassButton ile aynı satır yüksekliğinde kalır. */
 
 .active {
   background-color: color-mix(in srgb, var(--glass-tint) 85%, transparent);

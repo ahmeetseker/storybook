@@ -14,6 +14,12 @@ interface ListingProgressProps {
   onStepChange: (step: ListingStepId) => void
 }
 
+/**
+ * Adım göstergesi. Geniş kapta bağlantı çizgili yatay stepper: her adım
+ * tamamlandı / aktif / bekliyor / kilitli durumunu hem disk hem de metinle
+ * söyler. Dar kapta sayaç + adım seçici + ölçere iner; kilitli adımlar
+ * seçicide de kapalıdır.
+ */
 export function ListingProgress({
   draft,
   activeStep,
@@ -27,7 +33,9 @@ export function ListingProgress({
   return (
     <nav className={styles.progressNav} aria-label="İlan oluşturma adımları">
       <div className={styles.progressCompact}>
-        <span>Adım {activeIndex + 1}/{LISTING_STEPS.length}</span>
+        <span className={styles.progressCompactCount}>
+          Adım {activeIndex + 1}/{LISTING_STEPS.length}
+        </span>
         <GlassSelect
           size="md"
           aria-label="Aktif ilan oluşturma adımı"
@@ -48,16 +56,33 @@ export function ListingProgress({
           aria-label={`${activeDefinition?.label ?? 'İlan'}: ${activeIndex + 1}/${LISTING_STEPS.length}`}
         />
       </div>
+
       <ol className={styles.progressList}>
         {LISTING_STEPS.map((step, index) => {
           const valid = getStepValidation(draft, step.id).valid
           const enabled = index <= reachableIndex || valid
           const active = step.id === activeStep
+          const state = active
+            ? 'active'
+            : valid
+              ? 'complete'
+              : enabled
+                ? 'pending'
+                : 'locked'
+          const status = active
+            ? 'Şu an buradasınız'
+            : valid
+              ? 'Tamamlandı'
+              : enabled
+                ? 'Bekliyor'
+                : 'Kilitli'
+
           return (
-            <li key={step.id} className={styles.progressItem}>
+            <li key={step.id} className={styles.progressItem} data-state={state}>
               <button
                 type="button"
                 className={styles.progressButton}
+                data-state={state}
                 data-active={active || undefined}
                 data-complete={valid || undefined}
                 aria-current={active ? 'step' : undefined}
@@ -69,7 +94,7 @@ export function ListingProgress({
                 </span>
                 <span className={styles.progressCopy}>
                   <strong>{step.label}</strong>
-                  <small>{valid ? 'Tamamlandı' : step.description}</small>
+                  <small>{status}</small>
                 </span>
               </button>
             </li>

@@ -41,10 +41,13 @@
   .stepBtn:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.55); }
 }
 
-/* Boyutlar kontrol token'larından — dokunmatikte otomatik 44px'e yaklaşır */
-.sm .stepBtn { width: var(--lg-control-sm, 32px); height: var(--lg-control-sm, 32px); }
+/* Kare gövde: genişlik = yükseklik, ikisi de aynı kontrol token'ından.
+   İmleçli cihazda 36/40/44, dokunmatikte 44/44/48.
+   Not: hedefi görünmez bir `::after` ile büyütmek mümkün değil — stepBtn kökü
+   GlassSurface'tir ve `overflow: hidden` taşır (bkz. rules.md §9). */
+.sm .stepBtn { width: var(--lg-control-sm, 36px); height: var(--lg-control-sm, 36px); }
 .md .stepBtn { width: var(--lg-control-md, 40px); height: var(--lg-control-md, 40px); }
-.lg .stepBtn { width: var(--lg-control-lg, 48px); height: var(--lg-control-lg, 48px); }
+.lg .stepBtn { width: var(--lg-control-lg, 44px); height: var(--lg-control-lg, 44px); }
 
 .icon { display: inline-flex; }
 .glyph {

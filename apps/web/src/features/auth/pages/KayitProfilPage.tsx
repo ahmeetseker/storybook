@@ -1,10 +1,16 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { AuthFormPage } from '../components/AuthFormPage'
+import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { KorumaliSayfa } from '../components/KorumaliSayfa'
 import { useAuthSession } from '../AuthSessionProvider'
 import { guvenliDonusYolu } from '../domain/auth-session'
+import { kayitSeridi } from '../domain/kayit-adimlari'
 import styles from './GirisPage.module.css'
+
+/** Bireysel dalın şeridi: dört kayıt adımı + profil. Bu sayfa son adımdır. */
+const SERIT = kayitSeridi('profil')
+const AKTIF_INDEKS = SERIT.length - 1
 
 /**
  * Kayıt sonrası eksik profil alanlarını tamamlar. Oturum gerektirir;
@@ -41,6 +47,19 @@ export function KayitProfilPage() {
       <AuthFormPage
         baslik="Profilinizi tamamlayın"
         aciklama="Bu bilgiler ilanlarınızda ve mesajlarınızda görünür."
+        ustSerit={
+          <KayitAdimSeridi
+            adimlar={SERIT}
+            aktifIndeks={AKTIF_INDEKS}
+            sayac={
+              <KayitAdimSayaci
+                aktifIndeks={AKTIF_INDEKS}
+                toplam={SERIT.length}
+                baslik={SERIT[AKTIF_INDEKS].baslik}
+              />
+            }
+          />
+        }
         hata={hata}
         onSubmit={gonder}
         gonderEtiketi="Kaydet ve devam et"

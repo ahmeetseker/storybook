@@ -48,7 +48,13 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     select: (state) => state.location.pathname,
   })
   const currentRoute = getRouteByPath(pathname)
-  const isFocusedListingFlow = currentRoute.key === 'create-listing'
+  // Kendi kabuğunu kuran rotalar: ilan verme sihirbazı (odaklı akış) ve
+  // hesap panosu (sol ray + kendi üst şeridi). İkisinde de pazar yeri
+  // header'ı ve dock'u gizlenir — iki gezinme katmanı üst üste binmez.
+  const isFocusedListingFlow =
+    currentRoute.key === 'create-listing'
+    || currentRoute.key === 'account'
+    || currentRoute.key === 'messages'
   const [viewport, setViewport] = useState<ViewportTier | null>(null)
   const [theme, setTheme] = useState<ThemeChoice>('system')
 

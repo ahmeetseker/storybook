@@ -2,7 +2,7 @@
 name: GlassStepper
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassStepper Kuralları
@@ -106,6 +106,15 @@ yerel değişken olarak toplandı (`.root { --glyph-sm: 14px; --glyph-md: 16px;
 aynı borç), token'a bağlanmadı; geçiş süresi/easing (`0.16s ease-out`) süre
 token'ı olmadığından raw.
 
+**Dokunma hedefi:** ± butonları kare gövdedir, genişlik ve yükseklik aynı
+kontrol token'ından okunur — imleçli cihazda 36/40/44, dokunmatikte
+44/44/48px. Hedefi görünmez bir `::after` ile büyütmek mümkün değil: buton
+kökü GlassSurface'tir ve kendi köşe kırpması için `overflow: hidden` taşır
+(aynı kısıt GlassButton/GlassIconButton'da da geçerli). İmleçli cihazdaki
+36px, AA 2.5.8'in 24px tabanının belirgin üstündedir; AAA 2.5.5 dokunmatikte
+token katmanında karşılanır. Glyph ölçüleri (14/16/18px) kutu oranını 0.39
+civarında tutar, yeni ölçekte de dengeli.
+
 ## 10. Storybook kapsamı
 
 Var: Default, Formatted, AtBounds, Disabled, Sizes, ControlledRoomCount,
@@ -135,3 +144,7 @@ basılı tutunca tekrar (repeat) talebi gelirse eklenmesi.
 
 - 2026-07-16: İlk sürüm — spinbutton deseni, cam ± butonları (tek sekme durağı),
   sonsuz max desteği, uç kıskaçlama.
+- 2026-08-03: Yeni kontrol ölçeğine uyum: `--lg-control-*` fallback'leri
+  güncellendi (32/40/48 → 36/40/44). Görünür buton ölçüsü imleçli cihazda
+  44→36 (sm) / 44→40 (md) / 48→44 (lg), dokunmatikte 44/44/48'de kalıyor.
+  Glyph ve değer tipografisi değişmedi; hedef kısıtı §9'a yazıldı.

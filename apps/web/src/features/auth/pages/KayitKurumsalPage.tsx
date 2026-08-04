@@ -1,13 +1,22 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { AuthFormPage } from '../components/AuthFormPage'
+import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { KorumaliSayfa } from '../components/KorumaliSayfa'
 import { useAuthSession } from '../AuthSessionProvider'
 import { kurumsalBasvuruyuDogrula } from '../domain/kayit-dogrulama'
+import { kayitSeridi } from '../domain/kayit-adimlari'
 import { alanHataId, ilkHataliAlanaOdaklan } from '../domain/form-erisilebilirlik'
 import type { KurumsalAlanHatalari, KurumsalBasvuruBilgileri } from '../domain/auth-types'
 import alanStilleri from './GirisPage.module.css'
 import styles from './KayitPage.module.css'
+
+/**
+ * Kurumsal dalın şeridi: dört kayıt adımı + ofis bilgileri + EİDS
+ * doğrulaması. Bu sayfa beşinci adımdır; altıncı adım `/hesap/dogrula`.
+ */
+const SERIT = kayitSeridi('kurumsal')
+const AKTIF_INDEKS = SERIT.length - 2
 
 const BOS_BASVURU: KurumsalBasvuruBilgileri = {
   ticaretUnvani: '',
@@ -141,6 +150,19 @@ export function KayitKurumsalPage() {
       <AuthFormPage
         baslik="Emlak ofisi başvurusu"
         aciklama="İlan yayınlayabilmek için işletme bilgilerinizi ve yetki belgenizi iletin."
+        ustSerit={
+          <KayitAdimSeridi
+            adimlar={SERIT}
+            aktifIndeks={AKTIF_INDEKS}
+            sayac={
+              <KayitAdimSayaci
+                aktifIndeks={AKTIF_INDEKS}
+                toplam={SERIT.length}
+                baslik={SERIT[AKTIF_INDEKS].baslik}
+              />
+            }
+          />
+        }
         hata={hata}
         onSubmit={gonder}
         gonderEtiketi="Başvuruyu gönder"

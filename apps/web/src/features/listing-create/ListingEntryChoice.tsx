@@ -1,35 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 import { GlassButton } from '@repo/ui'
-import type { AiListingProposal } from './listing-create-domain'
+import {
+  LISTING_STEPS,
+  type AiListingProposal,
+  type ListingStepId,
+} from './listing-create-domain'
 import type { ListingAdapters } from './listing-create-adapters'
+import { familyLabels, locationChain } from './listing-labels'
 import styles from './ListingCreateWorkspace.module.css'
+
+export interface ListingResumeOffer {
+  /** Kaldığı adımın etiketi. */
+  stepId: ListingStepId
+  stepLabel: string
+  stepIndex: number
+  /** Taslakta duran başlık ya da konum — kullanıcı hangi ilan olduğunu tanısın. */
+  summary: string
+  droppedMediaCount: number
+}
 
 interface ListingEntryChoiceProps {
   adapters: ListingAdapters
   onManualStart: () => void
   onApplyProposal: (proposal: AiListingProposal) => void
-}
-
-const familyLabels = {
-  land: 'Arsa / Arazi',
-  residential: 'Konut',
-  commercial: 'İş yeri',
-  building: 'Bina',
-} as const
-
-const locationLabels: Record<string, string> = {
-  izmir: 'İzmir',
-  istanbul: 'İstanbul',
-  ankara: 'Ankara',
-  urla: 'Urla',
-  çeşme: 'Çeşme',
-  seferihisar: 'Seferihisar',
-  kadıköy: 'Kadıköy',
-  beşiktaş: 'Beşiktaş',
-  sarıyer: 'Sarıyer',
-  gölbaşı: 'Gölbaşı',
-  çankaya: 'Çankaya',
-  iskele: 'İskele',
+  /** Aynı sekmede yarım kalmış taslak varsa devam teklifi. */
+  resume?: ListingResumeOffer | null
+  onResume?: () => void
+  onDiscardResume?: () => void
 }
 
 function proposalFamilyLabel(proposal: AiListingProposal): string {
@@ -38,15 +35,12 @@ function proposalFamilyLabel(proposal: AiListingProposal): string {
 }
 
 function proposalLocationLabel(proposal: AiListingProposal): string {
-  const values = [
-    proposal.location.city,
-    proposal.location.district,
-    proposal.location.neighborhood,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .map((value) => locationLabels[value.toLocaleLowerCase('tr-TR')] ?? value)
-
-  return values.length > 0 ? values.join(' · ') : 'Belirtilmedi'
+  const chain = locationChain({
+    city: (proposal.location.city ?? '').toLocaleLowerCase('tr-TR'),
+    district: (proposal.location.district ?? '').toLocaleLowerCase('tr-TR'),
+    neighborhood: (proposal.location.neighborhood ?? '').toLocaleLowerCase('tr-TR'),
+  })
+  return chain || 'Belirtilmedi'
 }
 
 function proposalAreaLabel(proposal: AiListingProposal): string {
@@ -58,6 +52,9 @@ export function ListingEntryChoice({
   adapters,
   onManualStart,
   onApplyProposal,
+  resume = null,
+  onResume,
+  onDiscardResume,
 }: ListingEntryChoiceProps) {
   const [mode, setMode] = useState<'idle' | 'ai'>('idle')
   const [sourceText, setSourceText] = useState('')
@@ -105,49 +102,106 @@ export function ListingEntryChoice({
       <div className={styles.entryIntro}>
         <p className={styles.kicker}>Yeni ilan</p>
         <h1 id="entry-title">İlanınızı güvenle yayına hazırlayın</h1>
-        <p>
-          Önce en rahat başlangıç yolunu seçin. Girdiğiniz her bilgi taslakta kalır;
-          yayın kararı her zaman sizindir.
+        <p className={styles.entryLead}>
+          Önce en rahat başlangıç yolunu seçin. Girdiğiniz her bilgi taslakta
+          kalır; yayın kararı her zaman sizindir.
         </p>
       </div>
 
-      {mode === 'idle' ? (
-        <div className={styles.entryChoices}>
-          <article className={styles.entryChoicePrimary}>
-            <span className={styles.choiceMark} aria-hidden="true">
-              ✦
-            </span>
-            <p className={styles.choiceEyebrow}>Daha hızlı başlangıç</p>
-            <h2>Mülkü doğal dille anlatın</h2>
+      {resume && mode === 'idle' ? (
+        <section className={styles.resumeCard} aria-labelledby="resume-title">
+          <div className={styles.resumeBody}>
+            <p className={styles.choiceEyebrow}>Yarım kalan taslak</p>
+            <h2 id="resume-title">Kaldığınız yerden devam edin</h2>
             <p>
-              AI; kategori, konum ve öne çıkan özellikleri bir öneri halinde
-              hazırlasın. Siz incelemeden hiçbir alan değişmez.
+              {resume.summary} · {resume.stepIndex}. adım ({resume.stepLabel})
+              {resume.droppedMediaCount > 0
+                ? ` · ${resume.droppedMediaCount} fotoğrafı yeniden eklemeniz gerekiyor`
+                : ''}
             </p>
-            <GlassButton prominent size="md" onClick={() => setMode('ai')}>
-              AI ile hızlı başla
-            </GlassButton>
-          </article>
-
-          <article className={styles.entryChoiceSecondary}>
-            <span className={styles.choiceNumber}>01—05</span>
-            <h2>Adım adım ilerleyin</h2>
-            <p>
-              Mülk türünden EİDS doğrulamasına kadar tüm bilgileri kontrollü
-              formlarla kendiniz girin.
-            </p>
+          </div>
+          <div className={styles.resumeActions}>
             <button
               type="button"
-              className={styles.textAction}
-              onClick={() => {
-                invalidateProposalRequest()
-                onManualStart()
-              }}
+              className={styles.primaryFlatAction}
+              onClick={onResume}
             >
-              Bilgileri kendim gireceğim
-              <span aria-hidden="true">→</span>
+              Taslağa devam et
             </button>
-          </article>
-        </div>
+            <button
+              type="button"
+              className={styles.secondaryAction}
+              onClick={onDiscardResume}
+            >
+              Yeni taslak başlat
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {mode === 'idle' ? (
+        <>
+          <div className={styles.entryChoices}>
+            <article className={styles.entryChoicePrimary}>
+              <span className={styles.choiceMark} aria-hidden="true">
+                ✦
+              </span>
+              <p className={styles.choiceEyebrow}>Daha hızlı başlangıç</p>
+              <h2>Mülkü doğal dille anlatın</h2>
+              <p>
+                AI; kategori, konum ve öne çıkan özellikleri bir öneri halinde
+                hazırlasın. Siz incelemeden hiçbir alan değişmez.
+              </p>
+              <GlassButton prominent size="md" onClick={() => setMode('ai')}>
+                AI ile hızlı başla
+              </GlassButton>
+            </article>
+
+            <article className={styles.entryChoiceSecondary}>
+              <span className={styles.choiceMark} aria-hidden="true">
+                ☰
+              </span>
+              <p className={styles.choiceEyebrow}>Tam kontrol</p>
+              <h2>Adım adım ilerleyin</h2>
+              <p>
+                Mülk türünden EİDS doğrulamasına kadar tüm bilgileri kontrollü
+                formlarla kendiniz girin.
+              </p>
+              <button
+                type="button"
+                className={styles.textAction}
+                onClick={() => {
+                  invalidateProposalRequest()
+                  onManualStart()
+                }}
+              >
+                Bilgileri kendim gireceğim
+                <span aria-hidden="true">→</span>
+              </button>
+            </article>
+          </div>
+
+          <section className={styles.entryRoadmap} aria-labelledby="entry-roadmap-title">
+            <div className={styles.entryRoadmapHead}>
+              <h2 id="entry-roadmap-title">Yayına kadar beş adım</h2>
+              <p>
+                Hangi yolu seçerseniz seçin aynı adımlardan geçersiniz; her adım
+                ayrı ayrı kaydedilir.
+              </p>
+            </div>
+            <ol className={styles.entryRoadmapList}>
+              {LISTING_STEPS.map((step, index) => (
+                <li key={step.id}>
+                  <span className={styles.entryRoadmapIndex} aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <strong>{step.label}</strong>
+                  <small>{step.description}</small>
+                </li>
+              ))}
+            </ol>
+          </section>
+        </>
       ) : (
         <div className={styles.aiComposer}>
           <div className={styles.aiComposerHeader}>
@@ -181,16 +235,27 @@ export function ListingEntryChoice({
             aria-describedby={error ? 'listing-ai-error' : 'listing-ai-help'}
           />
           <p id="listing-ai-help" className={styles.fieldHelp}>
-            Tapu numarası veya kişisel bilgi yazmayın. Eksik alanları sonraki adımlarda
-            tamamlayabilirsiniz.
+            Tapu numarası veya kişisel bilgi yazmayın. Eksik alanları sonraki
+            adımlarda tamamlayabilirsiniz.
           </p>
           <p id="listing-ai-error" className={styles.fieldError} aria-live="polite">
             {error}
           </p>
           <div className={styles.composerActions}>
-            <GlassButton prominent loading={loading} onClick={prepareProposal}>
-              Öneriyi hazırla
-            </GlassButton>
+            {proposal ? (
+              <button
+                type="button"
+                className={styles.secondaryAction}
+                onClick={prepareProposal}
+                disabled={loading}
+              >
+                Öneriyi hazırla
+              </button>
+            ) : (
+              <GlassButton prominent loading={loading} onClick={prepareProposal}>
+                Öneriyi hazırla
+              </GlassButton>
+            )}
             <button
               type="button"
               className={styles.textAction}

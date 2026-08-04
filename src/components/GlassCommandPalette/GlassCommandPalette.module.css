@@ -176,9 +176,7 @@
   white-space: nowrap;
 }
 
-@media (pointer: coarse) {
-  .command {
-    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi */
-    min-height: var(--lg-control-md);
-  }
-}
+/* `pointer: coarse` yükseltmesi kaldırıldı: `--lg-control-md` zaten imleçli
+   cihazda 40px, dokunmatikte 44px. Aynı değeri ikinci kez yazan blok
+   gereksizdi. Komut satırı tam genişlikte bir metin hedefi — dikey taşma
+   gerekmez. */

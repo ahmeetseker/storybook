@@ -26,16 +26,17 @@
   --line-w: 24px; /* refraktif çizgi */
   --line-h: 3px;
   --bead-size: 6px; /* overlay boncuğu */
-  --island-pad-y: 14px; /* islands dikey pad (scroll'da daralır) */
-  --island-pad-y-scrolled: 7px;
-  --command-pad-y: 10px;
-  --command-min-h: 52px; /* command bar yüksekliği */
+  --island-pad-y: var(--lg-space-3); /* islands dikey pad (scroll'da daralır) */
+  --island-pad-y-scrolled: calc(var(--lg-space-3) / 2);
+  --command-pad-y: var(--lg-space-2);
   --search-max: 620px; /* arama rayı genişliği */
   --search-shift: 4px; /* ray/özet geçişinin mikro-offseti */
   --masthead-pad-t: 26px; /* kimlik satırı üst pad */
   --wordmark-min: 24px; /* masthead akışkan wordmark ölçüsü */
   --wordmark-max: 32px;
-  --index-rail-h: 42px; /* sticky indeks rayı yüksekliği */
+  /* Sticky indeks rayı bir DOKUNMA SATIRI: linkler rayı tepeden tırnağa
+     doldurur, o yüzden ray yüksekliği hedef tabanına bağlı (her cihazda 44px). */
+  --index-rail-h: var(--lg-control-hit);
   --index-link-gap: 6px;
   --overlay-link-pad: 15px;
 }
@@ -65,10 +66,13 @@
 }
 .linkItem { display: flex; }
 .link {
+  /* Görünür yükseklik yerel değişkende: indeks rayı bunu ezdiğinde dokunma
+     hedefi hesabı da otomatik izler. */
+  --link-h: var(--lg-control-sm, 36px);
   position: relative;
   display: inline-flex;
   align-items: center;
-  min-height: var(--lg-control-sm, 32px);
+  min-height: var(--link-h);
   padding: 0 var(--link-pad-x);
   border-radius: var(--lg-radius-capsule, 999px);
   color: var(--lg-label-secondary);
@@ -83,7 +87,17 @@
 .link:focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
 .linkActive { color: var(--lg-label); font-weight: 600; }
 .linkLabel { position: relative; z-index: 1; }
-@media (pointer: coarse) { .link { min-height: 44px; } }
+/* Dokunma hedefi görünmez ::after ile `--lg-control-hit`e taşar (imleçli
+   cihazda 36px görünür + 4px taşma). Taşma, islands/overlay şeritlerinin dikey
+   dolgusundan küçük; hiçbir ata `overflow: hidden` taşımaz. Eski
+   `pointer: coarse` yükseltmesi kaldırıldı — token dokunmatikte zaten 44px,
+   `min()` taşmayı 0'a indirir. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--link-h) - var(--lg-control-hit)) / 2));
+}
 
 .actions { display: inline-flex; align-items: center; gap: var(--actions-gap); flex: none; }
 .secondary :is(a, button) {
@@ -184,7 +198,9 @@
   display: flex;
   align-items: center;
   gap: var(--zone-gap);
-  min-height: var(--command-min-h);
+  /* Şerit = arama kontrolünün görünür ölçüsü + dikey dolgu. Kabuk kontrolden
+     büyük çizilmez (imleçli 40+16=56px, dokunmatik 44+16=60px). */
+  min-height: calc(var(--lg-control-md) + var(--command-pad-y) * 2);
 }
 .command .burger { display: inline-flex; } /* command'da merkez nav yok — menü hep hamburger'da */
 .searchZone { flex: 1; min-width: 0; display: grid; justify-items: center; }
@@ -194,7 +210,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--lg-space-2);
-  min-height: var(--lg-control-sm, 32px);
+  min-height: var(--lg-control-sm, 36px);
   padding: 0 var(--lg-space-4);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule, 999px);
@@ -261,7 +277,7 @@
 }
 .mastheadIndexInner .nav { flex: 1; }
 .mastheadIndexInner .linkList { gap: var(--index-link-gap); }
-.mastheadIndexInner .link { border-radius: 0; min-height: var(--index-rail-h); }
+.mastheadIndexInner .link { border-radius: 0; --link-h: var(--index-rail-h); }
 .mastheadIndexInner .linkActive { color: var(--lg-accent); }
 .mastheadIndexInner .actions { gap: var(--lg-space-3); }
 
@@ -326,7 +342,9 @@
   display: flex;
   width: 100%;
   align-items: center;
-  min-height: var(--lg-control-lg, 48px);
+  /* Drawer satırı bir DOKUNMA SATIRI — görünür ölçü doğrudan hedef tabanına
+     bağlı (her cihazda 44px), taşma gerekmez. */
+  min-height: var(--lg-control-hit);
   padding: 0 var(--drawer-pad-x);
   border: none;
   border-radius: var(--lg-radius-chip, 10px);
@@ -350,6 +368,10 @@
 }
 .drawerSecondary :is(a, button) {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--lg-control-hit);
   border: 1px solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip, 10px);
   background: none;

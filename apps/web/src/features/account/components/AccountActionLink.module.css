@@ -16,6 +16,9 @@
   color: var(--lg-accent-contrast);
   min-block-size: var(--lg-control-lg);
   padding-inline: var(--lg-space-5);
+  /* Birincil etiket kapsülün içinde kırılmaz; dar kapta kapsül tam
+     genişliğe yayılır (bkz. AccountSections.module.css `.identityAction`). */
+  white-space: nowrap;
 }
 
 .secondary {
@@ -23,10 +26,15 @@
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-capsule);
   padding-inline: var(--lg-space-4);
+  /* Gündem satırının sağındaki aksiyon iki satıra bölünmez. */
+  white-space: nowrap;
 }
 
 .text {
   color: var(--lg-accent);
+  /* Odak halkası metnin etrafında kapalı bir şekil çizsin. */
+  border-radius: var(--lg-radius-chip);
+  font-size: var(--lg-text-footnote);
   min-block-size: auto;
 }
 

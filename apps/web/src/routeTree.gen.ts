@@ -28,7 +28,14 @@ import { Route as GirisBaglantiGonderildiRouteImport } from './routes/giris_.bag
 import { Route as GirisHataRouteImport } from './routes/giris_.hata'
 import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
-import { Route as HesabimMesajlarRouteImport } from './routes/hesabim_.mesajlar'
+import { Route as HesabimIndexRouteImport } from './routes/hesabim.index'
+import { Route as HesabimFaturalarimRouteImport } from './routes/hesabim.faturalarim'
+import { Route as HesabimGuvenlikRouteImport } from './routes/hesabim.guvenlik'
+import { Route as HesabimHareketlerRouteImport } from './routes/hesabim.hareketler'
+import { Route as HesabimIlanlarimRouteImport } from './routes/hesabim.ilanlarim'
+import { Route as HesabimKayitliAramaRouteImport } from './routes/hesabim.kayitli-arama'
+import { Route as HesabimMesajlarRouteImport } from './routes/hesabim.mesajlar'
+import { Route as HesabimOdemelerRouteImport } from './routes/hesabim.odemeler'
 import { Route as HesapDogrulaRouteImport } from './routes/hesap.dogrula'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KayitHesapVarRouteImport } from './routes/kayit_.hesap-var'
@@ -137,10 +144,45 @@ const GirisParolaRoute = GirisParolaRouteImport.update({
   path: '/giris/parola',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HesabimIndexRoute = HesabimIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimFaturalarimRoute = HesabimFaturalarimRouteImport.update({
+  id: '/faturalarim',
+  path: '/faturalarim',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimGuvenlikRoute = HesabimGuvenlikRouteImport.update({
+  id: '/guvenlik',
+  path: '/guvenlik',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimHareketlerRoute = HesabimHareketlerRouteImport.update({
+  id: '/hareketler',
+  path: '/hareketler',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimIlanlarimRoute = HesabimIlanlarimRouteImport.update({
+  id: '/ilanlarim',
+  path: '/ilanlarim',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimKayitliAramaRoute = HesabimKayitliAramaRouteImport.update({
+  id: '/kayitli-arama',
+  path: '/kayitli-arama',
+  getParentRoute: () => HesabimRoute,
+} as any)
 const HesabimMesajlarRoute = HesabimMesajlarRouteImport.update({
-  id: '/hesabim_/mesajlar',
-  path: '/hesabim/mesajlar',
-  getParentRoute: () => rootRouteImport,
+  id: '/mesajlar',
+  path: '/mesajlar',
+  getParentRoute: () => HesabimRoute,
+} as any)
+const HesabimOdemelerRoute = HesabimOdemelerRouteImport.update({
+  id: '/odemeler',
+  path: '/odemeler',
+  getParentRoute: () => HesabimRoute,
 } as any)
 const HesapDogrulaRoute = HesapDogrulaRouteImport.update({
   id: '/hesap/dogrula',
@@ -213,7 +255,7 @@ export interface FileRoutesByFullPath {
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
-  '/hesabim': typeof HesabimRoute
+  '/hesabim': typeof HesabimRouteWithChildren
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
@@ -223,7 +265,13 @@ export interface FileRoutesByFullPath {
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
+  '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
+  '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
+  '/hesabim/hareketler': typeof HesabimHareketlerRoute
+  '/hesabim/ilanlarim': typeof HesabimIlanlarimRoute
+  '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
@@ -234,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/hesabim/': typeof HesabimIndexRoute
   '/konseptler/': typeof KonseptlerIndexRoute
   '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
 }
@@ -247,7 +296,6 @@ export interface FileRoutesByTo {
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
-  '/hesabim': typeof HesabimRoute
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
@@ -256,7 +304,13 @@ export interface FileRoutesByTo {
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
+  '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
+  '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
+  '/hesabim/hareketler': typeof HesabimHareketlerRoute
+  '/hesabim/ilanlarim': typeof HesabimIlanlarimRoute
+  '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
@@ -267,6 +321,7 @@ export interface FileRoutesByTo {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/hesabim': typeof HesabimIndexRoute
   '/konseptler': typeof KonseptlerIndexRoute
   '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
 }
@@ -281,7 +336,7 @@ export interface FileRoutesById {
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
   '/health': typeof HealthRoute
-  '/hesabim': typeof HesabimRoute
+  '/hesabim': typeof HesabimRouteWithChildren
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
@@ -291,7 +346,13 @@ export interface FileRoutesById {
   '/giris_/hata': typeof GirisHataRoute
   '/giris_/kod': typeof GirisKodRoute
   '/giris_/parola': typeof GirisParolaRoute
-  '/hesabim_/mesajlar': typeof HesabimMesajlarRoute
+  '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
+  '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
+  '/hesabim/hareketler': typeof HesabimHareketlerRoute
+  '/hesabim/ilanlarim': typeof HesabimIlanlarimRoute
+  '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
+  '/hesabim/mesajlar': typeof HesabimMesajlarRoute
+  '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit_/hesap-var': typeof KayitHesapVarRoute
@@ -302,6 +363,7 @@ export interface FileRoutesById {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/hesabim/': typeof HesabimIndexRoute
   '/konseptler/': typeof KonseptlerIndexRoute
   '/giris_/baglanti_/gecersiz': typeof GirisBaglantiGecersizRoute
 }
@@ -327,7 +389,13 @@ export interface FileRouteTypes {
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
+    | '/hesabim/faturalarim'
+    | '/hesabim/guvenlik'
+    | '/hesabim/hareketler'
+    | '/hesabim/ilanlarim'
+    | '/hesabim/kayitli-arama'
     | '/hesabim/mesajlar'
+    | '/hesabim/odemeler'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
@@ -338,6 +406,7 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/hesabim/'
     | '/konseptler/'
     | '/giris/baglanti/gecersiz'
   fileRoutesByTo: FileRoutesByTo
@@ -351,7 +420,6 @@ export interface FileRouteTypes {
     | '/favoriler'
     | '/giris'
     | '/health'
-    | '/hesabim'
     | '/ilan-ver'
     | '/karsilastir'
     | '/kayit'
@@ -360,7 +428,13 @@ export interface FileRouteTypes {
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
+    | '/hesabim/faturalarim'
+    | '/hesabim/guvenlik'
+    | '/hesabim/hareketler'
+    | '/hesabim/ilanlarim'
+    | '/hesabim/kayitli-arama'
     | '/hesabim/mesajlar'
+    | '/hesabim/odemeler'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
@@ -371,6 +445,7 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/hesabim'
     | '/konseptler'
     | '/giris/baglanti/gecersiz'
   id:
@@ -394,7 +469,13 @@ export interface FileRouteTypes {
     | '/giris_/hata'
     | '/giris_/kod'
     | '/giris_/parola'
-    | '/hesabim_/mesajlar'
+    | '/hesabim/faturalarim'
+    | '/hesabim/guvenlik'
+    | '/hesabim/hareketler'
+    | '/hesabim/ilanlarim'
+    | '/hesabim/kayitli-arama'
+    | '/hesabim/mesajlar'
+    | '/hesabim/odemeler'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit_/hesap-var'
@@ -405,6 +486,7 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/hesabim/'
     | '/konseptler/'
     | '/giris_/baglanti_/gecersiz'
   fileRoutesById: FileRoutesById
@@ -419,7 +501,7 @@ export interface RootRouteChildren {
   FavorilerRoute: typeof FavorilerRoute
   GirisRoute: typeof GirisRoute
   HealthRoute: typeof HealthRoute
-  HesabimRoute: typeof HesabimRoute
+  HesabimRoute: typeof HesabimRouteWithChildren
   IlanVerRoute: typeof IlanVerRoute
   KarsilastirRoute: typeof KarsilastirRoute
   KayitRoute: typeof KayitRoute
@@ -429,7 +511,6 @@ export interface RootRouteChildren {
   GirisHataRoute: typeof GirisHataRoute
   GirisKodRoute: typeof GirisKodRoute
   GirisParolaRoute: typeof GirisParolaRoute
-  HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   HesapDogrulaRoute: typeof HesapDogrulaRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
   KayitHesapVarRoute: typeof KayitHesapVarRoute
@@ -573,12 +654,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GirisParolaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hesabim_/mesajlar': {
-      id: '/hesabim_/mesajlar'
-      path: '/hesabim/mesajlar'
+    '/hesabim/': {
+      id: '/hesabim/'
+      path: '/'
+      fullPath: '/hesabim/'
+      preLoaderRoute: typeof HesabimIndexRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/faturalarim': {
+      id: '/hesabim/faturalarim'
+      path: '/faturalarim'
+      fullPath: '/hesabim/faturalarim'
+      preLoaderRoute: typeof HesabimFaturalarimRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/guvenlik': {
+      id: '/hesabim/guvenlik'
+      path: '/guvenlik'
+      fullPath: '/hesabim/guvenlik'
+      preLoaderRoute: typeof HesabimGuvenlikRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/hareketler': {
+      id: '/hesabim/hareketler'
+      path: '/hareketler'
+      fullPath: '/hesabim/hareketler'
+      preLoaderRoute: typeof HesabimHareketlerRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/ilanlarim': {
+      id: '/hesabim/ilanlarim'
+      path: '/ilanlarim'
+      fullPath: '/hesabim/ilanlarim'
+      preLoaderRoute: typeof HesabimIlanlarimRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/kayitli-arama': {
+      id: '/hesabim/kayitli-arama'
+      path: '/kayitli-arama'
+      fullPath: '/hesabim/kayitli-arama'
+      preLoaderRoute: typeof HesabimKayitliAramaRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/mesajlar': {
+      id: '/hesabim/mesajlar'
+      path: '/mesajlar'
       fullPath: '/hesabim/mesajlar'
       preLoaderRoute: typeof HesabimMesajlarRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof HesabimRoute
+    }
+    '/hesabim/odemeler': {
+      id: '/hesabim/odemeler'
+      path: '/odemeler'
+      fullPath: '/hesabim/odemeler'
+      preLoaderRoute: typeof HesabimOdemelerRouteImport
+      parentRoute: typeof HesabimRoute
     }
     '/hesap/dogrula': {
       id: '/hesap/dogrula'
@@ -667,6 +797,31 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface HesabimRouteChildren {
+  HesabimFaturalarimRoute: typeof HesabimFaturalarimRoute
+  HesabimGuvenlikRoute: typeof HesabimGuvenlikRoute
+  HesabimHareketlerRoute: typeof HesabimHareketlerRoute
+  HesabimIlanlarimRoute: typeof HesabimIlanlarimRoute
+  HesabimKayitliAramaRoute: typeof HesabimKayitliAramaRoute
+  HesabimMesajlarRoute: typeof HesabimMesajlarRoute
+  HesabimOdemelerRoute: typeof HesabimOdemelerRoute
+  HesabimIndexRoute: typeof HesabimIndexRoute
+}
+
+const HesabimRouteChildren: HesabimRouteChildren = {
+  HesabimFaturalarimRoute: HesabimFaturalarimRoute,
+  HesabimGuvenlikRoute: HesabimGuvenlikRoute,
+  HesabimHareketlerRoute: HesabimHareketlerRoute,
+  HesabimIlanlarimRoute: HesabimIlanlarimRoute,
+  HesabimKayitliAramaRoute: HesabimKayitliAramaRoute,
+  HesabimMesajlarRoute: HesabimMesajlarRoute,
+  HesabimOdemelerRoute: HesabimOdemelerRoute,
+  HesabimIndexRoute: HesabimIndexRoute,
+}
+
+const HesabimRouteWithChildren =
+  HesabimRoute._addFileChildren(HesabimRouteChildren)
+
 interface KonseptlerRouteChildren {
   KonseptlerAiDanismanRoute: typeof KonseptlerAiDanismanRoute
   KonseptlerAiKesifRoute: typeof KonseptlerAiKesifRoute
@@ -699,7 +854,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavorilerRoute: FavorilerRoute,
   GirisRoute: GirisRoute,
   HealthRoute: HealthRoute,
-  HesabimRoute: HesabimRoute,
+  HesabimRoute: HesabimRouteWithChildren,
   IlanVerRoute: IlanVerRoute,
   KarsilastirRoute: KarsilastirRoute,
   KayitRoute: KayitRoute,
@@ -709,7 +864,6 @@ const rootRouteChildren: RootRouteChildren = {
   GirisHataRoute: GirisHataRoute,
   GirisKodRoute: GirisKodRoute,
   GirisParolaRoute: GirisParolaRoute,
-  HesabimMesajlarRoute: HesabimMesajlarRoute,
   HesapDogrulaRoute: HesapDogrulaRoute,
   IlanListingIdRoute: IlanListingIdRoute,
   KayitHesapVarRoute: KayitHesapVarRoute,

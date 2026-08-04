@@ -2,7 +2,7 @@
 name: GlassSegmentedControl
 category: kontroller
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassSegmentedControl Kuralları
@@ -117,15 +117,23 @@ yatay scroll'a düşer (scrollbar gizli). Boş `options` render etmez (radiogrou
 | focus | outline | `--lg-accent` |
 
 **Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler kökte yerel
-değişkenlerde toplandı: `--root-pad` (3px iç çerçeve — segment yüksekliği
-`calc(--lg-control-* − --root-pad × 2)` bundan türetilir), `--list-gap`
-(2px), `--segment-gap` (6px ikon-etiket arası), `--pad-x-sm/md` (14/18px
-segment yatay padding'leri), `--font-md` (14px — footnote 13 ile body 15
-arası, ölçek dışı). Bilinçli bırakılan: damla dolgusu `rgba(255,255,255,.28)`
+değişkenlerde toplandı: `--root-pad` (3px iç çerçeve — segment TAM kontrol
+yüksekliğini alır, kök payı dışarıya eklenir), `--list-gap` (2px),
+`--segment-gap` (6px ikon-etiket arası), `--font-md` (14px — footnote 13 ile
+body 15 arası, ölçek dışı). `--pad-x-sm/md` artık raw değil, token'a bağlı
+(`--lg-space-3` / `--lg-space-4`) — yalnız isimlendirme kolaylığı.
+Bilinçli bırakılan: damla dolgusu `rgba(255,255,255,.28)`
 raw — GlassTabs `tabActive` ile aynı değer; cam-üstü highlight token'ı açık
 karar (bkz. Tokenlar.mdx); damla gölgesi `0 1px 4px rgba(0,0,0,.12),
 0 0 1px rgba(0,0,0,.08)` shadow token'larıyla birebir eşleşmiyor. Süre/easing
 (`0.18s ease`) raw — token yok.
+
+**Dokunma hedefi:** hedef segmentin kendisidir, kök değil. Segment tam
+kontrol yüksekliğini alır — imleçli cihazda sm 36 / md 40px (kapsül kökü
+`--root-pad` ile 42/46px), dokunmatikte token 44px'e çıkar ve AAA 2.5.5
+sağlanır. İmleçli cihazdaki 36px, AA 2.5.8'in 24px tabanının üstündedir.
+Hedefi görünmez bir `::after` ile büyütmek mümkün değil: `.list` yatay
+kaydırma için `overflow-x: auto` taşır, taşan pseudo-eleman kırpılır.
 
 ## 10. Storybook kapsamı
 
@@ -168,3 +176,8 @@ LongContent, Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı st
   giderildi.
 - 2026-07-30: `variant` ekseni eklendi (`capsule` | `bar`). `bar` cam kurmaz,
   tam genişliğe yayılır ve kontrol yüksekliğini birebir korur.
+- 2026-08-03: Yeni kontrol ölçeği. Segment yüksekliği imleçli cihazda
+  44/44 → 36/40px (token değişimi; CSS'te bayat fallback'ler güncellendi).
+  Küçülen yükseklikte 14/18px yatay dolgu kapsülü yayvan bıraktığı için
+  `--pad-x-sm/md` token'a çekildi: 14→12 (`--lg-space-3`), 18→16
+  (`--lg-space-4`). Font ölçüleri değişmedi.

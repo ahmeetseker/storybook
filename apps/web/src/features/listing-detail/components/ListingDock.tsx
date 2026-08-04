@@ -1,26 +1,35 @@
 import type { ListingDetail } from '../domain/listing-detail-types'
 import { contactClosedReason, formatPrice, formatUnitPrice } from '../format'
+import { SELLER_SECTION_ID } from './seller-reveal'
 import styles from './ListingDock.module.css'
 
 export interface ListingDockProps {
   detail: ListingDetail
-  /** Mesaj akışı. Verilmezse eylem `disabled` gelir ve gerekçesi yazılır. */
-  onContact?: () => void
 }
 
 /**
  * Yapışkan karar dock'u — yalnız dar ve orta yerleşimde.
  *
- * Geniş yerleşimde yerini 340px'lik karar kolonu alır ve dock DOM'dan değil
- * yerleşimden düşer (`display: none`): ikisi hiçbir zaman aynı anda
- * görünmez, çünkü ikisi de aynı işi yapar ve iki birincil eylem bir karar
- * ekranını ikiye böler.
+ * Geniş yerleşimde yerini karar kartı alır ve dock DOM'dan değil yerleşimden
+ * düşer (`display: none`): ikisi hiçbir zaman aynı anda görünmez.
  *
- * Dock iki şey taşır: fiyat çapası ve tek birincil eylem. Çapa `body`
- * ölçeğindedir — sayfanın en büyük sayısı akıştaki fiyat bloğudur, bu satır
- * onun kaydırılıp gitmiş hâlinin referansıdır, ikinci bir vurgu değil.
+ * **İş bölümü (bkz. `rules.md` §1b):** kart ile dock aynı kontrolü iki kez
+ * çizmez. Dar yerleşimde kartın tamamı (fiyat bloğu, sekmeler, eylem bölgesi)
+ * yerleşimden düşer; dock iki şey taşır: **fiyat çapası** ve **satıcı
+ * bölümüne götüren tek bağlantı**. Dock kendi başına bir karar yüzeyi
+ * değildir — kanıt akıştaki bölümlerde, iletişim satıcı bölümündedir; dock
+ * oraya götürür.
+ *
+ * Dock'ta mesaj butonu **yoktur**: mesajlaşma bu sürümde bağlı değildir ve
+ * rotası olmayan kontrol çizilmez (`rules.md` §4). İletişim kapalıyken de
+ * bağlantı çalışır (gerekçe satıcı bölümünde yazılıdır); dock durumu tek
+ * satırda bildirir, kartın uyarı cümlesini ikinci kez yazmaz.
+ *
+ * Çapa `body` ölçeğindedir: sayfanın en büyük sayısı akıştaki fiyat bloğudur,
+ * bu satır onun kaydırılıp gitmiş hâlinin referansıdır, ikinci bir vurgu
+ * değil.
  */
-export function ListingDock({ detail, onContact }: ListingDockProps) {
+export function ListingDock({ detail }: ListingDockProps) {
   const closedReason = contactClosedReason(detail.lifecycle)
 
   return (
@@ -29,15 +38,12 @@ export function ListingDock({ detail, onContact }: ListingDockProps) {
         {formatPrice(detail.price.amount)}
         <span className={styles.unit}> · {formatUnitPrice(detail.price.unitPrice)}</span>
       </span>
-      <button
-        type="button"
-        className={styles.action}
-        disabled={!onContact || closedReason !== undefined}
-        onClick={onContact}
-      >
-        Mesaj gönder
-      </button>
-      {closedReason ? <p className={styles.reason}>{closedReason}</p> : null}
+      <a className={styles.action} href={`#${SELLER_SECTION_ID}`}>
+        Satıcıya git
+      </a>
+      {closedReason ? (
+        <p className={styles.reason}>İletişim kapalı — gerekçe satıcı bölümünde.</p>
+      ) : null}
     </div>
   )
 }

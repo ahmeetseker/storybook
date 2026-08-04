@@ -107,12 +107,17 @@ describe('ContentPricingStep', () => {
     expect(screen.getByText('Kesinlik bildiren ifadeleri gözden geçirin')).toBeTruthy()
   })
 
-  it('offers legal and accuracy confirmations beside a semantic listing preview', () => {
+  // Canlı önizleme artık adımın içinde değil, çalışma alanının yan panelinde
+  // (ListingSidePanel) durur ve her adımda görünür; kapsamı
+  // ListingCreateWorkspace.test.tsx doğrular.
+  it('offers legal and accuracy confirmations in a dedicated group', () => {
     render(<Harness />)
 
     expect(screen.getByLabelText(/İlan bilgilerinin doğru olduğunu/)).toBeTruthy()
     expect(screen.getByLabelText(/yayın koşullarını/)).toBeTruthy()
-    expect(screen.getByRole('article', { name: 'İlan önizlemesi' })).toBeTruthy()
-    expect(screen.getByAltText('İlan kapak önizlemesi')).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { name: 'Beyan ve onaylar', level: 2 }),
+    ).toBeTruthy()
+    expect(screen.queryByRole('article', { name: 'İlan önizlemesi' })).toBeNull()
   })
 })

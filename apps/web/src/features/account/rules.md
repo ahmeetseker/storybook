@@ -2,7 +2,7 @@
 name: AccountWorkspace
 category: içerik
 status: hazır
-lastReviewed: 2026-07-27
+lastReviewed: 2026-08-02
 ---
 
 # AccountWorkspace Kuralları
@@ -14,9 +14,59 @@ aksiyon-öncelikli bir `/hesabim` çalışma alanında birleştirir. Ayrıntıl�
 yönetimi, mesajlaşma veya güvenlik ayarı yerine geçmez; gerçek rotalara
 yönlendirir.
 
+**Kendi kabuğunu kuran BÖLÜM.** `/hesabim` tek bir sayfa değil, kalıcı kabuklu
+bir alt uygulamadır. Kabuk (`AccountAppShell`) **layout rotasındadır**
+(`routes/hesabim.tsx`); alt sayfalar onun `Outlet`'inde açılır:
+
+| Rota | Sayfa |
+|---|---|
+| `/hesabim` | Hesap özeti (`AccountWorkspace`) |
+| `/hesabim/ilanlarim` | İlanlarım |
+| `/hesabim/mesajlar` | Mesajlar (`MessagesWorkspace`) |
+| `/hesabim/guvenlik` | Güvenlik ve doğrulama |
+| `/hesabim/hareketler` | Hesap hareketleri |
+| `/hesabim/kayitli-arama` | Kayıtlı arama |
+| `/hesabim/odemeler` | Ödemeler (yöntemler + işlem geçmişi) |
+| `/hesabim/faturalarim` | Faturalarım (dönem gruplu faturalar + fatura bilgileri) |
+
+Rota değişince kabuk yeniden kurulmaz: ray, üst şerit ve daraltma durumu
+korunur, yalnız içerik alanı değişir. Her sayfa kendi `main`'ini
+(`PageContainer`, `shellInsets={false}`) üretir; kabuk `main` üretmez —
+pazar yeri kabuğu gizli olduğu için yüzen header/dock payı da ayrılmaz.
+
+**Tam yükseklik modu.** Gezinme haritasında `fillsViewport: true` işaretli
+sayfalar (şu an yalnız Mesajlar) kabuğun kalan yüksekliğini kaplar: kabuk
+kökü `data-account-shell="fill"` alır, sayfa kaydırması kapanır ve kaydırma
+sayfanın kendi panellerine (konuşma rayı, mesaj listesi) devredilir. Bu modda
+sayfa başlığı da kompaktlaşır — konum izi zaten üst şeritte aynı bilgiyi
+veriyor.
+
+Gezinme haritasının tek kaynağı `domain/account-navigation.ts`'tir — ray,
+konum izi ve komut paleti aynı listeden beslenir.
+
+Pazar yeri kabuğu (GlassSiteHeader + GlassDock) bu bölümde render EDİLMEZ
+(`MarketplaceShell` istisna listesi: `create-listing`, `account`, `messages`).
+Gezinme iki katmandan gelir:
+
+| Katman | Geniş kapsayıcı (> 64rem) | Dar kapsayıcı |
+|---|---|---|
+| `AccountNav` (GlassSidebar, flat + `density="compact"`) | Sol yapışkan ray; üst şeritten daraltılıp ikon-only moda geçer | Gizli — "Hesap menüsünü aç" düğmesiyle `GlassDrawer` |
+| Üst şerit (`AccountTopbar`) | Ray daraltma + konum izi + ⌘K arama + tema | Hamburger + güncel adım + arama ikonu + tema |
+
+Site header'ı gizlendiği için tema anahtarı ve siteye dönüş yolu (ray
+alt bölgesindeki "Siteye dön") bu kabuğun sorumluluğundadır.
+
 ## 2. Semantik sözleşme
 
 - Her mod aynı tek `<main id="main-content">` kökünü üretir.
+- Kabuk parçaları içerik değildir: ray `nav[aria-label="Hesap bölümleri"]`,
+  üst şerit `header`, konum izi `nav[aria-label="Konum"]`. Hiçbiri başlık
+  (`h1`–`h6`) üretmez — sayfanın tek `h1`'i kimlik bölümündedir.
+- Ray daraltıldığında etiketler yalnız GÖRSEL olarak gizlenir; erişilebilir ad
+  ve `aria-current` korunur.
+- Bölümlerin görselleri `components/AccountSections.module.css` dosyasındadır;
+  `AccountWorkspace.module.css` yalnız kabuk, ızgara ve durum ekranlarını
+  tanımlar.
 - Hazır ve yeni hesap modlarında tek `h1` vardır; bölüm başlıkları `h2`, kart ve
   gündem başlıkları `h3` kullanır.
 - `session-expired` hiçbir kişisel veri veya hazır bölüm çizmez.
@@ -133,6 +183,25 @@ yalnız demo state'tir; üretimdeki `/hesabim` rotası bu modu üretmez.
 - Session expired görünümünde kişisel veri çizme.
 
 Bilinen kısıt: Workspace ayrıntılı hesap ayarı veya veri yenileme davranışı
-sunmaz. Açık karar yoktur.
+sunmaz. Ray daraltma tercihi kalıcı değildir (oturum içi state).
 
-Changelog: 2026-07-27 — Enterprise hesap genel bakış sözleşmesi oluşturuldu.
+Açık karar: `/hesabim/mesajlar` henüz bu kabuğun içine alınmadı — o rotada
+pazar yeri header'ı ve dock'u görünmeye devam ediyor; hesap bölümünün tamamı
+tek kabuğa taşınacak mı, karar bekliyor.
+
+Changelog:
+- 2026-08-03 — Hesap özetine performans bölümü (`AccountInsightsPanel`:
+  görüntülenme/mesaj/favori/harcama grafikleri) eklendi; Ödemeler ve
+  Faturalarım sayfaları açıldı. Veri sözleşmesi `AccountInsights` +
+  `AccountBilling` ile genişletildi (ikisi de opsiyonel; yoksa ilgili bölüm
+  boş durum çizer). Ödemelerden faturaya `#fatura-<no>` çapasıyla geçilir.
+- 2026-08-03 — Hesap alanı kalıcı kabuklu alt uygulamaya dönüştü: kabuk layout
+  rotasına (`AccountAppShell`) taşındı, bölümler ayrı sayfa oldu
+  (`ilanlarim` · `guvenlik` · `hareketler` · `kayitli-arama`), Mesajlar da
+  kabuğun içine alındı (`/hesabim/mesajlar`), gezinme haritası
+  `domain/account-navigation.ts`'te tek kaynağa indi.
+- 2026-08-02 — `/hesabim` kendi kabuğunu kuran panoya dönüştü: pazar yeri
+  header/dock gizlendi, sol ray (`AccountNav`, kompakt + daraltılabilir), üst
+  şerit (konum izi + ⌘K komut paleti + tema), bölüm görselleri
+  `AccountSections.module.css`'e ayrıldı.
+- 2026-07-27 — Enterprise hesap genel bakış sözleşmesi oluşturuldu.

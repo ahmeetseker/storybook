@@ -106,12 +106,22 @@ Varsayılan kombinasyon: `size=md`, `siblingCount=1`, `tone=auto`.
 | Part | Property | Token |
 |---|---|---|
 | root | radius / padding | capsule / `--lg-space-1` |
-| item | min-width/height | `--lg-control-{sm,md}` (dokunmatikte otomatik 44px'e yaklaşır) |
+| item | min-width/height | `--item-h` = `--lg-control-{sm,md}` (imleçli 36/40px, dokunmatik 44px) |
+| item | dokunma hedefi | `--lg-control-hit` (44px) — dikey `::after` taşması |
 | item | font-size | `--lg-text-footnote` (sm) / `--lg-text-body` (md) |
 | item | radius | `--lg-radius-capsule` |
 | active | background / color | `--lg-accent` / `--lg-accent-contrast` |
 | item | focus outline | `--lg-accent` |
 | ellipsis | min-width | `--lg-space-6` |
+
+**Dokunma hedefi (2026-08-03):** Ok ve sayfa karoları ikon/rakam ölçüsündedir;
+görünür ölçü `--item-h` (sm 36px / md 40px), hedef görünmez `::after` taşmasıyla
+DİKEYDE `--lg-control-hit`e (44px) çıkar. Yatay taşma bilinçli olarak YOK:
+karolar `--item-gap` (2px) ile dizildiği için yatay taşma komşu hedeflerle üst
+üste binerdi. Dikey taşma (2-4px) kökün `--lg-space-1` dolgusunun içinde kalır,
+bu yüzden `GlassSurface`'in `overflow: hidden`'ı kırpmaz — kırpma padding
+kutusunda olur. `--item-h` ayrı yerel değişkende tutulur ki taşma formülü sm/md
+ölçüsünü izlesin.
 
 **Borç (raw / mikro-geometri):** öğe arası boşluk ve hover zemini component
 kökünde yerel değişkende toplandı — `.pagination { --item-gap: 2px;
@@ -154,3 +164,6 @@ ile `<a>` render override'ı · ok etiketlerinin i18n'i · `boundaryCount` prop'
 
 - 2026-07-16: İlk sürüm — kontrollü API, ellipsis mantığı, CSS-tabanlı
   responsive kompakt mod (iki DOM bloğu, ortak oklar).
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. Karo görünür ölçüsü `--item-h`
+  yerel değişkenine taşındı (sm 36 / md 40, dokunmatikte 44); dikey görünmez
+  `::after` taşmasıyla dokunma hedefi her cihazda `--lg-control-hit` (44px).

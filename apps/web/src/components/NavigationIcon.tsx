@@ -3,7 +3,18 @@ import type { AppRouteDefinition } from '@/config/routes'
 
 export interface NavigationIconProps
   extends Omit<SVGProps<SVGSVGElement>, 'name'> {
-  name: AppRouteDefinition['icon'] | 'clock' | 'theme' | 'image' | 'mic'
+  name:
+    | AppRouteDefinition['icon']
+    | 'clock'
+    | 'theme'
+    | 'image'
+    | 'mic'
+    | 'panel'
+    | 'card'
+    | 'receipt'
+    | 'menu'
+    | 'logout'
+    | 'shield'
   size?: number
 }
 
@@ -23,6 +34,12 @@ const paths: Record<NavigationIconProps['name'], string[]> = {
   theme: ['M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4', 'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z'],
   image: ['M4 5.5h16v13H4z', 'm4 15.5 4.5-4.5 3.5 3.5 3-3 5 5', 'M9.2 10.2a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4Z'],
   mic: ['M12 3.5a2.5 2.5 0 0 1 2.5 2.5v5a2.5 2.5 0 0 1-5 0V6A2.5 2.5 0 0 1 12 3.5Z', 'M6.5 11a5.5 5.5 0 0 0 11 0', 'M12 16.5V20'],
+  panel: ['M4 5.5h16v13H4z', 'M10 5.5v13'],
+  card: ['M3 6.5h18v11H3z', 'M3 10.5h18', 'M6.5 14.5h3'],
+  receipt: ['M6 3.5h12v17l-2.5-1.5L13 20.5 10.5 19 8 20.5 6 19V3.5Z', 'M9 8.5h6', 'M9 12.5h6'],
+  menu: ['M4 7h16', 'M4 12h16', 'M4 17h16'],
+  logout: ['M14 4.5h5v15h-5', 'm9.5 8-4 4 4 4', 'M5.5 12h9'],
+  shield: ['M12 3.5 19 6v6c0 4.2-3 7-7 8.5-4-1.5-7-4.3-7-8.5V6l7-2.5Z', 'm9 11.8 2.2 2.2 4.3-4.3'],
 }
 
 export function NavigationIcon({

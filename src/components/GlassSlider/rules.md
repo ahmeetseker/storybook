@@ -2,7 +2,7 @@
 name: GlassSlider
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassSlider Kuralları
@@ -98,13 +98,21 @@ aşarsa taşar. Birimi `formatValue` içinde ver, ayrı etiket koyma.
 kökünde yerel değişkene toplandı (`.root { --slider-height: 28px;
 --track-height: 6px; --bubble-gap: 6px; --bubble-pad-y: 2px; }` — coarse'ta
 `--track-height: 8px`); baloncuk gölgesi `--lg-shadow-sm`'e, baloncuk yatay
-padding'i `--lg-space-2`'ye bağlandı; coarse kök yüksekliği 44px →
-`--lg-control-md` (coarse'ta token birebir 44px; dokunma hedefi büyümesi
-tasarımın istediği davranış). Bilinçli bırakılanlar: thumb beyazı (`#fff`) ve
+padding'i `--lg-space-2`'ye bağlandı; coarse'ta `--slider-height` doğrudan
+`--lg-control-hit`e (44px) eşitlenir — dokunmatikte görünür alanın kendisi
+hedeftir. Bilinçli bırakılanlar: thumb beyazı (`#fff`) ve
 thumb gölgeleri (`0 1px 4px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.2)`) raw —
 kontrast gereği, hiçbir gölge token deseniyle birebir değil; ray iç gölgesi
 `inset 0 1px 1px rgba(0,0,0,.06)` de token dışı (inset desen yok) — raw; ray
 cam yerine hairline kanal — filtre maliyeti olmadan cam hissi (Açık Kararlar).
+
+**Dokunma hedefi:** görünür alan imleçli cihazda 28px kalır (ray + thumb
+oranı bu yükseklikte doğru duruyor), ama sürükleme hedefi öyle değil: kökü
+kaplayan görünmez native `<input>` `inset-block: min(0px, calc((var(
+--slider-height) - var(--lg-control-hit)) / 2))` ile dikeyde 44px'e uzar.
+Kökte `overflow: hidden` olmadığı için bu taşma gerçekten tıklanır/sürüklenir
+(AAA 2.5.5). Dokunmatikte `--slider-height` zaten 44px olduğundan genişletme
+0'a düşer.
 
 ## 10. Storybook kapsamı
 
@@ -136,3 +144,8 @@ sarmalayıcı boyutlandırması çözülürse.
 
 - 2026-07-16: İlk sürüm — görünmez native range, `--pct` CSS var konumlama,
   değer baloncuğu, coarse pointer 28px thumb.
+- 2026-08-03: Yeni kontrol ölçeği. Coarse kök yüksekliği `--lg-control-md`
+  yerine `--slider-height: var(--lg-control-hit)` (değer aynı 44px, kontrol
+  ölçeği küçülse de sabit). İmleçli cihazda görünür yükseklik 28px'te kaldı
+  ama native input `inset-block` ile dikeyde 44px hedefe genişletildi
+  (görsel değişiklik yok, sürükleme alanı 28→44px).

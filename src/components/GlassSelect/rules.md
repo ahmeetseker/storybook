@@ -2,7 +2,7 @@
 name: GlassSelect
 category: form
 status: hazır
-lastReviewed: 2026-07-25
+lastReviewed: 2026-08-03
 ---
 
 # GlassSelect Kuralları
@@ -117,12 +117,20 @@ düşünülmeli (Açık Kararlar).
 | trigger/panel | border / radius | `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-chip` |
 | trigger | focus outline / invalid | `--lg-accent` / `--lg-danger` |
 | trigger/panel | background | `--lg-surface` tabanlı malzeme dolgusu |
+| option | min-height | `--lg-control-hit` (dokunma satırı — 44px) |
 | option | radius / active bg | `--lg-radius-chip` / `--lg-accent` %18 |
 | placeholder, chevron | color | `--lg-label-secondary` |
 | boşluklar | gap/padding | `--lg-space-1/2`; md/lg trigger padding `--lg-space-3/4` |
 
 Component CSS'inde raw ölçü/renk bulunmaz; geometriler ve durum renkleri
 `--lg-*` token'larından tüketilir.
+
+**Dokunma hedefi:** trigger yüksekliği kontrol ölçeğini izler (imleçli
+36/40/44, dokunmatik 44/44/48px) — kontroller küçülürken trigger da küçülür.
+Panel seçeneği ise bir "dokunma satırı"dır ve bu küçülmeye katılmaz:
+`min-height: var(--lg-control-hit)` ile her cihazda 44px'te kalır (AAA
+2.5.5). `pointer: fine` panel yüksekliği de aynı tabanla ölçülür
+(`calc(var(--lg-control-hit) * 6)` ≈ 6 satır).
 
 ## 10. Storybook kapsamı
 
@@ -158,6 +166,11 @@ option grupları (`optgroup` eşleniği) · form submit için hidden input.
 
 ## Changelog
 
+- 2026-08-03: Yeni kontrol ölçeği. Trigger imleçli cihazda 44/44/48 →
+  36/40/44px (token değişimi). Seçenek satırı `--lg-control-sm`'den
+  `--lg-control-hit`e alındı → 44px'te kaldı (aksi halde 36px'e düşecekti);
+  `pointer: fine` panel yüksekliği `--lg-control-xl × 6` yerine
+  `--lg-control-hit × 6` (336px → 264px, gerçek satır yüksekliğiyle uyumlu).
 - 2026-07-25: Accessible name/required nitelikleri trigger'a taşındı;
   `material=glass|flat` ekseni eklendi; odak/invalid ve responsive CSS
   token sözleşmesine geçirildi; Required/Materials story'leri ve regresyon

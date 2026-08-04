@@ -137,8 +137,10 @@ Hover, focus ve active prop değildir. Focus halkası yalnız
 ### Responsive
 
 - Safe-area inset'leri alt/sağ konuma katılır.
-- Coarse pointer'da peek ve ikon görünmez pseudo-element taşmasıyla en az
-  `--lg-control-md` dokunma hedefini korur.
+- İkon karosu HER cihazda görünmez `::after` taşmasıyla `--lg-control-hit`
+  (44px) dokunma hedefini korur; görünür ölçü 38px'te kalır.
+- Peek şeridinde taşma uygulanamaz (`.morphClosed` `overflow: hidden`) —
+  dokunmatikte görünür kalınlık `--lg-control-hit`e yükselir, imleçlide 24px.
 - Coarse pointer veya dar viewport'ta ray ilgili eksende kaydırılır;
   tooltip gizlenir, öğe ölçüleri küçültülmez.
 
@@ -161,12 +163,30 @@ Hover, focus ve active prop değildir. Focus halkası yalnız
 | tooltip | bg/border/text/radius/type | `--lg-surface` / `--lg-hairline` / `--lg-label` / `--lg-radius-capsule` / `--lg-text-badge` |
 | konum | spacing | `--lg-space-3` / `--lg-space-2` |
 | focus | outline | `--lg-accent` |
+| dokunma hedefi | `::after` taşması (karo) / görünür kalınlık (peek, coarse) | `--lg-control-hit` (44px) |
+
+**Dokunma hedefi — ikon karosu:** Karo 38px görünür (`BASE_ICON` ile birebir).
+Hedef, karonun görünmez `::after` taşmasıyla HER cihazda `--lg-control-hit`e
+(44px) çıkar; taşma her yönde 3px. Bu ölçü tesadüf değil: `ICON_GAP` 6px olduğu
+için komşu karoların hedefleri tam kenardan değer, üst üste BİNMEZ. Dikeyde
+taşma ray dolgusunun (`--glass-dock-track-pad-block`, 6px) içinde kaldığı için
+dar/dokunmatik bağlamda devreye giren `overflow: auto` şeridi de kırpmaz.
+Eski `@media (pointer: coarse)` koşulu kaldırıldı — hedef artık giriş
+yönteminden bağımsız.
+
+**Dokunma hedefi — peek şeridi (taşma UYGULANAMAZ):** `morph` davranışının
+kapalı hapı (`.morphClosed`) `overflow: hidden` taşır; morf sırasında içeriği
+kırpması bu kabuğun görevidir. Negatif inset'li bir `::after` orada kırpılırdı,
+dolayısıyla görünmez hedef genişletmesi mümkün değil. Çözüm: dokunmatikte
+şeridin GÖRÜNÜR kalınlığı (`--glass-dock-peek-thick`) doğrudan
+`--lg-control-hit`e yükselir. İmleçli cihazda 24px kalınlık korunur — WCAG 2.2
+AA 2.5.8 tabanı (24px) tam karşılanır, AAA 2.5.5 ise dokunmatikte sağlanır.
 
 **Yerel mikro-geometri borcu:** JS'te `BASE_ICON=38`, `ICON_GAP=6`,
 `MIN_SCALE=1`, `MAX_SCALE=1.5` ve `EFFECT_LENGTH=180` tutulur. CSS'te aynı
-38px ikon ölçüsü, 140×24 peek, 8/6px ray padding'i ve tooltip
-letter-spacing yerel değişkenlerdir. Cam highlight gölgelerindeki rgba ve
-`z-index: 60` için henüz global token yoktur.
+38px ikon ölçüsü, 140px peek uzunluğu, 24px imleçli peek kalınlığı, 8/6px ray
+padding'i ve tooltip letter-spacing yerel değişkenlerdir. Cam highlight
+gölgelerindeki rgba ve `z-index: 60` için henüz global token yoktur.
 
 ## 10. Storybook kapsamı
 
@@ -227,3 +247,9 @@ link/buton üzerindedir.
 - 2026-07-24: Magnification fine-pointer sorgusuyla sınırlandı; klavye odağı
   pointer hedefinden öncelikli yapıldı ve reduced-motion layout transform'u
   kapatıldı.
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. İkon karosunun dokunma hedefi
+  `pointer: coarse` koşulundan çıkarılıp her cihazda `--lg-control-hit`e
+  bağlandı (38px görünür + 3px görünmez taşma; `ICON_GAP` 6px olduğu için komşu
+  hedefler binmez). Peek şeridinde `::after` taşması `overflow: hidden`
+  yüzünden uygulanamadığı tespit edildi; dokunmatikte görünür kalınlık
+  `--lg-control-hit`e yükseltildi, imleçlide 24px (WCAG AA 2.5.8) korundu.

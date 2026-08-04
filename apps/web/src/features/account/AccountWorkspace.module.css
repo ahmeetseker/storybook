@@ -1,146 +1,38 @@
-/* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır. */
-.page {
-  min-block-size: 100%;
+/* Hesap panosu — kendi kabuğu olan tam sayfa uygulama yerleşimi.
+
+   Pazar yeri kabuğu (site header + dock) bu rotada gizlenir: gezinme sol
+   raydan ve üst şeritten gelir. Bölümlerin kendi görselleri
+   `components/AccountSections.module.css` dosyasındadır; burada yalnız
+   kabuk, ızgara ve durum ekranları tanımlıdır. */
+
+/* PageContainer'ın ölçü kademesini ez: pano kenardan kenara akar,
+   yatay nefes kabuğun kendi parçalarından gelir. */
+.page.page {
+  inline-size: 100%;
+  max-inline-size: none;
+  padding: 0;
   background-color: var(--lg-bg);
 }
 
 .frame {
   display: grid;
-  gap: var(--lg-space-7);
-}
-
-.page [data-account-section] {
-  min-inline-size: 0;
-  padding: var(--lg-space-5);
-  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  border-radius: var(--lg-radius-card);
-  background-color: var(--lg-surface);
-}
-
-.page [data-account-section] h1,
-.page [data-account-section] h2,
-.page [data-account-section] h3,
-.page [data-account-section] p,
-.page [data-account-section] ul,
-.page [data-account-section] dl,
-.page [data-account-section] dd {
-  margin: 0;
-}
-
-.page [data-account-section] h1 {
-  font-size: var(--lg-text-title);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.page [data-account-section] h2 {
-  font-size: var(--lg-text-headline);
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.page [data-account-section] h3 {
-  font-size: var(--lg-text-headline);
-  font-weight: 600;
-}
-
-.page [data-account-section='identity'] {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
   gap: var(--lg-space-5);
+  justify-self: center;
+  inline-size: 100%;
+  max-inline-size: var(--lg-container-base);
 }
 
-.page [data-account-section='identity'] [data-part='identity-details'] {
+.mainGrid,
+.bottomGrid {
   display: grid;
-  min-inline-size: 0;
-  gap: var(--lg-space-1);
-}
-
-.page [data-account-section='identity'] [data-part='display-name'] {
-  font-size: var(--lg-text-headline);
-  font-weight: 600;
-}
-
-.page [data-account-section='identity'] [data-part='role'],
-.page [data-account-section='identity'] [data-part='organization'],
-.page [data-account-section='identity'] [data-part='eids-notice'] {
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-}
-
-.page [data-account-section='identity'] [data-part='verification'] {
-  display: flex;
-  grid-column: 2;
-  flex-wrap: wrap;
-  gap: var(--lg-space-2);
-}
-
-.page [data-account-section='identity'] [data-part='eids-notice'] {
-  grid-column: 2;
-}
-
-.page [data-account-section='identity'] [data-part='primary-action'] {
-  grid-column: 3;
-  grid-row: 1 / span 3;
-}
-
-.page [data-account-section='attention'] {
-  display: grid;
-  gap: var(--lg-space-4);
-  border-color: var(--lg-accent);
-}
-
-.page [data-part='attention-list'] {
-  display: grid;
-  padding: 0;
-  list-style: none;
-}
-
-.page [data-part='attention-item'] {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--lg-space-2) var(--lg-space-5);
-  padding-block: var(--lg-space-4);
-  border-block-start:
-    var(--lg-stroke-hairline) solid var(--lg-hairline);
-}
-
-.page [data-part='attention-title'],
-.page [data-part='attention-reason'] {
-  grid-column: 1;
-  /* Gündem satırı sayfa genişliğinde akıyordu (ölçülen 164 karakter).
-     Gövde metni okuma ölçüsünde durur — AAA 1.4.8. */
-  max-inline-size: var(--lg-measure);
-}
-
-.page [data-part='attention-reason'],
-.page [data-part='attention-time'],
-.page [data-part='explanation-source'] {
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-}
-
-.page [data-part='attention-time'] {
-  grid-row: 3;
-}
-
-.page [data-part='explanation-source'] {
-  grid-column: 1;
-  grid-row: 4;
-  justify-self: end;
-}
-
-.page [data-part='attention-item'] > a {
-  grid-column: 2;
-  grid-row: 1 / span 4;
-  align-self: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--lg-space-5);
 }
 
 .section,
 .metricSection {
   display: grid;
-  gap: var(--lg-space-5);
+  gap: var(--lg-space-4);
 }
 
 .metricStrip {
@@ -148,75 +40,39 @@
   font-variant-numeric: tabular-nums;
 }
 
-.mainGrid,
-.bottomGrid {
+
+/* ---- Durum ekranları (yükleniyor / kısıtlı / oturum) ----
+   Bu modlarda kabuk çizilmez: ray başlığı ve konum izi kimlik taşır. */
+
+.stateShell {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--lg-space-4);
-}
-
-.mainGrid > :first-child,
-.bottomGrid > :first-child {
-  grid-column: span 8;
-}
-
-.mainGrid > :last-child,
-.bottomGrid > :last-child {
-  grid-column: span 4;
-}
-
-.bottomGrid > :only-child {
-  grid-column: 1 / -1;
-}
-
-.page [data-account-section='listings'],
-.page [data-account-section='security'],
-.page [data-account-section='activity'],
-.page [data-account-section='saved-search'] {
-  display: grid;
-  align-content: start;
-  gap: var(--lg-space-5);
-}
-
-.page [data-part='listing-list'],
-.page [data-part='verification-summary'],
-.page [data-part='saved-search-summary'] {
-  display: grid;
-  gap: var(--lg-space-4);
-}
-
-.page [data-part='verification-summary'] > div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--lg-space-3);
-  padding-block-end: var(--lg-space-3);
-  border-block-end:
-    var(--lg-stroke-hairline) solid var(--lg-hairline);
-}
-
-.page [data-part='verification-summary'] dd {
-  color: var(--lg-label-secondary);
-  text-align: end;
-}
-
-.page [data-part='last-login-device-location'],
-.page [data-part='saved-search-criteria'],
-.page [data-part='saved-search-updated-at'],
-.page [data-part='empty-state'] {
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-}
-
-.page [data-part='empty-state'] {
-  display: grid;
-  justify-items: start;
-  gap: var(--lg-space-3);
+  justify-items: center;
+  min-block-size: 100dvh;
+  align-content: center;
+  padding: var(--lg-space-6) var(--lg-space-4);
 }
 
 .stateSection {
   display: grid;
-  max-inline-size: calc(88rem / 2);
+  max-inline-size: var(--lg-measure);
   gap: var(--lg-space-4);
+  padding: var(--lg-space-6);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
+}
+
+.stateSection h1 {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stateSection p {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  line-height: 1.55;
 }
 
 .eyebrow {
@@ -237,58 +93,18 @@
   grid-column: 1 / -1;
 }
 
-@container (inline-size <= 64rem) {
-  .mainGrid > :first-child,
-  .mainGrid > :last-child,
-  .bottomGrid > :first-child,
-  .bottomGrid > :last-child {
+/* bp: iki kolonlu içerik ızgarası */
+@container (inline-size > 48rem) {
+  .mainGrid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .bottomGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .bottomGrid > :only-child {
     grid-column: 1 / -1;
-  }
-}
-
-@container (inline-size <= 40rem) {
-  .frame {
-    gap: var(--lg-space-5);
-  }
-
-  .page [data-account-section] {
-    padding: var(--lg-space-4);
-  }
-
-  .page [data-account-section='identity'] {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--lg-space-4);
-  }
-
-  .page [data-account-section='identity'] [data-part='verification'],
-  .page [data-account-section='identity'] [data-part='eids-notice'],
-  .page [data-account-section='identity'] [data-part='primary-action'] {
-    grid-column: 1 / -1;
-    grid-row: auto;
-  }
-
-  .page [data-account-section='identity'] [data-part='primary-action'] > * {
-    inline-size: 100%;
-  }
-
-  .page [data-part='attention-item'] {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .page [data-part='attention-title'],
-  .page [data-part='attention-reason'],
-  .page [data-part='attention-time'],
-  .page [data-part='explanation-source'],
-  .page [data-part='attention-item'] > a {
-    grid-column: 1;
-    grid-row: auto;
-    justify-self: start;
-  }
-}
-
-@media (hover: hover) {
-  .page [data-variant='secondary']:hover {
-    color: var(--lg-accent);
   }
 }
 
@@ -298,6 +114,7 @@
   }
 }
 
+/* Saydamlık azaltıldığında kalan tek cam yüzey opak zemine iner */
 @media (prefers-reduced-transparency: reduce) {
   .page [data-material='glass'] {
     background-color: var(--lg-surface);

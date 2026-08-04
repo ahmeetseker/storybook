@@ -16,7 +16,7 @@ import { Meta } from '@storybook/addon-docs/blocks'
   |---|---|
   | 1.4.6 Contrast (Enhanced) | Palet 7:1'e kalibre — tonlu `color-mix` zeminleri dahil (bkz. Token'lar) |
   | 1.4.8 Visual Presentation | Gövde metni `--lg-measure` (≈77 karakter), satır aralığı ≥ 1.5 |
-  | 2.5.5 Target Size (Enhanced) | Kontrol ölçeğinin tabanı her cihazda 44px |
+  | 2.5.5 Target Size (Enhanced) | Dokunmatikte kontrol tabanı 44px. İmleçli cihazda görünür ölçek 36–40px'e iner: orada karşılanan seviye **AA 2.5.8** (24px tabanı) — bkz. Token'lar → Kontrol yükseklikleri |
   | 2.4.12 Focus Not Obscured (Enhanced) | Odak, yüzen header/dock altında kalmaz (`scroll-margin-block`) |
 
   Amber koyu temada `#E9B179`'a açılır, üstü koyu kahve metin alır.
@@ -44,9 +44,9 @@ tetiklemez) · kesilebilir (spring) · exit tamamlanmadan DOM kaldırılmaz.
 # Responsive
 
 - Breakpoint yerine **yetenek sorguları**: `@media (hover: hover)` hover'ı yalnız
-  imleçli cihazlara verir. `@media (pointer: coarse)` artık kontrol yüksekliği
-  büyütmez — ölçeğin tabanı zaten 44px'tir (AAA 2.5.5); coarse yalnız yatay
-  nefes gibi ikincil ayarlar için kalır.
+  imleçli cihazlara verir. `@media (pointer: coarse)` kontrol ölçeğini token
+  düzeyinde büyütür (36/40 → 44); bileşenler ayrıca yükseltme yapmaz, ölçüyü
+  yalnız `--lg-control-*` üzerinden okur.
 - Sayfa genişliği ve kenar boşluğu container kademesinden gelir; sayfa kendi
   `max-width`'ini yazmaz (bkz. Token'lar → Sayfa container'ı).
 - Genişlik davranışı container'a göre: kartlar `minmax()` grid'de akar,

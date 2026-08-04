@@ -34,9 +34,18 @@ export interface ListingQuestionsProps {
  * değil dayanağını açar. Bu, kanıt defterini sayfanın sonuna sürmeden
  * okunur kılan sözleşmedir (bkz. rules.md §2).
  *
- * Erişilebilirlik: kapalı gövde DOM'da kalır (`hidden` ile gizlenir), böylece
- * sayfa içi arama ve ekran okuyucu sırası bozulmaz; `aria-expanded` ve
- * `aria-controls` bağları her soru için kurulur.
+ * Kontrolün yeri: chevron sorunun SOLUNDA durur ve kapalıyken 90° yatar
+ * (Finder'ın açılır üçgeni). Geniş yerleşimde satırın en sağındaki bir ikon
+ * etkilediği başlıktan yüzlerce piksel uzağa düşer; kontrol etkilediği şeyin
+ * yanında durmadığında eşleme zayıflar (bkz. rules.md §2). Açılan gövde de
+ * chevron kolonu kadar içeri alınır, böylece sorunun metniyle aynı eksene
+ * oturur ve kime ait olduğu hizadan okunur.
+ *
+ * Erişilebilirlik: kapalı gövde DOM'da kalır — `display: none` yerine
+ * `grid-template-rows: 0fr` ile kapanır, `inert` ile de odak sırasından ve
+ * erişilebilirlik ağacından çıkar. Böylece açılış her an kesilip geri
+ * çevrilebilir; `aria-expanded` ve `aria-controls` bağları her soru için
+ * kurulur.
  */
 export function ListingQuestions({ questions }: ListingQuestionsProps) {
   const baseId = useId()
@@ -51,7 +60,7 @@ export function ListingQuestions({ questions }: ListingQuestionsProps) {
         const expanded = Boolean(open[q.id]) && Boolean(q.body)
 
         return (
-          <div key={q.id} className={styles.qa}>
+          <div key={q.id} className={styles.qa} data-open={expanded || undefined}>
             <button
               type="button"
               className={styles.trigger}
@@ -60,6 +69,23 @@ export function ListingQuestions({ questions }: ListingQuestionsProps) {
               disabled={!q.body}
               onClick={() => setOpen((current) => ({ ...current, [q.id]: !current[q.id] }))}
             >
+              {q.body ? (
+                <svg
+                  className={styles.chevron}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="M2.5 4.5 6 8l3.5-3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
               <span className={styles.copy}>
                 <span className={styles.question}>{q.question}</span>
                 <span
@@ -68,15 +94,12 @@ export function ListingQuestions({ questions }: ListingQuestionsProps) {
                   {q.answer}
                 </span>
               </span>
-              {q.body ? (
-                <span className={styles.chevron} aria-hidden="true">
-                  ▾
-                </span>
-              ) : null}
             </button>
             {q.body ? (
-              <div className={styles.body} id={bodyId} hidden={!expanded}>
-                {q.body}
+              <div className={styles.body} id={bodyId}>
+                <div className={styles.bodyInner} inert={!expanded}>
+                  <div className={styles.bodyPad}>{q.body}</div>
+                </div>
               </div>
             ) : null}
           </div>

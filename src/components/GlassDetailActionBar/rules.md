@@ -133,16 +133,23 @@ görünümdür (kontrollü).
 | root | padding | `--lg-space-3` |
 | primary | background/color | `--lg-accent` / `--lg-accent-contrast` |
 | primary | border-radius | `--lg-radius-chip` |
-| primary | min-height | `--lg-control-lg` |
+| primary | min-height | `--lg-control-lg` (imleçli 44px / dokunmatik 48px) |
 | secondary | border | `--lg-stroke-hairline` `--lg-hairline` |
 | secondary | min-height | `--lg-control-md` |
 | secondary | border-radius | `--lg-radius-chip` |
 | utility | border | `--lg-stroke-hairline` `--lg-hairline` |
-| utility | min-height | `--lg-control-md` (coarse pointer'da da `--lg-control-md`, 44px karşılığı) |
+| utility | min-height | `--lg-control-md` (imleçli 40px / dokunmatik 44px) |
 | utility | font-size | `--lg-text-footnote` |
 | note | font-size / color | `--lg-text-footnote` / `--lg-label-secondary` |
 | focus ring | outline | `2px solid var(--lg-accent)`, yalnız `:focus-visible` |
 | bar padding-bottom | safe-area | `calc(var(--lg-space-3) + env(safe-area-inset-bottom))` |
+
+**Dokunma hedefi (2026-08-03):** Üç kontrol de tam genişlikte (veya `flex: 1`)
+olduğu için hedef genişliği zaten yeterli; yükseklik doğrudan kontrol
+token'larından gelir ve dokunmatikte 44/48px'e çıkar. Aynı token'ı ikinci kez
+yazan `@media (pointer: coarse) { .utility { … } }` bloğu KALDIRILDI. `primary`
+fallback'i eski ölçekten kalma `48px`'ten `44px`'e güncellendi
+(`--lg-control-lg`'nin imleçli değeri).
 
 **Borç:** yok. Tüm ölçüler `--lg-control-*`/`--lg-space-*`/`--lg-radius-chip`
 token'larından (fallback'leriyle birlikte) gelir; raw hex/rgba/px/shadow yok.
@@ -193,3 +200,10 @@ birlikte gelir, salt genişlik sinyali yeterli değildir). **Açık kararlar:**
 yalnızca rules.md kuralı olarak mı (§5) kalacağı.
 
 **Changelog:** 2026-07-28 — ilk sürüm.
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı — gereksizleşen
+  `pointer: coarse` utility yüksekliği kaldırıldı, `primary` token
+  fallback'i 48px → 44px güncellendi. Birincil CTA imleçli cihazda 48px →
+  44px, bar toplam 72px → 68px.

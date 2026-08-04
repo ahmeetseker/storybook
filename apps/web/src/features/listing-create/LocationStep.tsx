@@ -1,6 +1,7 @@
 import { GlassSelect } from '@repo/ui'
 import type { ListingLocation, PropertyFamily } from './listing-create-domain'
 import { ListingField } from './ListingField'
+import { ListingGroup, ListingStepIntro } from './ListingSection'
 import { LeafletPropertyPicker } from './LeafletPropertyPicker'
 import { listingFieldA11y } from './listing-field-a11y'
 import styles from './ListingCreateWorkspace.module.css'
@@ -102,193 +103,204 @@ export function LocationStep({
 
   return (
     <section className={styles.stepSection} aria-labelledby="location-step-title">
-      <header className={styles.stepHeader}>
-        <div>
-          <p className={styles.kicker}>Adım 2 / 5</p>
-          <h1 id="location-step-title" tabIndex={-1}>Konum ve taşınmaz</h1>
-          <p>
-            Doğrulama için gerçek adresi kullanırız; ilanda yaklaşık konumu
-            gösterebilirsiniz.
-          </p>
-        </div>
-        <span className={styles.privacyNote}>⌖ Tam adres ilanda gösterilmez</span>
-      </header>
+      <ListingStepIntro
+        headingId="location-step-title"
+        stepIndex={2}
+        stepCount={5}
+        title="Konum ve taşınmaz"
+        description="Doğrulama için gerçek adresi kullanırız; ilanda yaklaşık konumu gösterebilirsiniz."
+        note="⌖ Tam adres ilanda gösterilmez"
+      />
 
-      <div className={styles.formGridThree}>
-        <ListingField id="location-city" label="İl" required error={errors.city}>
-          <GlassSelect
-            material="flat"
-            size="lg"
-            options={cityOptions}
-            value={value.city}
-            onChange={(city) =>
-              onChange({
-                ...value,
-                city,
-                district: '',
-                neighborhood: '',
-                latitude: null,
-                longitude: null,
-              })
-            }
-            id="location-city"
-            invalid={Boolean(errors.city)}
-            aria-required="true"
-            aria-describedby={errors.city ? 'location-city-error' : undefined}
-          />
-        </ListingField>
-        <ListingField
-          id="location-district"
-          label="İlçe"
-          required
-          error={errors.district}
-        >
-          <GlassSelect
-            material="flat"
-            size="lg"
-            options={(districts[value.city] ?? []).map(([district, label]) => ({
-              value: district,
-              label,
-            }))}
-            value={value.district}
-            disabled={!value.city}
-            onChange={(district) =>
-              onChange({
-                ...value,
-                district,
-                neighborhood: '',
-                latitude: null,
-                longitude: null,
-              })
-            }
-            id="location-district"
-            invalid={Boolean(errors.district)}
-            aria-required="true"
-            aria-describedby={errors.district ? 'location-district-error' : undefined}
-          />
-        </ListingField>
-        <ListingField
-          id="location-neighborhood"
-          label="Mahalle"
-          required
-          error={errors.neighborhood}
-        >
-          <GlassSelect
-            material="flat"
-            size="lg"
-            options={(neighborhoods[value.district] ?? []).map(
-              ([neighborhood, label]) => ({ value: neighborhood, label }),
-            )}
-            value={value.neighborhood}
-            disabled={!value.district}
-            onChange={(neighborhood) => set('neighborhood', neighborhood)}
-            id="location-neighborhood"
-            invalid={Boolean(errors.neighborhood)}
-            aria-required="true"
-            aria-describedby={
-              errors.neighborhood ? 'location-neighborhood-error' : undefined
-            }
-          />
-        </ListingField>
-      </div>
-
-      <ListingField
+      <ListingGroup
         id="location-address"
-        label="Açık adres"
-        description="Bu bilgi yalnızca doğrulama ve konumlandırma için kullanılır."
+        title="Adres"
+        description="İl, ilçe ve mahalle birbirine bağlıdır; üstteki seçim değişince alttakiler sıfırlanır."
+        requirement="required"
       >
-        <input
-          className={styles.flatControl}
-          value={value.address}
-          onChange={(event) => set('address', event.target.value)}
-          placeholder="Cadde, sokak ve dış kapı bilgisi"
-          {...listingFieldA11y(
-            'location-address',
-            undefined,
-            'Bu bilgi yalnızca doğrulama ve konumlandırma için kullanılır.',
-          )}
-        />
-      </ListingField>
-
-      <div className={styles.locationGrid}>
-        <div
-          id="location-map"
-          className={styles.mapFrame}
-          aria-invalid={Boolean(errors.coordinates) || undefined}
-          aria-describedby={errors.coordinates ? 'location-coordinates-error' : undefined}
-          tabIndex={errors.coordinates ? -1 : undefined}
-        >
-          <LeafletPropertyPicker
-            center={mapCenter}
-            latitude={value.latitude}
-            longitude={value.longitude}
-            onPointChange={(latitude, longitude) =>
-              onChange({ ...value, latitude, longitude })
-            }
-          />
-        </div>
-        <div className={styles.locationSide}>
-          <fieldset className={styles.choiceFieldset}>
-            <legend>İlanda konum görünürlüğü</legend>
-            <label className={styles.radioLine}>
-              <input
-                type="radio"
-                name="location-precision"
-                checked={value.precision === 'approximate'}
-                onChange={() => set('precision', 'approximate')}
-              />
-              <span>
-                <strong>Yaklaşık konum</strong>
-                <small>Önerilen · Mahremiyeti korur</small>
-              </span>
-            </label>
-            <label className={styles.radioLine}>
-              <input
-                type="radio"
-                name="location-precision"
-                checked={value.precision === 'exact'}
-                onChange={() => set('precision', 'exact')}
-              />
-              <span>
-                <strong>Tam konum</strong>
-                <small>İlan haritasında nokta olarak görünür</small>
-              </span>
-            </label>
-          </fieldset>
-          <button
-            type="button"
-            className={styles.secondaryAction}
-            onClick={() =>
-              onChange({
-                ...value,
-                latitude: mapCenter[0],
-                longitude: mapCenter[1],
-              })
-            }
+        <div className={styles.formGridThree}>
+          <ListingField id="location-city" label="İl" required error={errors.city}>
+            <GlassSelect
+              material="flat"
+              size="lg"
+              options={cityOptions}
+              value={value.city}
+              onChange={(city) =>
+                onChange({
+                  ...value,
+                  city,
+                  district: '',
+                  neighborhood: '',
+                  latitude: null,
+                  longitude: null,
+                })
+              }
+              id="location-city"
+              invalid={Boolean(errors.city)}
+              aria-required="true"
+              aria-describedby={errors.city ? 'location-city-error' : undefined}
+            />
+          </ListingField>
+          <ListingField
+            id="location-district"
+            label="İlçe"
+            required
+            error={errors.district}
           >
-            Harita merkezini konum olarak seç
-          </button>
-          {value.latitude !== null && value.longitude !== null ? (
-            <p className={styles.coordinateStatus} role="status">
-              Seçili nokta: {value.latitude.toFixed(5)}, {value.longitude.toFixed(5)}
-            </p>
-          ) : null}
+            <GlassSelect
+              material="flat"
+              size="lg"
+              options={(districts[value.city] ?? []).map(([district, label]) => ({
+                value: district,
+                label,
+              }))}
+              value={value.district}
+              disabled={!value.city}
+              onChange={(district) =>
+                onChange({
+                  ...value,
+                  district,
+                  neighborhood: '',
+                  latitude: null,
+                  longitude: null,
+                })
+              }
+              id="location-district"
+              invalid={Boolean(errors.district)}
+              aria-required="true"
+              aria-describedby={errors.district ? 'location-district-error' : undefined}
+            />
+          </ListingField>
+          <ListingField
+            id="location-neighborhood"
+            label="Mahalle"
+            required
+            error={errors.neighborhood}
+          >
+            <GlassSelect
+              material="flat"
+              size="lg"
+              options={(neighborhoods[value.district] ?? []).map(
+                ([neighborhood, label]) => ({ value: neighborhood, label }),
+              )}
+              value={value.neighborhood}
+              disabled={!value.district}
+              onChange={(neighborhood) => set('neighborhood', neighborhood)}
+              id="location-neighborhood"
+              invalid={Boolean(errors.neighborhood)}
+              aria-required="true"
+              aria-describedby={
+                errors.neighborhood ? 'location-neighborhood-error' : undefined
+              }
+            />
+          </ListingField>
         </div>
-      </div>
-      <p
-        id="location-coordinates-error"
-        className={styles.fieldError}
-        aria-live="polite"
-      >
-        {errors.coordinates ?? ''}
-      </p>
 
-      <div className={styles.identityBlock}>
-        <div>
-          <p className={styles.contextEyebrow}>Taşınmaz kimliği</p>
-          <h2>Tapu kayıt bilgileri</h2>
-          <p>Bu değerler yalnız EİDS eşleştirmesinde kullanılır; ilanda gösterilmez.</p>
+        <ListingField
+          id="location-address"
+          label="Açık adres"
+          description="Bu bilgi yalnızca doğrulama ve konumlandırma için kullanılır."
+        >
+          <input
+            className={styles.flatControl}
+            value={value.address}
+            onChange={(event) => set('address', event.target.value)}
+            placeholder="Cadde, sokak ve dış kapı bilgisi"
+            {...listingFieldA11y(
+              'location-address',
+              undefined,
+              'Bu bilgi yalnızca doğrulama ve konumlandırma için kullanılır.',
+            )}
+          />
+        </ListingField>
+      </ListingGroup>
+
+      <ListingGroup
+        id="location-map-group"
+        title="Harita ve görünürlük"
+        description="Haritada bir nokta seçin; ilanda bu noktayı ne kadar açık göstereceğinize siz karar verin."
+        requirement="optional"
+      >
+        <div className={styles.locationGrid}>
+          <div
+            id="location-map"
+            className={styles.mapFrame}
+            aria-invalid={Boolean(errors.coordinates) || undefined}
+            aria-describedby={errors.coordinates ? 'location-coordinates-error' : undefined}
+            tabIndex={errors.coordinates ? -1 : undefined}
+          >
+            <LeafletPropertyPicker
+              center={mapCenter}
+              latitude={value.latitude}
+              longitude={value.longitude}
+              onPointChange={(latitude, longitude) =>
+                onChange({ ...value, latitude, longitude })
+              }
+            />
+          </div>
+          <div className={styles.locationSide}>
+            <fieldset className={styles.choiceFieldset}>
+              <legend>İlanda konum görünürlüğü</legend>
+              <label className={styles.radioLine}>
+                <input
+                  type="radio"
+                  name="location-precision"
+                  checked={value.precision === 'approximate'}
+                  onChange={() => set('precision', 'approximate')}
+                />
+                <span>
+                  <strong>Yaklaşık konum</strong>
+                  <small>Önerilen · Mahremiyeti korur</small>
+                </span>
+              </label>
+              <label className={styles.radioLine}>
+                <input
+                  type="radio"
+                  name="location-precision"
+                  checked={value.precision === 'exact'}
+                  onChange={() => set('precision', 'exact')}
+                />
+                <span>
+                  <strong>Tam konum</strong>
+                  <small>İlan haritasında nokta olarak görünür</small>
+                </span>
+              </label>
+            </fieldset>
+            <button
+              type="button"
+              className={styles.secondaryAction}
+              onClick={() =>
+                onChange({
+                  ...value,
+                  latitude: mapCenter[0],
+                  longitude: mapCenter[1],
+                })
+              }
+            >
+              Harita merkezini konum olarak seç
+            </button>
+            <p className={styles.coordinateStatus} role="status">
+              {value.latitude !== null && value.longitude !== null
+                ? `Seçili nokta: ${value.latitude.toFixed(5)}, ${value.longitude.toFixed(5)}`
+                : 'Henüz nokta seçilmedi'}
+            </p>
+          </div>
         </div>
+        <p
+          id="location-coordinates-error"
+          className={styles.fieldError}
+          aria-live="polite"
+        >
+          {errors.coordinates ?? ''}
+        </p>
+      </ListingGroup>
+
+      <ListingGroup
+        id="location-identity"
+        title="Taşınmaz kimliği"
+        description="Bu değerler yalnız EİDS eşleştirmesinde kullanılır; ilanda gösterilmez."
+        requirement="required"
+      >
         <ListingField
           id="location-property-number"
           label="Taşınmaz numarası"
@@ -348,7 +360,7 @@ export function LocationStep({
             />
           </ListingField>
         )}
-      </div>
+      </ListingGroup>
     </section>
   )
 }

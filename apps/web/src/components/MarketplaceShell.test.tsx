@@ -82,11 +82,7 @@ describe('MarketplaceShell odaklı ilan akışı', () => {
 })
 
 describe('MarketplaceShell hesap eylemi', () => {
-  it.each([
-    ['/hesabim', 'Hesabım'],
-    ['/hesabim/mesajlar', 'Hesabım'],
-    ['/emlak', 'Üye girişi'],
-  ])('rota %s iken %s etiketini gösterir', (pathname, label) => {
+  it.each([['/emlak', 'Üye girişi']])('rota %s iken %s etiketini gösterir', (pathname, label) => {
     routerState.pathname = pathname
 
     render(
@@ -97,6 +93,27 @@ describe('MarketplaceShell hesap eylemi', () => {
 
     expect(screen.getByRole('button', { name: label })).toBeTruthy()
   })
+
+  // Hesap panosu kendi kabuğunu kurar: iki gezinme katmanı üst üste binmesin
+  // diye pazar yeri header'ı ve dock'u bu rotada hiç render edilmez.
+  it.each(['/hesabim', '/hesabim/mesajlar', '/hesabim/ilanlarim'])(
+    'rota %s iken pazar yeri kabuğunu çizmez',
+    async (pathname) => {
+      routerState.pathname = pathname
+
+      render(
+        <MarketplaceShell>
+          <main>Hesap panosu</main>
+        </MarketplaceShell>,
+      )
+
+      expect(screen.queryByTestId('global-header')).toBeNull()
+      await waitFor(() =>
+        expect(screen.queryByTestId('global-dock')).toBeNull(),
+      )
+      expect(screen.getByRole('link', { name: 'İçeriğe geç' })).toBeTruthy()
+    },
+  )
 })
 
 describe('MarketplaceShell tema eylemi', () => {

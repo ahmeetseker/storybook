@@ -1,12 +1,9 @@
-import {
-  GlassAlert,
-  GlassMetricStrip,
-  GlassSkeleton,
-} from '@repo/ui'
+import { GlassAlert, GlassMetricStrip, GlassSkeleton } from '@repo/ui'
 
 import { PageContainer } from '@/components/PageContainer'
 import { AccountActivityList } from './components/AccountActivityList'
 import { AccountAttentionQueue } from './components/AccountAttentionQueue'
+import { AccountInsightsPanel } from './components/AccountInsightsPanel'
 import { AccountListingsPreview } from './components/AccountListingsPreview'
 import { AccountOverviewHeader } from './components/AccountOverviewHeader'
 import { AccountSavedSearchSummary } from './components/AccountSavedSearchSummary'
@@ -25,6 +22,8 @@ import type {
 } from './domain/account-types'
 
 import styles from './AccountWorkspace.module.css'
+// Bölüm kartlarının görsel dili tek kaynaktan gelir (bkz. components/rules)
+import sectionStyles from './components/AccountSections.module.css'
 
 function getSectionError(
   data: AccountDashboardData,
@@ -106,18 +105,24 @@ function AccountMetrics({ data }: { data: AccountDashboardData }) {
 
   return (
     <section
-      className={`${styles.section} ${styles.metricSection}`}
+      className={sectionStyles.card}
       data-account-section="metrics"
       aria-labelledby="account-metrics-title"
     >
-      <h2 id="account-metrics-title">Genel görünüm</h2>
+      <div className={sectionStyles.cardHead}>
+        <div className={sectionStyles.cardHeadText}>
+          <h2 id="account-metrics-title" className={sectionStyles.cardTitle}>
+            Genel görünüm
+          </h2>
+        </div>
+      </div>
       {error ? (
         <GlassAlert severity="warning" title="Göstergeler yüklenemedi">
           {error.message}
         </GlassAlert>
       ) : (
         <GlassMetricStrip
-          className={styles.metricStrip}
+          className={sectionStyles.metricGrid}
           items={getAccountMetricItems(data)}
           label="Hesap göstergeleri"
         />
@@ -170,6 +175,10 @@ function AccountReadyContent({
       <AccountIdentity data={data} />
       <AccountAttentionQueue items={attentionItems} />
       <AccountMetrics data={data} />
+      <AccountInsightsPanel
+        insights={data.insights}
+        error={getSectionError(data, 'insights')}
+      />
 
       <div className={styles.mainGrid}>
         <AccountListingsPreview
@@ -198,7 +207,12 @@ function AccountReadyContent({
   )
 }
 
-/** Hesap verisini erişilebilir, aksiyon-öncelikli çalışma alanında orkestre eder. */
+/**
+ * Hesap özeti sayfası — `/hesabim` rotasının içeriği.
+ *
+ * Kabuk (sol ray + üst şerit) artık layout rotasındadır (`AccountAppShell`);
+ * bu component yalnız sayfanın kendi `main`'ini ve bölümlerini üretir.
+ */
 export function AccountWorkspace({
   data,
   mode,
@@ -212,22 +226,32 @@ export function AccountWorkspace({
       sessionExpired: false,
     })
 
+  // Kişisel içerik yalnız bu iki modda gösterilir; diğerlerinde sayfa tek bir
+  // durum ekranına iner (kabuk da layout tarafında gizlenir).
+  const personal = resolvedMode === 'ready' || resolvedMode === 'new-account'
+
   return (
     <PageContainer
       className={styles.page}
+      size="wide"
+      shellInsets={false}
       aria-busy={resolvedMode === 'loading' || undefined}
     >
-      {resolvedMode === 'session-expired' ? (
-        <SessionExpiredState />
-      ) : resolvedMode === 'loading' ? (
-        <AccountLoadingState />
-      ) : resolvedMode === 'restricted' ? (
-        <RestrictedAccountState data={data} />
-      ) : (
+      {personal ? (
         <AccountReadyContent
           data={data}
           newAccount={resolvedMode === 'new-account'}
         />
+      ) : (
+        <div className={styles.stateShell}>
+          {resolvedMode === 'session-expired' ? (
+            <SessionExpiredState />
+          ) : resolvedMode === 'loading' ? (
+            <AccountLoadingState />
+          ) : (
+            <RestrictedAccountState data={data} />
+          )}
+        </div>
       )}
     </PageContainer>
   )

@@ -3,7 +3,7 @@
    kapsül içeriği GlassTierProvider ile düz katmana iner (cam üstüne cam yok). */
 .root {
   /* Token karşılığı olmayan layout ölçüleri — bkz. rules.md §9 Borç */
-  --rail-pad-y: var(--lg-space-3);
+  --rail-pad-y: var(--lg-space-2);
   --capsule-pad-y: var(--lg-space-2);
   --capsule-pad-x: var(--lg-space-4);
   --capsule-max: var(--lg-container-narrow);
@@ -82,7 +82,9 @@
   display: flex;
   align-items: center;
   gap: var(--zone-gap);
-  min-height: var(--lg-control-lg);
+  /* Şerit yüksekliği satırdaki kontrolün GÖRÜNÜR ölçüsüne eşit — kabuk
+     kontrolden büyük çizilmez (imleçli: 40px, dokunmatik: 44px). */
+  min-height: var(--lg-control-md);
 }
 
 .wordmark {
@@ -123,6 +125,17 @@
   letter-spacing: -0.01em;
   white-space: nowrap;
   transition: color 0.2s ease;
+}
+/* Dokunma hedefi görünür ölçüden bağımsız: 36px'lik link, görünmez ::after
+   taşmasıyla `--lg-control-hit`e (44px) genişler. Taşma (4px) kapsülün dikey
+   dolgusundan (`--capsule-pad-y`, 8px) küçük olduğu için kapsül dışına
+   çıkmaz; kapsülde `overflow: hidden` de yok. Dokunmatikte token zaten 44px
+   olduğundan `min()` taşmayı 0'a indirir. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
 }
 @media (hover: hover) { .link:hover { color: var(--lg-label); } }
 .link:focus-visible {
@@ -186,6 +199,7 @@
   padding: 0;
 }
 .panelLink {
+  position: relative;
   display: flex;
   align-items: center;
   min-height: var(--lg-control-md);
@@ -195,6 +209,14 @@
   text-decoration: none;
   font-size: var(--lg-text-body);
   font-weight: 500;
+}
+/* Panel linki 40px görünür; hedef ::after ile 44px'e taşar. Taşma satır başına
+   2px, liste boşluğu 4px — komşu hedefler değmez, üst üste binmez. */
+.panelLink::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--lg-control-md) - var(--lg-control-hit)) / 2));
 }
 @media (hover: hover) { .panelLink:hover { color: var(--lg-label); } }
 .panelLink:focus-visible {

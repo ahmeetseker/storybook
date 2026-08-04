@@ -295,7 +295,11 @@ export function GlassChart({
             <span>{lastIndex > 0 ? points[lastIndex].x : ''}</span>
           </div>
 
-          <table data-part="data-table" className={styles.srOnly}>
+          {/* Ekran okuyucu tablosu blok bir kapta gizlenir: `overflow: hidden`
+              table öğesinde yok sayıldığı için doğrudan tabloya uygulanınca
+              sayfada yatay taşma üretiyordu. */}
+          <div className={styles.srOnly}>
+          <table data-part="data-table">
             <caption>{ariaSummary} — tam veri tablosu</caption>
             <thead>
               <tr>
@@ -312,6 +316,7 @@ export function GlassChart({
               ))}
             </tbody>
           </table>
+          </div>
         </>
       ) : (
         <p className={styles.empty}>Veri yok</p>

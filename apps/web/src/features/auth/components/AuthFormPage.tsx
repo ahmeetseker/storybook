@@ -11,11 +11,25 @@ export interface AuthIkincilBaglanti {
 export interface AuthFormPageProps {
   baslik: string
   aciklama?: string
+  /**
+   * Başlığın ÜSTÜNDE duran şerit — çok adımlı akışın ilerleme göstergesi
+   * için. Başlık/açıklama sözleşmesini değiştirmez, yalnız önüne geçer.
+   */
+  ustSerit?: ReactNode
   /** Sunucudan veya doğrulamadan gelen hata — role="alert" ile duyurulur. */
   hata?: string
   onSubmit(event: FormEvent<HTMLFormElement>): void
-  gonderEtiketi: string
+  /** Varsayılan tek gönder butonunun etiketi. `aksiyonlar` verilirse kullanılmaz. */
+  gonderEtiketi?: string
   gonderiliyor?: boolean
+  /**
+   * Varsayılan tek gönder butonunun YERİNE geçen aksiyon satırı (ör. çok
+   * adımlı kayıtta "Geri" + "Devam et"). Hidrasyon bayrağı parametre olarak
+   * verilir: özel butonlar da hidrasyon tamamlanana kadar devre dışı
+   * kalmalıdır, yoksa erken tıklama native form gönderimine düşer ve
+   * `donus` sessizce kaybolur (aşağıdaki uzun nota bakın).
+   */
+  aksiyonlar?: (durum: { hidrasyonTamam: boolean }) => ReactNode
   ikincilBaglantilar?: readonly AuthIkincilBaglanti[]
   children: ReactNode
 }
@@ -24,10 +38,12 @@ export interface AuthFormPageProps {
 export function AuthFormPage({
   baslik,
   aciklama,
+  ustSerit,
   hata,
   onSubmit,
   gonderEtiketi,
   gonderiliyor = false,
+  aksiyonlar,
   ikincilBaglantilar = [],
   children,
 }: AuthFormPageProps) {
@@ -47,6 +63,8 @@ export function AuthFormPage({
 
   return (
     <main id="main-content" className={styles.page}>
+      {ustSerit}
+
       <header className={styles.header}>
         <h1 className={styles.title}>{baslik}</h1>
         {aciklama ? <p className={styles.description}>{aciklama}</p> : null}
@@ -61,15 +79,19 @@ export function AuthFormPage({
           </p>
         ) : null}
 
-        <GlassButton
-          type="submit"
-          prominent
-          size="md"
-          loading={gonderiliyor}
-          disabled={!hidrasyonTamam || gonderiliyor}
-        >
-          {gonderEtiketi}
-        </GlassButton>
+        {aksiyonlar ? (
+          aksiyonlar({ hidrasyonTamam })
+        ) : (
+          <GlassButton
+            type="submit"
+            prominent
+            size="md"
+            loading={gonderiliyor}
+            disabled={!hidrasyonTamam || gonderiliyor}
+          >
+            {gonderEtiketi}
+          </GlassButton>
+        )}
       </form>
 
       {ikincilBaglantilar.length > 0 ? (

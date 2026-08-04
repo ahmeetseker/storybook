@@ -9,6 +9,18 @@ export interface GlassButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
   tint?: string
   prominent?: boolean
   tone?: 'light' | 'dark' | 'auto'
+  /**
+   * Malzeme ekseni (bkz. EksenlerVeDurumlar.mdx). `'glass'` varsayılandır ve
+   * butonu kontrol katmanına taşır; `'flat'` aynı eylem dilini cam AÇMADAN
+   * çizer.
+   *
+   * `'flat'` bir stil tercihi değil **katman kararıdır**: sayfa başına cam
+   * bütçesi altıdır (GenelBakis.mdx) ve içerik katmanındaki bir yaprağın
+   * içinde duran buton camı hak etmez. Bu eksen açılmadan önce böyle her
+   * buton feature CSS'inde elle çiziliyordu ve her biri kendi rengini
+   * uyduruyordu.
+   */
+  material?: 'glass' | 'flat'
   /** Async işlem sürerken: tekrar aktivasyon engellenir, genişlik korunur, aria-busy verilir */
   loading?: boolean
 }
@@ -18,6 +30,7 @@ export function GlassButton({
   tint,
   prominent = false,
   tone = 'auto',
+  material = 'glass',
   loading = false,
   className,
   style,
@@ -40,13 +53,18 @@ export function GlassButton({
     .filter(Boolean)
     .join(' ')
 
-  const cssVars: CSSProperties = tint ? ({ '--glass-tint': tint } as CSSProperties) : {}
+  // `--lg-action-tint` eylem dilinin ton kancasıdır: karışım oranı ve kontrast
+  // kuralı token'da kalır, kontrol yalnız hangi rengin tonlanacağını söyler.
+  const cssVars: CSSProperties = tint
+    ? ({ '--glass-tint': tint, '--lg-action-tint': tint } as CSSProperties)
+    : {}
 
   return (
     <GlassSurface
       as={motion.button}
       shape="capsule"
       interactive
+      material={material}
       tone={tone}
       thickness={0.35}
       displacementScale={press.displacementScale}

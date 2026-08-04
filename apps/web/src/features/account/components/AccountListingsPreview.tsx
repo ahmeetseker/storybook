@@ -1,4 +1,4 @@
-import { GlassAlert, GlassListingManagementCard } from '@repo/ui'
+import { GlassAlert, GlassEmptyState, GlassListingManagementCard } from '@repo/ui'
 
 import type {
   AccountListingPreview as ListingPreview,
@@ -7,6 +7,7 @@ import type {
 } from '../domain/account-types'
 
 import { AccountActionLink } from './AccountActionLink'
+import styles from './AccountSections.module.css'
 
 export interface AccountListingsPreviewProps {
   /** Hesap sahibinin ilan oluşturma ya da keşfetme bağlamı. */
@@ -25,20 +26,31 @@ export function AccountListingsPreview({
 }: AccountListingsPreviewProps) {
   const visibleListings = listings.slice(0, 2)
   const isBuyer = role === 'buyer'
+  const hasListings = !error && visibleListings.length > 0
 
   return (
     <section
       data-account-section="listings"
       aria-labelledby="account-listings-title"
       data-part={error ? 'section-error' : undefined}
+      className={styles.card}
     >
-      <h2 id="account-listings-title">Son ilanlar</h2>
+      <div className={styles.cardHead}>
+        <div className={styles.cardHeadText}>
+          <h2 id="account-listings-title" className={styles.cardTitle}>
+            Son ilanlar
+          </h2>
+          {hasListings ? (
+            <p className={styles.cardSubtitle}>Son güncellenen ilanlarınız</p>
+          ) : null}
+        </div>
+      </div>
       {error ? (
         <GlassAlert severity="warning" title="İlanlar yüklenemedi">
           {error.message}
         </GlassAlert>
-      ) : visibleListings.length > 0 ? (
-        <div data-part="listing-list">
+      ) : hasListings ? (
+        <div data-part="listing-list" className={styles.listingList}>
           {visibleListings.map((listing) => (
             <GlassListingManagementCard
               key={listing.id}
@@ -56,15 +68,29 @@ export function AccountListingsPreview({
           ))}
         </div>
       ) : (
-        <div data-part="empty-state">
-          <p>{isBuyer ? 'Aramaya başlamak için ilanları keşfedin' : 'İlk ilanınızı hazırlayın'}</p>
-          <AccountActionLink
-            action={
+        <div data-part="empty-state" className={styles.emptyState}>
+          <GlassEmptyState
+            size="sm"
+            title={
               isBuyer
-                ? { kind: 'route', label: 'İlanları keşfedin', to: '/emlak' }
-                : { kind: 'route', label: 'İlan vermeye başla', to: '/ilan-ver' }
+                ? 'Aramaya başlamak için ilanları keşfedin'
+                : 'İlk ilanınızı hazırlayın'
             }
-            variant="text"
+            description={
+              isBuyer
+                ? 'Beğendiğiniz ilanları favorilerinize ekleyin; eşleşmeler burada listelenir.'
+                : 'İlanınızı yayına aldığınızda durumu ve performansı bu bölümde görünür.'
+            }
+            action={
+              <AccountActionLink
+                action={
+                  isBuyer
+                    ? { kind: 'route', label: 'İlanları keşfedin', to: '/emlak' }
+                    : { kind: 'route', label: 'İlan vermeye başla', to: '/ilan-ver' }
+                }
+                variant="text"
+              />
+            }
           />
         </div>
       )}

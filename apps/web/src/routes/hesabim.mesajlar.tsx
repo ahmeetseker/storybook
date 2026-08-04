@@ -33,7 +33,7 @@ function isCanonicalMessagesSearch(
   )
 }
 
-export const Route = createFileRoute('/hesabim_/mesajlar')({
+export const Route = createFileRoute('/hesabim/mesajlar')({
   validateSearch: (search) =>
     serializeMessagesRouteSearch(
       parseMessagesRouteSearch(search as Record<string, unknown>),

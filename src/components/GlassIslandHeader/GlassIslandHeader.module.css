@@ -416,11 +416,15 @@
   outline-offset: 2px;
 }
 
-@media (pointer: coarse) {
-  .bell {
-    width: var(--lg-control-md);
-    height: var(--lg-control-md);
-  }
+/* İkon-tek zil: 36px görünür, hedef görünmez ::after ile `--lg-control-hit`e
+   (44px) taşar. Taşma 4px — hap satırının dikey dolgusu (`--lg-space-2`, 8px)
+   bunu kapsar, dolayısıyla cam adanın `overflow: hidden`'ı hedefi kırpmaz.
+   Eski `pointer: coarse` büyütmesi kaldırıldı; dokunmatikte token zaten 44px
+   ve `min()` taşmayı 0'a indirir. */
+.bell::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
 }
 
 .badge {
@@ -469,6 +473,7 @@
 }
 
 .close {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,11 +506,13 @@
   outline-offset: 2px;
 }
 
-@media (pointer: coarse) {
-  .close {
-    width: var(--lg-control-md);
-    height: var(--lg-control-md);
-  }
+/* İkon-tek kapat: 36px görünür, hedef ::after ile 44px. Taşma (4px) panel
+   başlığının dikey dolgusundan (12-16px) küçük — panelin `overflow: hidden`'ı
+   kırpmaz. `pointer: coarse` büyütmesi kaldırıldı (token zaten 44px). */
+.close::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
 }
 
 .panelBody {

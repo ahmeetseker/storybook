@@ -46,6 +46,148 @@ export interface ListingLocation {
   neighbourhood?: string
 }
 
+/**
+ * Haritada gösterilecek YAKLAŞIK **coğrafi** konum.
+ *
+ * Parselin tam merkezi taşınmaz: ilan sahibinin mahremiyeti için nokta
+ * `radiusMeters` yarıçaplı bir alanın merkezidir ve görünüm katmanı bunu
+ * kelimeyle yazar.
+ */
+export interface ListingGeographicGeo {
+  kind: 'geographic'
+  lat: number
+  lng: number
+  radiusMeters: number
+  /** Konumun nereden geldiği — kanıt künyesinde görünür */
+  sourceLabel: string
+}
+
+/**
+ * Coğrafi OLMAYAN, yalnız şematik bir yerleşim.
+ *
+ * `x`/`y` 0-1 normalize düzlem koordinatıdır ve arama kaydının kendi şematik
+ * yerleşiminden (`ListingSummary.map`) gelir: enlem/boylam **değildir**, bir
+ * yere karşılık gelmez ve mesafe/yarıçap iddiası taşımaz. Bu yüzden
+ * `radiusMeters` alanı yoktur — mahremiyet dairesi ancak gerçek bir koordinat
+ * gizlenirken anlamlıdır. Görünüm katmanı çizimin şematik olduğunu ve kayıtta
+ * coğrafi koordinat bulunmadığını **görünür metinle** yazar.
+ */
+export interface ListingSchematicGeo {
+  kind: 'schematic'
+  x: number
+  y: number
+  /** Yerleşimin nereden geldiği — kanıt künyesinde görünür */
+  sourceLabel: string
+}
+
+/**
+ * Konum çiziminin iki varyantı.
+ *
+ * Ayrık birleşim bilinçlidir: şematik yerleşimi coğrafi koordinat gibi
+ * sunabilecek tek bir düz tip (opsiyonel `lat`/`lng`) görünüm katmanında iki
+ * ayrı iddiayı aynı şeye benzetirdi. Geo hiç yoksa harita çizilmez (yaklaşık
+ * bile olsa uydurulmaz), yalnız idari konum metni kalır.
+ */
+export type ListingApproximateGeo = ListingGeographicGeo | ListingSchematicGeo
+
+/** Çevredeki ilgi noktası — mesafe kuş uçuşudur ve öyle etiketlenir. */
+export interface ListingNearbyPlace {
+  id: string
+  label: string
+  kind: 'transit' | 'school' | 'health' | 'shopping' | 'landmark' | 'coast'
+  distanceMeters: number
+}
+
+/**
+ * Yazışmadaki bir kişi.
+ *
+ * Fotoğraf **taşınmaz**: avatar baş harflerden çizilir ve zemin tonu rolü
+ * söyler. Tam ad da taşınmaz — görünen kimlik kısaltmalıdır ("Kerem Ö.").
+ * `id` yetki kararının tek dayanağıdır: "kendi yazdığı" karşılaştırması
+ * görünen ada değil buna bakar.
+ */
+export interface ListingQnaAuthor {
+  id: string
+  label: string
+  /** Avatarda görünen baş harfler (ör. "KÖ") */
+  initials: string
+  role: 'buyer' | 'seller'
+}
+
+/**
+ * Bir yanıtın görünürlüğü.
+ *
+ * - `public` — herkese açık (varsayılan).
+ * - `hidden` — **ilan sahibinin tercihi**. Geri alınabilir. Başkalarında
+ *   hiçbir iz bırakmaz: satır tamamen çizilmez (04.08.2026 kararı).
+ * - `masked` — **platform kuralı**. Telefon/e-posta herkese açık alanda
+ *   yayımlanmaz. Tercih olmadığı için ilan sahibine "göster" seçeneği hiç
+ *   açılmaz; ikisi aynı menüde toplanmaz.
+ *
+ * İkisinde de yanıtı **yazan** ve ilan sahibi içeriği okumaya devam eder —
+ * kendi yazdığının yayında olup olmadığını bilemeyen bir kullanıcı bırakılmaz.
+ */
+export type ListingQnaVisibility = 'public' | 'hidden' | 'masked'
+
+/** Yazışmadaki tek bir yanıt. Alıcılar da yanıt yazabilir, yalnız satıcı değil. */
+export interface ListingQnaReply {
+  id: string
+  author: ListingQnaAuthor
+  answeredAt: string
+  body: string
+  /** Verilmezse `public` sayılır. */
+  visibility?: ListingQnaVisibility
+}
+
+/**
+ * Alıcı sorusu ve altındaki yazışma.
+ *
+ * Yanıtsız soru da görünür kalır: yanıt yokluğu bilgidir, gizlenmez. Ama
+ * yanıtı gizlenmiş soru "yanıtsız" diye **etiketlenmez** — boş bırakmak bir
+ * şey söylememektir, yanlış söylemek değil.
+ */
+export interface ListingQnaEntry {
+  id: string
+  askedAt: string
+  author: ListingQnaAuthor
+  question: string
+  /** Kronolojik yazışma; boş dizi "henüz yanıtlanmadı" demektir. */
+  replies: ListingQnaReply[]
+  /** Sık sorulan olarak öne çıkarılmış */
+  pinned?: boolean
+}
+
+/**
+ * Bölümü görüntüleyen kişi.
+ *
+ * Yetki bu üründe rolden değil **sahiplikten** türer: kendi yazdığını
+ * silersin, başkasınınkini bildirirsin. `isOwner` yalnız iki fazladan yetki
+ * verir — kendi yanıtını gizleme ve gizlenmiş içeriği okuma.
+ */
+export interface ListingQnaViewer {
+  /** Kapalıysa yazma alanı ve işlem menüleri hiç çizilmez. */
+  signedIn: boolean
+  /** Oturum açıkken kendi kimliği; `ListingQnaAuthor.id` ile eşleşir. */
+  id?: string
+  label?: string
+  initials?: string
+  /** Görüntüleyen bu ilanın sahibi mi */
+  isOwner?: boolean
+}
+
+export interface ListingQna {
+  entries: ListingQnaEntry[]
+  /** Satıcının tipik yanıt süresi (ör. "Genelde 4 saat içinde yanıtlıyor") */
+  responseLabel?: string
+  /**
+   * Soru sorma kapalıysa nedeni. Kapalıyken form çizilmez — tıklanınca
+   * hiçbir şey yapmayan buton bırakılmaz. **Oturum kapalılığıyla
+   * karıştırılmaz**: bu kanalın kendisinin kapalı olmasıdır ve giriş yapmak
+   * bunu açmaz.
+   */
+  askDisabledReason?: string
+}
+
 export interface ListingPrice {
   amount: number
   currency: 'TRY'
@@ -138,6 +280,21 @@ export interface ListingDetailBase {
   documents: ListingDocument[]
   seller: ListingSeller
   media: ListingMediaItem[]
+  /**
+   * İlan kaydında **bildirilen** görsel sayısı.
+   *
+   * `media` dizisinin uzunluğu değildir: kayıtta gösterilebilir dosya
+   * bulunmasa da ilan sahibinin bildirdiği sayı bilgidir. Sayı kadar sahte
+   * kare üretilmez; yalnız sayı olarak yazılır. Bildirilmemişse alan hiç
+   * doldurulmaz.
+   */
+  declaredMediaCount?: number
+  /** Yaklaşık konum — yoksa harita bölümü çizilmez */
+  geo?: ListingApproximateGeo
+  /** Çevredeki ilgi noktaları — boşsa liste yerine yokluk cümlesi yazılır */
+  nearby?: ListingNearbyPlace[]
+  /** Alıcı soruları ve yanıtları — yoksa bölüm boş durumla çizilir */
+  qna?: ListingQna
 }
 
 export interface LandListingDetail extends ListingDetailBase {

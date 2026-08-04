@@ -2,7 +2,7 @@
 name: GlassRadioGroup
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassRadioGroup Kuralları
@@ -98,12 +98,23 @@ hiçbirinde kullan.
 component kökünde yerel değişkenlerde toplandı: `--radio-circle-sm/md`
 (18/20px) ve `--radio-dot-sm/md` (7/8px) — `pointer: coarse`'ta kök
 değişkenleri 22/24 ve 9/10px'e büyütülür (dokunmatik büyüme tasarımın istediği
-davranıştır); `--radio-text-gap` (2px); `--radio-touch-target` (44px —
-dokunmatik satır hedefi sabiti; satır bir `<label>`'dır, `--lg-control-*`
-kontrol yüksekliği ölçeğine bağlanmadı). Daire/ilk metin satırı optik hizası
+davranıştır); `--radio-text-gap` (2px). Dokunma hedefi sabiti artık yerel
+değil: `--radio-touch-target: 44px` kaldırıldı, yerine `--lg-control-hit`
+token'ı kullanılıyor. Daire/ilk metin satırı optik hizası
 `margin-top: 1px` (hairline istisnası). Geçiş süresi/easing (`0.16s ease-out`,
 `0.18s cubic-bezier(0.34, 1.56, 0.64, 1)` nokta scale-in yayı) süre token'ı
 olmadığından bilinçli raw.
+
+**Dokunma hedefi:** daire görsel olarak 18/20px kalır; tıklanabilir seçenek
+satırı görünmez bir `::after` ile dikeyde grup boşluğunun (`--radio-gap`,
+varsayılan `--lg-space-3`) yarısı kadar üste ve alta taşar. Seçenek kökü bir
+`<label>`'dır (GlassSurface değil) → `overflow: hidden` yok, pseudo-eleman
+gerçekten tıklanır. Taşma tam olarak boşluğun yarısı olduğu için ardışık
+seçeneklerin hedefleri ne çakışır ne de ölü bölge bırakır — "yanlış seçenek
+seçildi" riski yoktur. Dokunmatikte satır ayrıca `min-height:
+var(--lg-control-hit)` (44px, AAA 2.5.5) alır. Bu hedef kontrol yüksekliği
+ölçeğinden bağımsızdır: satır bir "dokunma satırı"dır, kontroller küçülse de
+44px'te kalır.
 
 ## 10. Storybook kapsamı
 
@@ -132,3 +143,8 @@ ayrı prop olarak değerlendirilecek.
 
 - 2026-07-16: İlk sürüm — sr-only native inputlar, manuel ok tuşu gezinmesi,
   horizontal→vertical responsive düşüş.
+- 2026-08-03: Yeni kontrol ölçeği. `--radio-touch-target: 44px` yerel sabiti
+  kaldırıldı → `--lg-control-hit` (değer aynı 44px, kontrol ölçeği küçülse de
+  sabit kalır). Grup boşluğu `--radio-gap` değişkenine alındı ve imleçli
+  cihazda seçenek satırına `::after` hedef genişletmesi eklendi (satır
+  yüksekliği + 12px). Daire/nokta ölçüleri değişmedi.

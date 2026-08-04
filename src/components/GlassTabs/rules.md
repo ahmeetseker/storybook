@@ -94,9 +94,13 @@ Katman sırası: value (selected `background`) → interaction (hover opacity).
 - Dar container: `.list` yatay kayar (`overflow-x: auto`, scrollbar gizli);
   bar `max-width: 100%` ile taşmaz.
 - Async / overlay: N/A — senkron, portal yok.
-- Touch: `.tab` her ortamda `min-height: var(--lg-control-md)` (44px) taşır —
-  fare/dokunmatik ayrımı yok, sekme her zaman gerçek bir dokunma hedefidir
-  (Chip'in aksine, sekme yoğunluk kaygısı taşımaz).
+- Touch: `.tab` her ortamda `min-height: var(--lg-control-md)` taşır — tek
+  token, `pointer: coarse` dalı yok. Yeni ölçekte bu imleçli cihazda 40px,
+  dokunmatikte 44px demektir; sekme her ortamda gerçek bir dokunma hedefidir.
+  Görünmez `::after` taşmasıyla 44px'e çıkarma UYGULANAMAZ: `.list`
+  `overflow-x: auto` taşır ve dikeyde de kırpar. Gerek de yok — sekme geniş bir
+  METİN hedefidir, ikon-tek kontrol değil; 40px, WCAG 2.2 AA 2.5.8 tabanının
+  (24px) çok üstünde.
 
 ## 8. İçerik kuralları
 
@@ -122,7 +126,10 @@ Katman sırası: value (selected `background`) → interaction (hover opacity).
 yalnız isimlendirme kolaylığı için kalır. `--list-gap: 2px` token karşılığı
 olmadığından raw kalır (ölçek en küçük adımı 4px, 2px daha ince bir ayrım).
 `.tab` artık `min-height: var(--lg-control-md)` taşır — dokunma hedefi her
-ortamda garanti (bkz. §7 Davranış). Bağlananlar: bar `padding` →
+ortamda garanti (bkz. §7 Davranış). 2026-08-03 kontrol ölçeği güncellemesinde
+CSS'e dokunulmadı; aynı token artık imleçli cihazda 40px, dokunmatikte 44px
+verdiği için sekme şeridi masaüstünde 52px'ten 48px'e indi (`--lg-space-1`
+bar dolgusuyla birlikte). Bağlananlar: bar `padding` →
 `--lg-space-1`, tab dikey padding → `--lg-space-2`, tab radius →
 `--lg-radius-capsule`, panel `padding` → `--lg-space-5`, panel font →
 `--lg-text-body`. Aktif zemin `rgba(255,255,255,0.28)` bilinçli beyaz-alfa
@@ -172,3 +179,8 @@ bastırılmalı mı · `size` ekseni gerekli mi.
   hedefi eksikti, ~37px'te kalıyordu); `--tab-font-size`/`--root-gap`/
   `--tab-pad-inline` token'a bağlandı (`--lg-text-footnote`/`--lg-space-3`/
   `--lg-space-4`).
+- 2026-08-03 — Yeni kontrol ölçeği incelemesi: CSS değişmedi
+  (`min-height: var(--lg-control-md)` zaten tek token). Token yeniden
+  tanımlandığı için sekme imleçli cihazda 44px → 40px, şerit 52px → 48px;
+  dokunmatikte 44px korunuyor. `::after` hedef taşmasının `.list` kaydırma
+  şeridi yüzünden uygulanamadığı §7/§9'a yazıldı.

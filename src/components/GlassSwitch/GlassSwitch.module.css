@@ -50,20 +50,16 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
-/* Dokunmatik: ray büyür + görünmez halo dokunma hedefini 44px'e tamamlar */
+/* Dokunmatik: ray ve thumb parmak için büyür.
+   Görünmez halo YOK: kök GlassSurface'tir ve kendi köşe kırpması için
+   `overflow: hidden` taşır — kutunun dışına taşan bir `::after` ne boyanır ne
+   de tıklanır. (Eskiden burada duran halo kuralı bu yüzden ölü koddu.)
+   Dokunma hedefi = görünen kapsül: coarse'ta md 66×34, sm 56×28 px.
+   AA 2.5.8 (24px) karşılanır; AAA 2.5.5 (44px) için switch'i 44px'lik bir
+   satır/etiket içine yerleştirmek çağıranın işidir — bkz. rules.md §9. */
 @media (pointer: coarse) {
   .sm { --lg-switch-w: 40px; --lg-switch-h: 22px; --lg-switch-thumb: 18px; }
   .md { --lg-switch-w: 50px; --lg-switch-h: 28px; --lg-switch-thumb: 24px; }
-  .root::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    /* coarse'ta --lg-control-md = 44px (birebir) — dokunma hedefi halosu */
-    width: max(100%, var(--lg-control-md));
-    height: max(100%, var(--lg-control-md));
-    transform: translate(-50%, -50%);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

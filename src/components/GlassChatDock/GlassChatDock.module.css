@@ -357,8 +357,8 @@
   height: var(--lg-control-md);
   border: 0;
   border-radius: var(--lg-radius-capsule);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: opacity 0.15s ease-out, transform 0.15s ease-out;

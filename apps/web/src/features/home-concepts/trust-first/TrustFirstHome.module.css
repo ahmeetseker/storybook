@@ -11,10 +11,10 @@
   justify-content: center;
   padding-inline: var(--lg-space-4);
   border-radius: var(--lg-radius-capsule);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
   font-size: var(--lg-text-footnote);
-  font-weight: 700;
+  font-weight: var(--lg-action-weight);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -117,11 +117,7 @@
 @media (hover: hover) {
   .heroAction:hover,
   .sellerCta > a:hover {
-    background: color-mix(
-      in srgb,
-      var(--lg-accent) 84%,
-      var(--lg-label)
-    );
+    background: var(--lg-action-prominent-hover);
   }
 }
 

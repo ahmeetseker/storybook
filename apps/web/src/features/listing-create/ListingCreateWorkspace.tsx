@@ -9,17 +9,25 @@ import {
   applyAiProposal,
   canPublish,
   createEmptyDraft,
+  getCompletion,
   getStepValidation,
   type AiListingProposal,
   type ListingDraft,
   type ListingStepId,
   type ListingVerification,
 } from './listing-create-domain'
+import {
+  clearStoredDraft,
+  readStoredDraft,
+  writeStoredDraft,
+} from './listing-draft-storage'
+import { locationChain } from './listing-labels'
 import { ContentPricingStep } from './ContentPricingStep'
 import { ListingActionBar } from './ListingActionBar'
 import { ListingCreateHeader } from './ListingCreateHeader'
-import { ListingEntryChoice } from './ListingEntryChoice'
+import { ListingEntryChoice, type ListingResumeOffer } from './ListingEntryChoice'
 import { ListingProgress } from './ListingProgress'
+import { ListingSidePanel } from './ListingSidePanel'
 import { LocationStep } from './LocationStep'
 import { MediaStudioStep } from './MediaStudioStep'
 import { PropertyStep } from './PropertyStep'
@@ -31,33 +39,6 @@ export interface ListingCreateWorkspaceProps {
   adapterDelayMs?: number
   adapterScenario?: Omit<ListingAdapterScenario, 'delayMs'>
   initialDraft?: ListingDraft
-}
-
-const contextByStep: Record<
-  Exclude<ListingStepId, 'content' | 'verification'>,
-  { eyebrow: string; title: string; description: string; facts: string[] }
-> = {
-  property: {
-    eyebrow: 'Doğru sınıflandırma',
-    title: 'Doğru kategori, doğru alıcı',
-    description:
-      'Mülk ailesi arama filtrelerini, zorunlu alanları ve ilanınızın görünür olacağı kategoriyi belirler.',
-    facts: ['Kategoriye özel alanlar', 'Rol bazlı EİDS hazırlığı', 'Tek kaynaktan düzenleme'],
-  },
-  location: {
-    eyebrow: 'Mahremiyet kontrollü',
-    title: 'Gerçek kayıt, güvenli gösterim',
-    description:
-      'Tam adres doğrulama için saklanır. İlan haritasında yaklaşık ya da tam konumu siz seçersiniz.',
-    facts: ['Bağımlı il / ilçe seçimi', 'Taşınmaz numarası', 'Yaklaşık konum seçeneği'],
-  },
-  media: {
-    eyebrow: 'Fotoğraf kalitesi',
-    title: 'İlk üç kare karar verir',
-    description:
-      'Kapak, genel görünüm ve çevre fotoğraflarını ilk sıralara taşıyarak ilanı daha anlaşılır kılın.',
-    facts: ['En az 3 geçerli fotoğraf', 'Tek kapak seçimi', 'Erişilebilir sıralama'],
-  },
 }
 
 function emptyVerification(): ListingVerification {
@@ -119,13 +100,28 @@ const errorTargetByStep: Record<
   },
 }
 
+/** Devam teklifi kartındaki tanıtıcı satır. */
+function resumeSummary(draft: ListingDraft): string {
+  return (
+    draft.content.title.trim() ||
+    locationChain(draft.location) ||
+    draft.meta.name
+  )
+}
+
 export function ListingCreateWorkspace({
   adapterDelayMs = 450,
   adapterScenario,
   initialDraft,
 }: ListingCreateWorkspaceProps) {
+  /* Kalıcılık yalnız gerçek rotada çalışır: Story ve testler `initialDraft`
+     verdiğinde sekme deposuna ne yazılır ne de okunur. */
+  const persistEnabled = useRef(initialDraft === undefined)
   const [draft, setDraft] = useState<ListingDraft>(
     () => initialDraft ?? createEmptyDraft(),
+  )
+  const [storedDraft, setStoredDraft] = useState(() =>
+    persistEnabled.current ? readStoredDraft() : null,
   )
   const [maxVisitedIndex, setMaxVisitedIndex] = useState(() =>
     stepIndex(initialDraft?.meta.activeStep ?? 'property'),
@@ -134,6 +130,7 @@ export function ListingCreateWorkspace({
     Partial<Record<ListingStepId, Record<string, string>>>
   >({})
   const [saveRetryToken, setSaveRetryToken] = useState(0)
+  const [stepAnnouncement, setStepAnnouncement] = useState('')
   const adapters = useMemo(
     () => createListingAdapters({ ...adapterScenario, delayMs: adapterDelayMs }),
     [adapterDelayMs, adapterScenario],
@@ -201,6 +198,16 @@ export function ListingCreateWorkspace({
     [],
   )
 
+  /* Sekme deposu: fotoğraflar hariç taslak, adım değiştikçe tazelenir. */
+  useEffect(() => {
+    if (!persistEnabled.current || !draft.entryMode) return
+    if (draft.meta.published) {
+      clearStoredDraft()
+      return
+    }
+    writeStoredDraft(draft)
+  }, [draft])
+
   useEffect(() => {
     if (
       !draft.entryMode ||
@@ -217,6 +224,21 @@ export function ListingCreateWorkspace({
       heading?.scrollIntoView?.({ block: 'start' })
     })
     return () => window.cancelAnimationFrame(frame)
+  }, [draft.entryMode, draft.meta.activeStep, draft.meta.published])
+
+  /* Adım değişimi ekran okuyucuya ayrıca duyurulur: odak başlığa gitse de
+     "kaçıncı adımdayım" bilgisi başlıkta yazmaz. */
+  useEffect(() => {
+    if (!draft.entryMode || draft.meta.published) {
+      setStepAnnouncement('')
+      return
+    }
+    const index = stepIndex(draft.meta.activeStep)
+    const definition = LISTING_STEPS[index]
+    if (!definition) return
+    setStepAnnouncement(
+      `Adım ${index + 1} / ${LISTING_STEPS.length}: ${definition.label}`,
+    )
   }, [draft.entryMode, draft.meta.activeStep, draft.meta.published])
 
   useEffect(() => {
@@ -273,6 +295,7 @@ export function ListingCreateWorkspace({
 
   const startManual = () => {
     stepFocusPending.current = true
+    setStoredDraft(null)
     setDraft((current) => ({
       ...current,
       entryMode: 'manual',
@@ -283,6 +306,7 @@ export function ListingCreateWorkspace({
 
   const applyProposal = (proposal: AiListingProposal) => {
     stepFocusPending.current = true
+    setStoredDraft(null)
     setDraft((current) => {
       const next = applyAiProposal(current, proposal)
       return {
@@ -291,6 +315,19 @@ export function ListingCreateWorkspace({
       }
     })
     setMaxVisitedIndex(0)
+  }
+
+  const resumeStoredDraft = () => {
+    if (!storedDraft) return
+    stepFocusPending.current = true
+    setDraft(storedDraft.draft)
+    setMaxVisitedIndex(stepIndex(storedDraft.draft.meta.activeStep))
+    setStoredDraft(null)
+  }
+
+  const discardStoredDraft = () => {
+    clearStoredDraft()
+    setStoredDraft(null)
   }
 
   const setActiveStep = (activeStep: ListingStepId) => {
@@ -410,13 +447,28 @@ export function ListingCreateWorkspace({
 
   const activeStep = draft.meta.activeStep
   const activeErrors = stepErrors[activeStep] ?? {}
+  const errorEntries = Object.entries(activeErrors)
   const activeIndex = stepIndex(activeStep)
+  const activeDefinition = LISTING_STEPS[activeIndex]
+  const completion = getCompletion(draft)
   const primaryLabel =
     activeStep === 'verification'
       ? 'İlanı yayınla'
       : draft.meta.returnToReview
         ? 'Kaydet ve son kontrole dön'
         : 'Devam et'
+
+  const resumeOffer: ListingResumeOffer | null = storedDraft
+    ? {
+        stepId: storedDraft.draft.meta.activeStep,
+        stepLabel:
+          LISTING_STEPS[stepIndex(storedDraft.draft.meta.activeStep)]?.label ??
+          'Mülk bilgileri',
+        stepIndex: stepIndex(storedDraft.draft.meta.activeStep) + 1,
+        summary: resumeSummary(storedDraft.draft),
+        droppedMediaCount: storedDraft.droppedMediaCount,
+      }
+    : null
 
   const stepContent = () => {
     if (activeStep === 'property') {
@@ -511,6 +563,9 @@ export function ListingCreateWorkspace({
           adapters={adapters}
           onManualStart={startManual}
           onApplyProposal={applyProposal}
+          resume={resumeOffer}
+          onResume={resumeStoredDraft}
+          onDiscardResume={discardStoredDraft}
         />
       </PageContainer>
     )
@@ -518,7 +573,10 @@ export function ListingCreateWorkspace({
 
   return (
     <PageContainer shellInsets={false} className={styles.page}>
-      <ListingCreateHeader meta={draft.meta} />
+      <ListingCreateHeader
+        meta={draft.meta}
+        completion={draft.meta.published ? undefined : completion}
+      />
       <div className={styles.shell}>
         {draft.meta.published ? (
           <section
@@ -553,20 +611,20 @@ export function ListingCreateWorkspace({
           </section>
         ) : (
           <>
+            <p className={styles.srOnly} role="status" aria-live="polite">
+              {stepAnnouncement}
+            </p>
+
             <ListingProgress
               draft={draft}
               activeStep={activeStep}
               maxVisitedIndex={maxVisitedIndex}
               onStepChange={setActiveStep}
             />
-            <section
-              className={styles.workspaceGrid}
-              data-wide={
-                activeStep === 'content' || activeStep === 'verification' || undefined
-              }
-            >
-              <div className={styles.stepWorkspace}>
-                {Object.keys(activeErrors).length > 0 ? (
+
+            <div className={styles.workspaceGrid}>
+              <div className={styles.stepColumn}>
+                {errorEntries.length > 0 ? (
                   <section
                     className={styles.errorSummary}
                     role="alert"
@@ -575,9 +633,12 @@ export function ListingCreateWorkspace({
                     <h2 id="listing-step-error-title">
                       Bu adımda düzeltilmesi gereken alanlar
                     </h2>
-                    <p>Bilgileriniz silinmedi. İlgili alana gidip düzeltin.</p>
-                    <ul>
-                      {Object.entries(activeErrors).map(([key, message]) => (
+                    <p>
+                      {errorEntries.length} alan eksik ya da hatalı. Bilgileriniz
+                      silinmedi; bağlantıya dokunup ilgili alana gidin.
+                    </p>
+                    <ol>
+                      {errorEntries.map(([key, message]) => (
                         <li key={key}>
                           <a
                             href={`#${
@@ -589,44 +650,31 @@ export function ListingCreateWorkspace({
                           </a>
                         </li>
                       ))}
-                    </ul>
+                    </ol>
                   </section>
                 ) : null}
+
                 {draft.meta.aiProposalApplied && activeStep === 'property' ? (
                   <p className={styles.appliedNotice} role="status">
                     <span aria-hidden="true">✦</span>
                     AI önerisi uygulandı; doğruluğunu kontrol ederek ilerleyin.
                   </p>
                 ) : null}
+
                 {stepContent()}
               </div>
-              {activeStep === 'property' ||
-              activeStep === 'location' ||
-              activeStep === 'media' ? (
-                <aside
-                  className={styles.contextPanel}
-                  aria-label="Bu adım için yardım"
-                >
-                  <p className={styles.contextEyebrow}>
-                    {contextByStep[activeStep].eyebrow}
-                  </p>
-                  <h2>{contextByStep[activeStep].title}</h2>
-                  <p>{contextByStep[activeStep].description}</p>
-                  <ul>
-                    {contextByStep[activeStep].facts.map((fact) => (
-                      <li key={fact}>
-                        <span aria-hidden="true">✓</span>
-                        {fact}
-                      </li>
-                    ))}
-                  </ul>
-                </aside>
-              ) : null}
-            </section>
+
+              <ListingSidePanel draft={draft} activeStep={activeStep} />
+            </div>
+
             <ListingActionBar
               backDisabled={activeIndex === 0}
               primaryLabel={primaryLabel}
+              stepSummary={`Adım ${activeIndex + 1}/${LISTING_STEPS.length} · ${
+                activeDefinition?.label ?? ''
+              }`}
               saveError={draft.meta.saveStatus === 'error'}
+              saving={draft.meta.saveStatus === 'saving'}
               primaryDisabled={
                 activeStep === 'verification' &&
                 (!canPublish(draft) ||

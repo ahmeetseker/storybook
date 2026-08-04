@@ -10,7 +10,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { AuthSessionProvider, useAuthSession, useKorumaliRota } from './AuthSessionProvider'
-import { sahteAuthAdapters } from './test-utils'
+import { kayitAdimlariniDoldur, sahteAuthAdapters } from './test-utils'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
 import { KayitPage } from './pages/KayitPage'
@@ -108,14 +108,6 @@ function akisRouter(adapters: AuthAdapters, baslangic: string) {
   })
 }
 
-async function bireyselFormuDoldur(kullanici: ReturnType<typeof userEvent.setup>) {
-  await kullanici.type(screen.getByLabelText('Ad soyad'), 'Yeni Kullanıcı')
-  await kullanici.type(screen.getByLabelText('E-posta'), 'yeni@arsam.net')
-  await kullanici.type(screen.getByLabelText('Telefon'), '5559998877')
-  await kullanici.type(screen.getByLabelText('Parola'), 'Arsam1234')
-  await kullanici.click(screen.getByLabelText(/aydınlatma metnini/i))
-}
-
 async function kurumsalBasvuruyuDoldur(kullanici: ReturnType<typeof userEvent.setup>) {
   await kullanici.type(screen.getByLabelText('Ticaret ünvanı'), 'Arsam Gayrimenkul Ltd. Şti.')
   await kullanici.type(screen.getByLabelText('Vergi numarası'), '1234567890')
@@ -129,14 +121,13 @@ async function kurumsalBasvuruyuDoldur(kullanici: ReturnType<typeof userEvent.se
 }
 
 describe('kayıt akışı', () => {
-  it('bireysel kayıt: /kayit → gönder → dönüş hedefine iner, oturum açılmıştır', async () => {
+  it('bireysel kayıt: /kayit dört adımı → gönder → dönüş hedefine iner, oturum açılmıştır', async () => {
     const kullanici = userEvent.setup()
     const adapters = akisAdapters()
     render(<RouterProvider router={akisRouter(adapters, '/kayit?donus=%2Fhesabim')} />)
 
-    await screen.findByLabelText('Ad soyad')
-    await bireyselFormuDoldur(kullanici)
-    await kullanici.click(screen.getByRole('button', { name: 'Hesap oluştur' }))
+    await kayitAdimlariniDoldur(kullanici)
+    await kullanici.click(screen.getByRole('button', { name: 'Kaydı tamamla' }))
 
     await waitFor(() => expect(adapters.kayitYap).toHaveBeenCalled())
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Hesabım' })).toBeTruthy())
@@ -147,17 +138,16 @@ describe('kayıt akışı', () => {
     const adapters = akisAdapters()
     render(<RouterProvider router={akisRouter(adapters, '/kayit')} />)
 
-    // 1. Kayıt — emlak ofisi seç.
-    await screen.findByLabelText('Ad soyad')
-    await kullanici.click(screen.getByLabelText(/emlak ofisi/i))
-    await bireyselFormuDoldur(kullanici)
-    await kullanici.click(screen.getByRole('button', { name: 'Hesap oluştur' }))
+    // 1. Kayıt — dört adım, ilk adımda emlak ofisi seçilir.
+    await kayitAdimlariniDoldur(kullanici, { hesapTipi: 'kurumsal' })
+    await kullanici.click(screen.getByRole('button', { name: 'Kaydı tamamla' }))
     await waitFor(() => expect(adapters.kayitYap).toHaveBeenCalled())
 
-    // 2. Kurumsal başvuru.
+    // 2. Kurumsal başvuru — kayıt şeridi burada 5. adım olarak sürer.
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Emlak ofisi başvurusu' })).toBeTruthy(),
     )
+    expect(screen.getByText('Adım 5 / 6: Emlak ofisi bilgileri')).toBeTruthy()
     await kurumsalBasvuruyuDoldur(kullanici)
     await kullanici.click(screen.getByRole('button', { name: 'Başvuruyu gönder' }))
     await waitFor(() => expect(adapters.kurumsalBasvuruGonder).toHaveBeenCalled())

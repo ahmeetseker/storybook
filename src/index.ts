@@ -17,6 +17,11 @@ export {
   type GlassSidebarHeaderProps,
   type GlassSidebarItemProps,
   type GlassSidebarGroupProps,
+  type GlassSidebarSectionProps,
+  type GlassSidebarFooterProps,
+  type GlassSidebarSwitcherProps,
+  type GlassSidebarSwitcherOption,
+  type GlassSidebarDensity,
 } from './components/GlassSidebar'
 export { GlassBadge, type GlassBadgeProps } from './components/GlassBadge'
 export { GlassIconButton, type GlassIconButtonProps } from './components/GlassIconButton'

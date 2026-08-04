@@ -2,7 +2,7 @@
 name: GlassChip
 category: görüntüleme
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassChip Kuralları
@@ -57,7 +57,7 @@ Chip kullanıcı girdisi alır.
 | onRemove | event | `() => void` | — | × butonu ve Delete/Backspace |
 | onClick | event | `MouseEventHandler` | — | Toggle'dan bağımsız da çalışır (filtre chip'i) |
 | icon | prop | `ReactNode` | — | Dekoratif inline ikon |
-| size | prop | `'sm'\|'md'` | `'md'` | 32px; coarse pointer'da 44px (dokunma hedefi) |
+| size | prop | `'sm'\|'md'` | `'md'` | Yükseklik `--lg-control-sm/md`: imleçli 36/40px, dokunmatikte 44px |
 | tint | prop | `string` | — | `--glass-tint`; seçiliyken dolgu rengi olur |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | GlassSurface'a geçer |
 | disabled | prop | `boolean` | `false` | `aria-disabled`; focus almaz, handler çalışmaz |
@@ -94,9 +94,9 @@ Varsayılan kombinasyon: `size=md`, seçimsiz, nötr cam.
   `onRemove` çağırır; × butonu Tab sırasında ayrı durak.
 - `prefers-reduced-motion`: basınç spring'i kapanır (useGlassPress), renk
   geçişleri anlık olur.
-- Touch: fare ortamında min-height 32px kompakt kalır; coarse pointer'da
-  gerçek dokunma hedefi olarak 44px'e çıkar (`@media (pointer: coarse)`,
-  CSS'te).
+- Touch: yükseklik kontrol token'larından gelir — imleçli cihazda kompakt
+  (sm 36 / md 40px), dokunmatikte token'ın kendisi 44px'e çıkar; CSS'te ayrı
+  bir `pointer: coarse` kuralı yoktur.
 - Controlled kullanımda tıklama yalnız `onSelectedChange` çağırır; görünüm
   dışarıdan gelen `selected`'a kilitlidir.
 
@@ -120,10 +120,17 @@ Varsayılan kombinasyon: `size=md`, seçimsiz, nötr cam.
 **Borç (raw / mikro-geometri):** `--chip-pad-x-sm`/`--chip-pad-x-md` kökte
 yerel değişken olarak kalır ama artık ikisi de birebir token'a bağlı
 (`--lg-space-3` / `--lg-space-4`) — raw değer değil, yalnız isimlendirme
-kolaylığı. `.sm`/`.md` görsel yüksekliği `--lg-space-7` (32px, fare); coarse
-pointer'da ikisi de `--lg-control-md`'ye (44px) büyür — gerçek dokunma
-hedefi, kontrol ölçeğinden birebir. Geçiş süreleri `0.16s ease-out` raw
-kalır (süre token'ı yok).
+kolaylığı. Geçiş süreleri `0.16s ease-out` raw kalır (süre token'ı yok).
+
+**Yükseklik / dokunma hedefi:** `.sm`/`.md` artık kontrol ölçeğinden okur
+(`--lg-control-sm` / `--lg-control-md`) — imleçli cihazda 36/40px, dokunmatikte
+token kendiliğinden 44px'e çıktığı için ayrı bir `pointer: coarse` yükseltmesi
+yok (AAA 2.5.5 token katmanında karşılanıyor). Chip böylece yanındaki
+input/buton ile aynı satır yüksekliğini paylaşır; kompaktlığı taşıyan asıl
+oran yatay dolgudur. Kaldırma butonu (`.remove`) em tabanlı ama
+`max(1.5em, --lg-space-6)` ile AA 2.5.8'in 24px tabanının altına inmez;
+hedefi 44px'e taşımak mümkün değil — chip kökü GlassSurface'tir ve
+`overflow: hidden` taşır, taşan `::after` ne boyanır ne tıklanır.
 
 ## 10. Storybook kapsamı
 
@@ -163,3 +170,8 @@ değerlendirmesi.
 - 2026-07-30: Görsel yükseklik ölçeğe indirildi (`.sm`/`.md` 32px,
   `--lg-space-7`); 44px dokunma hedefi yalnız `@media (pointer: coarse)`
   altına taşındı. Yatay padding'ler token'a bağlandı (`--lg-space-3`/`-4`).
+- 2026-08-03: Yeni kontrol ölçeğine uyum. Yükseklik `--lg-space-7`'den
+  kontrol token'larına geçti: `.sm` 32→36px, `.md` 32→40px (imleçli cihaz);
+  dokunmatikte ikisi de 44px'te kaldığı için `pointer: coarse` yükseltmesi
+  kaldırıldı (artık token'ın işi). `.remove` kutusu 1.5em → `max(1.5em,
+  --lg-space-6)`; sm chip'te 18px olan hedef 24px'e çıktı (AA 2.5.8).

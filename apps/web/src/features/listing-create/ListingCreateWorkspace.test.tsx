@@ -1,7 +1,8 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ListingCreateWorkspace } from './ListingCreateWorkspace'
+import { LISTING_DRAFT_STORAGE_KEY } from './listing-draft-storage'
 import {
   createEmptyDraft,
   type ListingDraft,
@@ -73,6 +74,11 @@ function completeDraft(verified = false): ListingDraft {
 }
 
 describe('ListingCreateWorkspace', () => {
+  // Taslak kalıcılığı sekme deposunu kullanır; testler arasında sızmasın.
+  beforeEach(() => {
+    window.sessionStorage.clear()
+  })
+
   it('starts with a focused hybrid AI or manual choice', () => {
     render(<ListingCreateWorkspace />)
 
@@ -330,7 +336,9 @@ describe('ListingCreateWorkspace', () => {
 
       expect(await screen.findByText(message)).toBeTruthy()
       expect(publish.hasAttribute('disabled')).toBe(true)
-      expect(screen.getByText('Urla’da imarlı köşe parsel')).toBeTruthy()
+      // Başlık hem son kontrol özetinde hem de yan paneldeki canlı
+      // önizlemede görünür; ikisi de taslağın korunduğunu kanıtlar.
+      expect(screen.getAllByText('Urla’da imarlı köşe parsel').length).toBe(2)
 
       await user.click(screen.getByRole('button', { name: retry }))
       expect(await screen.findByText(message)).toBeTruthy()
@@ -443,5 +451,91 @@ describe('ListingCreateWorkspace', () => {
     expect(revokeUrl).toHaveBeenCalledTimes(3)
     createUrl.mockRestore()
     revokeUrl.mockRestore()
+  })
+
+  it('keeps a live listing preview beside the form on every step', async () => {
+    const user = userEvent.setup()
+    const draft = completeDraft(false)
+    draft.meta.activeStep = 'property'
+    render(<ListingCreateWorkspace adapterDelayMs={0} initialDraft={draft} />)
+
+    const preview = screen.getByRole('article', { name: 'İlan önizlemesi' })
+    expect(within(preview).getByAltText('İlan kapak önizlemesi')).toBeTruthy()
+    expect(within(preview).getByText('Urla’da imarlı köşe parsel')).toBeTruthy()
+    expect(within(preview).getByText('4.250.000 TL')).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: /Fotoğraf stüdyosu/ }))
+    expect(
+      within(screen.getByRole('article', { name: 'İlan önizlemesi' })).getByText(
+        'İzmir · Urla · İskele',
+      ),
+    ).toBeTruthy()
+  })
+
+  it('announces the active step to assistive technology', async () => {
+    const user = userEvent.setup()
+    render(<ListingCreateWorkspace adapterDelayMs={0} />)
+
+    await user.click(
+      screen.getByRole('button', { name: 'Bilgileri kendim gireceğim' }),
+    )
+
+    expect(screen.getByText('Adım 1 / 5: Mülk bilgileri')).toBeTruthy()
+  })
+
+  it('offers an explicit draft save action in the sticky rail', async () => {
+    const user = userEvent.setup()
+    render(
+      <ListingCreateWorkspace
+        adapterDelayMs={0}
+        initialDraft={completeDraft(false)}
+      />,
+    )
+
+    const save = await screen.findByRole('button', { name: 'Taslağı kaydet' })
+    await user.click(save)
+    expect(await screen.findByText('Kaydedildi 21:42')).toBeTruthy()
+  })
+
+  it('offers to resume a draft stored in the same tab', async () => {
+    const user = userEvent.setup()
+    const stored = completeDraft(false)
+    window.sessionStorage.setItem(
+      LISTING_DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        draft: { ...stored, media: [] },
+        droppedMediaCount: 3,
+      }),
+    )
+
+    render(<ListingCreateWorkspace adapterDelayMs={0} />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Kaldığınız yerden devam edin' }),
+    ).toBeTruthy()
+    expect(screen.getByText(/3 fotoğrafı yeniden eklemeniz/)).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Taslağa devam et' }))
+
+    expect(screen.getByRole('heading', { name: 'Doğrulama ve yayın' })).toBeTruthy()
+  })
+
+  it('discards the stored draft when a fresh one is started', async () => {
+    const user = userEvent.setup()
+    window.sessionStorage.setItem(
+      LISTING_DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        draft: { ...completeDraft(false), media: [] },
+        droppedMediaCount: 0,
+      }),
+    )
+
+    render(<ListingCreateWorkspace adapterDelayMs={0} />)
+    await user.click(screen.getByRole('button', { name: 'Yeni taslak başlat' }))
+
+    expect(window.sessionStorage.getItem(LISTING_DRAFT_STORAGE_KEY)).toBeNull()
+    expect(
+      screen.queryByRole('heading', { name: 'Kaldığınız yerden devam edin' }),
+    ).toBeNull()
   })
 })

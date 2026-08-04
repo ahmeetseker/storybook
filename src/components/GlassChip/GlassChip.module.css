@@ -16,21 +16,15 @@
   outline-offset: 2px;
 }
 
-/* Fare ortamında chip görsel bir etikettir — kontrol yüksekliği (44px) burada
-   şişkinlik yaratır, ölçü kompakt (32px) kalır. Dokunmatikte ise chip
-   seçilebilir olduğunda gerçek bir dokunma hedefidir ve WCAG 2.2 AAA 2.5.5
-   giriş yönteminden bağımsız olarak 44px ister (aşağıdaki `pointer: coarse`
-   bloğu). Görünmez bir ::after ile hedefi büyütmek denendi ve çalışmadı —
-   GlassSurface kendi köşe kırpması için `overflow: hidden` taşır, pseudo-eleman
-   kutunun dışına taşamıyor. Bu yüzden coarse'ta ölçü gerçekten büyütülür;
-   yatay dolgu (chip'in dar görünmesini sağlayan asıl oran) korunur. */
-.sm { min-height: var(--lg-space-7); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
-.md { min-height: var(--lg-space-7); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
-
-@media (pointer: coarse) {
-  .sm,
-  .md { min-height: var(--lg-control-md); }
-}
+/* Yükseklik ekseni kontrol ölçeğinden gelir: chip, yanındaki input/buton ile
+   aynı satır yüksekliğini paylaşır (imleçli cihazda sm 36 / md 40px).
+   Dokunmatikte token'ın kendisi 44px'e çıktığı için ayrı bir `pointer: coarse`
+   yükseltmesine gerek yok — WCAG 2.2 AAA 2.5.5 token katmanında karşılanır.
+   Görünmez bir ::after ile hedefi büyütmek mümkün değil: GlassSurface kendi
+   köşe kırpması için `overflow: hidden` taşır, pseudo-eleman kutunun dışına
+   taşamaz. Kompaktlığı taşıyan asıl oran yatay dolgudur, o korunur. */
+.sm { min-height: var(--lg-control-sm, 36px); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
+.md { min-height: var(--lg-control-md, 40px); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
 
 /* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 30%, transparent); }
@@ -65,8 +59,11 @@
   border: 0;
   padding: 0;
   margin-inline-end: -0.3em;
-  width: 1.5em;
-  height: 1.5em;
+  /* İkon-tek kontrol: em ile ölçeklenir ama AA 2.5.8'in 24px tabanının altına
+     inmez (sm chip'te 1.5em = 18px kalıyordu). Chip kökü `overflow: hidden`
+     taşıdığı için hedefi ::after ile 44px'e taşımak mümkün değil. */
+  width: max(1.5em, var(--lg-space-6));
+  height: max(1.5em, var(--lg-space-6));
   display: inline-flex;
   align-items: center;
   justify-content: center;

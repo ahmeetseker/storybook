@@ -30,6 +30,23 @@ describe('GlassButton', () => {
     expect(screen.getByRole('button').style.getPropertyValue('--glass-tint')).toBe('#0a84ff')
   })
 
+  // Ton, eylem dilinin kancasına da yazılır: karışım oranı ve kontrast kuralı
+  // token'da kalır, kontrol yalnız hangi rengin tonlanacağını söyler.
+  it('tint eylem dili kancasını da besler', () => {
+    renderBtn({ tint: '#0a84ff', prominent: true })
+    expect(screen.getByRole('button').style.getPropertyValue('--lg-action-tint')).toBe('#0a84ff')
+  })
+
+  // `material` bir katman kararıdır: flat buton cam bütçesine girmemelidir.
+  it('varsayılan malzeme camdır, flat verilince cam yüzey açılmaz', () => {
+    const { unmount } = renderBtn()
+    expect(screen.getByRole('button').getAttribute('data-material')).toBe('glass')
+    unmount()
+
+    renderBtn({ material: 'flat' })
+    expect(screen.getByRole('button').getAttribute('data-material')).toBe('flat')
+  })
+
   it('boyut sınıfı uygulanır', () => {
     renderBtn({ size: 'xl' })
     expect(screen.getByRole('button').className).toMatch(/xl/)

@@ -173,8 +173,9 @@ boyut/biçim kullanılır.
   filtresi genişlik geçişi sırasında yeniden üretilmez; böylece Chromium
   compositor'ında arka planın boşalması ve her karede map hesaplanması
   önlenir.
-- Dokunmatik: zil/kapat `pointer: coarse`'ta `--lg-control-md` (44px)
-  hedefe yükselir; kart/alt öğe min yükseklikleri kontrol token'larından.
+- Dokunma hedefi: zil/kapat HER cihazda `--lg-control-hit`e (44px) ulaşır —
+  görünür ölçü `--lg-control-sm` (imleçlide 36px), fark görünmez `::after`
+  taşmasıyla kapanır. Kart/alt öğe min yükseklikleri kontrol token'larından.
 - Responsive: breakpoint yok — genişlikler `min(vw, px)`, panel gövdesi
   `max-height: 100dvh - 2rem` içinde dikey kaydırılır.
 
@@ -203,11 +204,20 @@ boyut/biçim kullanılır.
 | metinler | color/font-size | `--lg-label`/`--lg-label-secondary`; caption/footnote/headline token'ları | — |
 | durum chip'i | bg/border/radius | `color-mix(var(--lg-surface) 30%)`/`--lg-hairline`/`--lg-radius-capsule` | — |
 | canlı nokta | background | `--lg-success` | reduced-motion'da ping kapalı |
-| zil/kapat | boyut/bg | `--lg-control-sm` (coarse: `--lg-control-md`)/surface color-mix | hover yalnız `@media (hover:hover) and (pointer:fine)` |
+| zil/kapat | boyut/bg | `--lg-control-sm` görünür + `--lg-control-hit` hedef (`::after`)/surface color-mix | hover yalnız `@media (hover:hover) and (pointer:fine)` |
 | rozet | bg/text | `--lg-danger`/`--lg-on-scrim` | — |
 | kartlar/alt öğeler | bg/border/radius | surface–label color-mix'leri/`--lg-hairline`/`--lg-radius-media`/`--lg-radius-chip` | aktif nokta `--lg-success` |
 | boşluklar | padding/gap | `--lg-space-*` | — |
 | focus halkası | outline | `--lg-accent` | yalnız `:focus-visible` |
+
+**Dokunma hedefi (2026-08-03):** Ada `GlassSurface` olduğu için
+`overflow: hidden` taşır; buna rağmen görünmez `::after` taşması UYGULANABİLİR,
+çünkü taşma yüzeyin dışına değil dolgusunun içine düşer. Zil için taşma 4px ve
+hap satırının dikey dolgusu (`--lg-space-2`, 8px) bunu kapsar; kapat butonu
+için taşma yine 4px ve panel başlığının dolgusu (12-16px) fazlasıyla yeterli.
+Eski `@media (pointer: coarse)` büyütmeleri kaldırıldı — token dokunmatikte
+zaten 44px verdiği için `min()` taşmayı kendiliğinden 0'a indiriyor. Kapalı hap
+satırı bu değişiklikle imleçli cihazda 60px'ten 52px'e indi.
 
 **Borç (raw):** mikro-geometri kökte yerel değişkenlerde:
 `--glass-island-w-closed/hover/open` (260/550/580 min(vw) — içerik uyarlaması),
@@ -294,3 +304,7 @@ başlığı sabit metin — lokalizasyon ihtiyacında prop'a açılmalı.
   üç aşamalı hap (kapalı/hover/panel), ölçüm tabanlı durum chip reveal'ı,
   canlı saat, zil rozeti, sayfa kartları → alt navigasyon akışı, `extras`/
   `search` slotları, controlled `open`, non-modal odak sözleşmesi.
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. Zil ve kapat butonlarının
+  `pointer: coarse` büyütmeleri kaldırılıp görünmez `::after` dokunma hedefi
+  taşmasıyla değiştirildi (36px görünür / 44px hedef, her cihazda). Kapalı hap
+  satırı imleçli cihazda 60px → 52px.

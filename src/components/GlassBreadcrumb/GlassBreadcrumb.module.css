@@ -1,9 +1,11 @@
 .breadcrumb {
-  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu) */
-  --bar-pad-block: 6px;
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç notu).
+     Dolgu dağılımı yeniden dengelendi: şerit dolgusu öğeye devredildi
+     (6px+2px → 4px+4px). Şerit toplam yüksekliği değişmez ama link hedefi
+     ~24px'e (WCAG 2.2 AA 2.5.8 tabanı) çıkar. */
+  --bar-pad-block: var(--lg-space-1);
   --gap-tight: 2px;
-  --item-pad: 2px 6px;
-  --link-radius: 8px;
+  --item-pad: var(--lg-space-1) var(--lg-space-2);
   display: inline-flex;
   align-items: center;
   padding: var(--bar-pad-block) var(--lg-space-4);
@@ -35,7 +37,7 @@
   font: inherit;
   color: inherit;
   opacity: 0.75;
-  border-radius: var(--link-radius);
+  border-radius: var(--lg-radius-chip);
   cursor: pointer;
   white-space: nowrap;
 }

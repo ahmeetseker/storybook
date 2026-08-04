@@ -11,7 +11,11 @@
   --glass-comparebar-thumb: 32px;
   --glass-comparebar-item-max: 200px;
   --glass-comparebar-title-max: 108px;
-  --glass-comparebar-remove-size: 22px;
+  /* Kaldır butonu: `.list` yatay kaydırma şeridi olduğu için (`overflow-x: auto`
+     dikeyde de kırpar) görünmez ::after taşması MÜMKÜN DEĞİL. Görünür ölçü bu
+     yüzden imleçli cihazda WCAG 2.2 AA 2.5.8 tabanına (24px) sabitlendi,
+     dokunmatikte `--lg-control-hit`e çıkar. Bkz. rules.md §9. */
+  --glass-comparebar-remove-size: var(--lg-space-6);
   --glass-comparebar-remove-font: 15px;
   --glass-comparebar-dot: 6px;
   --glass-comparebar-max-w: 720px;
@@ -129,11 +133,12 @@
   outline-offset: 2px;
 }
 
-/* Dokunmatik: kaldırma hedefi 44px'e yükselir — coarse'ta --lg-control-md = 44px (birebir). */
+/* Dokunmatik: kaldırma hedefinin GÖRÜNÜR ölçüsü hedef tabanına yükselir
+   (taşma kırpılacağı için tek yol bu). */
 @media (pointer: coarse) {
   .remove {
-    width: var(--lg-control-md);
-    height: var(--lg-control-md);
+    width: var(--lg-control-hit);
+    height: var(--lg-control-hit);
   }
 }
 

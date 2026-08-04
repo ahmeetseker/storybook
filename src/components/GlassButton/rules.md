@@ -42,6 +42,7 @@ Navigasyon/kontrol katmanının birincil aksiyonudur.
 | size | prop | `'sm'\|'md'\|'lg'\|'xl'` | `'md'` | Yükseklik kontrol token'ından |
 | tint | prop | `string` | — | Semantik vurgu; `--glass-tint` CSS var'ına yazılır |
 | prominent | prop | `boolean` | `false` | Birincil aksiyon; tint verilmezse `--lg-accent` |
+| material | prop | `'glass'\|'flat'` | `'glass'` | Malzeme ekseni; `GlassSurface`'e geçer |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | Zemin bağlamı ipucu |
 | loading | prop | `boolean` | `false` | `aria-busy`; tekrar aktivasyon yok; genişlik korunur |
 | disabled | prop | `boolean` | `false` | Native attribute |
@@ -59,7 +60,24 @@ Varsayılan kombinasyon: `size=md`, cam, nötr.
 |---|---|
 | `prominent` + `tint` yok | tint `--lg-accent`'ten türetilir |
 | `tinted` + `prominent` birlikte | prominent kazanır (className sırası) |
+| `material="flat"` + `prominent` | dolgu kendi sınırıdır; `.flat` hairline'ı şeffaflaşır |
 | hover/focus/active prop olarak | ❌ — yalnız CSS |
+
+**`material` bir stil tercihi değil katman kararıdır.** `'glass'` butonu
+kontrol katmanına taşır ve sayfanın cam bütçesinden (sayfa başına altı yüzey,
+`GenelBakis.mdx`) bir pay yer. İçerik katmanındaki bir kartın veya yaprağın
+içinde duran buton bu payı hak etmez — orada `'flat'` kullanılır ve buton
+görünümü (zemin, metin, ağırlık) yine bu component'ten gelir.
+
+Eksen açılmadan önce böyle her buton feature CSS'inde elle çiziliyordu ve her
+biri kendi rengini uyduruyordu: kabuğun `İlan ver` butonu accent'i %85 ile,
+ilan detayındaki karar rayının birincil eylemi DÜZ accent + ağırlık 700 ile
+çiziyordu. Aynı sayfada yan yana iki farklı kahve görünüyordu.
+
+Eksenin varlığı `'flat'` kullanma zorunluluğu değildir: bir sayfa bütün
+butonlarının aynı malzemeyi paylaşmasını tercih edip bütçeyi bilerek aşabilir
+(ilan detayı böyle yapar). O zaman bedeli görmek gerekir — cam zeminini
+arkasındaki yüzeyden alır, tonlu bir bandın üstünde soluklaşır.
 
 ## 6. State modeli
 
@@ -91,8 +109,21 @@ Tek satır; uzun metin taşarsa buton büyür, kırpma yapılmaz — çağıran 
 | root | min-height | `--lg-control-{size}` |
 | root | radius | capsule (shape prop'u) |
 | root | focus outline | `--lg-accent` |
-| prominent | background | `--glass-tint` ← `--lg-accent` |
+| root | font-weight | `--lg-action-weight` |
+| prominent | background | `--lg-action-prominent` |
+| prominent | color | `--lg-action-prominent-label` |
+| prominent | hover background | `--lg-action-prominent-hover` |
 | root | font | miras (`--lg-font`) |
+
+Dolu eylemin rengi burada değil **eylem dili token'larında** tanımlıdır
+(`--lg-action-*`, bkz. `Tokenlar.mdx`). Sebep: aynı görünümü paylaşması gereken
+her kontrol `<button>` değildir — dock'un `Satıcıya git` bağlantısı ve kabuğun
+atlama bağlantısı `<a>`'dır ve bu component'i kullanamaz. Ortak kaynak
+token seviyesinde olmazsa bu iki taraf kaçınılmaz olarak ayrışır.
+
+`tint` verildiğinde component `--lg-action-tint` kancasını set eder; karışım
+oranı ve kontrast kuralı token'da kalır, kontrol yalnız hangi rengin
+tonlanacağını söyler.
 
 Boyut rampası `--lg-space-*`, `--lg-text-*` ve `--lg-control-*`
 birebir değerlerinden üretilir — yatay padding `sm` `--lg-space-3`, `md`

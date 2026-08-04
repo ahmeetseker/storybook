@@ -65,6 +65,9 @@ export type AccountSectionKey =
   | 'security'
   | 'activity'
   | 'saved-search'
+  | 'insights'
+  | 'payments'
+  | 'invoices'
 
 export interface AccountSectionError {
   section: AccountSectionKey
@@ -124,7 +127,112 @@ export interface AccountDashboardData {
   attentionCandidates: AccountAttentionItem[]
   activities: AccountActivity[]
   savedSearch?: AccountSavedSearchSummary
+  /** Performans serileri — yoksa özet sayfasındaki grafik bölümü çizilmez */
+  insights?: AccountInsights
+  /** Ödeme yöntemleri, işlemler ve faturalar — yoksa ilgili sayfalar boş durum gösterir */
+  billing?: AccountBilling
   sectionErrors: AccountSectionError[]
+}
+
+
+/* ---------------------------------------------------------------------------
+   Performans serileri — hesap özetindeki grafikleri besler.
+   Nokta sırası kaynaktan gelir; görsel katman yeniden sıralamaz.
+--------------------------------------------------------------------------- */
+
+export interface AccountTrendPoint {
+  /** Kısa dönem etiketi (ör. "21 Tem", "Haz") — grafik ekseninde görünür */
+  label: string
+  /** ISO tarih; sıralama ve erişilebilir özet için */
+  occurredAt: string
+  value: number
+}
+
+export interface AccountInsightSummary {
+  totalViews: number
+  /** Önceki döneme göre yüzde değişim (negatif olabilir) */
+  viewsChangePct: number
+  totalMessages: number
+  messagesChangePct: number
+  /** Görüntülenme → mesaj dönüşümü, yüzde */
+  contactRatePct: number
+}
+
+export interface AccountInsights {
+  /** Serilerin kapsadığı dönem (ör. "Son 14 gün") */
+  periodLabel: string
+  listingViews: AccountTrendPoint[]
+  messages: AccountTrendPoint[]
+  favorites: AccountTrendPoint[]
+  /** Aylık doping/hizmet harcaması (TL) */
+  spendByMonth: AccountTrendPoint[]
+  summary: AccountInsightSummary
+}
+
+/* ---------------------------------------------------------------------------
+   Ödemeler ve faturalar
+--------------------------------------------------------------------------- */
+
+export type AccountPaymentStatus = 'paid' | 'pending' | 'failed' | 'refunded'
+export type AccountInvoiceStatus = 'issued' | 'pending' | 'cancelled'
+
+export interface AccountPaymentMethod {
+  id: string
+  kind: 'card' | 'transfer'
+  /** Maskeli görünen ad (ör. "Visa · 6411") — tam kart numarası ASLA taşınmaz */
+  label: string
+  expiryLabel?: string
+  isDefault: boolean
+}
+
+export interface AccountPayment {
+  id: string
+  occurredAt: string
+  dateLabel: string
+  description: string
+  amount: number
+  amountLabel: string
+  status: AccountPaymentStatus
+  methodLabel: string
+  /** İlişkili faturanın kimliği (varsa) */
+  invoiceId?: string
+}
+
+export interface AccountInvoice {
+  /** Fatura numarası (ör. "F-2026-0412") */
+  id: string
+  issuedAt: string
+  dateLabel: string
+  periodLabel: string
+  description: string
+  total: number
+  totalLabel: string
+  taxLabel: string
+  status: AccountInvoiceStatus
+  /** Belge bağlantısı; yoksa indirme sunulmaz */
+  downloadHref?: string
+}
+
+export interface AccountBillingProfile {
+  title: string
+  taxOffice?: string
+  taxNumber?: string
+  address?: string
+}
+
+export interface AccountBillingSummary {
+  periodLabel: string
+  paidTotalLabel: string
+  pendingTotalLabel: string
+  pendingCount: number
+}
+
+export interface AccountBilling {
+  methods: AccountPaymentMethod[]
+  payments: AccountPayment[]
+  invoices: AccountInvoice[]
+  profile?: AccountBillingProfile
+  summary: AccountBillingSummary
 }
 
 export interface AccountWorkspaceProps {
@@ -149,5 +257,7 @@ export interface RawAccountDashboard {
   attentionCandidates?: AccountAttentionItem[]
   activities?: AccountActivity[]
   savedSearch?: AccountSavedSearchSummary
+  insights?: AccountInsights
+  billing?: AccountBilling
   sectionErrors?: AccountSectionError[]
 }

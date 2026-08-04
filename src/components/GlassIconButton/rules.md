@@ -2,7 +2,7 @@
 name: GlassIconButton
 category: kontroller
 status: hazır
-lastReviewed: 2026-07-15
+lastReviewed: 2026-08-03
 ---
 
 # GlassIconButton Kuralları
@@ -114,6 +114,16 @@ shadow token'larıyla birebir eşleşmiyor. Hover gölgesinde `!important` var
 (GlassSurface inline box-shadow'unu ezmek için) — kırılgan, bkz. Bilinen
 kısıtlar. Süre/easing (`0.16s ease-out`) raw — token yok.
 
+**Dokunma hedefi:** kök GlassSurface'tir ve kendi köşe kırpması için
+`overflow: hidden` taşır; kutunun dışına taşan görünmez bir `::after`
+genişletmesi ne boyanır ne tıklanır. Bu yüzden hedef = görünür kutu ve
+doğrudan kontrol token'ından gelir: imleçli cihazda 36/40/44px (AA 2.5.8'in
+24px tabanının belirgin üstünde), dokunmatikte 44/44/48px (AAA 2.5.5).
+Aynı kısıt GlassButton ve GlassStepper'da da geçerli; ikon buton bu sayede
+yanındaki GlassButton ile aynı satır yüksekliğinde kalır. Hedefi görünür
+ölçüden bağımsız büyütmek GlassSurface'te bir "hit-slop" kanalı gerektirir
+(açık karar).
+
 ## 10. Storybook kapsamı
 
 Var: Default, FavoriteOff, FavoriteOn, Large, Disabled, Sizes (üçü yan yana),
@@ -147,3 +157,7 @@ adlandırılmalı (breaking, v2) · `active=true` + tint'siz durumda görselin
 değişmemesi düzeltilecek mi? · `type="button"` default'u.
 
 **Changelog ek:** 2026-07-15 — basınçtaki radial glow katmanı kaldırıldı.
+2026-08-03 — yeni kontrol ölçeğine uyum: `--lg-control-*` fallback'leri
+güncel değerlere çekildi (32/40/48 → 36/40/44); görünür ölçü imleçli cihazda
+44→36 (sm) / 44→40 (md) / 48→44 (lg), dokunmatikte token 44/44/48'de kalıyor.
+Dokunma hedefi kısıtı §9'a yazıldı.

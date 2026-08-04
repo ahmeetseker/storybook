@@ -1,7 +1,11 @@
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9 borç) */
   --focus-bleed: 3px;
-  --group-pad: 3px;
+  /* Grup dolgusu `--lg-space-1` (4px): kontrollerin görünmez dokunma hedefi
+     taşması (36px görünür → `--lg-control-hit` 44px) her yönde 4px'tir ve
+     `.group` bir `GlassSurface` olduğu için `overflow: hidden` ile kırpılır.
+     Dolgu tam taşma kadar olduğunda hedef kırpılmadan sığar. */
+  --group-pad: var(--lg-space-1);
   --group-gap: 2px;
   display: flex;
   align-items: center;

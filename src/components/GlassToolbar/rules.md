@@ -82,12 +82,24 @@ fiil öbeğidir ("İlanı Yayınla").
 | kök gap | gap | `--lg-space-3` |
 | gruplar arası | gap | `--lg-space-2` |
 | grup kapsülü | radius/malzeme | GlassSurface `capsule`, thickness .25 |
+| grup içi dolgu | padding | `--lg-space-1` (kontrolün dokunma hedefi taşması kadar) |
 
-**Borç (raw / mikro-geometri):** grup içi dolgu, kontrol arası boşluk ve focus
-halkası taşma payı token karşılığı olmadığından component kökünde yerel
-değişkende toplandı (`.root { --focus-bleed: 3px; --group-pad: 3px;
---group-gap: 2px; }`) — kapsül geometrisi (GlassTabs/SegmentedControl ile
-aynı değerler).
+**Kontrol yüksekliği:** Toolbar kendi kontrol yüksekliğini TANIMLAMAZ — şerit
+boyu tamamen içine konan `GlassButton`/`GlassIconButton`/`GlassSegmentedControl`
+ölçüsünden gelir. 2026-08-03 kontrol ölçeği güncellemesinde bu yüzden CSS'te
+yükseklik değişikliği gerekmedi; şerit kontrollerle birlikte kendiliğinden
+alçaldı.
+
+**Dokunma hedefi:** `--group-pad` 3px'ten `--lg-space-1`e (4px) çıkarıldı.
+Gerekçe: kontrollerin görünmez `::after` hedef taşması (36px görünür →
+`--lg-control-hit` 44px) her yönde 4px'tir; `.group` bir `GlassSurface`
+olduğundan `overflow: hidden` taşmayı kendi padding kutusunda kırpar. Dolgu tam
+taşma kadar olduğunda hedef kırpılmadan sığar (grup toplam yüksekliği 36+8=44px).
+
+**Borç (raw / mikro-geometri):** kontrol arası boşluk ve focus halkası taşma
+payı token karşılığı olmadığından component kökünde yerel değişkende toplandı
+(`.root { --focus-bleed: 3px; --group-gap: 2px; }`) — kapsül geometrisi
+(GlassTabs/SegmentedControl ile aynı değerler).
 
 ## 10. Storybook kapsamı
 
@@ -117,3 +129,8 @@ gelirse GlassMenu ile birleşik desen eklenecek.
 
 - 2026-07-16: İlk sürüm — pill grupları, ayrık tintli primary, WAI-ARIA
   toolbar roving tabindex.
+- 2026-08-03: Yeni kontrol ölçeği incelemesi. Toolbar kendi yüksekliğini
+  tanımlamadığı için şerit kontrollerle birlikte kendiliğinden alçaldı; tek
+  değişiklik `--group-pad` 3px → `--lg-space-1` (4px) — kontrollerin görünmez
+  dokunma hedefi taşması grup kapsülünün `overflow: hidden`
+  sınırında kırpılmasın diye.

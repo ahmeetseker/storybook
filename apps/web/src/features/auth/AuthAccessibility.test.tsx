@@ -113,6 +113,14 @@ const H1_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, AuthAdapte
   ...OTURUMLU_ALANSIZ_SAYFALAR,
 ]
 
+/** Adım sözleşmesi testinde adımı geçmek için kullanılan geçerli değerler. */
+const GECERLI_DEGERLER: Record<string, string> = {
+  'Ad soyad': 'Ayşe Kaya',
+  'E-posta': 'ayse@arsam.net',
+  Telefon: '5551112233',
+  Parola: 'Arsam1234',
+}
+
 describe('auth erişilebilirlik geçidi', () => {
   it.each(H1_SAYFALARI)('%s tek h1 taşır', async (_ad, Component, adapters) => {
     render(<RouterProvider router={sayfaRouter(Component, adapters)} />)
@@ -191,27 +199,57 @@ describe('auth erişilebilirlik geçidi', () => {
   // `aria-describedby` taşımıyordu ve odak ilk hatalı alana taşınmıyordu —
   // ekran okuyucu kullanıcısı yalnız özeti duyup alanları elle aramak
   // zorunda kalıyordu. Bu blok regresyonu kalıcı olarak engeller.
-  it('KayitPage başarısız gönderimde her hatalı alanı aria-invalid + aria-describedby ile işaretler ve ilk alana odaklanır', async () => {
+  //
+  // Kayıt formu çok adımlı olduğundan (2026-08-02) tek gönderimde TÜM
+  // alanlar hatalı işaretlenemez: her adım yalnız kendi alanlarını
+  // doğrular. Sözleşme adım adım sınanır — her adımda "Devam et"e boş
+  // basılır, o adımın alanları işaretlenmeli ve ilk alana odaklanılmalı.
+  const KAYIT_ADIM_SOZLESMESI: ReadonlyArray<{ adimAdi: string; etiketler: readonly string[] }> = [
+    { adimAdi: 'Kimlik', etiketler: ['Ad soyad', 'E-posta'] },
+    { adimAdi: 'İletişim ve güvenlik', etiketler: ['Telefon', 'Parola'] },
+  ]
+
+  it('KayitPage her adımda yalnız o adımın hatalı alanlarını aria-invalid + aria-describedby ile işaretler ve ilk alana odaklanır', async () => {
     const kullanici = userEvent.setup()
     render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
-    await screen.findByLabelText('Ad soyad')
-    await kullanici.click(screen.getByRole('button', { name: 'Hesap oluştur' }))
-    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+    await screen.findByLabelText(/bireysel/i)
+    // 1. adım (hesap tipi) doğrulanacak alan taşımaz — doğrudan geçilir.
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
 
-    const ilkAlan = screen.getByLabelText('Ad soyad')
-    expect(document.activeElement, 'odak ilk hatalı alana (Ad soyad) taşınmalı').toBe(ilkAlan)
+    for (const { adimAdi, etiketler } of KAYIT_ADIM_SOZLESMESI) {
+      await screen.findByRole('heading', { level: 2, name: adimAdi })
+      await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
+      await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
 
-    for (const etiket of ['Ad soyad', 'E-posta', 'Telefon', 'Parola']) {
-      const alan = screen.getByLabelText(etiket)
-      expect(alan.getAttribute('aria-invalid'), `${etiket} aria-invalid="true" taşımıyor`).toBe('true')
-      const describedBy = alan.getAttribute('aria-describedby')
-      expect(describedBy, `${etiket} aria-describedby taşımıyor`).toBeTruthy()
-      const hataElemani = document.getElementById(describedBy as string)
-      expect(hataElemani, `${etiket} aria-describedby "${describedBy}" hiçbir elemente çözülmüyor`).toBeTruthy()
-      expect(hataElemani?.textContent, `${etiket} hata metni boş`).toBeTruthy()
+      expect(
+        document.activeElement,
+        `${adimAdi}: odak ilk hatalı alana (${etiketler[0]}) taşınmalı`,
+      ).toBe(screen.getByLabelText(etiketler[0]))
+
+      for (const etiket of etiketler) {
+        const alan = screen.getByLabelText(etiket)
+        expect(alan.getAttribute('aria-invalid'), `${etiket} aria-invalid="true" taşımıyor`).toBe('true')
+        const describedBy = alan.getAttribute('aria-describedby')
+        expect(describedBy, `${etiket} aria-describedby taşımıyor`).toBeTruthy()
+        const hataElemani = document.getElementById(describedBy as string)
+        expect(hataElemani, `${etiket} aria-describedby "${describedBy}" hiçbir elemente çözülmüyor`).toBeTruthy()
+        expect(hataElemani?.textContent, `${etiket} hata metni boş`).toBeTruthy()
+      }
+
+      // Adımı geçerli değerlerle doldurup sonrakine ilerle.
+      for (const etiket of etiketler) {
+        const deger = GECERLI_DEGERLER[etiket]
+        await kullanici.clear(screen.getByLabelText(etiket))
+        await kullanici.type(screen.getByLabelText(etiket), deger)
+      }
+      await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
     }
 
-    // KVKK onayı checkbox — label içine sarılı, id/describedby'ı ayrıca taşır.
+    // Son adım: KVKK onayı checkbox — label içine sarılı, id/describedby'ı ayrıca taşır.
+    await screen.findByRole('heading', { level: 2, name: 'Onay' })
+    await kullanici.click(screen.getByRole('button', { name: 'Kaydı tamamla' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+
     const kvkk = screen.getByLabelText(/aydınlatma metnini/i)
     expect(kvkk.getAttribute('aria-invalid')).toBe('true')
     const kvkkHataId = kvkk.getAttribute('aria-describedby')

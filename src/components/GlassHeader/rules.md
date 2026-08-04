@@ -80,7 +80,8 @@ CSS'te; basışta `scale(0.98)`.
 - `command`: scroll'da arama rayı `searchSummary` özetine kapanır
   (opacity/transform), `:focus-within` yeniden açar. Merkez nav yoktur; linkler
   her genişlikte hamburger menüsündedir.
-- `masthead`: kimlik satırı akışta kaybolur; yalnız 42px indeks rayı sticky.
+- `masthead`: kimlik satırı akışta kaybolur; yalnız indeks rayı sticky
+  (`--lg-control-hit` = 44px — linkler rayı tepeden tırnağa doldurur).
   Dar ekranda indeks menüye çökmez, yatay kayar (editorial desen).
 - `overlay`: kök `position: absolute` — çağıran onu `position: relative` bir
   hero kapsayıcısının İÇİNE koyar; scroll eşiğinde `position: fixed` kompakt
@@ -103,7 +104,29 @@ CSS'te; basışta `scale(0.98)`.
 | metinler | `--lg-label(-secondary)`; overlay: `--lg-on-scrim` |
 | cam pill | `color-mix(--lg-surface)` zemin + blur(8px) + iç kenar ışıması |
 | refraktif çizgi | `color-mix(--lg-accent 78%)` + blur(4px) |
-| radius/kontrol | `--lg-radius-capsule/chip`, `--lg-control-sm/lg` |
+| radius/kontrol | `--lg-radius-capsule/chip`, `--lg-control-sm` (nav linki 36/44) · `--lg-control-md` (command şeridi 40/44) |
+| dokunma hedefi | `--lg-control-hit` (44px) — nav linki `::after` taşmasıyla, indeks rayı ve drawer satırı doğrudan |
+
+**Şerit ölçüsü (2026-08-03):** Kontrol ölçeği görünür/hedef ayrımına geçtiği
+için kabuklar yeniden dengelendi:
+
+| Şerit | Eski | Yeni (imleçli / dokunmatik) |
+|---|---|---|
+| islands dikey pad | 14px (scroll'da 7px) | `--lg-space-3` = 12px (scroll'da 6px) |
+| command şeridi | `--command-pad-y: 10px` + `--command-min-h: 52px` (fiili ~64px) | `--lg-space-2` = 8px + `calc(--lg-control-md + 2*pad)` = 56px / 60px |
+| masthead indeks rayı | 42px | `--lg-control-hit` = 44px (her cihazda) |
+| drawer satırı | `--lg-control-lg` (48px) | `--lg-control-hit` = 44px (her cihazda) |
+
+**Dokunma hedefi:** `.link` görünür yüksekliğini `--link-h` yerel değişkeninde
+tutar (varsayılan `--lg-control-sm`; indeks rayında `--index-rail-h`). Hedef,
+görünmez `::after` taşmasıyla `--lg-control-hit`e çıkar; formül `--link-h`'yi
+okuduğu için indeks rayında (44px) taşma kendiliğinden 0'a iner. Taşma (4px)
+islands/overlay şeritlerinin dikey dolgusundan küçük ve hiçbir ata
+`overflow: hidden` taşımadığı için kırpılmaz. Eski
+`@media (pointer: coarse) { .link { min-height: 44px } }` bloğu KALDIRILDI —
+token dokunmatikte zaten 44px veriyor. Drawer satırları ve indeks rayı
+"dokunma satırı" olduğu için taşma değil doğrudan `--lg-control-hit` kullanır;
+drawer'ın ikincil butonları da aynı ölçüye bağlandı.
 
 **Borç (raw / mikro-geometri):** Token karşılığı olmayan layout ölçüleri ve
 mikro-geometri kökte yerel değişkenlere toplandı — masthead kökü `.root`
@@ -112,10 +135,13 @@ sınıfını taşımadığından blok `.root, .masthead` çift seçicisinde:
 pad ritmi), `--nav-font: 14px`, `--summary-font: 13.5px`, `--wordmark-gap: 9px`,
 `--link-gap: 2px`, `--link-pad-x: 13px`, `--actions-gap: 14px`,
 `--focus-radius: 4px`, `--capsule-pad: 3px`, `--pill-inset: 3px 1px`,
-`--line-w/h: 24/3px`, `--bead-size: 6px`, `--island-pad-y(-scrolled): 14/7px`,
-`--command-pad-y: 10px`, `--command-min-h: 52px`, `--search-max: 620px`,
+`--line-w/h: 24/3px`, `--bead-size: 6px`, `--search-max: 620px`,
 `--search-shift: 4px`, `--masthead-pad-t: 26px`, `--wordmark-min/max: 24/32px`,
-`--index-rail-h: 42px`, `--index-link-gap: 6px`, `--overlay-link-pad: 15px`.
+`--index-link-gap: 6px`, `--overlay-link-pad: 15px`. Bu listeden çıkanlar
+(2026-08-03'te token'a bağlandı): `--island-pad-y(-scrolled)` → `--lg-space-3`
+ve yarısı, `--command-pad-y` → `--lg-space-2`, `--command-min-h` → `.commandInner`
+üzerinde `calc(--lg-control-md + 2 * --command-pad-y)`, `--index-rail-h` →
+`--lg-control-hit`.
 Drawer içeriği GlassDrawer portalında render edildiğinden kök kaskadı ulaşmaz;
 drawer ölçüleri kendi üst sınıflarında yerel (`.drawerList { --drawer-pad-x:
 14px }`, `.drawerSecondary { --drawer-btn-pad: 10px 14px; --drawer-font: 14px }`).
@@ -125,7 +151,7 @@ cam malzeme reçetesi `blur(4/8px) + saturate(150%)` ve `color-mix`'li
 ışıma/gölge desenleri (token gölge kalıplarıyla birebir değil), geçiş
 süre/easing'leri (token yok), z-index 30/40, 760px özel kırılımı (bp ölçeği
 dışı — satırda yorumlu), `var(--x, ...)` token fallback'leri (proje
-konvansiyonu), dokunmatik 44px hedefi (`pointer: coarse` bloğunda).
+konvansiyonu).
 
 ## 10. Storybook kapsamı
 
@@ -170,3 +196,14 @@ arama segmenti cam merceği (slot içeriğinin işi).
 varyantları ve `material`/`utility`/`actions` prop'ları kaldırıldı; yerine
 `islands/command/masthead/overlay` + `action/secondaryAction/meta/search/
 searchSummary` geldi (kullanıcı reddi + web araştırması + Codex danışması).
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. islands dolgusu 14/7px →
+  `--lg-space-3` ve yarısı; command şeridi `--command-min-h: 52px` yerine
+  `calc(--lg-control-md + 2 * --command-pad-y)` (56px / dokunmatikte 60px),
+  dolgu 10px → `--lg-space-2`; indeks rayı 42px → `--lg-control-hit`; drawer
+  satırı ve ikincil butonları `--lg-control-hit`e bağlandı. Nav linkinin
+  `pointer: coarse` yükseltmesi kaldırılıp yerine görünmez `::after` dokunma
+  hedefi taşması geldi (`--link-h` yerel değişkeniyle indeks rayında otomatik
+  kapanır).

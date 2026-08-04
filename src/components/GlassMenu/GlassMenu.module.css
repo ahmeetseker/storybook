@@ -62,10 +62,10 @@
   transition: background-color 0.16s ease;
 }
 
-/* Dokunmatik: 44px dokunma hedefi (kontrol token'ı coarse'ta 44) */
-@media (pointer: coarse) {
-  .item { min-height: var(--lg-control-md); }
-}
+/* Dokunma hedefi ölçeğin kendisinden gelir: `--lg-control-sm` dokunmatikte
+   zaten 44px'e çıkar, ayrı `pointer: coarse` yükseltmesi gereksizdi ve
+   kaldırıldı. İmleçli cihazda satır 36px görünür — metin hedefi olduğu için
+   WCAG 2.2 AA 2.5.8 (24px) tabanının üstünde. */
 
 @media (hover: hover) {
   .item:hover:not(:disabled) { background-color: var(--item-hover-bg); }

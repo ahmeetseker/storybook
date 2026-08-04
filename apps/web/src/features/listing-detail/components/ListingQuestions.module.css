@@ -8,27 +8,51 @@
   border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
 }
 
+/* Chevron kolonu (--lg-space-5) + kolon arası (--lg-space-3) = --lg-space-7.
+   Açılan gövdenin sol içeriği bu toplamı okur; hiza tek yerden türer. */
 .trigger {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--lg-space-6);
-  gap: var(--lg-space-2);
+  grid-template-columns: var(--lg-space-5) minmax(0, 1fr);
+  gap: var(--lg-space-3);
   align-items: start;
   inline-size: 100%;
   /* Satırın tamamı dokunma hedefidir (AAA 2.5.5). */
   min-block-size: var(--lg-control-md);
   padding-block: var(--lg-space-3);
-  padding-inline: 0;
+  /* Zemin tonu satırın metninden biraz taşsın diye içeri dolgu, dışarı
+     negatif kenar: satır kutusu büyümez, basınç yüzeyi büyür. */
+  padding-inline: var(--lg-space-2);
+  margin-inline: calc(var(--lg-space-2) * -1);
   border: 0;
+  border-radius: var(--lg-radius-chip);
   background: none;
   color: inherit;
   font: inherit;
   text-align: start;
   cursor: pointer;
+  transition: background-color 0.12s ease-out;
 }
 
 /* Dayanağı olmayan soru açılmaz — tıklanabilir görünmez de. */
 .trigger:disabled {
   cursor: default;
+}
+
+@media (hover: hover) {
+  .trigger:not(:disabled):hover {
+    background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  }
+
+  .trigger:not(:disabled):hover .chevron {
+    color: var(--lg-label);
+  }
+}
+
+/* Geri bildirim basınç ANINDA başlar, bırakışta değil. Kural hover'dan
+   SONRA yazılır: iki seçicinin özgüllüğü eşittir ve sonra gelen kazanır —
+   aksi hâlde basınç, üstünde durduğu hover tonunun altında kalırdı. */
+.trigger:not(:disabled):active {
+  background: color-mix(in srgb, var(--lg-label) 5%, transparent);
 }
 
 .trigger:focus-visible {
@@ -37,7 +61,10 @@
   border-radius: var(--lg-radius-chip);
 }
 
+/* Kolonlar açıkça yerleştirilir: dayanağı olmayan satırda chevron hiç
+   basılmaz ve metin yine ikinci kolonda kalır — hiza soruya göre değişmez. */
 .copy {
+  grid-column: 2;
   display: block;
   min-inline-size: 0;
 }
@@ -71,20 +98,115 @@
   color: var(--lg-warning);
 }
 
+/* Kapalıyken 90° yatık, açılınca düz — Finder'ın açılır üçgeni. Dönüş yönü
+   tek: kapanışta aynı yolu geri alır (mekânsal tutarlılık). */
 .chevron {
-  justify-self: end;
-  padding-block-start: 2px;
+  grid-column: 1;
+  justify-self: start;
+  align-self: start;
+  /* Başlığın optik ortasına oturur; ölçü ikonun kendi kutusundandır. */
+  margin-block-start: var(--lg-space-1);
+  inline-size: var(--lg-space-3);
+  block-size: var(--lg-space-3);
   color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-  transition: transform 0.18s ease-out;
+  transform: rotate(-90deg);
+  transition:
+    transform 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+    color 0.12s ease-out;
 }
 
 .trigger[aria-expanded='true'] .chevron {
-  transform: rotate(180deg);
+  color: var(--lg-accent);
+  transform: rotate(0deg);
 }
 
+/* Gövde `display: none` ile değil, 0fr → 1fr ızgara geçişiyle kapanır:
+   yükseklik ölçülmez, açılış her an kesilip mevcut değerden geri çevrilebilir
+   ve chevron'un dönüşüyle aynı eğriyi paylaşır. */
 .body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.qa[data-open] > .body {
+  grid-template-rows: 1fr;
+}
+
+.bodyInner {
+  overflow: hidden;
+  min-block-size: 0;
+}
+
+/* Gövde sorunun METNİYLE hizalanır: chevron kolonu + kolon arası. */
+.bodyPad {
+  padding-inline-start: var(--lg-space-7);
   padding-block-end: var(--lg-space-4);
+}
+
+/* ── Sıralı kanıt ────────────────────────────────────────────────────
+   Gövde açılırken kanıt satırları PEŞ PEŞE biner: her biri bir öncekinden
+   45ms sonra, --lg-space-2 kadar aşağıdan. Sıra bilgi taşır — göz nereden
+   başlayacağını bilir; dört satır aynı anda belirdiğinde bilmiyordu.
+
+   Kapanışta gecikme yoktur, hepsi birlikte iner: çıkış girişten hızlıdır,
+   çünkü kapatan kişi okumayı zaten bitirmiştir (asimetrik zamanlama).
+
+   Yalnız `opacity` ve `transform` animasyonu — yerleşim hiç yeniden
+   hesaplanmaz, hareket compositor'da kalır. */
+.bodyPad > dl > *,
+.bodyPad > div,
+.bodyPad > p {
+  opacity: 0;
+  transform: translateY(var(--lg-space-2));
+  transition:
+    opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.qa[data-open] .bodyPad > dl > *,
+.qa[data-open] .bodyPad > div,
+.qa[data-open] .bodyPad > p {
+  opacity: 1;
+  transform: none;
+}
+
+/* Basamak yalnız AÇILIŞTA kurulur; kapalı hâlde gecikme sıfırdır. */
+.qa[data-open] .bodyPad > dl > *:nth-child(1) {
+  transition-delay: 0.08s;
+}
+
+.qa[data-open] .bodyPad > dl > *:nth-child(2) {
+  transition-delay: 0.125s;
+}
+
+.qa[data-open] .bodyPad > dl > *:nth-child(3) {
+  transition-delay: 0.17s;
+}
+
+.qa[data-open] .bodyPad > dl > *:nth-child(4) {
+  transition-delay: 0.215s;
+}
+
+.qa[data-open] .bodyPad > dl > *:nth-child(5) {
+  transition-delay: 0.26s;
+}
+
+/* Uzun listede basamak birikmez: altıncıdan sonrası aynı anda gelir.
+   Sıklık arttıkça hareket kısalır — bekleme bilgi taşımaz. */
+.qa[data-open] .bodyPad > dl > *:nth-child(n + 6) {
+  transition-delay: 0.305s;
+}
+
+/* Harita ve tek başına duran not gövdenin ilk öğesidir: beklemez. */
+.qa[data-open] .bodyPad > div,
+.qa[data-open] .bodyPad > p:first-child {
+  transition-delay: 0.08s;
+}
+
+/* Kanıtın ARDINDAN gelen sınırlama notu en son oturur — okuma sırası bu. */
+.qa[data-open] .bodyPad > dl ~ p {
+  transition-delay: 0.35s;
 }
 
 /* Gövde içi açıklama — kanıtın altında duran görünür sınırlama notu. */
@@ -152,13 +274,32 @@
     max-inline-size: none;
   }
 
-  .body {
+  .bodyPad {
     max-inline-size: 74ch;
   }
 }
 
+/* Azaltılmış harekette geçiş tamamen düşer; durum anında değişir. Hiçbir
+   bilgi harekete emanet edilmiyor — açık/kapalı ikonun açısıyla da,
+   gövdenin varlığıyla da okunur. */
 @media (prefers-reduced-motion: reduce) {
-  .chevron {
+  .chevron,
+  .body,
+  .trigger {
     transition: none;
+  }
+
+  /* Basamak tamamen düşer: kanıt satırları kaymadan, beklemeden gelir. */
+  .bodyPad > dl > *,
+  .bodyPad > div,
+  .bodyPad > p {
+    transform: none;
+    transition: none;
+  }
+
+  .qa[data-open] .bodyPad > dl > *,
+  .qa[data-open] .bodyPad > div,
+  .qa[data-open] .bodyPad > p {
+    transition-delay: 0s;
   }
 }

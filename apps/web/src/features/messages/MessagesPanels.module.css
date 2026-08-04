@@ -130,6 +130,14 @@
   font-size: var(--lg-text-body);
 }
 
+/* Kişi adı dar rayda (hesap kabuğu 17rem alıyor) satır atlamaz, kırpılır */
+.panels :global(.conversationRail__topline) > :first-child {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .panels :global(.conversationRail__topline) time {
   flex: none;
   color: var(--lg-label-secondary);

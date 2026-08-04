@@ -9,7 +9,9 @@
   --band-pad: 26px 28px;
   --brand-col-min: 220px;
   --text-sm: 14px;
-  --link-min-h: 24px;
+  /* Footer linki metin hedefi: imleçlide WCAG 2.2 AA 2.5.8 tabanı (24px =
+     `--lg-space-6`), dokunmatikte `--lg-control-hit` (bkz. coarse bloğu). */
+  --link-min-h: var(--lg-space-6);
   container-type: inline-size;
   border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
   background: var(--lg-surface);
@@ -96,10 +98,12 @@
   outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset, 2px);
 }
-/* coarse bağlamda --lg-control-md birebir 44px — dokunma hedefi büyümesi tasarımın istediği davranış */
+/* Dokunmatikte görünür ölçü doğrudan hedef tabanına çıkar. `--lg-control-md`
+   yerine `--lg-control-hit` yazılıyor: niyet "kontrol boyu" değil "dokunma
+   hedefi", ve ölçek değişse de 44px sabit kalmalı. */
 @media (pointer: coarse) {
   .link {
-    min-height: var(--lg-control-md);
+    min-height: var(--lg-control-hit);
   }
 }
 

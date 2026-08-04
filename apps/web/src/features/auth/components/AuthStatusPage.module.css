@@ -72,10 +72,10 @@
   min-height: var(--lg-control-md);
   padding-inline: var(--lg-space-5);
   border-radius: var(--lg-radius-capsule);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
   font-size: var(--lg-text-body);
-  font-weight: 600;
+  font-weight: var(--lg-action-weight);
   text-decoration: none;
 }
 

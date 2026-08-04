@@ -1,6 +1,6 @@
-/* Yapışkan karar dock'u — cam bütçesinin üçüncü (ve son) yüzeyi.
-   Sahne kapsülü + sahne plakası + bu dock = 3; geniş yerleşimde dock
-   düştüğü için sayı 2'ye iner (rules.md §1). */
+/* Yapışkan karar dock'u — dar yerleşimin tek kontrol yüzeyi.
+   Geniş yerleşimde yerini karar kartı alır ve dock yerleşimden düşer
+   (rules.md §1b). */
 .dock {
   position: sticky;
   inset-block-end: 0;
@@ -13,8 +13,13 @@
   margin-block-start: var(--lg-space-6);
   /* Sayfa dolgusundan taşar: dock kabın kenarına dayanır. */
   margin-inline: calc(-1 * var(--lg-container-gutter));
+  /* Alt dolgu kabuğun yüzen dock'unun payını (`--dock-clearance`, sayfa
+     ızgarasından miras alınır) kadar açılır: dock çubuğu ekranın alt kenarına
+     dayanır ama İÇERİĞİ kabuk dock'unun üstünde durur — buton hiçbir zaman
+     yüzen kapsülün altında kalmaz. Pay tek kaynaktan okunur, sabit sayı
+     yazılmaz. */
   padding: var(--lg-space-3) var(--lg-container-gutter)
-    calc(var(--lg-space-4) + env(safe-area-inset-bottom, 0px));
+    calc(var(--dock-clearance, var(--lg-space-4)) + var(--lg-space-2));
   border-block-start: var(--lg-stroke-hairline) solid var(--lg-glass-line);
   background: var(--lg-glass);
   backdrop-filter: blur(20px) saturate(1.6);
@@ -35,23 +40,26 @@
   font-weight: 400;
 }
 
+/* Tek eylem bir BAĞLANTIDIR: dock karar vermez, kararın verildiği yere
+   (satıcı bölümü) götürür. Bağlantı olduğu için JavaScript'siz de çalışır ve
+   kartın butonlarıyla aynı erişilebilir adı taşımaz — aynı sayfada iki kez
+   çizilmiş tek bir eylem gibi okunmaz. */
 .action {
   flex: 0 1 auto;
-  min-block-size: var(--lg-control-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--lg-control-lg);
   padding-inline: var(--lg-space-5);
-  border: 0;
   border-radius: var(--lg-radius-capsule);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  /* Bir BAĞLANTIDIR ama dolu eylemdir: görünümü `GlassButton prominent` ile
+     aynı token'lardan gelir, yoksa aynı kahve iki farklı tonda çizilirdi. */
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
   font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.action:disabled {
-  background: color-mix(in srgb, var(--lg-label) 12%, transparent);
-  color: var(--lg-label-secondary);
-  cursor: not-allowed;
+  font-weight: var(--lg-action-weight);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .action:focus-visible {
@@ -66,7 +74,7 @@
   font-size: var(--lg-text-caption);
 }
 
-/* Geniş yerleşimde karar kolonu devralır; iki birincil eylem yan yana durmaz. */
+/* Geniş yerleşimde karar kartı devralır; iki eylem yüzeyi yan yana durmaz. */
 @container page (min-width: 1100px) {
   .dock {
     display: none;

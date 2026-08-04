@@ -1,11 +1,14 @@
 /* oxlint-disable react/only-export-components -- TanStack file routes export Route beside route-local components. */
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router'
+import { useAuthSession } from '@/features/auth'
+import type { Oturum } from '@/features/auth'
 import { ListingDetailWorkspace } from '@/features/listing-detail'
 import {
   loadListingDetail,
   type ListingDetailScenario,
 } from '@/features/listing-detail/data/listing-detail-adapter'
 import { revealListingPhone } from '@/features/listing-detail/data/listing-phone'
+import type { ListingQnaViewer } from '@/features/listing-detail/domain/listing-detail-types'
 
 const SCENARIOS: ListingDetailScenario[] = [
   'default',
@@ -64,14 +67,52 @@ export const Route = createFileRoute('/ilan/$listingId')({
   notFoundComponent: ListingNotFound,
 })
 
+/**
+ * Oturumu soru-cevap bölümünün beklediği görüntüleyene çevirir.
+ *
+ * Tam ad taşınmaz: yazışmada görünen kimlik kısaltmalıdır ("Ahmet Ş."), avatar
+ * ise baş harflerdir. Tek kelimelik adda ikinci harf yoktur; o durumda tek
+ * harf yeterlidir — uydurma bir ikinci harf üretilmez.
+ */
+function qnaGoruntuleyen(oturum: Oturum | null): ListingQnaViewer {
+  if (!oturum) return { signedIn: false }
+  const parcalar = oturum.adSoyad.trim().split(/\s+/).filter(Boolean)
+  const ad = parcalar[0] ?? ''
+  const soyad = parcalar.length > 1 ? parcalar[parcalar.length - 1] : ''
+  return {
+    signedIn: true,
+    id: oturum.kullaniciId,
+    label: soyad ? `${ad} ${soyad.charAt(0).toLocaleUpperCase('tr')}.` : ad,
+    initials: `${ad.charAt(0)}${soyad.charAt(0)}`.toLocaleUpperCase('tr'),
+  }
+}
+
 function ListingDetailRoutePage() {
   const result = Route.useLoaderData()
   const { listingId } = Route.useParams()
+  const { oturum } = useAuthSession()
+  const navigate = useNavigate()
+
+  const viewer = qnaGoruntuleyen(oturum)
+
   // Numara loader'da getirilmez: sunucudan gelen HTML numarayı içermemelidir.
   return (
     <ListingDetailWorkspace
       result={result}
       onRevealPhone={() => revealListingPhone(listingId)}
+      qnaViewer={viewer}
+      /* Kapı yalnız oturum kapalıyken çizilir; hedef, giriş sonrası tam bu
+         bölüme dönecek şekilde `donus` taşır (bkz. auth `guvenliDonusYolu`). */
+      onQnaGirisIste={
+        viewer.signedIn
+          ? undefined
+          : () => {
+              void navigate({
+                to: '/giris',
+                search: { donus: `/ilan/${listingId}#sorular` },
+              })
+            }
+      }
     />
   )
 }

@@ -13,6 +13,16 @@ import { contactClosedReason } from '../format'
 export const SELLER_REVEAL_CONTROL_ID = 'satici-numara-kontrolu'
 
 /**
+ * Satıcı bölümünün çapası.
+ *
+ * Karar kartının "Satıcı bölümü" bağlantısı ve dar yerleşimdeki dock buraya
+ * gider. Kimlik tek kaynaktan gelir: `SellerSection` de bu sabiti kullanır,
+ * iki yerde ayrı ayrı yazılan bir string bölüm yeniden adlandırıldığında
+ * sessizce kırılırdı.
+ */
+export const SELLER_SECTION_ID = 'satici'
+
+/**
  * Satıcı bölümünde numara kontrolünün render edilip edilmeyeceğini söyler.
  *
  * Karar rayı bu yüklemi kullanır: kontrol yoksa rayın "Satıcı bilgilerine git"

@@ -106,18 +106,31 @@ kapatılacaksa çağıran action'ı render etmez).
 | Part | Property | Token |
 |---|---|---|
 | geri pill / action grubu | malzeme | GlassSurface (`thickness 0.35`, capsule) |
-| bar | gap / padding | `--lg-space-3` / `--lg-space-3` + `--lg-space-4` |
+| bar | gap / padding | `--lg-space-3` / `--lg-space-2` + `--lg-space-4` |
 | başlık | font-size | `--lg-text-headline` |
 | action grubu | padding / iç gap | `--lg-space-1` |
-| action buton/link | padding / radius | `--lg-space-2` + `--lg-space-3` / `--lg-radius-capsule` |
+| action buton/link | min-height / padding / radius | `--lg-control-sm` / `0 --lg-space-3` / `--lg-radius-capsule` |
+| dokunma hedefi | `::after` taşması | `--lg-control-hit` (44px) |
+| spacer | width | `--lg-control-hit` |
 
 **Borç (raw / mikro-geometri):** token karşılığı olmayan ölçüler `.bar`
 kökünde yerel değişkenlerde toplandı: `--nav-edge-bleed` (-28px, scroll edge
 alt taşması), `--nav-edge-blur` (14px — blur token'ı yok),
 `--nav-chevron-box` (10px), `--nav-chevron-stroke` (2.5px),
-`--nav-chevron-gap` (2px), `--nav-spacer` (44px — dokunma hedefi sabiti;
-geri pill'i / action grubu yokken başlığı ortalayan simetri boşluğu, kontrol
-olmadığından `--lg-control-*` bağlanmadı). Bilinçli bırakılan: action hover
+`--nav-chevron-gap` (2px). `--nav-spacer` artık raw 44px değil
+`--lg-control-hit`e bağlı — geri pill'i / action grubu yokken başlığı ortalayan
+simetri boşluğu, ölçüsü dokunma hedefi tabanıyla aynı kalmalı.
+
+**Şerit ölçüsü (2026-08-03):** `.bar` dikey dolgusu `--lg-space-3` →
+`--lg-space-2`. Aksiyon buton/linkleri artık dikey padding yerine
+`min-height: var(--lg-control-sm)` (36px) taşıyor; `--lg-space-1` dolgulu
+aksiyon grubuyla birlikte grup 44px, bar toplam 60px (eski ~65px).
+
+**Dokunma hedefi:** Aksiyon slotu ikon-tek olabildiği için buton/link görünmez
+`::after` taşmasıyla `--lg-control-hit`e (44px) genişler. Taşma 4px ve
+`.actionGroup`'un `--lg-space-1` dolgusuna tam oturur; bu yüzden
+`GlassSurface`'in `overflow: hidden`'ı hedefi kırpmaz (kırpma padding
+kutusunda olur). Bilinçli bırakılan: action hover
 zemini `rgba(255,255,255,.18)` — cam capsule üstünde beyaz-alfa malzeme
 etkisi, birebir token yok, `color-mix`'e çevrilmedi; başlık ağırlığı `700`
 (headline token'ı yalnız boyut tanımlar, ağırlık kuralı 600'ü aşıyor —
@@ -153,3 +166,11 @@ Action hover/focus CSS state'idir — control/story yapılmaz (bkz. GlassButton 
 görünmezdir (içerik kesilmeden akar). **Açık kararlar:** `nav`'a `aria-label`
 için rest props açılmalı mı · 'Geri' fallback'inin i18n'i.
 (Başlığın `--lg-text-headline`'a bağlanması yapıldı — bkz. §9.)
+
+## Changelog
+
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. `.bar` dikey dolgusu
+  `--lg-space-3` → `--lg-space-2`; aksiyon buton/linkleri
+  `min-height: var(--lg-control-sm)` + `padding: 0 --lg-space-3` oldu (bar ~65px
+  → 60px). `--nav-spacer` raw 44px yerine `--lg-control-hit`e bağlandı.
+  İkon-tek aksiyonlar için görünmez `::after` dokunma hedefi taşması eklendi.

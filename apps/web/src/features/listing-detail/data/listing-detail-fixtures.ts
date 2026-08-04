@@ -3,10 +3,24 @@ import type { EvidenceValue } from '../domain/evidence'
 import type {
   LandListingDetail,
   ListingMediaPreview,
+  ListingQnaAuthor,
   VerificationRow,
 } from '../domain/listing-detail-types'
 
 const CUTOFF = '2026-07-24T09:12:00.000Z'
+
+/* Yazışmadaki kişiler tek yerde tanımlıdır: aynı kişi iki soruda göründüğünde
+   `id`'si de baş harfleri de aynı kalmalı. Tam ad taşınmaz, fotoğraf taşınmaz. */
+const QNA_SATICI: ListingQnaAuthor = {
+  id: 'seller-1',
+  label: 'Nur Y.',
+  initials: 'NY',
+  role: 'seller',
+}
+const QNA_ALICI_AD: ListingQnaAuthor = { id: 'buyer-ad', label: 'A. D.', initials: 'AD', role: 'buyer' }
+const QNA_ALICI_MK: ListingQnaAuthor = { id: 'buyer-mk', label: 'M. K.', initials: 'MK', role: 'buyer' }
+const QNA_ALICI_SY: ListingQnaAuthor = { id: 'buyer-sy', label: 'S. Y.', initials: 'SY', role: 'buyer' }
+const QNA_ALICI_BE: ListingQnaAuthor = { id: 'buyer-be', label: 'B. E.', initials: 'BE', role: 'buyer' }
 
 /**
  * Arsa kategorisinin temsili karesi — kaynak arama tarafıyla ortaktır.
@@ -322,4 +336,109 @@ export const OREN_LAND_LISTING: LandListingDetail = {
     },
     { id: 'plan-note', kind: 'plan', label: 'Plan notu (PDF)', capturedAt: '2025-11-19T00:00:00.000Z' },
   ],
+  // Yaklaşık konum: parselin tam merkezi değil, 250 m yarıçaplı alanın merkezi.
+  geo: {
+    kind: 'geographic',
+    lat: 37.2984,
+    lng: 27.4321,
+    radiusMeters: 250,
+    sourceLabel: 'İlan sahibi beyanı · yaklaşık alan',
+  },
+  nearby: [
+    { id: 'sahil', label: 'Ören sahili', kind: 'coast', distanceMeters: 900 },
+    { id: 'okul', label: 'Ören İlkokulu', kind: 'school', distanceMeters: 1400 },
+    { id: 'saglik', label: 'Aile Sağlığı Merkezi', kind: 'health', distanceMeters: 1700 },
+    { id: 'market', label: 'Ören çarşı', kind: 'shopping', distanceMeters: 1200 },
+    { id: 'durak', label: 'Milas–Ören dolmuş durağı', kind: 'transit', distanceMeters: 650 },
+  ],
+  qna: {
+    responseLabel: 'İlan sahibi soruları genelde 4 saat içinde yanıtlıyor.',
+    entries: [
+      {
+        id: 'qna-yol',
+        askedAt: '2026-07-21T09:10:00.000Z',
+        author: QNA_ALICI_AD,
+        question: 'Parsele araçla giriş var mı, yol stabilize mi?',
+        pinned: true,
+        replies: [
+          {
+            id: 'qna-yol-1',
+            author: QNA_SATICI,
+            answeredAt: '2026-07-21T12:40:00.000Z',
+            body: 'Stabilize yol parsel sınırına kadar geliyor; yaz aylarında binek araçla giriş yapılabiliyor.',
+          },
+        ],
+      },
+      {
+        id: 'qna-imar',
+        askedAt: '2026-07-23T15:05:00.000Z',
+        author: QNA_ALICI_MK,
+        question: 'İmar durumu belgesi güncel mi, ne zaman alındı?',
+        replies: [
+          {
+            id: 'qna-imar-1',
+            author: QNA_SATICI,
+            answeredAt: '2026-07-23T18:20:00.000Z',
+            body: 'İmar durumu belgesi Mart 2026 tarihli; belge bölümünden görüntülenebiliyor.',
+          },
+        ],
+      },
+      /* Çok yanıtlı yazışma: katlama burada devreye girer — yalnız son yanıt
+         durur, öncekiler "Tüm cevapları gör" arkasında bekler. Son yanıt
+         platform maskesi taşır: kişisel iletişim bilgisi herkese açık
+         alanda yayımlanmaz. */
+      {
+        id: 'qna-iletisim',
+        askedAt: '2026-07-27T10:15:00.000Z',
+        author: QNA_ALICI_SY,
+        question: 'Sizinle nasıl iletişim kurabilirim?',
+        replies: [
+          {
+            id: 'qna-iletisim-1',
+            author: QNA_SATICI,
+            answeredAt: '2026-07-27T11:02:00.000Z',
+            body: 'Mesaj kutusundan yazabilirsiniz, gün içinde dönüyorum.',
+          },
+          {
+            id: 'qna-iletisim-2',
+            author: QNA_ALICI_SY,
+            answeredAt: '2026-07-27T11:20:00.000Z',
+            body: 'Telefonla konuşmak benim için daha kolay olur.',
+          },
+          {
+            id: 'qna-iletisim-3',
+            author: QNA_SATICI,
+            answeredAt: '2026-07-27T12:05:00.000Z',
+            body: '0555 000 00 00',
+            visibility: 'masked',
+          },
+        ],
+      },
+      /* Tek yanıtı ilan sahibi tarafından gizlenmiş soru. Başkalarında
+         yanıt satırı HİÇ çizilmez ve soru "yanıtsız" diye de etiketlenmez —
+         bilgi saklanır ama yanlış bilgi üretilmez. */
+      {
+        id: 'qna-pazarlik',
+        askedAt: '2026-07-28T14:40:00.000Z',
+        author: QNA_ALICI_BE,
+        question: 'Son fiyat ne olur?',
+        replies: [
+          {
+            id: 'qna-pazarlik-1',
+            author: QNA_SATICI,
+            answeredAt: '2026-07-28T16:10:00.000Z',
+            body: 'Pazarlık payı var, ciddi alıcıyla görüşürüm.',
+            visibility: 'hidden',
+          },
+        ],
+      },
+      {
+        id: 'qna-elektrik',
+        askedAt: '2026-07-26T08:30:00.000Z',
+        author: QNA_ALICI_MK,
+        question: 'Elektrik ve su aboneliği parsele çekilebiliyor mu?',
+        replies: [],
+      },
+    ],
+  },
 }

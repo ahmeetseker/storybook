@@ -1,13 +1,19 @@
-import type { MouseEvent } from 'react'
+import type { CSSProperties, MouseEvent } from 'react'
 import { withBase } from '@/config/base-path'
 import styles from './ListingCreateWorkspace.module.css'
-import type { ListingDraftMeta } from './listing-create-domain'
+import type { ListingCompletion, ListingDraftMeta } from './listing-create-domain'
 
 interface ListingCreateHeaderProps {
   meta: ListingDraftMeta
+  /** Adım tamamlanma özeti; verilmezse ilerleme ölçeri gizlenir (giriş ekranı). */
+  completion?: ListingCompletion
 }
 
-export function ListingCreateHeader({ meta }: ListingCreateHeaderProps) {
+/**
+ * Odaklı akışın üst rayı: kimlik, taslak adı, kayıt durumu ve genel ilerleme.
+ * Kabuğun header'ı bu rotada gizli olduğu için çıkış yolu burada durur.
+ */
+export function ListingCreateHeader({ meta, completion }: ListingCreateHeaderProps) {
   const exitLocked = meta.saveStatus !== 'saved'
   const saveLabel =
     meta.saveStatus === 'saving'
@@ -32,10 +38,25 @@ export function ListingCreateHeader({ meta }: ListingCreateHeaderProps) {
         <span aria-hidden="true">✦</span>
         <span>arsam.net</span>
       </a>
+
       <div className={styles.draftIdentity}>
         <span className={styles.draftLabel}>İlan taslağı</span>
         <strong>{meta.name}</strong>
       </div>
+
+      {completion ? (
+        <p className={styles.headerProgress}>
+          <span className={styles.headerProgressLabel}>
+            {completion.completed}/{completion.total} adım hazır
+          </span>
+          <span
+            className={styles.headerMeter}
+            aria-hidden="true"
+            style={{ '--listing-meter': `${completion.percentage}%` } as CSSProperties}
+          />
+        </p>
+      ) : null}
+
       <div className={styles.headerActions}>
         <span
           className={styles.saveStatus}

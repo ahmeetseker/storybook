@@ -2,7 +2,7 @@
 name: GlassFileUpload
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassFileUpload Kuralları
@@ -109,9 +109,16 @@ MIME kontrolü eklenmesi değerlendirilecek.
 **Borç (raw / mikro-geometri):** kaldır butonu taban boyutu (28px) ve zone
 kesikli çerçeve kalınlığı (1.5px) token karşılığı olmadığından component
 kökünde yerel değişkene toplandı (`.root { --zone-border-w: 1.5px;
---remove-size: 28px; }`); dokunmatikte kaldır `--lg-control-sm`'e bağlandı
-(coarse'ta token 36px — büyüme tasarımın istediği davranıştır); geçiş
-süresi/easing (`0.16s ease-out`) süre token'ı olmadığından raw.
+--remove-size: 28px; }`); geçiş süresi/easing (`0.16s ease-out`) süre
+token'ı olmadığından raw.
+
+**Dokunma hedefi:** kaldır butonu ikon-tek kontroldür. Görünen kutu her
+cihazda 28px kalır (dosya satırını şişirmemesi için) ama `::after` ile her
+iki eksende `--lg-control-hit`e (44px) uzanır — satır düz bir `<li>`,
+`overflow: hidden` yok, pseudo-eleman gerçekten tıklanır (AAA 2.5.5, imleçli
+cihazda da). Bu sayede butonu dokunmatikte görünür şekilde büyüten eski
+`pointer: coarse` kuralı gereksizleşti ve kaldırıldı; o kural yeni ölçekte
+butonu 44px'e çıkarıp dosya satırını 44'ten 60px'e şişirecekti.
 
 ## 10. Storybook kapsamı
 
@@ -143,3 +150,8 @@ görsel dosyalar için thumbnail önizleme.
 
 - 2026-07-16: İlk sürüm — button+click deseni, maxSize reddi + alert listesi,
   kontrolsüz iç liste, drag'de accent çerçeve + scale.
+- 2026-08-03: Yeni kontrol ölçeği gözden geçirmesi. Kaldır butonunun
+  `pointer: coarse` görsel büyütmesi (`--lg-control-sm`) kaldırıldı — yeni
+  ölçekte butonu 44px'e çıkarıp satırı şişiriyordu. Yerine görünmez `::after`
+  hedef genişletmesi: görünen kutu 28px, hedef 44×44px (her cihazda).
+  Bırakma alanı ve dosya satırı ölçüleri değişmedi.

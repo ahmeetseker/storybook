@@ -2,11 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { GlassAgencyCard, GlassAlert, GlassButton, type GlassAgencyCardStat } from '@repo/ui'
 
 import type { ListingDetail } from '../domain/listing-detail-types'
-import { criticalIssues } from '../domain/listing-detail-view-model'
+import { type CriticalIssue, criticalIssues } from '../domain/listing-detail-view-model'
 import { contactClosedReason, formatDateShort, formatNumber } from '../format'
 import { EvidenceList, EvidenceRow } from './EvidenceRow'
 import { INDIVIDUAL_TTBS_SCOPE_NOTE, TTBS_SCOPE_NOTE } from './seller-copy'
-import { SELLER_REVEAL_CONTROL_ID } from './seller-reveal'
+import { SELLER_REVEAL_CONTROL_ID, SELLER_SECTION_ID } from './seller-reveal'
 import styles from '../ListingDetailWorkspace.module.css'
 
 /**
@@ -50,6 +50,13 @@ function toTelHref(phone: string): string {
   return `tel:${phone.replace(/[^+\d]/g, '')}`
 }
 
+/** Gündeme girebilen konu: adımı olmayan konu telefonda yapılacak bir iş değildir. */
+type AgendaIssue = CriticalIssue & { action: string }
+
+function agendaIssues(detail: ListingDetail): AgendaIssue[] {
+  return criticalIssues(detail).filter((issue): issue is AgendaIssue => Boolean(issue.action))
+}
+
 function sellerStats(seller: ListingDetail['seller']): GlassAgencyCardStat[] {
   const stats: GlassAgencyCardStat[] = []
   if (seller.activeListings !== undefined) {
@@ -65,11 +72,24 @@ function sellerStats(seller: ListingDetail['seller']): GlassAgencyCardStat[] {
 }
 
 /**
- * Satıcı bölümü.
+ * Satıcı bölümü — görüşme kartı.
  *
- * İçerik katmanındadır — cam açmaz; kimlik kartı ve yetki belgesi künyesi düz
- * yüzeydedir. Numara açma kontrolü sayfanın kontrol katmanına ait tek cam
- * yüzeydir ve yalnız `onRevealPhone` verildiğinde render edilir.
+ * Bölümün konusu "satıcı hakkında bilgi" değil, kullanıcının yapacağı
+ * GÖRÜŞMEdir: üstte künye bandı ve numara kontrolü, gövdede telefonda sırayla
+ * ilerlenecek gündem, altta ince baskı (TTBS kapsamı, mahremiyet notu).
+ * Gündemin numaralandırması süs değildir — maddeler `criticalIssues()`
+ * sırasını taşır ve her madde hangi açık konuyu kapattığını kendi altında
+ * söyler (`issue.title`).
+ *
+ * Bölümün gövdesi içerik katmanındadır: kimlik kartı ve yetki belgesi künyesi
+ * düz yüzeydedir, künye bandı da cam değil düz tondur (`color-mix` ile vurgu
+ * tonlanır) — bant §2 cam bütçesine girmez.
+ *
+ * Numara açma kontrolü kontrol katmanına aittir ve **camdır**: sayfadaki her
+ * buton kabuktaki `İlan ver` ile aynı malzemeyi paylaşır (ürün kararı, §2).
+ * Bedeli görünürlüktür — cam zeminini arkasındaki yüzeyden alır, bu yüzden
+ * tonlu bandın üstünde düz hâline göre daha soluk okunur. Kontrol yalnız
+ * `onRevealPhone` verildiğinde render edilir.
  *
  * Numara sözleşmesi: `phone` prop'u yoktur, numara istek anında getirilir,
  * başarıda odak numaraya taşınır, başarısızlıkta gerekçe görünür ve kontrol
@@ -163,26 +183,123 @@ export function SellerSection({
     commitRevealed(true)
   }
 
-  const questions = criticalIssues(detail)
-    .map((issue) => issue.action)
-    .filter((action): action is string => Boolean(action))
+  const agenda = agendaIssues(detail)
+
+  // Gündem işaretleri yalnız bu görüntülemede yaşar — kalıcılığı olmayan bir
+  // kontrol çizmemek için (§4) kapsamı listenin altında görünür yazılır.
+  // Sunucuya gitmez, taslak üretmez: telefondayken nerede kalındığını tutar.
+  const [checked, setChecked] = useState<ReadonlySet<string>>(() => new Set())
+  const toggleChecked = (id: string) => {
+    setChecked((current) => {
+      const next = new Set(current)
+      if (!next.delete(id)) next.add(id)
+      return next
+    })
+  }
+
+  const revealControl =
+    contactClosed || !onRevealPhone ? null : isRevealed && phone !== null ? (
+      <>
+        <p className={styles.callActionLabel}>Telefon</p>
+        <p className={styles.revealedPhone}>
+          <a
+            ref={linkRef}
+            id={SELLER_REVEAL_CONTROL_ID}
+            href={toTelHref(phone)}
+            className={styles.phoneLink}
+          >
+            {phone}
+          </a>
+        </p>
+      </>
+    ) : (
+      <GlassButton
+        id={SELLER_REVEAL_CONTROL_ID}
+        onClick={handleReveal}
+        loading={status === 'loading'}
+        className={styles.revealButton}
+      >
+        Numarayı göster
+      </GlassButton>
+    )
 
   return (
-    <section id="satici" className={styles.section} aria-labelledby="satici-baslik">
+    <section id={SELLER_SECTION_ID} className={styles.section} aria-labelledby="satici-baslik">
       <h2 id="satici-baslik" className={styles.sectionTitle}>
         Satıcı
       </h2>
 
-      <GlassAgencyCard
-        name={seller.name}
-        tagline={sellerTypeLabel(seller.type)}
-        stats={sellerStats(seller)}
-        className={styles.sellerCard}
-      />
+      {/* Künye bandı: görüşülecek kişi solda, numara kontrolü sağda. Band
+          yaprağın iç dolgusunu negatif payla iptal eder ve kenardan kenara
+          uzanır — kart İÇİNDE kart değil, yaprağın tonlanmış bir bölgesidir. */}
+      <div className={styles.callBand}>
+        <GlassAgencyCard
+          name={seller.name}
+          tagline={sellerTypeLabel(seller.type)}
+          stats={sellerStats(seller)}
+          className={styles.sellerCard}
+        />
+        {revealControl ? <div className={styles.callAction}>{revealControl}</div> : null}
+      </div>
 
-      {seller.type === 'agency' ? (
-        <div className={styles.sellerLicence}>
-          {seller.licence ? (
+      {/* Numara durumunun tek yeri: band altında sabit bir yuva. Hata belirdiğinde
+          künye kaymaz — başarısız denemeden sonra göz kontrolü aynı yerde bulur. */}
+      {contactClosed || !onRevealPhone || status === 'error' ? (
+        <div className={styles.revealStatus}>
+          {contactClosed ? (
+            <p className={styles.blockNote}>
+              İlan yayında olmadığı için numara paylaşımı kapalı. Bu görünüm arşiv kaydıdır.
+            </p>
+          ) : !onRevealPhone ? (
+            <p className={styles.blockNote}>
+              Numara yalnız istek anında sunucudan alınır; bu görünümde numara servisi bağlı değil.
+            </p>
+          ) : null}
+
+          {status === 'error' ? (
+            <GlassAlert severity="warning" title="Numara alınamadı">
+              {REVEAL_FAILURE_TEXT}
+            </GlassAlert>
+          ) : null}
+        </div>
+      ) : null}
+
+      {agenda.length > 0 ? (
+        <div className={styles.agenda}>
+          <h3 className={styles.subTitle}>Görüşme gündemi</h3>
+          <p className={styles.blockNote}>
+            Özet bölümündeki açık konular, telefonda ilerleyeceğiniz sıraya dizildi. Bu adımları
+            platform sizin adınıza atmaz.
+          </p>
+          <ol className={styles.agendaList}>
+            {agenda.map((issue) => (
+              <li key={issue.id}>
+                <label className={styles.agendaItem}>
+                  <input
+                    type="checkbox"
+                    className={styles.agendaCheck}
+                    checked={checked.has(issue.id)}
+                    onChange={() => toggleChecked(issue.id)}
+                  />
+                  <span className={styles.agendaText}>
+                    <span className={styles.agendaAction}>{issue.action}</span>
+                    <span className={styles.agendaWhy}>{issue.title}</span>
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ol>
+          <p className={styles.blockNote}>
+            İşaretler yalnız bu görüntülemede tutulur; kaydedilmez.
+          </p>
+        </div>
+      ) : null}
+
+      {/* İnce baskı: yetki belgesi kapsamı ve mahremiyet notu. Kararı taşıyan
+          içerik değil, kararın çerçevesi — bu yüzden gündemin altındadır. */}
+      <div className={styles.sellerFinePrint}>
+        {seller.type === 'agency' ? (
+          seller.licence ? (
             <EvidenceList>
               <EvidenceRow
                 label="Yetki belgesi"
@@ -199,70 +316,19 @@ export function SellerSection({
               </p>
               <p className={styles.blockNote}>{TTBS_SCOPE_NOTE}</p>
             </>
-          )}
-        </div>
-      ) : (
-        <p className={styles.blockNote}>
-          {`${INDIVIDUAL_TTBS_SCOPE_NOTE} ${TTBS_SCOPE_NOTE}`}
-        </p>
-      )}
-
-      <div className={styles.reveal}>
-        {contactClosed ? (
-          <p className={styles.blockNote}>
-            İlan yayında olmadığı için numara paylaşımı kapalı. Bu görünüm arşiv kaydıdır.
-          </p>
-        ) : isRevealed && phone !== null ? (
-          <p className={styles.revealedPhone}>
-            <a
-              ref={linkRef}
-              id={SELLER_REVEAL_CONTROL_ID}
-              href={toTelHref(phone)}
-              className={styles.phoneLink}
-            >
-              {phone}
-            </a>
-          </p>
-        ) : onRevealPhone ? (
-          <GlassButton
-            id={SELLER_REVEAL_CONTROL_ID}
-            onClick={handleReveal}
-            loading={status === 'loading'}
-            className={styles.revealButton}
-          >
-            Numarayı göster
-          </GlassButton>
+          )
         ) : (
           <p className={styles.blockNote}>
-            Numara yalnız istek anında sunucudan alınır; bu görünümde numara servisi bağlı değil.
+            {`${INDIVIDUAL_TTBS_SCOPE_NOTE} ${TTBS_SCOPE_NOTE}`}
           </p>
         )}
 
-        {status === 'error' ? (
-          <GlassAlert severity="warning" title="Numara alınamadı">
-            {REVEAL_FAILURE_TEXT}
-          </GlassAlert>
-        ) : null}
-
-        <p className={styles.blockNote}>
-          Numara bu sayfada saklanmaz; yalnız siz istediğinizde getirilir.
-        </p>
-      </div>
-
-      {questions.length > 0 ? (
-        <div className={styles.sellerAsk}>
-          <h3 className={styles.subTitle}>Görüşmede sorulacaklar</h3>
+        {contactClosed || !onRevealPhone ? null : (
           <p className={styles.blockNote}>
-            Özet bölümündeki açık konuların satıcıya yöneltilecek hâli. Bu adımları platform sizin
-            adınıza atmaz.
+            Numara bu sayfada saklanmaz; yalnız siz istediğinizde getirilir.
           </p>
-          <ul className={styles.askList}>
-            {questions.map((question) => (
-              <li key={question}>{question}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+        )}
+      </div>
     </section>
   )
 }

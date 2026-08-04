@@ -90,8 +90,8 @@ select {
   min-height: var(--lg-control-md);
   padding-inline: var(--lg-space-4);
   border-radius: var(--lg-radius-chip);
-  color: var(--lg-accent-contrast);
-  background: var(--lg-accent);
+  color: var(--lg-action-prominent-label);
+  background: var(--lg-action-prominent);
   text-decoration: none;
   transform: translateY(-160%);
 }

@@ -165,6 +165,7 @@ ek render tetiklemez.
 | thumb/thumbFallback | radius | `--lg-radius-chip` | — |
 | itemTitle | renk/boyut | `--lg-label` / `--lg-text-footnote` | — |
 | kaldırma butonu | zemin/renk | `color-mix(--lg-label 8%)` / `--lg-label-secondary` | hover: `color-mix(--lg-danger 16%)` + `--lg-danger` (yalnız `hover: hover`) |
+| kaldırma butonu | boyut | `--lg-space-6` (24px, imleçli) → `--lg-control-hit` (44px, `pointer: coarse`) | görünmez taşma kırpılacağı için görünür ölçü büyür |
 | kaldırma/Temizle/Karşılaştır focus | outline | `--lg-accent` | yalnız `:focus-visible` |
 | Temizle | renk | `--lg-label-secondary` | hover: `--lg-label` (yalnız `hover: hover`) |
 | ipucu (normal + `maxItems` aşımı) | renk | `--lg-label-secondary` | metin rengi her iki durumda da aynı (≥4.5:1 AA) — semantik renk metne KARIŞMAZ |
@@ -176,12 +177,20 @@ ek render tetiklemez.
 içeriğiyle aynı düzlemde, hiçbir overlay'in üstüne çıkmaz) · mikro-geometri
 kökte yerel değişkenlerde toplandı: `--glass-comparebar-thumb` (32px),
 `--glass-comparebar-item-max` (200px), `--glass-comparebar-title-max`
-(108px), `--glass-comparebar-remove-size/font` (22px/15px),
+(108px), `--glass-comparebar-remove-font` (15px),
 `--glass-comparebar-dot` (6px), `--glass-comparebar-max-w` (720px, bar maks.
 genişliği), `--glass-comparebar-underline-offset` (2px, Temizle alt çizgisi)
-— token karşılığı yok (container query yok) · `pointer: coarse` kaldırma
-hedefi `--lg-control-md`'ye bağlandı (coarse'ta 44px — birebir) · `96px`
-giriş/çıkış `translateY` mesafesi raw.
+— token karşılığı yok (container query yok) · `96px` giriş/çıkış `translateY`
+mesafesi raw.
+
+**Dokunma hedefi (2026-08-03) — `::after` taşması UYGULANAMAZ:** Kaldırma
+butonu `.list` içinde yaşar ve bu liste yatay kaydırma şeridi
+(`overflow-x: auto`); CSS'te `overflow-x: auto` dikeyde de `auto` hesaplandığı
+için negatif inset'li bir pseudo-element kırpılır. Dolayısıyla hedef yalnız
+GÖRÜNÜR ölçüyle büyütülebilir: imleçli cihazda `--lg-space-6` (24px — WCAG 2.2
+AA 2.5.8 tabanı, eski 22px bunun ALTINDAYDI), dokunmatikte `--lg-control-hit`
+(44px). "Temizle" metin aksiyonunun hedefi ise negatif margin'li padding
+büyümesiyle korunur (satır yüksekliği sabit kalır).
 
 ## 10. Storybook kapsamı
 
@@ -253,3 +262,8 @@ seçildi, ama tartışmaya açık) · kart sürükle-bırak ile yeniden sıralam
 yok, `items` dizi sırası aynen korunur).
 
 **Changelog:** 2026-07-17 ilk sözleşme.
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı. Kaldırma butonunun imleçli
+  görünür ölçüsü 22px → `--lg-space-6` (24px, WCAG AA 2.5.8 tabanı),
+  dokunmatik ölçüsü `--lg-control-md` yerine niyeti açık `--lg-control-hit`
+  token'ına bağlandı. `::after` taşmasının `.list` kaydırma şeridi yüzünden
+  uygulanamadığı §9'a yazıldı.

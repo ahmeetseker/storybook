@@ -57,6 +57,7 @@
   /* Sabit çerçeve: ray kendi içinde kaydırır, composer daima görünür kalır */
   grid-template-rows: minmax(0, 1fr);
   block-size: min(70rem, 72dvh);
+  min-block-size: 0;
   overflow: hidden;
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-card);
@@ -232,4 +233,41 @@
     background-color: var(--lg-surface);
     backdrop-filter: none;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Hesap kabuğunun "tam yükseklik" modu (bkz. account-navigation → fillsViewport).
+
+   Kabuk içindeyken sayfa kaydırması KAPALIDIR: çalışma alanı kalan yüksekliği
+   kaplar, kaydırma konuşma rayının ve mesaj listesinin kendi içindedir. Sayfa
+   başlığı da kompaktlaşır — konum izi zaten üst şeritte "Hesabım / Mesajlar"
+   diyor, aynı bilgi ikinci kez dikey yer kaplamaz.
+--------------------------------------------------------------------------- */
+
+:global([data-account-shell='fill']) .page {
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+:global([data-account-shell='fill']) .frame {
+  grid-template-rows: auto minmax(0, 1fr);
+  block-size: 100%;
+  min-block-size: 0;
+  gap: var(--lg-space-3);
+}
+
+:global([data-account-shell='fill']) .pageHeader > div > p {
+  display: none;
+}
+
+:global([data-account-shell='fill']) .page h1 {
+  font-size: var(--lg-text-headline);
+}
+
+:global([data-account-shell='fill']) .workspace {
+  /* Hesap rayı 17rem aldığı için konuşma sütunu biraz genişletilir: kişi adı
+     tarih etiketiyle aynı satırda kırpılmadan sığsın. */
+  grid-template-columns: minmax(21rem, 2fr) minmax(0, 5fr);
+  block-size: 100%;
+  min-block-size: 0;
 }

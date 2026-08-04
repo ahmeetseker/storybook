@@ -13,13 +13,18 @@
 }
 .disabled { opacity: 0.45; }
 
-/* Native input görünmez ama tüm alanı kaplar: sürükleme/odak/rol ondan gelir */
+/* Native input görünmez ama tüm alanı kaplar: sürükleme/odak/rol ondan gelir.
+   `inset-block` görünür yüksekliği (28px) değiştirmeden hedefi dikeyde
+   `--lg-control-hit`e (44px) taşır; kökte `overflow: hidden` olmadığı için
+   taşan alan gerçekten tıklanır. Dokunmatikte --slider-height zaten 44'e
+   çıktığından genişletme 0'a düşer. */
 .input {
   position: absolute;
   inset: 0;
+  inset-block: min(0px, calc((var(--slider-height) - var(--lg-control-hit)) / 2));
   z-index: 2;
   width: 100%;
-  height: 100%;
+  height: auto;
   margin: 0;
   opacity: 0;
   cursor: pointer;
@@ -89,11 +94,12 @@
   white-space: nowrap;
 }
 
-/* Dokunmatik: thumb 28px, kök 44px dokunma hedefi (coarse'ta --lg-control-md birebir 44px) */
+/* Dokunmatik: thumb 28px, ray kalınlaşır ve görünür alanın kendisi dokunma
+   hedefi tabanına (`--lg-control-hit` = 44px) çıkar — genişletmeye gerek kalmaz */
 @media (pointer: coarse) {
   .root {
     --lg-slider-thumb: 28px;
     --track-height: 8px;
-    height: var(--lg-control-md);
+    --slider-height: var(--lg-control-hit);
   }
 }

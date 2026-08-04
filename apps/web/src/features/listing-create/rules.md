@@ -2,7 +2,7 @@
 name: ListingCreateWorkspace
 category: içerik
 status: hazır
-lastReviewed: 2026-07-25
+lastReviewed: 2026-08-03
 ---
 
 # ListingCreateWorkspace Kuralları
@@ -16,23 +16,29 @@ yayın kararına taşır. Tek alan düzenlemek veya hızlı ilan aramak için ku
 ## 2. Semantik sözleşme
 
 Kök element `main` olur. İlerleme göstergesi etiketli `nav`, adımlar sıralı liste,
-form bölümleri `section`, son kontrol satırları `article` kullanır. Hata mesajları
-alanla `aria-describedby` üzerinden bağlı ve adım başındaki bağlantılı hata
-özetinde tekrarlanır. EİDS bekleme durumu `aria-busy`,
+alan grupları başlıkla etiketlenmiş `section`, son kontrol satırları `article`
+kullanır. Her adımda tek `h1` (adım başlığı) ve grup başına bir `h2` bulunur.
+Hata mesajları alanla `aria-describedby` üzerinden bağlı ve adım başındaki
+bağlantılı hata özetinde (`role="alert"`, sıralı liste) tekrarlanır. Adım
+değişimi ayrıca görsel olmayan bir `role="status"` bölgesinde
+"Adım N / 5: <ad>" biçiminde duyurulur. EİDS bekleme durumu `aria-busy`,
 başarısız durumlar `role="alert"` ve yayın sonucu odaklanabilir `role="status"`
-kullanır. Portal yoktur.
+kullanır. Canlı önizleme `article` + `aria-label="İlan önizlemesi"`dir.
+Portal yoktur.
 
 ## 3. Anatomy ve slotlar
 
 | Slot | Zorunlu | İçerik | Kurallar |
 |---|---|---|---|
-| Entry | Evet | AI veya manuel başlangıç | AI önerisi ayrı incelenir |
-| Header | Evet | Taslak ve kayıt durumu | Hedefli canlı bölge |
-| Progress | Evet | Beş adım | Gelecek adımlar doğrulanmadan açılmaz |
-| Workspace | Evet | Aktif adım formu | İçerik yüzeyi flat |
+| Entry | Evet | AI / manuel başlangıç + yol haritası | AI önerisi ayrı incelenir; boş alan beklenti kurarak dolar |
+| Resume | Yarım taslak varsa | "Kaldığınız yerden devam edin" | Yalnız aynı sekmede saklı taslak varken; fotoğraflar geri gelmez ve bu yazılır |
+| Header | Evet | Taslak adı, kayıt durumu, genel ilerleme ölçeri | Yapışkan DEĞİL; ölçer dekoratif, sayı metinle okunur |
+| Progress | Evet | Beş adım | Bağlantı çizgili stepper; durum hem disk hem metinle söylenir; gelecek adımlar doğrulanmadan açılmaz |
+| Step intro | Evet | `h1` + adım sayacı + koşul rozeti | Sayfadaki tek `h1`; ray ile aynı bilgiyi üç kez tekrarlamaz |
+| Group | Evet | Alan grubu kartı (`ListingGroup`) | Flat `--lg-surface`; başlık + gerekçe + Zorunlu/İsteğe bağlı rozeti |
 | Select | Gerektikçe | Temalı `GlassSelect` listbox | Formda `material="flat"`; mobil ilerlemede glass; native OS menüsü yok |
-| Context | İlk 3 adım | Adım yardımı | Formu tekrar etmez |
-| Action bar | Evet | Geri, kayıt kurtarma ve birincil eylem | Sticky flat kontrol rayı |
+| Side panel | Evet | Canlı ilan önizlemesi + adım yardımı | Geniş kapta yapışkan yan sütun, dar kapta formun altı |
+| Action bar | Evet | Adım özeti, taslağı kaydet / kurtar, geri, birincil eylem | Sticky flat kontrol rayı; sayfadaki tek birincil CTA |
 
 ## 4. Public API
 
@@ -67,8 +73,16 @@ Katman sırası: yayınlandı → entry → aktif adım → alan etkileşimi.
 ## 7. Davranış
 
 - Tab sırası görsel sırayı izler; Enter/Space tüm butonlarda native davranır.
-- Geçersiz “Devam et” ilk hatalı alana odak verir.
-- Adım geçişi yeni adım başlığına odak ve scroll taşır.
+- Geçersiz “Devam et” ilk hatalı alana odak verir ve adım başında sayılı özet açar.
+- Adım geçişi yeni adım başlığına odak ve scroll taşır; hedef
+  `scroll-margin-block-start` ile ekranın tepesine yapışmaz ve adım geçişi
+  `aria-live="polite"` bölgede duyurulur.
+- Fotoğraflar fare ile sürüklenerek, klavye ile ← / → düğmeleriyle sıralanır;
+  iki yol da aynı `aria-live` duyurusunu üretir.
+- “Taslağı kaydet” elle kayıt tetikler; kayıt başarısızsa aynı düğme kurtarma
+  eylemine dönüşür (iki ayrı düğme gösterilmez).
+- Taslak (fotoğraflar hariç) `sessionStorage`'a yazılır; giriş ekranı devam
+  teklifi sunar. `initialDraft` verildiğinde (Story/test) kalıcılık kapalıdır.
 - Son kontrolden açılan bölüm geçerliyse doğrudan son kontrole döner.
 - Rol veya taşınmaz kimliği değişince önceki EİDS sonucu geçersizleşir.
 - Taslak değişiklikleri gecikmeli ve yarış güvenli biçimde kaydedilir; hata
@@ -157,3 +171,25 @@ hedefi ölçeğinden (`--lg-control-sm`, 44px) saf boyut token'ına
 yüksekliği (`calc(var(--lg-control-xl) + var(--lg-space-5))`, 76px) tek
 token'a (`--lg-control-xl`, 56px) indirildi. `.progressButton` gerçek bir
 `<button>` olduğu için kontrol yüksekliği token'ı burada doğru kullanım.
+
+Changelog: 2026-08-03 — Görsel/etkileşim yenilemesi. (1) Adım göstergesi
+bağlantı çizgili stepper'a dönüştü; tamamlandı / şu an buradasınız / bekliyor /
+kilitli durumları hem diskte hem metinde okunuyor. (2) Adımlar tek büyük kart
+yerine başlıklı **alan grubu kartlarına** (`ListingGroup`) bölündü; her grup
+Zorunlu / İsteğe bağlı rozeti taşıyor. (3) Adım başlığı `display` ölçeğinden
+`title` ölçeğine indi ve "Adım N/5" tekrarı üç yerden bire düştü. (4) Canlı ilan
+önizlemesi 4. adımın içinden çıkarılıp (`ListingSidePanel`) **her adımda görünen
+yapışkan yan panele** taşındı; adım yardımı da bu panele girdi ve son iki adımda
+kaybolmuyor. (5) Giriş ekranındaki dikey boşluk "Yayına kadar beş adım" yol
+haritasıyla doldu; iki başlangıç kartı eşit ağırlığa geldi. (6) Alt kontrol
+rayına adım özeti ve **"Taslağı kaydet"** eklendi; kayıt hatasında aynı düğme
+kurtarma eylemine dönüşüyor. (7) Taslak (fotoğraflar hariç) `sessionStorage`'a
+yazılıyor ve giriş ekranı "Kaldığınız yerden devam edin" teklifi sunuyor
+(`listing-draft-storage.ts`). (8) Fotoğraf karoları fareyle sürüklenerek de
+sıralanabiliyor; ok düğmeleri klavye yolu olarak korundu, kapak seçimi ve
+44px dokunma hedefleri netleşti. (9) Adım değişimi görsel olmayan `aria-live`
+bölgede duyuruluyor; odak/çapa hedefleri `scroll-margin-block-start` ile
+üst rayın altında kalmıyor. (10) Üst ray yapışkanlıktan çıkarıldı — odak
+hedeflerini örtüyor ve dar ekranda ekranın beşte birini yiyordu. (11) Yerleşim
+eşikleri isimsiz `@container`'dan `@container page`'e taşındı. (12) İl/ilçe/
+mülk etiket sözlükleri `listing-labels.ts` altında tek kaynağa indi.

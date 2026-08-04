@@ -4,6 +4,8 @@ import {
   type ListingStepId,
   type PublisherRole,
 } from './listing-create-domain'
+import { ListingGroup, ListingStepIntro } from './ListingSection'
+import { locationChain } from './listing-labels'
 import styles from './ListingCreateWorkspace.module.css'
 
 interface VerificationReviewStepProps {
@@ -35,23 +37,6 @@ const roleGuidance: Record<
   },
 }
 
-const cityLabels: Record<string, string> = {
-  izmir: 'İzmir',
-  istanbul: 'İstanbul',
-  ankara: 'Ankara',
-}
-
-const districtLabels: Record<string, string> = {
-  urla: 'Urla',
-  çeşme: 'Çeşme',
-  seferihisar: 'Seferihisar',
-  kadıköy: 'Kadıköy',
-  beşiktaş: 'Beşiktaş',
-  sarıyer: 'Sarıyer',
-  gölbaşı: 'Gölbaşı',
-  çankaya: 'Çankaya',
-}
-
 function maskedPropertyNumber(value: string): string {
   if (value.length <= 4) return value
   return `•••• •••• ${value.slice(-4)}`
@@ -74,38 +59,32 @@ export function VerificationReviewStep({
   const staleVerification =
     verification.status === 'verified' && !verificationValidation.valid
   const readyMedia = media.filter((item) => item.status === 'ready').length
-  const locationText =
-    [cityLabels[location.city], districtLabels[location.district], location.neighborhood]
-      .filter(Boolean)
-      .join(' · ') || 'Konum henüz tamamlanmadı'
+  const locationText = locationChain(location) || 'Konum henüz tamamlanmadı'
 
   return (
     <section className={styles.stepSection} aria-labelledby="verification-step-title">
-      <header className={styles.stepHeader}>
-        <div>
-          <p className={styles.kicker}>Adım 5 / 5</p>
-          <h1 id="verification-step-title" tabIndex={-1}>Doğrulama ve yayın</h1>
-          <p>
-            İlanı yayınlamadan önce yetkiyi doğrulayın ve girdiğiniz bilgileri son
-            kez kontrol edin.
-          </p>
-        </div>
-        <span className={styles.requiredNote}>Yayın öncesi zorunlu kontrol</span>
-      </header>
+      <ListingStepIntro
+        headingId="verification-step-title"
+        stepIndex={5}
+        stepCount={5}
+        title="Doğrulama ve yayın"
+        description="İlanı yayınlamadan önce yetkiyi doğrulayın ve girdiğiniz bilgileri son kez kontrol edin."
+        note="Yayın öncesi zorunlu kontrol"
+      />
 
       <section
         className={styles.eidsCard}
         aria-labelledby="eids-card-title"
         aria-busy={verification.status === 'checking' || undefined}
       >
-        <div className={styles.eidsHeader}>
+        <header className={styles.eidsHeader}>
           <div>
             <p className={styles.contextEyebrow}>EİDS yetki doğrulaması</p>
             <h2 id="eids-card-title">{guidance.title}</h2>
             <p>{guidance.description}</p>
           </div>
           <span className={styles.demoTag}>Güvenli demo</span>
-        </div>
+        </header>
 
         {role === 'agency' ? (
           <p className={styles.disclosure}>
@@ -240,93 +219,91 @@ export function VerificationReviewStep({
         ) : null}
       </section>
 
-      <div className={styles.reviewHeader}>
-        <div>
-          <p className={styles.contextEyebrow}>Son kontrol</p>
-          <h2>Yayınlanacak bilgilerin özeti</h2>
-        </div>
-        <p>Bir bölümü düzenlediğinizde kaydettikten sonra buraya dönersiniz.</p>
-      </div>
-
-      <div className={styles.reviewList}>
-        <article className={styles.reviewItem}>
-          <div>
-            <span data-ready={getStepValidation(draft, 'property').valid || undefined}>
-              {reviewStatus(draft, 'property')}
-            </span>
-            <h3>Mülk bilgileri</h3>
-            <p>
-              {property.family === 'land' ? 'Arsa / Arazi' : 'Emlak'} ·{' '}
-              {property.transaction === 'rent' ? 'Kiralık' : 'Satılık'}
-            </p>
-          </div>
-          <button type="button" onClick={() => onEdit('property')}>
-            Mülk bilgilerini düzenle
-          </button>
-        </article>
-        <article className={styles.reviewItem}>
-          <div>
-            <span data-ready={getStepValidation(draft, 'location').valid || undefined}>
-              {reviewStatus(draft, 'location')}
-            </span>
-            <h3>Konum</h3>
-            <p>{locationText}</p>
-          </div>
-          <button type="button" onClick={() => onEdit('location')}>
-            Konum bilgilerini düzenle
-          </button>
-        </article>
-        <article className={styles.reviewItem}>
-          <div>
-            <span data-ready={getStepValidation(draft, 'media').valid || undefined}>
-              {reviewStatus(draft, 'media')}
-            </span>
-            <h3>Fotoğraflar</h3>
-            <p>{readyMedia} geçerli fotoğraf · {media.some((item) => item.isCover) ? 'Kapak seçili' : 'Kapak eksik'}</p>
-          </div>
-          <button type="button" onClick={() => onEdit('media')}>
-            Fotoğrafları düzenle
-          </button>
-        </article>
-        <article className={styles.reviewItem}>
-          <div>
-            <span data-ready={getStepValidation(draft, 'content').valid || undefined}>
-              {reviewStatus(draft, 'content')}
-            </span>
-            <h3>Fiyat ve ilan metni</h3>
-            <p>{content.title || 'Başlık eksik'}</p>
-          </div>
-          <button type="button" onClick={() => onEdit('content')}>
-            Fiyat ve ilan metnini düzenle
-          </button>
-        </article>
-        <article className={styles.reviewItem} data-verification>
-          <div>
-            <span data-ready={verificationValidation.valid || undefined}>
-              {verificationValidation.valid ? 'Hazır' : 'Doğrulama gerekli'}
-            </span>
-            <h3>EİDS doğrulaması</h3>
-            <p>
+      <ListingGroup
+        id="review"
+        title="Yayınlanacak bilgilerin özeti"
+        description="Bir bölümü düzenlediğinizde kaydettikten sonra buraya dönersiniz."
+      >
+        <div className={styles.reviewList}>
+          <article className={styles.reviewItem}>
+            <div>
+              <span data-ready={getStepValidation(draft, 'property').valid || undefined}>
+                {reviewStatus(draft, 'property')}
+              </span>
+              <h3>Mülk bilgileri</h3>
+              <p>
+                {property.family === 'land' ? 'Arsa / Arazi' : 'Emlak'} ·{' '}
+                {property.transaction === 'rent' ? 'Kiralık' : 'Satılık'}
+              </p>
+            </div>
+            <button type="button" onClick={() => onEdit('property')}>
+              Mülk bilgilerini düzenle
+            </button>
+          </article>
+          <article className={styles.reviewItem}>
+            <div>
+              <span data-ready={getStepValidation(draft, 'location').valid || undefined}>
+                {reviewStatus(draft, 'location')}
+              </span>
+              <h3>Konum</h3>
+              <p>{locationText}</p>
+            </div>
+            <button type="button" onClick={() => onEdit('location')}>
+              Konum bilgilerini düzenle
+            </button>
+          </article>
+          <article className={styles.reviewItem}>
+            <div>
+              <span data-ready={getStepValidation(draft, 'media').valid || undefined}>
+                {reviewStatus(draft, 'media')}
+              </span>
+              <h3>Fotoğraflar</h3>
+              <p>{readyMedia} geçerli fotoğraf · {media.some((item) => item.isCover) ? 'Kapak seçili' : 'Kapak eksik'}</p>
+            </div>
+            <button type="button" onClick={() => onEdit('media')}>
+              Fotoğrafları düzenle
+            </button>
+          </article>
+          <article className={styles.reviewItem}>
+            <div>
+              <span data-ready={getStepValidation(draft, 'content').valid || undefined}>
+                {reviewStatus(draft, 'content')}
+              </span>
+              <h3>Fiyat ve ilan metni</h3>
+              <p>{content.title || 'Başlık eksik'}</p>
+            </div>
+            <button type="button" onClick={() => onEdit('content')}>
+              Fiyat ve ilan metnini düzenle
+            </button>
+          </article>
+          <article className={styles.reviewItem} data-verification>
+            <div>
+              <span data-ready={verificationValidation.valid || undefined}>
+                {verificationValidation.valid ? 'Hazır' : 'Doğrulama gerekli'}
+              </span>
+              <h3>EİDS doğrulaması</h3>
+              <p>
+                {verificationValidation.valid
+                  ? 'Yetki ve taşınmaz kimliği eşleşti'
+                  : 'Yayın öncesinde yetki kontrolünü tamamlayın'}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onVerify}
+              disabled={
+                verification.status === 'checking' ||
+                !location.propertyNumber ||
+                !property.publisherRole
+              }
+            >
               {verificationValidation.valid
-                ? 'Yetki ve taşınmaz kimliği eşleşti'
-                : 'Yayın öncesinde yetki kontrolünü tamamlayın'}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onVerify}
-            disabled={
-              verification.status === 'checking' ||
-              !location.propertyNumber ||
-              !property.publisherRole
-            }
-          >
-            {verificationValidation.valid
-              ? 'Yetkiyi yeniden doğrula'
-              : 'Yetkiyi kontrol et'}
-          </button>
-        </article>
-      </div>
+                ? 'Yetkiyi yeniden doğrula'
+                : 'Yetkiyi kontrol et'}
+            </button>
+          </article>
+        </div>
+      </ListingGroup>
     </section>
   )
 }

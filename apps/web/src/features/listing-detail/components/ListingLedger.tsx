@@ -1,16 +1,13 @@
 import type { ListingDetail, VerificationRow } from '../domain/listing-detail-types'
 import { formatDate } from '../format'
+import workspaceStyles from '../ListingDetailWorkspace.module.css'
+import { EvidenceState } from './EvidenceState'
+import { VERIFICATION_SECTION_ID } from './ListingIntro'
 import styles from './ListingLedger.module.css'
 import questionStyles from './ListingQuestions.module.css'
 
 export interface ListingLedgerProps {
   detail: ListingDetail
-}
-
-const DOT_CLASS: Record<VerificationRow['state'], string> = {
-  positive: questionStyles.dotOk,
-  negative: questionStyles.dotWarn,
-  unknown: questionStyles.dotNone,
 }
 
 /**
@@ -31,28 +28,57 @@ const STATE_TEXT: Record<VerificationRow['state'], string> = {
  * Defter bir soru değildir; sayfanın zeminidir. Her satır neyi, hangi
  * kaynaktan, ne zaman doğruladığımızı söyler ve kapsam notu varsa onu da
  * taşır: bir kontrolün olumlu olması diğerlerini olumlu yapmaz.
+ *
+ * Satırlar bandın ortak kanıt ızgarasındadır (`.evidenceRow`) — Belgeler
+ * bölümüyle aynı üç sütun. Daha önce satır düz bir cümleydi ve kaynak künyesi
+ * cümlenin içinde kayboluyordu; artık kendi sütununda, sağa hizalı durur.
  */
 export function ListingLedger({ detail }: ListingLedgerProps) {
   return (
-    <section className={styles.ledger} aria-labelledby="defter-baslik">
+    // Karar kartındaki "Doğrulama vektörünün tamamı" bağlantısının hedefi:
+    // vektörün tamamı burada durur, kartta yalnız özeti kalır.
+    <section
+      id={VERIFICATION_SECTION_ID}
+      className={styles.ledger}
+      aria-labelledby="defter-baslik"
+    >
       <h2 id="defter-baslik" className={styles.title}>
         Neyi, ne zaman doğruladık
       </h2>
-      <ul className={styles.rows}>
-        {detail.verification.map((row) => (
-          <li key={row.id} className={questionStyles.check}>
-            <span className={`${questionStyles.dot} ${DOT_CLASS[row.state]}`} aria-hidden="true" />
-            <span>
-              <span className={styles.state}>{STATE_TEXT[row.state]}</span>{' '}
-              <strong>{row.title}</strong>
-              {row.scopeNote ? <> {row.scopeNote}</> : null}{' '}
-              <span className={styles.source}>
+      <ul className={workspaceStyles.evidenceGrid}>
+        {detail.verification.map((row) => {
+          const state = (
+            <EvidenceState tone={row.state} className={workspaceStyles.evidenceState}>
+              {STATE_TEXT[row.state]}
+            </EvidenceState>
+          )
+
+          return (
+            <li key={row.id} className={workspaceStyles.evidenceRow} data-state={row.state}>
+              {/* Kimlik sütunu: satırlar arasında değişen tek şey budur. */}
+              <p className={workspaceStyles.evidenceLabel}>{row.title}</p>
+              {/* Kapsam notu yoksa sarmalayıcı da yoktur: tek çocuklu bir
+                  kutu, durum kelimesini iki ayrı düğümde tekrar ederdi. */}
+              {row.scopeNote ? (
+                <div className={workspaceStyles.evidenceValue}>
+                  {state}
+                  <p className={workspaceStyles.evidenceScope}>{row.scopeNote}</p>
+                </div>
+              ) : (
+                state
+              )}
+              <p className={workspaceStyles.evidenceSource}>
                 {row.source}
-                {row.retrievedAt ? ` · ${formatDate(row.retrievedAt)}` : ''}
-              </span>
-            </span>
-          </li>
-        ))}
+                {row.retrievedAt ? (
+                  <>
+                    <br />
+                    {formatDate(row.retrievedAt)}
+                  </>
+                ) : null}
+              </p>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
@@ -63,7 +89,12 @@ export interface ListingTallyProps {
 }
 
 /**
- * Dosyanın durumu — üç sayı, kutu içinde değil ızgarada.
+ * Dosyanın durumu — bölümlü ölçer, üç sayı, kutu içinde değil ızgarada.
+ *
+ * Ölçer sayıların GÖRSEL karşılığıdır, ikinci bir bilgi kanalı değil: her
+ * kontrol bir segmenttir, rengi durumunu söyler. Bilgiyi altındaki üç sayı
+ * taşır, bu yüzden ölçer `aria-hidden`'dır — ekran okuyucuya aynı şey iki kez
+ * okunmaz.
  *
  * Sayılar doğrulama vektöründen okunur; "eksik" bizim sorgulamadığımız
  * anlamına gelir, ilanın olumsuzluğu anlamına değil.
@@ -75,6 +106,13 @@ export function ListingTally({ rows }: ListingTallyProps) {
 
   return (
     <>
+      {rows.length > 0 ? (
+        <ul className={styles.meter} aria-hidden="true">
+          {rows.map((row) => (
+            <li key={row.id} data-state={row.state} />
+          ))}
+        </ul>
+      ) : null}
       <dl className={styles.tally}>
         <div>
           <dt>Olumlu</dt>

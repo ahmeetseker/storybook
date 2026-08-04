@@ -2,7 +2,7 @@
 name: GlassInput
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassInput Kuralları
@@ -103,13 +103,22 @@ Placeholder yardım metni değildir (kaybolur) — kalıcı yardım GlassField
 
 **Borç (raw / mikro-geometri):** md/lg yatay padding'ler birebir
 `--lg-space-3/4`'e bağlandı; token karşılığı olmayanlar kökte yerel
-değişkenlerde toplandı: `--pad-x-sm` (10px — space-2/3 arası), `--clear-size`
-(22px temizle butonu kutusu), `--ios-min-font` (16px — iOS Safari zoom eşiği,
-platform sabiti, <bp-sm tüm boyutlarda geçerli). Bilinçli bırakılan: invalid
+değişkenlerde toplandı: `--pad-x-sm` (10px — space-2/3 arası),
+`--ios-min-font` (16px — iOS Safari zoom eşiği, platform sabiti, <bp-sm tüm
+boyutlarda geçerli). `--clear-size` artık raw değil, `--lg-space-6`'ya (24px)
+bağlı. Bilinçli bırakılan: invalid
 gölge deseni `inset 0 0 0 1.5px var(--lg-danger) + 0 4px 16px rgba(0,0,0,.12)`
 shadow token'larıyla birebir eşleşmediğinden raw kaldı (`!important`
 GlassSurface inline gölgesini ezmek için). Süre/easing (`0.16s ease-out`)
 raw — token yok.
+
+**Dokunma hedefi:** kabuk yüksekliği `--lg-control-{size}`'dan gelir —
+imleçli cihazda 36/40/44, dokunmatikte 44/44/48px. Temizle butonu görünürde
+24px kalır ama `::after` ile dikeyde `--lg-control-hit`e (44px) uzanır;
+GlassSurface `overflow: hidden` taşıdığı için taşma satır yüksekliğinde
+kırpılır, yani gerçek hedef satırın kendi yüksekliği kadardır (36–44px) —
+eski 22px'e göre belirgin iyi. Yatayda genişletilmez: girdi metnine taşıp
+yanlış hedef üretirdi.
 
 ## 10. Storybook kapsamı
 
@@ -140,3 +149,7 @@ toggle'ı (suffix aksiyonu gerektirir).
 
 - 2026-07-16: İlk sürüm — size/tone/invalid/prefix/suffix/clearable,
   GlassField context entegrasyonu, iOS 16px kuralı.
+- 2026-08-03: Yeni kontrol ölçeği. Kabuk yüksekliği imleçli cihazda
+  44/44/48 → 36/40/44px (token değişimi; CSS'te yalnız bayat fallback'ler
+  güncellendi). `--clear-size` 22px → `--lg-space-6` (24px) ve butona
+  görünmez `::after` hedef genişletmesi eklendi.

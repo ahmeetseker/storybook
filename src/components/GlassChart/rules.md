@@ -225,7 +225,11 @@ component'in genişletilmesi mi · dokunmatikte `pointerup` sonrası balonun
 otomatik kapanması (şu an yalnız `pointerleave` kapatıyor, dokunmatikte bu
 olay güvenilir tetiklenmeyebilir — dış tıklamayla kapanma ihtiyacı olabilir).
 
-**Changelog:** 2026-07-17 — İlk sürüm: `line`/`area`/`bar`, son nokta
+**Changelog:**
+- 2026-08-03 — Ekran okuyucu veri tablosu blok bir kapta gizleniyor: `.srOnly`
+  doğrudan `<table>`'a uygulanınca `overflow: hidden` yok sayılıyor ve grafik
+  dar ekranlarda sayfada yatay taşma üretiyordu.
+- 2026-07-17 — İlk sürüm: `line`/`area`/`bar`, son nokta
 vurgusu, pointer/tap kılavuz + balon, `role="img"` + sr-only veri tablosu.
 
 2026-07-17 — Code review fix'leri: (1) hover açıkken `points` kısaldığında

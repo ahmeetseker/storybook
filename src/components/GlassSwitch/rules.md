@@ -2,7 +2,7 @@
 name: GlassSwitch
 category: form
 status: hazır
-lastReviewed: 2026-07-16
+lastReviewed: 2026-08-03
 ---
 
 # GlassSwitch Kuralları
@@ -71,8 +71,9 @@ Varsayılan: `md`, kapalı, accent vurgu.
   click ile çift tetikleme olmaz, jsdom dahil her ortamda deterministiktir.
 - Motion: thumb `layout` animasyonu, `presets.springs.sidebar` (salınımsız).
   `prefers-reduced-motion`: geçiş süresi 0 — anında atlar.
-- Touch (`pointer: coarse`): ray/thumb büyür + görünmez `::after` halo dokunma
-  hedefini min 44px'e tamamlar (görsel bozulmadan).
+- Touch (`pointer: coarse`): ray ve thumb büyür (md 50×28, sm 40×22). Dokunma
+  hedefi = görünen kapsül; görünmez halo mümkün değil, bkz. §9 "Dokunma
+  hedefi (bilinen kısıt)".
 
 ## 8. İçerik
 
@@ -93,9 +94,20 @@ değişkenlerde (`--lg-switch-w/h/thumb`); kök kapsül padding'i de yerel
 değişkende toplandı (`--lg-switch-pad: 3px`). Bilinçli bırakılanlar: thumb
 `background: #fff` (cam üstü kontrast — tema token'ı değil, her temada
 beyaz) ve thumb gölgesi `0 1px 3px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.15)`
-(hiçbir `--lg-shadow-*` deseniyle birebir değil — dokunulmadı). Coarse
-dokunma halosu `max(100%, var(--lg-control-md))` — coarse'ta 44px, birebir.
+(hiçbir `--lg-shadow-*` deseniyle birebir değil — dokunulmadı).
 Geçiş süresi `0.18s ease-out` raw (süre token'ı yok).
+
+**Dokunma hedefi (bilinen kısıt):** hedef = görünen kapsül. İmleçli cihazda
+md 50×30, sm 40×24; dokunmatikte md 56×34, sm 46×28px. AA 2.5.8 (24px) her
+durumda karşılanır, AAA 2.5.5 (44px) **karşılanmaz**. Görünmez bir `::after`
+halosu mümkün değil: kök GlassSurface'tir ve kendi köşe kırpması için
+`overflow: hidden` taşır — kutunun dışına taşan pseudo-eleman ne boyanır ne
+de tıklanır. (2026-08-03'e kadar CSS'te böyle bir coarse halosu duruyordu;
+ölçüldüğünde hiçbir etkisi olmadığı görülüp kaldırıldı.) Kapsülü 44px'e
+büyütmek iOS switch oranını (51×31) bozar ve "kontroller çok iri" geri
+bildirimiyle çelişir; bu yüzden AAA gerektiğinde switch'i 44px'lik bir
+satır/etiket içine yerleştirmek çağıranın işidir. Kalıcı çözüm
+GlassSurface'te bir "hit-slop" kanalı açmaktır (açık karar).
 
 ## 10. Storybook kapsamı
 
@@ -126,3 +138,7 @@ değerlendirilecek.
 
 - 2026-07-16: İlk sürüm — role=switch button, layout-spring thumb,
   coarse pointer halo hedefi.
+- 2026-08-03: Yeni kontrol ölçeği gözden geçirmesi. Coarse dokunma halosu
+  (`.root::after`) kaldırıldı — kök GlassSurface'in `overflow: hidden`'ı
+  nedeniyle hiç çalışmıyordu (ölü kod). Ray/thumb ölçüleri değişmedi;
+  gerçek hedef ve AAA 2.5.5 kısıtı §9'da açıkça belgelendi.

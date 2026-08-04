@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 import { ListingCreateWorkspace } from './ListingCreateWorkspace'
+import { LISTING_DRAFT_STORAGE_KEY } from './listing-draft-storage'
 import {
   createEmptyDraft,
   type ListingDraft,
@@ -96,6 +97,13 @@ const meta = {
     layout: 'fullscreen',
   },
   tags: ['autodocs'],
+  // Taslak kalıcılığı sekme deposunu kullanır; her story temiz başlar.
+  loaders: [
+    async () => {
+      window.sessionStorage.removeItem(LISTING_DRAFT_STORAGE_KEY)
+      return {}
+    },
+  ],
   argTypes: {
     adapterDelayMs: {
       control: { type: 'number', min: 0, max: 1500, step: 50 },
@@ -304,4 +312,22 @@ export const HareketAzaltilmis: Story = {
       reducedTransparency: 'reduce',
     },
   },
+}
+
+export const TaslagaDevam: Story = {
+  args: {
+    adapterDelayMs: 0,
+  },
+  loaders: [
+    async () => {
+      window.sessionStorage.setItem(
+        LISTING_DRAFT_STORAGE_KEY,
+        JSON.stringify({
+          draft: { ...enterpriseDraft('media'), media: [] },
+          droppedMediaCount: 3,
+        }),
+      )
+      return {}
+    },
+  ],
 }

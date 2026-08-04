@@ -101,7 +101,8 @@ Varsayılan kombinasyon: `placement=bottom-start`, `tone=auto`.
 - Animasyon: scale 0.96 + 4px kayma + opacity, 160ms; `prefers-reduced-motion`
   → yalnız opacity. transform-origin placement'a göre.
 - Responsive: panel `min-width: 60vw` mobile-first; `/* bp-sm */ 640px`'te
-  200px'e iner. Item yüksekliği `pointer: coarse`'ta `--lg-control-md` (44px).
+  200px'e iner. Item yüksekliği tek token'dan: `--lg-control-sm` — imleçli
+  cihazda 36px, dokunmatikte 44px.
 
 ## 8. İçerik
 
@@ -118,7 +119,7 @@ Varsayılan kombinasyon: `placement=bottom-start`, `tone=auto`.
 | panel | radius | `--lg-radius-media` |
 | panel offset | top/bottom | `--lg-space-2` |
 | list | padding | `--lg-space-1` |
-| item | padding / min-height | `--lg-space-2/3` / `--lg-control-sm` (coarse: `--lg-control-md`) |
+| item | padding / min-height | `--lg-space-2/3` / `--lg-control-sm` (imleçli 36px, dokunmatik 44px) |
 | item | font-size / radius | `--lg-text-body` / `--lg-radius-chip` |
 | item | focus outline | `--lg-accent` |
 | destructive | color | `--lg-danger` |
@@ -129,8 +130,15 @@ kökünde yerel değişkende toplandı (`.root { --panel-min-width: 200px;
 --item-hover-bg: rgba(255,255,255,.28); }`) — hover zemini beyaz-alfa cam
 malzeme etkisidir (GlassTabs paritesi), değer değiştirilmedi; `200px`'in token
 karşılığı yok. Bilinçli bırakılan: z-index 30 (z ölçeği token'ı yok), geçiş
-süresi `0.16s ease` (süre/easing token'ı yok). Öğe dokunmatik hedefi
-pointer:coarse'ta `--lg-control-md` token'ından (coarse'ta 44px).
+süresi `0.16s ease` (süre/easing token'ı yok).
+
+**Dokunma hedefi (2026-08-03):** Öğe yüksekliği tek kaynaktan —
+`--lg-control-sm` imleçli cihazda 36px, dokunmatikte 44px verdiği için eski
+`@media (pointer: coarse) { .item { min-height: var(--lg-control-md) } }`
+bloğu gereksizleşti ve KALDIRILDI. Görünmez `::after` taşması bilinçli olarak
+EKLENMEDİ: öğeler `--lg-space-1` dolgulu bir listede 1px boşlukla dizili,
+dikey taşma komşu hedeflerle üst üste binerdi. Menü satırı tam genişlikte bir
+metin hedefidir; 36px yükseklik WCAG 2.2 AA 2.5.8 tabanının (24px) üstündedir.
 
 ## 10. Storybook kapsamı
 
@@ -168,3 +176,6 @@ typeahead eklenmesi.
 
 - 2026-07-16: İlk sürüm — cloneElement aria enjeksiyonu, roving tabIndex,
   AnimatePresence panel, dış tıklama/Escape/Tab kapanışı.
+- 2026-08-03: Yeni kontrol ölçeğine uyarlandı — gereksizleşen
+  `pointer: coarse` yüksekliği kaldırıldı; öğe imleçlide 36px, dokunmatikte
+  44px (tek token, `--lg-control-sm`).
