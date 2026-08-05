@@ -45,7 +45,13 @@ export {
 export { GlassTabs, type GlassTabsProps, type GlassTabItem } from './components/GlassTabs'
 export { GlassSellerCard, type GlassSellerCardProps } from './components/GlassSellerCard'
 export { GlassLocationCard, type GlassLocationCardProps } from './components/GlassLocationCard'
-export { GlassListingCard, type GlassListingCardProps } from './components/GlassListingCard'
+export {
+  GlassListingCard,
+  type GlassListingCardAmenity,
+  type GlassListingCardMetric,
+  type GlassListingCardProps,
+  type GlassListingCardVariant,
+} from './components/GlassListingCard'
 export { GlassCarousel, type GlassCarouselProps } from './components/GlassCarousel'
 export { GlassHero, type GlassHeroProps } from './components/GlassHero'
 export {

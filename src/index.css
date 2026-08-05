@@ -79,6 +79,8 @@
 
   /* Etkileşim */
   --lg-stroke-hairline: 1px;
+  --lg-motion-duration-normal: 240ms;
+  --lg-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --lg-focus-ring-width: 2px;
   --lg-focus-ring-offset: 2px;
 
@@ -95,6 +97,13 @@
   --lg-space-8: 40px;
   --lg-space-9: 48px;
   --lg-space-10: 64px;
+
+  /* İlan kartı geometri kademeleri — carousel uyumlu kompakt ve vitrin genişliği. */
+  --lg-listing-card-compact-width: 240px;
+  --lg-listing-card-wide-width: 420px;
+  --lg-listing-card-property-width: 320px;
+  --lg-listing-card-property-price-fluid: 6cqi;
+  --lg-listing-card-property-ratio: 4 / 5;
 
   /* Okuma genişliği (measure) — WCAG 2.2 AAA 1.4.8 gövde metni satırının
      80 karakteri aşmamasını ister.

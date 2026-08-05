@@ -194,7 +194,7 @@ export function MapFirstHome({
       showConceptNavigation={showConceptNavigation}
       className={styles.page}
       footer={
-        <HomeFooter variant="columns" showConceptLink={showConceptNavigation} />
+        <HomeFooter variant="columns" />
       }
     >
       <div className={styles.hero}>

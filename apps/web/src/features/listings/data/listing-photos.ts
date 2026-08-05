@@ -73,8 +73,14 @@ export const REPRESENTATIVE_IMAGE_NOTE =
   'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.'
 
 export function getRepresentativeListingImage(listing: ListingSummary): ListingPhoto {
+  const pool = STOCK_PHOTOS_BY_CATEGORY[listing.category]
+  const stableIndex = [...listing.id].reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  ) % pool.length
+  const portraitSource = `${pool[stableIndex]}&h=1500`
   return {
-    src: STOCK_PHOTOS_BY_CATEGORY[listing.category][0],
+    src: portraitSource,
     fallbackSrc: listing.image.src,
     alt: `${listing.title} için temsili ilan fotoğrafı`,
   }

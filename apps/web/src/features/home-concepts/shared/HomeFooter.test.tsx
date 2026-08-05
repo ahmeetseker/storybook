@@ -15,8 +15,8 @@ function renderFooter(
 }
 
 describe('HomeFooter', () => {
-  it('marka anlatısını ve dört ürün bilgi grubunu birlikte gösterir', () => {
-    renderFooter({ showConceptLink: false })
+  it('marka anlatısını ve üç ürün bilgi grubunu birlikte gösterir', () => {
+    renderFooter()
 
     const footer = screen.getByRole('contentinfo')
     expect(
@@ -34,14 +34,13 @@ describe('HomeFooter', () => {
       'Keşfet',
       'Karar araçları',
       'İlan ve hesap',
-      'Güven',
     ]) {
       expect(within(footer).getByText(heading)).toBeDefined()
     }
   })
 
-  it('yalnız gerçek ürün rotalarını kullanır ve konsept bağlantısını isteğe göre gizler', () => {
-    renderFooter({ showConceptLink: false })
+  it('yalnız gerçek ürün rotalarını kullanır ve konsept bağlantısı göstermez', () => {
+    renderFooter()
 
     const footer = screen.getByRole('contentinfo')
     const expectedLinks = new Map([
@@ -55,7 +54,6 @@ describe('HomeFooter', () => {
       ['İlan ver', '/ilan-ver'],
       ['Hesabım', '/hesabim'],
       ['Mesajlar', '/hesabim/mesajlar'],
-      ['Güven merkezi', '/konseptler/guven-merkezi'],
     ])
 
     for (const [name, href] of expectedLinks) {
@@ -71,16 +69,12 @@ describe('HomeFooter', () => {
     expect(footer.querySelector('a[href="#"]')).toBeNull()
   })
 
-  it('slim varyantta kısa link seti, konsept görünümünde konsept bağlantısı kullanır', () => {
-    renderFooter({ variant: 'slim', showConceptLink: true })
+  it('slim varyantta yalnız gerçek kısa yolları kullanır', () => {
+    renderFooter({ variant: 'slim' })
 
     const footer = screen.getByRole('contentinfo')
     expect(footer.getAttribute('data-variant')).toBe('slim')
-    expect(
-      within(footer)
-        .getByRole('link', { name: 'Ana sayfa konseptleri' })
-        .getAttribute('href'),
-    ).toBe('/konseptler')
+    expect(within(footer).queryByRole('link', { name: 'Ana sayfa konseptleri' })).toBeNull()
     expect(within(footer).queryByText('Karar araçları')).toBeNull()
   })
 })

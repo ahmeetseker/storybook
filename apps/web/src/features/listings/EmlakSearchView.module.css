@@ -309,6 +309,72 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.gridListingShell {
+  --lg-listing-card-property-ratio: 4 / 5;
+  position: relative;
+  min-width: 0;
+  aspect-ratio: var(--lg-listing-card-property-ratio);
+  border-radius: var(--lg-radius-card);
+}
+
+.gridListingShell > button {
+  height: 100%;
+}
+
+.overlayActions {
+  position: absolute;
+  top: var(--lg-space-4);
+  right: var(--lg-space-4);
+  z-index: 2;
+  display: flex;
+  gap: var(--lg-space-2);
+}
+
+.overlayActions button {
+  display: inline-grid;
+  width: var(--lg-control-sm);
+  height: var(--lg-control-sm);
+  place-items: center;
+  padding: 0;
+  border: var(--lg-stroke-hairline) solid color-mix(in srgb, var(--lg-label) 10%, transparent);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-glass);
+  color: var(--lg-label);
+  box-shadow: var(--lg-shadow-xs);
+  cursor: pointer;
+}
+
+.overlayActions svg {
+  width: var(--lg-space-4);
+  height: var(--lg-space-4);
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--lg-focus-ring-width);
+}
+
+.overlayActions button:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.overlayActions button[aria-pressed='true'] svg {
+  fill: currentColor;
+}
+
+@media (hover: hover) {
+  .overlayActions button:hover {
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .overlayActions button {
+    background: var(--lg-surface);
+  }
+}
+
 .resultStage.withMap .gridList {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

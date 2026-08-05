@@ -6,11 +6,6 @@ import {
 import { withBase } from "@/config/base-path";
 import styles from "./HomeFooter.module.css";
 
-const conceptLink = {
-  label: "Ana sayfa konseptleri",
-  href: "/konseptler",
-} as const;
-
 const footerColumns: GlassFooterColumn[] = [
   {
     title: "Keşfet",
@@ -37,15 +32,6 @@ const footerColumns: GlassFooterColumn[] = [
       { label: "Mesajlar", href: "/hesabim/mesajlar" },
     ],
   },
-  {
-    title: "Güven",
-    links: [
-      {
-        label: "Güven merkezi",
-        href: "/konseptler/guven-merkezi",
-      },
-    ],
-  },
 ];
 
 const slimColumns: GlassFooterColumn[] = [
@@ -54,7 +40,6 @@ const slimColumns: GlassFooterColumn[] = [
     links: [
       { label: "Arsa ara", href: "/arsa-ara" },
       { label: "İlan ver", href: "/ilan-ver" },
-      { label: "Güven merkezi", href: "/konseptler/guven-merkezi" },
     ],
   },
 ];
@@ -62,26 +47,16 @@ const slimColumns: GlassFooterColumn[] = [
 export interface HomeFooterProps extends Pick<
   GlassFooterProps,
   "variant" | "cta" | "newsletter" | "social"
-> {
-  showConceptLink?: boolean;
-}
+> {}
 
 export function HomeFooter({
   variant = "columns",
   cta,
   newsletter,
   social,
-  showConceptLink = true,
 }: HomeFooterProps) {
   const baseColumns = variant === "slim" ? slimColumns : footerColumns;
-  const withConceptLink = showConceptLink
-    ? baseColumns.map((column, index) =>
-        index === baseColumns.length - 1
-          ? { ...column, links: [...column.links, conceptLink] }
-          : column,
-      )
-    : baseColumns;
-  const columns = withConceptLink.map((column) => ({
+  const columns = baseColumns.map((column) => ({
     ...column,
     links: column.links.map((link) =>
       link.href ? { ...link, href: withBase(link.href) } : link,

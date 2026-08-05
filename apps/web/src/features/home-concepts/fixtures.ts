@@ -161,7 +161,7 @@ const generatedListings = Array.from({ length: 42 }, (_, index) => {
 const listingData = [...leadingListings, ...generatedListings]
 
 export const homeListings: GlassListingCardProps[] = listingData.map(
-  ({ id, title, price, size, location, image }) => ({
+  ({ id, title, price, size, location, image, featured }) => ({
     id,
     image: {
       src: image,
@@ -169,9 +169,18 @@ export const homeListings: GlassListingCardProps[] = listingData.map(
     },
     title,
     price,
-    location: `${location} · ${size}`,
+    pricePrefix: 'Liste:',
+    location,
+    metrics: [
+      { value: size, label: 'Alan' },
+      { value: 'Müstakil', label: 'Tapu' },
+    ],
+    seller: 'Arsam ilanı',
+    listedAt: 'Bugün',
+    variant: 'propertyOverlay',
     material: 'flat',
     type: 'button',
+    'aria-label': `${featured ? 'Öne çıkan ilan. ' : ''}${title}, ${location}, ${size}, ${price}`,
   }),
 )
 

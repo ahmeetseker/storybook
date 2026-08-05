@@ -2,14 +2,15 @@
 name: GlassListingCard
 category: içerik
 status: hazır
-lastReviewed: 2026-07-15
+lastReviewed: 2026-08-04
 ---
 
 # GlassListingCard Kuralları
 
 ## 1. Amaç
 
-Tıklanabilir ilan kartı: görsel + başlık + konum + fiyat (+rozet). Kartın tamamı
+Tıklanabilir ilan kartı: görsel + başlık + konum + fiyat (+rozet). `compact`,
+`details`, `overlay` ve `propertyOverlay` yerleşimleri aynı içerik sözleşmesini paylaşır. Kartın tamamı
 tek bir `<button>`'dur; basınca `useGlassPress` ile sıvılaşır/jöle salınımı yapar.
 İçerik katmanında yaşar, malzemesi seçilebilir (`material`).
 
@@ -44,6 +45,9 @@ tek bir `<button>`'dur; basınca `useGlassPress` ile sıvılaşır/jöle salın�
 | location | — | string | İkincil metin, opacity .65 |
 | price | ✅ | string (biçimlenmiş) | Component para biçimlemez; '785.000 TL' hazır gelir |
 | badge | — | ReactNode (GlassBadge) | Sol üst overlay; metni a11y adına karışır — kısa tut |
+| amenities | — | `{ label, icon? }[]` | Zengin varyantlarda tek satırlık olanak chip'leri |
+| reviewCount | — | string | Konum satırının karşı ucundaki hazır değerlendirme metni |
+| actionLabel | — | string | Görsel eylem etiketi; ayrı bir iç buton değildir |
 
 ## 4. Public API
 
@@ -54,6 +58,15 @@ tek bir `<button>`'dur; basınca `useGlassPress` ile sıvılaşır/jöle salın�
 | price | prop | `string` | — | Hazır biçimli fiyat metni |
 | location | prop | `string` | — | Opsiyonel konum satırı |
 | badge | prop | `ReactNode` | — | Sol üst rozet |
+| variant | prop | `'compact'\|'details'\|'overlay'` | `'compact'` | Bağımsız yerleşim ekseni |
+| priceSuffix | prop | `string` | — | Fiyat dönemi (`/Ay`) |
+| reviewCount | prop | `string` | — | Hazır değerlendirme sayısı |
+| amenities | prop | `GlassListingCardAmenity[]` | — | Olanak listesi |
+| actionLabel | prop | `string` | `'Detayları Gör'` | Zengin varyantların CTA etiketi |
+| pricePrefix | prop | `string` | — | Fiyat öncesi kısa etiket (`Liste:`) |
+| metrics | prop | `GlassListingCardMetric[]` | — | Konut kartındaki kısa değer/etiket çiftleri |
+| seller | prop | `string` | — | İlan sahibi |
+| listedAt | prop | `string` | — | Hazır yayın zamanı |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | GlassSurface'e |
 | material | prop | `'glass'\|'flat'` | — (Surface default: `'glass'`) | İçerik katmanında `flat` önerilir |
 | disabled | prop | `boolean` | — | Native + basınç animasyonunu da kapatır |
@@ -65,11 +78,15 @@ dışarı sızmaz (rest'teki aynı isimli handler'lar **ezilir** — bilinen kı
 
 ## 5. Seçenek eksenleri
 
-Varsayılan kombinasyon: `tone='auto'`, `material` verilmez (cam), rozet yok.
+Varsayılan kombinasyon: `variant='compact'`, `tone='auto'`, `material` verilmez
+(compact için Surface default cam; zengin varyantlar flat), rozet yok.
 
 | Kural / türetilen | Davranış |
 |---|---|
-| `size` ekseni | ❌ yok — genişlik sabit 240px (bkz. Borç/Açık Kararlar) |
+| `size` ekseni | ❌ yok — geometri `variant` yerleşiminden türetilir |
+| `variant='details'` | 420px açık içerik kartı; medya üstte, bilgi altta |
+| `variant='overlay'` | 420px medya üstü içerik; scrim ile okunurluk |
+| `variant='propertyOverlay'` | 320px, 4/5 konut medyası; alt scrim üstünde fiyat, adres, metrik ve satıcı künyesi |
 | `disabled` | hover + basınç animasyonu bastırılır |
 | `prefers-reduced-motion` | `useGlassPress` kendini kapatır (spring'ler çalışmaz) |
 | hover/active prop olarak | ❌ — yalnız CSS + press hook |
@@ -132,11 +149,11 @@ bkz. Açık Kararlar).
 
 ## 10. Storybook kapsamı
 
-Var: `Default`, `WithBadge`, `Materials` (glass/flat yan yana), `States`
+Var: `Default`, `Playground`, `ReferansVaryantlar`, `SagKartReferansi`, `Variants`, `WithBadge`, `Materials` (glass/flat yan yana), `States`
 (default · disabled · flat+disabled), `UzunBaslik` (2 satır clamp), `GridKullanimi`
-(carousel-dışı, `auto-fill 240px` grid) — autodocs, `onClick: fn()`. Arka
-plan/tema toolbar'dan (Arka plan + Tier global'leri). **Eksik:** Playground,
-Erişilebilirlik (a11y adının okunuşu) story'si. Hover/focus/active CSS + press
+(carousel-dışı, `auto-fill 240px` grid), `Responsive`, `Erisilebilirlik` — autodocs,
+`onClick: fn()`. Arka plan/tema toolbar'dan (Arka plan + Tier global'leri).
+Hover/focus/active CSS + press
 hook state'idir — control/story yapılmaz (bkz. GlassButton kuralı).
 
 ## 11. Test kabul kriterleri
@@ -144,6 +161,9 @@ hook state'idir — control/story yapılmaz (bkz. GlassButton kuralı).
 - [x] başlık, fiyat, konum, görsel render (unit)
 - [x] `role=button` ile tıklanır, `onClick` çağrılır
 - [x] badge verilince görünür
+- [x] details/overlay zengin içeriği ve varyant veri niteliğini render eder
+- [x] propertyOverlay fiyat, metrik, satıcı ve tarihi render eder
+- [x] varsayılan `type="button"` ile form submit etmez
 - [ ] `disabled` tıklamayı ve basınç animasyonunu engeller
 - [ ] klavye (Enter/Space) aktivasyonu (interaction)
 - [ ] 2 satır clamp (visual)

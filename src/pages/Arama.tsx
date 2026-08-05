@@ -190,14 +190,19 @@ export function Arama({ baslangicGorunumu = 'liste' }: { baslangicGorunumu?: Ara
   ]
 
   const listePaneli = (
-    <div style={{ display: 'grid', gridTemplateColumns: gorunum === 'bolunmus' ? '1fr' : 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16, alignContent: 'start' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: gorunum === 'bolunmus' ? '320px' : 'repeat(auto-fill, minmax(300px, 320px))', gap: 16, alignContent: 'start' }}>
       {sonuclar.map((ilan) => (
         <GlassListingCard
           key={ilan.id}
           image={ilan.gorsel}
           title={ilan.baslik}
           price={ilan.fiyat}
-          location={`${ilan.konum} · ${ilan.m2} · ${ilan.m2Fiyat}`}
+          pricePrefix="Liste:"
+          location={ilan.konum}
+          metrics={[{ value: ilan.m2, label: 'Alan' }, { value: ilan.m2Fiyat, label: 'm² fiyatı' }]}
+          seller="Arsam ilanı"
+          listedAt={ilan.tarih}
+          variant="propertyOverlay"
           badge={ilan.eidsDogrulandi ? <EidsBadge dogrulandi /> : undefined}
           onClick={noop}
           material="flat"
