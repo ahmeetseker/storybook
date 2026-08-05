@@ -32,7 +32,7 @@ vi.mock('leaflet/dist/leaflet.css', () => ({}))
 
 describe('MapFirstHome hero', () => {
   it('varsayılan olarak arsa sekmesini ve başlığını gösterir', () => {
-    render(<MapFirstHome showConceptNavigation={false} />)
+    render(<MapFirstHome />)
     expect(
       screen.getByRole('heading', { level: 1, name: 'Önce haritada gör, sonra karar ver' }),
     ).toBeDefined()
@@ -40,7 +40,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('konut sekmesi başlığı, hızlı filtreleri ve sayacı değiştirir', () => {
-    render(<MapFirstHome showConceptNavigation={false} />)
+    render(<MapFirstHome />)
     fireEvent.click(screen.getByRole('radio', { name: 'Konut' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Evi mahallesiyle birlikte gör' })).toBeDefined()
     // Not: 'konut' sekmesinde '3+1' hem hızlı filtre chip'inde hem de ayrıştırılmış
@@ -52,7 +52,7 @@ describe('MapFirstHome hero', () => {
 
   it('controlled tab değeri dışarıdan yönetilir', () => {
     const onTabChange = vi.fn()
-    render(<MapFirstHome showConceptNavigation={false} tab="proje" onTabChange={onTabChange} />)
+    render(<MapFirstHome tab="proje" onTabChange={onTabChange} />)
     expect(screen.getByRole('heading', { level: 1, name: 'Teslim tarihinden önce yerini seç' })).toBeDefined()
     fireEvent.click(screen.getByRole('radio', { name: 'Arsa' }))
     expect(onTabChange).toHaveBeenCalledWith('arsa')
@@ -61,7 +61,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('arama hero varyantı vurgulu başlığı, arama kartını ve istatistikleri gösterir', () => {
-    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    render(<MapFirstHome heroVariant="search" />)
     expect(
       screen.getByRole('heading', { level: 1, name: 'Hayal ettiğin arsa seni bekliyor.' }),
     ).toBeDefined()
@@ -74,7 +74,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('arama hero varyantında sekme değişince vurgulu kelime ve ikinci seçici değişir', () => {
-    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    render(<MapFirstHome heroVariant="search" />)
     fireEvent.click(screen.getByRole('radio', { name: 'Konut' }))
     expect(
       screen.getByRole('heading', { level: 1, name: 'Hayal ettiğin ev seni bekliyor.' }),
@@ -84,7 +84,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('footer üstü SEO rafı uzun kuyruk sayfalarını gerçek bağlantı olarak sunar', () => {
-    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    render(<MapFirstHome heroVariant="search" />)
     expect(
       screen.getByRole('heading', { level: 2, name: 'En çok aranan arsa sayfaları' }),
     ).toBeDefined()
@@ -110,7 +110,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('footer üstündeki dönen şerit ilanları bağlantı olarak taşır ve duraklatılabilir', () => {
-    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    render(<MapFirstHome heroVariant="search" />)
     const strip = screen.getByRole('list', { name: 'Öne çıkan ilanlar' })
     const links = within(strip).getAllByRole('link')
     expect(links.length).toBeGreaterThan(4)
@@ -120,7 +120,7 @@ describe('MapFirstHome hero', () => {
   })
 
   it('AI çıkarım chipi kaldırılınca listeden çıkar', () => {
-    render(<MapFirstHome showConceptNavigation={false} />)
+    render(<MapFirstHome />)
     expect(screen.getByText('Urla')).toBeDefined()
     // Not: GlassAiSearchBar kaldırma butonunun erişilebilir adı `Kaldır` değil,
     // `Filtreyi kaldır: ${filter.label}: ${filter.value}` biçiminde (bkz. GlassAiSearchBar.tsx).

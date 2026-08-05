@@ -1,45 +1,21 @@
 import { expect, test, type Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
-const conceptRoutes = [
-  {
-    href: '/konseptler',
-    heading: 'Beş arsam.net deneyimini karşılaştırın',
-  },
-  {
-    href: '/konseptler/ai-kesif',
-    heading: 'Arsanı tarif et, gerisini birlikte daraltalım',
-  },
-  {
-    href: '/konseptler/pazar-vitrini',
-    heading: 'Türkiye genelinde arsa ilanları',
-  },
-  {
-    href: '/konseptler/harita-kesfi',
-    heading: 'Arsayı önce haritada gör',
-  },
-  {
-    href: '/konseptler/guven-merkezi',
-    heading: 'Arsa kararında kanıtı öne al',
-  },
-  {
-    href: '/konseptler/ai-danisman',
-    heading: 'Nasıl bir arsa aradığını birlikte netleştirelim',
-  },
-] as const
+/* `/konseptler` seçim ekranı ve beş konsept rotası kaldırıldı; Harita Keşfi
+   deneyimi artık doğrudan ana sayfadır (`/` → MapFirstHome). Buradaki
+   kapsam da o yüzden tek rota üzerinden yürür. */
+const HOME_HEADING = 'Hayal ettiğin arsa seni bekliyor.'
 
-async function expectConceptShell(
-  page: Page,
-  route: (typeof conceptRoutes)[number],
-) {
-  await page.goto(route.href)
+/* Kabuk gezinmesi burada DOĞRULANMAZ: `Site` landmark'ı dar ekranda menünün
+   içine girdiği için görünürlük iddiası viewport'a bağlı olurdu. Kabuk
+   gezinmesinin kendi kapsamı `shell.spec.ts`'tedir; burada sayfanın kendi
+   sözleşmesi (tek h1, tek main) sınanır. */
+async function expectHomeShell(page: Page) {
+  await page.goto('/')
   await expect(
-    page.getByRole('heading', { level: 1, name: route.heading }),
+    page.getByRole('heading', { level: 1, name: HOME_HEADING }),
   ).toBeVisible()
   await expect(page.locator('main#main-content')).toHaveCount(1)
-  await expect(
-    page.getByRole('navigation', { name: 'Ana gezinme' }),
-  ).toBeVisible()
 }
 
 test('Harita Keşfi yoğun ve simetrik gerçek ana sayfa olarak çalışır', async ({
@@ -51,7 +27,7 @@ test('Harita Keşfi yoğun ve simetrik gerçek ana sayfa olarak çalışır', as
   await expect(
     page.getByRole('heading', {
       level: 1,
-      name: 'Arsayı önce haritada gör',
+      name: HOME_HEADING,
     }),
   ).toBeVisible()
   await expect(
@@ -200,7 +176,7 @@ test('Harita Keşfi yoğun ve simetrik gerçek ana sayfa olarak çalışır', as
   const tabletHeading = await page
     .getByRole('heading', {
       level: 1,
-      name: 'Arsayı önce haritada gör',
+      name: HOME_HEADING,
     })
     .boundingBox()
   const tabletMap = await page
@@ -340,33 +316,11 @@ test('Harita Keşfi önerilerinin hero dışına taşan bölümü görünür ve 
   expect(bottomEdgeIsClickable).toBe(true)
 })
 
-test('AI Keşif ve Pazar Vitrini SSR ana içeriklerini gösterir', async ({
-  page,
-}) => {
-  for (const route of conceptRoutes.slice(1, 3)) {
-    await expectConceptShell(page, route)
-  }
-})
-
-test('Harita Keşfi ve Güven Merkezi kendi ürün yönlerini gösterir', async ({
-  page,
-}) => {
-  await page.goto('/konseptler/harita-kesfi')
-  await expect(
-    page.getByRole('region', { name: 'Bölgesel arsa haritası' }),
-  ).toBeVisible()
-
-  await page.goto('/konseptler/guven-merkezi')
-  await expect(
-    page.getByRole('heading', { name: 'Güven Kontrolleri' }),
-  ).toBeVisible()
-})
-
-test('Harita Keşfi CTA’ları mobilde erişilebilir ve gerçek rotalara gider', async ({
+test('ana sayfa CTA’ları mobilde erişilebilir ve gerçek rotalara gider', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/konseptler/harita-kesfi')
+  await page.goto('/')
 
   const compareRegion = page.getByRole('region', {
     name: 'Konumu, fiyatı ve imarı yan yana koy',
@@ -440,98 +394,45 @@ test('Harita Keşfi CTA’ları mobilde erişilebilir ve gerçek rotalara gider'
   await expect(page).toHaveURL(/\/ofisler$/)
 })
 
-test('Güven Merkezi doğrulanmış ofis CTA’sı erişilebilir ve gerçek rotaya gider', async ({
+test('ana sayfa tek ana içerik ve ortak Glass kabuğu taşır', async ({
   page,
 }) => {
-  await page.goto('/konseptler/guven-merkezi')
-
-  const agencyButton = page
-    .getByRole('region', { name: 'Doğrulanmış kurumsal ofisler' })
-    .getByRole('button', {
-      name: 'Tüm doğrulanmış ofisleri gör',
-      exact: true,
-    })
-
-  await expect(agencyButton).toBeVisible()
-
-  const contrast = await new AxeBuilder({ page })
-    .include('[aria-labelledby="trust-agencies-title"] > button')
-    .withRules(['color-contrast'])
-    .analyze()
-  expect(contrast.violations).toEqual([])
-
-  await agencyButton.click()
-  await expect(page).toHaveURL(/\/ofisler$/)
-})
-
-test('AI Danışman öneriden karşılaştırmaya ilerleyen akışı gösterir', async ({
-  page,
-}) => {
-  await page.goto('/konseptler/ai-danisman')
+  await expectHomeShell(page)
   await expect(
-    page.getByRole('heading', {
-      level: 1,
-      name: 'Nasıl bir arsa aradığını birlikte netleştirelim',
-    }),
-  ).toBeVisible()
-  await expect(
-    page.getByRole('link', { name: 'Önerileri karşılaştır' }),
-  ).toHaveAttribute('href', '/karsilastir')
-  await expect(
-    page.getByText('Sen onaylamadan hiçbir mesaj gönderilmez.'),
+    page.getByRole('link', { name: 'arsam.net' }).first(),
   ).toBeVisible()
 })
 
-test('altı konsept rotası tek ana içerik ve ortak Glass kabuğu taşır', async ({
-  page,
-}) => {
-  for (const route of conceptRoutes) {
-    await expectConceptShell(page, route)
-    await expect(
-      page.getByRole('link', { name: 'arsam.net' }).first(),
-    ).toBeVisible()
-  }
-})
-
-test('konseptler masaüstü ve mobilde yatay taşma üretmez', async ({
-  page,
-}) => {
+test('ana sayfa masaüstü ve mobilde yatay taşma üretmez', async ({ page }) => {
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 390, height: 844 },
   ]) {
     await page.setViewportSize(viewport)
-
-    for (const route of conceptRoutes) {
-      await expectConceptShell(page, route)
-      expect(
-        await page.evaluate(() => document.documentElement.scrollWidth),
-      ).toBeLessThanOrEqual(viewport.width)
-    }
+    await expectHomeShell(page)
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(viewport.width)
   }
 })
 
-test('konsept rotalarında critical veya serious Axe ihlali yoktur', async ({
+test('ana sayfada critical veya serious Axe ihlali yoktur', async ({
   page,
 }) => {
   test.slow()
-  for (const route of conceptRoutes) {
-    await expectConceptShell(page, route)
-    // GlassHero'nun giriş opaklığı son değerine ulaşmadan Axe ara rengi
-    // ölçmemeli; gerçek durumu sabitlenene kadar kısa bir görsel bekleme yap.
-    await page.waitForTimeout(1_000)
-    const accessibility = await new AxeBuilder({ page }).analyze()
-    const blockingViolations = accessibility.violations.filter(
-      (violation) =>
-        violation.impact === 'critical' || violation.impact === 'serious',
-    )
-    expect(blockingViolations, route.href).toEqual([])
-  }
+  await expectHomeShell(page)
+  // GlassHero'nun giriş opaklığı son değerine ulaşmadan Axe ara rengi
+  // ölçmemeli; gerçek durumu sabitlenene kadar kısa bir görsel bekleme yap.
+  await page.waitForTimeout(1_000)
+  const accessibility = await new AxeBuilder({ page }).analyze()
+  const blockingViolations = accessibility.violations.filter(
+    (violation) =>
+      violation.impact === 'critical' || violation.impact === 'serious',
+  )
+  expect(blockingViolations, '/').toEqual([])
 })
 
-test('JavaScript olmadan seçim ekranı ve AI Keşif okunabilir kalır', async ({
-  browser,
-}) => {
+test('JavaScript olmadan ana sayfa okunabilir kalır', async ({ browser }) => {
   const context = await browser.newContext({
     javaScriptEnabled: false,
     viewport: { width: 390, height: 844 },
@@ -539,23 +440,9 @@ test('JavaScript olmadan seçim ekranı ve AI Keşif okunabilir kalır', async (
   const page = await context.newPage()
 
   try {
-    await page.goto('/konseptler')
+    await page.goto('/')
     await expect(
-      page.getByRole('heading', {
-        level: 1,
-        name: 'Beş arsam.net deneyimini karşılaştırın',
-      }),
-    ).toBeVisible()
-    await expect(
-      page.locator('a[href^="/konseptler/"]'),
-    ).toHaveCount(5)
-
-    await page.goto('/konseptler/ai-kesif')
-    await expect(
-      page.getByRole('heading', {
-        level: 1,
-        name: 'Arsanı tarif et, gerisini birlikte daraltalım',
-      }),
+      page.getByRole('heading', { level: 1, name: HOME_HEADING }),
     ).toBeVisible()
     await expect(page.locator('main#main-content')).toHaveCount(1)
     expect(

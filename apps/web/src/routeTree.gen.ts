@@ -23,7 +23,6 @@ import { Route as HesabimRouteImport } from './routes/hesabim'
 import { Route as IlanVerRouteImport } from './routes/ilan-ver'
 import { Route as KarsilastirRouteImport } from './routes/karsilastir'
 import { Route as KayitRouteImport } from './routes/kayit'
-import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
 import { Route as OrganizasyonSecRouteImport } from './routes/organizasyon-sec'
 import { Route as OturumSuresiDolduRouteImport } from './routes/oturum-suresi-doldu'
@@ -49,12 +48,6 @@ import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KayitHesapVarRouteImport } from './routes/kayit_.hesap-var'
 import { Route as KayitKurumsalRouteImport } from './routes/kayit_.kurumsal'
 import { Route as KayitProfilRouteImport } from './routes/kayit_.profil'
-import { Route as KonseptlerIndexRouteImport } from './routes/konseptler.index'
-import { Route as KonseptlerAiDanismanRouteImport } from './routes/konseptler.ai-danisman'
-import { Route as KonseptlerAiKesifRouteImport } from './routes/konseptler.ai-kesif'
-import { Route as KonseptlerGuvenMerkeziRouteImport } from './routes/konseptler.guven-merkezi'
-import { Route as KonseptlerHaritaKesfiRouteImport } from './routes/konseptler.harita-kesfi'
-import { Route as KonseptlerPazarVitriniRouteImport } from './routes/konseptler.pazar-vitrini'
 import { Route as ParolaSifirlaGecersizRouteImport } from './routes/parola-sifirla_.gecersiz'
 import { Route as ParolaSifirlaGonderildiRouteImport } from './routes/parola-sifirla_.gonderildi'
 import { Route as ParolaSifirlaTamamRouteImport } from './routes/parola-sifirla_.tamam'
@@ -129,11 +122,6 @@ const KarsilastirRoute = KarsilastirRouteImport.update({
 const KayitRoute = KayitRouteImport.update({
   id: '/kayit',
   path: '/kayit',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KonseptlerRoute = KonseptlerRouteImport.update({
-  id: '/konseptler',
-  path: '/konseptler',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfislerRoute = OfislerRouteImport.update({
@@ -261,36 +249,6 @@ const KayitProfilRoute = KayitProfilRouteImport.update({
   path: '/kayit/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
-const KonseptlerIndexRoute = KonseptlerIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
-const KonseptlerAiDanismanRoute = KonseptlerAiDanismanRouteImport.update({
-  id: '/ai-danisman',
-  path: '/ai-danisman',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
-const KonseptlerAiKesifRoute = KonseptlerAiKesifRouteImport.update({
-  id: '/ai-kesif',
-  path: '/ai-kesif',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
-const KonseptlerGuvenMerkeziRoute = KonseptlerGuvenMerkeziRouteImport.update({
-  id: '/guven-merkezi',
-  path: '/guven-merkezi',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
-const KonseptlerHaritaKesfiRoute = KonseptlerHaritaKesfiRouteImport.update({
-  id: '/harita-kesfi',
-  path: '/harita-kesfi',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
-const KonseptlerPazarVitriniRoute = KonseptlerPazarVitriniRouteImport.update({
-  id: '/pazar-vitrini',
-  path: '/pazar-vitrini',
-  getParentRoute: () => KonseptlerRoute,
-} as any)
 const ParolaSifirlaGecersizRoute = ParolaSifirlaGecersizRouteImport.update({
   id: '/parola-sifirla_/gecersiz',
   path: '/parola-sifirla/gecersiz',
@@ -332,7 +290,6 @@ export interface FileRoutesByFullPath {
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
-  '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/organizasyon-sec': typeof OrganizasyonSecRoute
   '/oturum-suresi-doldu': typeof OturumSuresiDolduRoute
@@ -357,17 +314,11 @@ export interface FileRoutesByFullPath {
   '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
   '/kayit/profil': typeof KayitProfilRoute
-  '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
-  '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
-  '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
-  '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
-  '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/parola-sifirla/gecersiz': typeof ParolaSifirlaGecersizRoute
   '/parola-sifirla/gonderildi': typeof ParolaSifirlaGonderildiRoute
   '/parola-sifirla/tamam': typeof ParolaSifirlaTamamRoute
   '/parola-sifirla/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim/': typeof HesabimIndexRoute
-  '/konseptler/': typeof KonseptlerIndexRoute
   '/giris/google/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -408,17 +359,11 @@ export interface FileRoutesByTo {
   '/kayit/hesap-var': typeof KayitHesapVarRoute
   '/kayit/kurumsal': typeof KayitKurumsalRoute
   '/kayit/profil': typeof KayitProfilRoute
-  '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
-  '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
-  '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
-  '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
-  '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/parola-sifirla/gecersiz': typeof ParolaSifirlaGecersizRoute
   '/parola-sifirla/gonderildi': typeof ParolaSifirlaGonderildiRoute
   '/parola-sifirla/tamam': typeof ParolaSifirlaTamamRoute
   '/parola-sifirla/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim': typeof HesabimIndexRoute
-  '/konseptler': typeof KonseptlerIndexRoute
   '/giris/google/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRoutesById {
@@ -437,7 +382,6 @@ export interface FileRoutesById {
   '/ilan-ver': typeof IlanVerRoute
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
-  '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
   '/organizasyon-sec': typeof OrganizasyonSecRoute
   '/oturum-suresi-doldu': typeof OturumSuresiDolduRoute
@@ -462,17 +406,11 @@ export interface FileRoutesById {
   '/kayit_/hesap-var': typeof KayitHesapVarRoute
   '/kayit_/kurumsal': typeof KayitKurumsalRoute
   '/kayit_/profil': typeof KayitProfilRoute
-  '/konseptler/ai-danisman': typeof KonseptlerAiDanismanRoute
-  '/konseptler/ai-kesif': typeof KonseptlerAiKesifRoute
-  '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
-  '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
-  '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
   '/parola-sifirla_/gecersiz': typeof ParolaSifirlaGecersizRoute
   '/parola-sifirla_/gonderildi': typeof ParolaSifirlaGonderildiRoute
   '/parola-sifirla_/tamam': typeof ParolaSifirlaTamamRoute
   '/parola-sifirla_/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim/': typeof HesabimIndexRoute
-  '/konseptler/': typeof KonseptlerIndexRoute
   '/giris_/google_/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRouteTypes {
@@ -492,7 +430,6 @@ export interface FileRouteTypes {
     | '/ilan-ver'
     | '/karsilastir'
     | '/kayit'
-    | '/konseptler'
     | '/ofisler'
     | '/organizasyon-sec'
     | '/oturum-suresi-doldu'
@@ -517,17 +454,11 @@ export interface FileRouteTypes {
     | '/kayit/hesap-var'
     | '/kayit/kurumsal'
     | '/kayit/profil'
-    | '/konseptler/ai-danisman'
-    | '/konseptler/ai-kesif'
-    | '/konseptler/guven-merkezi'
-    | '/konseptler/harita-kesfi'
-    | '/konseptler/pazar-vitrini'
     | '/parola-sifirla/gecersiz'
     | '/parola-sifirla/gonderildi'
     | '/parola-sifirla/tamam'
     | '/parola-sifirla/yeni'
     | '/hesabim/'
-    | '/konseptler/'
     | '/giris/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -568,17 +499,11 @@ export interface FileRouteTypes {
     | '/kayit/hesap-var'
     | '/kayit/kurumsal'
     | '/kayit/profil'
-    | '/konseptler/ai-danisman'
-    | '/konseptler/ai-kesif'
-    | '/konseptler/guven-merkezi'
-    | '/konseptler/harita-kesfi'
-    | '/konseptler/pazar-vitrini'
     | '/parola-sifirla/gecersiz'
     | '/parola-sifirla/gonderildi'
     | '/parola-sifirla/tamam'
     | '/parola-sifirla/yeni'
     | '/hesabim'
-    | '/konseptler'
     | '/giris/google/callback'
   id:
     | '__root__'
@@ -596,7 +521,6 @@ export interface FileRouteTypes {
     | '/ilan-ver'
     | '/karsilastir'
     | '/kayit'
-    | '/konseptler'
     | '/ofisler'
     | '/organizasyon-sec'
     | '/oturum-suresi-doldu'
@@ -621,17 +545,11 @@ export interface FileRouteTypes {
     | '/kayit_/hesap-var'
     | '/kayit_/kurumsal'
     | '/kayit_/profil'
-    | '/konseptler/ai-danisman'
-    | '/konseptler/ai-kesif'
-    | '/konseptler/guven-merkezi'
-    | '/konseptler/harita-kesfi'
-    | '/konseptler/pazar-vitrini'
     | '/parola-sifirla_/gecersiz'
     | '/parola-sifirla_/gonderildi'
     | '/parola-sifirla_/tamam'
     | '/parola-sifirla_/yeni'
     | '/hesabim/'
-    | '/konseptler/'
     | '/giris_/google_/callback'
   fileRoutesById: FileRoutesById
 }
@@ -650,7 +568,6 @@ export interface RootRouteChildren {
   IlanVerRoute: typeof IlanVerRoute
   KarsilastirRoute: typeof KarsilastirRoute
   KayitRoute: typeof KayitRoute
-  KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
   OrganizasyonSecRoute: typeof OrganizasyonSecRoute
   OturumSuresiDolduRoute: typeof OturumSuresiDolduRoute
@@ -773,13 +690,6 @@ declare module '@tanstack/react-router' {
       path: '/kayit'
       fullPath: '/kayit'
       preLoaderRoute: typeof KayitRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/konseptler': {
-      id: '/konseptler'
-      path: '/konseptler'
-      fullPath: '/konseptler'
-      preLoaderRoute: typeof KonseptlerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ofisler': {
@@ -957,48 +867,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KayitProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/konseptler/': {
-      id: '/konseptler/'
-      path: '/'
-      fullPath: '/konseptler/'
-      preLoaderRoute: typeof KonseptlerIndexRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
-    '/konseptler/ai-danisman': {
-      id: '/konseptler/ai-danisman'
-      path: '/ai-danisman'
-      fullPath: '/konseptler/ai-danisman'
-      preLoaderRoute: typeof KonseptlerAiDanismanRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
-    '/konseptler/ai-kesif': {
-      id: '/konseptler/ai-kesif'
-      path: '/ai-kesif'
-      fullPath: '/konseptler/ai-kesif'
-      preLoaderRoute: typeof KonseptlerAiKesifRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
-    '/konseptler/guven-merkezi': {
-      id: '/konseptler/guven-merkezi'
-      path: '/guven-merkezi'
-      fullPath: '/konseptler/guven-merkezi'
-      preLoaderRoute: typeof KonseptlerGuvenMerkeziRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
-    '/konseptler/harita-kesfi': {
-      id: '/konseptler/harita-kesfi'
-      path: '/harita-kesfi'
-      fullPath: '/konseptler/harita-kesfi'
-      preLoaderRoute: typeof KonseptlerHaritaKesfiRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
-    '/konseptler/pazar-vitrini': {
-      id: '/konseptler/pazar-vitrini'
-      path: '/pazar-vitrini'
-      fullPath: '/konseptler/pazar-vitrini'
-      preLoaderRoute: typeof KonseptlerPazarVitriniRouteImport
-      parentRoute: typeof KonseptlerRoute
-    }
     '/parola-sifirla_/gecersiz': {
       id: '/parola-sifirla_/gecersiz'
       path: '/parola-sifirla/gecersiz'
@@ -1062,28 +930,6 @@ const HesabimRouteChildren: HesabimRouteChildren = {
 const HesabimRouteWithChildren =
   HesabimRoute._addFileChildren(HesabimRouteChildren)
 
-interface KonseptlerRouteChildren {
-  KonseptlerAiDanismanRoute: typeof KonseptlerAiDanismanRoute
-  KonseptlerAiKesifRoute: typeof KonseptlerAiKesifRoute
-  KonseptlerGuvenMerkeziRoute: typeof KonseptlerGuvenMerkeziRoute
-  KonseptlerHaritaKesfiRoute: typeof KonseptlerHaritaKesfiRoute
-  KonseptlerPazarVitriniRoute: typeof KonseptlerPazarVitriniRoute
-  KonseptlerIndexRoute: typeof KonseptlerIndexRoute
-}
-
-const KonseptlerRouteChildren: KonseptlerRouteChildren = {
-  KonseptlerAiDanismanRoute: KonseptlerAiDanismanRoute,
-  KonseptlerAiKesifRoute: KonseptlerAiKesifRoute,
-  KonseptlerGuvenMerkeziRoute: KonseptlerGuvenMerkeziRoute,
-  KonseptlerHaritaKesfiRoute: KonseptlerHaritaKesfiRoute,
-  KonseptlerPazarVitriniRoute: KonseptlerPazarVitriniRoute,
-  KonseptlerIndexRoute: KonseptlerIndexRoute,
-}
-
-const KonseptlerRouteWithChildren = KonseptlerRoute._addFileChildren(
-  KonseptlerRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiDanismanRoute: AiDanismanRoute,
@@ -1099,7 +945,6 @@ const rootRouteChildren: RootRouteChildren = {
   IlanVerRoute: IlanVerRoute,
   KarsilastirRoute: KarsilastirRoute,
   KayitRoute: KayitRoute,
-  KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
   OrganizasyonSecRoute: OrganizasyonSecRoute,
   OturumSuresiDolduRoute: OturumSuresiDolduRoute,

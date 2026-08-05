@@ -42,4 +42,45 @@ describe('GlassListingCard', () => {
     )
     expect(screen.getByText('Acil')).toBeDefined()
   })
+
+  it.each(['details', 'overlay'] as const)('%s varyantında zengin içeriği gösterir', (variant) => {
+    render(
+      <GlassTierProvider tier="fallback">
+        <GlassListingCard
+          {...baseProps}
+          variant={variant}
+          priceSuffix="/Ay"
+          reviewCount="2 bin değerlendirme"
+          amenities={[{ label: 'Wifi' }, { label: 'Mutfak' }]}
+          actionLabel="Detayları Gör"
+        />
+      </GlassTierProvider>,
+    )
+    expect(screen.getByText('2 bin değerlendirme')).toBeDefined()
+    expect(screen.getByLabelText('Olanaklar')).toBeDefined()
+    expect(screen.getByText('Detayları Gör')).toBeDefined()
+    expect(screen.getByRole('button').getAttribute('data-variant')).toBe(variant)
+  })
+
+  it('varsayılan olarak form göndermeyen button tipini kullanır', () => {
+    render(<GlassListingCard {...baseProps} />)
+    expect(screen.getByRole('button').getAttribute('type')).toBe('button')
+  })
+
+  it('propertyOverlay varyantında fiyat, metrik, satıcı ve tarihi gösterir', () => {
+    render(
+      <GlassListingCard
+        {...baseProps}
+        variant="propertyOverlay"
+        pricePrefix="Liste:"
+        metrics={[{ value: '29 m²', label: 'Yaşam' }, { value: '2', label: 'Oda' }]}
+        seller="Waleed Sabir"
+        listedAt="2 gün önce"
+      />,
+    )
+    expect(screen.getByText(/Liste:/)).toBeDefined()
+    expect(screen.getByLabelText('İlan özellikleri')).toBeDefined()
+    expect(screen.getByText('Waleed Sabir')).toBeDefined()
+    expect(screen.getByText('2 gün önce')).toBeDefined()
+  })
 })

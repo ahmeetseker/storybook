@@ -34,7 +34,6 @@ export function AiDiscoveryHome() {
 
   return (
     <HomeConceptFrame
-      activeConcept="ai-kesif"
       className={styles.page}
       footer={<HomeFooter variant="columns" />}
     >

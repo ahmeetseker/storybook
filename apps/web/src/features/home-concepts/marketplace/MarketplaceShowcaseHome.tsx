@@ -34,7 +34,6 @@ export function MarketplaceShowcaseHome() {
 
   return (
     <HomeConceptFrame
-      activeConcept="pazar-vitrini"
       className={styles.page}
       footer={<HomeFooter variant="slim" />}
     >

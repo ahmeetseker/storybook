@@ -121,7 +121,6 @@ export function AiAdvisorHome() {
 
   return (
     <HomeConceptFrame
-      activeConcept="ai-danisman"
       className={styles.page}
       footer={<HomeFooter variant="columns" />}
     >

@@ -76,7 +76,6 @@ export function TrustFirstHome() {
 
   return (
     <HomeConceptFrame
-      activeConcept="guven-merkezi"
       className={styles.page}
       footer={
         <HomeFooter

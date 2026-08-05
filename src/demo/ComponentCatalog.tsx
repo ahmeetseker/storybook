@@ -715,10 +715,10 @@ const ENTRIES: CatalogEntry[] = [
   },
   {
     name: 'Listing Card',
-    description: 'Benzer ilan kartı — görsel, iki satır başlık, konum ve fiyat; tamamı tıklanabilir.',
+    description: 'İlan kartı — kompakt liste, zengin detay ve görsel-üstü sunum varyantları; olanak, değerlendirme ve fiyat desteği.',
     category: 'İçerik',
     status: 'hazır',
-    storyPath: '/story/components-glasslistingcard--default',
+    storyPath: '/story/bileşenler-pazar-yeri-glasslistingcard--sag-kart-referansi',
   },
   // ── Dalga 5: Codex boşluk kapatma ──────────────────────────────────────
   {

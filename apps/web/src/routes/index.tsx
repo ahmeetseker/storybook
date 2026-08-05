@@ -17,7 +17,6 @@ function HomePage() {
 
   return (
     <MapFirstHome
-      showConceptNavigation={false}
       heroVariant="search"
       tab={tur ?? 'arsa'}
       onTabChange={(next) => {

@@ -7,6 +7,7 @@ import {
   GlassDrawer,
   GlassEmptyState,
   GlassFilterPanel,
+  GlassListingCard,
   GlassMap,
   GlassMapPopupCard,
   GlassPagination,
@@ -33,6 +34,7 @@ import {
   type PropertyCategory,
   type TransactionType,
 } from './domain/search-state'
+import { getRepresentativeListingImage } from './data/listing-photos'
 import styles from './EmlakSearchView.module.css'
 
 type HistoryMode = 'push' | 'replace'
@@ -504,6 +506,65 @@ function ListingCard({
   selected: boolean
   onSelect: () => void
 }) {
+  const [favorite, setFavorite] = useState(false)
+
+  if (layout === 'grid') {
+    const representativeImage = getRepresentativeListingImage(item)
+    return (
+      <article
+        aria-label={`${item.title} ilanı`}
+        className={[
+          styles.gridListingShell,
+          selected ? styles.selectedGridListing : '',
+        ].filter(Boolean).join(' ')}
+        onMouseEnter={onSelect}
+        onFocusCapture={onSelect}
+      >
+        <GlassListingCard
+          variant="propertyOverlay"
+          material="flat"
+          image={{ src: representativeImage.src, alt: representativeImage.alt }}
+          badge={
+            <span className={item.verified ? styles.verified : styles.unverified}>
+              {item.verified ? 'Doğrulanmış · Temsili' : 'Yetki bekliyor · Temsili'}
+            </span>
+          }
+          pricePrefix={item.transaction === 'sale' ? 'Liste:' : 'Kira:'}
+          price={currency(item.price, item.transaction)}
+          title={item.title}
+          location={`${item.city.toLocaleUpperCase('tr-TR')} · ${item.district.toLocaleUpperCase('tr-TR')}`}
+          metrics={[
+            { value: `${formatter.format(item.area)} m²`, label: 'Alan' },
+            {
+              value: CATEGORY_LABELS[item.category],
+              label: item.transaction === 'sale' ? 'Satılık' : 'Kiralık',
+            },
+          ]}
+          seller={item.sellerName}
+          listedAt={`${item.publishedDays} gün önce`}
+          aria-label={`${item.title}; ${currency(item.price, item.transaction)}; ${formatter.format(item.area)} metrekare; ${item.city}, ${item.district}`}
+          onClick={() => {
+            window.location.href = withBase(`/ilan/${item.id}`)
+          }}
+          style={{ width: '100%' }}
+        />
+        <span className={styles.overlayActions} aria-label="İlan eylemleri">
+          <button
+            type="button"
+            aria-label={favorite ? 'Favorilerden çıkar' : 'Favoriye ekle'}
+            aria-pressed={favorite}
+            title={favorite ? 'Favorilerden çıkar' : 'Favoriye ekle'}
+            onClick={() => setFavorite((current) => !current)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 3h12v18l-6-4-6 4V3Z" />
+            </svg>
+          </button>
+        </span>
+      </article>
+    )
+  }
+
   return (
     <article
       aria-label={`${item.title} ilanı`}

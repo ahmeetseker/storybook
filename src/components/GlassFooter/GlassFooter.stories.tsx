@@ -25,7 +25,6 @@ const columns: GlassFooterColumn[] = [
       { label: "AI danışman", href: "/ai-danisman" },
       { label: "Karşılaştır", href: "/karsilastir" },
       { label: "Favoriler", href: "/favoriler" },
-      { label: "Güven merkezi", href: "/konseptler/guven-merkezi" },
     ],
   },
   {
@@ -34,7 +33,6 @@ const columns: GlassFooterColumn[] = [
       { label: "İlan ver", href: "/ilan-ver" },
       { label: "Hesabım", href: "/hesabim" },
       { label: "Mesajlar", href: "/hesabim/mesajlar" },
-      { label: "Ana sayfa konseptleri", href: "/konseptler" },
     ],
   },
 ];
@@ -221,10 +219,7 @@ export const Slim: Story = {
         links: [
           { label: "Arsa ara", href: "/arsa-ara" },
           { label: "İlan ver", href: "/ilan-ver" },
-          {
-            label: "Güven merkezi",
-            href: "/konseptler/guven-merkezi",
-          },
+          { label: "Favoriler", href: "/favoriler" },
         ],
       },
     ],

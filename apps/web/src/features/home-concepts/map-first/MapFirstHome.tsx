@@ -147,7 +147,6 @@ const ShieldIcon = () => (
 );
 
 export interface MapFirstHomeProps {
-  showConceptNavigation?: boolean;
   /**
    * Hero yerleşimi — "map": haritalı split hero (konsept galerisi),
    * "search": Arsam yerleşimi (eyebrow + vurgulu başlık + yapılandırılmış arama kartı).
@@ -161,7 +160,6 @@ export interface MapFirstHomeProps {
 }
 
 export function MapFirstHome({
-  showConceptNavigation = true,
   heroVariant = "map",
   tab,
   defaultTab = "arsa",
@@ -201,8 +199,6 @@ export function MapFirstHome({
 
   return (
     <HomeConceptFrame
-      activeConcept={showConceptNavigation ? "harita-kesfi" : undefined}
-      showConceptNavigation={showConceptNavigation}
       className={styles.page}
       footer={
         <>

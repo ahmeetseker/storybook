@@ -248,14 +248,19 @@ export function AnaSayfa() {
             </h2>
             <GlassButton size="sm" onClick={noop}>Tümünü Gör</GlassButton>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 320px))', gap: 16 }}>
             {yayindakiler.map((ilan) => (
               <GlassListingCard
                 key={ilan.id}
                 image={ilan.gorsel}
                 title={ilan.baslik}
                 price={ilan.fiyat}
-                location={`${ilan.konum} · ${ilan.m2}`}
+                pricePrefix="Liste:"
+                location={ilan.konum}
+                metrics={[{ value: ilan.m2, label: 'Alan' }, { value: ilan.imar, label: 'İmar' }]}
+                seller="Arsam ilanı"
+                listedAt={ilan.tarih}
+                variant="propertyOverlay"
                 badge={<EidsBadge dogrulandi={ilan.eidsDogrulandi} />}
                 onClick={noop}
                 material="flat"

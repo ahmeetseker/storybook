@@ -14,6 +14,38 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const amenityIcon = (path: string) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <path d={path} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+const PrimePickBadge = () => (
+  <GlassBadge material="flat" tone="dark">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z" strokeLinejoin="round" />
+    </svg>
+    Öne Çıkan
+  </GlassBadge>
+)
+
+const referenceAmenities = [
+  { label: 'Wifi', icon: amenityIcon('M4 9a12 12 0 0 1 16 0M7 13a7.5 7.5 0 0 1 10 0M10.5 17a2.4 2.4 0 0 1 3 0M12 20h.01') },
+  { label: 'Mutfak', icon: amenityIcon('M5 3v7m3-7v7M3 7h7m-3 3v11m7-18v18m0-11h4a3 3 0 0 0 0-6h-4') },
+  { label: 'Spor', icon: amenityIcon('M3 10v4m3-6v8m12-8v8m3-6v4M6 12h12') },
+  { label: 'Otopark', icon: amenityIcon('M5 21V5h8a4 4 0 0 1 0 8H9m0-4h4') },
+] as const
+
+const referenceArgs = {
+  title: 'Modern Urban Loft – NYC',
+  price: '$210',
+  priceSuffix: '/Ay',
+  location: 'Manhattan, New York',
+  reviewCount: '2 bin değerlendirme',
+  amenities: referenceAmenities,
+  actionLabel: 'Detayları Gör',
+} as const
+
 export const Default: Story = {
   args: {
     image: { src: placeholderImage('Clio', '#3a5f8a', '#1f3a5f', 480, 360), alt: 'Renault Clio' },
@@ -21,6 +53,82 @@ export const Default: Story = {
     price: '785.000 TL',
     location: 'İstanbul, Maltepe',
   },
+}
+
+export const Playground: Story = {
+  args: {
+    ...referenceArgs,
+    variant: 'details',
+    image: { src: '/images/listings/organic-loft.png', alt: 'Organik formlu modern loft yatak odası' },
+  },
+}
+
+/** Kullanıcının verdiği referanstaki açık içerik ve görsel-üstü düzenlerin birebir karşılaştırması. */
+export const ReferansVaryantlar: Story = {
+  args: {
+    ...referenceArgs,
+    image: { src: '/images/listings/organic-loft.png', alt: 'Organik formlu modern loft yatak odası' },
+  },
+  parameters: { layout: 'fullscreen', backgrounds: { disable: true } },
+  render: (args) => (
+    <div
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 56,
+        flexWrap: 'wrap',
+        padding: 64,
+        background: 'linear-gradient(135deg, #e8e5df, #d9deea)',
+      }}
+    >
+      <GlassListingCard {...args} variant="details" material="flat" />
+      <GlassListingCard
+        {...args}
+        variant="overlay"
+        material="flat"
+        image={{ src: '/images/listings/urban-office-pod.png', alt: 'Manhattan manzaralı koyu metal çalışma podu' }}
+      />
+    </div>
+  ),
+}
+
+/** İkinci referanstaki sağ kart: tek parça görsel, koyu alt bilgi yüzeyi ve ilan metrikleri. */
+export const SagKartReferansi: Story = {
+  args: {
+    variant: 'propertyOverlay',
+    material: 'flat',
+    image: { src: '/images/listings/nordic-farmhouse.png', alt: 'Çayır içindeki beyaz İskandinav kır evi' },
+    badge: <PrimePickBadge />,
+    pricePrefix: 'Liste:',
+    price: '$250.000',
+    title: 'Harry Koningsbergstr.,',
+    location: '1063 AG Guillaume Briard',
+    metrics: [
+      { value: '29 m²', label: 'Yaşam' },
+      { value: '2', label: 'Oda' },
+    ],
+    seller: 'Waleed Sabir',
+    listedAt: '2 gün önce',
+    'aria-label': 'Öne çıkan ilan. Liste fiyatı 250 bin dolar. 29 metrekare, 2 oda. Waleed Sabir tarafından 2 gün önce yayınlandı.',
+  },
+  parameters: { layout: 'fullscreen', backgrounds: { disable: true } },
+  decorators: [
+    (Story) => (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          padding: 64,
+          background: '#eeeeee',
+        }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
 }
 
 export const WithBadge: Story = {
@@ -43,6 +151,29 @@ export const Materials: Story = {
         <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600 }}>material="flat"</p>
         <GlassListingCard {...args} material="flat" />
       </div>
+    </div>
+  ),
+}
+
+export const Variants: Story = {
+  args: { ...Default.args },
+  render: () => (
+    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center', padding: 32 }}>
+      <GlassListingCard {...Default.args!} variant="compact" />
+      <GlassListingCard {...referenceArgs} variant="details" image={{ src: '/images/listings/organic-loft.png', alt: '' }} />
+      <GlassListingCard {...referenceArgs} variant="overlay" image={{ src: '/images/listings/urban-office-pod.png', alt: '' }} />
+      <GlassListingCard
+        variant="propertyOverlay"
+        image={{ src: '/images/listings/nordic-farmhouse.png', alt: '' }}
+        badge={<PrimePickBadge />}
+        pricePrefix="Liste:"
+        price="$250.000"
+        title="Harry Koningsbergstr.,"
+        location="1063 AG Guillaume Briard"
+        metrics={[{ value: '29 m²', label: 'Yaşam' }, { value: '2', label: 'Oda' }]}
+        seller="Waleed Sabir"
+        listedAt="2 gün önce"
+      />
     </div>
   ),
 }
@@ -106,5 +237,24 @@ export const GridKullanimi: Story = {
         ))}
       </div>
     )
+  },
+}
+
+export const Responsive: Story = {
+  args: {
+    ...referenceArgs,
+    variant: 'overlay',
+    image: { src: '/images/listings/urban-office-pod.png', alt: 'Manhattan manzaralı çalışma podu' },
+  },
+  parameters: { viewport: { defaultViewport: 'mobile360' } },
+  decorators: [(Story) => <div style={{ padding: 16 }}><Story /></div>],
+}
+
+export const Erisilebilirlik: Story = {
+  args: {
+    ...referenceArgs,
+    variant: 'details',
+    image: { src: '/images/listings/organic-loft.png', alt: '' },
+    'aria-label': 'Modern Urban Loft, Manhattan New York; aylık 210 dolar. Detayları gör',
   },
 }

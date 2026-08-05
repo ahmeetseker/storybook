@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { LISTING_FIXTURES } from '../../listings/data/listing-adapter'
+import { getRepresentativeListingImage } from '../../listings/data/listing-photos'
 import type { AdvisorMatch } from '../domain/advisor-types'
 import { AdvisorListingCard } from './AdvisorListingCard'
 
@@ -153,7 +154,6 @@ describe('AdvisorListingCard', () => {
     }
     const { rerender } = render(<AdvisorListingCard {...defaultProps} />)
     const firstImage = screen.getByAltText(/temsili ilan fotoğrafı/i)
-    const representativeSrc = firstImage.getAttribute('src')
 
     fireEvent.error(firstImage)
     expect(firstImage.getAttribute('src')).toBe(match.listing.image.src)
@@ -163,7 +163,12 @@ describe('AdvisorListingCard', () => {
     const nextImage = screen.getByAltText(
       `${nextMatch.listing.title} için temsili ilan fotoğrafı`,
     )
-    expect(nextImage.getAttribute('src')).toBe(representativeSrc)
+    // Temsili fotoğraf ilan başına dağıtılır (aynı kategorideki iki ilan aynı
+    // kareyi paylaşmaz), o yüzden beklenen kaynak yeni ilanın kendisinden
+    // türetilir. Buradaki sözleşme: önceki ilanın yedeğine TAKILI KALMAMAK.
+    expect(nextImage.getAttribute('src')).toBe(
+      getRepresentativeListingImage(nextMatch.listing).src,
+    )
     expect(nextImage.getAttribute('src')).not.toBe(match.listing.image.src)
 
     fireEvent.error(nextImage)
