@@ -5,9 +5,13 @@
   container-type: inline-size;
 }
 
+/* Hero, arama kartının açılır panellerini (konum/m² select) taşıyor; panel
+   kartın dışına taşıp alttaki vitrin bölümünün üstüne düşmek zorunda.
+   z-index: 1 sayfadaki diğer 1'lerle berabere kalıp DOM sırasına yeniliyordu,
+   bu yüzden bir kademe yukarıda duruyor (shell header 30'da kalır). */
 .hero {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   min-width: 0;
 }
 
@@ -260,6 +264,14 @@
 
 .agencyCta {
   align-self: flex-start;
+}
+
+/* Sayfanın son bandı footer'a yaslanır; ayrımı zemin değil ince bir çizgi ve
+   nefes payı kurar — bölüm içerik katmanında kalır, ikinci bir cam yüzey açmaz. */
+.seoSection {
+  padding-block-start: var(--lg-space-7);
+  border-block-start: 1px solid var(--lg-hairline);
+  gap: var(--lg-space-5);
 }
 
 .regionLink:focus-visible {

@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-router'
 import { AuthSessionProvider, useAuthSession, useKorumaliRota } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
+import { sahteAuthAdapters } from './test-utils'
 import type { Oturum } from './domain/auth-types'
 import { GirisPage } from './pages/GirisPage'
 import { GirisKodPage } from './pages/GirisKodPage'
@@ -26,7 +27,9 @@ const ORNEK_OTURUM: Oturum = {
 
 function akisAdapters(): AuthAdapters {
   let oturum: Oturum | null = null
-  return {
+  // `sahteAuthAdapters` üzerinden kurulur — elle kurulan mock'lar arayüze her
+  // yeni metot eklendiğinde çalışma zamanında patlıyordu (bkz. rules.md §7).
+  return sahteAuthAdapters({
     girisBaslat: vi.fn(async () => ({
       durum: 'basarili' as const,
       veri: { kanal: 'sms' as const, maskeliKimlik: '555 *** 22 33' },
@@ -35,16 +38,11 @@ function akisAdapters(): AuthAdapters {
       oturum = ORNEK_OTURUM
       return { durum: 'basarili' as const, veri: ORNEK_OTURUM }
     }),
-    parolaIleGiris: vi.fn(),
-    kayitYap: vi.fn(),
-    profilTamamla: vi.fn(),
-    kurumsalBasvuruGonder: vi.fn(),
-    eidsDogrulamaBaslat: vi.fn(),
     oturumuGetir: () => oturum,
     cikisYap: () => {
       oturum = null
     },
-  } as AuthAdapters
+  })
 }
 
 function KorumaliHesabim() {

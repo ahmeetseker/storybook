@@ -232,8 +232,8 @@ aralığı örnekleri), States (`Geri Bildirim ve Yükleme`: `onFeedback` var/yo
 `loading` + boş `drivers`), UzunIcerik, Responsive (mobile1 + dokunmatik geri
 bildirim butonları), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Temalar` ayrı story olarak yok: `size` ekseni tanımlı değil, tema
-toolbar'la otomatik doğrulanır (`GlassMatchScore` ile aynı karar).
+`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (`GlassMatchScore`
+ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

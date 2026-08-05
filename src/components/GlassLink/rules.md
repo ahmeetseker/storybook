@@ -90,8 +90,8 @@ Varsayılan kombinasyon: `variant=inline`.
   focus'a girmez.
 - `prefers-reduced-motion`: renk/chevron geçişleri kapalı.
 - Responsive: **yok** — link her yerde aynı; inline metinle birlikte sarar.
-- Hover koyulaşması `color-mix(accent, label)` — açık temada koyulaşır, koyu
-  temada aydınlanır; iki temada da kontrast artar.
+- Hover koyulaşması `color-mix(accent, label)` — açık temada koyulaşır;
+  kontrast artar.
 
 ## 8. İçerik
 
@@ -122,7 +122,7 @@ token'ı yok).
 
 Var: Default (paragraf içi inline), Standalone, External, Disabled,
 Varyantlar (matris), MobilAkis (viewport: mobile1 — responsive davranışın
-*olmadığını* gösterir). **Eksik:** koyu tema forced story, visited tartışması.
+*olmadığını* gösterir). **Eksik:** visited tartışması.
 
 ## 11. Test kabul kriterleri
 
@@ -132,7 +132,7 @@ Varyantlar (matris), MobilAkis (viewport: mobile1 — responsive davranışın
 - [x] external çağıran `rel`'ini korur
 - [x] disabled: href/target yok, `aria-disabled`, onClick guard
 - [x] standalone chevron var / inline yok
-- [ ] hover kontrastı iki temada (visual)
+- [ ] hover kontrastı (visual)
 
 ## 12. Do / Don't
 

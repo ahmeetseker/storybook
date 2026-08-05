@@ -212,6 +212,12 @@ export function AccountSecurityPage({ data }: AccountSecurityPageProps) {
               Tanımadığınız bir cihaz ya da konum görürseniz parolanızı değiştirin.
             </p>
           </div>
+          {/* Bu cümle 2026-08-04'e kadar AKSİYONSUZ bir tavsiyeydi: parola
+              değiştirme sayfası yoktu. İP-6 onu yazdı, bağlantı artık gerçek. */}
+          <AccountActionLink
+            action={{ kind: 'route', label: 'Parolamı değiştir', to: '/parola-degistir' }}
+            variant="secondary"
+          />
         </div>
 
         <dl data-part="session-summary" className={styles.infoList}>

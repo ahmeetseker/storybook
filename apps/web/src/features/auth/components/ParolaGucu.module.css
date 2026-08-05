@@ -1,0 +1,167 @@
+/* Parola gücü göstergesi. Cam DEĞİL: cam yalnız navigasyon/kontrol
+   katmanına ayrılmıştır ve auth sayfalarının cam bütçesi birincil eylem
+   butonundadır. Burası form alanının altına düşen düz bir geri bildirim
+   şerididir. */
+
+.gosterge {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  inline-size: 100%;
+}
+
+/* Kademe sayısı veriden gelir (`PAROLA_KURALLARI.length`), bu yüzden
+   `grid-template-columns` satır içi yazılır — bir tasarım değeri değil,
+   kural sayısının kendisidir. */
+.olcek {
+  display: grid;
+  gap: var(--lg-space-1);
+}
+
+/* Şerit yüksekliği ölçek adımından alınır; ayrı bir "bar boyu" token'ı
+   uydurmak yerine mevcut aralık ölçeği kullanılır. */
+.bolum {
+  position: relative;
+  block-size: var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-hairline);
+  overflow: hidden;
+}
+
+.dolgu {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  border-radius: var(--lg-radius-capsule);
+}
+
+.durumSatiri {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+/* Etiketler üst üste yığılır ve çapraz geçişle değişir; yığın, en uzun
+   etiketin genişliğini tuttuğu için satır puan değiştikçe zıplamaz. */
+.etiketYigini {
+  display: inline-grid;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+}
+
+.etiket {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.uyari {
+  color: var(--lg-warning);
+  font-size: var(--lg-text-badge);
+  text-align: end;
+}
+
+.kurallar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kural {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.kuralSaglandi {
+  color: var(--lg-label);
+}
+
+/* İşaret yuvası: sağlanmamış kuralda boş halka, sağlanmışta onay çizgisi.
+   Dolu bir kutu KULLANILMAZ — kutunun içindeki tik, `--lg-success` zemini
+   üzerinde kontrastı düşürüyordu. Çizgi doğrudan semantik rengi taşır ve
+   arka planla kontrastı korur. */
+.isaret {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: var(--lg-space-4);
+  block-size: var(--lg-space-4);
+}
+
+.halka {
+  grid-area: 1 / 1;
+  inline-size: var(--lg-space-3);
+  block-size: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-label-secondary);
+  border-radius: var(--lg-radius-capsule);
+}
+
+.tik {
+  grid-area: 1 / 1;
+  inline-size: var(--lg-space-4);
+  block-size: var(--lg-space-4);
+  color: var(--lg-success);
+}
+
+/* "önerilir" niteleyicisi: kuralın zorunlu OLMADIĞINI söyler. Rengi
+   ikincil kalır ki zorunlu kuralların okunuşunu bastırmasın. */
+.oneri {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-badge);
+}
+
+/* ---------- Ton kademeleri ----------
+   Şerit dolgusu ile etiket metni AYRI sınıflar alır: aynı sınıf hem
+   `background` hem `color` taşısaydı etiketin arkasına semantik renkte bir
+   zemin düşerdi. */
+
+.seritYok {
+  background: var(--lg-hairline);
+}
+
+.seritZayif {
+  background: var(--lg-danger);
+}
+
+.seritOrta {
+  background: var(--lg-warning);
+}
+
+.seritGuclu {
+  background: var(--lg-success);
+}
+
+.metinYok {
+  color: var(--lg-label-secondary);
+}
+
+.metinZayif {
+  color: var(--lg-danger);
+}
+
+.metinOrta {
+  color: var(--lg-warning);
+}
+
+.metinGuclu {
+  color: var(--lg-success);
+}
+
+/* Görsel-gizli metin. 1px kırpma geometrisidir, tasarım kararı değil — bu
+   yüzden token almaz (aynı gerekçe: `KayitAdimSeridi.module.css`). */
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -166,8 +166,7 @@ değişmedi.
 Var: `Default` (stage), `Playground`, `Tabbed` (varyant), `EksikTurler` (dolu
 olmayan tür sekmesi görünmez), `TekMedya` (tek öğede thumbnail/sayaç gizli),
 `UzunIcerik` (14 öğe, dar container, uzun label), `Erisilebilirlik` (docs
-açıklamalı). **Eksik:** Temalar (Kağıt/Grafit toolbar ile — token tüketimi
-zaten tema-duyarlı, ayrı story eklenmedi), States (statik — hover/focus CSS'te,
+açıklamalı). **Eksik:** States (statik — hover/focus CSS'te,
 control gerekmiyor), Responsive'in ayrı story olarak izole edilmesi
 (`UzunIcerik` dar container ile kısmen kapsıyor).
 

@@ -74,7 +74,7 @@
 /* --lg-label-secondary düz surface'e karşı ~4.7:1 iken, banner'ın %9 semantik
    tonlu zemininde ~4.2-4.4:1'e düşüyordu (Codex bulgusu, küçük metin ≥4.5:1
    eşiğini kaçırıyordu). Yalnız label token'ları karıştırılarak (semantik renk
-   metne SIZMADAN) koyulaştırıldı — tüm severity/temalarda ≥4.5:1 sağlar. */
+   metne SIZMADAN) koyulaştırıldı — tüm severity düzeylerinde ≥4.5:1 sağlar. */
 .description {
   margin: 0;
   font-size: var(--lg-text-footnote);

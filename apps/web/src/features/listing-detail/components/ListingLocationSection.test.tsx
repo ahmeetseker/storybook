@@ -84,10 +84,12 @@ describe('ListingLocationSection', () => {
     expect(summary?.textContent).toMatch(/kaynak: İlan sahibi beyanı · yaklaşık alan/)
   })
 
-  it('noktanın tam merkez olmadığını ve zeminin şematikliğini söyler', () => {
+  // Coğrafi varyantta zemin artık GERÇEK haritadır; mahremiyet iddiası
+  // dairenin kendisiyle taşınır ve metin bunu ölçüyle birlikte söyler.
+  it('dairenin tam yeri göstermediğini ve zeminin gerçek olduğunu söyler', () => {
     render(<ListingLocationSection location={LOCATION} geo={GEO} />)
-    expect(screen.getByText(/parselin tam merkezi değildir/i)).toBeTruthy()
-    expect(screen.getByText(/ölçeğe göre çizilmemiştir/i)).toBeTruthy()
+    expect(screen.getByText(/parselin tam yerini göstermez/i)).toBeTruthy()
+    expect(screen.getByText(/zemin\s+gerçek haritadır/i)).toBeTruthy()
   })
 
   it('geo yokken harita hiç çizilmez, gerekçe metni kalır', () => {
@@ -159,7 +161,7 @@ describe('ListingLocationSection', () => {
     expect(container.textContent).not.toMatch(/Şematik yerleşim/)
     expect(container.textContent).not.toMatch(/coğrafi koordinat kaydı yok/)
     expect(screen.getByRole('heading', { level: 3, name: 'Yaklaşık konum' })).toBeTruthy()
-    expect(screen.getByText(/parselin tam merkezi değildir/i)).toBeTruthy()
+    expect(screen.getByText(/parselin tam yerini göstermez/i)).toBeTruthy()
   })
 
   it('nearby boş ya da yokken liste yerine yokluk cümlesi durur', () => {

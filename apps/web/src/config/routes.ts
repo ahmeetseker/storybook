@@ -185,32 +185,6 @@ export type AppRouteHref = AppRoute['href']
 
 export const headerRouteKeys = ['search', 'offices', 'regions', 'blog'] as const
 
-export const dockRouteKeys = {
-  desktop: [
-    'home',
-    'search',
-    'offices',
-    'regions',
-    'compare',
-    'favorites',
-    'ai-advisor',
-    'create-listing',
-    'account',
-    'messages',
-  ],
-  tablet: [
-    'home',
-    'search',
-    'compare',
-    'favorites',
-    'ai-advisor',
-    'create-listing',
-    'account',
-    'messages',
-  ],
-  mobile: ['home', 'search', 'ai-advisor', 'compare', 'account'],
-} as const satisfies Record<'desktop' | 'tablet' | 'mobile', readonly AppRouteKey[]>
-
 export function getRouteByKey(key: AppRouteKey): AppRouteDefinition {
   const route = appRoutes.find((item) => item.key === key)
   if (!route) throw new Error(`Bilinmeyen rota anahtarı: ${key}`)
@@ -264,13 +238,24 @@ export function createPageHead(key: AppRouteKey) {
  * `/hesabim/*` bu listede DEĞİLDİR: oturum gerektiren sayfalar pazaryeri
  * kabuğunda kalır. Buradaki rotalar oturumu olmayan kullanıcı içindir.
  */
+/**
+ * Bu öneklerin altındaki her sayfa `MarketplaceShell` yerine `AuthShell`
+ * kabuğunu alır. Bir kısmı oturum GEREKTİRİR (`/hesap`, `/parola-degistir`,
+ * `/organizasyon-sec`, `/e-posta-dogrula`) — kabuk seçimi oturumla değil,
+ * sayfanın odaklı bir akış adımı olup olmadığıyla ilgilidir: bu ekranlarda
+ * pazar yeri gezinmesi sunmak kullanıcıyı akıştan çıkarır.
+ */
 export const authRoutePaths = [
   '/giris',
   '/kayit',
   '/parola-sifirla',
+  '/parola-degistir',
   '/oturum-suresi-doldu',
   '/yetkisiz',
   '/hesap',
+  '/davet',
+  '/organizasyon-sec',
+  '/e-posta-dogrula',
 ] as const
 
 export function isAuthPath(pathname: string): boolean {

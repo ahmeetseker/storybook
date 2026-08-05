@@ -135,7 +135,7 @@ Varsayılan kombinasyon: controlled prop'lar verilmemiş (→ ilk oda aktif),
 | Eksen | Durum |
 |---|---|
 | `material` | N/A — flat içerik yüzeyi, cam eksen yok |
-| `tone` (light/dark/auto) | N/A — `GlassSurface` kullanmaz, tema `data-theme` kök token'larından otomatik |
+| `tone` (light/dark/auto) | N/A — `GlassSurface` kullanmaz, renkler `:root` token'larından otomatik |
 | `size` | N/A — spec'te istenmedi, tek ölçek |
 | `variant` | N/A — tek görsel biçim (sekme şeridi); `GlassNearbyPlaces`'in aksine `chips`/`tabs` ayrımı yok |
 | `thickness`/`prominent` | N/A — cam olmayan component |
@@ -226,7 +226,7 @@ odaya düşüş) → render.
 | güven metni | color/font-size | `--lg-label-secondary` / `--lg-text-caption` | — |
 | sekme (tab) | border/radius/min-height | `--lg-hairline` / `--lg-radius-chip` / `--lg-control-sm` | seçili → `--lg-accent` zemin + `--lg-accent-contrast` metin |
 | sekme focus | outline | `--lg-accent` | yalnız `:focus-visible` |
-| fotoğraf adedi rozeti | background | `color-mix(in srgb, var(--lg-label) 10%, transparent)` | seçili → `color-mix(in srgb, var(--lg-accent-contrast) 4%, transparent)` — 24% karışım açık temada ~3,3:1'e düşüyordu, 4% her iki temada ≥4,5:1 (Codex dalga4 bulgusu) |
+| fotoğraf adedi rozeti | background | `color-mix(in srgb, var(--lg-label) 10%, transparent)` | seçili → `color-mix(in srgb, var(--lg-accent-contrast) 4%, transparent)` — 24% karışım açık temada ~3,3:1'e düşüyordu, 4% ile ≥4,5:1 (Codex dalga4 bulgusu) |
 | fotoğraf adedi rozeti | color | `--lg-label` — `--lg-label-secondary` bu zeminde açık temada ~3,9:1 kalıp 4,5:1 eşiğini kaçırıyordu (Codex dalga4 bulgusu) | seçili → `--lg-accent-contrast` |
 | skeleton çip | background | `color-mix(in srgb, var(--lg-label) 8%, var(--lg-surface))` | `loading` |
 | boşluklar | gap/padding | `--lg-space-1..5` | — |
@@ -257,9 +257,9 @@ Responsive (mobile1 + 320px konteyner, dokunmatik hedef), Erişilebilirlik
 (docs description'lı, `radiogroup`/`radio` seçimi + `aria-controls`
 kararının gerekçesi dahil).
 
-`Variants`/`Sizes`/`Temalar` ayrı story olarak yok: `variant`/`size` ekseni
-tanımlı değil (tek görsel biçim), tema toolbar'la otomatik doğrulanır
-(`GlassNearbyPlaces`/`GlassMatchScore` ile aynı karar).
+`Variants`/`Sizes` ayrı story olarak yok: `variant`/`size` ekseni tanımlı
+değil (tek görsel biçim) (`GlassNearbyPlaces`/`GlassMatchScore` ile aynı
+karar).
 
 ## 11. Test kabul kriterleri
 

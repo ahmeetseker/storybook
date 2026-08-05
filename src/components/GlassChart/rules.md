@@ -173,8 +173,7 @@ UzunIcerik (24 aylık geçmiş, büyük rakamlar), Erisilebilirlik (docs
 description — role/aria-label/sr-only tablo).
 
 Eksik: Responsive (dar container'da 600 mantıksal genişlik ölçekleme
-davranışı — görsel QA borcu), Temalar (toolbar'daki Arka plan/Tier
-global'leriyle dolaylı kapsanır, component kendi tema prop'u almaz), States
+davranışı — görsel QA borcu), States
 (N/A — hover/focus/active prop değil, yalnız pointer'a bağlı iç state).
 
 ## 11. Test kabul kriterleri

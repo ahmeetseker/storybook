@@ -1,0 +1,100 @@
+/* GlassMapPopupCard — harita popup gövdesi. Yalnız token tüketir; kabuk
+   (yüzey, gölge, kenarlık, kapatma düğmesi) GlassMap'in .popup'ından gelir,
+   burada ikinci bir kart yüzeyi çizilmez. */
+
+.card {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
+  --popup-card-title-line: 1.35;
+  --popup-card-badge-pad: 3px 8px;
+  /* Kapatma düğmesi sağ üstte duruyor; başlık altına girmesin diye ilk
+     satıra yer bırakılır. */
+  --popup-card-title-inset: 22px;
+  display: grid;
+  gap: var(--lg-space-1, 4px);
+  text-align: left;
+}
+
+.title {
+  margin: 0;
+  padding-inline-end: var(--popup-card-title-inset);
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  line-height: var(--popup-card-title-line);
+  text-wrap: pretty;
+}
+
+.meta {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption, 12px);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-2, 8px);
+  margin-top: var(--lg-space-2, 8px);
+  padding-top: var(--lg-space-2, 8px);
+  border-top: var(--lg-border-width, 1px) solid var(--lg-hairline);
+}
+
+.price {
+  color: var(--lg-label);
+  font-size: var(--lg-text-body, 15px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge {
+  --popup-badge-color: var(--lg-accent);
+  padding: var(--popup-card-badge-pad);
+  border: var(--lg-border-width, 1px) solid
+    color-mix(in srgb, var(--popup-badge-color) 30%, transparent);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--popup-badge-color) 12%, var(--lg-surface));
+  color: var(--popup-badge-color);
+  font-size: var(--lg-text-badge, 11px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge[data-tone='success'] { --popup-badge-color: var(--lg-success); }
+.badge[data-tone='warning'] { --popup-badge-color: var(--lg-warning); }
+.badge[data-tone='danger'] { --popup-badge-color: var(--lg-danger); }
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lg-space-2, 8px);
+  height: var(--lg-control-sm, 36px);
+  margin-top: var(--lg-space-2, 8px);
+  padding: 0 var(--lg-space-3, 12px);
+  border: none;
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.14s ease;
+}
+
+.action:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (hover: hover) {
+  .action:hover {
+    background: color-mix(in srgb, var(--lg-label) 14%, var(--lg-accent));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action { transition: none; }
+}

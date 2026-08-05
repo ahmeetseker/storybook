@@ -5,14 +5,17 @@ import {
   Outlet,
   RouterProvider,
   createMemoryHistory,
-  createRootRoute,
+  createRootRouteWithContext,
   createRoute,
   createRouter,
 } from '@tanstack/react-router'
+import { QueryClient } from '@tanstack/react-query'
 import { describe, expect, it, vi } from 'vitest'
 import { AuthSessionProvider } from '@/features/auth'
 import type { AuthAdapters } from '@/features/auth'
 import type { Oturum } from '@/features/auth'
+import { sahteAuthAdapters } from '@/features/auth/test-utils'
+import type { RouterContext } from '@/router-context'
 import { Route } from './hesabim'
 import { Route as IndexRoute } from './hesabim.index'
 
@@ -30,23 +33,18 @@ const ORNEK_OTURUM: Oturum = {
 const cikisYapMock = vi.fn()
 
 function adapters(oturum: Oturum | null): AuthAdapters {
-  return {
-    girisBaslat: vi.fn(),
-    koduDogrula: vi.fn(),
-    parolaIleGiris: vi.fn(),
-    kayitYap: vi.fn(),
-    profilTamamla: vi.fn(),
-    kurumsalBasvuruGonder: vi.fn(),
-    eidsDogrulamaBaslat: vi.fn(),
+  return sahteAuthAdapters({
     oturumuGetir: () => oturum,
     cikisYap: cikisYapMock,
-  } as AuthAdapters
+  })
 }
 
-function routeTreeIle(oturum: Oturum | null) {
-  const rootRoute = createRootRoute({
+function routeTreeIle(authAdapters: AuthAdapters) {
+  // `createRootRouteWithContext` şart: `/hesabim` artık `beforeLoad`'unda
+  // `context.oturum`u okuyan bir guard taşıyor.
+  const rootRoute = createRootRouteWithContext<RouterContext>()({
     component: () => (
-      <AuthSessionProvider adapters={adapters(oturum)}>
+      <AuthSessionProvider adapters={authAdapters}>
         <Outlet />
       </AuthSessionProvider>
     ),
@@ -88,11 +86,19 @@ function routeTreeIle(oturum: Oturum | null) {
 }
 
 function renderRoute(initialEntry: string, oturum: Oturum | null = ORNEK_OTURUM) {
+  // Tek adapter örneği hem provider'a hem router context'ine gider; ayrışırsa
+  // guard'ın gördüğü oturumla render'ın gördüğü oturum farklı olur.
+  const authAdapters = adapters(oturum)
   const router = createRouter({
-    routeTree: routeTreeIle(oturum),
+    routeTree: routeTreeIle(authAdapters),
     history: createMemoryHistory({
       initialEntries: [initialEntry],
     }),
+    context: {
+      queryClient: new QueryClient(),
+      adapters: authAdapters,
+      oturum: oturum ? { durum: 'kimlikli', oturum } : { durum: 'anonim' },
+    },
   })
 
   render(<RouterProvider router={router} />)
@@ -127,6 +133,23 @@ describe('/hesabim rotası', () => {
     )
 
     expect(cikisYapMock).toHaveBeenCalledTimes(1)
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Anasayfa' })).toBeTruthy(),
+    )
+  })
+
+  it('raydaki marka işareti anasayfaya götürür', async () => {
+    const kullanici = userEvent.setup()
+    renderRoute('/hesabim')
+
+    await screen.findByRole('heading', { level: 1, name: 'Hesabım' })
+    const ray = screen.getByRole('navigation', { name: 'Hesap bölümleri' })
+    // Pazar yeri header'ı bu bölümde gizli: siteye dönüşün görünür yolu marka
+    const marka = within(ray).getByRole('link', { name: 'arsam.net ana sayfası' })
+    expect(marka.getAttribute('href')).toBe('/')
+
+    await kullanici.click(marka)
+
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Anasayfa' })).toBeTruthy(),
     )

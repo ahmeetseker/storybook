@@ -169,8 +169,7 @@ Var: Default, Playground, Variants (`grid`/`compact`), Materials
 (`glass`/`flat`), States (boş form · dolu gün · onay ekranı, play ile),
 Uzun İçerik (uzun tur tipi etiketleri + uzun gün etiketi), Erişilebilirlik
 (docs), Mobil (Responsive, `compact` + `pointer: coarse` dokunma hedefi).
-**Sizes: N/A** — `size` ekseni yok (§5). Temalar: proje toolbar'ıyla
-(Kağıt/Grafit) her story'de sınanır, ayrı story gerekmez.
+**Sizes: N/A** — `size` ekseni yok (§5).
 
 ## 11. Test kabul kriterleri
 

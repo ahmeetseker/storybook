@@ -175,12 +175,7 @@ test('Harita Keşfi yoğun ve simetrik gerçek ana sayfa olarak çalışır', as
 
   const footer = page.getByRole('contentinfo')
   await expect(footer).toBeVisible()
-  for (const title of [
-    'Keşfet',
-    'Karar araçları',
-    'İlan ve hesap',
-    'Güven',
-  ]) {
+  for (const title of ['Keşfet', 'Karar araçları', 'İlan ve hesap']) {
     await expect(footer.getByText(title, { exact: true })).toBeVisible()
   }
   await expect(
@@ -371,9 +366,6 @@ test('Harita Keşfi CTA’ları mobilde erişilebilir ve gerçek rotalara gider'
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.addInitScript(() => {
-    window.localStorage.setItem('arsam-theme', 'dark')
-  })
   await page.goto('/konseptler/harita-kesfi')
 
   const compareRegion = page.getByRole('region', {
@@ -451,9 +443,6 @@ test('Harita Keşfi CTA’ları mobilde erişilebilir ve gerçek rotalara gider'
 test('Güven Merkezi doğrulanmış ofis CTA’sı erişilebilir ve gerçek rotaya gider', async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    window.localStorage.setItem('arsam-theme', 'dark')
-  })
   await page.goto('/konseptler/guven-merkezi')
 
   const agencyButton = page

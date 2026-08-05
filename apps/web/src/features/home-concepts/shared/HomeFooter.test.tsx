@@ -15,8 +15,8 @@ function renderFooter(
 }
 
 describe('HomeFooter', () => {
-  it('marka anlatısını ve dört ürün bilgi grubunu birlikte gösterir', () => {
-    renderFooter({ showConceptLink: false })
+  it('marka anlatısını, iletişim bilgilerini ve üç ürün bilgi grubunu birlikte gösterir', () => {
+    renderFooter()
 
     const footer = screen.getByRole('contentinfo')
     expect(
@@ -30,18 +30,41 @@ describe('HomeFooter', () => {
       ),
     ).toBeDefined()
 
-    for (const heading of [
-      'Keşfet',
-      'Karar araçları',
-      'İlan ve hesap',
-      'Güven',
-    ]) {
+    // İletişim satırları gerçek protokol bağlantısıdır.
+    expect(
+      within(footer)
+        .getByRole('link', { name: /0 850 000 00 00/ })
+        .getAttribute('href'),
+    ).toBe('tel:+908500000000')
+    expect(
+      within(footer)
+        .getByRole('link', { name: /destek@arsam.net/ })
+        .getAttribute('href'),
+    ).toBe('mailto:destek@arsam.net')
+
+    for (const heading of ['Keşfet', 'Karar araçları', 'İlan ve hesap']) {
       expect(within(footer).getByText(heading)).toBeDefined()
     }
   })
 
-  it('yalnız gerçek ürün rotalarını kullanır ve konsept bağlantısını isteğe göre gizler', () => {
-    renderFooter({ showConceptLink: false })
+  it('son eklenen ilanlar kolonu ve sosyal bağlantılar alt barda görünür', () => {
+    renderFooter()
+
+    const footer = screen.getByRole('contentinfo')
+    const highlights = within(footer).getByRole('list', {
+      name: 'Son eklenen ilanlar',
+    })
+    const listingLinks = within(highlights).getAllByRole('link')
+    expect(listingLinks).toHaveLength(4)
+    expect(listingLinks[0].getAttribute('href')).toMatch(/^\/ilan\/\d+$/)
+
+    for (const social of ['Facebook', 'Instagram', 'X', 'YouTube', 'LinkedIn']) {
+      expect(within(footer).getByRole('link', { name: social })).toBeDefined()
+    }
+  })
+
+  it('yalnız gerçek ürün rotalarını kullanır, konsept bağlantısı taşımaz', () => {
+    renderFooter()
 
     const footer = screen.getByRole('contentinfo')
     const expectedLinks = new Map([
@@ -55,7 +78,6 @@ describe('HomeFooter', () => {
       ['İlan ver', '/ilan-ver'],
       ['Hesabım', '/hesabim'],
       ['Mesajlar', '/hesabim/mesajlar'],
-      ['Güven merkezi', '/konseptler/guven-merkezi'],
     ])
 
     for (const [name, href] of expectedLinks) {
@@ -63,24 +85,25 @@ describe('HomeFooter', () => {
         within(footer).getByRole('link', { name }).getAttribute('href'),
       ).toBe(href)
     }
-    expect(
-      within(footer).queryByRole('link', {
-        name: 'Ana sayfa konseptleri',
-      }),
-    ).toBeNull()
+    for (const removed of ['Ana sayfa konseptleri', 'Güven merkezi']) {
+      expect(
+        within(footer).queryByRole('link', { name: removed }),
+      ).toBeNull()
+    }
     expect(footer.querySelector('a[href="#"]')).toBeNull()
   })
 
-  it('slim varyantta kısa link seti, konsept görünümünde konsept bağlantısı kullanır', () => {
-    renderFooter({ variant: 'slim', showConceptLink: true })
+  it('slim varyantta yalnız kısa link setini gösterir', () => {
+    renderFooter({ variant: 'slim' })
 
     const footer = screen.getByRole('contentinfo')
     expect(footer.getAttribute('data-variant')).toBe('slim')
     expect(
-      within(footer)
-        .getByRole('link', { name: 'Ana sayfa konseptleri' })
-        .getAttribute('href'),
-    ).toBe('/konseptler')
+      within(footer).getByRole('link', { name: 'Arsa ara' }).getAttribute('href'),
+    ).toBe('/arsa-ara')
+    expect(
+      within(footer).queryByRole('link', { name: 'Ana sayfa konseptleri' }),
+    ).toBeNull()
     expect(within(footer).queryByText('Karar araçları')).toBeNull()
   })
 })

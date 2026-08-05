@@ -175,24 +175,6 @@ export const MediumContainer: Story = {
   decorators: [fullBleedDecorator],
 }
 
-/** Kağıt tema mevcut backgroundKey global’iyle üretilir. */
-export const PaperResults: Story = {
-  args: {
-    searchAdapter: instantAdapter,
-    initialQuery: 'Urla’da arsa',
-  },
-  globals: { backgroundKey: 'light' },
-}
-
-/** Grafit tema mevcut backgroundKey global’iyle üretilir. */
-export const GraphiteResults: Story = {
-  args: {
-    searchAdapter: instantAdapter,
-    initialQuery: 'Urla’da arsa',
-  },
-  globals: { backgroundKey: 'dark' },
-}
-
 /** Portal drawer, Escape focus dönüşü ve kalıcı compare ARIA state’i. */
 export const Accessibility: Story = {
   name: 'Klavye ve ARIA sözleşmesi',

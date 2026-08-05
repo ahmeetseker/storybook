@@ -109,7 +109,7 @@ token'ı bilinçli verilmedi. bp-sm (640px) breakpoint'i yorumla işaretli.
 ## 10. Storybook kapsamı
 
 Var: Default, Aksiyonlu, Hata, Boyutlar, Mobil (viewport: mobile1).
-**Eksik:** koyu tema forced görseli, çok uzun description taşma örneği.
+**Eksik:** çok uzun description taşma örneği.
 
 ## 11. Test kabul kriterleri
 

@@ -8,7 +8,12 @@ export const Route = createFileRoute('/giris')({
   head: () => ({
     meta: [
       { title: 'Giriş yapın | arsam.net' },
-      { name: 'description', content: 'arsam.net hesabınıza telefon, parola veya Google ile giriş yapın.' },
+      // Google girişi İP-6'da bağlandı; metin artık üç yöntemin üçünü de
+      // doğru sayıyor.
+      {
+        name: 'description',
+        content: 'arsam.net hesabınıza telefon, parola veya Google ile giriş yapın.',
+      },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),

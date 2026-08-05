@@ -83,7 +83,10 @@ function sellerStats(seller: ListingDetail['seller']): GlassAgencyCardStat[] {
  *
  * Bölümün gövdesi içerik katmanındadır: kimlik kartı ve yetki belgesi künyesi
  * düz yüzeydedir, künye bandı da cam değil düz tondur (`color-mix` ile vurgu
- * tonlanır) — bant §2 cam bütçesine girmez.
+ * tonlanır) — bant §2 cam bütçesine girmez. Gündem maddeleri de aynı izinde:
+ * tonlu zemin + yarıçap taşırlar, çerçeve/gölge taşımazlar (§1b, "kart içinde
+ * kart yok"). Gövde yaprak yeterince genişlediğinde iki kolona ayrılır ve
+ * ince baskı gündemin yanına geçer; eşik yaprağın kendi kabındadır.
  *
  * Numara açma kontrolü kontrol katmanına aittir ve **camdır**: sayfadaki her
  * buton kabuktaki `İlan ver` ile aynı malzemeyi paylaşır (ürün kararı, §2).
@@ -264,70 +267,92 @@ export function SellerSection({
         </div>
       ) : null}
 
-      {agenda.length > 0 ? (
-        <div className={styles.agenda}>
-          <h3 className={styles.subTitle}>Görüşme gündemi</h3>
-          <p className={styles.blockNote}>
-            Özet bölümündeki açık konular, telefonda ilerleyeceğiniz sıraya dizildi. Bu adımları
-            platform sizin adınıza atmaz.
-          </p>
-          <ol className={styles.agendaList}>
-            {agenda.map((issue) => (
-              <li key={issue.id}>
-                <label className={styles.agendaItem}>
-                  <input
-                    type="checkbox"
-                    className={styles.agendaCheck}
-                    checked={checked.has(issue.id)}
-                    onChange={() => toggleChecked(issue.id)}
-                  />
-                  <span className={styles.agendaText}>
-                    <span className={styles.agendaAction}>{issue.action}</span>
-                    <span className={styles.agendaWhy}>{issue.title}</span>
-                  </span>
-                </label>
-              </li>
-            ))}
-          </ol>
-          <p className={styles.blockNote}>
-            İşaretler yalnız bu görüntülemede tutulur; kaydedilmez.
-          </p>
-        </div>
-      ) : null}
+      {/* Gövde: gündem ile ince baskı. Dar yerleşimde alt alta; yaprak
+          gündem kartlarının yanına ikinci bir kolon sığdıracak kadar
+          açıldığında ince baskı sağa geçer — yaprağın sağ yarısı boş kalmaz. */}
+      <div className={styles.sellerBody}>
+        {agenda.length > 0 ? (
+          <div className={styles.agenda}>
+            <h3 className={styles.subTitle}>Görüşme gündemi</h3>
+            <p className={styles.blockNote}>
+              Özet bölümündeki açık konular, telefonda ilerleyeceğiniz sıraya dizildi. Bu adımları
+              platform sizin adınıza atmaz.
+            </p>
+            <ol className={styles.agendaList}>
+              {agenda.map((issue) => (
+                <li key={issue.id}>
+                  <label className={styles.agendaItem}>
+                    <input
+                      type="checkbox"
+                      className={styles.agendaCheck}
+                      checked={checked.has(issue.id)}
+                      onChange={() => toggleChecked(issue.id)}
+                    />
+                    {/* Sıra numarası ile işaret kutucuğu TEK rozettir: madde
+                        işaretlendiğinde numara yerini onaya bırakır. İkisi ayrı
+                        sütunda dururken kutucuk maddenin ~800px sağına düşüyor
+                        ve hangi maddeye ait olduğunu söylemez oluyordu. */}
+                    <span className={styles.agendaMark} aria-hidden="true">
+                      <span className={styles.agendaNumber} />
+                      <svg className={styles.agendaTick} viewBox="0 0 16 16" focusable="false">
+                        <path
+                          d="M3.5 8.4 6.6 11.5 12.5 5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span className={styles.agendaText}>
+                      <span className={styles.agendaAction}>{issue.action}</span>
+                      <span className={styles.agendaWhy}>{issue.title}</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ol>
+            <p className={styles.blockNote}>
+              İşaretler yalnız bu görüntülemede tutulur; kaydedilmez.
+            </p>
+          </div>
+        ) : null}
 
-      {/* İnce baskı: yetki belgesi kapsamı ve mahremiyet notu. Kararı taşıyan
-          içerik değil, kararın çerçevesi — bu yüzden gündemin altındadır. */}
-      <div className={styles.sellerFinePrint}>
-        {seller.type === 'agency' ? (
-          seller.licence ? (
-            <EvidenceList>
-              <EvidenceRow
-                label="Yetki belgesi"
-                value={seller.licence}
-                fallbackText="Yetki belgesi kaydı bulunamadı — bu, belgenin olmadığı anlamına gelmez."
-                note={TTBS_SCOPE_NOTE}
-              />
-            </EvidenceList>
+        {/* İnce baskı: yetki belgesi kapsamı ve mahremiyet notu. Kararı taşıyan
+            içerik değil, kararın çerçevesi — bu yüzden gündemin yanındadır. */}
+        <div className={styles.sellerFinePrint}>
+          {seller.type === 'agency' ? (
+            seller.licence ? (
+              <EvidenceList>
+                <EvidenceRow
+                  label="Yetki belgesi"
+                  value={seller.licence}
+                  fallbackText="Yetki belgesi kaydı bulunamadı — bu, belgenin olmadığı anlamına gelmez."
+                  note={TTBS_SCOPE_NOTE}
+                />
+              </EvidenceList>
+            ) : (
+              <>
+                <p className={styles.blockNote}>
+                  Yetki belgesi kaydı bulunamadı. Kaydın bulunmaması belgenin olmadığı anlamına
+                  gelmez.
+                </p>
+                <p className={styles.blockNote}>{TTBS_SCOPE_NOTE}</p>
+              </>
+            )
           ) : (
-            <>
-              <p className={styles.blockNote}>
-                Yetki belgesi kaydı bulunamadı. Kaydın bulunmaması belgenin olmadığı anlamına
-                gelmez.
-              </p>
-              <p className={styles.blockNote}>{TTBS_SCOPE_NOTE}</p>
-            </>
-          )
-        ) : (
-          <p className={styles.blockNote}>
-            {`${INDIVIDUAL_TTBS_SCOPE_NOTE} ${TTBS_SCOPE_NOTE}`}
-          </p>
-        )}
+            <p className={styles.blockNote}>
+              {`${INDIVIDUAL_TTBS_SCOPE_NOTE} ${TTBS_SCOPE_NOTE}`}
+            </p>
+          )}
 
-        {contactClosed || !onRevealPhone ? null : (
-          <p className={styles.blockNote}>
-            Numara bu sayfada saklanmaz; yalnız siz istediğinizde getirilir.
-          </p>
-        )}
+          {contactClosed || !onRevealPhone ? null : (
+            <p className={styles.blockNote}>
+              Numara bu sayfada saklanmaz; yalnız siz istediğinizde getirilir.
+            </p>
+          )}
+        </div>
       </div>
     </section>
   )

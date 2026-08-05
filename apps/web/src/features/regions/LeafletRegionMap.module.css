@@ -1,1 +1,11 @@
-.root{position:relative;min-height:22rem;background:var(--lg-bg)}.map{position:absolute;inset:0;z-index:0}.status{position:absolute;inset:var(--lg-space-5);display:grid;place-items:center;color:var(--lg-label-secondary);background:color-mix(in srgb,var(--lg-bg) 88%,transparent);z-index:2}.attributionNote{position:absolute;right:var(--lg-space-2);bottom:var(--lg-space-2);z-index:3;background:var(--lg-surface);border-radius:var(--lg-radius-chip);padding:var(--lg-space-1) var(--lg-space-2);color:var(--lg-label-secondary);font-size:var(--lg-text-badge)}
+/* Yükleme/hata bildirimi, atıf ve zoom kontrolleri artık GlassMap'in kendi
+   yüzeyinden gelir; burada yalnız çerçeve yüksekliği verilir. */
+.root {
+  position: relative;
+  min-height: 22rem;
+}
+
+.map {
+  height: 100%;
+  min-height: 22rem;
+}

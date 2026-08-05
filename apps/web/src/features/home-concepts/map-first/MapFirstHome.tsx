@@ -7,40 +7,51 @@ import {
   GlassChip,
   GlassHero,
   GlassMap,
+  GlassMapPopupCard,
+  GlassMarquee,
+  type GlassMarqueeItem,
   GlassMetricStrip,
   GlassSegmentedControl,
   GlassSelect,
+  GlassSeoDiscovery,
   GlassVitrin,
 } from "@repo/ui";
 import { withBase } from "@/config/base-path";
+import { EXPLORE_BASEMAP } from "@/config/basemap";
 import { agencyFixtures, homeVitrinItems } from "../fixtures";
+import { buildSeoDiscoveryColumns } from "../shared/seo-discovery-links";
 import { HERO_TABS, heroTab, type HeroTabId, type HeroParsedFilter } from "./heroTabs";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
 import { HomeFooter } from "../shared/HomeFooter";
 import styles from "./MapFirstHome.module.css";
 
-// Zemin sabit referans: her render'da yeni nesne üretilirse harita yeniden kurulur.
-const HERO_BASEMAP = {
-  tileUrl: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  attribution: (
-    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-      © OpenStreetMap katkıcıları
-    </a>
-  ),
-  // Kadraj Türkiye sınırlarına oturtulur. Sabit zoom panel genişliğine göre
-  // ülkeyi kırpıyordu (dar panelde batı illeri dışarıda kalıp pinler eleniyordu);
-  // bounds ile kadraj panele göre hesaplanır. center/zoom yalnız yedek.
-  center: [39.1, 35.3] as [number, number],
-  zoom: 5.4,
-  bounds: [
-    [35.9, 25.7],
-    [42.2, 44.6],
-  ] as [[number, number], [number, number]],
-  // Vitrin haritası: kadraj Türkiye'de sabit kalsın, sürüklenip kaybolmasın.
-  pannable: false,
-  maxZoom: 19,
-  tone: "quiet" as const,
-};
+// Zemin sabit referans: her render'da yeni nesne üretilirse harita yeniden
+// kurulur. Ortak `EXPLORE_BASEMAP` kullanılır — hero, arama sonucu ve bölge
+// rehberi aynı zemini ve aynı kadraj sınırlarını paylaşır.
+//
+// Kadraj artık SÜRÜKLENEBİLİR (`pannable: true`): harita bir vitrin resmi değil
+// bir keşif aracı. Kullanıcı yoğunluk rozetine tıklayıp ülkeden bölgeye,
+// bölgeden ilçeye, oradan tek ilana iniyor; kilitli kadraj bu zinciri ilk
+// adımda kesiyordu.
+const HERO_BASEMAP = EXPLORE_BASEMAP;
+
+// Footer üstü SEO rafı — `withBase` derleme zamanı sabitine bağlı, render
+// başına yeniden kurulmasın diye modül düzeyinde çözülür.
+const seoDiscoveryColumns = buildSeoDiscoveryColumns(withBase);
+
+// Footer'ın hemen üstünde dönen şerit: önce vitrin (doping) ilanları, sonra
+// portföyün başı — 10 öğe bir turu makul tutar (bkz. GlassMarquee rules §8).
+const marqueeListings: GlassMarqueeItem[] = [
+  ...homeVitrinItems.filter((item) => item.featured),
+  ...homeVitrinItems.filter((item) => !item.featured),
+]
+  .slice(0, 10)
+  .map((item) => ({
+    id: item.id,
+    label: item.title,
+    meta: item.price,
+    href: withBase(`/ilan/${item.id}`),
+  }));
 
 const regions = [
   {
@@ -194,7 +205,16 @@ export function MapFirstHome({
       showConceptNavigation={showConceptNavigation}
       className={styles.page}
       footer={
-        <HomeFooter variant="columns" showConceptLink={showConceptNavigation} />
+        <>
+          {/* Şerit sayfa container'ının dışında yaşar: tam genişlikte bant
+              kırpılmadan footer'a yaslanır. */}
+          <GlassMarquee
+            items={marqueeListings}
+            label="Öne çıkan ilanlar"
+            variant="accent"
+          />
+          <HomeFooter variant="columns" />
+        </>
       }
     >
       <div className={styles.hero}>
@@ -317,9 +337,22 @@ export function MapFirstHome({
                 label={`${active.label} haritası`}
                 pins={active.pins}
                 basemap={HERO_BASEMAP}
+                // Yoğunluk rozetine tıklamak kadrajı o bölgeye indirir; alt
+                // kümeler açılır ve zincir tek ilanın fiyat kapsülüne kadar
+                // sürer (bkz. GlassMap rules §10).
+                cluster
                 popupContent={(id) => {
                   const pin = active.pins.find((item) => item.id === id);
-                  return pin ? <strong>{pin.price ?? `${pin.count} ilan`}</strong> : null;
+                  if (!pin) return null;
+                  return (
+                    <GlassMapPopupCard
+                      title={pin.title ?? active.label}
+                      meta={pin.meta}
+                      price={pin.price ?? `${pin.count} ilan`}
+                      href={pin.href ?? withBase("/arsa-ara")}
+                      actionLabel="İlanları gör"
+                    />
+                  );
                 }}
               />
             </div>
@@ -476,6 +509,23 @@ export function MapFirstHome({
         <GlassButton className={styles.agencyCta} onClick={goToAgencies}>
           Tüm doğrulanmış ofisleri gör
         </GlassButton>
+      </section>
+
+      {/* Sayfanın son bandı: arama niyetine göre kümelenmiş uzun kuyruk açılış
+          sayfaları. Footer'ın hemen üstünde durur — okuma biten yerde bir
+          sonraki niyeti önerir, aynı zamanda bu sayfaları taranabilir kılar. */}
+      <section
+        className={`${styles.section} ${styles.seoSection}`}
+        aria-labelledby="map-seo-discovery-title"
+      >
+        <header className={styles.sectionHeader}>
+          <h2 id="map-seo-discovery-title">En çok aranan arsa sayfaları</h2>
+          <p>
+            Bölge, arazi tipi ve yatırım amacına göre hazırlanmış rehberler.
+            Aradığın cümleyi seç, doğrudan sonuçlara git.
+          </p>
+        </header>
+        <GlassSeoDiscovery columns={seoDiscoveryColumns} columnCount={4} />
       </section>
     </HomeConceptFrame>
   );

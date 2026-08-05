@@ -10,7 +10,7 @@ import {
   createRouter,
 } from '@tanstack/react-router'
 import { AuthSessionProvider, useAuthSession, useKorumaliRota } from './AuthSessionProvider'
-import { kayitAdimlariniDoldur, sahteAuthAdapters } from './test-utils'
+import { kayitAdimlariniDoldur, kurumsalBolumleriniDoldur, sahteAuthAdapters } from './test-utils'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
 import { KayitPage } from './pages/KayitPage'
@@ -52,6 +52,8 @@ function akisAdapters(): AuthAdapters {
       return { durum: 'basarili' as const, veri: oturum }
     }),
     oturumuGetir: () => oturum,
+    oturumuCoz: async () =>
+      oturum ? { durum: 'kimlikli' as const, oturum } : { durum: 'anonim' as const },
     cikisYap: () => {
       oturum = null
     },
@@ -108,18 +110,6 @@ function akisRouter(adapters: AuthAdapters, baslangic: string) {
   })
 }
 
-async function kurumsalBasvuruyuDoldur(kullanici: ReturnType<typeof userEvent.setup>) {
-  await kullanici.type(screen.getByLabelText('Ticaret ünvanı'), 'Arsam Gayrimenkul Ltd. Şti.')
-  await kullanici.type(screen.getByLabelText('Vergi numarası'), '1234567890')
-  await kullanici.type(screen.getByLabelText('Vergi dairesi'), 'Konak')
-  await kullanici.type(screen.getByLabelText('İl'), 'İzmir')
-  await kullanici.type(screen.getByLabelText('İlçe'), 'Konak')
-  await kullanici.type(screen.getByLabelText('Yetki belgesi numarası'), 'YB-2026-0042')
-  await kullanici.type(screen.getByLabelText('Yetkili ad soyad'), 'Ayşe Kaya')
-  await kullanici.type(screen.getByLabelText('Yetkili e-posta'), 'ayse@arsam.net')
-  await kullanici.type(screen.getByLabelText('Yetkili telefon'), '5551112233')
-}
-
 describe('kayıt akışı', () => {
   it('bireysel kayıt: /kayit dört adımı → gönder → dönüş hedefine iner, oturum açılmıştır', async () => {
     const kullanici = userEvent.setup()
@@ -148,7 +138,7 @@ describe('kayıt akışı', () => {
       expect(screen.getByRole('heading', { name: 'Emlak ofisi başvurusu' })).toBeTruthy(),
     )
     expect(screen.getByText('Adım 5 / 6: Emlak ofisi bilgileri')).toBeTruthy()
-    await kurumsalBasvuruyuDoldur(kullanici)
+    await kurumsalBolumleriniDoldur(kullanici)
     await kullanici.click(screen.getByRole('button', { name: 'Başvuruyu gönder' }))
     await waitFor(() => expect(adapters.kurumsalBasvuruGonder).toHaveBeenCalled())
 

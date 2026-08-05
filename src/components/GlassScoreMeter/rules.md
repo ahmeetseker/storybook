@@ -80,7 +80,7 @@ Varsayılan kombinasyon: `variant=ring`, otomatik ton (value'dan).
 | Eksen | Durum |
 |---|---|
 | `material` | N/A — flat içerik yüzeyi, cam eksen yok |
-| `tone` (tema bağlamı: light/dark/auto) | N/A — bu component'te `tone` prop'u semantik renk eşiği anlamında kullanılır (Açık Kararlar'da not) |
+| `tone` (zemin bağlamı: light/dark/auto) | N/A — bu component'te `tone` prop'u semantik renk eşiği anlamında kullanılır (Açık Kararlar'da not) |
 | `size` | N/A — spec'te istenmedi; ring/bar/badge her biri tek sabit ölçekte (§9 borç) |
 | `thickness`/`prominent` | N/A — cam olmayan component |
 
@@ -161,9 +161,9 @@ Yürünebilirlik/Ulaşım/Okullar/Sessizlik), UzunIcerik, Responsive
 (mobile1, bar), Erişilebilirlik (docs description'lı).
 
 `States` story'si N/A — component etkileşimsiz; "durum" ekseni burada renk
-eşiğidir ve `ToneEsigi` story'si bu rolü karşılar. `Sizes`/`Temalar` ayrı
-story olarak yok: `size` ekseni component'te tanımlı değil, tema toolbar'la
-otomatik doğrulanır (GlassProgress ile aynı karar).
+eşiğidir ve `ToneEsigi` story'si bu rolü karşılar. `Sizes` ayrı story
+olarak yok: `size` ekseni component'te tanımlı değil (GlassProgress ile
+aynı karar).
 
 ## 11. Test kabul kriterleri
 
@@ -192,8 +192,8 @@ otomatik doğrulanır (GlassProgress ile aynı karar).
 - ❌ Cam yüzey/backdrop-filter ekleme — içerik katmanı kuralı.
 
 **Açık kararlar:** `tone` adı burada semantik renk eşiği taşıyor (diğer
-component'lerdeki `tone: light|dark|auto` tema bağlamıyla isim çakışıyor —
-bu component `material`/tema `tone` eksenini hiç kullanmadığından pratikte
+component'lerdeki `tone: light|dark|auto` zemin bağlamıyla isim çakışıyor —
+bu component `material`/zemin `tone` eksenini hiç kullanmadığından pratikte
 çakışma yok, ama v2'de global isimlendirme netleştirilirse gözden geçirilir)
 · `size` ekseni ihtiyacı (kart içi çok küçük ring) · maksimum skor 100 dışı
 ölçekler (ör. 1-10) desteği.

@@ -115,7 +115,7 @@ Varsayılan kombinasyon: `aspectRatio='4 / 3'`, `material` verilmez (cam), `tone
 | stage / thumb | focus outline | `--lg-accent` (fallback `#0a84ff`) |
 | oklar, kapat | tüm görünüm | GlassIconButton token'ları |
 | sayaç / lightbox sayacı | font-size | `--lg-text-caption` / `--lg-text-footnote` |
-| sayaç pilleri | radius / metin | `--lg-radius-capsule` / `--lg-on-scrim` (iki temada da `#ffffff`) |
+| sayaç pilleri | radius / metin | `--lg-radius-capsule` / `--lg-on-scrim` (scrim üstünde sabit `#ffffff`) |
 | thumbs gap, lightbox ofsetleri | boşluk | `--lg-space-2` (8px) / `--lg-space-5` (20px, kapat) / `--lg-space-6` (24px, ok+sayaç) |
 
 **Borç (raw / mikro-geometri):** token karşılığı olmayan ölçü ve renkler
@@ -139,7 +139,7 @@ görsel gölgesi `0 24px 80px rgba(0,0,0,.5)` hiçbir `--lg-shadow-*` ile birebi
 Var: `Default`, `SingleImage`, `Wide` (16/9), `Materials` (glass/flat yan yana,
 oklar iki tarafta da cam), `CokGorsel` (20 görsel + uzun `alt` → thumb overflow),
 `DarContainer` (320px responsive) — hepsi `onIndexChange: fn()` ile, autodocs
-açık. Arka plan/tema toolbar'dan (Arka plan + Tier global'leri). **Eksik:**
+açık. Arka plan toolbar'dan (Arka plan + Tier global'leri). **Eksik:**
 Playground, Erişilebilirlik (lightbox klavye akışı) story'si. Thumb hover/focus
 CSS state'idir — control/story yapılmaz; aktif thumb tüm story'lerde görünür.
 

@@ -18,6 +18,17 @@ import { AuthShell } from '@/features/auth/components/AuthShell'
 import type { RouterContext } from '@/router-context'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
+  /**
+   * Oturumun TEK çözüm noktası. Render'dan önce koştuğu için korumalı
+   * rotaların `beforeLoad`'ları `throw redirect` atabilir — bugünkü
+   * "render et, sonra istemcide sek" davranışının yerini alacak seam budur.
+   *
+   * Fixture aşamasında sunucuda `bilinmiyor` döner (oturum sessionStorage'da);
+   * istemci tarafı navigasyonlarda gerçek değeri verir.
+   */
+  beforeLoad: async ({ context }) => ({
+    oturum: await context.adapters.oturumuCoz(),
+  }),
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -39,14 +50,17 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext()
+  const { queryClient, adapters } = Route.useRouteContext()
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const authSayfasi = isAuthPath(pathname)
 
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <AuthSessionProvider>
+        {/* Adapter tek kaynaktan gelir: router context. Provider'ın kendi
+            varsayılanına düşmesi, testlerin enjekte ettiği sahte adapter ile
+            `beforeLoad`'un kullandığı adapter'ın ayrışmasına yol açardı. */}
+        <AuthSessionProvider adapters={adapters}>
           {authSayfasi ? (
             <AuthShell>
               <Outlet />

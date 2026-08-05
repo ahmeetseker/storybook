@@ -201,6 +201,9 @@ type Story = StoryObj<typeof meta>
  * Yön A (Karar Dosyası) yerleşiminin tam hâli: karar özeti, kaynaklı kanıt
  * bölümleri, karar rayı ve satıcı bölümü. Numara yalnız "Numarayı göster"e
  * basıldığında getirilir ve odak numaraya taşınır.
+ *
+ * Durum tonları (çelişki, eksik, bayat) rengin yanında kelimeyle de taşınır;
+ * sayfadaki cam yüzey sayısı katman modelinin sınırında kalır.
  */
 export const Default: Story = {}
 
@@ -253,12 +256,6 @@ export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile390' } },
   args: { containerWidth: 390 },
 }
-
-/**
- * Kağıt + Grafit: tema toolbar'dan değişir. Durum tonları (çelişki, eksik,
- * bayat) her iki temada kelimeyle de taşınır; cam yüzey sayısı değişmez.
- */
-export const Temalar: Story = {}
 
 /**
  * Arama sonucundan yansıtılan ilan (`/ilan/listing-3-1`).

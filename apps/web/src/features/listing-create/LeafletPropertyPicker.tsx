@@ -1,5 +1,37 @@
 import { useEffect, useRef, useState } from 'react'
+import { BASEMAP_TILE_URL } from '@/config/basemap'
 import styles from './ListingCreateWorkspace.module.css'
+
+/**
+ * Token'ı gerçek renge çözer.
+ *
+ * Leaflet'in `circleMarker`'ı bir SVG şeklidir ve `color`/`fillColor` doğrudan
+ * SVG attribute'una yazılır — CSS değişkeni orada ÇÖZÜLMEZ. Eskiden
+ * `'var(--lg-accent)'` geçiliyordu ve işaret token rengiyle değil tarayıcı
+ * varsayılanıyla (siyah) çiziliyordu. Değer burada bir kez okunup somut renge
+ * çevrilir; hesaplanamazsa (SSR/jsdom) token'ın bugünkü karşılığına düşülür.
+ */
+function accentColor(): string {
+  if (typeof window === 'undefined') return ACCENT_FALLBACK
+  const resolved = getComputedStyle(document.documentElement)
+    .getPropertyValue('--lg-accent')
+    .trim()
+  return resolved || ACCENT_FALLBACK
+}
+
+const ACCENT_FALLBACK = '#7c3806'
+
+/** İşaretin ortak biçimi — iki çağrı yeri de aynı sözleşmeyi kullanır. */
+function markerStyle() {
+  const color = accentColor()
+  return {
+    radius: 9,
+    color: '#ffffff',
+    weight: 3,
+    fillColor: color,
+    fillOpacity: 1,
+  }
+}
 
 interface LeafletPoint {
   lat: number
@@ -137,13 +169,7 @@ export function LeafletPropertyPicker({
         markerRef.current.setLatLng([latitude, longitude])
       } else if (leafletRef.current) {
         markerRef.current = leafletRef.current
-          .circleMarker([latitude, longitude], {
-            radius: 10,
-            color: 'var(--lg-accent)',
-            fillColor: 'var(--lg-accent)',
-            fillOpacity: 0.9,
-            weight: 2,
-          })
+          .circleMarker([latitude, longitude], markerStyle())
           .addTo(map)
       }
       return
@@ -174,21 +200,19 @@ export function LeafletPropertyPicker({
         leafletRef.current = leaflet
 
         leaflet
-          .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors',
+          // Zemin diğer haritalarla aynı açık gri tile setinden gelir:
+          // konum seçerken gördüğü harita ile ilanın yayında görüneceği harita
+          // aynı olmalı.
+          .tileLayer(BASEMAP_TILE_URL, {
+            maxZoom: 18,
+            attribution:
+              '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · <a href="https://carto.com/attributions">CARTO</a>',
           })
           .addTo(map)
 
         if (latest.latitude !== null && latest.longitude !== null) {
           markerRef.current = leaflet
-            .circleMarker([latest.latitude, latest.longitude], {
-              radius: 10,
-              color: 'var(--lg-accent)',
-              fillColor: 'var(--lg-accent)',
-              fillOpacity: 0.9,
-              weight: 2,
-            })
+            .circleMarker([latest.latitude, latest.longitude], markerStyle())
             .addTo(map)
         }
 
@@ -197,13 +221,7 @@ export function LeafletPropertyPicker({
             markerRef.current.setLatLng([latlng.lat, latlng.lng])
           } else {
             markerRef.current = leaflet
-              .circleMarker([latlng.lat, latlng.lng], {
-                radius: 10,
-                color: 'var(--lg-accent)',
-                fillColor: 'var(--lg-accent)',
-                fillOpacity: 0.9,
-                weight: 2,
-              })
+              .circleMarker([latlng.lat, latlng.lng], markerStyle())
               .addTo(map)
           }
           onPointChangeRef.current(latlng.lat, latlng.lng)

@@ -44,17 +44,21 @@ veriyor.
 Gezinme haritasının tek kaynağı `domain/account-navigation.ts`'tir — ray,
 konum izi ve komut paleti aynı listeden beslenir.
 
-Pazar yeri kabuğu (GlassSiteHeader + GlassDock) bu bölümde render EDİLMEZ
+Pazar yeri kabuğu (GlassSiteHeader) bu bölümde render EDİLMEZ
 (`MarketplaceShell` istisna listesi: `create-listing`, `account`, `messages`).
 Gezinme iki katmandan gelir:
 
 | Katman | Geniş kapsayıcı (> 64rem) | Dar kapsayıcı |
 |---|---|---|
 | `AccountNav` (GlassSidebar, flat + `density="compact"`) | Sol yapışkan ray; üst şeritten daraltılıp ikon-only moda geçer | Gizli — "Hesap menüsünü aç" düğmesiyle `GlassDrawer` |
-| Üst şerit (`AccountTopbar`) | Ray daraltma + konum izi + ⌘K arama + tema | Hamburger + güncel adım + arama ikonu + tema |
+| Üst şerit (`AccountTopbar`) | Ray daraltma + konum izi + ⌘K arama | Hamburger + güncel adım + arama ikonu |
 
-Site header'ı gizlendiği için tema anahtarı ve siteye dönüş yolu (ray
-alt bölgesindeki "Siteye dön") bu kabuğun sorumluluğundadır.
+Site header'ı gizlendiği için siteye dönüş yolu (rayın
+tepesindeki marka işareti + alt bölgedeki "Siteye dön") bu kabuğun
+sorumluluğundadır. Marka işareti gerçek bir bağlantıdır (`<Link to="/">`):
+orta tık ve ⌘-tık çalışır. Daraltılmış rayda yalnız işaret kalır — erişilebilir
+ad `aria-label="arsam.net ana sayfası"`dan gelir ve görünen "arsam.net"
+metnini kapsar (WCAG 2.5.3 label-in-name).
 
 ## 2. Semantik sözleşme
 
@@ -154,8 +158,8 @@ frame'de yaşar; state yüzeyi genişliği ayrı geometri üretmeden
 ## 10. Storybook kapsamı
 
 `Default`, `AliciHesabi`, `IslemGerekiyor`, `YeniHesap`, `Loading`,
-`PartialError`, `Restricted`, `UzunIcerik`, `Mobile390`, `Tablet768`, `Kagit`,
-`Grafit`, `Erisilebilirlik`, `SessionExpired` senaryoları vardır. `SessionExpired`
+`PartialError`, `Restricted`, `UzunIcerik`, `Mobile390`, `Tablet768`,
+`Erisilebilirlik`, `SessionExpired` senaryoları vardır. `SessionExpired`
 yalnız demo state'tir; üretimdeki `/hesabim` rotası bu modu üretmez.
 
 ## 11. Test kabul kriterleri
@@ -163,8 +167,7 @@ yalnız demo state'tir; üretimdeki `/hesabim` rotası bu modu üretmez.
 - Unit: tek main/h1/primary/local glass, mod izolasyonu, heading sırası, loading,
   role empty state, yerel error, attention sınırı ve route tipi.
 - Interaction: primary bağlantı gerçek router context içinde klavyeyle odaklanır.
-- Visual: 88rem eksen, 8:4 kolon grupları, 390 ve 768 container görünümleri,
-  Kağıt/Grafit.
+- Visual: 88rem eksen, 8:4 kolon grupları, 390 ve 768 container görünümleri.
 - A11y: tek main, sıralı başlıklar, metinsel statüler, `aria-busy`, focus-visible.
 
 ## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
@@ -202,6 +205,6 @@ Changelog:
   `domain/account-navigation.ts`'te tek kaynağa indi.
 - 2026-08-02 — `/hesabim` kendi kabuğunu kuran panoya dönüştü: pazar yeri
   header/dock gizlendi, sol ray (`AccountNav`, kompakt + daraltılabilir), üst
-  şerit (konum izi + ⌘K komut paleti + tema), bölüm görselleri
+  şerit (konum izi + ⌘K komut paleti), bölüm görselleri
   `AccountSections.module.css`'e ayrıldı.
 - 2026-07-27 — Enterprise hesap genel bakış sözleşmesi oluşturuldu.

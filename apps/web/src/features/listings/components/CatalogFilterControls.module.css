@@ -1,0 +1,84 @@
+.stack {
+  display: grid;
+  gap: var(--lg-space-4);
+}
+
+.facet {
+  display: grid;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding: 0;
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+/* Kriterin kaç seçeneği seçili — bölüm kapalıyken bile görünür kalır. */
+.count {
+  min-width: 1.1rem;
+  padding: 0 var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* Kısa etiketli seçenekler kapsül olarak sarmalanır: 10 seçenek bir kolonda
+   10 satır kaplamak yerine iki satıra sığar ve göz tek bakışta tarar. */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.unit {
+  color: var(--lg-label-secondary);
+  font-weight: 500;
+}
+
+/* Seçenekler tek kolonda alt alta durur; çok seçenekli facet'lerde (ör. iç
+   özellikler) liste uzarsa modal zaten kendi içinde kayar. */
+.options {
+  display: grid;
+  gap: var(--lg-space-2);
+}
+
+.rangeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.rangeInput {
+  min-width: 0;
+  flex: 1;
+  height: var(--lg-control-md);
+  padding: 0 var(--lg-space-3);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-variant-numeric: tabular-nums;
+}
+
+.rangeInput:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+.rangeDash {
+  color: var(--lg-label-secondary);
+}

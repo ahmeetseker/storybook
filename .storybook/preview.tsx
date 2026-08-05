@@ -22,7 +22,7 @@ const preview: Preview = {
   globalTypes: {
     backgroundKey: {
       description: 'Demo arka planı',
-      toolbar: { title: 'Arka plan', icon: 'photo', items: ['light', 'dark', 'blinds', 'vivid'], dynamicTitle: true },
+      toolbar: { title: 'Arka plan', icon: 'photo', items: ['light', 'blinds', 'vivid'], dynamicTitle: true },
     },
     forceTier: {
       description: 'Cam katmanını zorla',

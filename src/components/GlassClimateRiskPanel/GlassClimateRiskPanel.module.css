@@ -53,7 +53,7 @@
 }
 
 /* Metin rengi bilinçli olarak --lg-label — semantik ton yalnız arka plan/kenarlıkta
-   (grafik öğe) taşınır. Ton ham renk metne uygulanırsa açık temada küçük metin
+   (grafik öğe) taşınır. Ton ham renk metne uygulanırsa küçük metin
    WCAG 1.4.3'ün istediği 4.5:1 kontrastın altına düşüyordu (bkz. rules.md §9). */
 .levelChip {
   flex-shrink: 0;

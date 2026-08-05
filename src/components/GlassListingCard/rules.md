@@ -135,7 +135,7 @@ bkz. Açık Kararlar).
 Var: `Default`, `WithBadge`, `Materials` (glass/flat yan yana), `States`
 (default · disabled · flat+disabled), `UzunBaslik` (2 satır clamp), `GridKullanimi`
 (carousel-dışı, `auto-fill 240px` grid) — autodocs, `onClick: fn()`. Arka
-plan/tema toolbar'dan (Arka plan + Tier global'leri). **Eksik:** Playground,
+plan toolbar'dan (Arka plan + Tier global'leri). **Eksik:** Playground,
 Erişilebilirlik (a11y adının okunuşu) story'si. Hover/focus/active CSS + press
 hook state'idir — control/story yapılmaz (bkz. GlassButton kuralı).
 

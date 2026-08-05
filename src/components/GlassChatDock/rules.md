@@ -238,9 +238,8 @@ mesaj gönderimi), Bekleme (pending "yazıyor" göstergesi), UzunIcerik,
 Responsive (mobile1, tam genişlik alt yarı), Erişilebilirlik (docs
 description'lı).
 
-`Sizes`/`Variants`/`Temalar` ayrı story olarak yok: `size`/`variant`
-ekseni tanımlı değil (tek sabit görsel biçim), tema toolbar'la otomatik
-doğrulanır.
+`Sizes`/`Variants` ayrı story olarak yok: `size`/`variant`
+ekseni tanımlı değil (tek sabit görsel biçim).
 
 ## 11. Test kabul kriterleri
 

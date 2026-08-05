@@ -279,16 +279,6 @@ export const Mobil: Story = {
   },
 }
 
-export const GrafitTema: Story = {
-  args: {
-    adapterDelayMs: 0,
-    initialDraft: enterpriseDraft('verification', 'verified'),
-  },
-  globals: {
-    backgroundKey: 'dark',
-  },
-}
-
 export const Erisilebilirlik: Story = {
   args: {
     adapterDelayMs: 0,

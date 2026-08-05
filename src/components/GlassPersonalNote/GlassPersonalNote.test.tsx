@@ -165,8 +165,8 @@ describe('GlassPersonalNote — regresyon (Codex dalga4 bulguları)', () => {
     expect(blockMatch).not.toBeNull()
     const block = blockMatch![1]
     expect(block).toMatch(/opacity:\s*1/)
-    // Renk --lg-label-secondary'den geliyor: açık temada ~4.74:1, koyu
-    // temada ~6.3:1 — ikisi de ≥4.5:1 küçük metin eşiğini karşılar.
+    // Renk --lg-label-secondary'den geliyor: fildişi zeminde ~4.74:1 —
+    // ≥4.5:1 küçük metin eşiğini karşılar.
     expect(block).toMatch(/color:\s*var\(--lg-label-secondary\)/)
   })
 })

@@ -12,6 +12,7 @@ import {
 import { AuthSessionProvider } from '../AuthSessionProvider'
 import type { AuthAdapters } from '../data/auth-adapters'
 import type { Oturum } from '../domain/auth-types'
+import { sahteAuthAdapters } from '../test-utils'
 import { GirisParolaPage } from './GirisParolaPage'
 
 const ORNEK_OTURUM: Oturum = {
@@ -23,15 +24,12 @@ const ORNEK_OTURUM: Oturum = {
   eidsDurumu: 'dogrulandi',
 }
 
+/** Bu sayfa özelinde `parolaIleGiris` varsayılanı başarılı sonuç döndürür. */
 function sahteAdapters(overrides: Partial<AuthAdapters> = {}): AuthAdapters {
-  return {
-    girisBaslat: vi.fn(),
-    koduDogrula: vi.fn(),
+  return sahteAuthAdapters({
     parolaIleGiris: vi.fn(async () => ({ durum: 'basarili' as const, veri: ORNEK_OTURUM })),
-    oturumuGetir: () => null,
-    cikisYap: vi.fn(),
     ...overrides,
-  } as AuthAdapters
+  })
 }
 
 function parolaRouter(adapters: AuthAdapters) {
@@ -98,10 +96,14 @@ describe('GirisParolaPage', () => {
     )
   })
 
-  it('parola sıfırlama sayfası henüz yokken o bağlantıyı sunmaz — ölü buton yasağı', async () => {
+  // Bu test eskiden bağlantının OLMADIĞINI doğruluyordu: `/parola-sifirla`
+  // yazılmamıştı ve ölü bağlantı bırakmamak için satır kaldırılmıştı. İP-2
+  // akışı yazdı; artık kurtarma yolunun SUNULDUĞU doğrulanıyor.
+  it('parola sıfırlama bağlantısı sunar', async () => {
     render(<RouterProvider router={parolaRouter(sahteAdapters())} />)
     await screen.findByRole('heading', { level: 1 })
-    expect(screen.queryByRole('link', { name: /parolanızı mı unuttunuz/i })).toBeNull()
+    const baglanti = await screen.findByRole('link', { name: /parolanızı mı unuttunuz/i })
+    expect(baglanti.getAttribute('href')).toBe('/parola-sifirla')
   })
 
   it('telefonla giriş bağlantısı sunar', async () => {

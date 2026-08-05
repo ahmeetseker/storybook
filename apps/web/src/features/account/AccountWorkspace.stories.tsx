@@ -168,18 +168,6 @@ export const Tablet768: Story = {
   parameters: { viewport: { defaultViewport: 'tablet768' } },
 }
 
-/** Kağıt tema mevcut Storybook token bağlamıyla gösterilir. */
-export const Kagit: Story = {
-  args: { data: ACCOUNT_FIXTURES.default },
-  globals: { backgroundKey: 'light' },
-}
-
-/** Grafit tema aynı semantik tokenlarla gösterilir. */
-export const Grafit: Story = {
-  args: { data: ACCOUNT_FIXTURES.default },
-  globals: { backgroundKey: 'dark' },
-}
-
 /** Klavye odağı primary linke ulaşır ve tek h1 sözleşmesi korunur. */
 export const Erisilebilirlik: Story = {
   args: { data: ACCOUNT_FIXTURES.default },

@@ -51,12 +51,12 @@ describe('GlassSiteHeader — semantik ve slotlar', () => {
   it('logo, utility, secondaryAction ve action slotları render olur', () => {
     renderHeader({
       logo: <span>arsam.net</span>,
-      utility: <button>Tema</button>,
+      utility: <button>Dil</button>,
       secondaryAction: <button>Üye girişi</button>,
       action: <button>İlan ver</button>,
     })
     expect(screen.getByText('arsam.net')).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Tema' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Dil' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Üye girişi' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'İlan ver' })).toBeDefined()
   })
@@ -100,7 +100,7 @@ describe('GlassSiteHeader — scroll morfu', () => {
 
   it('condensedAction verilince scroll sonrası üçlü aksiyonun yerine geçer', () => {
     renderHeader({
-      utility: <button>Tema</button>,
+      utility: <button>Dil</button>,
       secondaryAction: <button>Üye girişi</button>,
       action: <button>İlan ver</button>,
       condensedAction: <button>Hemen başla</button>,
@@ -111,7 +111,7 @@ describe('GlassSiteHeader — scroll morfu', () => {
     setScroll(200)
     expect(screen.getByRole('button', { name: 'Hemen başla' })).toBeDefined()
     expect(screen.queryByRole('button', { name: 'Üye girişi' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Tema' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Dil' })).toBeNull()
     setScroll(0)
   })
 

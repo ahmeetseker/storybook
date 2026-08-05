@@ -105,8 +105,8 @@ tanımı gereği 1px).
 
 Var: Default, Etiketli ("veya" + bölüm etiketi), Bosluklar (sm/md/lg),
 ListeInset (iOS inset kalıbı), Dikey (satır içi metaveri), MobilRitim
-(responsive: spacing sabitliği, mobile1 viewport). **Eksik:** koyu tema
-karşılaştırması, RTL (inset `margin-inline-start` ile hazır, görsel test yok).
+(responsive: spacing sabitliği, mobile1 viewport). **Eksik:** RTL (inset
+`margin-inline-start` ile hazır, görsel test yok).
 
 ## 11. Test kabul kriterleri
 

@@ -4,7 +4,7 @@
   --avatar-size: 40px;
   --media-height: 96px;
   display: block;
-  /* Zemin: label'ın %8'i — açık/koyu temada otomatik doğru kontrast */
+  /* Zemin: label'ın %8'i — yüzeyle birlikte doğru kontrastı korur */
   background-color: color-mix(in srgb, var(--lg-label, #24211b) 8%, transparent);
   flex: none;
 }

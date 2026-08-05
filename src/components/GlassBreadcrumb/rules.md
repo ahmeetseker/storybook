@@ -123,7 +123,7 @@ raw.
 
 Var: Default (4 seviye), TwoLevels, CustomSeparator, UzunIcerik (çok seviyeli +
 uzun TR kategori adları, dar container'da wrap). **Eksik:** Playground,
-Temalar, Erişilebilirlik (landmark + aria-current gösterimi). States: hover/focus
+Erişilebilirlik (landmark + aria-current gösterimi). States: hover/focus
 CSS state'i olduğundan zorlanmaz. Variants/Sizes: N/A — eksen yok.
 
 ## 11. Test kabul kriterleri

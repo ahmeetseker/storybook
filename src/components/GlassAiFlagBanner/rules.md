@@ -198,7 +198,7 @@ Changelog); `JSON.stringify` tuple alan/eleman sınırlarını korur.
 | root | border | `color-mix(in srgb, var(--flag-color) 28%, var(--lg-hairline))` | — |
 | root | radius | `--lg-radius-media` | — |
 | title | color | `--lg-label` | — |
-| description/reasons/confidence metni | color | `color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary))` | Semantik renk metne SIZMAZ (kontrast dersi) — yalnız ikon/zemin/kenarlık `--flag-color` kullanır. Ham `--lg-label-secondary` banner'ın %9 tonlu zemininde ~4.2-4.4:1'e düşüyordu (Codex bulgusu); iki label token'ının karışımıyla tüm severity/temalarda ≥4.5:1'e koyulaştırıldı |
+| description/reasons/confidence metni | color | `color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary))` | Semantik renk metne SIZMAZ (kontrast dersi) — yalnız ikon/zemin/kenarlık `--flag-color` kullanır. Ham `--lg-label-secondary` banner'ın %9 tonlu zemininde ~4.2-4.4:1'e düşüyordu (Codex bulgusu); iki label token'ının karışımıyla tüm severity durumlarında ≥4.5:1'e koyulaştırıldı |
 | icon | color/background | `color-mix(in srgb, var(--flag-color) 70%, var(--lg-label))` / `color-mix(in srgb, var(--flag-color) 16%, var(--lg-surface))` | `severity`'den otomatik. Ham `--flag-color` kendi %16 zemine karşı ~1.9-2.9:1'e düşüyordu (Codex bulgusu, anlam taşıyan grafik ≥3:1 eşiğini kaçırıyordu); diğer AI component'lerindeki "semantik %70 + label" desenine uyuldu |
 | icon | boyut | `--lg-control-sm` | — |
 | **aiBadge** (AI-first, kopya CSS) | background/color | `color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface))` / `color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label))` | Sabit — tüm AI component'lerinde AYNI (GlassAiSummaryCard/GlassTrustSignalPanel ile birebir), `severity`'den bağımsız |
@@ -243,8 +243,8 @@ reasons-only / minimal kombinasyonları), States (etkileşimli demo:
 onDetails/onFeedback/onDismiss birlikte), Yukleniyor (`loading`), UzunIcerik,
 Responsive (mobile1), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Materials`/`Temalar` story'si N/A — tek sabit ölçek, cam olmayan
-component, tema toolbar'la otomatik doğrulanır.
+`Sizes`/`Materials` story'si N/A — tek sabit ölçek, cam olmayan
+component.
 
 ## 11. Test kabul kriterleri
 
@@ -280,7 +280,6 @@ component, tema toolbar'la otomatik doğrulanır.
 - [x] description/reasonItem/confidence metin rengi ve severity ikon rengi
       component CSS'inde belgelenen koyulaştırılmış color-mix token'larını
       kullanır (kontrast regresyonu)
-- [ ] iki temada (Kağıt/Grafit) renk kontrastı (visual)
 - [ ] `loading` placeholder'ının reduced-motion'da animasyonsuz kalması
       (visual)
 
@@ -326,7 +325,7 @@ açık isteği) · banner'ın kendi kendine kapanmaması (görünürlük her zam
   `color-mix(in srgb, var(--lg-label) 10%, var(--lg-label-secondary))`'a,
   severity ikon rengi `color-mix(in srgb, var(--flag-color) 70%,
   var(--lg-label))`'a koyulaştırıldı (açık temada ham değerler sırasıyla
-  ~4.2-4.4:1 ve ~1.9-2.9:1'e düşüyordu; yeni değerler tüm severity/temalarda
+  ~4.2-4.4:1 ve ~1.9-2.9:1'e düşüyordu; yeni değerler tüm severity durumlarında
   metin ≥4.5:1, ikon ≥3:1 sağlıyor);
   (4) `loading` `true`→`false` geçişinde canlı bölge artık boşalmak yerine
   "Yapay zekâ incelemesi tamamlandı" mesajı yayınlıyor (önceki davranış

@@ -41,7 +41,7 @@
   width: 100%;
 }
 
-/* Yükseklikler kontrol token'larından; dokunmatik ölçüler tema katmanında büyür. */
+/* Yükseklikler kontrol token'larından; dokunmatik ölçüler token katmanında büyür. */
 .sm { min-height: var(--lg-control-sm); }
 .md { min-height: var(--lg-control-md); }
 .lg { min-height: var(--lg-control-lg); }

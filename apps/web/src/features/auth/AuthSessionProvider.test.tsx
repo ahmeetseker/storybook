@@ -12,6 +12,7 @@ import {
 import { AuthSessionProvider, useAuthSession, useKorumaliRota } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
+import { sahteAuthAdapters } from './test-utils'
 
 const ORNEK_OTURUM: Oturum = {
   kullaniciId: 'test-1',
@@ -22,12 +23,13 @@ const ORNEK_OTURUM: Oturum = {
   eidsDurumu: 'dogrulandi',
 }
 
+// `sahteAuthAdapters` üzerinden kurulur — elle kurulan mock'lar arayüze her
+// yeni metot eklendiğinde çalışma zamanında patlıyordu (bkz. rules.md §7).
+// Burada yalnız bu testin ihtiyaç duyduğu davranış geçilir; `oturumuCoz`
+// otomatik olarak `oturumuGetir`den türetilir.
 function sahteAdapters(baslangic: Oturum | null): AuthAdapters {
   let oturum = baslangic
-  return {
-    async girisBaslat() {
-      return { durum: 'basarili', veri: { kanal: 'sms', maskeliKimlik: '555 *** 22 33' } }
-    },
+  return sahteAuthAdapters({
     async koduDogrula() {
       oturum = ORNEK_OTURUM
       return { durum: 'basarili', veri: ORNEK_OTURUM }
@@ -40,20 +42,11 @@ function sahteAdapters(baslangic: Oturum | null): AuthAdapters {
       oturum = ORNEK_OTURUM
       return { durum: 'basarili', veri: ORNEK_OTURUM }
     },
-    async profilTamamla() {
-      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
-    },
-    async kurumsalBasvuruGonder() {
-      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
-    },
-    async eidsDogrulamaBaslat() {
-      return { durum: 'basarili', veri: oturum ?? ORNEK_OTURUM }
-    },
     oturumuGetir: () => oturum,
     cikisYap: () => {
       oturum = null
     },
-  }
+  })
 }
 
 function Sonda() {
@@ -69,22 +62,35 @@ function Sonda() {
 }
 
 describe('AuthSessionProvider', () => {
-  it('adapter oturum döndürdüğünde oturumu yayınlar', () => {
+  // Oturum ARTIK asenkron çözülür (`oturumuCoz`): ilk render koşulsuz
+  // `bilinmiyor` durumundadır — sunucu ve istemcinin hidrasyon eşleştirmesi
+  // yapılan render'ı aynı ağacı üretsin diye. Gerçek değer mount sonrası
+  // efektte gelir, bu yüzden bu iki test artık `findBy*` ile bekler.
+  it('ilk render oturumu bilmez — hidrasyon güvenliği', () => {
     render(
       <AuthSessionProvider adapters={sahteAdapters(ORNEK_OTURUM)}>
         <Sonda />
       </AuthSessionProvider>,
     )
-    expect(screen.getByText('Oturum: Ayşe Kaya')).toBeTruthy()
+    expect(screen.getByText('Oturum yok')).toBeTruthy()
   })
 
-  it('oturum yokken girisYapildi false döner', () => {
+  it('adapter oturum döndürdüğünde oturumu yayınlar', async () => {
+    render(
+      <AuthSessionProvider adapters={sahteAdapters(ORNEK_OTURUM)}>
+        <Sonda />
+      </AuthSessionProvider>,
+    )
+    expect(await screen.findByText('Oturum: Ayşe Kaya')).toBeTruthy()
+  })
+
+  it('oturum yokken girisYapildi false döner', async () => {
     render(
       <AuthSessionProvider adapters={sahteAdapters(null)}>
         <Sonda />
       </AuthSessionProvider>,
     )
-    expect(screen.getByText('Oturum yok')).toBeTruthy()
+    await waitFor(() => expect(screen.getByText('Oturum yok')).toBeTruthy())
   })
 
   it('çıkış yapınca oturumu düşürür', async () => {

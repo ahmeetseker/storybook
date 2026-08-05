@@ -64,7 +64,7 @@ Varsayılan kombinasyon: `placement=top`, `delay=300`.
 |---|---|
 | dokunmatik (pointer: coarse) | Tooltip hiç açılmaz — JS `matchMedia`, CSS gizleme değil; long-press YOK |
 | controlled `open` prop | ❌ bilinçli yok — tooltip tamamen hover/focus güdümlüdür |
-| tone/tint | ❌ — panel her temada ters kontrast (`--lg-label` zemin + `--lg-bg` metin) |
+| tone/tint | ❌ — panel bilinçli ters kontrast kullanır (`--lg-label` zemin + `--lg-bg` metin) |
 
 ## 6. State modeli
 

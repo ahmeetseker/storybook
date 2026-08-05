@@ -9,6 +9,9 @@
   --band-pad: 26px 28px;
   --brand-col-min: 220px;
   --text-sm: 14px;
+  --thumb-size: 42px; /* vitrin satırının yuvarlak görseli */
+  --social-size: 40px; /* sosyal ikon dairesi — coarse'ta hedefe çıkar */
+  --meta-gap: 2px; /* başlık/fiyat arası; --lg-space-1 bu ölçekte fazla */
   /* Footer linki metin hedefi: imleçlide WCAG 2.2 AA 2.5.8 tabanı (24px =
      `--lg-space-6`), dokunmatikte `--lg-control-hit` (bkz. coarse bloğu). */
   --link-min-h: var(--lg-space-6);
@@ -28,11 +31,19 @@
   box-sizing: border-box;
 }
 
+/* Marka | link sütunları | vitrin. Vitrin yokken orta blok kalan yeri alır. */
 .top {
   display: grid;
-  grid-template-columns: minmax(var(--brand-col-min), 1.2fr) 3fr;
+  grid-template-columns: minmax(var(--brand-col-min), 1.1fr) 2.4fr;
   gap: var(--lg-space-7);
   align-items: start;
+}
+
+.top:has(.highlights) {
+  grid-template-columns:
+    minmax(var(--brand-col-min), 1.05fr)
+    2.2fr
+    minmax(0, 1.15fr);
 }
 .brandBlock {
   display: flex;
@@ -54,9 +65,11 @@
 .columnsNav:only-child {
   grid-column: 1 / -1;
 }
+/* Sütun sayısı veriden gelir: sabit dört yazıldığında üç sütunlu footer'da
+   dördüncü yuva boş kalıyor ve vitrin kolonuyla arada koca bir boşluk oluyordu. */
 .columnsGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--footer-columns, 4), minmax(0, 1fr));
   gap: var(--lg-space-6);
 }
 .column {
@@ -105,6 +118,108 @@
   .link {
     min-height: var(--lg-control-hit);
   }
+
+  .root {
+    --social-size: var(--lg-control-hit);
+  }
+}
+
+/* ── Vitrin kolonu (son eklenen ilanlar) ── */
+.highlights {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--item-gap);
+}
+
+.highlightList {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.highlightLink {
+  display: flex;
+  min-width: 0;
+  /* Satır parmakla basılan bir hedef; görünür ölçüsü zaten büyük ama taban
+     yine de token'dan okunur. */
+  min-height: var(--lg-control-hit);
+  align-items: center;
+  gap: var(--lg-space-3);
+  border-radius: var(--lg-radius-chip, 10px);
+  color: var(--lg-label);
+  text-decoration: none;
+}
+
+/* Yuvarlak küçük görsel: kart ızgarasından ayrışsın, satır listesi gibi
+   okunsun diye kapsül yarıçapı. */
+.highlightThumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label) 8%, transparent);
+}
+
+.highlightThumb img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+}
+
+.highlightBody {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--meta-gap);
+}
+
+/* İlan başlıkları uzun; tek satırda kırpmak "İzmir Urla Denize 900 m, İmarlı …"
+   gibi bilgiyi tam da ayırt edici yerinden kesiyordu. İki satır serbest. */
+.highlightLabel {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: var(--lg-label);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.highlightMeta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--lg-space-2);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.highlightPreviousMeta {
+  color: var(--lg-danger);
+  text-decoration-thickness: 1px;
+}
+
+.highlightLink:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (hover: hover) {
+  .highlightLink:hover .highlightLabel {
+    color: var(--lg-accent);
+  }
 }
 
 .legalRow {
@@ -124,6 +239,58 @@
   display: inline-flex;
   align-items: center;
   gap: var(--lg-space-3);
+}
+
+/* Yuvarlak sosyal medya bağlantıları — alt barın sağ ucu. */
+.socialList {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.socialLink {
+  display: grid;
+  width: var(--social-size);
+  height: var(--social-size);
+  border: var(--lg-border-width, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule, 999px);
+  color: var(--lg-label-secondary);
+  place-items: center;
+  text-decoration: none;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+/* İkon sarmalayıcısı blok akışına alınır: inline SVG metin baseline'ına
+   oturur ve altında descender payı kadar boşluk bırakırdı — o boşluklu kutu
+   ortalanınca ikon dairede optik olarak yukarı kayıyordu. */
+.socialLink > * {
+  display: flex;
+}
+
+.socialLink svg {
+  display: block;
+}
+
+@media (hover: hover) {
+  .socialLink:hover {
+    border-color: var(--lg-accent);
+    color: var(--lg-accent);
+  }
+}
+
+.socialLink:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .socialLink {
+    transition: none;
+  }
 }
 
 /* slim */
@@ -179,7 +346,8 @@
 
 /* Component kendi kapsayıcısına göre 4 → 2 → 1 sütuna akar. */
 @container (max-width: 64rem) {
-  .top {
+  .top,
+  .top:has(.highlights) {
     grid-template-columns: 1fr;
   }
   .columnsGrid {

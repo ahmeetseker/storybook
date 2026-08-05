@@ -67,7 +67,7 @@ Varsayılan kombinasyon: `tone=auto`, `material` verilmemiş (→ glass),
 | Kural | Davranış |
 |---|---|
 | `priceTint` yalnız fiyata | Başlık/meta rengini etkilemez |
-| `material="flat"` + `tone="light"` | GlassSurface: koyu opak kart (Grafit) |
+| `material="flat"` + `tone="light"` | GlassSurface: temadan bağımsız sabit koyu opak kart |
 | size ekseni | Yok — tek boyut; genişlik parent'tan |
 
 ## 6. State modeli
@@ -113,7 +113,7 @@ değiştirilmedi · letter-spacing em değerleri raw (tipografi token'ı yok).
 
 Var: Default (uzun TR başlıkla), WithBadgesAndActions, Materials (glass vs
 flat yan yana), UzunIcerik (dar container'da uzun başlık/meta + sabit actions —
-Responsive'i de kısmen kapsar). **Eksik:** Playground, Temalar,
+Responsive'i de kısmen kapsar). **Eksik:** Playground,
 Erişilebilirlik. States N/A (statik).
 
 ## 11. Test kabul kriterleri

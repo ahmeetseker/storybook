@@ -106,6 +106,64 @@
   justify-content: flex-end;
 }
 
+/* "Tüm Seçenekler" girişi sonuç listesinin hemen üstünde durur: kullanıcı
+   sonucu görüp daraltmak istediğinde eli oradadır. */
+/* Bölüm başlığındaki seçili kriter sayısı: bölüm kapalıyken bile kullanıcı
+   orada bir şey bıraktığını görür. */
+.sectionCount {
+  min-width: 1.1rem;
+  margin-inline-start: var(--lg-space-2);
+  padding: 0 var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast, #ffffff);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* Panel başlığı — etkin kriter rozetiyle birlikte. */
+.panelTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+/* "Tüm Seçenekler" girişi panelin ALTINDA, tam genişlikte durur: kullanıcı
+   kenar çubuğundaki kriterleri tarayıp bitirdiği yerde "daha fazlası" ile
+   karşılaşır. Sonuçların üstünde serbest duran küçük bir düğme, filtre
+   paneliyle ilişkisini kaybediyordu. */
+.allFiltersTrigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lg-space-2);
+  min-height: var(--lg-control-md);
+  margin-block-start: var(--lg-space-4);
+  padding: 0 var(--lg-space-3);
+  border: var(--lg-border-width, 1px) solid var(--lg-accent);
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+}
+
+.allFiltersTrigger:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (hover: hover) {
+  .allFiltersTrigger:hover {
+    background: color-mix(in srgb, var(--lg-accent) 10%, transparent);
+  }
+}
+
 .appliedFilters {
   display: flex;
   align-items: center;

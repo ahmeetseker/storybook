@@ -6,7 +6,7 @@ Apple Liquid Glass tasarım dilinin React karşılığı — Storybook üzerinde
 
 Tasarım sistemi `src/design/*.mdx` dokümanlarında tanımlıdır ve **her component işinde uyulması zorunludur**:
 
-- `src/design/GenelBakis.mdx` — token/seçenek/state ayrımı, katman modeli (cam yalnız navigasyon/kontrol katmanı, sayfa başına max 6 cam yüzey, cam üstüne cam yok), tema (Kağıt/Grafit), dosya yapısı.
+- `src/design/GenelBakis.mdx` — token/seçenek/state ayrımı, katman modeli (cam yalnız navigasyon/kontrol katmanı, sayfa başına max 6 cam yüzey, cam üstüne cam yok), tema (Kağıt — tek tema, koyu tema yok), dosya yapısı.
 - `src/design/Tokenlar.mdx` — tek kaynak `src/index.css` (`--lg-*`). Component CSS'inde raw px/hex **yasak** (token fallback'i hariç). Radius yalnız chip/media/card/capsule ölçeğinden; kontrol yükseklikleri `--lg-control-*`; dokunmatikte min 44px hedef.
 - `src/design/EksenlerVeDurumlar.mdx` — birleşik variant yasak; eksenler: `material · tone · size · variant · thickness · tint · prominent`. hover/focus/active asla prop olmaz. Controlled deseni: `value` + `defaultValue` + `onXChange`.
 - `src/design/ErisilebilirlikMotionResponsive.mdx` — focus halkası `outline: 2px solid var(--lg-accent)` yalnız `:focus-visible`; ikon-tek butonlarda `label` zorunlu; `prefers-reduced-motion`/`-transparency` desteği; animasyon yalnız transform/opacity/filter; breakpoint yerine `pointer: coarse` / `hover: hover` yetenek sorguları.

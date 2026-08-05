@@ -225,8 +225,6 @@ dar container), Responsive (mobile viewport + sticky ilk kolon),
 Erisilebilirlik (docs açıklamalı, `onRemove` ile). States kapsamındaki
 görsel yükleme hatası `GorselFallback` ile kapsanır; disabled ilan/alan
 v1'de N/A'dır.
-**Eksik:** Temalar (ayrı story yok — toolbar'la Kağıt/Grafit doğrulanır,
-tüm token'lar üzerinden otomatik).
 
 ## 11. Test kabul kriterleri
 
@@ -265,7 +263,7 @@ tüm token'lar üzerinden otomatik).
       (unit)
 - [ ] sticky ilk kolonun yatay kaydırmada gerçekten sabit kaldığı ve altta
       kayan hücrelerin görünmediği (visual, Chrome)
-- [ ] Kağıt/Grafit tema kontrastı, özellikle en iyi değer `--lg-success`
+- [ ] Kağıt teması kontrastı, özellikle en iyi değer `--lg-success`
       rengi (visual)
 
 ## 12. Do / Don't

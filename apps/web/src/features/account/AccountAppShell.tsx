@@ -31,51 +31,6 @@ export interface AccountAppShellProps {
   onCikis?: () => void
 }
 
-type ThemeChoice = 'system' | 'light' | 'dark'
-
-function applyTheme(theme: ThemeChoice) {
-  if (typeof document === 'undefined') return
-  if (theme === 'system') delete document.documentElement.dataset.theme
-  else document.documentElement.dataset.theme = theme
-}
-
-const themeLabel: Record<ThemeChoice, string> = {
-  system: 'Sistem teması',
-  light: 'Açık tema',
-  dark: 'Koyu tema',
-}
-
-/** Pazar yeri kabuğu bu bölümde gizli olduğundan tema anahtarı üst şeritte durur. */
-function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeChoice>('system')
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem('arsam-theme')
-    const next: ThemeChoice =
-      stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
-    setTheme(next)
-    applyTheme(next)
-  }, [])
-
-  return (
-    <button
-      type="button"
-      className={styles.iconButton}
-      aria-label={themeLabel[theme]}
-      title={themeLabel[theme]}
-      onClick={() => {
-        const next: ThemeChoice =
-          theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system'
-        setTheme(next)
-        applyTheme(next)
-        window.localStorage.setItem('arsam-theme', next)
-      }}
-    >
-      <NavigationIcon name="theme" size={18} />
-    </button>
-  )
-}
-
 /** Üst şerit: ray daraltma, konum izi ve çalışma alanı araçları. */
 function AccountTopbar({
   collapsed,
@@ -136,8 +91,6 @@ function AccountTopbar({
           ⌘K
         </kbd>
       </button>
-
-      <ThemeToggle />
     </header>
   )
 }

@@ -4,6 +4,9 @@ import { motion, useReducedMotion } from 'motion/react'
 import { GlassButton } from '@repo/ui'
 import { AuthFormPage } from '../components/AuthFormPage'
 import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
+import { ParolaAlani } from '../components/ParolaAlani'
+import { ParolaGucu } from '../components/ParolaGucu'
+import { TelefonAlani } from '../components/TelefonAlani'
 import { useAuthSession } from '../AuthSessionProvider'
 import { guvenliDonusYolu } from '../domain/auth-session'
 import { kayitBilgileriniDogrula } from '../domain/kayit-dogrulama'
@@ -15,6 +18,12 @@ import {
   kayitSeridi,
 } from '../domain/kayit-adimlari'
 import { alanHataId, ilkHataliAlanaOdaklan } from '../domain/form-erisilebilirlik'
+import {
+  VARSAYILAN_TELEFON_ULKESI,
+  telefonuNormallestir,
+  telefonuUluslararasiGoster,
+  type TelefonUlkeKodu,
+} from '../domain/telefon-ulkeler'
 import type { HesapTipi, KayitAlanHatalari, KayitBilgileri } from '../domain/auth-types'
 import alanStilleri from './GirisPage.module.css'
 import styles from './KayitPage.module.css'
@@ -60,11 +69,14 @@ export function KayitPage() {
   const [hesapTipi, setHesapTipi] = useState<HesapTipi>('bireysel')
   const [adSoyad, setAdSoyad] = useState('')
   const [ePosta, setEPosta] = useState('')
+  const [telefonUlke, setTelefonUlke] = useState<TelefonUlkeKodu>(VARSAYILAN_TELEFON_ULKESI)
   const [telefon, setTelefon] = useState('')
   const [parola, setParola] = useState('')
   const [kvkkOnayi, setKvkkOnayi] = useState(false)
   const [alanHatalari, setAlanHatalari] = useState<KayitAlanHatalari>({})
   const [hata, setHata] = useState<string | undefined>()
+  /** Her gönderim denemesinde artar — aynı hata metni tekrar duyurulsun diye. */
+  const [hataAnahtari, setHataAnahtari] = useState(0)
   const [gonderiliyor, setGonderiliyor] = useState(false)
   const [odak, setOdak] = useState<OdakIstegi>({ bilet: 0 })
 
@@ -88,7 +100,10 @@ export function KayitPage() {
   const bilgileriTopla = (): KayitBilgileri => ({
     adSoyad,
     ePosta,
-    telefon,
+    // Adapter'a KANONİK numara gider: kullanıcı "0532…", "+90 532…" ya da
+    // boşluklu yazmış olabilir; kayıt tek biçim tanır.
+    telefon: telefonuNormallestir(telefon, telefonUlke),
+    telefonUlke,
     parola,
     hesapTipi,
     kvkkOnayi,
@@ -127,6 +142,7 @@ export function KayitPage() {
   const gonder = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setHata(undefined)
+    setHataAnahtari((onceki) => onceki + 1)
 
     const bilgiler = bilgileriTopla()
     const tumHatalar = kayitBilgileriniDogrula(bilgiler)
@@ -285,46 +301,29 @@ export function KayitPage() {
 
   const iletisimAdimi = () => (
     <>
-      <div className={alanStilleri.field}>
-        <label className={alanStilleri.label} htmlFor="kayit-telefon">
-          Telefon
-        </label>
-        <input
-          id="kayit-telefon"
-          className={alanStilleri.input}
-          type="tel"
-          inputMode="numeric"
-          autoComplete="tel"
-          placeholder="5XX XXX XX XX"
-          value={telefon}
-          onChange={(event) => setTelefon(event.target.value)}
-          aria-invalid={alanHatalari.telefon ? true : undefined}
-          aria-describedby={alanHatalari.telefon ? alanHataId('kayit-telefon') : undefined}
-        />
-        {alanHatasi('telefon', 'kayit-telefon')}
-      </div>
+      <TelefonAlani
+        id="kayit-telefon"
+        ulkeKodu={telefonUlke}
+        onUlkeKoduChange={setTelefonUlke}
+        deger={telefon}
+        onDegerChange={setTelefon}
+        hata={alanHatalari.telefon}
+        ipucu="Numaranız alıcılarla iletişim ve giriş doğrulaması için kullanılır."
+      />
 
-      <div className={alanStilleri.field}>
-        <label className={alanStilleri.label} htmlFor="kayit-parola">
-          Parola
-        </label>
-        <input
-          id="kayit-parola"
-          className={alanStilleri.input}
-          type="password"
-          autoComplete="new-password"
-          value={parola}
-          onChange={(event) => setParola(event.target.value)}
-          aria-invalid={alanHatalari.parola ? true : undefined}
-          aria-describedby={alanHatalari.parola ? alanHataId('kayit-parola') : undefined}
-        />
-        <ul className={styles.parolaKurallari}>
-          <li>En az 8 karakter</li>
-          <li>En az bir büyük harf</li>
-          <li>En az bir rakam</li>
-        </ul>
-        {alanHatasi('parola', 'kayit-parola')}
-      </div>
+      <ParolaAlani
+        id="kayit-parola"
+        etiket="Parola"
+        deger={parola}
+        onDegerChange={setParola}
+        autoComplete="new-password"
+        hata={alanHatalari.parola}
+      >
+        {/* Statik kural listesinin yerini canlı gösterge aldı: kurallar aynı
+            kaynaktan (`domain/parola-gucu.ts`) gelir ve artık yazarken
+            karşılanıp karşılanmadıklarını da söyler. */}
+        <ParolaGucu parola={parola} />
+      </ParolaAlani>
     </>
   )
 
@@ -372,7 +371,9 @@ export function KayitPage() {
         {ozetGrubu(
           2,
           <>
-            {ozetSatiri('Telefon', telefon)}
+            {/* Özette ülke kodu da görünür: kullanıcı numarasını ulusal
+                biçimde yazdı, ama onaylayacağı şey numaranın TAMAMI. */}
+            {ozetSatiri('Telefon', telefonuUluslararasiGoster(telefon, telefonUlke))}
             {ozetSatiri(
               'Parola',
               <>
@@ -422,6 +423,7 @@ export function KayitPage() {
         <KayitAdimSeridi adimlar={SERIT} aktifIndeks={adimIndeksi} onAdimSec={adimaTasi} />
       }
       hata={hata}
+      hataAnahtari={hataAnahtari}
       onSubmit={gonder}
       gonderiliyor={gonderiliyor}
       aksiyonlar={({ hidrasyonTamam }) => (

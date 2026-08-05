@@ -6,6 +6,7 @@ import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
+  type AnyRoute,
 } from '@tanstack/react-router'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,6 +14,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPageHead } from '@/config/routes'
 import { AuthSessionProvider } from '@/features/auth'
 import type { AuthAdapters, Oturum } from '@/features/auth'
+import { KorumaliSayfa } from '@/features/auth/components/KorumaliSayfa'
+import { korumaliRotaGuard } from '@/features/auth/domain/auth-guard'
+import { sahteAuthAdapters } from '@/features/auth/test-utils'
 import type { MessagesWorkspaceProps } from '@/features/messages/domain/message-types'
 import type { RouterContext } from '@/router-context'
 
@@ -127,34 +131,42 @@ const ORNEK_OTURUM: Oturum = {
 }
 
 function adapters(oturum: Oturum | null): AuthAdapters {
-  return {
-    girisBaslat: vi.fn(),
-    koduDogrula: vi.fn(),
-    parolaIleGiris: vi.fn(),
-    kayitYap: vi.fn(),
-    profilTamamla: vi.fn(),
-    kurumsalBasvuruGonder: vi.fn(),
-    eidsDogrulamaBaslat: vi.fn(),
-    oturumuGetir: () => oturum,
-    cikisYap: vi.fn(),
-  } as AuthAdapters
+  return sahteAuthAdapters({ oturumuGetir: () => oturum })
 }
 
 function renderRoute(initialEntry: string, oturum: Oturum | null = ORNEK_OTURUM) {
   const queryClient = freshQueryClient()
+  // Tek adapter örneği hem provider'a hem router context'ine verilir —
+  // ikisi ayrışırsa `beforeLoad`'un gördüğü oturumla render'ın gördüğü
+  // oturum farklı olur.
+  const authAdapters = adapters(oturum)
   const rootRoute = createRootRouteWithContext<RouterContext>()({
     component: () => (
       <QueryClientProvider client={queryClient}>
-        <AuthSessionProvider adapters={adapters(oturum)}>
+        <AuthSessionProvider adapters={authAdapters}>
           <Outlet />
         </AuthSessionProvider>
       </QueryClientProvider>
     ),
   })
+  // Üretimdeki ağacı taklit eder: koruma `/hesabim` LAYOUT rotasındadır,
+  // `/hesabim/mesajlar` onun çocuğudur ve kendi guardını taşımaz. Harness
+  // doğrudan root'a bağlasaydı, oturumsuz erişim testi korumanın gerçekte
+  // olmadığı bir yolu sınamış olurdu.
+  const hesabimLayoutRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    id: 'hesabim-layout',
+    beforeLoad: ({ context, location }) => korumaliRotaGuard(context.oturum, location.href),
+    component: () => (
+      <KorumaliSayfa>
+        <Outlet />
+      </KorumaliSayfa>
+    ),
+  })
   const messagesRoute = Route.update({
     id: '/hesabim/mesajlar',
     path: '/hesabim/mesajlar',
-    getParentRoute: () => rootRoute,
+    getParentRoute: () => hesabimLayoutRoute,
   } as never)
   const girisRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -168,9 +180,18 @@ function renderRoute(initialEntry: string, oturum: Oturum | null = ORNEK_OTURUM)
   const push = vi.spyOn(history, 'push')
   const replace = vi.spyOn(history, 'replace')
   const router = createRouter({
-    routeTree: rootRoute.addChildren([messagesRoute, girisRoute]),
+    // Jenerik ağaç tipi testte taşınmaz olduğu için AnyRoute'a indirgenir
+    // (aynı desen `hesabim.test.tsx`'te de kullanılıyor).
+    routeTree: rootRoute.addChildren([
+      hesabimLayoutRoute.addChildren([messagesRoute] as never),
+      girisRoute,
+    ] as never) as unknown as AnyRoute,
     history,
-    context: { queryClient },
+    context: {
+      queryClient,
+      adapters: authAdapters,
+      oturum: oturum ? { durum: 'kimlikli', oturum } : { durum: 'anonim' },
+    },
   })
 
   const view = render(<RouterProvider router={router} />)

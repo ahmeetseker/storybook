@@ -77,7 +77,7 @@ bağlamı verir.
 
 | Ad | Type | Default | Controlled | Açıklama |
 |---|---|---|---|---|
-| pins | `GlassMapPin[]` | — | — | Fiyat/cluster pinleri |
+| pins | `GlassMapPin[]` | — | — | Fiyat/cluster pinleri. Her pin `tone` (`accent`\|`success`\|`warning`\|`danger`) ile durum rengini semantic token'dan okuyabilir; `tone` biçimi DEĞİŞTİRMEZ (kapsül mü rozet mi olduğunu `price`/`count` belirler) |
 | selectedId | `string \| null` | — | ✅ | Controlled seçili pin — `undefined`=uncontrolled, `null`=controlled BOŞ seçim, `string`=controlled seçili id |
 | defaultSelectedId | `string` | — | — | Uncontrolled başlangıç |
 | onPinSelect | `(id: string \| undefined) => void` | — | — | Seçim değişince; aynı pine tekrar tıklama → `undefined` |
@@ -85,11 +85,13 @@ bağlamı verir.
 | layer | `'yol'\|'uydu'` | — | ✅ | Controlled zemin katmanı |
 | defaultLayer | `'yol'\|'uydu'` | `'yol'` | — | Uncontrolled başlangıç |
 | onLayerChange | `(layer) => void` | — | — | İç toggle veya dışarıdan değişince |
-| privacyCircle | `{x,y,r}` | — | — | Yaklaşık konum dairesi |
+| privacyCircle | `{x,y,r,lat?,lng?,radiusMeters?}` | — | — | Yaklaşık konum dairesi. `basemap` yokken `x`/`y`/`r` (0-1 normalize) kullanılır; `basemap` varken daire `lat`/`lng` merkezinden konumlanır ve `radiusMeters` ile zeminle birlikte ölçeklenir. Gerçek zeminde `lat`/`lng` verilmezse daire ÇİZİLMEZ — yanlış yerde bir mahremiyet dairesi, hiç daire olmamasından kötüdür |
 | variant | `'inline'\|'panel'` | `'inline'` | — | inline 16:9, panel dikey dolu (üst bileşen yükseklik verir) |
 | seed | `number \| string` | `1` | — | Sokak dokusu üretim tohumu — deterministik |
 | label | `string` | `'Harita'` | — | Kök `aria-label` |
 | basemap | `GlassMapBasemap` | — | — | Gerçek tile zemini (Leaflet projeksiyon/tile motoru). Verilmezse seed'li SVG zemin (bugünkü v1 davranışı) korunur; verildiğinde pin konumu `lat`/`lng` üzerinden hesaplanır (bkz. §3, §7). `basemap.satelliteTileUrl` verilmezse katman toggle'ı `basemap` modunda hiç render EDİLMEZ (bkz. §2, §7) |
+| cluster | `boolean \| {radius?, disableAtZoom?}` | `false` | — | Zoom'a bağlı kümeleme. YALNIZ `basemap` verildiğinde ve zemin `ready` iken etkindir — sentetik zeminde yakınlaşacak kadraj yoktur. `radius` (varsayılan 64) aynı rozete girme eşiğidir ve PİKSEL cinsindendir: ekranda sabit olduğu için yaklaştıkça kümeler kendiliğinden çözülür. `disableAtZoom` (varsayılan 15) bu seviyeden sonra kümelemeyi tamamen kapatır (bkz. §7 iniş zinciri) |
+| onClusterOpen | `(memberIds: string[]) => void` | — | — | Bir rozet açıldığında çağrılır. Kadraj hareketini component'in KENDİSİ yapar; bu geri çağrı yalnız üst bileşenin listeyi daraltması gibi yan etkiler içindir |
 
 Ref hedefi yok. `onPinSelect`/`onLayerChange` yalnız kullanıcı etkileşiminde
 çalışır (prop değişikliği kendi kendine tetiklemez).
@@ -137,6 +139,44 @@ sağladığında bunun konumun kaba bir yüzde karşılığı olmasına özen g�
 gerekir (bkz. §3, §7).
 
 ## 7. Davranış
+
+### İniş zinciri (ülke → bölge → ilan)
+
+`cluster` açıkken harita bir vitrin resmi değil bir keşif aracıdır. Kullanıcı
+tek bir hareketi tekrarlayarak ölçek iner:
+
+1. Ülke kadrajında yakın ilanlar tek **yoğunluk rozetinde** toplanır; rozet
+   temsil ettiği ilan sayısını yazar ve sayı büyüdükçe rozet büyür
+   (`<10` / `<50` / `50+` üç kademe).
+2. Rozete tıklamak kadrajı **o rozetin kapsadığı üyelerin sınırına** indirir
+   (`flyToBounds`; `prefers-reduced-motion` açıkken animasyonsuz `fitBounds`).
+3. Yeni kadrajda eşik aynı kaldığı için rozetler ayrışır ve bir alt kademe
+   (bölge → şehir → ilçe) görünür. Adım 2 tekrarlanır.
+4. Zincirin sonunda tek başına kalan pin bir **fiyat kapsülü** olarak çizilir;
+   tıklanınca `popupContent` ile ilan detayı açılır.
+
+Kritik ayrımlar:
+
+- Rozet bir **seçim kontrolü değildir**, bir iniş kontrolüdür: `aria-pressed`
+  bildirmez, `onPinSelect` çağırmaz, `popupContent` açmaz. Erişilebilir adı
+  ne yapacağını söyler ("N ilan — bu bölgeye yaklaş").
+- Kümeleme **piksel uzayında** yapılır (coğrafi uzayda değil): eşik ekranda
+  sabit bir mesafedir, bu yüzden yaklaştıkça kümeler kendiliğinden çözülür.
+- Kümeleme **deterministiktir**: noktalar id'ye göre sıralanıp taranır, bu
+  yüzden veri sırası (API cevabı, filtre) sonucu değiştirmez — rozet her
+  yenilemede aynı yerde aynı sayıyla durur.
+- Üst üste binen ilanlarda sınır tek noktaya çöker; `fitBounds` sonsuz
+  yakınlaşmaya gideceği için kadraj sabit bir adım (`+3`) yaklaştırılır.
+- Önceden toplanmış pinler (kendi `count`'u olanlar) rozete **kendi
+  ağırlıklarıyla** girer: 12 ilanı temsil eden bir pin, iki pinlik bir rozette
+  "2" değil toplam sayıya katkı verir.
+- Projeksiyon kadrajın bir miktar (160px) DIŞINDAKİ noktaları da döndürür ki
+  kenardaki rozetin sayısı doğru çıksın; panelin gerçekten dışına düşen düğüm
+  çizilmeden elenir (kök `overflow:hidden` almaz, bkz. §3).
+
+`cluster` kapalıyken (varsayılan) bugünkü sözleşme aynen korunur: `count`
+taşıyan pin seçilebilir bir rozettir, `aria-pressed` bildirir ve popup açar.
+
 
 - Pointer: pine tıklama seçer; aynı pine tekrar tıklama seçimi kaldırır
   (popup kapanır). Katman butonuna tıklama anında değiştirir (animasyonsuz
@@ -243,9 +283,8 @@ iç boşluğu), `--map-corner-surface-max-w` (`calc(50% - var(--lg-space-2) *
 1.5)` — atıf ve hata bildirimi aynı satırda yan yana durduğunda çakışmasınlar
 diye her biri genişliğin yarısından biraz azını alır). `tone` filtre
 değerlerinin (`saturate`/`sepia`/`brightness`/`contrast` katsayıları; `quiet`/
-`raw`/`satellite` + yalnız `quiet` ve `satellite` için ayrı koyu tema
-varyantları — `raw`'ın `filter: none`'u koyu temada da değişmez, bilinçli
-olarak filtresiz bırakılır) token karşılığı yok — bunlar tile
+`raw`/`satellite` — `raw`'ın `filter: none`'u bilinçli olarak filtresiz
+bırakılır) token karşılığı yok — bunlar tile
 sağlayıcısının (OSM) kendi paletini sitenin sıcak nötrlerine yaklaştırmak için
 ampirik olarak ayarlanmış, tasarım tokenlarına bilinçli bağlanmamış değerler.
 `.zoomBtn:hover` arka planı için `--lg-fill-quaternary` token'ı projede
@@ -261,6 +300,12 @@ sırasıyla varsayılan sessiz ton, filtresiz ham ton, popup ile birlikte),
 GercekZeminUyduToggle (`satelliteTileUrl` verilmiş — Yol/Uydu toggle görünür
 ve gerçekten iki tile katmanı arasında geçiş yapar; `GercekZemin*` story'lerinde
 `satelliteTileUrl` YOK, bu yüzden onlarda toggle hiç render edilmez).
+KumelemeInisZinciri (yoğun veri + `cluster` — rozete tıklayınca kadraj o
+bölgeye iner, alt rozetler açılır, zincir fiyat kapsülüne kadar sürer),
+KumelemeGenisYaricap (`cluster: {radius: 110}` — aynı veri daha az/kalabalık
+rozete iner), PinTonlari (accent/success/warning/danger),
+GercekZeminMahremiyetDairesi (gerçek zeminde metre ölçekli daire),
+PopupKarti (`GlassMapPopupCard` ile ortak detay kartı).
 Eksik: Sizes N/A — tek ölçek.
 
 ## 11. Test kabul kriterleri
@@ -287,6 +332,17 @@ Eksik: Sizes N/A — tek ölçek.
 - [x] `basemap` modunda `satelliteTileUrl` verilmezse katman toggle render
       edilmez; verilince render edilir ve Yol/Uydu tıklaması tile katmanının
       `setUrl` ile gerçek kaynağını değiştirir (bkz. Task 9 review Bulgu 1)
+- [x] `cluster` açıkken yakın pinler tek rozette toplanır, uzaktaki kendi
+      kapsülünde kalır
+- [x] rozete tıklamak kadrajı üyelerin sınırına indirir (`flyToBounds`)
+- [x] rozet `aria-pressed` bildirmez ve `onClusterOpen` üyelerini haber verir
+- [x] üst üste binen ilanlarda (çökmüş sınır) sabit adım yaklaşılır
+- [x] zincirin sonunda tek kalan pin fiyat kapsülüdür ve popup açar
+- [x] önceden toplanmış pinler rozete kendi ağırlıklarıyla girer
+- [x] `cluster` kapalıyken bugünkü davranış korunur (rozet seçilebilir)
+- [x] zemin yokken `cluster` devreye girmez
+- [x] kümeleme deterministiktir: girdi sırası sonucu değiştirmez
+- [x] kümeleme yarıçapı piksel eşiğidir: eşik büyüyünce kümeler birleşir
 - [ ] zemin dokusunun görsel yoğunluğu (visual, Chrome)
 - [ ] popup'ın gerçek DOM ölçümüyle (ör. ResizeObserver) tam kenar-güvenli
       konumlanması — v1 yalnız pin koordinatına göre eşiklenmiş tahmin
@@ -295,7 +351,10 @@ Eksik: Sizes N/A — tek ölçek.
 ## 12. Do / Don't
 
 - ✅ `label` ver; sayfada birden çok harita varsa adlandır.
-- ✅ Yoğun bölgede `count` ile cluster kullan; her ilanı tek tek pinleme.
+- ✅ Yoğun bölgede `cluster` aç; her ilanı tek tek pinleyip haritayı kapatma.
+- ✅ `cluster` açtığında zemini sürüklenebilir/yakınlaştırılabilir bırak —
+  rozetin gidecek bir yeri yoksa iniş zinciri ilk adımda kesilir.
+- ❌ Rozeti seçim kontrolü gibi kullanma; rozet ölçek indirir, ilan seçmez.
 - ✅ Kesin konum gerekmiyorsa `privacyCircle` ile yaklaşık alanı göster.
 - ❌ Harita yüzeyine cam/backdrop-filter verme — içerik katmanı flat kalır.
 - ❌ `popupContent` içine ikinci seviye interaktif harita kontrolü koyma
@@ -375,8 +434,7 @@ veri adaptörü" açık kararı `basemap` + Leaflet-yalnız-projeksiyon lehine
 kapatıldı. Chrome + Playwright (gerçek Chromium) ile görsel doğrulama
 yapıldı: sessiz ton sağlayıcı paletini nötrlüyor, pin/cluster tasarım
 dilinde (Leaflet'in kendi mavi işaretçileri yok), zoom kontrolleri sağ üstte
-cam yüzeyde (Leaflet kutusu yok), atıf sol altta tek/linkli, koyu temada
-zemin kararıyor ama etiketler okunur kalıyor, dar viewport'ta atıf ellipsis
+cam yüzeyde (Leaflet kutusu yok), atıf sol altta tek/linkli, dar viewport'ta atıf ellipsis
 alıyor ve zorlanmış hata durumunda atıf ile hata bildirimi çakışmıyor, popup
 okunaklı ve doğru konumlanıyor (ayrıntılar için task-4-report.md).
 2026-07-27 — Task 9 uçtan uca Chrome/Playwright QA'sında bulunan düzeltme:

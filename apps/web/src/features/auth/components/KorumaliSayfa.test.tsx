@@ -65,6 +65,19 @@ describe('KorumaliSayfa', () => {
     expect(await screen.findByRole('heading', { name: 'Korumalı içerik' })).toBeTruthy()
   })
 
+  /**
+   * Hidrasyon güvenliğinin gözlemlenebilir hâli: oturum VARKEN bile ilk
+   * render korumalı içeriği çizmez, çünkü oturum o anda `bilinmiyor`dur.
+   * Sunucu da tam olarak bunu üretir; iki taraf aynı ağacı verdiği için
+   * hidrasyon uyuşur. Bu test kırılırsa `AuthSessionProvider`ın başlangıç
+   * durumu context'ten seed ediliyor demektir — "Hydration failed" geri gelir.
+   */
+  it('oturum varken bile ilk render korumalı içeriği çizmez', () => {
+    const adapters = sahteAuthAdapters({ oturumuGetir: () => ORNEK_OTURUM })
+    render(<RouterProvider router={korumaliSayfaRouter(adapters)} />)
+    expect(screen.queryByRole('heading', { name: 'Korumalı içerik' })).toBeNull()
+  })
+
   it('oturumsuzken içeriği hiç göstermeden /girise yönlendirir', async () => {
     const adapters = sahteAuthAdapters({ oturumuGetir: () => null })
     const router = korumaliSayfaRouter(adapters)

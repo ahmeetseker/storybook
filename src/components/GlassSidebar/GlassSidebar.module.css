@@ -38,7 +38,7 @@
 }
 
 /* Overlay (Drawer/Sheet) içinde: opak yüzey + tam genişlik; beyaz-alfa yerine
-   temaya göre koyulaşan color-mix katmanları (Kağıt temada beyaz alfa görünmez). */
+   label'dan koyulaşan color-mix katmanları (açık yüzeyde beyaz alfa görünmez). */
 .flat {
   --sidebar-width: 100%;
   --hover-bg: color-mix(in srgb, var(--lg-label) 6%, transparent);

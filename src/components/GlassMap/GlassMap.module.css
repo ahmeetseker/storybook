@@ -7,12 +7,24 @@
   --map-toggle-pad: 3px;
   --map-toggle-btn-pad: 5px 11px;
   --map-toggle-btn-pad-coarse: 10px 13px;
-  /* Pin bir dokunma hedefidir; ölçü kontrol ölçeğinden okunur (AAA 2.5.5). */
-  --map-pin-price-h: var(--lg-control-md, 44px);
-  --map-pin-price-pad: 5px 10px;
-  --map-pin-price-pad-inline-coarse: 14px;
-  --map-pin-cluster-size: var(--lg-control-md, 44px);
+  /* Pin GÖRSEL ölçüsü tasarım dilinden gelir; dokunma hedefi ayrı bir
+     görünmez katmanla (.pin::before) her zaman --lg-control-hit'e tamamlanır
+     (AAA 2.5.5). İkisi ayrılmasaydı fiyat kapsülü 44px yüksekliğinde şişkin
+     bir kutuya dönüşüp haritayı kapatırdı. */
+  --map-pin-price-h: 26px;
+  --map-pin-price-pad: 0 9px;
+  --map-pin-price-pad-inline-coarse: 11px;
+  --map-pin-cluster-size: 34px;
+  --map-pin-cluster-size-md: 40px;
+  --map-pin-cluster-size-lg: 46px;
   --map-pin-cluster-pad-inline: 6px;
+  /* Kapsülü konumuna bağlayan sap + uçtaki nokta (referans harita dili). */
+  --map-pin-stem-w: 2px;
+  --map-pin-stem-h: 10px;
+  --map-pin-dot: 9px;
+  --map-pin-ring: 2px;
+  --map-pin-cluster-ring: 3px;
+  --map-pin-halo: 7px;
   --map-popup-close-size: 22px;
   --map-popup-close-glyph: 15px;
   --map-popup-close-glyph-coarse: 17px;
@@ -89,6 +101,19 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* Gerçek zemin üzerindeki mahremiyet dairesi. SVG yüzeyi çizilmediği için
+   ayrı bir katman: merkez projeksiyondan, çap metreden hesaplanır. Kesikli
+   kenar "kesin nokta değil" demenin görsel karşılığıdır. */
+.privacyDisc {
+  position: absolute;
+  z-index: 1;
+  border: var(--lg-border-width, 1px) dashed var(--lg-accent);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-accent) 16%, transparent);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
 /* ── katman toggle (iç segmentli kontrol, flat) ── */
 .toggle {
   position: absolute;
@@ -138,8 +163,19 @@
   position: absolute;
   --pin-shift-x: -50%;
   --pin-shift-y: -50%;
+  /* Ton tek kaynaktan: buton, sap ve nokta aynı değişkeni okur. */
+  --map-pin-color: var(--lg-accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transform: translate(var(--pin-shift-x), var(--pin-shift-y));
 }
+/* Rozet çapasının ÜSTÜNE ortalanır; fiyat kapsülü konumun yukarısında durur ve
+   sapının ucundaki nokta koordinatı işaretler (referans harita dili). */
+.pinWrap[data-kind='price'] { --pin-shift-y: -100%; }
+.pinWrap[data-tone='success'] { --map-pin-color: var(--lg-success); }
+.pinWrap[data-tone='warning'] { --map-pin-color: var(--lg-warning); }
+.pinWrap[data-tone='danger'] { --map-pin-color: var(--lg-danger); }
 .pinWrap[data-edge-x='start'] { --pin-shift-x: calc(-1 * var(--map-pin-edge-inset)); }
 .pinWrap[data-edge-x='end'] { --pin-shift-x: calc(-100% + var(--map-pin-edge-inset)); }
 .pinWrap[data-edge-y='start'] { --pin-shift-y: calc(-1 * var(--map-pin-edge-inset)); }
@@ -150,11 +186,22 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  border: 1px solid var(--lg-hairline);
+  border: none;
   font: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 0.15s ease;
+}
+/* Görünmez dokunma hedefi: görsel pin tasarım ölçüsünde kalırken tıklama
+   alanı her zaman --lg-control-hit'e tamamlanır (WCAG 2.2 AAA 2.5.5). */
+.pin::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--lg-control-hit, 44px));
+  height: max(100%, var(--lg-control-hit, 44px));
+  transform: translate(-50%, -50%);
 }
 .pin:focus-visible {
   outline: 2px solid var(--lg-accent);
@@ -165,43 +212,87 @@
 }
 
 .pinPrice {
-  min-height: var(--map-pin-price-h);
+  height: var(--map-pin-price-h);
   padding: var(--map-pin-price-pad);
   border-radius: var(--lg-radius-capsule, 999px);
-  background: var(--lg-surface);
-  color: var(--lg-label);
+  background: var(--map-pin-color);
+  color: var(--lg-accent-contrast, #ffffff);
   font-size: var(--lg-text-caption, 12px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   white-space: nowrap;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--lg-label) 28%, transparent);
+  box-shadow:
+    0 0 0 var(--map-pin-ring) var(--lg-surface),
+    0 2px 6px color-mix(in srgb, var(--lg-label) 30%, transparent);
 }
+
+/* Kapsülü koordinatına bağlayan sap; ucundaki nokta gerçek konumdur. */
+.pinStem {
+  position: relative;
+  width: var(--map-pin-stem-w);
+  height: var(--map-pin-stem-h);
+  background: var(--map-pin-color);
+  pointer-events: none;
+}
+.pinStem::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: var(--map-pin-dot);
+  height: var(--map-pin-dot);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--map-pin-color);
+  box-shadow: 0 0 0 var(--map-pin-ring) var(--lg-surface);
+  transform: translate(-50%, -45%);
+}
+
 .pinCluster {
   min-width: var(--map-pin-cluster-size);
   height: var(--map-pin-cluster-size);
   padding: 0 var(--map-pin-cluster-pad-inline);
   border-radius: var(--lg-radius-capsule, 999px);
-  background: var(--lg-accent);
+  background: var(--map-pin-color);
   color: var(--lg-accent-contrast, #ffffff);
   font-size: var(--lg-text-caption, 12px);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--lg-label) 28%, transparent);
+  /* Beyaz halka + dışında yumuşak renk halesi: rozet zeminden ayrışır ve
+     yoğunluk uzaktan okunur. */
+  box-shadow:
+    0 0 0 var(--map-pin-cluster-ring) var(--lg-surface),
+    0 0 0 calc(var(--map-pin-cluster-ring) + var(--map-pin-halo))
+      color-mix(in srgb, var(--map-pin-color) 20%, transparent),
+    0 2px 10px color-mix(in srgb, var(--lg-label) 26%, transparent);
 }
+/* Yoğunluk arttıkça rozet büyür — kaç ilan olduğu okunmadan önce hissedilir. */
+.pinCluster[data-scale='md'] {
+  min-width: var(--map-pin-cluster-size-md);
+  height: var(--map-pin-cluster-size-md);
+  font-size: var(--lg-text-footnote, 13px);
+}
+.pinCluster[data-scale='lg'] {
+  min-width: var(--map-pin-cluster-size-lg);
+  height: var(--map-pin-cluster-size-lg);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+/* Seçili pin rengini korur (popup zaten hangi ilan olduğunu söyler); yalnız
+   halkası koyulaşıp öne çıkar — renk değiştirmek durumu (tone) gizlerdi. */
 .pinSelected.pinPrice {
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast, #ffffff);
-  border-color: transparent;
+  box-shadow:
+    0 0 0 var(--map-pin-ring) var(--lg-surface),
+    0 0 0 calc(var(--map-pin-ring) + 2px) var(--lg-label),
+    0 4px 12px color-mix(in srgb, var(--lg-label) 38%, transparent);
 }
 .pinSelected.pinCluster {
   background: var(--lg-label);
   color: var(--lg-surface);
 }
 
-/* Hedef ölçüsü artık her girişte 44px (yukarıdaki token'lar); dokunmatikte
-   yalnız yatay nefes bir adım açılır. */
 @media (pointer: coarse) {
-  .pinPrice { padding: var(--lg-space-2) var(--map-pin-price-pad-inline-coarse); }
+  .pinPrice { padding: 0 var(--map-pin-price-pad-inline-coarse); }
 }
 
 /* ── popup ──
@@ -295,12 +386,12 @@
 
 /* Ton, tile sağlayıcısından bağımsız olarak burada verilir. Amaç zemini sitenin
    sıcak nötrlerine yaklaştırmak; renk kaynağı tile olduğu için filtre kullanılır. */
-/* Sıra önemli: önce doygunluk kırılır, sonra sepia zemini tek bir sıcak aileye
-   toplar, hue-rotate kalan yeşil/mavi kaymasını amber tarafına çeker. Yalnız
-   doygunluk düşürmek yetmiyordu — zemin soğuk gri-mavi kalıp fildişi sayfanın
-   yanında yabancı duruyordu. */
+/* Zemin artık açık gri "light" tile setinden geliyor (bkz. web/basemap.ts):
+   kaynak zaten doygunluğu kırılmış olduğu için eski ağır sepia zemini sarıya
+   boyayıp yol/sınır çizgilerini yutuyordu. Bugün yalnız hafif bir sıcaklık ve
+   kontrast düşürme uygulanır — pinler zeminden ayrışsın, zemin öne çıkmasın. */
 .tiles[data-tone='quiet'] {
-  filter: saturate(0.2) sepia(0.52) hue-rotate(-6deg) brightness(1.06) contrast(0.9);
+  filter: saturate(0.55) sepia(0.16) brightness(1.02) contrast(0.97);
 }
 
 .tiles[data-tone='raw'] {
@@ -309,17 +400,6 @@
 
 .tiles[data-tone='satellite'] {
   filter: saturate(0.86) contrast(1.06) brightness(0.94);
-}
-
-@media (prefers-color-scheme: dark) {
-  /* Koyu temada ters çevirme YOK — etiketler okunaklı kalsın diye yalnız karartma. */
-  .tiles[data-tone='quiet'] {
-    filter: saturate(0.18) sepia(0.4) hue-rotate(-6deg) brightness(0.56) contrast(1.06);
-  }
-
-  .tiles[data-tone='satellite'] {
-    filter: saturate(0.8) brightness(0.78) contrast(1.1);
-  }
 }
 
 @media (prefers-reduced-transparency: reduce) {

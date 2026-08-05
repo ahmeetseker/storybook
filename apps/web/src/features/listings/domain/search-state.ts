@@ -31,13 +31,35 @@ export interface ListingSearchState {
   category: PropertyCategory
   city?: string
   district?: string
+  /** Mahalle — il/ilçenin altındaki en ince kırılım */
+  neighbourhood?: string
+  /**
+   * Haritadan seçilen alan `[[güney, batı], [kuzey, doğu]]`.
+   *
+   * "Bu alanda ara" bunu yazar. Kadrajın KENDİSİ filtre değildir: kullanıcı
+   * haritayı her oynattığında sonuç listesi değişseydi liste okunamaz hale
+   * gelirdi. Alan yalnız kullanıcı açıkça istediğinde uygulanır ve çip olarak
+   * görünür kalır.
+   */
+  mapArea?: [[number, number], [number, number]]
   salePrice?: NumericRange
   rentPrice?: NumericRange
   area?: NumericRange
   unitPrice?: NumericRange
   owners: OwnerType[]
   verified: boolean
+  /**
+   * Katalog tabanlı çoklu seçim filtreleri: `key` bir facet anahtarı,
+   * değer seçilen seçeneklerdir. URL'de `f_<key>=a,b` olarak taşınır.
+   */
   categoryFilters: Record<string, string[]>
+  /**
+   * Katalog tabanlı SAYISAL ARALIK filtreleri (bina yaşı, banyo sayısı, kat…).
+   * `salePrice`/`area` gibi dört aralık tarihsel olarak ayrı alanlardır;
+   * yeni facet'ler tek tek alan açmadan buraya girer. URL'de
+   * `r_<key>Min` / `r_<key>Max` olarak taşınır.
+   */
+  categoryRanges: Record<string, NumericRange>
   sort: ListingSort
   page: number
   layout: ResultLayout
@@ -51,6 +73,7 @@ export const DEFAULT_LISTING_SEARCH_STATE: ListingSearchState = {
   owners: [],
   verified: false,
   categoryFilters: {},
+  categoryRanges: {},
   sort: 'recommended',
   page: 1,
   layout: 'row',
@@ -138,6 +161,46 @@ function categoryFilters(raw: RawSearch): Record<string, string[]> {
   )
 }
 
+/**
+ * `r_<key>Min` / `r_<key>Max` çiftlerini tek bir aralık sözlüğüne toplar.
+ * Yalnız bir ucu verilmiş aralık geçerlidir (ör. yalnız "en az 2 banyo").
+ */
+function categoryRanges(raw: RawSearch): Record<string, NumericRange> {
+  const buckets: Record<string, { min?: unknown; max?: unknown }> = {}
+  for (const [rawKey, value] of Object.entries(raw)) {
+    if (!rawKey.startsWith('r_')) continue
+    const body = rawKey.slice(2)
+    if (body.endsWith('Min')) {
+      const key = body.slice(0, -3)
+      if (key) buckets[key] = { ...buckets[key], min: value }
+    } else if (body.endsWith('Max')) {
+      const key = body.slice(0, -3)
+      if (key) buckets[key] = { ...buckets[key], max: value }
+    }
+  }
+  const parsed: Record<string, NumericRange> = {}
+  for (const [key, bounds] of Object.entries(buckets)) {
+    const value = range(bounds.min, bounds.max)
+    if (value) parsed[key] = value
+  }
+  return parsed
+}
+
+/** `bbox=güney,batı,kuzey,doğu` — dört sonlu sayı değilse alan yok sayılır. */
+function mapArea(raw: RawSearch): [[number, number], [number, number]] | undefined {
+  const value = stringValue(raw.bbox)
+  if (!value) return undefined
+  const parts = value.split(',').map(Number)
+  if (parts.length !== 4 || !parts.every((part) => Number.isFinite(part))) return undefined
+  const [south, west, north, east] = parts
+  // Ters verilmiş sınır sessizce düzeltilir: kullanıcıya hata göstermek yerine
+  // anlaşılabilir olanı uygularız.
+  return [
+    [Math.min(south, north), Math.min(west, east)],
+    [Math.max(south, north), Math.max(west, east)],
+  ]
+}
+
 export function parseListingSearch(raw: RawSearch): ListingSearchState {
   const transactions = stringList<TransactionType>(
     raw.type,
@@ -161,6 +224,8 @@ export function parseListingSearch(raw: RawSearch): ListingSearchState {
     ),
     city: stringValue(raw.city),
     district: stringValue(raw.district),
+    neighbourhood: stringValue(raw.neighbourhood),
+    mapArea: mapArea(raw),
     salePrice: range(raw.salePriceMin, raw.salePriceMax),
     rentPrice: range(raw.rentPriceMin, raw.rentPriceMax),
     area: range(raw.areaMin, raw.areaMax),
@@ -168,6 +233,7 @@ export function parseListingSearch(raw: RawSearch): ListingSearchState {
     owners,
     verified: raw.verified === '1' || raw.verified === true,
     categoryFilters: categoryFilters(raw),
+    categoryRanges: categoryRanges(raw),
     sort: enumValue(raw.sort, SORTS, DEFAULT_LISTING_SEARCH_STATE.sort),
     page: positiveInteger(raw.page, 1),
     layout: enumValue(
@@ -209,6 +275,8 @@ export function serializeListingSearch(
   if (state.category !== 'all') search.category = state.category
   if (state.city) search.city = state.city
   if (state.district) search.district = state.district
+  if (state.neighbourhood) search.neighbourhood = state.neighbourhood
+  if (state.mapArea) search.bbox = state.mapArea.flat().join(',')
   appendRange(search, 'salePrice', state.salePrice)
   appendRange(search, 'rentPrice', state.rentPrice)
   appendRange(search, 'area', state.area)
@@ -226,7 +294,40 @@ export function serializeListingSearch(
       if (values.length > 0) search[`f_${key}`] = values.join(',')
     })
 
+  Object.entries(state.categoryRanges)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .forEach(([key, value]) => appendRange(search, `r_${key}`, value))
+
   return search
+}
+
+/**
+ * Tüm daraltıcıları temizler; yalnız görünüm tercihleri (sıralama, yerleşim,
+ * harita modu) ve serbest metin sorgusu korunur.
+ *
+ * Tek yerde yaşamasının nedeni somut: sıfırlama üç ayrı yerde (kenar çubuğu,
+ * mobil çekmece, "Tüm Seçenekler" modalı) elle tekrarlanıyordu ve yeni bir
+ * filtre alanı eklendiğinde biri güncellenmeden kalıyordu — kullanıcı
+ * "sıfırla" dedikten sonra hâlâ süzülmüş bir sonuç görüyordu.
+ */
+export function clearListingFilters(state: ListingSearchState): ListingSearchState {
+  return {
+    ...state,
+    category: 'all',
+    city: undefined,
+    district: undefined,
+    neighbourhood: undefined,
+    mapArea: undefined,
+    salePrice: undefined,
+    rentPrice: undefined,
+    area: undefined,
+    unitPrice: undefined,
+    owners: [],
+    verified: false,
+    categoryFilters: {},
+    categoryRanges: {},
+    page: 1,
+  }
 }
 
 export function changeCategory(
@@ -236,7 +337,10 @@ export function changeCategory(
   return {
     ...state,
     category,
+    // Kategori değişince ona özgü filtreler anlamını yitirir: arsada seçili
+    // "Isıtma" konut kategorisine taşınmamalı.
     categoryFilters: {},
+    categoryRanges: {},
     page: 1,
   }
 }

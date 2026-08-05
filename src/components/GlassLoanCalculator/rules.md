@@ -169,8 +169,7 @@ daralmaya izin verir.
 
 Var: Default, Playground, Compact (variant), SifirFaiz, YuksekPesinat,
 UzunIcerik, Erisilebilirlik (docs), Responsive (mobile1 viewport), Variants
-(full+compact yan yana). Temalar: toolbar'daki Arka plan/Tier global'leriyle
-kapsanır (component kendi tema prop'u almaz — token tüketir).
+(full+compact yan yana).
 
 Eksik: forced-focus görsel story (Chrome görsel QA borcu, genel proje notu).
 

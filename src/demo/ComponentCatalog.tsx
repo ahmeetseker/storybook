@@ -320,6 +320,20 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassvitrin--default',
   },
   {
+    name: 'Dönen Şerit',
+    description: 'Footer üstü tam genişlikte ilan şeridi — kesintisiz döngü, sabit hız, duraklat düğmesi + hover/odakla durma.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassmarquee--default',
+  },
+  {
+    name: 'SEO Keşif Rafı',
+    description: 'Footer üstü iç bağlantı bloğu — arama niyetine göre kolonlar, uzun kuyruk açılış sayfaları, sıralı liste + hayalet rakam.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glassseodiscovery--default',
+  },
+  {
     name: "Karşılaştırma Tepsisi",
     description: "Sayfa altı sabit karşılaştırma şeridi — mini önizlemeler, N<2 koruması, maxItems ipucu.",
     category: 'İçerik',

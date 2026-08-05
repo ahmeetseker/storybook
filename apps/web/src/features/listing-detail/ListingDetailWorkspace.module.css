@@ -86,8 +86,15 @@
   line-height: 1.55;
 }
 
-/* Satıcı ızgaranın ikinci satırında; karar kolonuyla yan yana gelmez. */
+/* Satıcı ızgaranın ikinci satırında; karar kolonuyla yan yana gelmez.
+
+   Yaprak kendi KAPIDIR: içindeki gövde ızgarası (gündem + ince baskı) sayfanın
+   değil, bu yaprağın genişliğine göre bölünür. Sayfa eşiğiyle sorulduğunda
+   yanlış ölçü okunuyordu — yaprak sayfanın tamamı değil, karar kolonu
+   düştükten sonra kalan paydır. Alt ağaçtaki isimsiz kap sorguları etkilenmez:
+   `.evidenceGrid` ve `GlassAgencyCard` kendi kaplarını kuruyor. */
 .seller {
+  container: sellerSheet / inline-size;
   grid-column: 1 / -1;
   min-inline-size: 0;
 }
@@ -614,10 +621,22 @@
 /* Satıcı bölümü yaprağın tam genişliğini kaplar ama İÇERİĞİ okuma ölçüsünü
    aşmaz: aksi halde kanıt satırının kaynak sütunu değerinden ~1000px uzağa
    düşüyordu — kontrol etkilediği şeyin yanında durur (§1b). */
-.revealStatus,
-.agenda,
-.sellerFinePrint {
+/* Numara durumu okuma ölçüsünde durur. Gündem ve ince baskı bu kapağı
+   PAYLAŞMAZ: ikisi `.sellerBody` ızgarasının kolonlarıdır ve genişliklerini
+   oradan alır — sabit bir kapak, yaprak açıldığında sağ yarıyı boş bırakıyordu. */
+.revealStatus {
   max-inline-size: 58rem;
+}
+
+/* Bölüm gövdesi: gündem + ince baskı. Dar yerleşimde tek kolon (gündem üstte),
+   yaprak yeterince açıldığında iki kolon — ince baskı gündemin yanına geçer.
+   Kırılma noktası kap sorgusundadır (aşağıda), çünkü belirleyici olan
+   viewport değil bu yaprağın kendi genişliğidir. */
+.sellerBody {
+  display: grid;
+  align-items: start;
+  gap: var(--lg-space-5) var(--lg-space-6);
+  min-inline-size: 0;
 }
 
 /* Numara durumunun sabit yuvası: kapalı iletişim gerekçesi, bağlı olmayan
@@ -664,15 +683,23 @@
 /* Görüşme gündemi — bölümün gövdesi, eki değil. */
 .agenda {
   display: grid;
+  align-content: start;
   gap: var(--lg-space-3);
+  min-inline-size: 0;
 }
 
 /* Numaralandırma burada süs değil: maddeler telefonda ilerlenecek SIRAdır ve
    sıra `criticalIssues()` sırasından gelir. `<ol>` semantiği de bunu söyler;
-   görünür sayı CSS sayacından gelir, işaretleyici gizlenir. */
+   görünür sayı CSS sayacından gelir, işaretleyici gizlenir.
+
+   Maddeler tam genişlik SATIR değil, kendi ölçüsünde KARTtır. Satır düzeninde
+   madde metni ~35 karakterken satır 900px'e uzuyordu; ayraçlar boş bir şeridi
+   bölüyor, hover bandı da o şeridin tamamını boyuyordu. `auto-fill` ızgarası
+   kartı kendi ölçüsünde tutar ve yer varsa maddeleri yan yana dizer. */
 .agendaList {
   display: grid;
-  gap: 0;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--lg-space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -681,50 +708,92 @@
 
 .agendaList li {
   counter-increment: agenda;
-  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  min-inline-size: 0;
 }
 
-.agendaList li:first-child {
-  border-block-start: 0;
-}
+/* Kartın tamamı etikettir: rozeti değil, maddeyi işaretlersiniz. Dokunma
+   hedefi kart yüksekliğinden gelir, minimum `--lg-control-hit`.
 
-/* Satırın tamamı etikettir: kutucuğu değil, maddeyi işaretlersiniz.
-   Dokunma hedefi satır yüksekliğinden gelir, minimum `--lg-control-hit`.
-
-   Orta sütun okuma ölçüsünde DURUR, `1fr` değildir: kolon 900px'e açıldığında
-   `1fr` kutucuğu metnin ~840px sağına atıyordu ve işaret hangi maddeye ait
-   olduğunu söylemez oluyordu. Kutucuk metnin bittiği yerde durur; satırın
-   tıklanabilir alanı ve ayraç yine tam genişliktedir. */
+   İki sütun: rozet ve metin. Metin rozetin hemen yanında biter — arada
+   ölçüsü belirsiz üçüncü bir sütun yok. */
+/* Madde bir KART DEĞİL, tonlanmış bir bölgedir (§1b): zemini ve yarıçapı var,
+   çerçevesi ve gölgesi YOK. Üçlü açılsaydı yaprağın içinde ikinci bir kart
+   olurdu — künye bandının durduğu iznin aynısında duruyor. */
 .agendaItem {
+  position: relative;
   display: grid;
-  grid-template-columns: var(--lg-space-6) minmax(0, var(--lg-measure)) var(--lg-space-5);
+  grid-template-columns: auto minmax(0, 1fr);
   gap: var(--lg-space-3);
   align-items: start;
   min-block-size: var(--lg-control-hit);
-  padding-block: var(--lg-space-3);
+  padding: var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  background: color-mix(in srgb, var(--lg-label) 4%, transparent);
   cursor: pointer;
+  transition:
+    background-color 0.16s ease-out,
+    transform 0.16s ease-out;
 }
 
-.agendaItem::before {
-  content: counter(agenda, decimal-leading-zero);
+/* Sıra numarası ile işaret kutucuğunun BİRLEŞTİĞİ rozet. İki durum aynı
+   karede üst üste durur (`grid-area: 1 / 1`) ve opaklık + ölçekle yer
+   değiştirir: numara çekilirken onay büyüyerek gelir.
+
+   Renkler eylem dilinden gelir, bu kontrol kendi rengini uydurmaz: boşta
+   `GlassButton`'ın tonlu hâli (accent'in seyreltilmişi), işaretliyken dolu
+   hâli (`--lg-action-prominent` + `--lg-action-prominent-label`). */
+.agendaMark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--lg-space-6);
+  block-size: var(--lg-space-6);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, transparent);
   color: var(--lg-accent);
+  transition:
+    background-color 0.16s ease-out,
+    color 0.16s ease-out,
+    transform 0.16s ease-out;
+}
+
+.agendaNumber,
+.agendaTick {
+  grid-area: 1 / 1;
+  transition:
+    opacity 0.16s ease-out,
+    transform 0.16s ease-out;
+}
+
+.agendaNumber::before {
+  content: counter(agenda, decimal-leading-zero);
   font-size: var(--lg-text-badge);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.06em;
-  padding-block-start: 0.28em;
+  letter-spacing: 0.04em;
+}
+
+.agendaTick {
+  inline-size: var(--lg-space-4);
+  block-size: var(--lg-space-4);
+  opacity: 0;
+  transform: scale(0.6);
 }
 
 .agendaText {
   display: grid;
   gap: 2px;
   min-inline-size: 0;
+  /* Rozet 24px, metin ilk satırı 1.5 satır yüksekliğinde: optik hizayı
+     yakalamak için metin yarım piksel aşağıdan başlar. */
+  padding-block-start: 1px;
 }
 
 .agendaAction {
   font-size: var(--lg-text-footnote);
   font-weight: 600;
   line-height: 1.5;
+  transition: color 0.16s ease-out;
 }
 
 /* Adımın gerekçesi: hangi açık konuyu kapattığını söyler (`issue.title`).
@@ -735,25 +804,42 @@
   line-height: 1.45;
 }
 
-/* Kutucuk son sütunda: göz önce yapılacak işi, sonra işaretleme yerini görür.
-   `accent-color` vurgu token'ından gelir; kutucuk kendi rengini uydurmaz. */
+/* Yerli kutucuk görünmezdir ama DOM'da ve odak sırasındadır: durum, rol ve
+   klavye davranışı tarayıcıdan gelir; boyanan yalnız rozettir. */
 .agendaCheck {
-  grid-column: 3;
-  grid-row: 1;
-  inline-size: 18px;
-  block-size: 18px;
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
   margin: 0;
-  margin-block-start: 0.15em;
-  accent-color: var(--lg-accent);
-  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.agendaCheck:focus-visible {
+/* Odak halkası kartın kendisine çizilir — kullanıcı kutucuğu değil maddeyi
+   işaretliyor, halka da işaretlenecek şeyi göstermeli. */
+.agendaCheck:focus-visible ~ .agendaMark {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
 }
 
-/* İşaretlenen madde silinmez, geri çekilir: satır kalır, ağırlık düşer.
+/* İşaretli: rozet dolu eylem rengine geçer, numara yerini onaya bırakır. */
+.agendaCheck:checked ~ .agendaMark {
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
+}
+
+.agendaCheck:checked ~ .agendaMark > .agendaNumber {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.agendaCheck:checked ~ .agendaMark > .agendaTick {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* İşaretlenen madde silinmez, geri çekilir: kart kalır, ağırlık düşer.
    Üstü çizili metin ekran okuyucuda okunur kalır, yalnız görsel durum değişir. */
 .agendaCheck:checked ~ .agendaText > .agendaAction {
   color: var(--lg-label-secondary);
@@ -761,17 +847,71 @@
   text-decoration: line-through;
 }
 
+.agendaItem:has(.agendaCheck:checked) {
+  background: color-mix(in srgb, var(--lg-accent) 8%, transparent);
+}
+
+/* Hover MADDEnin zeminini boyar, satırın tamamını değil: eski hâlde tam
+   genişlik gri bir bant yanıyordu ve imlecin neyi hedeflediğini değil,
+   satırın nereye kadar uzandığını gösteriyordu. Zemin nötrden accent'e
+   döner — hangi maddenin hedeflendiği renkten de okunur. */
 @media (hover: hover) {
   .agendaItem:hover {
-    background: color-mix(in srgb, var(--lg-label) 3%, transparent);
+    background: color-mix(in srgb, var(--lg-accent) 11%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .agendaItem:hover:has(.agendaCheck:checked) {
+    background: color-mix(in srgb, var(--lg-accent) 14%, transparent);
+  }
+
+  .agendaItem:hover .agendaMark {
+    background: color-mix(in srgb, var(--lg-accent) 22%, transparent);
+  }
+
+  .agendaItem:hover:has(.agendaCheck:checked) .agendaMark {
+    background: var(--lg-action-prominent-hover);
+  }
+}
+
+/* Basınç: madde yerine oturur — kütüphanenin buton basıncıyla aynı dil. */
+.agendaItem:active {
+  transform: translateY(0);
+}
+
+.agendaItem:active .agendaMark {
+  transform: scale(0.92);
+}
+
+/* Hareket azaltma: yer değiştirme ve ölçek yok, yalnız renk konuşur.
+   Numara/onay geçişi de anında olur — durum yine okunur. */
+@media (prefers-reduced-motion: reduce) {
+  .agendaItem,
+  .agendaMark,
+  .agendaNumber,
+  .agendaTick,
+  .agendaAction {
+    transition-duration: 0.01ms;
+  }
+
+  .agendaItem:hover,
+  .agendaItem:active {
+    transform: none;
+  }
+
+  .agendaItem:active .agendaMark {
+    transform: none;
   }
 }
 
 /* İnce baskı: kararın çerçevesi (TTBS kapsamı, mahremiyet notu) — kararı
-   taşıyan içerik değil. Gündemden hairline ile ayrılır. */
+   taşıyan içerik değil. Gündemden hairline ile ayrılır; iki kolonlu
+   yerleşimde ayraç üstten yana döner (aşağıdaki kap sorgusu). */
 .sellerFinePrint {
   display: grid;
+  align-content: start;
   gap: var(--lg-space-2);
+  min-inline-size: 0;
   border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
   padding-block-start: var(--lg-space-4);
 }
@@ -1103,6 +1243,28 @@
 
   .duo {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ═══ Satıcı yaprağı iki kolona ayrılır: YAPRAK ≥ 56rem ═══
+   Eşik yaprağın kendi kabındadır (`sellerSheet`), sayfanın değil: karar
+   kolonu açıldığında yaprak sayfadan ~372px dar kalır ve sayfa eşiği bunu
+   göremez. 56rem, gündem kartlarının yanına bir okuma kolonu sığdığı ilk
+   genişliktir. Altında ince baskı gündemin ALTINDA kalır — dar bir kolona
+   sıkıştırılmış hukuki metin satır başına 30 karaktere düşerdi.
+
+   `:has(.agenda)` bilinçli: gündemi olmayan ilanda ikinci kolon açılırsa
+   ince baskı tek başına sol kolonda kalır ve sağ yarı gerçekten boşalır. */
+@container sellerSheet (min-width: 56rem) {
+  .sellerBody:has(.agenda) {
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem);
+  }
+
+  .sellerBody:has(.agenda) > .sellerFinePrint {
+    border-block-start: 0;
+    border-inline-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+    padding-block-start: 0;
+    padding-inline-start: var(--lg-space-5);
   }
 }
 

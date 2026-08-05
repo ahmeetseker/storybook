@@ -4,6 +4,7 @@ import {
   changeCategory,
   parseListingSearch,
   serializeListingSearch,
+  clearListingFilters,
 } from './search-state'
 
 describe('listing search URL state', () => {
@@ -81,5 +82,52 @@ describe('listing search URL state', () => {
       categoryFilters: {},
       page: 1,
     })
+  })
+
+  // Katalog aralıkları URL'de `r_<key>Min/Max` olarak yaşar: tarayıcıdan
+  // paylaşılan bir arama bağlantısı aynı sonucu vermelidir.
+  it('katalog aralıklarını URL ile gidiş-dönüş taşır', () => {
+    const state = parseListingSearch({
+      'r_building-ageMin': '5',
+      'r_building-ageMax': '20',
+      r_bathroomsMin: '2',
+    })
+    expect(state.categoryRanges['building-age']).toEqual({ min: 5, max: 20 })
+    expect(state.categoryRanges.bathrooms).toEqual({ min: 2, max: undefined })
+
+    const search = serializeListingSearch(state)
+    expect(search['r_building-ageMin']).toBe(5)
+    expect(search['r_building-ageMax']).toBe(20)
+    expect(search.r_bathroomsMin).toBe(2)
+    expect(search.r_bathroomsMax).toBeUndefined()
+  })
+
+  it('geçersiz aralık değerlerini yok sayar', () => {
+    const state = parseListingSearch({ r_bathroomsMin: 'abc', 'r_duesMax': '-5' })
+    expect(state.categoryRanges.bathrooms).toBeUndefined()
+    expect(state.categoryRanges.dues).toBeUndefined()
+  })
+
+  // Sıfırlama üç ayrı yerde tekrarlanıyordu ve biri güncellenmeden kalınca
+  // kullanıcı "sıfırla" dedikten sonra süzülmüş sonuç görüyordu.
+  it('clearListingFilters her daraltıcıyı temizler, görünüm tercihini korur', () => {
+    const state = parseListingSearch({
+      category: 'land',
+      city: 'izmir',
+      f_zoning: 'residential',
+      'r_road-widthMin': '7',
+      verified: '1',
+      sort: 'newest',
+      view: 'grid',
+    })
+    const cleared = clearListingFilters(state)
+    expect(cleared.categoryFilters).toEqual({})
+    expect(cleared.categoryRanges).toEqual({})
+    expect(cleared.category).toBe('all')
+    expect(cleared.city).toBeUndefined()
+    expect(cleared.verified).toBe(false)
+    // Görünüm tercihleri daraltıcı değildir, korunur.
+    expect(cleared.sort).toBe('newest')
+    expect(cleared.layout).toBe('grid')
   })
 })

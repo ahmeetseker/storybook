@@ -159,8 +159,7 @@ büyümesi tasarımın istediği davranıştır.
 Var: Default (accordion), Playground, Accordion, Checklist, Columns,
 UzunIcerik, Erişilebilirlik (docs description'lı). **Eksik:** Sizes (N/A —
 `size` ekseni yok), Responsive (ayrı story — dar container her variant
-story'sinde `maxWidth` ile zaten örtük test ediliyor), Temalar (toolbar'la
-manuel).
+story'sinde `maxWidth` ile zaten örtük test ediliyor).
 
 ## 11. Test kabul kriterleri
 

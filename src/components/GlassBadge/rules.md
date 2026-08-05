@@ -92,7 +92,7 @@ token karşılığı olmadığından (space ölçeğinin arasında) kökte yerel
 toplandı: `.badge { --badge-pad-y-sm: 3px; --badge-pad-x-sm: 10px;
 --badge-pad-y-md: 5px; --badge-pad-x-md: 14px; }`. Tint üstü metin `#fff`
 bilinçli raw bırakıldı: tint zemini temadan bağımsızdır, `--lg-accent-contrast`
-ise Grafit'te koyulaşır (`#1a140c`) — birebir token yok (koyu tint varsayımı;
+tint renklerinin birebir karşılığı değildir (koyu tint varsayımı;
 açık tint'te kontrast çağıranın sorumluluğunda). Story'lerdeki semantic
 renkler (`#ff453a`, `#ff9f0a`) henüz token değil (bkz. Token'lar → Açık
 Kararlar).
@@ -101,7 +101,7 @@ Kararlar).
 
 Var: Default, Urgent, Featured, Sold, Sizes (sm/md yan yana), Materials
 (`flat`'te opak tint görünümü), UzunIcerik (nowrap — tek satırda büyür).
-**Eksik:** Playground, Responsive, Temalar, Erişilebilirlik.
+**Eksik:** Playground, Responsive, Erişilebilirlik.
 States: N/A — etkileşimsiz.
 
 ## 11. Test kabul kriterleri

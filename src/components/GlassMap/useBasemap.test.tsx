@@ -6,12 +6,15 @@ import { useBasemap, type GlassMapBasemap } from './useBasemap'
 const mapInstance = {
   setView: vi.fn(),
   fitBounds: vi.fn(),
+  flyToBounds: vi.fn(),
   remove: vi.fn(),
   invalidateSize: vi.fn(),
   on: vi.fn(),
   off: vi.fn(),
   zoomIn: vi.fn(),
   zoomOut: vi.fn(),
+  getZoom: vi.fn(() => 6),
+  getMaxZoom: vi.fn(() => 19),
   // Testte projeksiyon deterministik: lng → x, lat → y
   latLngToContainerPoint: vi.fn((coords: [number, number]) => ({ x: coords[1], y: coords[0] })),
 }
@@ -185,15 +188,17 @@ describe('useBasemap', () => {
     await waitFor(() => expect(tileLayerInstance.setUrl).toHaveBeenCalledWith(basemap.tileUrl))
   })
 
-  // Harita sürüklenirken panel dışına çıkan pinler çizilmemeli: kök overflow:hidden
-  // almadığı için (popup taşabilmeli) elenmezlerse etiketler sayfa içeriğinin üstüne akar.
-  it('görünür alan dışına çıkan pin projeksiyona girmez', async () => {
+  // Eleme iki kademelidir: projeksiyon kadrajın CULL_MARGIN kadar dışını da
+  // döndürür (kenardaki küme rozetinin sayısı doğru çıksın diye), panelin
+  // gerçekten dışına düşen düğümü GlassMap çizmeden atar. Burada projeksiyon
+  // kademesi doğrulanır — marjın da ötesindeki nokta hiç hesaplanmaz.
+  it('marjın ötesine çıkan pin projeksiyona girmez', async () => {
     const points = [
       { id: 'icerde', lat: 20, lng: 30 },
-      { id: 'sagda', lat: 20, lng: 260 },
-      { id: 'altta', lat: 190, lng: 30 },
-      { id: 'solda', lat: 20, lng: -5 },
-      { id: 'ustte', lat: -5, lng: 30 },
+      { id: 'sagda', lat: 20, lng: 600 },
+      { id: 'altta', lat: 600, lng: 30 },
+      { id: 'solda', lat: 20, lng: -400 },
+      { id: 'ustte', lat: -400, lng: 30 },
     ]
     const { result } = renderHook(() =>
       useSizedHarness(basemap, points, { width: 200, height: 150 }),
@@ -204,6 +209,51 @@ describe('useBasemap', () => {
     expect(result.current.positions.altta).toBeUndefined()
     expect(result.current.positions.solda).toBeUndefined()
     expect(result.current.positions.ustte).toBeUndefined()
+  })
+
+  // Kadrajın hemen dışındaki komşu kümelemeye dahil kalmalı: elenirse kenardaki
+  // rozet eksik sayı gösterir ve harita kaydırıldıkça sayı zıplar.
+  it('kadrajın hemen dışındaki pin kümeleme için korunur', async () => {
+    const { result } = renderHook(() =>
+      useSizedHarness(basemap, [{ id: 'kenarda', lat: 20, lng: 260 }], {
+        width: 200,
+        height: 150,
+      }),
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    await waitFor(() => expect(result.current.positions.kenarda).toEqual({ left: 260, top: 20 }))
+  })
+
+  it('panel ölçüsünü ve o anki zoom seviyesini bildirir', async () => {
+    const { result } = renderHook(() =>
+      useSizedHarness(basemap, [{ id: 'icerde', lat: 20, lng: 30 }], {
+        width: 200,
+        height: 150,
+      }),
+    )
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    await waitFor(() => expect(result.current.size).toEqual({ width: 200, height: 150 }))
+    expect(result.current.zoom).toBe(6)
+  })
+
+  // Küme rozeti açılınca kadraj üyelerin sınırına uçar (reduced-motion kapalıyken).
+  it('fitBounds üyelerin sınırına uçar', async () => {
+    const { result } = renderHook(() => useHarness(basemap, noPoints))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    const bounds: [[number, number], [number, number]] = [
+      [39, 26],
+      [41, 29],
+    ]
+    result.current.fitBounds(bounds)
+    expect(mapInstance.flyToBounds).toHaveBeenCalledWith(bounds, expect.anything())
+  })
+
+  // Üst üste binen ilanlarda sınır çöker; kadraj sabit adım yaklaştırılır.
+  it('zoomAround merkezi koruyarak sabit adım yaklaşır', async () => {
+    const { result } = renderHook(() => useHarness(basemap, noPoints))
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    result.current.zoomAround([39, 35], 3)
+    expect(mapInstance.setView).toHaveBeenCalledWith([39, 35], 9, expect.anything())
   })
 
   it('bounds verilince kadraj setView yerine fitBounds ile kurulur', async () => {

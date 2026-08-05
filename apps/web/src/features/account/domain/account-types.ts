@@ -25,7 +25,12 @@ export type AccountWorkspaceMode =
 export interface AccountAction {
   kind: 'route'
   label: string
-  to: '/ilan-ver' | '/favoriler' | '/emlak'
+  /**
+   * Hesap alanından çıkan aksiyon rotaları. Liste kasıtlı olarak dar: yeni
+   * bir hedef eklemek bilinçli bir karar olmalı, serbest string değil.
+   * `/parola-degistir` 2026-08-04'te eklendi (güvenlik sayfasından).
+   */
+  to: '/ilan-ver' | '/favoriler' | '/emlak' | '/parola-degistir'
 }
 
 export interface AccountMetricItem {

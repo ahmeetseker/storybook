@@ -140,7 +140,7 @@ mevcut karar); scrollEdge mask gradyan yüzdesi (%55) spec sabiti.
 
 Var: `WithBackAndActions` (scroll edge senaryolu), `TitleOnly`, `IkonTekGeri`
 (backLabel'sız pill), `UzunBaslik` (başlık truncation), `DarContainer`
-(360px responsive). Arka plan/tema toolbar'dan (Arka plan + Tier global'leri).
+(360px responsive). Arka plan toolbar'dan (Arka plan + Tier global'leri).
 **Eksik:** Playground (Controls), Erişilebilirlik (Tab sırası) story'si.
 Action hover/focus CSS state'idir — control/story yapılmaz (bkz. GlassButton kuralı).
 

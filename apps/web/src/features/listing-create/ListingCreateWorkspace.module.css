@@ -4,7 +4,8 @@
    - Sayfa zemini          → `--lg-bg`
    - Kart / ray / panel    → `--lg-surface` (flat kağıt, cam YOK)
    - Kart içi gömülü kutu  → `--lg-bg` (seçim kartı, harita, medya karosu,
-                              özet satırı). Her iki temada doğru yönde ayrışır.
+                              özet satırı). Kart kağıdından bir kademe geri
+                              çekilerek ayrışır.
 
    Cam bütçesi: sayfada tek cam yüzey vardır ve o da navigasyon/kontrol
    katmanındadır (giriş ekranındaki `GlassButton prominent`, dar ekranda
@@ -1192,20 +1193,6 @@
 .leafletCanvas {
   position: absolute;
   inset: 0;
-}
-
-:global(html[data-theme='dark'])
-  .leafletCanvas
-  :global(.leaflet-tile-pane) {
-  filter: brightness(0.7) contrast(1.15) saturate(0.72);
-}
-
-@media (prefers-color-scheme: dark) {
-  :global(html:not([data-theme='light']))
-    .leafletCanvas
-    :global(.leaflet-tile-pane) {
-    filter: brightness(0.7) contrast(1.15) saturate(0.72);
-  }
 }
 
 .leafletStatus {

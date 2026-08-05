@@ -201,8 +201,8 @@ DisplayVaryanti (adetli/adetsiz), Controlled (input), States (boş/seçili/
 disabled), UzunIcerik (büyük adet sayısı + sıfır dağılım), Responsive
 (mobile1, dokunmatik hedef), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Temalar` ayrı story olarak yok: `size` ekseni tanımlı değil, tema
-toolbar'la otomatik doğrulanır (GlassScoreMeter ile aynı karar).
+`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (GlassScoreMeter
+ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

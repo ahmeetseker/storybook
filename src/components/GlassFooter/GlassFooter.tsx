@@ -13,6 +13,34 @@ export interface GlassFooterColumn {
   links: GlassFooterLinkItem[];
 }
 
+/** Footer'ın son kolonundaki mini kart (son eklenen ilan, öne çıkan içerik). */
+export interface GlassFooterHighlightItem {
+  id: string;
+  label: string;
+  href?: string;
+  onClick?: () => void;
+  /** Dekoratif yuvarlak görsel (alt=""); bilgi label/meta ile verilir */
+  image?: string;
+  /** Güncel değer — fiyat gibi */
+  meta?: string;
+  /** Eski değer — üstü çizili gösterilir */
+  previousMeta?: string;
+}
+
+export interface GlassFooterHighlights {
+  title: string;
+  items: GlassFooterHighlightItem[];
+}
+
+/** Alt bardaki yuvarlak sosyal medya bağlantısı. */
+export interface GlassFooterSocialLink {
+  id: string;
+  /** Erişilebilir ad — "Instagram" (ikon dekoratif) */
+  label: string;
+  href: string;
+  icon: ReactNode;
+}
+
 export interface GlassFooterProps {
   /** columns/cta/newsletter varyantlarında sütun grupları; slim/centered'da satıra düzleştirilir */
   columns?: GlassFooterColumn[];
@@ -22,7 +50,11 @@ export interface GlassFooterProps {
   cta?: ReactNode;
   /** Logo/marka bloğu */
   brand?: ReactNode;
-  /** Sosyal linkler satırı */
+  /** Son kolon: mini kartlı vitrin (son eklenen ilanlar) — yalnız `columns` ailesi */
+  highlights?: GlassFooterHighlights;
+  /** Alt bardaki yuvarlak sosyal medya bağlantıları */
+  socialLinks?: GlassFooterSocialLink[];
+  /** Sosyal linkler satırı — serbest slot; `socialLinks` verilirse o kazanır */
   social?: ReactNode;
   /** Yalnız variant="newsletter": kayıt formu slotu */
   newsletter?: ReactNode;
@@ -41,16 +73,67 @@ function FootLink({ link }: { link: GlassFooterLinkItem }) {
   );
 }
 
+function HighlightRow({ item }: { item: GlassFooterHighlightItem }) {
+  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (!item.href) e.preventDefault();
+    item.onClick?.();
+  };
+  return (
+    <li>
+      <a href={item.href ?? "#"} onClick={onClick} className={styles.highlightLink}>
+        {item.image ? (
+          <span className={styles.highlightThumb}>
+            <img src={item.image} alt="" loading="lazy" decoding="async" />
+          </span>
+        ) : null}
+        <span className={styles.highlightBody}>
+          <span className={styles.highlightLabel}>{item.label}</span>
+          {item.meta || item.previousMeta ? (
+            <span className={styles.highlightMeta}>
+              {item.meta}
+              {item.previousMeta ? (
+                <s className={styles.highlightPreviousMeta}>{item.previousMeta}</s>
+              ) : null}
+            </span>
+          ) : null}
+        </span>
+      </a>
+    </li>
+  );
+}
+
 export function GlassFooter({
   columns = [],
   legal,
   cta,
   brand,
+  highlights,
+  socialLinks,
   social,
   newsletter,
   variant = "columns",
 }: GlassFooterProps) {
   const flatLinks = columns.flatMap((c) => c.links);
+
+  // İkonlar dekoratif; erişilebilir ad bağlantının `label`'ından gelir.
+  const socialRow = socialLinks?.length ? (
+    <ul className={styles.socialList}>
+      {socialLinks.map((item) => (
+        <li key={item.id}>
+          <a
+            className={styles.socialLink}
+            href={item.href}
+            aria-label={item.label}
+            title={item.label}
+          >
+            <span aria-hidden>{item.icon}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    social
+  );
 
   const inlineNav = flatLinks.length ? (
     <nav aria-label="Alt bilgi">
@@ -81,7 +164,7 @@ export function GlassFooter({
         <div className={`${styles.inner} ${styles.centeredInner}`}>
           {brand ? <span className={styles.brand}>{brand}</span> : null}
           {inlineNav}
-          {social ? <span className={styles.social}>{social}</span> : null}
+          {socialRow ? <span className={styles.social}>{socialRow}</span> : null}
           <span className={styles.legal}>{legal}</span>
         </div>
       </footer>
@@ -105,7 +188,10 @@ export function GlassFooter({
           {brand ? <div className={styles.brandBlock}>{brand}</div> : null}
           {columns.length ? (
             <nav aria-label="Alt bilgi" className={styles.columnsNav}>
-              <div className={styles.columnsGrid}>
+              <div
+                className={styles.columnsGrid}
+                style={{ ["--footer-columns" as string]: columns.length }}
+              >
                 {columns.map((col) => (
                   <div key={col.title} className={styles.column}>
                     <span className={styles.columnTitle}>{col.title}</span>
@@ -121,10 +207,20 @@ export function GlassFooter({
               </div>
             </nav>
           ) : null}
+          {highlights?.items.length ? (
+            <div className={styles.highlights}>
+              <span className={styles.columnTitle}>{highlights.title}</span>
+              <ul className={styles.highlightList} aria-label={highlights.title}>
+                {highlights.items.map((item) => (
+                  <HighlightRow key={item.id} item={item} />
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
         <div className={styles.legalRow}>
           <span className={styles.legal}>{legal}</span>
-          {social ? <span className={styles.social}>{social}</span> : null}
+          {socialRow ? <span className={styles.social}>{socialRow}</span> : null}
         </div>
       </div>
     </footer>

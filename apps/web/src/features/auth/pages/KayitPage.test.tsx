@@ -72,6 +72,22 @@ function kayitRouter(adapters: AuthAdapters, yol = '/kayit') {
 const devamEt = async (kullanici: ReturnType<typeof userEvent.setup>) =>
   kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
 
+/**
+ * Üçüncü adıma (iletişim ve güvenlik) kadar ilerletir ve ORADA bırakır.
+ * `kayitAdimlariniDoldur` bu adımı geçerli değerlerle geçip son adıma
+ * gider; telefon/parola alanlarının kendi davranışını sınayan testler
+ * alanları boş bulmak zorunda.
+ */
+const iletisimAdimina = async (kullanici: ReturnType<typeof userEvent.setup>) => {
+  await screen.findByLabelText(/bireysel/i)
+  await devamEt(kullanici)
+  await screen.findByLabelText('Ad soyad')
+  await kullanici.type(screen.getByLabelText('Ad soyad'), 'Yeni Kullanıcı')
+  await kullanici.type(screen.getByLabelText('E-posta'), 'yeni@arsam.net')
+  await devamEt(kullanici)
+  await screen.findByLabelText('Telefon')
+}
+
 describe('KayitPage — adım adım kayıt', () => {
   it('ilk adımda hesap tipi seçeneklerini sunar, bireysel varsayılandır', async () => {
     render(<RouterProvider router={kayitRouter(sahteAdapters())} />)
@@ -135,7 +151,14 @@ describe('KayitPage — adım adım kayıt', () => {
     await kullanici.type(screen.getByLabelText('E-posta'), 'yeni@arsam.net')
     await devamEt(kullanici)
 
-    expect((await screen.findByLabelText('Telefon')).getAttribute('autocomplete')).toBe('tel')
+    // Numara alanı ülke kodunu TAŞIMAZ (o ayrı kontrolde) — bu yüzden
+    // `tel` değil `tel-national`.
+    expect((await screen.findByLabelText('Telefon')).getAttribute('autocomplete')).toBe(
+      'tel-national',
+    )
+    expect(screen.getByLabelText('Ülke kodu').getAttribute('autocomplete')).toBe(
+      'tel-country-code',
+    )
     expect(screen.getByLabelText('Parola').getAttribute('autocomplete')).toBe('new-password')
   })
 
@@ -220,10 +243,72 @@ describe('KayitPage — adım adım kayıt', () => {
 
     expect(screen.getByRole('button', { name: 'Kaydı tamamla' })).toBeTruthy()
     expect(screen.getByText('yeni@arsam.net')).toBeTruthy()
-    expect(screen.getByText('5559998877')).toBeTruthy()
+    // Özet numarayı ülke koduyla ve gruplanmış gösterir — onaylanan şey
+    // numaranın tamamıdır.
+    expect(screen.getByText('+90 555 999 88 77')).toBeTruthy()
 
     await kullanici.click(screen.getByRole('button', { name: 'Düzenle: İletişim ve güvenlik' }))
     expect(((await screen.findByLabelText('Telefon')) as HTMLInputElement).value).toBe('5559998877')
+  })
+
+  it('telefon alanı ülke seçimi sunar; ülke değişince beklenen biçim ve doğrulama da değişir', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={kayitRouter(sahteAdapters())} />)
+    await iletisimAdimina(kullanici)
+    await kullanici.type(screen.getByLabelText('Parola'), 'Arsam1234')
+
+    const ulke = screen.getByLabelText('Ülke kodu') as HTMLSelectElement
+    expect(ulke.value).toBe('TR')
+    expect(screen.getByLabelText('Telefon').getAttribute('placeholder')).toBe('532 123 45 67')
+
+    // Türkiye'de Alman numarası reddedilir…
+    await kullanici.type(screen.getByLabelText('Telefon'), '15123456789')
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+    expect(screen.getByText('Telefon numarasını 5XX XXX XX XX biçiminde girin.')).toBeTruthy()
+
+    // …ülke Almanya'ya çevrilince kabul edilir.
+    await kullanici.selectOptions(screen.getByLabelText('Ülke kodu'), 'DE')
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
+    await screen.findByRole('heading', { level: 2, name: 'Onay' })
+    expect(screen.getByText('+49 151 234 567 89')).toBeTruthy()
+  })
+
+  it('numarayı sıfır veya ülke kodu ile yazmak da kabul edilir, kanonik hâle getirilir', async () => {
+    const kullanici = userEvent.setup()
+    const adapters = sahteAdapters()
+    render(<RouterProvider router={kayitRouter(adapters)} />)
+    await kayitAdimlariniDoldur(kullanici, { telefon: '0532 123 45 67' })
+    await kullanici.click(screen.getByRole('button', { name: 'Kaydı tamamla' }))
+
+    await waitFor(() =>
+      expect(adapters.kayitYap).toHaveBeenCalledWith(
+        expect.objectContaining({ telefon: '5321234567', telefonUlke: 'TR' }),
+      ),
+    )
+  })
+
+  it('parola alanı göster/gizle düğmesi taşır; basınca yazılan parola okunur olur', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={kayitRouter(sahteAdapters())} />)
+    await iletisimAdimina(kullanici)
+    await kullanici.type(screen.getByLabelText('Parola'), 'Arsam1234')
+
+    const parola = screen.getByLabelText('Parola') as HTMLInputElement
+    expect(parola.type, 'parola gizli başlamalı').toBe('password')
+
+    const goster = screen.getByRole('button', { name: 'Parolayı göster' })
+    expect(goster.getAttribute('aria-pressed')).toBe('false')
+    expect(goster.getAttribute('aria-controls')).toBe(parola.id)
+
+    await kullanici.click(goster)
+    expect((screen.getByLabelText('Parola') as HTMLInputElement).type).toBe('text')
+    const gizle = screen.getByRole('button', { name: 'Parolayı gizle' })
+    expect(gizle.getAttribute('aria-pressed')).toBe('true')
+
+    await kullanici.click(gizle)
+    expect((screen.getByLabelText('Parola') as HTMLInputElement).type).toBe('password')
+    expect(screen.getByRole('button', { name: 'Parolayı göster' })).toBeTruthy()
   })
 
   it('KVKK onayı verilmeden gönderilemez', async () => {

@@ -13,7 +13,7 @@ import {
 import { AuthSessionProvider } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
-import { sahteAuthAdapters } from './test-utils'
+import { kurumsalBolumleriniDoldur, sahteAuthAdapters } from './test-utils'
 import { GirisPage } from './pages/GirisPage'
 import { GirisKodPage } from './pages/GirisKodPage'
 import { GirisParolaPage } from './pages/GirisParolaPage'
@@ -21,12 +21,62 @@ import { KayitPage } from './pages/KayitPage'
 import { KayitProfilPage } from './pages/KayitProfilPage'
 import { KayitKurumsalPage } from './pages/KayitKurumsalPage'
 import { HesapDogrulaPage } from './pages/HesapDogrulaPage'
-import {
-  BaglantiGecersizPage,
-  BaglantiGonderildiPage,
-  GirisHataPage,
-} from './pages/girisDurumSayfalari'
+import { GirisHataPage } from './pages/girisDurumSayfalari'
 import { HesapVarPage } from './pages/kayitDurumSayfalari'
+import { ParolaSifirlaPage } from './pages/ParolaSifirlaPage'
+import { ParolaYeniPage } from './pages/ParolaYeniPage'
+import {
+  ParolaBaglantiGecersizPage,
+  ParolaBaglantiGonderildiPage,
+  ParolaSifirlandiPage,
+} from './pages/parolaSifirlamaDurumSayfalari'
+import {
+  HesapAskidaPage,
+  OturumSuresiDolduPage,
+  YetkisizPage,
+} from './pages/hesapDurumSayfalari'
+import { DavetGecersizPage } from './pages/davetDurumSayfalari'
+import { ParolaDegistirPage } from './pages/ParolaDegistirPage'
+import { DavetPage } from './pages/DavetPage'
+import { OrganizasyonSecPage } from './pages/OrganizasyonSecPage'
+
+/**
+ * `DavetPage` ve `OrganizasyonSecPage` veriyi mount SONRASI çeker; boş
+ * `vi.fn()` stub'ı `undefined` döndürüp `.then` üzerinde patlar. Bu ikisi
+ * geçide çözümlenen adapter'la girer — landmark sözleşmesi yükleme
+ * durumunda da, veri geldikten sonra da geçerli olmalı.
+ */
+function davetliAdapters(): AuthAdapters {
+  return sahteAuthAdapters({
+    oturumuGetir: () => OTURUMLU_KULLANICI,
+    davetiGetir: async () => ({
+      durum: 'basarili',
+      veri: { organizasyonAdi: 'Yılmaz Gayrimenkul', davetEden: 'Mehmet Yılmaz', rol: 'danisman' },
+    }),
+  })
+}
+
+function organizasyonluAdapters(): AuthAdapters {
+  return sahteAuthAdapters({
+    oturumuGetir: () => OTURUMLU_KULLANICI,
+    organizasyonlariGetir: async () => ({
+      durum: 'basarili',
+      veri: [{ id: 'org-1', ad: 'Yılmaz Gayrimenkul', rol: 'sahip' }],
+    }),
+  })
+}
+import { AuthCallbackPage } from './components/AuthCallbackPage'
+
+/**
+ * `AuthCallbackPage` props aldığından geçit dizilerine doğrudan giremez;
+ * iki durumu da sarmalanarak katılır. Bu sayfa 2026-07-31 denetiminde
+ * `role="status"`'u `<main>`'e koyup landmarkı yok etmişti ve o gün hiçbir
+ * geçitte yer almadığı için yakalanmamıştı — artık yer alıyor.
+ */
+const CallbackBeklemePage = () => <AuthCallbackPage durum="pending" baslik="Doğrulanıyor" />
+const CallbackHataPage = () => (
+  <AuthCallbackPage durum="error" baslik="Doğrulanamadı" hataMesaji="Bağlantının süresi dolmuş." />
+)
 
 function bosAdapters(): AuthAdapters {
   return sahteAuthAdapters()
@@ -76,14 +126,27 @@ const ALANLI_FORM_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, A
   ['KayitPage', KayitPage, bosAdapters()],
   ['KayitProfilPage', KayitProfilPage, oturumluAdapters()],
   ['KayitKurumsalPage', KayitKurumsalPage, oturumluAdapters()],
+  ['ParolaSifirlaPage', ParolaSifirlaPage, bosAdapters()],
+  ['ParolaYeniPage', ParolaYeniPage, bosAdapters()],
+  ['ParolaDegistirPage', ParolaDegistirPage, oturumluAdapters()],
 ]
 
 /** Durum sayfaları form taşımaz — yalnız landmark/heading/alert sözleşmesi test edilir. */
 const DURUM_SAYFALARI: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
-  ['BaglantiGonderildiPage', BaglantiGonderildiPage, bosAdapters()],
-  ['BaglantiGecersizPage', BaglantiGecersizPage, bosAdapters()],
   ['GirisHataPage', GirisHataPage, bosAdapters()],
   ['HesapVarPage', HesapVarPage, bosAdapters()],
+  ['AuthCallbackPage (bekleme)', CallbackBeklemePage, bosAdapters()],
+  ['AuthCallbackPage (hata)', CallbackHataPage, bosAdapters()],
+  ['ParolaBaglantiGonderildiPage', ParolaBaglantiGonderildiPage, bosAdapters()],
+  ['ParolaSifirlandiPage', ParolaSifirlandiPage, bosAdapters()],
+  ['ParolaBaglantiGecersizPage', ParolaBaglantiGecersizPage, bosAdapters()],
+  ['HesapAskidaPage', HesapAskidaPage, bosAdapters()],
+  // Bu üçü İP-6'da import edilmiş ama hiçbir diziye eklenmemişti: yardımcı
+  // adapter'lar (`davetliAdapters`, `organizasyonluAdapters`) yazıldığı hâlde
+  // kullanılmadan duruyordu, yani sayfalar geçitten hiç geçmiyordu.
+  ['OturumSuresiDolduPage', OturumSuresiDolduPage, bosAdapters()],
+  ['DavetPage', DavetPage, davetliAdapters()],
+  ['OrganizasyonSecPage', OrganizasyonSecPage, organizasyonluAdapters()],
 ]
 
 /**
@@ -103,8 +166,12 @@ const TUM_SAYFALAR: ReadonlyArray<[string, () => ReactElement | null, AuthAdapte
 ]
 
 const HATA_TONLU_SAYFALAR: ReadonlyArray<[string, () => ReactElement | null, AuthAdapters]> = [
-  ['BaglantiGecersizPage', BaglantiGecersizPage, bosAdapters()],
   ['GirisHataPage', GirisHataPage, bosAdapters()],
+  ['AuthCallbackPage (hata)', CallbackHataPage, bosAdapters()],
+  ['ParolaBaglantiGecersizPage', ParolaBaglantiGecersizPage, bosAdapters()],
+  ['HesapAskidaPage', HesapAskidaPage, bosAdapters()],
+  ['YetkisizPage', YetkisizPage, bosAdapters()],
+  ['DavetGecersizPage', DavetGecersizPage, bosAdapters()],
 ]
 
 /** h1/main kontrolleri tüm sayfalar için geçerli — alanlı form + alansız oturumlu sayfalar. */
@@ -261,24 +328,16 @@ describe('auth erişilebilirlik geçidi', () => {
     const kullanici = userEvent.setup()
     render(<RouterProvider router={sayfaRouter(KayitKurumsalPage, oturumluAdapters())} />)
     await screen.findByLabelText('Ticaret ünvanı')
-    await kullanici.click(screen.getByRole('button', { name: 'Başvuruyu gönder' }))
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
     await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
 
     const ilkAlan = screen.getByLabelText('Ticaret ünvanı')
     expect(document.activeElement, 'odak ilk hatalı alana (Ticaret ünvanı) taşınmalı').toBe(ilkAlan)
 
-    const TUM_ETIKETLER = [
-      'Ticaret ünvanı',
-      'Vergi numarası',
-      'Vergi dairesi',
-      'İl',
-      'İlçe',
-      'Yetki belgesi numarası',
-      'Yetkili ad soyad',
-      'Yetkili e-posta',
-      'Yetkili telefon',
-    ]
-    for (const etiket of TUM_ETIKETLER) {
+    // Sayfa artık bölümlüdür: yalnız BULUNULAN bölümün alanları DOM'dadır,
+    // bu yüzden geçit ilk bölümün tamamını burada denetler; onay kutuları
+    // aşağıdaki ayrı testte (son bölüm) denetlenir.
+    for (const etiket of ['Ticaret ünvanı', 'Vergi kimlik no / TCKN', 'Vergi dairesi']) {
       const alan = screen.getByLabelText(etiket)
       expect(alan.getAttribute('aria-invalid'), `${etiket} aria-invalid="true" taşımıyor`).toBe('true')
       const describedBy = alan.getAttribute('aria-describedby')
@@ -287,5 +346,30 @@ describe('auth erişilebilirlik geçidi', () => {
       expect(hataElemani, `${etiket} aria-describedby "${describedBy}" hiçbir elemente çözülmüyor`).toBeTruthy()
       expect(hataElemani?.textContent, `${etiket} hata metni boş`).toBeTruthy()
     }
+  })
+
+  it('KayitKurumsalPage onay kutuları da aria-invalid + aria-describedby sözleşmesine uyar', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitKurumsalPage, oturumluAdapters())} />)
+    await screen.findByLabelText('Ticaret ünvanı')
+
+    // Son bölüme geçerli verilerle ilerle, sonra zorunlu onayları geri al.
+    await kurumsalBolumleriniDoldur(kullanici)
+    await kullanici.click(screen.getByLabelText(/aydınlatma metnini/i))
+    await kullanici.click(screen.getByLabelText(/temsile yetkili/i))
+    await kullanici.click(screen.getByRole('button', { name: 'Başvuruyu gönder' }))
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+
+    for (const desen of [/aydınlatma metnini/i, /temsile yetkili/i]) {
+      const kutu = screen.getByLabelText(desen)
+      expect(kutu.getAttribute('aria-invalid'), `${desen} aria-invalid taşımıyor`).toBe('true')
+      const describedBy = kutu.getAttribute('aria-describedby')
+      expect(describedBy, `${desen} aria-describedby taşımıyor`).toBeTruthy()
+      expect(document.getElementById(describedBy as string)?.textContent).toBeTruthy()
+    }
+
+    // İsteğe bağlı izin hiçbir zaman hatalı işaretlenmez.
+    const iys = screen.getByLabelText(/ticari elektronik ileti/i)
+    expect(iys.getAttribute('aria-invalid')).toBeNull()
   })
 })

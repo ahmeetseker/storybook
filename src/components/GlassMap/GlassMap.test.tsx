@@ -4,12 +4,16 @@ import { GlassMap, type GlassMapPin } from './GlassMap'
 
 const basemapInstance = {
   setView: vi.fn(),
+  fitBounds: vi.fn(),
+  flyToBounds: vi.fn(),
   remove: vi.fn(),
   invalidateSize: vi.fn(),
   on: vi.fn(),
   off: vi.fn(),
   zoomIn: vi.fn(),
   zoomOut: vi.fn(),
+  getZoom: vi.fn(() => 6),
+  getMaxZoom: vi.fn(() => 19),
   latLngToContainerPoint: vi.fn((coords: [number, number]) => ({ x: coords[1], y: coords[0] })),
 }
 
@@ -373,5 +377,151 @@ describe('GlassMap', () => {
     expect(screen.getByRole('radio', { name: 'Uydu' })).toBeDefined()
     fireEvent.click(screen.getByRole('radio', { name: 'Uydu' }))
     expect(container.querySelector('[data-layer="uydu"]')).not.toBeNull()
+  })
+
+  // ── Kümeleme ve iniş zinciri (ülke → bölge → ilan) ─────────────────────
+  describe('kümeleme', () => {
+    it('yakın pinler tek rozette toplanır, uzaktaki kendi kapsülünde kalır', async () => {
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', lat: 10, lng: 10, price: '1M' },
+            { id: 'b', lat: 12, lng: 12, price: '2M' },
+            { id: 'uzak', lat: 300, lng: 300, price: '3M' },
+          ]}
+          basemap={basemap}
+          cluster
+        />,
+      )
+      await screen.findByRole('button', { name: '3M' })
+      expect(screen.getByRole('button', { name: /2 ilan/ })).toBeDefined()
+      expect(screen.queryByRole('button', { name: '1M' })).toBeNull()
+      expect(screen.queryByRole('button', { name: '2M' })).toBeNull()
+    })
+
+    it('rozete tıklamak kadrajı o bölgeye indirir (iniş adımı)', async () => {
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', lat: 10, lng: 10, price: '1M' },
+            { id: 'b', lat: 12, lng: 12, price: '2M' },
+          ]}
+          basemap={basemap}
+          cluster
+        />,
+      )
+      const rozet = await screen.findByRole('button', { name: /2 ilan/ })
+      fireEvent.click(rozet)
+      expect(basemapInstance.flyToBounds).toHaveBeenCalledWith(
+        [
+          [10, 10],
+          [12, 12],
+        ],
+        expect.anything(),
+      )
+    })
+
+    it('rozet seçim kontrolü değildir: aria-pressed bildirmez, üyelerini haber verir', async () => {
+      const onClusterOpen = vi.fn()
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', lat: 10, lng: 10, price: '1M' },
+            { id: 'b', lat: 12, lng: 12, price: '2M' },
+          ]}
+          basemap={basemap}
+          cluster
+          onClusterOpen={onClusterOpen}
+        />,
+      )
+      const rozet = await screen.findByRole('button', { name: /2 ilan/ })
+      expect(rozet.getAttribute('aria-pressed')).toBeNull()
+      fireEvent.click(rozet)
+      expect(onClusterOpen).toHaveBeenCalledWith(['a', 'b'])
+    })
+
+    // Üst üste binen ilanlarda sınır tek noktaya çöker; fitBounds sonsuz
+    // yakınlaşmaya giderdi, bunun yerine sabit adım yaklaşılır.
+    it('üst üste binen ilanlarda sabit adım yaklaşır', async () => {
+      // Bu dosyada mock'lar testler arası paylaşılıyor; önceki iniş
+      // çağrıları bu iddiaya sızmasın diye temizlenir.
+      basemapInstance.flyToBounds.mockClear()
+      basemapInstance.setView.mockClear()
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', lat: 10, lng: 10, price: '1M' },
+            { id: 'b', lat: 10, lng: 10, price: '2M' },
+          ]}
+          basemap={basemap}
+          cluster
+        />,
+      )
+      const rozet = await screen.findByRole('button', { name: /2 ilan/ })
+      fireEvent.click(rozet)
+      expect(basemapInstance.flyToBounds).not.toHaveBeenCalled()
+      expect(basemapInstance.setView).toHaveBeenCalledWith([10, 10], 9, expect.anything())
+    })
+
+    // Zincirin son halkası: tek kalan pin artık bir fiyat kapsülüdür ve
+    // tıklanınca detay popup'ını açar.
+    it('tek kalan pin fiyat kapsülüdür ve popup açar', async () => {
+      render(
+        <GlassMap
+          pins={[{ id: 'a', lat: 10, lng: 10, price: '4.250.000 TL' }]}
+          basemap={basemap}
+          cluster
+          popupContent={() => <span>Detay içeriği</span>}
+        />,
+      )
+      const kapsul = await screen.findByRole('button', { name: '4.250.000 TL' })
+      fireEvent.click(kapsul)
+      expect(screen.getByText('Detay içeriği')).toBeDefined()
+    })
+
+    it('önceden toplanmış pinler rozete kendi ağırlıklarıyla girer', async () => {
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', lat: 10, lng: 10, count: 12 },
+            { id: 'b', lat: 12, lng: 12, count: 6 },
+          ]}
+          basemap={basemap}
+          cluster
+        />,
+      )
+      // 2 değil 18: rozet temsil ettiği ilan sayısını gösterir.
+      expect(await screen.findByRole('button', { name: /18 ilan/ })).toBeDefined()
+    })
+
+    it('kümeleme kapalıyken bugünkü davranış korunur — rozet seçilebilir kalır', async () => {
+      basemapInstance.flyToBounds.mockClear()
+      render(
+        <GlassMap
+          pins={[{ id: 'ege', lat: 10, lng: 10, count: 18 }]}
+          basemap={basemap}
+          popupContent={() => <span>Bölge özeti</span>}
+        />,
+      )
+      const rozet = await screen.findByRole('button', { name: '18 ilan' })
+      expect(rozet.getAttribute('aria-pressed')).toBe('false')
+      fireEvent.click(rozet)
+      expect(screen.getByText('Bölge özeti')).toBeDefined()
+      expect(basemapInstance.flyToBounds).not.toHaveBeenCalled()
+    })
+
+    it('zemin yokken kümeleme devreye girmez (yakınlaşacak kadraj yok)', () => {
+      render(
+        <GlassMap
+          pins={[
+            { id: 'a', x: 0.1, y: 0.1, price: '1M' },
+            { id: 'b', x: 0.11, y: 0.11, price: '2M' },
+          ]}
+          cluster
+        />,
+      )
+      expect(screen.getByRole('button', { name: '1M' })).toBeDefined()
+      expect(screen.getByRole('button', { name: '2M' })).toBeDefined()
+    })
   })
 })

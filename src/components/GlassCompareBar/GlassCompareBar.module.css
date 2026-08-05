@@ -194,7 +194,7 @@
 }
 
 /* İpucu her zaman metin — durum yalnız renkle iletilmez. Metin rengi HER
-   durumda `--lg-label-secondary` (Kağıt/Grafit ikisinde de ≥4.5:1) — semantik
+   durumda `--lg-label-secondary` (yüzeye karşı ≥4.5:1) — semantik
    renk (`--lg-warning`) metne karıştırılmaz, yalnız dekoratif bir noktaya
    (`.hintDot`) uygulanır; kontrast hesaplaması bu yüzden metinden bağımsızdır. */
 .hint {

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   appRoutes,
-  dockRouteKeys,
   getRouteByPath,
   headerRouteKeys,
   isAuthPath,
@@ -40,7 +39,6 @@ describe('uygulama rota kaydı', () => {
 
     const navKeys = appRoutes.map((item) => item.key) as string[]
     expect(navKeys).not.toContain('listing-detail')
-    expect(Object.values(dockRouteKeys).flat() as string[]).not.toContain('listing-detail')
     expect(headerRouteKeys as readonly string[]).not.toContain('listing-detail')
 
     // Sayfa kendi kategori yolunu taşır; kabuk ikinci bir durum izi basmaz.
@@ -62,15 +60,9 @@ describe('uygulama rota kaydı', () => {
     expect(siteOrigin).toBe('https://arsam.net')
   })
 
-  it('header ve responsive dock listelerinde yalnız kayıtlı rotaları kullanır', () => {
+  it('header listesinde yalnız kayıtlı rotaları kullanır', () => {
     const keys = new Set(appRoutes.map((route) => route.key))
     expect(headerRouteKeys.every((key) => keys.has(key))).toBe(true)
-    expect(dockRouteKeys.desktop).toHaveLength(10)
-    expect(dockRouteKeys.tablet).toHaveLength(8)
-    expect(dockRouteKeys.mobile).toHaveLength(5)
-    expect(
-      Object.values(dockRouteKeys).flat().every((key) => keys.has(key)),
-    ).toBe(true)
   })
 })
 

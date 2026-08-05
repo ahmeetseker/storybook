@@ -1,12 +1,12 @@
 /* ─────────────────────────────────────────────────────────────
    liquid-glass-ui design token'ları — "Kağıt" teması
-   Açık: fildişi zemin + amber vurgu · Koyu: grafit zemin
+   Tek tema: fildişi zemin + amber vurgu
    Font: Manrope Variable (self-host, .storybook/preview.tsx'te import)
    ───────────────────────────────────────────────────────────── */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
-  /* Renk — Kağıt (açık)
+  /* Renk — Kağıt
      Metin taşıyan her token WCAG 2.2 AAA (1.4.6, 7:1) hedefine göre seçilir.
      Ölçüm düz zeminlerle sınırlı değildir: component'ler rozet ve uyarı
      zeminlerini `color-mix(… %7–12, --lg-surface)` ile üretir ve bu tonlu
@@ -143,7 +143,6 @@
      sm 640px · md 768px · lg 1024px · xl 1280px · 2xl 1536px (mobile-first, min-width) */
 }
 
-/* Koyu tema — Grafit */
 /* Dokunmatik: görünür ölçü doğrudan dokunma hedefine eşitlenir; parmakla
    kullanımda küçük kontrol yoktur. */
 @media (pointer: coarse) {
@@ -152,33 +151,6 @@
     --lg-control-md: 44px;
     --lg-control-lg: 48px;
     --lg-control-xl: 56px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Koyu temada da ölçüm tonlu zeminleri kapsar; en kötü durum genellikle
-       rengin kendi %12 tonlu yüzeyidir, düz --lg-surface değil. */
-    --lg-bg: #121316;
-    --lg-surface: #1b1c20;
-    --lg-label: #f2f2f3;                     /* 11.92 : 1 */
-    --lg-label-secondary: #bcbcc1;           /*  7.05 : 1 */
-    --lg-hairline: rgba(255, 255, 255, 0.1);
-    --lg-accent: #e9b179;                    /* amber koyuda açılır — 7.01 : 1 */
-    --lg-accent-contrast: #1a140c;           /* amber üstü metin — 9.60 : 1 */
-    --lg-scrim: rgba(4, 5, 8, 0.62);
-    --lg-on-scrim: #ffffff;
-    /* Koyu camda en kötü durum beyaz fotoğraftır; surface tonu 0.92 ile
-       ikincil metne 7.17:1 bırakır. */
-    --lg-glass: rgba(27, 28, 32, 0.92);
-    --lg-glass-line: rgba(255, 255, 255, 0.14);
-    --lg-danger: #ffa49e;                    /*  7.02 : 1 */
-    --lg-warning: #ffb44c;                   /*  7.55 : 1 */
-    --lg-success: #58d478;                   /*  7.05 : 1 */
-    --lg-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --lg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.32);
-    --lg-shadow-md: 0 12px 32px rgba(0, 0, 0, 0.4);
-    --lg-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.55);
   }
 }
 

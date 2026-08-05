@@ -95,7 +95,7 @@ export interface GlassIslandHeaderProps {
   notificationCount?: number
   /** Verilirse zil butonu render edilir ve tıklamada çağrılır */
   onNotificationsClick?: () => void
-  /** Panel alt şeridi — dil/tema/oturum eylemleri için serbest slot */
+  /** Panel alt şeridi — dil/oturum eylemleri için serbest slot */
   extras?: ReactNode
   /** Panelin en altındaki arama slotu (ör. `GlassAiSearchBar`) */
   search?: ReactNode

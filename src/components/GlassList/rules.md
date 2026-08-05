@@ -147,7 +147,7 @@ olmadığından raw; `.body` içi `gap: 1px` hairline istisnası.
 
 Var: Default, Interactive, Destructive, NoInset, LongContent, Mobile
 (viewport: mobile1). **Eksik:** forced hover/focus görselleri, RTL
-(chevron yönü), koyu tema görsel kontrolü.
+(chevron yönü).
 
 ## 11. Test kabul kriterleri
 

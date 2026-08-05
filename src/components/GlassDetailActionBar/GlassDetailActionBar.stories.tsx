@@ -110,8 +110,9 @@ export const Responsive: Story = {
   ),
 }
 
-/** Kağıt + Grafit: tema toolbar'dan değişir; accent dolgu ve hairline kontrastı her iki temada korunur. */
-export const Temalar: Story = {
+/** Düz fildişi zemin: accent dolgu ve hairline kontrastı arka plan sabitlenerek denetlenir. */
+export const DuzZemin: Story = {
+  parameters: { globals: { backgroundKey: 'light' } },
   args: Playground.args,
   render: (args) => (
     <div style={{ maxWidth: 320, margin: '48px auto' }}>

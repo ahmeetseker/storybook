@@ -1,0 +1,176 @@
+/* GlassMarquee — footer üstü dönen bağlantı şeridi. Flat içerik katmanı:
+   bant sayfanın tam genişliğini kaplar, cam burada okunmaz ve sayfanın cam
+   bütçesini (max 6 yüzey) boşa harcar. */
+
+.root {
+  /* Mikro geometri — token karşılığı yok (bkz. rules.md §9 borç notu) */
+  --marquee-gap: var(--lg-space-6); /* iki ilan arası nefes */
+  --marquee-fade: 3rem; /* kenarlardaki eriyerek giriş/çıkış payı */
+
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  background: var(--lg-accent);
+  color: var(--lg-accent-contrast);
+}
+
+.ink {
+  background: var(--lg-label);
+  color: var(--lg-bg);
+}
+
+.sm {
+  min-block-size: var(--lg-control-sm);
+  font-size: var(--lg-text-caption);
+}
+
+.md {
+  min-block-size: var(--lg-control-lg);
+  font-size: var(--lg-text-footnote);
+}
+
+/* Şerit kenarlarda kesilmez, erir: kesik metin "yarım kaldı" hissi veriyordu. */
+.viewport {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--marquee-fade),
+    #000 calc(100% - var(--marquee-fade)),
+    transparent
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marqueeStart var(--marquee-duration, 40s) linear infinite;
+}
+
+[data-direction='end'] .track {
+  animation-name: marqueeEnd;
+}
+
+/* İki grup yan yana; bir grup genişliği kadar kayınca desen başa döner. */
+@keyframes marqueeStart {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marqueeEnd {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap);
+  margin: 0;
+  padding-inline: calc(var(--marquee-gap) / 2);
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap);
+  white-space: nowrap;
+}
+
+/* Ayraç: öğeden sonra sönük bir nokta — ayrı DOM düğümü değil. */
+.item::after {
+  content: '·';
+  opacity: 0.5;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding-block: var(--lg-space-1);
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.meta {
+  font-weight: 500;
+  opacity: 0.78;
+}
+
+/* Duraklatma kontrolü bandın sağ ucunda sabit durur — şeritle birlikte kaymaz,
+   yoksa durdurulacak düğmenin kendisi kaçar. */
+.toggle {
+  display: grid;
+  flex: none;
+  min-inline-size: var(--lg-control-hit);
+  min-block-size: var(--lg-control-hit);
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  place-items: center;
+}
+
+.link:focus-visible,
+.toggle:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid currentcolor;
+  outline-offset: calc(var(--lg-focus-ring-offset, 2px) * -1);
+}
+
+/* Duraklatma: kullanıcı düğmesi, imleç bandın üstündeyken ve içeride odak
+   varken. Hareket eden bağlantıya tıklamak ya da klavyeyle gezmek aksi halde
+   kovalamaca olur. */
+[data-paused='true'] .track,
+.root:focus-within .track {
+  animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .root:hover .track {
+    animation-play-state: paused;
+  }
+
+  .link:hover .label {
+    text-decoration: underline;
+  }
+}
+
+/* Hareket istenmiyorsa şerit hiç dönmez: kopya kaldırılır, bant yatay
+   kaydırılabilir bir bağlantı listesine iner, duraklat düğmesi anlamsızlaşır. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+
+  .track > .group + .group {
+    display: none;
+  }
+
+  .viewport {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .toggle {
+    display: none;
+  }
+}

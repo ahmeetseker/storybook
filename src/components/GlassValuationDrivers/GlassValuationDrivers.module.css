@@ -189,10 +189,10 @@
   overflow-wrap: anywhere;
 }
 
-/* %55 karışım — bkz. GlassAgencyCard aynı desen: Kağıt temada --lg-surface
-   zeminine karşı ~5.17:1 (success) / ~7.37:1 (danger), WCAG AA'nın 13px/700
-   metin için gerektirdiği 4.5:1'i her iki tonda da geçer (Grafit temada her
-   iki ton da ~7:1 üzerinde — bkz. rules.md §9, kontrast tablosu). */
+/* %55 karışım — bkz. GlassAgencyCard aynı desen: --lg-surface zeminine karşı
+   ~5.17:1 (success) / ~7.37:1 (danger), WCAG AA'nın 13px/700 metin için
+   gerektirdiği 4.5:1'i her iki ton da geçer (bkz. rules.md §9, kontrast
+   tablosu). */
 .impactText[data-tone='success'] {
   color: color-mix(in srgb, var(--lg-success) 55%, var(--lg-label));
 }

@@ -52,6 +52,63 @@ describe('GlassFooter', () => {
     expect(screen.getAllByRole('link').length).toBeGreaterThanOrEqual(4)
   })
 
+  it('vitrin kolonu mini kartları bağlantı olarak sunar, görsel dekoratiftir', () => {
+    const { container } = render(
+      <GlassFooter
+        columns={columns}
+        legal="©"
+        highlights={{
+          title: 'Son eklenen ilanlar',
+          items: [
+            {
+              id: '1',
+              label: 'İzmir Urla İmarlı Köşe Parsel',
+              meta: '4.250.000 TL',
+              previousMeta: '4.900.000 TL',
+              image: 'urla.jpg',
+              href: '/ilan/1',
+            },
+          ],
+        }}
+      />,
+    )
+    const link = screen.getByRole('link', { name: /İzmir Urla İmarlı Köşe Parsel/ })
+    expect(link.getAttribute('href')).toBe('/ilan/1')
+    expect(screen.getByText('Son eklenen ilanlar')).toBeDefined()
+    expect(screen.getByText('4.900.000 TL').tagName).toBe('S')
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('')
+  })
+
+  it('sosyal bağlantılar erişilebilir adla render olur, ikon dekoratif kalır', () => {
+    render(
+      <GlassFooter
+        columns={columns}
+        legal="©"
+        socialLinks={[
+          { id: 'x', label: 'X', href: 'https://x.com/arsam', icon: <svg /> },
+          { id: 'ig', label: 'Instagram', href: 'https://instagram.com/arsam', icon: <svg /> },
+        ]}
+      />,
+    )
+    expect(
+      screen.getByRole('link', { name: 'Instagram' }).getAttribute('href'),
+    ).toBe('https://instagram.com/arsam')
+    expect(screen.getByRole('link', { name: 'X' })).toBeDefined()
+  })
+
+  it('socialLinks verilince serbest social slotunun yerini alır', () => {
+    render(
+      <GlassFooter
+        columns={columns}
+        legal="©"
+        social={<a href="#eski">Eski sosyal blok</a>}
+        socialLinks={[{ id: 'x', label: 'X', href: 'https://x.com/arsam', icon: <svg /> }]}
+      />,
+    )
+    expect(screen.queryByText('Eski sosyal blok')).toBeNull()
+    expect(screen.getByRole('link', { name: 'X' })).toBeDefined()
+  })
+
   it('variant data attribute olarak işaretlenir', () => {
     render(<GlassFooter variant="slim" legal="©" />)
     expect(screen.getByRole('contentinfo').getAttribute('data-variant')).toBe('slim')

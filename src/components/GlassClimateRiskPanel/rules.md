@@ -154,8 +154,7 @@ UzunIcerik, Responsive (mobile1), Erişilebilirlik (docs description'lı).
 
 `States`/`Sizes`/`Materials` story'si N/A — component etkileşimsiz ve tek
 sabit ölçek/malzeme (`SeviyeÖlçeği` story'si renk eksenini karşılar,
-ScoreMeter'ın `ToneEsigi`'siyle aynı rol). `Temalar` ayrı story olarak yok —
-toolbar'la otomatik doğrulanır.
+ScoreMeter'ın `ToneEsigi`'siyle aynı rol).
 
 ## 11. Test kabul kriterleri
 
@@ -171,7 +170,6 @@ toolbar'la otomatik doğrulanır.
 - [x] `data-tone` seviyeye göre doğru eşik (1-2 success, 3 warning, 4-5 danger)
 - [x] boş `hazards` dizisi hata fırlatmadan boş liste render eder
 - [ ] `badges` satırının dar container'da sarması (visual)
-- [ ] iki temada (Kağıt/Grafit) renk kontrastı (visual)
 
 ## 12. Do / Don't
 

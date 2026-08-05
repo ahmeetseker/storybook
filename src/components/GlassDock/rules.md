@@ -194,7 +194,7 @@ Var: `Default` (fixed), `Playground`, `HoverVeHeaderMalzemesi`,
 `LegacyMorph`, `Dikey`, `UzunIcerik`, `Responsive`, `Erisilebilirlik`.
 
 `Sizes`/`Variants`/`States` ayrı story değildir; ilgili eksenler tanımlı
-değildir. Tema Storybook toolbar'ı ile doğrulanır.
+değildir.
 
 ## 11. Test kabul kriterleri
 

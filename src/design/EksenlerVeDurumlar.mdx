@@ -10,7 +10,7 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 ```ts
 material: 'glass' | 'flat'      // malzeme (katman kuralına bağlı)
-tone: 'light' | 'dark' | 'auto' // zemin bağlamı ipucu (bkz. Açık Kararlar)
+tone: 'light' | 'dark' | 'auto' // camın altındaki zeminin açık/koyu olduğu ipucu — tema değil
 size: 'sm' | 'md' | 'lg' | 'xl' // geometri — kontrol token'larına bağlanır
 variant: 'regular' | 'clear'    // yalnız GlassSurface: cam ailesi
 thickness: 0..1                 // yalnız cam: gölge+lensing+blur birlikte
@@ -25,7 +25,7 @@ prominent: boolean              // birincil aksiyon (Button)
 | Anlamı/davranışı değiştiriyor mu? | Public prop olabilir |
 | Tekrar eden görsel aile mi? | `variant` / `tone` / `size` |
 | Geçici kullanıcı etkileşimi mi? | CSS/DOM state — **prop olamaz** |
-| Tema genelinde mi değişiyor? | Token/context — prop olamaz |
+| Ürün genelinde tek değere mi bağlı? | Token/context — prop olamaz |
 | Parent yerleşimi mi? | Layout'un işi — prop olamaz |
 | Tek ekranlık istisna mı? | Core API'ye eklenmez |
 | Semantiği tümden değişiyor mu? | Ayrı component (ör. ToggleButton) |
@@ -44,7 +44,7 @@ prominent: boolean              // birincil aksiyon (Button)
 | loading | prop (GlassButton) | active, hover lift | `aria-busy` |
 
 **Katman sırası:** availability (disabled/loading) → value (selected/invalid)
-→ interaction (hover/active/focus) → tema uyarlaması.
+→ interaction (hover/active/focus) → zemin uyarlaması (`tone`).
 
 **Yasak birliktelikler:** `disabled + hover` görsel uygulanmaz ·
 `disabled + focus` alınmaz · `material="flat"` + `variant="clear"` → dimming
@@ -63,7 +63,7 @@ render edilmez (flat kazanır).
 
 | Konu | Durum |
 |---|---|
-| `tone` adı tema bağlamı taşıyor (semantic tone değil) | v2'de `surfaceTone` veya context'e taşınması değerlendirilecek |
+| `tone` adı zemin bağlamı taşıyor (semantic tone değil) | v2'de `surfaceTone` veya context'e taşınması değerlendirilecek |
 | `GlassIconButton.active` kalıcı durum için `pressed` olmalı | API yeniden adlandırma — breaking, v2 |
 | ~~`loading` ekseni yok~~ | ✅ GlassButton'a eklendi (aria-busy + spinner + genişlik koruma) |
-| ~~success/warning/danger token'ları~~ | ✅ `--lg-danger/-warning/-success` eklendi (tema başına) |
+| ~~success/warning/danger token'ları~~ | ✅ `--lg-danger/-warning/-success` eklendi (`:root`'ta tek değer) |

@@ -112,8 +112,8 @@
   position: absolute;
   inset: 0;
   border-radius: var(--lg-radius-capsule, 999px);
-  /* Gölgesiz damla: seçim, tema yüzeyinden türeyen dolgu + rim ile okunur (bkz. rules.md §7).
-     Sabit beyaz yerine yüzey token'ı → Grafit temada da etiket kontrastı korunur. */
+  /* Gölgesiz damla: seçim, yüzey token'ından türeyen dolgu + rim ile okunur (bkz. rules.md §7).
+     Sabit beyaz yerine yüzey token'ı → etiket kontrastı yüzeyle birlikte korunur. */
   background: color-mix(in srgb, var(--lg-surface, #fff) 80%, transparent);
   border: 1px solid color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
 }

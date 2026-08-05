@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useRouter, useRouterState } from '@tanstack/react-router'
+import { Link, useRouter, useRouterState } from '@tanstack/react-router'
 import { GlassSidebar } from '@repo/ui'
 
 import { NavigationIcon } from '@/components/NavigationIcon'
@@ -99,6 +99,25 @@ export function AccountNav({
       aria-label="Hesap bölümleri"
       className={[styles.nav, className].filter(Boolean).join(' ')}
     >
+      {/*
+        Pazar yeri kabuğu (site header + marka) bu bölümde gizli olduğundan
+        marka işareti rayın en üstünde durur ve ana sayfaya döner. Daraltılmış
+        rayda yalnız işaret kalır — erişilebilir ad `aria-label`dan gelir,
+        görünen "arsam.net" metnini kapsar (WCAG 2.5.3).
+      */}
+      <Link
+        to="/"
+        className={styles.brand}
+        aria-label="arsam.net ana sayfası"
+        title="arsam.net ana sayfası"
+        onClick={() => onNavigate?.()}
+      >
+        <span className={styles.brandMark} aria-hidden>
+          <NavigationIcon name="sparkles" size={18} />
+        </span>
+        <span className={styles.brandName}>arsam.net</span>
+      </Link>
+
       {/* Kimlik bilgisi sayfanın kimlik bölümünde yaşar; ray adı tekrar etmez */}
       <GlassSidebar.Header title="Hesabım" subtitle={identityMeta} />
 

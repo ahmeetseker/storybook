@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { parseListingSearch } from './domain/search-state'
 import { searchListings } from './data/listing-adapter'
@@ -41,11 +41,22 @@ describe('EmlakSearchView', () => {
     ).toHaveLength(24)
   })
 
+  // Filtreler artık tek bir katalogdan (filter-catalog.ts) render ediliyor;
+  // bölüm başlıkları oradan gelir.
   it('shows land-specialist filter groups for the land category', async () => {
     await renderSearch({ category: 'land' })
 
-    expect(screen.getAllByText('İmar ve tapu').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Altyapı ve konum').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Tapu ve kullanım').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Arsa ayrıntıları').length).toBeGreaterThan(0)
+  })
+
+  // Kategoriye uymayan bir kriter GÖSTERİLMEMELİ: arsada "Oda sayısı" her
+  // zaman sıfır sonuç üretir ve kullanıcıyı çıkmaza sokardı.
+  it('arsa kategorisinde konuta özgü kriterleri göstermez', async () => {
+    await renderSearch({ category: 'land' })
+
+    expect(screen.queryByText('Oda sayısı')).toBeNull()
+    expect(screen.queryByText('Isıtma tipi')).toBeNull()
   })
 
   it('emits an updated state when a desktop filter changes', async () => {
@@ -129,5 +140,108 @@ describe('EmlakSearchView', () => {
       screen.getByRole('button', { name: 'Önerilen filtreleri uygula' }),
     )
     expect(onApplyAiProposal).toHaveBeenCalledOnce()
+  })
+
+  // "Tüm Seçenekler": kenar çubuğuna sığmayan kriterlerin girişi. Bölüm rayı
+  // ve seçili kriter sayısı, kullanıcının nerede ne bıraktığını modalı
+  // kapatmadan görmesini sağlar.
+  it('Tüm Seçenekler modalı bölüm rayıyla açılır', async () => {
+    await renderSearch({ category: 'residential' })
+
+    fireEvent.click(screen.getByRole('button', { name: /Tüm Seçenekler/ }))
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toBeTruthy()
+    const rail = screen.getByRole('navigation', { name: 'Filtre bölümleri' })
+    expect(
+      within(rail).getByRole('button', { name: /Bina ve tesisat/ }),
+    ).toBeTruthy()
+    // Konuta uymayan bölüm rayda hiç görünmez.
+    expect(within(rail).queryByRole('button', { name: /Arsa ayrıntıları/ })).toBeNull()
+  })
+
+  it('modal tetikleyicisi seçili kriter sayısını gösterir', async () => {
+    await renderSearch({
+      category: 'residential',
+      f_heating: 'natural-gas',
+      'r_building-ageMax': '10',
+    })
+
+    // Sayı artık parantez içinde metin değil, düğmenin içindeki rozet;
+    // erişilebilir ad boşluk normalleştirmesine bağlı kalmasın diye desenle
+    // eşleştirilir.
+    expect(
+      screen.getByRole('button', { name: /^Tüm Seçenekler\s*2$/ }),
+    ).toBeTruthy()
+  })
+
+  // Modalda seçilen kriter panelde çip olarak görünmezse kullanıcı sonucun
+  // neden daraldığını anlayamaz ve geri alamaz.
+  it('katalog filtresi uygulanan filtreler çipinde görünür', async () => {
+    await renderSearch({ category: 'residential', f_heating: 'natural-gas' })
+
+    expect(screen.getByText('Isıtma tipi: Doğalgaz (kombi)')).toBeTruthy()
+  })
+
+  // Modaldaki kriter arama: 50+ kriterde adını bilen kullanıcı bölüm bölüm
+  // taramak zorunda kalmasın (sahibinden'in modalinde bu yok).
+  it('modalda kriter araması eşleşenleri süzer', async () => {
+    await renderSearch({ category: 'residential' })
+    fireEvent.click(screen.getByRole('button', { name: /Tüm Seçenekler/ }))
+    const dialog = await screen.findByRole('dialog')
+
+    fireEvent.change(screen.getByLabelText('Kriter ara'), {
+      target: { value: 'ısıtma' },
+    })
+
+    // Kenar çubuğunda da "Isıtma tipi" var; iddia MODAL içine kapsanır.
+    expect(within(dialog).getByText('Isıtma tipi')).toBeTruthy()
+    // Eşleşmeyen kriter modalde kalmaz.
+    expect(within(dialog).queryByText('Balkon')).toBeNull()
+    // Arama açıkken bölüm rayı devre dışıdır.
+    expect(screen.queryByRole('navigation', { name: 'Filtre bölümleri' })).toBeNull()
+  })
+
+  it('eşleşme yoksa gerekçe yazar', async () => {
+    await renderSearch({ category: 'residential' })
+    fireEvent.click(screen.getByRole('button', { name: /Tüm Seçenekler/ }))
+    await screen.findByRole('dialog')
+
+    fireEvent.change(screen.getByLabelText('Kriter ara'), {
+      target: { value: 'zzzz' },
+    })
+    expect(screen.getByText(/için kriter bulunamadı/)).toBeTruthy()
+  })
+
+  // "Bu alanda ara" eskiden ölü bir butondu: kullanıcı basıyor, hiçbir şey
+  // olmuyordu.
+  it('haritada seçili alan çip olarak görünür ve kaldırılabilir', async () => {
+    const { onStateChange } = await renderSearch({
+      map: 'split',
+      bbox: '38.2,26.2,38.6,27.3',
+    })
+
+    const chip = screen.getByText('Haritada seçili alan')
+    expect(chip).toBeTruthy()
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Kaldır' })[0])
+    expect(onStateChange).toHaveBeenCalled()
+    const [next] = onStateChange.mock.calls.at(-1) as [{ mapArea?: unknown }]
+    expect(next.mapArea).toBeUndefined()
+  })
+
+  // Mobil çekmece tam ekran bir yüzey: kriterleri ikinci bir modala saklamak
+  // yerine core OLMAYANLAR da burada açılır. Aksi halde mobil kullanıcı
+  // katalogdaki kriterlerin çoğuna hiç ulaşamıyordu.
+  it('mobil çekmece core olmayan kriterleri de gösterir', async () => {
+    await renderSearch({ category: 'residential' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filtreleri aç' }))
+    const drawer = await screen.findByRole('dialog', { name: 'Emlak filtreleri' })
+
+    // "Balkon" core değildir; kenar çubuğunda yok, çekmecede olmalı.
+    expect(within(drawer).getByText('Balkon')).toBeTruthy()
+    // Çekmecenin içinde ikinci bir "Tüm Seçenekler" girişi OLMAMALI.
+    expect(within(drawer).queryByRole('button', { name: /Tüm Seçenekler/ })).toBeNull()
   })
 })

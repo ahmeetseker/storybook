@@ -57,6 +57,13 @@ export {
   type GlassBentoCellProps,
 } from './components/GlassBento'
 export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
+export { GlassMarquee, type GlassMarqueeProps, type GlassMarqueeItem } from './components/GlassMarquee'
+export {
+  GlassSeoDiscovery,
+  type GlassSeoDiscoveryProps,
+  type GlassSeoDiscoveryColumn,
+  type GlassSeoDiscoveryLink,
+} from './components/GlassSeoDiscovery'
 export { GlassCompareBar } from './components/GlassCompareBar'
 export type { GlassCompareBarProps, GlassCompareBarItem } from './components/GlassCompareBar'
 export { GlassTaxHistoryTable, type GlassTaxHistoryTableProps, type GlassTaxHistoryTableRow } from './components/GlassTaxHistoryTable'
@@ -142,8 +149,12 @@ export { GlassMediaGallery } from './components/GlassMediaGallery'
 export type { GlassMediaGalleryProps, GlassMediaGalleryItem, GlassMediaGalleryItemType } from './components/GlassMediaGallery'
 export {
   GlassMap,
+  GlassMapPopupCard,
   type GlassMapProps,
   type GlassMapPin,
+  type GlassMapPinTone,
+  type GlassMapClusterOptions,
+  type GlassMapPopupCardProps,
   type GlassMapPrivacyCircle,
   type GlassMapBasemap,
 } from './components/GlassMap'
@@ -170,7 +181,15 @@ export {
   type GlassTableSortDirection,
 } from './components/GlassTable'
 export { GlassChart, type GlassChartProps, type GlassChartPoint, type GlassChartType } from './components/GlassChart'
-export { GlassFooter, type GlassFooterProps, type GlassFooterColumn, type GlassFooterLinkItem } from './components/GlassFooter'
+export {
+  GlassFooter,
+  type GlassFooterProps,
+  type GlassFooterColumn,
+  type GlassFooterLinkItem,
+  type GlassFooterHighlights,
+  type GlassFooterHighlightItem,
+  type GlassFooterSocialLink,
+} from './components/GlassFooter'
 export { GlassAlert, type GlassAlertProps } from './components/GlassAlert'
 export { GlassAvatar, type GlassAvatarProps } from './components/GlassAvatar'
 export { GlassCheckbox, type GlassCheckboxProps } from './components/GlassCheckbox'

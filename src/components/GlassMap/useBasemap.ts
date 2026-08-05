@@ -29,7 +29,10 @@ export interface GlassMapBasemap {
    * Verilirse `center`/`zoom` yerine bu kullanılır ve panel boyutu ne olursa olsun
    * bölge kadraja sığdırılır — sabit zoom, dar panelde bölgenin bir kısmını
    * dışarıda bırakıp pinlerin elenmesine yol açıyordu. Panel yeniden
-   * boyutlandığında kadraj tazelenir.
+   * boyutlandığında kadraj tazelenir — ama YALNIZ kullanıcı kadrajı henüz
+   * kendi hareket ettirmediyse. Rozetle bir bölgeye inen ya da haritayı
+   * sürükleyen kullanıcı, bir pencere boyutu değişikliğinde ülke görünümüne
+   * geri fırlatılmaz.
    */
   bounds?: [[number, number], [number, number]]
   minZoom?: number
@@ -58,15 +61,46 @@ export interface BasemapState {
   status: BasemapStatus
   /** Pin id'sinden kapsayıcıya göre piksel konumu */
   positions: Record<string, { left: number; top: number }>
+  /** Kapsayıcının o anki piksel ölçüsü — kenar hizalaması ve eleme buradan okunur */
+  size: { width: number; height: number }
+  /** Haritanın o anki (kesirli olabilen) yakınlaştırma seviyesi */
+  zoom: number
   zoomIn: () => void
   zoomOut: () => void
+  /**
+   * Kadrajı verilen coğrafi sınıra oturtur — küme rozetine tıklanınca
+   * "o bölgeye in" hareketi bununla yapılır. `prefers-reduced-motion` açıkken
+   * uçuş animasyonu yerine anında geçiş yapılır.
+   */
+  fitBounds: (bounds: [[number, number], [number, number]]) => void
+  /** Kadrajı merkezi koruyarak belirtilen adım kadar yaklaştırır (çökmüş sınır durumu). */
+  zoomAround: (center: [number, number], delta: number) => void
+  /**
+   * Kadrajın o anki coğrafi sınırı `[[güney, batı], [kuzey, doğu]]`.
+   * "Bu alanda ara" gibi kadraj tabanlı filtreler bunu okur; harita hazır
+   * değilse `undefined` döner (çağıran o zaman filtre uygulamaz).
+   */
+  getViewportBounds: () => [[number, number], [number, number]] | undefined
+  /**
+   * Metre cinsinden bir yarıçapı o anki kadrajda piksele çevirir — mahremiyet
+   * dairesi zeminle birlikte ölçeklensin diye. Harita hazır değilse `0` döner.
+   */
+  metersToPixels: (lat: number, lng: number, meters: number) => number
 }
 
 interface LeafletMapLike {
-  setView(center: [number, number], zoom: number): LeafletMapLike
+  setView(
+    center: [number, number],
+    zoom: number,
+    options?: { animate?: boolean },
+  ): LeafletMapLike
   fitBounds(
     bounds: [[number, number], [number, number]],
-    options?: { padding?: [number, number]; animate?: boolean },
+    options?: { padding?: [number, number]; animate?: boolean; maxZoom?: number },
+  ): LeafletMapLike
+  flyToBounds(
+    bounds: [[number, number], [number, number]],
+    options?: { padding?: [number, number]; duration?: number; maxZoom?: number },
   ): LeafletMapLike
   remove(): void
   invalidateSize(): void
@@ -74,6 +108,14 @@ interface LeafletMapLike {
   off(): void
   zoomIn(): void
   zoomOut(): void
+  getZoom(): number
+  getMaxZoom(): number
+  getBounds(): {
+    getSouth(): number
+    getWest(): number
+    getNorth(): number
+    getEast(): number
+  }
   latLngToContainerPoint(coords: [number, number]): { x: number; y: number }
 }
 
@@ -81,6 +123,9 @@ interface LeafletTileLayerLike {
   addTo(map: LeafletMapLike): unknown
   setUrl(url: string): unknown
 }
+
+/** Kadrajın dışında bu kadar piksele kadar olan noktalar kümelemeye dahil kalır. */
+const CULL_MARGIN = 160
 
 export function useBasemap(
   containerRef: RefObject<HTMLDivElement | null>,
@@ -91,6 +136,11 @@ export function useBasemap(
 ): BasemapState {
   const [status, setStatus] = useState<BasemapStatus>(basemap ? 'loading' : 'idle')
   const [positions, setPositions] = useState<Record<string, { left: number; top: number }>>({})
+  const [size, setSize] = useState({ width: 0, height: 0 })
+  // Kadrajın o anki seviyesi — kümeleme eşiği ve "artık kümeleme" kararı
+  // buradan okunur. Başlangıç değeri basemap'in istenen seviyesidir; harita
+  // kurulunca ilk `project()` gerçek değerle günceller.
+  const [currentZoom, setCurrentZoom] = useState(basemap?.zoom ?? 0)
   const mapRef = useRef<LeafletMapLike | undefined>(undefined)
   const tileLayerRef = useRef<LeafletTileLayerLike | undefined>(undefined)
   // İlk kurulumda hangi katmanın aktif olduğunu okumak için ref'te tutulur —
@@ -115,6 +165,12 @@ export function useBasemap(
     // eleme yapılır — aksi halde harita sürüklenirken fiyat etiketleri panelin
     // dışına, sayfa içeriğinin üstüne akar. Boyut okunamıyorsa (SSR/jsdom,
     // ilk yerleşim öncesi) eleme atlanır, yoksa tüm pinler kaybolurdu.
+    //
+    // Eleme kenardan CULL_MARGIN kadar dışarıda yapılır: kümeleme piksel
+    // uzayında çalıştığı için, kadrajın hemen dışındaki bir komşu elenirse
+    // kenardaki rozet eksik sayı gösterir ve harita kaydırıldıkça sayı
+    // "zıplar". Marj, kümeleme yarıçapından geniştir; GlassMap gerçekten
+    // görünür alanın dışına düşen düğümü çizmeden atar.
     const container = containerRef.current
     const width = container?.clientWidth ?? 0
     const height = container?.clientHeight ?? 0
@@ -125,10 +181,21 @@ export function useBasemap(
       const pixel = map.latLngToContainerPoint([point.lat as number, point.lng as number])
       // Projeksiyon sonlu bir nokta üretmediyse pin konumlandırılamaz.
       if (!Number.isFinite(pixel.x) || !Number.isFinite(pixel.y)) continue
-      if (cull && (pixel.x < 0 || pixel.y < 0 || pixel.x > width || pixel.y > height)) continue
+      if (
+        cull &&
+        (pixel.x < -CULL_MARGIN ||
+          pixel.y < -CULL_MARGIN ||
+          pixel.x > width + CULL_MARGIN ||
+          pixel.y > height + CULL_MARGIN)
+      ) {
+        continue
+      }
       next[point.id] = { left: pixel.x, top: pixel.y }
     }
     setPositions(next)
+    setSize((prev) => (prev.width === width && prev.height === height ? prev : { width, height }))
+    const nextZoom = map.getZoom()
+    if (Number.isFinite(nextZoom)) setCurrentZoom((prev) => (prev === nextZoom ? prev : nextZoom))
   }, [containerRef])
 
   // Zemin kurulumu — yalnız istemcide, yalnız basemap verildiğinde.
@@ -145,6 +212,9 @@ export function useBasemap(
   const boundsKey = basemap?.bounds ? basemap.bounds.flat().join(',') : ''
   const boundsRef = useRef(basemap?.bounds)
   boundsRef.current = basemap?.bounds
+  // Kullanıcı kadrajı kendi hareket ettirdi mi? Başlangıç kadrajının yeniden
+  // boyutlanmada tazelenip tazelenmeyeceğini bu belirler (bkz. ResizeObserver).
+  const userMovedRef = useRef(false)
 
   useEffect(() => {
     if (!tileUrl || centerLat === undefined || centerLng === undefined || zoom === undefined) {
@@ -158,6 +228,8 @@ export function useBasemap(
     let disposed = false
     let frame = 0
     let resizeObserver: ResizeObserver | undefined
+    // Zemin baştan kuruluyor: başlangıç kadrajı yeniden geçerli.
+    userMovedRef.current = false
     setStatus('loading')
 
     const schedule = () => {
@@ -233,18 +305,34 @@ export function useBasemap(
         // Panel CSS ile yeniden boyutlanınca (responsive yerleşim, pencere
         // değişimi) Leaflet bunu kendiliğinden algılamaz: boyut bildirilmezse
         // kadraj kayar ve pinler yanlış konumlanır.
+        // Kullanıcı kadrajı kendi hareket ettirdiyse (rozetle indi, sürükledi,
+        // yakınlaştırdı) yeniden boyutlanma onu BAŞA DÖNDÜRMEMELİ. Başlangıç
+        // kadrajı yalnız kullanıcı henüz karışmamışken tazelenir; aksi halde
+        // bir pencere boyutu değişikliği ilanı bulmuş kullanıcıyı ülke
+        // görünümüne fırlatıyordu.
+        typedMap.on('zoomstart dragstart', () => {
+          userMovedRef.current = true
+        })
         if (typeof ResizeObserver !== 'undefined') {
           resizeObserver = new ResizeObserver(() => {
             typedMap.invalidateSize()
             const current = boundsRef.current
-            if (current) typedMap.fitBounds(current, { padding: [6, 6], animate: false })
+            if (current && !userMovedRef.current) {
+              typedMap.fitBounds(current, { padding: [6, 6], animate: false })
+            }
             schedule()
           })
           resizeObserver.observe(element)
         }
         setStatus('ready')
         project()
-      } catch {
+      } catch (error) {
+        // Sessiz yutma YASAK: bu dal bir kez tetiklendiğinde harita şematik
+        // yedeğe düşer ve kümeleme/iniş hiç devreye girmez — kullanıcı yalnız
+        // "zemin yüklenemedi" satırını görür, NEDENİNİ göremezdi. Gerçek hata
+        // konsola yazılır (ör. `leaflet` modülü ön paketlenmediği için
+        // `import()` reddi, bkz. apps/web vite.config optimizeDeps notu).
+        console.error('[GlassMap] Harita zemini kurulamadı:', error)
         if (!disposed) setStatus('error')
       }
     })()
@@ -276,8 +364,87 @@ export function useBasemap(
     if (status === 'ready') project()
   }, [points, project, status])
 
-  const zoomIn = useCallback(() => mapRef.current?.zoomIn(), [])
-  const zoomOut = useCallback(() => mapRef.current?.zoomOut(), [])
+  const zoomIn = useCallback(() => {
+    userMovedRef.current = true
+    mapRef.current?.zoomIn()
+  }, [])
+  const zoomOut = useCallback(() => {
+    userMovedRef.current = true
+    mapRef.current?.zoomOut()
+  }, [])
 
-  return { status, positions, zoomIn, zoomOut }
+  // Küme rozetine tıklandığında kadraj üyelerin sınırına oturur. Padding
+  // rozetin kendi yarıçapından geniş tutulur: sıfır padding'de kenardaki üye
+  // pini tam sınıra oturup etiketiyle panel dışına taşıyordu.
+  const fitBounds = useCallback((bounds: [[number, number], [number, number]]) => {
+    const map = mapRef.current
+    if (!map) return
+    // Rozetle inmek de bir kullanıcı hareketidir: yeniden boyutlanma bu
+    // kadrajı ülke görünümüne geri çekmemeli.
+    userMovedRef.current = true
+    const options = { padding: [48, 48] as [number, number], maxZoom: map.getMaxZoom() }
+    if (prefersReducedMotion()) {
+      map.fitBounds(bounds, { ...options, animate: false })
+      return
+    }
+    map.flyToBounds(bounds, { ...options, duration: 0.6 })
+  }, [])
+
+  // Üst üste binen ilanlarda sınır tek noktaya çöker; `fitBounds` sonsuz
+  // yakınlaşmaya gideceği için kadraj sabit bir adım yaklaştırılır.
+  const zoomAround = useCallback((center: [number, number], delta: number) => {
+    const map = mapRef.current
+    if (!map) return
+    userMovedRef.current = true
+    const next = Math.min(map.getMaxZoom(), map.getZoom() + delta)
+    map.setView(center, next, { animate: !prefersReducedMotion() })
+  }, [])
+
+  // Yarıçap, merkez ile aynı enlemde `meters` kadar doğuya kaydırılmış bir
+  // noktanın piksel uzaklığı olarak ölçülür. Enlem çemberi kutuplara doğru
+  // daraldığı için boylam farkı `cos(lat)` ile düzeltilir; sabit bir derece
+  // katsayısı kullanmak daireyi kuzeyde belirgin biçimde şişiriyordu.
+  const metersToPixels = useCallback(
+    (lat: number, lng: number, meters: number) => {
+      const map = mapRef.current
+      if (!map || !(meters > 0)) return 0
+      const metersPerLngDegree = 111_320 * Math.cos((lat * Math.PI) / 180)
+      if (!(metersPerLngDegree > 0)) return 0
+      const center = map.latLngToContainerPoint([lat, lng])
+      const edge = map.latLngToContainerPoint([lat, lng + meters / metersPerLngDegree])
+      const radius = Math.abs(edge.x - center.x)
+      return Number.isFinite(radius) ? radius : 0
+    },
+    [],
+  )
+
+  const getViewportBounds = useCallback(():
+    | [[number, number], [number, number]]
+    | undefined => {
+    const map = mapRef.current
+    if (!map) return undefined
+    const bounds = map.getBounds()
+    const south = bounds.getSouth()
+    const west = bounds.getWest()
+    const north = bounds.getNorth()
+    const east = bounds.getEast()
+    if (![south, west, north, east].every((value) => Number.isFinite(value))) return undefined
+    return [
+      [south, west],
+      [north, east],
+    ]
+  }, [])
+
+  return {
+    status,
+    positions,
+    size,
+    zoom: currentZoom,
+    zoomIn,
+    zoomOut,
+    fitBounds,
+    zoomAround,
+    metersToPixels,
+    getViewportBounds,
+  }
 }

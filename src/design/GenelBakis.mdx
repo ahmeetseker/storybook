@@ -10,14 +10,16 @@ bu tablo karar verir:
 | Kavram | Örnekler | Nerede tanımlanır |
 |---|---|---|
 | **Foundation token** | spacing, radius, tipografi ölçeği, kontrol yükseklikleri | `src/index.css` (`--lg-*`) |
-| **Semantic token** | accent, success/warning/danger, hairline | `src/index.css` (tema başına) |
+| **Semantic token** | accent, success/warning/danger, hairline | `src/index.css` (`:root`) |
 | **Component seçeneği** | `material`, `tone`, `size`, `variant`, `thickness` | Component public API'si |
 | **Component state'i** | hover, focus-visible, pressed, disabled, loading | CSS pseudo-class / DOM / kontrollü prop |
 
 Temel ilkeler:
 
 - `hover`, `focus-visible`, `active` **asla production prop olmaz** — CSS/DOM işidir.
-- `light` / `dark` component variantı değil **tema bağlamıdır**; component'ler token tüketir.
+- `tone` (`light` / `dark` / `auto`) bir tema anahtarı değil, **camın altındaki zeminin
+  bağlam ipucudur**: cam yüzey koyu bir görselin mi yoksa açık bir kağıdın mı üstünde
+  duruyor, onu söyler. Rengi yine token belirler.
 - Component dışı boşluk (`margin`) component'in değil, **parent layout'un** sorumluluğudur.
 - Raw px / hex değeri component CSS'inde kullanılmaz; token'a bağlanır.
 
@@ -31,9 +33,18 @@ Temel ilkeler:
 
 ## Tema
 
-Açık tema **Kağıt** (fildişi zemin + amber vurgu), koyu tema **Grafit**.
-Tema `prefers-color-scheme` ve Storybook toolbar'ından gelir; component'ler tema
-bilmez, token okur.
+Ürünün **tek teması** vardır: **Kağıt** — fildişi zemin + amber vurgu. Token'lar
+`src/index.css` içinde tek bir `:root` bloğunda tanımlıdır; tema anahtarı, tema
+toolbar'ı, tema kök attribute'u veya sistem renk şeması dalı yoktur.
+
+**Koyu tema desteklenmiyor** — bilinçli bir ürün kararıdır: palet tek zemin
+üstünde AAA'ya kalibre edildi, cam malzemenin kalınlık/ışıma ayarı da tek zemine
+göre çözüldü. İkinci bir renk şeması bu iki kalibrasyonu birden ikiye böler.
+Yeni bir component, story, CSS veya doğrulama listesi yazarken ikinci bir renk
+şeması dalı eklenmez; story matrisinde tema satırı da yoktur.
+
+Bunu `tone` prop'uyla karıştırmayın: `tone` renk şemasını değil, **camın
+altındaki zemini** anlatır (bkz. Eksenler ve Durumlar) ve yürürlüktedir.
 
 ## Dosya yapısı
 
@@ -51,4 +62,4 @@ src/
 ```
 
 **Öncelik sırası:** kullanıcının açık prop'u → parent context (ör. `GlassTierProvider`)
-→ tema token'ı → component default'u.
+→ token değeri → component default'u.

@@ -1,14 +1,7 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
+import { GlassButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
 import {
-  GlassButton,
-  GlassDock,
-  GlassSiteHeader,
-  type GlassDockItem,
-  type GlassSiteHeaderLink,
-} from '@repo/ui'
-import {
-  dockRouteKeys,
   getRouteByKey,
   getRouteByPath,
   headerRouteKeys,
@@ -16,27 +9,6 @@ import {
 } from '@/config/routes'
 import { stripBase, withBase } from '@/config/base-path'
 import { NavigationIcon } from './NavigationIcon'
-
-type ViewportTier = keyof typeof dockRouteKeys
-type ThemeChoice = 'system' | 'light' | 'dark'
-
-const viewportTiers = ['desktop', 'tablet', 'mobile'] as const
-
-function getViewportTier(): ViewportTier {
-  if (typeof window === 'undefined') return 'desktop'
-  if (window.innerWidth < 768) return 'mobile'
-  if (window.innerWidth < 1024) return 'tablet'
-  return 'desktop'
-}
-
-function applyTheme(theme: ThemeChoice) {
-  if (typeof document === 'undefined') return
-  if (theme === 'system') {
-    delete document.documentElement.dataset.theme
-  } else {
-    document.documentElement.dataset.theme = theme
-  }
-}
 
 export interface MarketplaceShellProps {
   children: ReactNode
@@ -50,30 +22,11 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
   const currentRoute = getRouteByPath(pathname)
   // Kendi kabuğunu kuran rotalar: ilan verme sihirbazı (odaklı akış) ve
   // hesap panosu (sol ray + kendi üst şeridi). İkisinde de pazar yeri
-  // header'ı ve dock'u gizlenir — iki gezinme katmanı üst üste binmez.
+  // header'ı gizlenir — iki gezinme katmanı üst üste binmez.
   const isFocusedListingFlow =
     currentRoute.key === 'create-listing'
     || currentRoute.key === 'account'
     || currentRoute.key === 'messages'
-  const [viewport, setViewport] = useState<ViewportTier | null>(null)
-  const [theme, setTheme] = useState<ThemeChoice>('system')
-
-  useEffect(() => {
-    const update = () => setViewport(getViewportTier())
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem('arsam-theme')
-    const next =
-      stored === 'light' || stored === 'dark' || stored === 'system'
-        ? stored
-        : 'system'
-    setTheme(next)
-    applyTheme(next)
-  }, [])
 
   const routeTo = useCallback(
     (href: string) => {
@@ -83,14 +36,6 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     },
     [router],
   )
-
-  const cycleTheme = () => {
-    const next: ThemeChoice =
-      theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system'
-    setTheme(next)
-    applyTheme(next)
-    window.localStorage.setItem('arsam-theme', next)
-  }
 
   const headerLinks = useMemo<GlassSiteHeaderLink[]>(
     () =>
@@ -106,48 +51,11 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     [currentRoute.key, routeTo],
   )
 
-  const dockItems = useMemo<Record<ViewportTier, GlassDockItem[]>>(() => {
-    const createItems = (tier: ViewportTier) =>
-      dockRouteKeys[tier].map((key) => {
-        const route = getRouteByKey(key)
-        const label =
-          route.key === 'compare'
-            ? 'Karşılaştır'
-            : route.key === 'search'
-              ? 'Arama'
-              : route.label
-        return {
-          key: route.key,
-          label,
-          href: withBase(route.href),
-          icon: <NavigationIcon name={route.icon} size={20} />,
-          active: route.key === currentRoute.key,
-        }
-      })
-
-    return {
-      desktop: createItems('desktop'),
-      tablet: createItems('tablet'),
-      mobile: createItems('mobile'),
-    }
-  }, [currentRoute.key])
-
   const logo = (
     <a className="shell-brand" href={withBase('/')}>
       <NavigationIcon name="sparkles" size={22} />
       arsam.net
     </a>
-  )
-
-  const themeAction = (
-    <GlassButton
-      size="sm"
-      aria-label={`Tema: ${theme}`}
-      title={`Tema: ${theme}`}
-      onClick={cycleTheme}
-    >
-      <NavigationIcon name="theme" size={18} />
-    </GlassButton>
   )
 
   const accountAction = (
@@ -166,20 +74,6 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     </GlassButton>
   )
 
-  const renderDock = (tier: ViewportTier) => (
-    <div
-      key={tier}
-      className={`shell-dock-variant shell-dock-variant--${tier}`}
-    >
-      <GlassDock
-        items={dockItems[tier]}
-        behavior="fixed"
-        label="Ana gezinme"
-        onRoute={routeTo}
-      />
-    </div>
-  )
-
   return (
     <div className="marketplace-shell">
       <a className="skip-link" href="#main-content">
@@ -189,17 +83,11 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
         <GlassSiteHeader
           logo={logo}
           links={headerLinks}
-          utility={themeAction}
           secondaryAction={accountAction}
           action={createAction}
         />
       ) : null}
       {children}
-      {!isFocusedListingFlow
-        ? viewport === null
-          ? viewportTiers.map((tier) => renderDock(tier))
-          : renderDock(viewport)
-        : null}
     </div>
   )
 }

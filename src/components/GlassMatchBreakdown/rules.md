@@ -235,9 +235,8 @@ Var: Default, Playground, RenkEsigi (genel + grup skorlarında otomatik eşik
 UzunIcerik, Responsive (mobile1 + dokunmatik geri bildirim butonları),
 Erişilebilirlik (docs description'lı).
 
-`Variants`/`Sizes`/`Temalar` ayrı story olarak yok: bu component'te `variant`
-ekseni tanımlı değil (tek sabit anatomi), tema toolbar'la otomatik doğrulanır
-(`GlassMatchScore` ile aynı karar).
+`Variants`/`Sizes` ayrı story olarak yok: bu component'te `variant`
+ekseni tanımlı değil (tek sabit anatomi, `GlassMatchScore` ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

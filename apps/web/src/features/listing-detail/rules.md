@@ -379,9 +379,9 @@ her buton kabuktaki `İlan ver` ile aynı görünmeli, malzeme dahil. Bu, katman
 kuralını değil **bütçe sayısını** esnetir; eylemler zaten kontrol katmanına
 aittir.
 
-Gerçek sayı: sayfa genelinde **9 cam yüzey** (kabuk: tema anahtarı · `Üye
+Gerçek sayı: sayfa genelinde **8 cam yüzey** (kabuk: `Üye
 girişi` · `İlan ver` · menü — sayfa: iki hero/gezinme örtüsü — eylemler: üç
-buton). `GenelBakis.mdx` sayfa başına altı önerir; bu sayfa üçü aşar.
+buton). `GenelBakis.mdx` sayfa başına altı önerir; bu sayfa ikiyi aşar.
 
 **Testlerin ölçtüğü sayı bu değildir.** `ListingDetailWorkspace` testleri
 kabuğu render etmez; oradaki sayım beştir ve `<= 6` iddiası geçmeye devam eder.
@@ -713,7 +713,7 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 `ListingDetailWorkspace.stories.tsx` — `Sayfalar/Public/İlan Detayı`:
 `Default` · `Bayat plan kaynağı` · `AI kullanılamıyor` ·
 `Harita kullanılamıyor` · `Süresi dolmuş` · `Yükleniyor` · `Uzun içerik` ·
-`Responsive` · `Temalar` · `Yansıtılmış ilan (arama sonucu)` ·
+`Responsive` · `Yansıtılmış ilan (arama sonucu)` ·
 `Numara alınamadı`. Her story sabit `now` ile yükler.
 
 ## 13. Bilinen kabuller
@@ -729,6 +729,54 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
   sözlüğü, SLO ölçümü.
 
 ## Changelog
+
+- 2026-08-04 — **Görüşme gündemi satır olmaktan çıkıp kart oldu** (§1b, §4,
+  §9, §10). Üç ayrı şikâyet aynı kökten geliyordu: gündem, ölçüsü içeriğinden
+  değil **kolondan** gelen bir satır listesiydi.
+
+  (a) **Kutucuk maddesinden koptu.** Satır üç sütunluydu (numara · metin ·
+  kutucuk) ve orta sütun okuma ölçüsüne kadar uzuyordu; 35 karakterlik bir
+  maddede kutucuk metnin ~800px sağına düşüyor, hangi maddeye ait olduğunu
+  söylemez oluyordu. Sütun daha önce `1fr`'den `--lg-measure`'a çekilmişti —
+  aynı hatanın küçüğü. Çözüm ölçüyü değil **yapıyı** değiştirdi: sıra numarası
+  ile işaret kutucuğu TEK rozette birleşti. Madde işaretlendiğinde numara
+  yerini onay işaretine bırakır; aralarında kapatılacak bir mesafe kalmaz.
+
+  (b) **Hover neyi hedeflediğini değil satırın nereye kadar uzandığını
+  gösteriyordu.** Tam genişlik gri bant yerine maddenin kendi zemini yanıyor:
+  nötr tondan accent tonuna döner ve madde 1px yükselir. Hareket yalnız
+  transform/opacity/filter kanalında; `prefers-reduced-motion` açıkken yer
+  değiştirme ve ölçek düşer, renk konuşmaya devam eder.
+
+  Madde bir **kart değildir** — §1b'nin izin verdiği tarafta durur: tonlu
+  zemin + yarıçap var, **çerçeve ve gölge yok**. İlk denemede hover'da
+  çerçeve + yarıçap + gölge üçlüsü açılıyordu; bu, yaprağın içinde ikinci bir
+  kart demekti. Zemin tek başına hem durumu hem hedefi taşıyor.
+
+  (c) **Yaprağın sağ yarısı boştu.** Maddeler artık
+  `repeat(auto-fill, minmax(16rem, 1fr))` ızgarasında — yer varsa yan yana
+  dizilir. İnce baskı da yaprak 56rem'i geçtiğinde gündemin YANINA geçer
+  (`.sellerBody` iki kolon). Eşik **yaprağın kendi kabındadır**
+  (`.seller` → `container: sellerSheet / inline-size`), sayfanın değil: karar
+  kolonu açıldığında yaprak sayfadan ~372px dar kalır ve sayfa eşiği bu farkı
+  göremez. Alt ağaçtaki isimsiz kap sorguları etkilenmedi — `.evidenceGrid` ve
+  `GlassAgencyCard` zaten kendi kaplarını kuruyor; kanıt satırı 336px'lik
+  kolonda kendi eşiğiyle çöküyor.
+
+  **Rozetin rengi eylem dilinden gelir, uydurulmaz** (§10). Boşta
+  `GlassButton`'ın tonlu hâli (accent'in seyreltilmişi), işaretliyken dolu hâli
+  (`--lg-action-prominent` + `--lg-action-prominent-label`), hover'da
+  `--lg-action-prominent-hover`. Önceki hâl yerli kutucuğun `accent-color`'ıydı
+  ve sistemin buton diliyle akraba değildi.
+
+  **Numara kontrolü yine `prominent` YAPILMADI.** Rozet dolu eylem rengini
+  taşıyor ama bir buton değil; sayfanın tek birincil eylemi `Satıcı bilgilerine
+  git` olarak kalıyor (§4 ve onu koruyan tek `[data-variant="primary"]` testi).
+
+  Yerli kutucuk DOM'da ve odak sırasında kaldı — durum, rol ve klavye davranışı
+  tarayıcıdan geliyor, boyanan yalnız rozet. Odak halkası kutucuğa değil rozete
+  çizilir: kullanıcı kutucuğu değil maddeyi işaretliyor. Dokunma hedefi kart
+  yüksekliğinden geliyor (66px, `--lg-control-hit` üstünde).
 
 - 2026-08-04 — **Eylem dili tek kaynağa bağlandı** (§2, §4). Sayfadaki
   butonlar aynı işi yapıp farklı görünüyordu: kabuğun `İlan ver` butonu
@@ -841,7 +889,7 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 
   **Avatarın pastel tonuna bilerek dokunulmadı:** `GlassAvatar`'ın baş harf
   mürekkebi temayla dönmez ve zemin tam bu yüzden algısal olarak sabit açıklıkta
-  (`oklch(88% 0.05 h)`) seçilmiştir. Token'lı bir tonla değiştirmek koyu temada
+  (`oklch(88% 0.05 h)`) seçilmiştir. Token'lı bir tonla değiştirmek
   kontrastı düşürürdü.
 - 2026-08-04 — **Soru-cevap yazışmaya dönüştü** (§7b — yeni bölüm, §4, §1b).
   `ListingQnaSection` artık avatarlı bir yazışma taşıyor: her soru ve yanıt

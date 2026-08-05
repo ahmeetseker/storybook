@@ -167,8 +167,8 @@ Var: Default, Playground, Variants (full/compact), States (doğrulanmış+
 etkileşimli · doğrulanmamış+etkileşimli · aksiyonsuz · yalnız sayaç/düz
 metin), UzunIcerik (uzun ad + uzun metin, full vs compact), Responsive
 (dar container + dokunmatik viewport), KontrolluFaydali (kontrollü sayaç
-örneği), Erisilebilirlik (docs). Temalar: toolbar üzerinden (ayrı story yok,
-repo konvansiyonu). Sizes: N/A (tek boyut ekseni yok, yalnız `variant`).
+örneği), Erisilebilirlik (docs). Sizes: N/A (tek boyut ekseni yok, yalnız
+`variant`).
 
 ## 11. Test kabul kriterleri
 

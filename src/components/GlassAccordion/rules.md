@@ -154,9 +154,8 @@ alternatifi olarak korunur (reduced-motion'da kapanır).
 ## 10. Storybook kapsamı
 
 Default, Playground, Multiple (mode ekseni), Controlled, UzunIcerik,
-Responsive, Erisilebilirlik (docs description'lı). Sizes/Materials/Temalar
-story'si YOK — eksen yok (Temalar global toolbar'la tüm story'lerde zaten
-kapsanıyor, mevcut proje konvansiyonu).
+Responsive, Erisilebilirlik (docs description'lı). Sizes/Materials
+story'si YOK — eksen yok (mevcut proje konvansiyonu).
 
 ## 11. Test kabul kriterleri
 

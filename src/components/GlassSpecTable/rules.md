@@ -98,7 +98,7 @@ ile cam beyaz-alfa ayraç yerine koyu ayraç uygulanır.
 **Borç (raw / mikro-geometri):** satır ayracı iki malzemede de bilinçli raw —
 cam `rgba(255,255,255,.16)` beyaz-alfa malzeme etkisi; flat `rgba(0,0,0,.08)`
 `--lg-hairline` (`rgba(36,33,27,.09)`) ile birebir aynı olmadığından bağlamak
-tema başına görsel değişiklik yaratırdı (hairline'a geçiş ayrı görsel karar
+gözle görülür bir değişiklik yaratırdı (hairline'a geçiş ayrı görsel karar
 olarak bekliyor). Label/value 14px hiçbir tipografi token'ına denk değil
 (footnote 13 / body 15 arası); satır min-height 36px ve dikey padding 7px ile
 birlikte component kökünde yerel değişkene toplandı (`.card {
@@ -113,7 +113,7 @@ Var: Default, TwoColumns, WithoutTitle (+ `columns` control'ü argTypes'ta),
 Materials (flat'te ayraç farkı — glass vs flat yan yana), Columns (1 vs 2
 karşılaştırma), UzunIcerik (uzun değer + kesintisiz şasi no, dar container).
 **Eksik:** Playground (tam), Responsive (dar container'da `columns=2`
-taşması), Temalar, Erişilebilirlik. States N/A.
+taşması), Erişilebilirlik. States N/A.
 
 ## 11. Test kabul kriterleri
 

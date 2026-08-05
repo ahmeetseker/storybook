@@ -224,8 +224,9 @@ export const Responsive: Story = {
   ),
 }
 
-/** Kağıt + Grafit: tema toolbar'dan değişir; kompozitör iki temada da düz yüzey kalır. */
-export const Temalar: Story = {
+/** Düz fildişi zemin: kompozitör canlı arka planlarda da düz yüzey kalır — burada zemin sabittir. */
+export const DuzZemin: Story = {
+  parameters: { globals: { backgroundKey: 'light' } },
   args: { defaultValue: BRIEF, tools: TOOLS, answer: ANSWER },
 }
 

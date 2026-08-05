@@ -1,45 +1,12 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { GradientBlinds } from '../src/demo/GradientBlinds'
 
-// light/dark: "Kağıt" temasının açık (fildişi) ve koyu (Grafit) zeminleri.
-// Toolbar seçimi OS temasından bağımsız çalışsın diye token'lar burada override edilir.
+// light: ürünün tek teması — fildişi düz zemin. Token override'ı YOK: değerler
+// doğrudan `src/index.css` `:root`'undan okunur. Burada ikinci bir palet tutmak
+// geçmişte sessiz sapma üretmişti (Storybook `--lg-accent: #b45309` ile ürünün
+// AAA'lı `#7c3806`'sını gösteriyor, yani kontrast gerçekte olduğundan kötü
+// görünüyordu). Tek tema kaldığı için override'ın gerekçesi de kalmadı.
 // blinds/vivid: kırılmanın gözle test edilebildiği canlı arka planlar (toolbar'dan seçilir).
-const FLAT: Record<string, { scheme: 'light' | 'dark'; vars: Record<string, string> }> = {
-  light: {
-    scheme: 'light',
-    vars: {
-      '--lg-bg': '#faf8f4',
-      '--lg-surface': '#ffffff',
-      '--lg-label': '#24211b',
-      '--lg-label-secondary': '#79726a',
-      '--lg-hairline': 'rgba(36, 33, 27, 0.09)',
-      '--lg-accent': '#b45309',
-      '--lg-accent-contrast': '#ffffff',
-      '--lg-danger': '#c92a20',
-      '--lg-warning': '#9a5700',
-      '--lg-success': '#18743a',
-      '--lg-scrim': 'rgba(10, 12, 16, 0.55)',
-      '--lg-on-scrim': '#ffffff',
-    },
-  },
-  dark: {
-    scheme: 'dark',
-    vars: {
-      '--lg-bg': '#121316',
-      '--lg-surface': '#1b1c20',
-      '--lg-label': '#f2f2f3',
-      '--lg-label-secondary': '#9d9da4',
-      '--lg-hairline': 'rgba(255, 255, 255, 0.1)',
-      '--lg-accent': '#e09143',
-      '--lg-accent-contrast': '#1a140c',
-      '--lg-danger': '#ff6961',
-      '--lg-warning': '#ffb44c',
-      '--lg-success': '#52d273',
-      '--lg-scrim': 'rgba(4, 5, 8, 0.62)',
-      '--lg-on-scrim': '#ffffff',
-    },
-  },
-}
 
 const vividGradient =
   'linear-gradient(135deg,#ff9a9e 0%,#fad0c4 25%,#a18cd1 50%,#fbc2eb 75%,#8fd3f4 100%)'
@@ -52,9 +19,7 @@ const blob = (size: number, color: string, top: string, left: string): CSSProper
 })
 
 export function DemoBackground({ variant, children }: { variant: string; children: ReactNode }) {
-  const flat = FLAT[variant]
-
-  if (flat) {
+  if (variant === 'light') {
     return (
       <div
         style={{
@@ -62,10 +27,9 @@ export function DemoBackground({ variant, children }: { variant: string; childre
           minHeight: '100vh',
           background: 'var(--lg-bg)',
           color: 'var(--lg-label)',
-          colorScheme: flat.scheme,
+          colorScheme: 'light',
           padding: '4rem 2rem',
-          ...flat.vars,
-        } as CSSProperties}
+        }}
       >
         {children}
       </div>

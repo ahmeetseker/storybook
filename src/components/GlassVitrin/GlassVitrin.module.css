@@ -35,9 +35,13 @@
   --cap-pad: 30px 10px 9px;
 }
 
-/* Ortak görsel hücresi */
+/* Ortak görsel hücresi.
+   isolation: kart içi rozet/chip/caption katmanları (z-index: 1) hücrenin
+   dışına taşmasın; aksi halde sayfa kökünde aynı seviyedeki overlay'lerin
+   (select paneli vb.) üstüne çıkıyorlar. */
 .ph {
   position: relative;
+  isolation: isolate;
   display: block;
   overflow: hidden;
   background: color-mix(in srgb, var(--lg-label) 8%, transparent);
@@ -160,7 +164,7 @@
 .mosaicGrid.cols8 { grid-template-columns: repeat(9, 1fr); }
 .mosaicGrid.cols9 { grid-template-columns: repeat(10, 1fr); }
 .mosaicGrid.cols10 { grid-template-columns: repeat(11, 1fr); }
-.mosaicCard { position: relative; gap: 0; }
+.mosaicCard { position: relative; isolation: isolate; gap: 0; }
 .mosaicCard .ph { aspect-ratio: 1 / 1; border-radius: var(--radius-tile); }
 .chip {
   position: absolute;
@@ -220,7 +224,7 @@
 
 /* ── banded (P): doping bandı + mikro ızgara ── */
 .band { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--lg-space-3); margin-bottom: var(--band-mb); }
-.bandCard { position: relative; border-radius: var(--lg-radius-chip, 10px); overflow: hidden; gap: 0; }
+.bandCard { position: relative; isolation: isolate; border-radius: var(--lg-radius-chip, 10px); overflow: hidden; gap: 0; }
 .bandCard .ph { aspect-ratio: 16 / 11; }
 .bandRozet {
   position: absolute;

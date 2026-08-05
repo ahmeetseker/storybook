@@ -71,7 +71,7 @@
 
 /* Cam tonu — GlassSurface'in kendi %6'lık zeminini yener (ata seçici, 0-2-0).
    Blur tek başına yetmiyor: altından geçen metin bulanıklaşsa da kontrastı
-   sürüyor. `--lg-glass` tema duyarlıdır (Kağıt beyaz / Grafit koyu). */
+   sürüyor. `--lg-glass` beyaz cam yüzeyidir. */
 .root .material {
   background: color-mix(in srgb, var(--lg-glass) var(--material-tint), transparent);
 }

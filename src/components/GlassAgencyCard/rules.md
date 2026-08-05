@@ -177,9 +177,7 @@ Info button görünür glyph'i küçük kalırken odak hedefi masaüstünde
 Var: Default, Playground, Varyantlar (panel/inline yan yana), Logolu,
 Durumlar (minimal · yalnız telefon+ilan · kaynaksız doğrulama · kaynak
 tooltip'i), Uzun İçerik, Responsive (mobile1, container-güdümlü tek kolon),
-Erişilebilirlik (docs description'lı). **Eksik:** Sizes (N/A — `size` ekseni tanımlı değil),
-Temalar (ayrı story yok — tema toolbar'la otomatik doğrulanır, GlassScoreMeter
-ile aynı karar).
+Erişilebilirlik (docs description'lı). **Eksik:** Sizes (N/A — `size` ekseni tanımlı değil).
 
 ## 11. Test kabul kriterleri
 

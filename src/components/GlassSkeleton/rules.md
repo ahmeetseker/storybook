@@ -117,7 +117,7 @@ bağlanması açık karar.
 Var: Default, CokSatir (son satır %60), Varyantlar (% tabanlı genişlik),
 Statik (`animate=false`), IlanKartiIskeleti (kompozisyon + `aria-busy`
 kalıbı), MobilListeIskeleti (responsive: % tabanlı akışkanlık, mobile1
-viewport). **Eksik:** reduced-motion forced görseli, koyu tema karşılaştırması.
+viewport). **Eksik:** reduced-motion forced görseli.
 
 ## 11. Test kabul kriterleri
 

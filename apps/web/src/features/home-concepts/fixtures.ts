@@ -6,7 +6,7 @@ import type {
 } from '@repo/ui'
 import { placeholderImage } from '../../../../../src/demo/placeholderImage'
 
-const landImages = [
+export const landImages = [
   'https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=640&q=82',
   'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=640&q=82',
   'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=640&q=82',

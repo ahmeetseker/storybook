@@ -17,7 +17,18 @@
  *   riski var mı) göre karar verilmeli.
  */
 const AUTH_ONEK_REDDI = ['/giris', '/parola-sifirla', '/oturum-suresi-doldu', '/yetkisiz']
-const AUTH_TAM_YOL_REDDI = ['/kayit', '/kayit/hesap-var', '/hesap/askida']
+/*
+ * `/davet/:token` ve `/e-posta-dogrula` KASITLI olarak burada YOK: ikisi de
+ * oturum gerektirir, yani "giriş yap, sonra geldiğin yere dön" akışının
+ * meşru hedefleridir. Yalnız kendi durum sayfaları (`/davet/gecersiz`)
+ * reddedilir — oraya dönmek anlamsızdır.
+ */
+const AUTH_TAM_YOL_REDDI = [
+  '/kayit',
+  '/kayit/hesap-var',
+  '/hesap/askida',
+  '/davet/gecersiz',
+]
 
 /**
  * `donus` parametresini güvenli bir uygulama içi yola indirger.

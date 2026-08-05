@@ -143,7 +143,7 @@ Var: **Default** (3 sekme, uncontrolled) · **Controlled** (`activeId='konum'`) 
 **Materials** (glass/flat panel yan yana; bar iki örnekte de cam) ·
 **UzunIcerik** (6 sekme + uzun TR etiket, yatay kaydırma) · **DarContainer**
 (280px; bar taşmaz, liste kayar). **Eksik:** Playground (Controls) · States
-(forced hover/focus) · Responsive (coarse pointer) · Temalar (Kağıt/Grafit) ·
+(forced hover/focus) · Responsive (coarse pointer) ·
 Erişilebilirlik (focus sırası). Sizes: N/A — `size` ekseni yok.
 
 ## 11. Test kabul kriterleri

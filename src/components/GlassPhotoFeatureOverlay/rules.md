@@ -230,9 +230,9 @@ Var: Default, Playground, Durumlar (`defaultShowLabels` false/true yan yana),
 Controlled, UzunIcerik (uzun etiket + NaN/kenetlenen koordinat), Responsive
 (mobile1 + dokunmatik 44px), Erişilebilirlik (docs description'lı).
 
-`Variants`/`Sizes`/`Temalar` ayrı story olarak yok: `material`/`variant`/
-`size` ekseni tanımlı değil (bkz. §5), tema toolbar'la otomatik doğrulanır
-(`GlassMatchScore`/`GlassMap` ile aynı karar).
+`Variants`/`Sizes` ayrı story olarak yok: `material`/`variant`/
+`size` ekseni tanımlı değil (bkz. §5, `GlassMatchScore`/`GlassMap` ile aynı
+karar).
 
 ## 11. Test kabul kriterleri
 

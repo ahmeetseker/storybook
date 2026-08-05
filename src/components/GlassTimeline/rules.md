@@ -150,11 +150,10 @@ sırası: `events.length === 0` → emptyState; aksi halde her `event` için
 zemin üzerinde WCAG "non-text contrast" ≥3:1 eşiğini açık temada kaçırıyordu
 (ölçülen: success ~2.22:1, warning ~2.20:1, danger ~3.55:1 — bkz. Codex
 dalga4 konsolide raporu). Fix: `color-mix(in srgb, var(--lg-<tone>) 68%,
-var(--lg-label))` — semantik rengin `--lg-label` ile karışımı. `--lg-label`
-temalar arası ters yönde uçlaştığı (açıkta koyu, koyuda açık) için TEK
-formül her iki temada da ≥3:1 sağlar: açık temada ölçülen sonuç success
-~3.95:1, warning ~3.90:1, danger ~5.88:1; koyu temada tümü ≥6.6:1. İkonlu
-marker'da aynı formül ikonun `color`'ına uygulanır (zemin tint'i dekoratif
+var(--lg-label))` — semantik rengin `--lg-label` ile karışımı; `--lg-label`
+koyu olduğu için bu formül ≥3:1 eşiğini güvenle sağlar: ölçülen sonuç
+success ~3.95:1, warning ~3.90:1, danger ~5.88:1. İkonlu marker'da aynı
+formül ikonun `color`'ına uygulanır (zemin tint'i dekoratif
 kaldığı için ham renkte bırakılabilir — kontrast hedefi anlam taşıyan
 grafiğe, yani ikonun kendisine bakar).
 
@@ -175,9 +174,7 @@ Var: Default, Playground, Variants (`line` vs `compact` yan yana), Durumlar
 (ton ekseni: default/success/warning/danger + boş liste), Uzun İçerik,
 Responsive (mobile1, 320px), Erişilebilirlik (docs description'lı).
 
-`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil. `Temalar` ayrı
-story değil — tema toolbar'la otomatik doğrulanır (component yalnız token
-tüketir, tema-özel dallanma yok).
+`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil.
 
 ## 11. Test kabul kriterleri
 
@@ -193,7 +190,7 @@ tüketir, tema-özel dallanma yok).
 - [x] `event.id` hiçbir DOM `id` özniteliğine yazılmaz
 - [x] `children` prop tipinden omit edilmiştir — tip-only regresyon testi (`@ts-expect-error`) derleme zamanı sözleşmesini doğrular
 - [x] Ton noktaları (`marker`/`compactDot`/ikonlu marker `color`) ham semantik renk yerine `color-mix(... 68%, var(--lg-label))` kullanır — kaynak CSS regresyon testiyle statik doğrulanır
-- [ ] Kağıt/Grafit temalarında nokta/hairline kontrastı (visual, Chrome)
+- [ ] Nokta/hairline kontrastı (visual, Chrome)
 
 ## 12. Do / Don't
 

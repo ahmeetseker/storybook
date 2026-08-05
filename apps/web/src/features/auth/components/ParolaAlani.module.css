@@ -1,0 +1,100 @@
+/* Göster/gizle düğmeli parola alanı.
+
+   Telefon alanıyla (`TelefonAlani.module.css`) aynı reçete: çerçeve ve odak
+   halkası sarmalayıcıda, içerideki kontroller çerçevesiz. İki alan kayıt
+   formunda yan yana durduğu için ölçüleri birbirini tutmak zorunda. */
+
+.grup {
+  display: flex;
+  align-items: stretch;
+  min-block-size: var(--lg-control-md);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+.grup:has(:focus-visible) {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.grup[data-hatali] {
+  border-color: var(--lg-danger);
+}
+
+.girdi {
+  flex: 1;
+  min-inline-size: 0;
+  padding-inline: var(--lg-space-3);
+  border: 0;
+  background: none;
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-body);
+}
+
+/* Halka gruba taşındı — iç içe iki halka çizilmesin. */
+.girdi:focus-visible {
+  outline: none;
+}
+
+/* Tarayıcının kendi parola gösterme/temizleme düğmeleri (Edge'in "göz"ü,
+   Safari'nin temizleme çarpısı) bizimkinin yanında ikinci bir kontrol olarak
+   belirir; ikisi de aynı işi yapınca alan iki farklı gözle sunulur. */
+.girdi::-ms-reveal,
+.girdi::-ms-clear {
+  display: none;
+}
+
+/* Dokunma hedefi 44px: düğme grubun tam yüksekliğini kaplar, genişliği de
+   parmak için yeterlidir. */
+.dugme {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--lg-control-hit);
+  padding: 0;
+  border: 0;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+}
+
+.dugme:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: calc(var(--lg-focus-ring-offset) * -1);
+}
+
+/* Basılı durum (parola görünür) yalnız ikonla değil renkle de ayrışır. */
+.dugme[aria-pressed='true'] {
+  color: var(--lg-accent);
+}
+
+@media (hover: hover) {
+  .dugme:hover {
+    color: var(--lg-label);
+  }
+
+  .dugme[aria-pressed='true']:hover {
+    color: var(--lg-accent);
+  }
+}
+
+.ikon {
+  inline-size: var(--lg-space-5);
+  block-size: var(--lg-space-5);
+}
+
+/* Bkz. KayitAdimSeridi.module.css — 1px kırpma geometrisi, token değil. */
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

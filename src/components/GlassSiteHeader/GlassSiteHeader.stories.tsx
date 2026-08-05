@@ -25,9 +25,10 @@ const Logo = () => (
   </>
 )
 
-const ThemeButton = () => (
-  <GlassButton size="sm" aria-label="Tema: sistem" title="Tema: sistem">
-    ◐
+/** `utility` slotu örneği — aksiyonların solunda duran küçük yardımcı eylem. */
+const LanguageButton = () => (
+  <GlassButton size="sm" aria-label="Dil: Türkçe" title="Dil: Türkçe">
+    TR
   </GlassButton>
 )
 
@@ -56,7 +57,7 @@ const meta = {
   args: {
     logo: <Logo />,
     links,
-    utility: <ThemeButton />,
+    utility: <LanguageButton />,
     secondaryAction: <AccountButton />,
     action: <CreateButton />,
     menuLabel: 'Menü',
@@ -111,9 +112,9 @@ export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
 }
 
-/** Kağıt teması — toolbar'daki tema seçicisiyle Grafit'e de bakılır. */
-export const Temalar: Story = {
-  parameters: { backgrounds: { default: 'light' } },
+/** Düz fildişi zemin: kapsül hairline'ı ve accent dolgusu arka planı sabitlenerek denetlenir. */
+export const DuzZemin: Story = {
+  parameters: { globals: { backgroundKey: 'light' } },
 }
 
 /**

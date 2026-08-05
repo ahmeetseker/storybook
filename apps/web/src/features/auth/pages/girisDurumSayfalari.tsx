@@ -1,30 +1,15 @@
 import { AuthStatusPage } from '../components/AuthStatusPage'
 
-/** E-posta bağlantısı gönderildikten sonra gösterilir. */
-export function BaglantiGonderildiPage() {
-  return (
-    <AuthStatusPage
-      tone="info"
-      baslik="Bağlantıyı gönderdik"
-      aciklama="E-posta kutunuzdaki giriş bağlantısına tıklayın. Bağlantı 15 dakika geçerlidir."
-      ikincilBaglanti={{ etiket: 'Başka bir yöntemle girin', hedef: '/giris' }}
-    />
-  )
-}
-
-/** Magic link süresi dolduğunda veya bozuk olduğunda gösterilir. */
-export function BaglantiGecersizPage() {
-  return (
-    <AuthStatusPage
-      tone="error"
-      baslik="Bağlantı geçersiz"
-      aciklama="Bu giriş bağlantısının süresi dolmuş veya daha önce kullanılmış. Yeni bir bağlantı isteyin."
-      birincilEylem={{ etiket: 'Yeni bağlantı iste', hedef: '/giris' }}
-    />
-  )
-}
-
-/** Sınıflandırılamayan kimlik hatalarının düştüğü sayfa. */
+/**
+ * Sınıflandırılamayan kimlik hatalarının düştüğü sayfa.
+ *
+ * 2026-08-04: Bu dosyada ayrıca magic link durum sayfaları
+ * (`BaglantiGonderildiPage`, `BaglantiGecersizPage`) vardı. Rotaları
+ * bağlıydı ama hiçbir sayfa `girisBaslat('baglanti')` çağırmadığından yalnız
+ * URL yazarak erişilebiliyorlardı. Telefon+OTP birincil, parola ikincil
+ * yöntem olduğu için üçüncü bir yöntem taşınmıyor — magic link akışı
+ * tamamen kaldırıldı (karar K1, `docs/auth-eksikler-plani-2026-08-04.md`).
+ */
 export function GirisHataPage() {
   return (
     <AuthStatusPage

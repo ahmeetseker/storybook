@@ -190,7 +190,7 @@ Var: Default, Playground (tam public API), KaynakSiniflari (altı
 `sourceClass` yan yana), Cakisma (`conflicts` + `currentValueLabel`,
 `defaultOpen`), BayatKaynak (`freshness='stale'`), UzunIcerik (uzun
 sağlayıcı adı + üç sınırlama, dar container), Responsive (240px + mobile
-viewport), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik (açık panel +
+viewport), Erişilebilirlik (açık panel +
 `sourceHref` linki ile focus sırası). Eksik yok — matris tam.
 
 ## 11. Test kabul kriterleri
@@ -205,7 +205,6 @@ viewport), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik (açık panel 
 - [x] `[data-material="glass"]` üretmez — cam bütçesini tüketmez (unit)
 - [x] erişilebilir ad `fieldLabel` içerir (unit)
 - [ ] focus-visible halkasının yalnız klavye odağında göründüğü (visual)
-- [ ] Kağıt/Grafit temalarında rozet tonlarının kontrastı (visual)
 
 ## 12. Do / Don't
 

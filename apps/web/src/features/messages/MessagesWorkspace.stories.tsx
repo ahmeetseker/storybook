@@ -678,19 +678,10 @@ function story(
   }
 }
 
-/** Kağıt temada dolu iki panel ve kişi × ilan bağlamı. */
-export const DefaultPaper = story(
-  createDefaultSource,
-  { defaultConversationId: DEFAULT_CONVERSATION_ID },
-  { globals: { backgroundKey: 'light' } },
-)
-
-/** Grafit tema aynı semantik token ve içerik hiyerarşisini korur. */
-export const DefaultGraphite = story(
-  createDefaultSource,
-  { defaultConversationId: DEFAULT_CONVERSATION_ID },
-  { globals: { backgroundKey: 'dark' } },
-)
+/** Dolu iki panel ve kişi × ilan bağlamı. */
+export const Default = story(createDefaultSource, {
+  defaultConversationId: DEFAULT_CONVERSATION_ID,
+})
 
 /** Okunmamış filtresi, sayaçları renk dışı metinle de ifade eder. */
 export const UnreadConversations = story(

@@ -215,9 +215,8 @@ Var: Default, Playground, Variants (panel/inline), ListPriceKarsilastirma
 geri bildirimli), UzunIcerik (uzun `asOf`, büyük sayılar), Responsive
 (mobile1), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Materials`/`Temalar` story'si N/A — tek sabit ölçek, cam eksen
-yok, tema toolbar'la otomatik doğrulanır (`GlassAiSummaryCard` ile aynı
-karar).
+`Sizes`/`Materials` story'si N/A — tek sabit ölçek, cam eksen yok
+(`GlassAiSummaryCard` ile aynı karar).
 
 ## 11. Test kabul kriterleri
 
@@ -246,7 +245,7 @@ karar).
 - [x] `loading` canlı bölgesi her zaman mount'lu kalır — loading↔içerik
       geçişinde aynı DOM düğümü sürer, yalnız metni güncellenir
 - [x] `inline` varyant tek satırda rozet + tahmin + aralık metni gösterir
-- [ ] iki temada (Kağıt/Grafit) rozet/nokta kontrastı (visual)
+- [ ] Rozet/nokta kontrastı (visual)
 - [ ] dar container'da ray/legend kırılması (visual)
 
 ## 12. Do / Don't

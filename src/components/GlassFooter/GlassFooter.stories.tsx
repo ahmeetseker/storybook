@@ -1,7 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef } from "react";
-import { GlassFooter, type GlassFooterColumn } from "./GlassFooter";
+import {
+  GlassFooter,
+  type GlassFooterColumn,
+  type GlassFooterHighlights,
+  type GlassFooterSocialLink,
+} from "./GlassFooter";
 import { GlassButton } from "../GlassButton";
+import { placeholderImage } from "../../demo/placeholderImage";
 
 const columns: GlassFooterColumn[] = [
   {
@@ -19,6 +25,7 @@ const columns: GlassFooterColumn[] = [
       { label: "AI danışman", href: "/ai-danisman" },
       { label: "Karşılaştır", href: "/karsilastir" },
       { label: "Favoriler", href: "/favoriler" },
+      { label: "Güven merkezi", href: "/konseptler/guven-merkezi" },
     ],
   },
   {
@@ -27,19 +34,28 @@ const columns: GlassFooterColumn[] = [
       { label: "İlan ver", href: "/ilan-ver" },
       { label: "Hesabım", href: "/hesabim" },
       { label: "Mesajlar", href: "/hesabim/mesajlar" },
-    ],
-  },
-  {
-    title: "Güven",
-    links: [
-      {
-        label: "Güven merkezi",
-        href: "/konseptler/guven-merkezi",
-      },
       { label: "Ana sayfa konseptleri", href: "/konseptler" },
     ],
   },
 ];
+
+// Vitrin kolonu: marka + link sütunları + son eklenen ilanlar — geniş footer'ın
+// tam anatomisi. Üç link sütunu + vitrin, 1120px içerik genişliğine oturur.
+const highlights: GlassFooterHighlights = {
+  title: "Son eklenen ilanlar",
+  items: [
+    ["İzmir Urla Denize 900 m, İmarlı Köşe Parsel", "4.250.000 TL", "Urla", "#3a6f5f", "#1f4a3a"],
+    ["Antalya Kaş Deniz Manzaralı Arsa", "6.900.000 TL", "Kaş", "#3a7a8a", "#1f4a5f"],
+    ["Ankara Gölbaşı Yol Cepheli Yatırımlık Tarla", "1.850.000 TL", "Gölbaşı", "#8a6f3a", "#5f4a1f"],
+    ["Balıkesir Ayvalık Müstakil Tapulu Zeytinlik", "3.980.000 TL", "Ayvalık", "#5f6f3a", "#35431c"],
+  ].map(([label, meta, etiket, from, to], index) => ({
+    id: `ilan-${index}`,
+    label,
+    meta,
+    href: "/ilan/1084526631",
+    image: placeholderImage(etiket, from, to, 120, 120),
+  })),
+};
 
 const Brand = () => (
   <span
@@ -82,6 +98,14 @@ const Brand = () => (
   </span>
 );
 
+/** `socialLinks` ikonu — daireyi ve erişilebilir adı component çizer. */
+const SocialGlyph = ({ d }: { d: string }) => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden>
+    <path d={d} />
+  </svg>
+);
+
+/** Eski serbest `social` slotu — daireyi çağıran çizer (bkz. SerbestSosyalSlot). */
 const SocialIcon = ({
   href,
   label,
@@ -145,12 +169,40 @@ const Social = () => (
 
 const legal = "© 2026 arsam.net · Tüm hakları saklıdır.";
 
+// Alt barın sağ ucu: ikonlar dekoratif, erişilebilir ad `label`'dan gelir.
+const socialLinks: GlassFooterSocialLink[] = [
+  {
+    id: "x",
+    label: "X",
+    href: "https://x.com",
+    icon: <SocialGlyph d="M4 4l7.2 9.6L4.4 20h2.6l5.4-5.1 3.8 5.1H20l-7.5-10L19.4 4h-2.6l-4.9 4.7L8.4 4H4z" />,
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    href: "https://instagram.com",
+    icon: <SocialGlyph d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2zM17 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 12.9a4.9 4.9 0 1 1 0-9.8 4.9 4.9 0 0 1 0 9.8zM17.4 7.6a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />,
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    href: "https://youtube.com",
+    icon: <SocialGlyph d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z" />,
+  },
+  {
+    id: "linkedin",
+    label: "LinkedIn",
+    href: "https://linkedin.com",
+    icon: <SocialGlyph d="M6.5 8.5V19H3.4V8.5h3.1zM4.9 4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6zM20.6 13v6h-3.1v-5.4c0-1.4-.5-2.3-1.7-2.3-.9 0-1.5.6-1.7 1.2-.1.2-.1.5-.1.8V19h-3.1V8.5h3.1v1.4c.4-.6 1.2-1.6 2.9-1.6 2.1 0 3.7 1.4 3.7 4.7z" />,
+  },
+];
+
 const meta = {
   title: "Bileşenler/Vitrin ve Yerleşim/GlassFooter",
   component: GlassFooter,
   parameters: { layout: "fullscreen" },
   tags: ["autodocs"],
-  args: { columns, legal, brand: <Brand />, social: <Social /> },
+  args: { columns, legal, brand: <Brand />, highlights, socialLinks },
 } satisfies Meta<typeof GlassFooter>;
 
 export default meta;
@@ -391,13 +443,42 @@ export const Focus: Story = {
   },
 };
 
+export const VitrinsizVeSosyalsiz: Story = {
+  name: "Vitrinsiz — yalnız link sütunları",
+  args: { highlights: undefined, socialLinks: undefined },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Vitrin kolonu ve sosyal bağlantılar opsiyoneldir; ikisi de yokken footer link " +
+          "sütunlarına iner ve orta blok kalan genişliği alır.",
+      },
+    },
+  },
+};
+
+export const SerbestSosyalSlot: Story = {
+  name: "Serbest sosyal slot",
+  args: { socialLinks: undefined, social: <Social /> },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`socialLinks` yerine `social` ReactNode'u da verilebilir — o zaman daireyi ve " +
+          "erişilebilir adı çağıran çizer. İkisi birlikte verilirse `socialLinks` kazanır.",
+      },
+    },
+  },
+};
+
 export const Erisilebilirlik: Story = {
   name: "Erişilebilirlik",
   parameters: {
     docs: {
       description: {
         story:
-          "Tab sırası: marka bağlantısı → sütun linkleri (soldan sağa, yukarıdan aşağı) → sosyal ikonlar. " +
+          "Tab sırası: marka bağlantısı → sütun linkleri (soldan sağa, yukarıdan aşağı) → vitrin ilanları → sosyal ikonlar. " +
+          "Vitrin görselleri dekoratiftir (alt=\"\"); sosyal ikonlar aria-hidden, ad `label`'dan gelir. " +
           'Sütun başlıkları heading değildir; tek landmark çifti: contentinfo + "Alt bilgi" nav. ' +
           "Klavyeyle gezinip :focus-visible halkasını doğrulayın.",
       },

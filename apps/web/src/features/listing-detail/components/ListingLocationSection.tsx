@@ -1,5 +1,6 @@
-import { useId } from 'react'
+import { useId, useMemo } from 'react'
 import { GlassMap } from '@repo/ui'
+import { pointBasemap } from '@/config/basemap'
 
 import type {
   ListingApproximateGeo,
@@ -114,6 +115,15 @@ export function ListingLocationSection({ location, geo, nearby }: ListingLocatio
   const baseId = useId()
   const summaryId = `${baseId}-konum-ozeti`
   const places = [...(nearby ?? [])].sort((a, b) => distanceOrder(a) - distanceOrder(b))
+  // Zemin SABİT referans olmalı: her render'da yeni nesne üretilirse Leaflet
+  // örneği baştan kurulur ve harita sürekli titrer (bkz. useBasemap kurulum
+  // efektinin bağımlılıkları).
+  const geoLat = geo?.kind === 'geographic' ? geo.lat : undefined
+  const geoLng = geo?.kind === 'geographic' ? geo.lng : undefined
+  const basemap = useMemo(
+    () => (geoLat !== undefined && geoLng !== undefined ? pointBasemap([geoLat, geoLng], 13) : undefined),
+    [geoLat, geoLng],
+  )
 
   return (
     <section
@@ -153,7 +163,19 @@ export function ListingLocationSection({ location, geo, nearby }: ListingLocatio
               label="Yaklaşık konum haritası"
               aria-describedby={summaryId}
               pins={[]}
-              privacyCircle={{ x: 0.5, y: 0.5, r: privacyRadius(geo.radiusMeters) }}
+              // Gerçek zemin: kayıtta coğrafi koordinat VAR, bu yüzden
+              // şematik çizim değil gerçek harita gösterilir. Mahremiyet
+              // dairesi metre cinsinden verilir ve zeminle ölçeklenir;
+              // x/y/r yalnız zemin yüklenemezse devreye giren yedektir.
+              basemap={basemap}
+              privacyCircle={{
+                x: 0.5,
+                y: 0.5,
+                r: privacyRadius(geo.radiusMeters),
+                lat: geo.lat,
+                lng: geo.lng,
+                radiusMeters: geo.radiusMeters,
+              }}
               seed={`${geo.lat},${geo.lng}`}
             />
           </div>
@@ -162,9 +184,10 @@ export function ListingLocationSection({ location, geo, nearby }: ListingLocatio
             {geo.sourceLabel}
           </p>
           <p className={workspace.blockNote}>
-            Haritadaki nokta parselin tam merkezi değildir: ilan sahibinin mahremiyeti için
+            Haritadaki daire parselin tam yerini göstermez: ilan sahibinin mahremiyeti için
             konum {formatDistance(geo.radiusMeters)} yarıçaplı bir alanla gösterilir. Zemin
-            şematiktir; daire yaklaşık alanı temsil eder, ölçeğe göre çizilmemiştir.
+            gerçek haritadır ve daire bu ölçeğe göre çizilir; parsel bu alanın içinde
+            herhangi bir noktada olabilir.
           </p>
         </>
       ) : null}

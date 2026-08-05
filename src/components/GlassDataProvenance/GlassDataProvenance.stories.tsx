@@ -171,8 +171,9 @@ export const Responsive: Story = {
   ),
 }
 
-/** Kağıt + Grafit: tema toolbar'dan değişir; rozet tonları (`data-tone`) her iki temada da okunur kalır. */
-export const Temalar: Story = {
+/** Düz fildişi zemin: rozet tonları (`data-tone`) arka plan sabitlenerek okunurluk için denetlenir. */
+export const DuzZemin: Story = {
+  parameters: { globals: { backgroundKey: 'light' } },
   args: Default.args,
   render: (args) => (
     <div style={{ maxWidth: 420, margin: '48px auto' }}>

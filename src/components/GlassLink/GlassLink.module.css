@@ -34,7 +34,7 @@
   font-weight: 600;
 }
 
-/* hover'da koyulaşma: accent'i label'a karıştır — iki temada da doğru yöne gider */
+/* hover'da koyulaşma: accent'i label'a karıştır — kontrast doğru yöne gider */
 @media (hover: hover) {
   .link:hover {
     color: color-mix(in srgb, var(--lg-accent) 72%, var(--lg-label));

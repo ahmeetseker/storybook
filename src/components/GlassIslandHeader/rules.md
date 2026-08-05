@@ -237,8 +237,7 @@ DurumYoluVeSsrSaati, UzunDurumYolu (`ilk › … › son` + son etiket
 ellipsis), RotaBaglantilari, UzunIcerik, Responsive (mobile1),
 Erisilebilirlik.
 
-`Sizes`/`Variants`/`Temalar` ayrı story olarak yok: eksen tanımlı değil,
-tema toolbar'la doğrulanır.
+`Sizes`/`Variants` ayrı story olarak yok: eksen tanımlı değil.
 
 ## 11. Test kabul kriterleri
 
@@ -262,7 +261,7 @@ tema toolbar'la doğrulanır.
 - [x] alt görünümden başka sayfaya doğrudan geçiş
 - [x] yeniden açılışta kart ızgarasına sıfırlanma
 - [x] `extras`/`search` slotları yalnız açıkken render
-- [ ] hap genişleme/chip reveal + tema görselleri (visual, Chrome)
+- [ ] hap genişleme/chip reveal (visual, Chrome)
 
 ## 12. Do / Don't
 

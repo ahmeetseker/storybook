@@ -90,7 +90,7 @@
 .panel {
   display: block;
   padding: var(--lg-space-3);
-  /* Takvim metni her zeminde okunur kalsın diye cam üstüne hafif tema örtüsü */
+  /* Takvim metni her zeminde okunur kalsın diye cam üstüne hafif zemin örtüsü */
   background-color: color-mix(in srgb, var(--lg-bg) 62%, transparent);
 }
 .panel > span:last-child { display: block; }

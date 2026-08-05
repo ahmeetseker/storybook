@@ -108,7 +108,7 @@ describe('GlassCompareBar — Karşılaştır eylemi', () => {
   })
 
   // Regresyon: kontrast bulgusu (semantik uyarı rengi doğrudan ipucu METNİNE
-  // karışıyordu, Kağıt temada AA'nın altına düşüyordu — bkz. rules.md §11).
+  // karışıyordu, fildişi zeminde AA'nın altına düşüyordu — bkz. rules.md §11).
   // Düzeltme: metin her zaman `.hint` sınıfını (salt `--lg-label-secondary`)
   // taşır; `--lg-warning` yalnız dekoratif, `aria-hidden` bir `.hintDot`
   // üzerinde yaşar. Bu test o ayrımın regresyona uğramadığını doğrular.

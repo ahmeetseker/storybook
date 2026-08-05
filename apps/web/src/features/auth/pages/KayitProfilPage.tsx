@@ -15,8 +15,24 @@ const AKTIF_INDEKS = SERIT.length - 1
 /**
  * Kayıt sonrası eksik profil alanlarını tamamlar. Oturum gerektirir;
  * koruma (yönlendirme + hidrasyon-güvenli bekleme) `KorumaliSayfa` sağlar.
+ *
+ * Form, `KorumaliSayfa`'nın İÇİNDE ayrı bir bileşendir ve bu ayrım
+ * zorunludur: alanlar ilk değerlerini oturumdan alıyor
+ * (`useState(oturum?.adSoyad ?? '')`) ve `useState` yalnız İLK render'da
+ * okunur. Oturum artık asenkron çözüldüğü için (`oturumuCoz`), dış bileşen
+ * oturum gelmeden önce de render olur — form orada kurulsaydı alanlar boş
+ * seed edilir ve oturum geldiğinde bir daha güncellenmezdi. İçeride kurulunca
+ * bileşen ancak `kimlikli` durumunda mount olur, yani oturum garanti vardır.
  */
 export function KayitProfilPage() {
+  return (
+    <KorumaliSayfa>
+      <ProfilFormu />
+    </KorumaliSayfa>
+  )
+}
+
+function ProfilFormu() {
   const { oturum, adapters, oturumuTazele } = useAuthSession()
   const navigate = useNavigate()
   const { donus } = useSearch({ strict: false }) as { donus?: string }
@@ -43,56 +59,54 @@ export function KayitProfilPage() {
   }
 
   return (
-    <KorumaliSayfa>
-      <AuthFormPage
-        baslik="Profilinizi tamamlayın"
-        aciklama="Bu bilgiler ilanlarınızda ve mesajlarınızda görünür."
-        ustSerit={
-          <KayitAdimSeridi
-            adimlar={SERIT}
-            aktifIndeks={AKTIF_INDEKS}
-            sayac={
-              <KayitAdimSayaci
-                aktifIndeks={AKTIF_INDEKS}
-                toplam={SERIT.length}
-                baslik={SERIT[AKTIF_INDEKS].baslik}
-              />
-            }
-          />
-        }
-        hata={hata}
-        onSubmit={gonder}
-        gonderEtiketi="Kaydet ve devam et"
-        gonderiliyor={gonderiliyor}
-      >
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="profil-ad">
-            Ad soyad
-          </label>
-          <input
-            id="profil-ad"
-            className={styles.input}
-            type="text"
-            autoComplete="name"
-            value={adSoyad}
-            onChange={(event) => setAdSoyad(event.target.value)}
-          />
-        </div>
+    <AuthFormPage
+      baslik="Profilinizi tamamlayın"
+      aciklama="Bu bilgiler ilanlarınızda ve mesajlarınızda görünür."
+      ustSerit={
+        <KayitAdimSeridi
+          adimlar={SERIT}
+          aktifIndeks={AKTIF_INDEKS}
+          sayac={
+            <KayitAdimSayaci
+              aktifIndeks={AKTIF_INDEKS}
+              toplam={SERIT.length}
+              baslik={SERIT[AKTIF_INDEKS].baslik}
+            />
+          }
+        />
+      }
+      hata={hata}
+      onSubmit={gonder}
+      gonderEtiketi="Kaydet ve devam et"
+      gonderiliyor={gonderiliyor}
+    >
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="profil-ad">
+          Ad soyad
+        </label>
+        <input
+          id="profil-ad"
+          className={styles.input}
+          type="text"
+          autoComplete="name"
+          value={adSoyad}
+          onChange={(event) => setAdSoyad(event.target.value)}
+        />
+      </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="profil-eposta">
-            E-posta
-          </label>
-          <input
-            id="profil-eposta"
-            className={styles.input}
-            type="email"
-            autoComplete="email"
-            value={ePosta}
-            onChange={(event) => setEPosta(event.target.value)}
-          />
-        </div>
-      </AuthFormPage>
-    </KorumaliSayfa>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="profil-eposta">
+          E-posta
+        </label>
+        <input
+          id="profil-eposta"
+          className={styles.input}
+          type="email"
+          autoComplete="email"
+          value={ePosta}
+          onChange={(event) => setEPosta(event.target.value)}
+        />
+      </div>
+    </AuthFormPage>
   )
 }

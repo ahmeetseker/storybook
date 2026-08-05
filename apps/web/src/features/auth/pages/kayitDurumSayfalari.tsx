@@ -13,6 +13,10 @@ export function HesapVarPage() {
       baslik="Bu hesap zaten var"
       aciklama="Girdiğiniz e-posta adresiyle bir hesap bulunuyor. Giriş yaparak devam edebilirsiniz."
       birincilEylem={{ etiket: 'Giriş yapın', hedef: '/giris' }}
+      // Buraya düşen kullanıcının hesabı var ama parolasını hatırlamıyor
+      // olması çok olası — tek seçeneği "Giriş yapın" olmamalı. Parola
+      // sıfırlama akışı İP-2'de yazıldı, bağlantı artık ölü değil.
+      ikincilBaglanti={{ etiket: 'Parolanızı mı unuttunuz?', hedef: '/parola-sifirla' }}
     />
   )
 }

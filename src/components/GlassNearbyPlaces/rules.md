@@ -80,7 +80,7 @@ Varsayılan kombinasyon: `variant=chips`, controlled prop'lar verilmemiş
 | Eksen | Durum |
 |---|---|
 | `material` | N/A — flat içerik yüzeyi, cam eksen yok |
-| `tone` (light/dark/auto) | N/A — component `GlassSurface` kullanmaz, tema `data-theme` kök token'larından otomatik gelir |
+| `tone` (light/dark/auto) | N/A — component `GlassSurface` kullanmaz, renkler `:root` kök token'larından otomatik gelir |
 | `size` | N/A — spec'te istenmedi (§9 borç yok, zaten token'lı tek ölçek) |
 | `thickness`/`prominent` | N/A — cam olmayan component |
 
@@ -176,8 +176,8 @@ Var: Default, Playground, Variants (chips/tabs yan yana), Controlled
 olmayan başlangıç sekmesi + boş kategori), UzunIcerik, Responsive (mobile1 +
 320px konteyner), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Temalar` ayrı story olarak yok: `size` ekseni tanımlı değil, tema
-toolbar'la otomatik doğrulanır (GlassScoreMeter ile aynı karar).
+`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (GlassScoreMeter
+ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

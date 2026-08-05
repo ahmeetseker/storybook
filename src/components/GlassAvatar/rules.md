@@ -123,7 +123,7 @@ garanti); koyu `tint` verilirse kontrast çağıranın sorumluluğunda.
 Var: Default (görsel), BasHarfler (TR büyütme + pastel), KirikGorsel
 (onError fallback), Boyutlar, Sekiller, Durumlar, MobilSaticiSatiri
 (responsive: avatar sabit, metin daralır — mobile1 viewport).
-**Eksik:** koyu tema karşılaştırması, yükleme anı (skeleton ile kompozisyon).
+**Eksik:** yükleme anı (skeleton ile kompozisyon).
 
 ## 11. Test kabul kriterleri
 

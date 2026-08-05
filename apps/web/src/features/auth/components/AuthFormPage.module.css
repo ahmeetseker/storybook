@@ -1,7 +1,7 @@
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--lg-space-5);
+  gap: var(--lg-space-6);
 }
 
 .header {
@@ -10,17 +10,24 @@
   gap: var(--lg-space-2);
 }
 
-/* Sayfa başlığı title ölçeğinde — display (28px) marka/hero ölçüsüdür. */
+/* Başlık `--lg-text-display`i AŞMAZ — 28px bu sistemde marka/hero tavanıdır.
+   Kabuk iki kolona ayrıldıktan sonra sütun genişlediği için başlık artık
+   title'da sabit değil, `GlassHero`'daki desenle kademelenir: dar ekranda
+   title, geniş ekranda display. */
 .title {
   margin: 0;
-  font-size: var(--lg-text-title);
+  font-size: clamp(var(--lg-text-title), 2.6vw, var(--lg-text-display));
   font-weight: 700;
-  letter-spacing: -0.022em;
+  line-height: 1.15;
+  letter-spacing: -0.028em;
 }
 
+/* Alt başlık footnote'tan body'ye çıktı: iki kolonlu düzende başlık bloğu
+   sayfanın giriş cümlesidir ve caption ölçeğinde okunmuyordu. */
 .description {
   margin: 0;
-  font-size: var(--lg-text-footnote);
+  font-size: var(--lg-text-body);
+  line-height: 1.45;
   color: var(--lg-label-secondary);
   max-inline-size: var(--lg-measure);
 }

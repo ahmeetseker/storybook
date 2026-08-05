@@ -162,7 +162,7 @@ prop'undan gelir.
 Var: Default, Playground (tam public API), Layouts (rail/bar yan yana),
 Materials (glass/flat), States (disabled primary, pressed utility),
 UzunIcerik (uzun TR eylem metinleri), Responsive (360px + `bar` düzeni,
-dokunmatik hedefler), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik
+dokunmatik hedefler), Erişilebilirlik
 (grup adı + DOM sekme sırası). Eksik yok — matris tam.
 
 ## 11. Test kabul kriterleri
@@ -175,7 +175,6 @@ dokunmatik hedefler), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik
 - [x] `note` eylemlerin altında görünür metin olarak render edilir (unit)
 - [x] `layout="bar"` kök elementte `data-layout="bar"` üretir (unit)
 - [ ] `bar` düzeninde `env(safe-area-inset-bottom)` alt boşluğunun cihazda doğru uygulandığı (visual)
-- [ ] Kağıt/Grafit temalarında accent dolgu ve hairline kontrastı (visual)
 - [ ] dokunmatik viewport'ta tüm hedeflerin ≥44px olduğu (visual)
 
 ## 12. Do / Don't

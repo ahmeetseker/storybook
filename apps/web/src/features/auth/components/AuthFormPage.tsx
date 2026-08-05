@@ -8,7 +8,7 @@ export interface AuthIkincilBaglanti {
   hedef: string
 }
 
-export interface AuthFormPageProps {
+interface AuthFormPageTemelProps {
   baslik: string
   aciklama?: string
   /**
@@ -18,21 +18,48 @@ export interface AuthFormPageProps {
   ustSerit?: ReactNode
   /** Sunucudan veya doğrulamadan gelen hata — role="alert" ile duyurulur. */
   hata?: string
-  onSubmit(event: FormEvent<HTMLFormElement>): void
-  /** Varsayılan tek gönder butonunun etiketi. `aksiyonlar` verilirse kullanılmaz. */
-  gonderEtiketi?: string
-  gonderiliyor?: boolean
   /**
-   * Varsayılan tek gönder butonunun YERİNE geçen aksiyon satırı (ör. çok
-   * adımlı kayıtta "Geri" + "Devam et"). Hidrasyon bayrağı parametre olarak
-   * verilir: özel butonlar da hidrasyon tamamlanana kadar devre dışı
-   * kalmalıdır, yoksa erken tıklama native form gönderimine düşer ve
-   * `donus` sessizce kaybolur (aşağıdaki uzun nota bakın).
+   * Her gönderim denemesinde ARTAN sayaç. `role="alert"` düğümü bu değeri
+   * `key` olarak kullanır, böylece AYNI hata metni ikinci kez oluştuğunda da
+   * düğüm yeniden takılır ve ekran okuyucu tekrar duyurur.
+   *
+   * Buna neden gerek var: `setHata(undefined)` ve `setHata(ozet)` aynı tick
+   * içinde çağrılırsa React ikisini toplar ve DOM'da hiçbir değişiklik olmaz
+   * — canlı bölge yalnız İÇERİĞİ değiştiğinde duyurduğu için kullanıcı ikinci
+   * denemede hiçbir şey duymaz. Sayacı vermeyen sayfalar eski davranışta
+   * kalır (tek gönderimlik akışlarda sorun değildir).
    */
-  aksiyonlar?: (durum: { hidrasyonTamam: boolean }) => ReactNode
+  hataAnahtari?: number
+  onSubmit(event: FormEvent<HTMLFormElement>): void
+  gonderiliyor?: boolean
   ikincilBaglantilar?: readonly AuthIkincilBaglanti[]
   children: ReactNode
 }
+
+/**
+ * Gönderim satırı ya VARSAYILAN tek butondur (`gonderEtiketi` zorunlu) ya da
+ * TAMAMEN özel bir aksiyon satırıdır (`aksiyonlar`) — ikisi birden ya da
+ * hiçbiri verilemez.
+ *
+ * Ayrık birleşim olmasının sebebi: `gonderEtiketi` opsiyonelken unutulursa
+ * erişilebilir ismi olmayan bir submit butonu sessizce üretiliyordu; ne
+ * TypeScript ne de erişilebilirlik geçidi (yalnız `input` denetler) bunu
+ * yakalıyordu. Artık çağrı yerinde derleme hatası olur.
+ */
+type AuthFormGonderimProps =
+  | { gonderEtiketi: string; aksiyonlar?: never }
+  | {
+      /**
+       * Hidrasyon bayrağı parametre olarak verilir: özel butonlar da hidrasyon
+       * tamamlanana kadar devre dışı kalmalıdır, yoksa erken tıklama native
+       * form gönderimine düşer ve `donus` sessizce kaybolur (aşağıdaki uzun
+       * nota bakın).
+       */
+      aksiyonlar: (durum: { hidrasyonTamam: boolean }) => ReactNode
+      gonderEtiketi?: never
+    }
+
+export type AuthFormPageProps = AuthFormPageTemelProps & AuthFormGonderimProps
 
 /** Auth akışındaki form sayfalarının ortak iskeleti. */
 export function AuthFormPage({
@@ -40,6 +67,7 @@ export function AuthFormPage({
   aciklama,
   ustSerit,
   hata,
+  hataAnahtari,
   onSubmit,
   gonderEtiketi,
   gonderiliyor = false,
@@ -74,7 +102,7 @@ export function AuthFormPage({
         <div className={styles.fields}>{children}</div>
 
         {hata ? (
-          <p className={styles.error} role="alert">
+          <p key={hataAnahtari} className={styles.error} role="alert">
             {hata}
           </p>
         ) : null}

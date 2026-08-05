@@ -32,7 +32,7 @@ export const WithoutButton: Story = {
 /**
  * Malzeme karşılaştırması: içerik sayfasında `material="flat"` önerilir — harita
  * görseli zaten doygun renklidir (bkz. rules.md §12). Harita deseni her iki malzemede
- * aynı render edilir (bilinen borç: tema duyarsız).
+ * aynı render edilir (bilinen borç: malzeme duyarsız).
  */
 export const Materials: Story = {
   args: {

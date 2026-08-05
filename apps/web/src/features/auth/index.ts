@@ -19,4 +19,7 @@ export type {
   KurumsalBasvuruBilgileri,
   KayitAlanHatalari,
   KurumsalAlanHatalari,
+  // `KayitBilgileri.telefonUlke`'nin tipi — bilgileri kuran her çağıran
+  // buna da ihtiyaç duyar.
+  TelefonUlkeKodu,
 } from './domain/auth-types'

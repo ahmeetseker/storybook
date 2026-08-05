@@ -46,7 +46,7 @@ Kaynak: Tailark `hero-section-1`'in `HeroHeader`'ı; Liquid Glass uyarlaması.
 |---|---|---|
 | logo | ✅ | Wordmark/monogram — harf-kutusu kalıbı kullanılmaz |
 | links | — | Boşsa nav, hamburger ve panel render edilmez |
-| utility | — | Küçük yardımcı ikon buton (tema vb.) — aksiyonların solunda |
+| utility | — | Küçük yardımcı ikon buton (dil/bildirim vb.) — aksiyonların solunda |
 | secondaryAction | — | İkincil aksiyon ("Üye girişi") |
 | action | — | TEK birincil CTA ("İlan ver") |
 | condensedAction | — | Verilirse condensed'de utility+secondary+action üçlüsünün yerine geçer |
@@ -254,7 +254,7 @@ tek seçicide birleştirilebilirdi, bilinçli olarak ertelendi.
 ## 10. Storybook kapsamı
 
 Default, Playground, ScrollDurumlari (`Variants/Materials` yerine — varyant
-ekseni yok), Durumlar, UzunIcerik, Responsive, Temalar, Erisilebilirlik.
+ekseni yok), Durumlar, UzunIcerik, Responsive, Erisilebilirlik.
 `Sizes`: N/A — `size` ekseni yok. Story zeminleri 220vh olduğu için scroll
 morfu canlı denenebilir.
 

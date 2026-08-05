@@ -44,7 +44,7 @@ const sayfalar: YasalSayfa[] = [
     baslik: 'Çerez Politikası',
     guncelleme: '15 Mayıs 2026',
     paragraflar: [
-      'ArsaPazar; oturumunuzu açık tutmak, tema ve dil tercihlerinizi hatırlamak için zorunlu çerezler, site kullanımını anonim olarak ölçmek için ise isteğe bağlı analitik çerezler kullanır. Zorunlu çerezler platformun çalışması için gereklidir ve kapatılamaz.',
+      'ArsaPazar; oturumunuzu açık tutmak ve dil tercihinizi hatırlamak için zorunlu çerezler, site kullanımını anonim olarak ölçmek için ise isteğe bağlı analitik çerezler kullanır. Zorunlu çerezler platformun çalışması için gereklidir ve kapatılamaz.',
       'İsteğe bağlı çerezleri, sayfa altbilgisindeki "Çerez Tercihleri" bağlantısından dilediğiniz an açıp kapatabilirsiniz. Tarayıcı ayarlarınızdan tüm çerezleri silmeniz hâlinde oturumunuz sonlanır ve tercihlerinizin yeniden sorulması gerekir.',
     ],
   },

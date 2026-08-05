@@ -53,9 +53,8 @@
 }
 /* Ton noktaları anlam taşıyan grafiklerdir (WCAG "non-text contrast" ≥3:1) —
    ham `--lg-success/warning/danger` yüzeye karşı bu eşiği kaçırdığı için
-   `--lg-label` ile koyulaştırılmış (açık temada) / açılmış (koyu temada)
-   color-mix türevi kullanılır; `--lg-label` tema başına ters yönde uçlaştığı
-   için tek formül iki temada da ≥3:1 sağlar (bkz. rules.md §9). */
+   `--lg-label` ile koyulaştırılmış color-mix türevi kullanılır; karışım
+   yüzeyden uzaklaştığı için eşik ≥3:1'de kalır (bkz. rules.md §9). */
 .marker[data-tone='success'] {
   background: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));
 }

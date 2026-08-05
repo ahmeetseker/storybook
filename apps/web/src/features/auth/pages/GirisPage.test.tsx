@@ -11,20 +11,18 @@ import {
 } from '@tanstack/react-router'
 import { AuthSessionProvider } from '../AuthSessionProvider'
 import type { AuthAdapters } from '../data/auth-adapters'
+import { sahteAuthAdapters } from '../test-utils'
 import { GirisPage } from './GirisPage'
 
+/** Bu sayfa özelinde `girisBaslat` varsayılanı başarılı SMS sonucu döndürür. */
 function sahteAdapters(overrides: Partial<AuthAdapters> = {}): AuthAdapters {
-  return {
+  return sahteAuthAdapters({
     girisBaslat: vi.fn(async () => ({
       durum: 'basarili' as const,
       veri: { kanal: 'sms' as const, maskeliKimlik: '555 *** 22 33' },
     })),
-    koduDogrula: vi.fn(),
-    parolaIleGiris: vi.fn(),
-    oturumuGetir: () => null,
-    cikisYap: vi.fn(),
     ...overrides,
-  } as AuthAdapters
+  })
 }
 
 function girisRouter(adapters: AuthAdapters, baslangicYolu = '/giris') {

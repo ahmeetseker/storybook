@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MapFirstHome } from './MapFirstHome'
 
 vi.mock('@tanstack/react-router', () => ({
@@ -81,6 +81,42 @@ describe('MapFirstHome hero', () => {
     ).toBeDefined()
     expect(screen.getByRole('combobox', { name: 'Oda sayısı' })).toBeDefined()
     expect(screen.queryByRole('combobox', { name: 'Metrekare aralığı' })).toBeNull()
+  })
+
+  it('footer üstü SEO rafı uzun kuyruk sayfalarını gerçek bağlantı olarak sunar', () => {
+    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'En çok aranan arsa sayfaları' }),
+    ).toBeDefined()
+    expect(screen.getByRole('heading', { level: 3, name: 'Tarım ve zeytinlik' })).toBeDefined()
+
+    const ayvalik = screen.getByRole('link', {
+      name: /Balıkesir Ayvalık'ta zeytinlik sahibi olun/,
+    })
+    // Yönlendirme atan /arsa-ara değil, doğrudan 200 dönen arama URL'i.
+    expect(ayvalik.getAttribute('href')).toContain('/emlak?category=land')
+    expect(ayvalik.getAttribute('href')).not.toContain('/arsa-ara')
+
+    expect(
+      screen.getByRole('link', { name: /Ankara yatırımlık arsa fırsatları/ }),
+    ).toBeDefined()
+    expect(
+      screen.getByRole('link', { name: /Malatya'da satılık kayısı bahçesi/ }),
+    ).toBeDefined()
+    // Hub bağlantıları küme adıyla ayrışır — dördü de "Tümünü gör" olmaz.
+    expect(
+      screen.getByRole('link', { name: 'Tüm tarım arazisi sayfaları' }),
+    ).toBeDefined()
+  })
+
+  it('footer üstündeki dönen şerit ilanları bağlantı olarak taşır ve duraklatılabilir', () => {
+    render(<MapFirstHome showConceptNavigation={false} heroVariant="search" />)
+    const strip = screen.getByRole('list', { name: 'Öne çıkan ilanlar' })
+    const links = within(strip).getAllByRole('link')
+    expect(links.length).toBeGreaterThan(4)
+    expect(links[0].getAttribute('href')).toMatch(/\/ilan\/\d+$/)
+    // Otomatik başlayan hareket durdurulabilir olmalı (WCAG 2.2.2).
+    expect(screen.getByRole('button', { name: 'Şeridi duraklat' })).toBeDefined()
   })
 
   it('AI çıkarım chipi kaldırılınca listeden çıkar', () => {

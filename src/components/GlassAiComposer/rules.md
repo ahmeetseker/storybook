@@ -186,7 +186,6 @@ property): `--dot-size: 6px`, `--remove-size: 20px`,
 | States | ✅ (Yükleniyor, Cevapla, Akış simülasyonu) |
 | Uzun içerik | ✅ |
 | Responsive | ✅ |
-| Temalar | ✅ |
 | Erişilebilirlik | ✅ |
 
 Ek: Araçlarla, Eklerle, Akış simülasyonu.
@@ -213,7 +212,7 @@ Ek: Araçlarla, Eklerle, Akış simülasyonu.
   görsel metin korunur.
 
 **Visual**
-- Kağıt/Grafit temada düz yüzey ve hairline okunur kalır.
+- Kağıt temada düz yüzey ve hairline okunur kalır.
 - Dar container'da araç çubuğu sarar, dokunmatikte hedefler 44px'e çıkar.
 
 ## 12. Do / Don't

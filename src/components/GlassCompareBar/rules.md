@@ -198,9 +198,7 @@ Var: Default, Playground (yerel state ile kaldır/temizle/karşılaştır akış
 `Durum — Tek İlan` (N<2 disable+ipucu), `Durum — maxItems Aşımı` (N>4
 disable+ipucu, kırpma YOK), UzunIcerik, Responsive (mobile viewport),
 Erişilebilirlik (docs açıklamalı).
-**Eksik:** Variants/Materials/Sizes (N/A — eksen yok, §5) · Temalar (ayrı
-story yok — toolbar'la Kağıt/Grafit doğrulanır, tüm token'lar üzerinden
-otomatik, GlassCompareTable ile aynı emsal).
+**Eksik:** Variants/Materials/Sizes (N/A — eksen yok, §5).
 
 ## 11. Test kabul kriterleri
 
@@ -225,9 +223,9 @@ otomatik, GlassCompareTable ile aynı emsal).
       ve tıklama `onClear`'ı çağırır (unit)
 - [ ] `translateY` giriş/çıkış animasyonunun gerçekten süzülerek çalıştığı ve
       `prefers-reduced-motion: reduce`'ta anlık olduğu (visual, Chrome)
-- [x] Kağıt/Grafit tema kontrastı, özellikle `maxItems` aşımı ipucu rengi
+- [x] Kağıt teması kontrastı, özellikle `maxItems` aşımı ipucu rengi
       (visual) — düzeltme: ipucu metni her zaman salt `--lg-label-secondary`
-      (Kağıt'ta ~4.74:1, Grafit'te ~6.84:1, ikisi de AA'yı geçer); semantik
+      (~4.74:1, AA'yı geçer); semantik
       `--lg-warning` artık metne karışmıyor, yalnız dekoratif `.hintDot`
       noktasında kullanılıyor (kod review bulgusu)
 

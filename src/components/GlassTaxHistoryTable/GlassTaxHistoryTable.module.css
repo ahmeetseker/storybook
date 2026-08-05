@@ -112,7 +112,7 @@
 }
 
 /* Ok ikonu rengi ham semantik token yerine label ile koyulaştırılmış
-   color-mix kullanır — açık temada ham --lg-danger/--lg-success küçük
+   color-mix kullanır — ham --lg-danger/--lg-success küçük
    ikonda 3:1 anlamlı-grafik eşiğini kaçırıyordu (bkz. dalga4 QA raporu). */
 .change[data-direction='up'] .arrow {
   color: color-mix(in srgb, var(--lg-danger) 65%, var(--lg-label));

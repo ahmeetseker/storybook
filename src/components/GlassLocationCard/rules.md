@@ -111,8 +111,8 @@ hardcoded — temayla değişmez, bilinçli dekoratif) · harita paleti
 `--map-green-1/2` (#4a7a63/#2f5546), ızgara `--map-grid-line`
 rgba(255,255,255,.16) + adımları `--map-row-a/b` 34/36px,
 `--map-col-a/b` 46/48px, parlama `--map-glow` rgba(255,255,255,.18) /
-`--map-glow-size: 160px` — tümü tema duyarsız dekoratif görsel (Kağıt temada
-da koyu yeşil kalır; tema token'ına bağlanması Açık Kararlar'da). Bilinçli
+`--map-glow-size: 160px` — tümü tema duyarsız dekoratif görsel (koyu yeşil
+sabit kalır; tema token'ına bağlanması Açık Kararlar'da). Bilinçli
 bırakılan: pin `drop-shadow(0 4px 8px rgba(0,0,0,.35))` — `--lg-shadow-*`
 desenleriyle birebir eşleşmediğinden dokunulmadı.
 
@@ -120,8 +120,7 @@ desenleriyle birebir eşleşmediğinden dokunulmadı.
 
 Var: Default, WithoutButton, Materials (glass vs flat yan yana), UzunIcerik
 (uzun mahalle/site adı + çok satırlı note, dar container). **Eksik:**
-Playground, Responsive (geniş container), Temalar (harita deseninin iki
-temadaki görünümü — bilinen borç), Erişilebilirlik (haritanın AT'ye kapalı
+Playground, Responsive (geniş container), Erişilebilirlik (haritanın AT'ye kapalı
 olduğunu doğrulayan story). States N/A.
 
 ## 11. Test kabul kriterleri
@@ -130,7 +129,7 @@ olduğunu doğrulayan story). States N/A.
 - [x] "Haritada Aç" → `onOpenMap` 1 kez (interaction)
 - [ ] harita bloğu ve pin `aria-hidden` (a11y — regresyon)
 - [ ] `note` verilmeyince `<p>` render edilmez (unit)
-- [ ] flat + iki temada kart/harita kontrastı (visual)
+- [ ] flat kart/harita kontrastı (visual)
 
 ## 12. Do / Don't
 

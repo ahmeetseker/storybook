@@ -7,27 +7,28 @@ import { Meta } from '@storybook/addon-docs/blocks'
 Tek kaynak: `src/index.css`. Component'ler yalnız bu değişkenleri tüketir;
 raw px/hex kullanmaz (fallback değeri hariç: `var(--lg-accent, #0a84ff)`).
 
-## Renk — tema başına değişir
+## Renk
 
-Palet **WCAG 2.2 AAA (1.4.6, 7:1)** hedefine göre kalibre edilmiştir.
+Ürünün tek teması **Kağıt**'tır; palet tek bir değer sütunu olarak tanımlıdır ve
+**WCAG 2.2 AAA (1.4.6, 7:1)** hedefine göre kalibre edilmiştir.
 
-| Token | Kağıt (açık) | Grafit (koyu) | Kullanım |
-|---|---|---|---|
-| `--lg-bg` | `#FAF8F4` | `#121316` | Sayfa zemini |
-| `--lg-surface` | `#FFFFFF` | `#1B1C20` | Flat kart zemini |
-| `--lg-label` | `#24211B` | `#F2F2F3` | Birincil metin |
-| `--lg-label-secondary` | `#4F4B45` | `#BCBCC1` | İkincil metin |
-| `--lg-hairline` | `rgba(36,33,27,.09)` | `rgba(255,255,255,.10)` | Ayraç, kart kenarı |
-| `--lg-accent` | `#7C3806` | `#E9B179` | Vurgu (amber) |
-| `--lg-accent-contrast` | `#FFFFFF` | `#1A140C` | Vurgu üstü metin |
+| Token | Değer | Kullanım |
+|---|---|---|
+| `--lg-bg` | `#FAF8F4` | Sayfa zemini |
+| `--lg-surface` | `#FFFFFF` | Flat kart zemini |
+| `--lg-label` | `#24211B` | Birincil metin |
+| `--lg-label-secondary` | `#4F4B45` | İkincil metin |
+| `--lg-hairline` | `rgba(36,33,27,.09)` | Ayraç, kart kenarı |
+| `--lg-accent` | `#7C3806` | Vurgu (amber) |
+| `--lg-accent-contrast` | `#FFFFFF` | Vurgu üstü metin |
 
 Semantic tone renkleri token'dır (rozet, uyarı, doğrulama):
 
-| Token | Kağıt | Grafit |
-|---|---|---|
-| `--lg-danger` | `#911E17` | `#FFA49E` |
-| `--lg-warning` | `#703F00` | `#FFB44C` |
-| `--lg-success` | `#12572C` | `#58D478` |
+| Token | Değer |
+|---|---|
+| `--lg-danger` | `#911E17` |
+| `--lg-warning` | `#703F00` |
+| `--lg-success` | `#12572C` |
 
 **Kontrast ölçümü düz zeminle sınırlı değildir.** Component'ler rozet/uyarı
 zeminlerini `color-mix(… %7–12, --lg-surface)` ile üretir; bu tonlu yüzeyler
@@ -111,9 +112,11 @@ Tam daire gereken kare öğelerde (nokta, pin, avatar) `border-radius: 50%` yeri
 | `--lg-shadow-md` | Yüzen panel, popover, dock |
 | `--lg-shadow-lg` | Overlay — modal, command palette |
 
-Component CSS'inde raw `box-shadow: … rgba(…)` yazılmaz; koyu temada
-token'lar otomatik koyulaşır. (İç ışıma `inset` katmanları cam malzemenin
-parçasıdır ve `GlassSurface`'ta yaşar — bu ölçeğin dışındadır.)
+Component CSS'inde raw `box-shadow: … rgba(…)` yazılmaz; gölge yoğunluğu tek
+elden bu dört token'da ayarlanır. Elle yazılan rgba değerleri kaçınılmaz olarak
+ayrışır ve aynı yükseklikteki iki yüzey farklı derinlik gösterir. (İç ışıma
+`inset` katmanları cam malzemenin parçasıdır ve `GlassSurface`'ta yaşar — bu
+ölçeğin dışındadır.)
 
 ## Boşluk
 
@@ -183,4 +186,4 @@ taşıdığından çoğu yerde ölçü gerçekten büyütülür.
 
 - Dış margin token'ı yoktur; boşluk parent layout'tan (`gap`) gelir.
 - Disabled görünümü yalnız opacity düşürerek çözülmez (etkileşim de kapanır).
-- Tema değişimi hiçbir component'e prop olarak sızmaz.
+- Renk kararı hiçbir component'e prop olarak sızmaz; component token okur.

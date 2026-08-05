@@ -11,7 +11,7 @@
 // üzerinden basit doğrusal eşleme kullanılır:
 //   x ≈ (lng - 26) / (45 - 26)
 //   y ≈ (42 - lat) / (42 - 36)
-import type { GlassMapPin } from '@repo/ui'
+import { buildHeroPins, type HeroPin } from './heroPins'
 
 export type HeroTabId = 'arsa' | 'konut' | 'proje'
 
@@ -43,7 +43,12 @@ export interface HeroTab {
   quickFilters: string[]
   parsedFilters: HeroParsedFilter[]
   confidence: number
-  pins: GlassMapPin[]
+  /**
+   * Harita pinleri. Sekme başına `buildHeroPins` ile üretilir: kümeleme
+   * rozetlerinin ortaya çıkması için haritada gerçek bir yoğunluk olmalı,
+   * elle yazılmış birkaç pin ile iniş zinciri hiç başlamıyordu.
+   */
+  pins: HeroPin[]
   verifiedCount: string
   verifiedLabel: string
 }
@@ -80,13 +85,7 @@ export const HERO_TABS: HeroTab[] = [
       { id: 'imar', label: 'İmar', value: 'Konut' },
     ],
     confidence: 92,
-    pins: [
-      { id: '1084526631', lat: 38.322, lng: 26.764, x: 0.04, y: 0.613, price: '4.250.000 TL' },
-      { id: '1084526632', lat: 39.783, lng: 32.809, x: 0.358, y: 0.369, price: '1.850.000 TL' },
-      { id: '1084526634', lat: 36.2, lng: 29.64, x: 0.192, y: 0.967, price: '6.900.000 TL' },
-      { id: 'ege-cluster', lat: 37.04, lng: 27.43, x: 0.075, y: 0.827, count: 18 },
-      { id: 'marmara-cluster', lat: 40.35, lng: 29.06, x: 0.161, y: 0.275, count: 9 },
-    ],
+    pins: buildHeroPins('arsa'),
     verifiedCount: '18.412',
     verifiedLabel: 'doğrulanmış arsa ilanı',
   },
@@ -120,12 +119,7 @@ export const HERO_TABS: HeroTab[] = [
       { id: 'butce', label: 'Bütçe', value: '≤ 7.000.000 TL' },
     ],
     confidence: 88,
-    pins: [
-      { id: 'ist-cluster', lat: 41.01, lng: 28.98, x: 0.157, y: 0.165, count: 48 },
-      { id: 'konut-bursa', lat: 40.19, lng: 29.06, x: 0.161, y: 0.302, price: '6.400.000 TL' },
-      { id: 'ank-cluster', lat: 39.93, lng: 32.86, x: 0.361, y: 0.345, count: 31 },
-      { id: 'konut-izmir', lat: 38.42, lng: 27.14, x: 0.06, y: 0.597, price: '5.150.000 TL' },
-    ],
+    pins: buildHeroPins('konut'),
     verifiedCount: '42.860',
     verifiedLabel: 'doğrulanmış konut ilanı',
   },
@@ -157,11 +151,7 @@ export const HERO_TABS: HeroTab[] = [
       { id: 'teslim', label: 'Teslim', value: '2027' },
     ],
     confidence: 84,
-    pins: [
-      { id: 'proje-ist', lat: 41.01, lng: 28.98, x: 0.157, y: 0.165, price: '12 etap' },
-      { id: 'proje-antalya', lat: 36.9, lng: 30.7, x: 0.247, y: 0.85, price: '6 etap' },
-      { id: 'proje-ankara', lat: 39.93, lng: 32.86, x: 0.361, y: 0.345, count: 7 },
-    ],
+    pins: buildHeroPins('proje'),
     verifiedCount: '1.284',
     verifiedLabel: 'doğrulanmış proje',
   },

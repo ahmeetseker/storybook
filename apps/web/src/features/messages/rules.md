@@ -75,8 +75,8 @@ kullanıcı seçimiyle çalışır; prop senkronizasyonu veya query sonucu callb
 ## 5. Seçenek eksenleri
 
 Görsel `material`, `tone`, `size`, `variant`, `thickness`, `tint` veya
-`prominent` ekseni public workspace API'si değildir. Tema Kağıt/Grafit token
-bağlamından gelir. `mode` ve `connectionState` görsel variant değil domain
+`prominent` ekseni public workspace API'si değildir. Renkler `:root`
+token'larından gelir. `mode` ve `connectionState` görsel variant değil domain
 state'idir; capability'ler veri kaynağının entegrasyon sözleşmesidir.
 
 Varsayılan kombinasyon:
@@ -203,7 +203,7 @@ Coarse pointer'da kritik hedefler en az `--lg-control-md` olur. Focus yalnız
 
 | Part | Property | Token | State override |
 |---|---|---|---|
-| Page | zemin / metin | `--lg-bg`, `--lg-label` | Kağıt/Grafit |
+| Page | zemin / metin | `--lg-bg`, `--lg-label` | N/A |
 | Flat workspace | zemin / border / radius | `--lg-surface`, `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-card` | Compact grid |
 | Rows / bubbles | radius / border / renk | `--lg-radius-media`, `--lg-hairline`, `--lg-accent`, `--lg-accent-contrast` | Selected/outgoing |
 | Status / chips | radius / type | `--lg-radius-chip`, `--lg-text-caption`, `--lg-text-badge` | Connection/unread |
@@ -231,8 +231,7 @@ sözleşmesini aşan yeni tasarım geometrisi için kullanılamaz.
 
 | Story | Kanıt |
 |---|---|
-| `DefaultPaper` | Kağıt, dolu master-detail |
-| `DefaultGraphite` | Grafit, aynı semantik tokenlar |
+| `Default` | Dolu master-detail |
 | `UnreadConversations` | Unread filtre ve metinsel sayaç |
 | `EmptyInbox` | Gerçek inbox boş durumu |
 | `SearchNoResults` | Dolu kaynağa karşı sıfır arama sonucu |
@@ -282,7 +281,7 @@ CSS'iyle gösterilir; global `matchMedia` mutasyonu yapılmaz.
   tetikleyiciye focus dönüşü.
 - Virtualization: bounded DOM, focused row pinning, prepend anchor, dipte
   olmayan kullanıcıya scroll gasp etmeme.
-- Visual: Kağıt/Grafit, 390px list/thread, uzun Türkçe içerik, blocked/closed,
+- Visual: 390px list/thread, uzun Türkçe içerik, blocked/closed,
   reduced motion/transparency ve Dock safe-area rezervi.
 - A11y: `nav/ul/li/a`, `aria-current`, named log, live-region ayrımı,
   non-color state cues, visible `:focus-visible`, coarse pointer hedefleri.

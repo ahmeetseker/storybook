@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   GlassAiSearchBar,
   GlassButton,
@@ -8,12 +8,18 @@ import {
   GlassEmptyState,
   GlassFilterPanel,
   GlassMap,
+  GlassMapPopupCard,
   GlassPagination,
   GlassSegmentedControl,
   GlassSelect,
   GlassSkeleton,
 } from '@repo/ui'
 import { withBase } from '@/config/base-path'
+import { EXPLORE_BASEMAP } from '@/config/basemap'
+import { FACET_BY_KEY, FILTER_SECTIONS } from './domain/filter-catalog'
+import { sectionFacets } from './domain/filter-catalog-types'
+import { CatalogFilterControls } from './components/CatalogFilterControls'
+import { AllFiltersModal } from './components/AllFiltersModal'
 import { PageContainer } from '@/components/PageContainer'
 import type {
   AiFilterProposal,
@@ -22,6 +28,7 @@ import type {
 } from './data/listing-adapter'
 import {
   changeCategory,
+  clearListingFilters,
   type ListingSearchState,
   type PropertyCategory,
   type TransactionType,
@@ -88,6 +95,33 @@ function currency(value: number, transaction: TransactionType) {
   return `${formatter.format(value)} TL${transaction === 'rent' ? ' / ay' : ''}`
 }
 
+/**
+ * "İlçe, İl" — şehir/ilçe veride küçük harfli anahtar olarak durur, görünür
+ * metin Türkçe yerelinde büyük harfe çevrilir (i/İ ayrımı için `tr-TR` şart).
+ */
+function locationLabel(item: Pick<ListingSummary, 'city' | 'district'>): string {
+  const capitalize = (value: string) =>
+    value.charAt(0).toLocaleUpperCase('tr-TR') + value.slice(1)
+  return `${capitalize(item.district)}, ${capitalize(item.city)}`
+}
+
+/**
+ * Harita pini için kısaltılmış fiyat. Kapsül zemini kapatmasın diye tam tutar
+ * değil büyüklük mertebesi yazılır; tam tutarı popup ve ilan kartı taşır.
+ * Milyonun altındaki satışlar da "B" (bin) ile okunur — aksi halde 850.000 TL
+ * "0,9M" olarak yuvarlanıp yanıltıcı hale geliyordu.
+ */
+function compactPrice(value: number, transaction: TransactionType): string {
+  const suffix = transaction === 'rent' ? '/ay' : ''
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000
+    // 10M üstünde ondalık gürültüdür; altında tek hane ayırt edici.
+    const text = millions >= 10 ? String(Math.round(millions)) : millions.toFixed(1).replace('.', ',')
+    return `₺${text}M${suffix}`
+  }
+  return `₺${Math.round(value / 1000)}B${suffix}`
+}
+
 function updateRange(
   state: ListingSearchState,
   key: 'salePrice' | 'rentPrice' | 'area',
@@ -116,14 +150,27 @@ function FilterSection({
   title,
   children,
   open = true,
+  selectedCount = 0,
 }: {
   title: string
   children: ReactNode
   open?: boolean
+  /** Bu bölümde kaç kriterin seçili olduğu — kapalıyken de görünür kalır. */
+  selectedCount?: number
 }) {
   return (
     <details className={styles.filterSection} open={open}>
-      <summary>{title}</summary>
+      <summary>
+        {title}
+        {selectedCount > 0 ? (
+          <span
+            className={styles.sectionCount}
+            aria-label={`${selectedCount} kriter seçili`}
+          >
+            {selectedCount}
+          </span>
+        ) : null}
+      </summary>
       <div className={styles.filterSectionBody}>{children}</div>
     </details>
   )
@@ -135,6 +182,21 @@ interface FilterFormProps {
   onChange: (state: ListingSearchState) => void
   onReset: () => void
   footer?: ReactNode
+  /**
+   * Panelin nerede yaşadığı.
+   *
+   * `sidebar` (masaüstü): dar kolona yalnız `core` kriterler sığar, gerisi
+   * "Tüm Seçenekler" modalına devredilir.
+   * `sheet` (mobil çekmece): çekmece zaten tam ekran bir yüzey; kriterleri
+   * ikinci bir modala saklamak yerine HEPSİ burada açılır. Çekmecenin üstüne
+   * modal bindirmek hem odak tuzağını iç içe geçirir hem de kullanıcıyı iki
+   * kademe geri gitmeye zorlardı.
+   */
+  surface?: 'sidebar' | 'sheet'
+  /** "Tüm Seçenekler"i açar; verilmezse düğme render EDİLMEZ (yalancı kontrol yok). */
+  onOpenAllFilters?: () => void
+  /** Katalogda kaç kriterin etkin olduğu — başlıkta ve düğmede görünür */
+  activeCount?: number
 }
 
 function FilterForm({
@@ -143,25 +205,28 @@ function FilterForm({
   onChange,
   onReset,
   footer,
+  surface = 'sidebar',
+  onOpenAllFilters,
+  activeCount = 0,
 }: FilterFormProps) {
   const selectId = useId()
-
-  const setCategoryFilter = (key: string, value: string) => {
-    const nextValues = toggleValue(state.categoryFilters[key] ?? [], value)
-    onChange({
-      ...state,
-      categoryFilters: {
-        ...state.categoryFilters,
-        [key]: nextValues,
-      },
-      page: 1,
-    })
-  }
 
   return (
     <GlassFilterPanel
       label="Emlak filtreleri"
-      title="Filtreler"
+      title={
+        <span className={styles.panelTitle}>
+          Filtreler
+          {activeCount > 0 ? (
+            <span
+              className={styles.sectionCount}
+              aria-label={`${activeCount} kriter etkin`}
+            >
+              {activeCount}
+            </span>
+          ) : null}
+        </span>
+      }
       resultCount={resultCount}
       resultLabel={(count) => `${count} ilan`}
       onReset={onReset}
@@ -234,6 +299,22 @@ function FilterForm({
               onChange({
                 ...state,
                 district: event.target.value || undefined,
+                // İlçe değişince mahalle anlamını yitirir.
+                neighbourhood: undefined,
+                page: 1,
+              })
+            }
+          />
+        </label>
+        <label className={styles.field}>
+          <span>Mahalle</span>
+          <input
+            value={state.neighbourhood ?? ''}
+            placeholder="Mahalle ara"
+            onChange={(event) =>
+              onChange({
+                ...state,
+                neighbourhood: event.target.value || undefined,
                 page: 1,
               })
             }
@@ -334,75 +415,39 @@ function FilterForm({
         </div>
       </FilterSection>
 
-      {state.category === 'land' ? (
-        <>
-          <FilterSection title="İmar ve tapu">
-            <div className={styles.checkStack}>
-              <GlassCheckbox
-                label="Konut imarlı"
-                checked={(state.categoryFilters.zoning ?? []).includes(
-                  'residential',
-                )}
-                onChange={() => setCategoryFilter('zoning', 'residential')}
-              />
-              <GlassCheckbox
-                label="Turizm imarlı"
-                checked={(state.categoryFilters.zoning ?? []).includes(
-                  'tourism',
-                )}
-                onChange={() => setCategoryFilter('zoning', 'tourism')}
-              />
-              <GlassCheckbox
-                label="Müstakil tapu"
-                checked={(state.categoryFilters.deed ?? []).includes(
-                  'detached',
-                )}
-                onChange={() => setCategoryFilter('deed', 'detached')}
-              />
-            </div>
+      {/* Katalog tabanlı bölümler: elle yazılmış kategori blokları yerine tek
+          kaynaktan (filter-catalog.ts) gelir. Kenar çubuğunda YALNIZ `core`
+          kriterler durur; gerisi "Tüm Seçenekler" modalında yaşar — dar bir
+          kolona 60+ kriter sığdırmaya çalışmak hepsini okunmaz kılıyordu. */}
+      {FILTER_SECTIONS.map((section) => {
+        const all = sectionFacets(section, state.category)
+        const facets = surface === 'sheet' ? all : all.filter((facet) => facet.importance === 'core')
+        if (facets.length === 0) return null
+        const chosen = facets.reduce(
+          (total, facet) =>
+            total +
+            (facet.type === 'range'
+              ? state.categoryRanges[facet.key]
+                ? 1
+                : 0
+              : (state.categoryFilters[facet.key] ?? []).length > 0
+                ? 1
+                : 0),
+          0,
+        )
+        return (
+          <FilterSection
+            key={section.id}
+            title={section.title}
+            selectedCount={chosen}
+            // Seçim yapılmamış bölümler kapalı başlar: dar kolonda 12 bölüm
+            // birden açıkken kullanıcı hiçbirini göremiyordu.
+            open={chosen > 0}
+          >
+            <CatalogFilterControls facets={facets} state={state} onChange={onChange} />
           </FilterSection>
-          <FilterSection title="Altyapı ve konum">
-            <div className={styles.checkStack}>
-              <GlassCheckbox
-                label="Yola cepheli"
-                checked={(state.categoryFilters.road ?? []).includes(
-                  'frontage',
-                )}
-                onChange={() => setCategoryFilter('road', 'frontage')}
-              />
-              <GlassCheckbox label="Elektrik hattı yakınında" />
-              <GlassCheckbox label="Su hattı yakınında" />
-            </div>
-          </FilterSection>
-        </>
-      ) : null}
-
-      {state.category === 'residential' ? (
-        <FilterSection title="Konut özellikleri">
-          <div className={styles.checkStack}>
-            {['1+1', '2+1', '3+1', '4+1'].map((room) => (
-              <GlassCheckbox
-                key={room}
-                label={room}
-                checked={(state.categoryFilters.rooms ?? []).includes(room)}
-                onChange={() => setCategoryFilter('rooms', room)}
-              />
-            ))}
-          </div>
-        </FilterSection>
-      ) : null}
-
-      {state.category !== 'all' &&
-      state.category !== 'land' &&
-      state.category !== 'residential' ? (
-        <FilterSection title={`${CATEGORY_LABELS[state.category]} özellikleri`}>
-          <div className={styles.checkStack}>
-            <GlassCheckbox label="Kullanıma hazır" />
-            <GlassCheckbox label="Otopark" />
-            <GlassCheckbox label="Ruhsatlı / belgeli" />
-          </div>
-        </FilterSection>
-      ) : null}
+        )
+      })}
 
       <FilterSection title="Güven ve satıcı">
         <div className={styles.checkStack}>
@@ -437,6 +482,13 @@ function FilterForm({
           />
         </div>
       </FilterSection>
+
+      {onOpenAllFilters ? (
+        <button type="button" className={styles.allFiltersTrigger} onClick={onOpenAllFilters}>
+          Tüm Seçenekler
+          {activeCount > 0 ? <span className={styles.sectionCount}>{activeCount}</span> : null}
+        </button>
+      ) : null}
     </GlassFilterPanel>
   )
 }
@@ -544,7 +596,27 @@ function activeFilterChips(state: ListingSearchState) {
     chips.push({
       key: 'city',
       label: state.city.toLocaleUpperCase('tr-TR'),
-      state: { ...state, city: undefined, district: undefined, page: 1 },
+      state: {
+        ...state,
+        city: undefined,
+        district: undefined,
+        neighbourhood: undefined,
+        page: 1,
+      },
+    })
+  }
+  if (state.mapArea) {
+    chips.push({
+      key: 'map-area',
+      label: 'Haritada seçili alan',
+      state: { ...state, mapArea: undefined, page: 1 },
+    })
+  }
+  if (state.neighbourhood) {
+    chips.push({
+      key: 'neighbourhood',
+      label: `${state.neighbourhood.toLocaleUpperCase('tr-TR')} Mah.`,
+      state: { ...state, neighbourhood: undefined, page: 1 },
     })
   }
   if (state.salePrice?.max !== undefined) {
@@ -575,6 +647,46 @@ function activeFilterChips(state: ListingSearchState) {
       state: { ...state, verified: false, page: 1 },
     })
   }
+
+  // Katalog filtreleri de çipe döner: modalda seçilen bir kriter panelde
+  // görünmezse kullanıcı sonucun neden daraldığını anlayamaz ve geri alamaz.
+  for (const [key, values] of Object.entries(state.categoryFilters)) {
+    const facet = FACET_BY_KEY.get(key)
+    if (!facet || values.length === 0) continue
+    const label =
+      facet.type === 'boolean'
+        ? facet.label
+        : `${facet.label}: ${values
+            .map((value) => facet.options?.find((option) => option.value === value)?.label ?? value)
+            .join(', ')}`
+    const nextFilters = { ...state.categoryFilters }
+    delete nextFilters[key]
+    chips.push({
+      key: `f-${key}`,
+      label,
+      state: { ...state, categoryFilters: nextFilters, page: 1 },
+    })
+  }
+
+  for (const [key, bounds] of Object.entries(state.categoryRanges)) {
+    const facet = FACET_BY_KEY.get(key)
+    if (!facet) continue
+    const unit = facet.unit ? ` ${facet.unit}` : ''
+    const label =
+      bounds.min !== undefined && bounds.max !== undefined
+        ? `${facet.label}: ${formatter.format(bounds.min)}–${formatter.format(bounds.max)}${unit}`
+        : bounds.min !== undefined
+          ? `${facet.label} ≥ ${formatter.format(bounds.min)}${unit}`
+          : `${facet.label} ≤ ${formatter.format(bounds.max as number)}${unit}`
+    const nextRanges = { ...state.categoryRanges }
+    delete nextRanges[key]
+    chips.push({
+      key: `r-${key}`,
+      label,
+      state: { ...state, categoryRanges: nextRanges, page: 1 },
+    })
+  }
+
   return chips
 }
 
@@ -593,6 +705,10 @@ export function EmlakSearchView({
 }: EmlakSearchViewProps) {
   const sortSelectId = useId()
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+  const [allFiltersOpen, setAllFiltersOpen] = useState(false)
+  // Haritanın o anki kadrajı. State'e YAZILMAZ: her hareket bir render ve URL
+  // güncellemesi tetiklerdi. Yalnız "Bu alanda ara" anında okunur.
+  const viewportRef = useRef<[[number, number], [number, number]] | undefined>(undefined)
   const [draftState, setDraftState] = useState(state)
   const [selectedId, setSelectedId] = useState<string | undefined>()
 
@@ -602,16 +718,24 @@ export function EmlakSearchView({
 
   const total = response?.total ?? 0
   const chips = activeFilterChips(state)
+  const catalogFilterCount =
+    Object.values(state.categoryFilters).filter((values) => values.length > 0).length +
+    Object.keys(state.categoryRanges).length
+  // Pin etiketi haritada okunabilir kalmalı: tam fiyat kapsülü zemini kapatır,
+  // bu yüzden büyüklük mertebesine yuvarlanır (₺6,8M / ₺45B). Tam tutar
+  // popup'ta ve kartta zaten yazılı.
   const pins = useMemo(
     () =>
       (response?.items ?? []).map((item) => ({
         id: item.id,
+        lat: item.coordinates.lat,
+        lng: item.coordinates.lng,
+        // Zemin yüklenemezse şematik yüzeye düşülür (bkz. GlassMap rules §7).
         x: item.map.x,
         y: item.map.y,
-        price:
-          item.transaction === 'rent'
-            ? `${Math.round(item.price / 1000)}B`
-            : `${(item.price / 1_000_000).toFixed(1)}M`,
+        price: compactPrice(item.price, item.transaction),
+        // Doğrulanmamış ilan uyarı tonunda: haritada da listedeki ayrımı korur.
+        tone: item.verified ? ('accent' as const) : ('warning' as const),
       })),
     [response],
   )
@@ -700,21 +824,7 @@ export function EmlakSearchView({
           <button
             type="button"
             onClick={() =>
-              onStateChange(
-                {
-                  ...state,
-                  category: 'all',
-                  city: undefined,
-                  district: undefined,
-                  salePrice: undefined,
-                  rentPrice: undefined,
-                  area: undefined,
-                  unitPrice: undefined,
-                  owners: [],
-                  verified: false,
-                  categoryFilters: {},
-                  page: 1,
-                },
+              onStateChange(clearListingFilters(state),
                 { history: 'replace' },
               )
             }
@@ -741,22 +851,10 @@ export function EmlakSearchView({
             state={state}
             resultCount={total}
             onChange={desktopChange}
+            activeCount={catalogFilterCount}
+            onOpenAllFilters={() => setAllFiltersOpen(true)}
             onReset={() =>
-              onStateChange(
-                {
-                  ...state,
-                  category: 'all',
-                  city: undefined,
-                  district: undefined,
-                  salePrice: undefined,
-                  rentPrice: undefined,
-                  area: undefined,
-                  unitPrice: undefined,
-                  owners: [],
-                  verified: false,
-                  categoryFilters: {},
-                  page: 1,
-                },
+              onStateChange(clearListingFilters(state),
                 { history: 'replace' },
               )
             }
@@ -912,20 +1010,49 @@ export function EmlakSearchView({
                     variant="panel"
                     label="İlan haritası"
                     pins={pins}
+                    basemap={EXPLORE_BASEMAP}
+                    cluster
                     selectedId={selectedId ?? null}
                     onPinSelect={setSelectedId}
                     popupContent={(id) => {
                       const item = response?.items.find(
                         (listing) => listing.id === id,
                       )
-                      return item ? (
-                        <strong>{currency(item.price, item.transaction)}</strong>
-                      ) : null
+                      if (!item) return null
+                      return (
+                        <GlassMapPopupCard
+                          title={item.title}
+                          meta={`${locationLabel(item)} · ${formatter.format(item.area)} m²`}
+                          price={currency(item.price, item.transaction)}
+                          status={{
+                            label: item.verified ? 'Doğrulanmış' : 'Doğrulanmamış',
+                            tone: item.verified ? 'success' : 'warning',
+                          }}
+                          href={withBase(`/ilan/${item.id}`)}
+                        />
+                      )
+                    }}
+                    onViewportChange={(bounds) => {
+                      viewportRef.current = bounds
                     }}
                     seed="enterprise-emlak"
                   />
-                  <GlassButton size="sm" className={styles.mapSearchButton}>
-                    Bu alanda ara
+                  {/* Kadraj kendiliğinden filtre DEĞİLDİR: harita her
+                      oynadığında liste değişseydi sonuçlar okunamaz olurdu.
+                      Alan yalnız kullanıcı burada istediğinde uygulanır. */}
+                  <GlassButton
+                    size="sm"
+                    className={styles.mapSearchButton}
+                    onClick={() => {
+                      const bounds = viewportRef.current
+                      if (!bounds) return
+                      onStateChange(
+                        { ...state, mapArea: bounds, page: 1 },
+                        { history: 'replace' },
+                      )
+                    }}
+                  >
+                    {state.mapArea ? 'Bu alanda yeniden ara' : 'Bu alanda ara'}
                   </GlassButton>
                 </div>
               ) : null}
@@ -948,6 +1075,17 @@ export function EmlakSearchView({
           ) : null}
         </section>
       </div>
+
+      <AllFiltersModal
+        open={allFiltersOpen}
+        onClose={() => setAllFiltersOpen(false)}
+        state={state}
+        resultCount={total}
+        onChange={(next) => onStateChange(next, { history: 'replace' })}
+        onReset={() => {
+          onStateChange(clearListingFilters(state), { history: 'replace' })
+        }}
+      />
 
       <GlassDrawer
         open={mobileFiltersOpen}
@@ -978,6 +1116,9 @@ export function EmlakSearchView({
           state={draftState}
           resultCount={response?.total ?? 0}
           onChange={setDraftState}
+          // Çekmece tam ekran bir yüzey: kriterleri ikinci bir modala saklamak
+          // yerine hepsi burada açılır (bkz. FilterFormProps.surface).
+          surface="sheet"
           onReset={() =>
             setDraftState({
               ...state,

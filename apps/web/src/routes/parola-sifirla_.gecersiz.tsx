@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { BaglantiGecersizPage } from '@/features/auth/pages/girisDurumSayfalari'
+import { ParolaBaglantiGecersizPage } from '@/features/auth/pages/parolaSifirlamaDurumSayfalari'
 
-export const Route = createFileRoute('/giris_/baglanti_/gecersiz')({
+export const Route = createFileRoute('/parola-sifirla_/gecersiz')({
   head: () => ({
     meta: [
       { title: 'Bağlantı geçersiz | arsam.net' },
       { name: 'robots', content: 'noindex, nofollow' },
     ],
   }),
-  component: BaglantiGecersizPage,
+  component: ParolaBaglantiGecersizPage,
 })

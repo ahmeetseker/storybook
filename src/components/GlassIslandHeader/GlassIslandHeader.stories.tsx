@@ -114,7 +114,7 @@ const meta = {
           'hap; hover\'da hap genişleyip "Şu an: <sayfa> · <saat>" durum chip\'ini gösterir (dokunmatikte hep ' +
           'görünür); tıklayınca "Nereye gitmek istersin?" hızlı gezinme paneline morph eder. Sayfa kartına ' +
           'tıklama alt navigasyonu açar (alt öğesi olmayan sayfa doğrudan `onNavigate` çağırır). `extras` ve ' +
-          '`search` slotlarıyla dil/tema/oturum eylemleri ve arama (`GlassAiSearchBar`) kompoze edilir. ' +
+          '`search` slotlarıyla dil/oturum eylemleri ve arama (`GlassAiSearchBar`) kompoze edilir. ' +
           'Cam malzeme açıkça `tier="fallback"`, `thickness={0.55}` ve ' +
           '`blur(14px) saturate(180%)` kullanır; GlassDock dış yüzeyiyle aynıdır. ' +
           '`href` değerleri gerçek bağlantı semantiği üretir; `onRoute` aynı-origin tıklamaları SPA router\'a delege eder. ' +

@@ -218,8 +218,7 @@
      opacity, zaten ikincil tonda olan metni kontrast eşiğinin altına düşürür).
      Ham `--lg-label-secondary` bu zemine karşı ~4.23:1 kalıp küçük metin
      eşiğini (4.5:1) kaçırıyordu (Codex bulgusu) — `--lg-label` ile
-     koyulaştırılmış türev kullanılır (açık temada ~6.5:1, koyu temada
-     `--lg-label` ters yönde uçlaştığı için yine güvenli aralıkta kalır). */
+     koyulaştırılmış türev kullanılır (~6.5:1). */
   background: color-mix(in srgb, var(--lg-label) 6%, transparent);
   color: color-mix(in srgb, var(--lg-label-secondary) 65%, var(--lg-label));
 }
@@ -232,7 +231,7 @@
 
 /* İkon anlam taşıyan bir grafiktir (WCAG non-text contrast ≥3:1) — ham
    `--lg-success` beyaz zemine karşı ~2:1 kalıyordu (Codex bulgusu);
-   `--lg-label` ile koyulaştırılmış türev iki temada da ≥3:1 sağlar
+   `--lg-label` ile koyulaştırılmış türev ≥3:1 sağlar
    (bkz. GlassTimeline'daki aynı desen). */
 .detail[data-matched='true'] .detailIcon {
   color: color-mix(in srgb, var(--lg-success) 68%, var(--lg-label));

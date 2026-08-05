@@ -184,8 +184,7 @@ Var: **Default** (4 kat, hotspot'lu) · **Playground** (Controls) ·
 hotspot etkileşim daveti) · **UzunIcerik** (6 kat, uzun TR etiketler + uzun
 oda adı, dar container) · **Responsive** (300px, dokunma hedefi) ·
 **Erişilebilirlik** (ARIA sözleşmesi dokümante). **Eksik:** Sizes/Variants —
-N/A (eksen yok). Temalar dedike story değil, global toolbar'la kapsanır
-(kütüphane geneli konvansiyon).
+N/A (eksen yok).
 
 ## 11. Test kabul kriterleri
 

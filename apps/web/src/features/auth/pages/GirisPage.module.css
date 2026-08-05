@@ -25,16 +25,72 @@
   outline-offset: var(--lg-focus-ring-offset);
 }
 
+/* `.input` ile birlikte kullanılır — yalnız tek satırlık girdiden ayrışan
+   özellikleri taşır. Select'in yerel oku korunur: kendi okumuzu çizmek
+   `appearance: none` gerektirir ve platformun dokunmatik açılır listesini
+   bozar. */
+.select {
+  padding-block: 0;
+}
+
+.textarea {
+  min-height: calc(var(--lg-control-md) * 2);
+  padding-block: var(--lg-space-2);
+  resize: vertical;
+  line-height: 1.5;
+}
+
 .hint {
   margin: 0;
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
 }
 
+/* Alan hatası — `aria-describedby` ile girdiye bağlanır. Kayıt formundaki
+   `.alanHatasi` ile aynı ölçü ve renkte; giriş ve parola sıfırlama sayfaları
+   da artık alan seviyesinde hata gösteriyor. */
+.alanHatasi {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-danger);
+}
+
+/* Kodu tekrar gönderme satırı: buton + geri sayım/durum metni. */
+.tekrarSatiri {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.tekrarButonu {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--lg-accent);
+  font: inherit;
+  font-size: var(--lg-text-caption);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.tekrarButonu:disabled {
+  color: var(--lg-label-secondary);
+  text-decoration: none;
+  cursor: default;
+}
+
+.tekrarButonu:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
+}
+
 .divider {
   display: flex;
   align-items: center;
   gap: var(--lg-space-3);
+  margin: 0;
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
 }
@@ -45,4 +101,161 @@
   flex: 1;
   block-size: var(--lg-stroke-hairline);
   background: var(--lg-hairline);
+}
+
+/* Google ile devam butonu. Cam DEĞİL: cam bütçesi birincil eylem
+   (`GlassButton`) için ayrılmıştır; sosyal giriş ikincil bir yoldur ve düz
+   yüzey + hairline ile sunulur. */
+.googleButonu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lg-space-3);
+  inline-size: 100%;
+  /* Birincil eylemle (`GlassButton size="md"` → `--lg-control-lg`) aynı
+     yükseklik: iki buton alt alta durduğunda farklı boy kademeleri
+     ikincil yolu kazara "daha küçük bir eylem" gibi göstermiyor. */
+  min-height: var(--lg-control-lg);
+  padding-inline: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.googleButonu:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+@media (hover: hover) {
+  .googleButonu:hover {
+    background: var(--lg-bg);
+  }
+}
+
+/* Marka işareti artık gerçek Google logosu (bkz. `GirisPage.tsx` içindeki
+   `GoogleIsareti` ve oradaki hex istisnası notu). Daire/harf rozeti
+   kaldırıldı: sahte bir işaret, sağlayıcıyı tanımayı zorlaştırıyordu. */
+.googleIsaret {
+  flex: none;
+  inline-size: var(--lg-space-5);
+  block-size: var(--lg-space-5);
+}
+
+/* Davet ve organizasyon seçimi: form olmayan ama tek mesajdan da fazla olan
+   sayfalar. `AuthFormPage` (form ister) ve `AuthStatusPage` (tek paragraf)
+   arasındaki boşluğu doldurur; ikisiyle aynı ölçü ve tipografiyi taşır. */
+.davetSayfasi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  inline-size: 100%;
+  max-inline-size: var(--lg-measure);
+}
+
+.davetBaslik {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+
+.davetAciklama {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-body);
+}
+
+.davetOzet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  margin: 0;
+  padding: var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+}
+
+.davetSatir {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.davetEtiket {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.davetDeger {
+  margin: 0;
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  text-align: end;
+}
+
+.orgListesi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.orgSecenek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  inline-size: 100%;
+  min-height: var(--lg-control-hit);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.orgSecenek:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Aktif organizasyon — kayıt formundaki seçili kartla aynı ton reçetesi. */
+.orgSecenek[aria-current='true'] {
+  border-color: var(--lg-accent);
+  background-color: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+}
+
+.orgSecenek:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@media (hover: hover) {
+  .orgSecenek:not(:disabled):hover {
+    background: var(--lg-bg);
+  }
+}
+
+.orgAd {
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+}
+
+.orgRol {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
 }

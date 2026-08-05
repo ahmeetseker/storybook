@@ -202,19 +202,23 @@ describe('arama sonucundan yansıtılan ilan detayı', () => {
     expect(detail.media.length).toBeLessThan(summary.imageCount)
   })
 
-  it('konum çizimi ŞEMATİKTİR: lat/lng taşımaz, arama kaydının yerleşimini taşır', async () => {
+  // Arama kaydı artık gerçek bir koordinat taşıyor (`coordinates`), bu yüzden
+  // yansıtma da coğrafi. Koordinat ilçe merkezinden türetilmiş YAKLAŞIK bir
+  // noktadır: parselin tam yeri değildir, bu yüzden mahremiyet yarıçapıyla
+  // birlikte taşınır ve kaynak künyesi bunu "ilçe düzeyinde" diye yazar.
+  it('konum çizimi COĞRAFİDİR: yaklaşık koordinatı mahremiyet yarıçapıyla taşır', async () => {
     const summary = summaryOf('listing-1-4')
     const detail = await projected('listing-1-4')
 
-    expect(detail.geo?.kind).toBe('schematic')
-    if (detail.geo?.kind !== 'schematic') throw new Error('şematik geo bekleniyordu')
-    expect(detail.geo.x).toBe(summary.map.x)
-    expect(detail.geo.y).toBe(summary.map.y)
-    expect(detail.geo.sourceLabel).toMatch(/şematik/i)
-    expect(detail.geo).not.toHaveProperty('lat')
-    expect(detail.geo).not.toHaveProperty('lng')
-    // Mahremiyet yarıçapı yalnız gerçek koordinat gizlenirken anlamlıdır.
-    expect(detail.geo).not.toHaveProperty('radiusMeters')
+    expect(detail.geo?.kind).toBe('geographic')
+    if (detail.geo?.kind !== 'geographic') throw new Error('coğrafi geo bekleniyordu')
+    expect(detail.geo.lat).toBe(summary.coordinates.lat)
+    expect(detail.geo.lng).toBe(summary.coordinates.lng)
+    // Kaynak künyesi kesinlik iddia ETMEZ: konumun ilçe düzeyinden geldiğini yazar.
+    expect(detail.geo.sourceLabel).toMatch(/ilçe/i)
+    // Yaklaşıklık bir yarıçapla ölçülebilir olmalı; aksi halde "yaklaşık"
+    // sözcüğü ölçüsüz bir iddia olurdu.
+    expect(detail.geo.radiusMeters).toBeGreaterThan(0)
   })
 
   it('referans defterin coğrafi konumu yansıtmadan etkilenmez', async () => {

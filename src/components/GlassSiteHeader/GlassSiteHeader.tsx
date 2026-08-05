@@ -25,7 +25,7 @@ export interface GlassSiteHeaderProps {
   /** Wordmark/monogram slotu — harf-kutusu logo kalıbı kullanılmaz */
   logo: ReactNode
   links?: GlassSiteHeaderLink[]
-  /** Aksiyonların solundaki küçük yardımcı slot (örn. tema butonu) */
+  /** Aksiyonların solundaki küçük yardımcı slot (örn. dil butonu) */
   utility?: ReactNode
   /** İkincil aksiyon (örn. "Üye girişi") */
   secondaryAction?: ReactNode

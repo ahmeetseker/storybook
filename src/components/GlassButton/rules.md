@@ -134,7 +134,7 @@ kullanılır — tipografi/boyut hesabına karışmaz (önceki `xl` font-size'ı
 `calc(--lg-text-headline + --lg-focus-ring-width)` idi, token sözleşmesi
 ihlaliydi; kaldırıldı). Prominent durumda normal, hover ve loading metni
 daima `--lg-accent-contrast` kullanır; hover arka planı opak `--glass-tint` /
-`--lg-accent` olur. Böylece Kağıt ve Grafit temada metin kontrastı durum
+`--lg-accent` olur. Böylece Kağıt temada metin kontrastı durum
 değişiminde bozulmaz.
 
 ## 10. Storybook kapsamı

@@ -30,6 +30,45 @@
   text-wrap: pretty;
 }
 
+/* İletişim satırları — ikon + metin, referans footer'daki gibi marka
+   kolonunun altında. Telefon ve e-posta gerçek bağlantı (tel:/mailto:). */
+.contactList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-1);
+}
+
+.contactRow,
+.contactLink {
+  display: inline-flex;
+  min-height: var(--lg-space-6);
+  align-items: center;
+  gap: var(--lg-space-2);
+  border-radius: var(--lg-radius-chip);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.contactLink:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .contactLink:hover {
+    color: var(--lg-label);
+  }
+}
+
+@media (pointer: coarse) {
+  .contactLink {
+    min-height: var(--lg-control-hit);
+  }
+}
+
 .trustLine {
   display: inline-flex;
   align-items: center;

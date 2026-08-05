@@ -3,42 +3,6 @@ html {
   background: var(--lg-bg);
 }
 
-/* Tema seçimi `data-theme` ile yapılır; buradaki bloklar kütüphane token'larının
-   (src/index.css) `prefers-color-scheme` kancasını elle kullanıcı tercihine
-   çevirir. Değerler kütüphaneyle birebir aynıdır — aynı rolün iki farklı hex
-   taşıması geçmişte açık temada AAA'yı kaçıran sapmayı üretmişti. */
-html[data-theme='light'] {
-  color-scheme: light;
-  --lg-bg: #faf8f4;
-  --lg-surface: #ffffff;
-  --lg-label: #24211b;
-  --lg-label-secondary: #4f4b45;
-  --lg-hairline: rgb(36 33 27 / 9%);
-  --lg-accent: #7c3806;
-  --lg-accent-contrast: #ffffff;
-  --lg-danger: #911e17;
-  --lg-warning: #703f00;
-  --lg-success: #12572c;
-  --lg-glass: rgb(255 255 255 / 92%);
-  --lg-glass-line: rgb(36 33 27 / 12%);
-}
-
-html[data-theme='dark'] {
-  color-scheme: dark;
-  --lg-bg: #121316;
-  --lg-surface: #1b1c20;
-  --lg-label: #f2f2f3;
-  --lg-label-secondary: #bcbcc1;
-  --lg-hairline: rgb(255 255 255 / 10%);
-  --lg-accent: #e9b179;
-  --lg-accent-contrast: #1a140c;
-  --lg-danger: #ffa49e;
-  --lg-warning: #ffb44c;
-  --lg-success: #58d478;
-  --lg-glass: rgb(27 28 32 / 92%);
-  --lg-glass-line: rgb(255 255 255 / 14%);
-}
-
 body {
   min-width: 320px;
   min-height: 100dvh;
@@ -54,8 +18,11 @@ select {
 .marketplace-shell {
   min-height: 100dvh;
   isolation: isolate;
-  /* Fixed GlassDock için diğer alt overlay'lerin kullanacağı ortak rezerv. */
-  --lg-shell-dock-offset: calc(var(--lg-control-xl) + var(--lg-space-7));
+  /* Alt kenardaki yapışkan overlay'lerin (ör. ilan detayının `ListingDock`'u)
+     kullandığı ortak rezerv. Global gezinme dock'u kaldırıldı; pay kalktı
+     değil KÜÇÜLDÜ — alt kenarda hâlâ sayfa-içi yapışkan çubuklar var ve
+     odak/scroll payı tek kaynaktan okunmaya devam ediyor. */
+  --lg-shell-dock-offset: var(--lg-control-xl);
   /* Fixed GlassSiteHeader'ın kapladığı dikey alan: rayın üst boşluğu
      (--lg-space-3, GlassSiteHeader.module.css `--rail-pad-y`) + kapsül dolgusu
      (2 × --lg-space-2) + satır yüksekliği (--lg-control-lg).
@@ -200,34 +167,6 @@ select {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset, 2px);
   border-radius: var(--lg-radius-chip);
-}
-
-.shell-dock-variant {
-  display: none;
-}
-
-.shell-dock-variant--mobile {
-  display: block;
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  .shell-dock-variant--mobile {
-    display: none;
-  }
-
-  .shell-dock-variant--tablet {
-    display: block;
-  }
-}
-
-@media (min-width: 1024px) {
-  .shell-dock-variant--mobile {
-    display: none;
-  }
-
-  .shell-dock-variant--desktop {
-    display: block;
-  }
 }
 
 /* bp-md 768px — dar ekranda yalnız yatay ritim sıkışır. Sahnenin dikey payı

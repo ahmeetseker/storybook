@@ -189,8 +189,8 @@ Var: Default, Playground, Variants (İçerik Varyantları: yalnız özet / yaln�
 Artılar / yalnız Eksiler), States (Durumlar: geri bildirimli kart + loading),
 UzunIcerik, Responsive (mobile1), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Materials`/`Temalar` story'si N/A — tek sabit ölçek, cam eksen yok,
-tema toolbar'la otomatik doğrulanır (GlassClimateRiskPanel ile aynı karar).
+`Sizes`/`Materials` story'si N/A — tek sabit ölçek, cam eksen yok
+(GlassClimateRiskPanel ile aynı karar).
 
 ## 11. Test kabul kriterleri
 
@@ -209,7 +209,6 @@ tema toolbar'la otomatik doğrulanır (GlassClimateRiskPanel ile aynı karar).
 - [x] aynı içerikle yeniden render geri bildirim seçimini korur (gereksiz reset yok)
 - [x] onFeedback verilmezse butonlar render edilmez
 - [x] `loading=true`: özet/kolon/geri bildirim gizli, rozet görünür, kök `aria-busy="true"`
-- [ ] iki temada (Kağıt/Grafit) rozet/marker kontrastı (visual)
 - [ ] dar container'da columns→1 kolon kırılması (visual)
 
 ## 12. Do / Don't

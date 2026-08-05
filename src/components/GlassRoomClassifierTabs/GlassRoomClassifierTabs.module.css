@@ -116,16 +116,16 @@
   padding: var(--grct-count-padding-block) var(--lg-space-2);
   /* Renkli küçük metin kontrastı yalnız zeminden gelir, metin rengi her
      durumda okunaklı bir label token'ından — semantik renk (accent) yalnız
-     zemin karışımına uygulanır. `--lg-label-secondary` bu zeminde (açık
-     temada ~3,9:1) küçük metin eşiğini (4,5:1) kaçırıyordu; tam `--lg-label`
-     açık temada ~13:1, koyu temada ~11,5:1 sağlar. */
+     zemin karışımına uygulanır. `--lg-label-secondary` bu zeminde ~3,9:1
+     kalıp küçük metin eşiğini (4,5:1) kaçırıyordu; tam `--lg-label`
+     ~13:1 sağlar. */
   background: color-mix(in srgb, var(--lg-label) 10%, transparent);
   color: var(--lg-label);
 }
 .tabActive .countBadge {
-  /* 24% karışım açık temada ~3,3:1'e düşüyordu (beyaz metin amber zemine
-     çok yaklaşıyor); 4% karışım açık temada ~4,7:1, koyu temada ~6,7:1
-     sağlar — küçük metin eşiği (4,5:1) her iki temada da karşılanır. */
+  /* 24% karışım ~3,3:1'e düşüyordu (beyaz metin amber zemine çok
+     yaklaşıyor); 4% karışım ~4,7:1 sağlar — küçük metin eşiği (4,5:1)
+     karşılanır. */
   background: color-mix(in srgb, var(--lg-accent-contrast) 4%, transparent);
   color: var(--lg-accent-contrast);
 }

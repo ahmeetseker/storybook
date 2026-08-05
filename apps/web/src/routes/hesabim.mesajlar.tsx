@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createPageHead } from '@/config/routes'
-import { useAuthSession, useKorumaliRota } from '@/features/auth'
 import {
   MessagesWorkspace,
   createMessagesFixtureDataSource,
@@ -85,9 +84,14 @@ export const Route = createFileRoute('/hesabim/mesajlar')({
   component: MessagesRoutePage,
 })
 
+/**
+ * Koruma BURADA YOKTUR ve olmamalıdır: bu rota `/hesabim` layout rotasının
+ * çocuğudur; oturum kontrolü orada `beforeLoad` guard'ı + `KorumaliSayfa`
+ * ile bir kez yapılır. Bu dosya eskiden aynı kalıbın kendi kopyasını
+ * taşıyordu (rules.md §14 ihlali) ve `hidrasyonTamam` bayrağı olmadığı için
+ * aynı hidrasyon hatasını ikinci kez üretiyordu.
+ */
 function MessagesRoutePage() {
-  useKorumaliRota()
-  const { girisYapildi } = useAuthSession()
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
   const [dataSource] = useState<MessagesDataSource>(
@@ -95,8 +99,6 @@ function MessagesRoutePage() {
   )
   const routeState = parseMessagesRouteSearch(search)
   const currentSearch = serializeMessagesRouteSearch(routeState)
-
-  if (!girisYapildi) return null
 
   return (
     <MessagesWorkspace

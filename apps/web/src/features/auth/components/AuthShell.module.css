@@ -1,19 +1,48 @@
-/* Auth kabuğu — oturumu olmayan kullanıcı için dar, odaklanmış yüzey.
-   Cam yok: gezinme sunmayan bu katmanda cam yüzey bütçesi harcanmaz. */
+/* Auth kabuğu — oturumu olmayan kullanıcı için odaklanmış yüzey.
+   Cam yok: gezinme sunmayan bu katmanda cam yüzey bütçesi harcanmaz.
+
+   Geniş ekranda iki kolon (dekoratif marka paneli + form), dar ekranda tek
+   kolon. Form sütunu bilinçli olarak KART DEĞİLDİR (`--lg-bg` üzerinde
+   durur): `KayitPage`/`KayitKurumsalPage` kendi adım kartlarını
+   (`--lg-surface` + hairline) çiziyor ve sütuna da yüzey vermek kart içinde
+   kart üretirdi. Bölünme zaten soldaki dolu panelle okunuyor. */
 .shell {
   min-block-size: 100dvh;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: var(--lg-space-6);
-  padding-block: var(--lg-space-6);
-  padding-inline: var(--lg-container-gutter);
+  padding: var(--lg-space-4);
   background: var(--lg-bg);
   color: var(--lg-label);
 }
 
-.masthead {
+.duzen {
+  display: grid;
+  gap: var(--lg-space-4);
+  /* Kabuğun kendi dolgusu düşülür ki panel tam yüksekliği kaplasın ama
+     sayfa gereksiz dikey kaydırma üretmesin. */
+  min-block-size: calc(100dvh - 2 * var(--lg-space-4));
+  max-inline-size: var(--lg-container-base);
+  margin-inline: auto;
+}
+
+.formKolonu {
   display: flex;
   justify-content: center;
+  padding-block: var(--lg-space-6);
+  padding-inline: var(--lg-container-gutter);
+}
+
+/* Marka · içerik · footer tek ölçüyü paylaşır — hepsi aynı sol kenara
+   hizalanır. Orta satır `1fr` olduğu için form dikeyde ortalanır ve footer
+   sütunun altına iner. */
+.formIc {
+  inline-size: 100%;
+  max-inline-size: 30rem;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--lg-space-7);
+}
+
+.masthead {
+  display: flex;
 }
 
 .brand {
@@ -21,7 +50,8 @@
   align-items: center;
   gap: var(--lg-space-2);
   min-height: var(--lg-control-md);
-  padding-inline: var(--lg-space-3);
+  /* Yatay dolgu yok: marka, başlığın ve alanların sol kenarına birebir
+     hizalanmalı. Dokunma hedefi yükseklikten ve metin genişliğinden gelir. */
   border-radius: var(--lg-radius-capsule);
   font-size: var(--lg-text-headline);
   font-weight: 700;
@@ -37,19 +67,17 @@
 
 .content {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-}
-
-.inner {
-  inline-size: 100%;
-  max-inline-size: 26rem;
+  /* Grid çocuğunun taşmasını engeller: uzun bir tablo/şerit sütunu
+     genişletip yatay kaydırma üretmesin. */
+  min-inline-size: 0;
 }
 
 .footer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  align-items: center;
   gap: var(--lg-space-2) var(--lg-space-4);
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
@@ -66,6 +94,24 @@
 .footerLink:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* İki kolon: solda dekoratif panel, sağda form. Sağ kolon bir tık dar: form
+   ölçüsü sabittir (30rem), artan genişlik yalnız boşluğa gideceği için
+   fazlalık dekoratif panele verilir.
+
+   Yer değişimi DOM'da değil `order` ile yapılır. Kaynak sırası form → panel
+   olarak KALIR: içeriğe atla bağlantısından sonra klavye ve ekran okuyucu
+   önce forma varır, dekoratif panelin rozetleri arkada kalır. Dar ekranda
+   panel zaten `display: none` olduğu için kural bu sorgunun içindedir. */
+@media (min-width: 64rem) {
+  .duzen {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+
+  .formKolonu {
+    order: 1;
+  }
 }
 
 @media (hover: hover) {

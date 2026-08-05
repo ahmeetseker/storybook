@@ -48,10 +48,11 @@
   line-height: 1;
   /* tint/pastel verilmediyse nötr zemin */
   background-color: color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
-  /* Pastel zemin her iki temada da açıktır (oklch L %88), bu yüzden mürekkep
-     temayla dönmez ve raw kalır — `--lg-label` koyu temada açılır ve açık
-     zeminin üstünde okunmaz olurdu. Opaklık 0.62'den 0.8'e çıkarıldı: tüm
-     hue'larda ölçülen en kötü kontrast 4.22 → 9.63 (WCAG 2.2 AAA 1.4.6). */
+  /* Pastel zemin daima açıktır (oklch L %88) ve token'lardan bağımsız
+     üretilir, bu yüzden mürekkep de raw kalır — zemin sabitken metni
+     yüzey token'ına bağlamak yanlış yöne kayardı. Opaklık 0.62'den 0.8'e
+     çıkarıldı: tüm hue'larda ölçülen en kötü kontrast 4.22 → 9.63
+     (WCAG 2.2 AAA 1.4.6). */
   color: rgba(0, 0, 0, 0.8);
   box-shadow: inset 0 0 0 1px var(--lg-hairline, rgba(0, 0, 0, 0.09));
 }

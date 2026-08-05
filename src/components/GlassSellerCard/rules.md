@@ -125,7 +125,7 @@ görünmez kalabilir, yalnız açık flat'e göre ayarlı.
 Var: Default, WithoutPhone, Minimal, WithAvatar (`avatarUrl` ile img,
 fallback'siz), Materials (glass vs flat yan yana), States (maskeli · play ile
 açılmış · verified'sız), UzunIcerik (uzun kurumsal isim). **Eksik:**
-Playground, Responsive, Temalar, Erişilebilirlik.
+Playground, Responsive, Erişilebilirlik.
 
 ## 11. Test kabul kriterleri
 

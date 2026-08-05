@@ -158,7 +158,7 @@ prop'undan gelir.
 Var: Default, Playground (tam public API), Materials (flat/glass yan yana),
 Sizes (`headingLevel` 1-2-3), States (dört `status.tone`), UzunIcerik (uzun TR
 başlık + altı meta öğesi, dar container), Responsive (360px + container
-query), Temalar (toolbar'dan Kağıt/Grafit), Erişilebilirlik (h1 + `utilities`
+query), Erişilebilirlik (h1 + `utilities`
 içindeki gerçek butonların focus sırası). Eksik yok — matris tam.
 
 ## 11. Test kabul kriterleri
@@ -172,7 +172,7 @@ içindeki gerçek butonların focus sırası). Eksik yok — matris tam.
 - [x] `utilities` slotu başlık bölgesinde render edilir (unit)
 - [x] durum metni yalnız renkle değil görünür metinle taşınır (unit)
 - [ ] container query'nin 640px altında tek kolona düştüğü (visual)
-- [ ] Kağıt/Grafit temalarında durum tonlarının kontrastı (visual)
+- [ ] durum tonlarının kontrastı (visual)
 
 ## 12. Do / Don't
 

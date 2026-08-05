@@ -122,7 +122,6 @@ dahil cam bütçesi iki yüzeyi aşmaz.
   medya kalite durumları ve yayınlandı var
 - Uzun içerik: var
 - Responsive: mobil story var
-- Temalar: Grafit toolbar story var
 - Erişilebilirlik: hata odağı/ARIA ve reduced-motion story’leri var
 
 ## 11. Test kabul kriterleri

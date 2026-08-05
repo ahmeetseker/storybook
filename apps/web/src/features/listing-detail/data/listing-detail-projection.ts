@@ -216,6 +216,16 @@ function mediaFor(summary: ListingSummary): ListingMediaItem[] {
  */
 const SCHEMATIC_GEO_SOURCE = 'Arama kaydının şematik yerleşimi'
 
+/**
+ * Yansıtılan koordinatın kaynağı ve mahremiyet yarıçapı.
+ *
+ * Koordinat ilçe merkezinden türetilmiştir; parselin tam yeri DEĞİLDİR. 750 m
+ * yarıçap bu belirsizliği hem dürüstçe bildirir hem de ilan sahibinin tam
+ * adresini açık etmez.
+ */
+const APPROXIMATE_GEO_SOURCE = 'Arama kaydının ilçe düzeyindeki konumu'
+const APPROXIMATE_GEO_RADIUS_METERS = 750
+
 const VALUATION_REASON =
   'Bu ilan için emsal kesiti ve gerçekleşmiş işlem verisi derlenmedi; ArsaPazar fiyat tahmini üretilmedi.'
 
@@ -283,14 +293,18 @@ export function projectListingDetail(
     // Dosya sayısı değil, ilanda BİLDİRİLEN sayı. Sahne bunu kare olarak
     // değil, sayı olarak gösterir.
     declaredMediaCount: summary.imageCount,
-    // Coğrafi koordinat kayıtta YOKTUR; taşınan şey arama kaydının şematik
-    // yerleşimidir ve tip düzeyinde de öyle işaretlenir (`kind: 'schematic'`),
-    // böylece görünüm katmanı onu lat/lng gibi sunamaz.
+    // Arama kaydı artık gerçek bir koordinat taşıyor (`coordinates`), bu yüzden
+    // geo COĞRAFİ olarak yansıtılır. Koordinat ilçe merkezinden türetilmiş
+    // YAKLAŞIK bir noktadır — parselin tam yeri değildir; bu yüzden mahremiyet
+    // yarıçapıyla birlikte taşınır ve görünüm katmanı yarıçapı kelimeyle yazar.
+    // Kayıtta koordinat bulunmayan bir sürümde yeniden şematik yansıtmaya
+    // dönülmelidir (bkz. `SCHEMATIC_GEO_SOURCE`).
     geo: {
-      kind: 'schematic',
-      x: summary.map.x,
-      y: summary.map.y,
-      sourceLabel: SCHEMATIC_GEO_SOURCE,
+      kind: 'geographic',
+      lat: summary.coordinates.lat,
+      lng: summary.coordinates.lng,
+      radiusMeters: APPROXIMATE_GEO_RADIUS_METERS,
+      sourceLabel: APPROXIMATE_GEO_SOURCE,
     },
     qna: projectQna(summary, now),
   }

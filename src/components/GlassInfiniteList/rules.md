@@ -77,7 +77,7 @@ Varsayılan kombinasyon: `hasMore=true`, `loading=false`, `threshold=400`.
 | Eksen | Durum |
 |---|---|
 | `material` | N/A — flat içerik yüzeyi, cam eksen yok |
-| `tone` (light/dark/auto) | N/A — `GlassSurface` kullanmaz, tema `data-theme` kök token'larından otomatik gelir |
+| `tone` (light/dark/auto) | N/A — `GlassSurface` kullanmaz, renkler `:root` token'larından gelir |
 | `size` | N/A — spec'te istenmedi |
 | `variant`/`thickness`/`tint`/`prominent` | N/A — cam olmayan, tek görünümlü akış sarmalayıcısı |
 
@@ -167,9 +167,8 @@ setTimeout ile 700ms), Durumlar (hasMore/loading/bitti yan yana),
 UzunIcerik, Responsive (mobile1 + 320px konteyner), Erişilebilirlik (docs
 description'lı).
 
-`Variants`/`Sizes`/`Temalar` ayrı story olarak yok: component'te
-material/variant/size ekseni tanımlı değil (§5), tema toolbar'la otomatik
-doğrulanır (`GlassNearbyPlaces`/`GlassScoreMeter` ile aynı karar).
+`Variants`/`Sizes` ayrı story olarak yok: component'te
+material/variant/size ekseni tanımlı değil (§5) (`GlassNearbyPlaces`/`GlassScoreMeter` ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

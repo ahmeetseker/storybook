@@ -138,7 +138,7 @@ kaydırma için `overflow-x: auto` taşır, taşan pseudo-eleman kırpılır.
 ## 10. Storybook kapsamı
 
 Var: Default, WithDefaultValue, Sizes, Variants, States, Controlled,
-LongContent, Mobile (viewport). Eksik: Temalar toolbar'dan test edilir (ayrı story yok).
+LongContent, Mobile (viewport).
 
 ## 11. Test kabul kriterleri
 

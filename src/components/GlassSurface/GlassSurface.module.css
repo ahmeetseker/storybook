@@ -42,7 +42,7 @@
 }
 
 /* Düz malzeme: içerik katmanı — backdrop-filter yok, opak zemin + hairline border.
-   Renkler tema token'larından gelir (Kağıt açık / Grafit koyu). */
+   Renkler yüzey token'larından gelir. */
 .flat {
   background: var(--lg-surface, #fff);
   border: 1px solid var(--lg-hairline, rgba(0, 0, 0, 0.08));
@@ -54,7 +54,7 @@
 .toneLight { color: rgba(255, 255, 255, 0.95); }
 .toneDark { color: rgba(0, 0, 0, 0.85); }
 
-/* Flat + light ton: koyu zemin üzerinde kullanılan opak koyu kart (Grafit kartı) */
+/* Flat + light ton: koyu zemin üzerinde kullanılan opak koyu kart */
 .flat.toneLight {
   background: #1b1c20;
   border-color: rgba(255, 255, 255, 0.14);

@@ -10,13 +10,16 @@ import {
 } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { varsayilanAuthAdapters, type AuthAdapters } from './data/auth-adapters'
-import type { Oturum } from './domain/auth-types'
+import type { Oturum, OturumCozumu } from './domain/auth-types'
 
 interface AuthSessionDegeri {
+  /** Üçlü durum — `bilinmiyor` ile `anonim` ayrımı gereken her yerde bunu kullanın. */
+  cozum: OturumCozumu
   oturum: Oturum | null
+  /** Yalnız `kimlikli` durumunda true. `bilinmiyor` da false döner — dikkat. */
   girisYapildi: boolean
   adapters: AuthAdapters
-  /** Adapter'daki oturumu yeniden okur — giriş sonrası çağrılır. */
+  /** Adapter'daki oturumu yeniden çözer — giriş/kayıt sonrası çağrılır. */
   oturumuTazele(): void
   cikisYap(): void
 }
@@ -30,26 +33,51 @@ export function AuthSessionProvider({
   children: ReactNode
   adapters?: AuthAdapters
 }) {
-  const [oturum, setOturum] = useState<Oturum | null>(() => adapters.oturumuGetir())
+  /**
+   * İlk render HER ZAMAN `bilinmiyor` — router context'ten seed EDİLMEZ.
+   *
+   * Bu kasıtlı: sunucu ve istemcinin hidrasyon eşleştirmesi yapılan ilk
+   * render'ı koşulsuz aynı ağacı üretmeli. Context'ten seed etmek, istemci
+   * tarafında `beforeLoad`'un yeniden koşup `kimlikli` dönmesi hâlinde
+   * sunucunun `bilinmiyor` ağacıyla uyuşmazlık yaratırdı.
+   *
+   * Gerçek değer mount SONRASI efektte çözülür; o noktada React artık sunucu
+   * çıktısıyla karşılaştırma yapmaz. Bu, eski `hidrasyonTamam` bayrağının
+   * yerini alır — aynı güvenlik, ayrı bir bayrak yerine modelin kendisiyle.
+   */
+  const [cozum, setCozum] = useState<OturumCozumu>({ durum: 'bilinmiyor' })
+
+  const coz = useCallback(() => {
+    let iptal = false
+    void adapters.oturumuCoz().then((yeni) => {
+      if (!iptal) setCozum(yeni)
+    })
+    return () => {
+      iptal = true
+    }
+  }, [adapters])
+
+  useEffect(() => coz(), [coz])
 
   const oturumuTazele = useCallback(() => {
-    setOturum(adapters.oturumuGetir())
-  }, [adapters])
+    coz()
+  }, [coz])
 
   const cikisYap = useCallback(() => {
     adapters.cikisYap()
-    setOturum(null)
+    setCozum({ durum: 'anonim' })
   }, [adapters])
 
   const deger = useMemo<AuthSessionDegeri>(
     () => ({
-      oturum,
-      girisYapildi: oturum !== null,
+      cozum,
+      oturum: cozum.durum === 'kimlikli' ? cozum.oturum : null,
+      girisYapildi: cozum.durum === 'kimlikli',
       adapters,
       oturumuTazele,
       cikisYap,
     }),
-    [oturum, adapters, oturumuTazele, cikisYap],
+    [cozum, adapters, oturumuTazele, cikisYap],
   )
 
   return <AuthSessionContext.Provider value={deger}>{children}</AuthSessionContext.Provider>
@@ -64,9 +92,16 @@ export function useAuthSession(): AuthSessionDegeri {
 }
 
 /**
- * Korumalı sayfalarda çağrılır. Oturum yoksa kullanıcıyı `/giris`'e
- * yönlendirir ve geldiği yolu `donus` parametresinde taşır — giriş sonrası
- * aynı yere döner.
+ * Korumalı sayfalarda çağrılır. Oturum KESİN olarak yoksa kullanıcıyı
+ * `/giris`'e yönlendirir ve geldiği yolu `donus` parametresinde taşır.
+ *
+ * `bilinmiyor` durumunda hiçbir şey yapmaz — bu, `beforeLoad` guard'ıyla
+ * (`korumaliRotaGuard`) aynı kuraldır. Oturum henüz çözülmemişken
+ * yönlendirmek, oturumu OLAN kullanıcıyı da dışarı atardı.
+ *
+ * Bu hook `korumaliRotaGuard`'ın yerini ALMAZ, onu tamamlar: guard sunucuda
+ * ve istemci navigasyonlarında render'dan önce çalışır; bu hook ise ilk
+ * yüklemede sunucunun `bilinmiyor` dediği durumu hidrasyondan sonra kapatır.
  *
  * Konum `useRouter().state.location`'dan efekt İÇİNDE, imperatif olarak
  * okunur — `useRouterState` ile reaktif abone olunmaz. Sebep: router,
@@ -92,13 +127,13 @@ export function useAuthSession(): AuthSessionDegeri {
  *    daha encode ederek iç içe geçmiş bir yönlendirme zincirine yol açar.
  */
 export function useKorumaliRota(): void {
-  const { girisYapildi } = useAuthSession()
+  const { cozum } = useAuthSession()
   const navigate = useNavigate()
   const router = useRouter()
   const yonlendirildi = useRef(false)
 
   useEffect(() => {
-    if (girisYapildi || yonlendirildi.current) return
+    if (cozum.durum !== 'anonim' || yonlendirildi.current) return
     const { pathname, searchStr } = router.state.location
     if (pathname.startsWith('/giris')) return
     yonlendirildi.current = true
@@ -106,5 +141,5 @@ export function useKorumaliRota(): void {
       href: `/giris?donus=${encodeURIComponent(`${pathname}${searchStr}`)}`,
       replace: true,
     })
-  }, [girisYapildi, navigate, router])
+  }, [cozum, navigate, router])
 }

@@ -172,9 +172,7 @@ Var: Default, Playground, Sortable (controlled gerçek sıralama akışı),
 Selectable (controlled çoklu seçim + indeterminate), Empty, EmptyOzel,
 UzunIcerik, Responsive (mobile viewport + selectable), Erisilebilirlik (docs
 açıklamalı).
-**Eksik:** Temalar (ayrı story yok — toolbar'la Kağıt/Grafit doğrulanır,
-tüm token'lar üzerinden otomatik) · States (disabled satır/kolon N/A — v1'de
-yok, §12 açık karar).
+**Eksik:** States (disabled satır/kolon N/A — v1'de yok, §12 açık karar).
 
 ## 11. Test kabul kriterleri
 
@@ -195,7 +193,6 @@ yok, §12 açık karar).
 - [ ] 700px altı gerçek kart görünümü + sticky header (visual, Chrome)
 - [ ] mobilde `<thead>` `display:none` sonrası sort/tümünü-seç kontrollerinin
       Tab sırasından gerçekten çıktığı (visual/manual, Chrome)
-- [ ] Kağıt/Grafit tema kontrastı (visual)
 
 ## 12. Do / Don't
 

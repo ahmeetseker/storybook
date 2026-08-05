@@ -92,8 +92,8 @@ Açık/kapalı metni switch'e yazılmaz; gerekiyorsa satır açıklamasında gö
 varyantları CSS'te) kontrol token'ları switch oranına uymadığı için yerel
 değişkenlerde (`--lg-switch-w/h/thumb`); kök kapsül padding'i de yerel
 değişkende toplandı (`--lg-switch-pad: 3px`). Bilinçli bırakılanlar: thumb
-`background: #fff` (cam üstü kontrast — tema token'ı değil, her temada
-beyaz) ve thumb gölgesi `0 1px 3px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.15)`
+`background: #fff` (cam üstü kontrast — tema token'ı değil, sabit beyaz) ve
+thumb gölgesi `0 1px 3px rgba(0,0,0,.3), 0 0 1px rgba(0,0,0,.15)`
 (hiçbir `--lg-shadow-*` deseniyle birebir değil — dokunulmadı).
 Geçiş süresi `0.18s ease-out` raw (süre token'ı yok).
 

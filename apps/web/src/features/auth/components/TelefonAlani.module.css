@@ -1,0 +1,136 @@
+/* Ülke kodlu telefon alanı.
+
+   Çerçeve TEK bir kutuda: ülke seçimi ve numara ayrı kontroller olsa da
+   kullanıcı için tek bir alandır. Bu yüzden hairline, radius ve odak halkası
+   sarmalayıcıya (`.grup`) konur; içerideki iki kontrol çerçevesizdir ve
+   aralarında yalnız bir ayraç çizgisi durur. */
+
+.grup {
+  display: flex;
+  align-items: stretch;
+  min-block-size: var(--lg-control-md);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+/* Odak halkası gruba taşınır: iki kontrolden hangisi odaktaysa alanın
+   tamamı işaretlenir. `:focus-visible` şartı korunur — fare tıklamasında
+   halka çıkmaz. */
+.grup:has(:focus-visible) {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.grup[data-hatali] {
+  border-color: var(--lg-danger);
+}
+
+/* ---------- Ülke seçimi ---------- */
+
+/* Gerçek `<select>` bu kutunun içinde, tam boyutunda ve ŞEFFAF durur;
+   görünen kısım `.ulkeGosterim`. Amaç, seçimin görünümünü küçültürken
+   (kapalıyken ülke adı değil bayrak + arama kodu) yerel açılır listeyi
+   olduğu gibi korumak: dokunmatikte platformun kendi seçicisi açılır,
+   klavyede harf yazarak ülkeye atlanır. `appearance: none` ile kendi
+   listemizi çizmek bunların hiçbirini vermezdi. */
+.ulke {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.ulkeGosterim {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  padding-inline: var(--lg-space-3);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  white-space: nowrap;
+}
+
+.bayrak {
+  /* Bayrak emojisi metin ölçeğinden bir kademe büyük durur; emoji bayrağı
+     olmayan platformlarda ISO harfleri (ör. "TR") olarak çizilir — bilgi
+     yine okunur. */
+  font-size: var(--lg-text-headline);
+  line-height: 1;
+}
+
+.aramaKodu {
+  font-variant-numeric: tabular-nums;
+}
+
+.ok {
+  inline-size: var(--lg-space-3);
+  block-size: var(--lg-space-3);
+  color: var(--lg-label-secondary);
+}
+
+.ulkeSecim {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* Görünmez ama YERİNDE: tıklama, klavye ve ekran okuyucu hedefi budur. */
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Zorlanmış renk kiplerinde (Windows yüksek kontrast) `opacity: 0` bir
+   kontrolü gerçekten kaybettirir — orada gösterim katmanı bırakılır,
+   seçimin kendisi görünür kılınır. */
+@media (forced-colors: active) {
+  .ulkeGosterim {
+    display: none;
+  }
+
+  .ulkeSecim {
+    position: static;
+    opacity: 1;
+  }
+}
+
+/* ---------- Numara ---------- */
+
+/* Ayraç: iki kontrolün arasındaki tek çizgi. Kenarlık yerine sol çerçeve —
+   grubun dış çerçevesiyle aynı hairline. */
+.numara {
+  flex: 1;
+  min-inline-size: 0;
+  padding-inline: var(--lg-space-3);
+  border: 0;
+  border-inline-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  background: none;
+  color: var(--lg-label);
+  font: inherit;
+  font-size: var(--lg-text-body);
+}
+
+/* Halka gruba taşındığı için girdinin kendi halkası bastırılır — iç içe iki
+   halka çizilmesin. */
+.numara:focus-visible {
+  outline: none;
+}
+
+.numara::placeholder {
+  color: var(--lg-label-secondary);
+}
+
+/* Bkz. KayitAdimSeridi.module.css — 1px kırpma geometrisi, token değil. */
+.srOnly {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

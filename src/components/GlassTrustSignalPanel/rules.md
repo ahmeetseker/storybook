@@ -110,7 +110,7 @@ Varsayılan kombinasyon: `variant=panel`, `title='Güven Kontrolleri'`,
 | Eksen | Durum |
 |---|---|
 | `material` | N/A — flat içerik yüzeyi, cam eksen yok |
-| `tone` (tema light/dark/auto) | N/A — durum rengi `signal.status`'tan otomatik türer, override prop'u yok |
+| `tone` (zemin bağlamı: light/dark/auto) | N/A — durum rengi `signal.status`'tan otomatik türer, override prop'u yok |
 | `size` | N/A — spec'te istenmedi, tek sabit ölçek |
 | `thickness`/`prominent` | N/A — cam olmayan component |
 
@@ -214,8 +214,7 @@ Responsive (mobile1), Erişilebilirlik (docs description'lı).
 
 `States`/`Sizes`/`Materials` story'si N/A — component etkileşimsiz (geri
 bildirim düğmeleri hariç) ve tek sabit ölçek/malzeme (`DurumÖrnekleri` story'si
-renk eksenini karşılar). `Temalar` ayrı story olarak yok — toolbar'la otomatik
-doğrulanır.
+renk eksenini karşılar).
 
 ## 11. Test kabul kriterleri
 
@@ -235,7 +234,6 @@ doğrulanır.
 - [x] `loading=true`: `aria-busy="true"`, gerçek liste/özet gizli
 - [x] loading duyurusu her zaman mount'lu `aria-live="polite"` bölgede taşınır (aynı DOM node, `loading=false→true` arası yalnız metin değişir)
 - [x] boş `signals` dizisi hata fırlatmadan `"0/0 doğrulama geçti"` render eder
-- [ ] iki temada (Kağıt/Grafit) renk kontrastı (visual)
 - [ ] `loading` placeholder'ının reduced-motion'da animasyonsuz kalması (visual)
 
 ## 12. Do / Don't

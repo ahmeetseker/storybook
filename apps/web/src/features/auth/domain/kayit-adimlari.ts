@@ -1,5 +1,6 @@
-import type { KayitAlanHatalari, KayitBilgileri } from './auth-types'
+import type { KayitAlanHatalari } from './auth-types'
 import type { OdakAlani } from './form-erisilebilirlik'
+import { adimHatalariniSuz, hataliAdimIndeksiniBul } from './adim-suzgeci'
 
 /**
  * Kayıt akışının adım tanımları.
@@ -81,13 +82,7 @@ export function adimHatalari(
   hatalar: KayitAlanHatalari,
   adim: KayitAdimi,
 ): KayitAlanHatalari {
-  const suzulmus: KayitAlanHatalari = {}
-  for (const alan of adim.alanlar) {
-    const ad = alan.ad as keyof KayitBilgileri
-    const mesaj = hatalar[ad]
-    if (mesaj) suzulmus[ad] = mesaj
-  }
-  return suzulmus
+  return adimHatalariniSuz(hatalar, adim)
 }
 
 /**
@@ -95,7 +90,7 @@ export function adimHatalari(
  * Son adımdaki tam doğrulama başarısız olursa kullanıcı bu adıma taşınır.
  */
 export function hataliAdimIndeksi(hatalar: KayitAlanHatalari): number {
-  return KAYIT_ADIMLARI.findIndex((adim) => Object.keys(adimHatalari(hatalar, adim)).length > 0)
+  return hataliAdimIndeksiniBul(hatalar, KAYIT_ADIMLARI)
 }
 
 /** İlerleme şeridinin tek bir adım öğesi. */

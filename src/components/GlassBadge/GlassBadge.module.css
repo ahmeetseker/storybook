@@ -19,7 +19,7 @@
 /* Adaptif ton: düz overlay değil, yarı saydam tint (Apple tint kuralı) */
 .tinted {
   background-color: color-mix(in srgb, var(--glass-tint) 65%, transparent);
-  color: #fff; /* bilinçli raw: tint zemini temadan bağımsız — accent-contrast Grafit'te koyulaşır, birebir değil (bkz. rules.md §9) */
+  color: #fff; /* bilinçli raw: tint zemini semantik renkten gelir, yüzeyden değil — `--lg-accent-contrast` amber zemine göre tanımlıdır, bu tint'lerin birebir karşılığı değil (bkz. rules.md §9) */
 }
 /* Flat malzemede yarı saydam tint soluk kalır; opak tam renk kullan */
 .tinted[data-material='flat'] {

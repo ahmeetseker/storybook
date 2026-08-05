@@ -229,9 +229,8 @@ eşik üç örnek), States (Geri Bildirim: `onFeedback` var/yok + `loading`),
 UzunIcerik, Responsive (mobile1 + dokunmatik geri bildirim butonları),
 Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Temalar` ayrı story olarak yok: `size` ekseni tanımlı değil (yalnız
-`variant`'a bağlı iki sabit ölçek), tema toolbar'la otomatik doğrulanır
-(GlassScoreMeter ile aynı karar).
+`Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (yalnız
+`variant`'a bağlı iki sabit ölçek, GlassScoreMeter ile aynı karar).
 
 ## 11. Test kabul kriterleri
 

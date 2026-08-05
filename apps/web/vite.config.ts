@@ -43,6 +43,19 @@ export default defineConfig({
     ],
     dedupe: ['react', 'react-dom', 'motion'],
   },
+  /**
+   * `leaflet` uygulamaya `@repo/ui` kaynağı üzerinden, üstelik DİNAMİK
+   * `import('leaflet')` ile giriyor (bkz. GlassMap/useBasemap.ts). Vite'ın
+   * bağımlılık tarayıcısı uygulama kökünün dışındaki bu dinamik içe aktarımı
+   * ilk taramada göremiyor; sonuç olarak modül ön paketlenmiyor ve istek
+   * 504 ile düşüyordu. `import()` reddedilince `useBasemap` hata dalına
+   * geçiyor ve TÜM haritalar şematik yedeğe düşüyordu ("Harita zemini
+   * yüklenemedi"). Bağımlılık burada açıkça bildirilerek ön paketleme
+   * garanti altına alınır.
+   */
+  optimizeDeps: {
+    include: ['leaflet'],
+  },
   plugins: [
     tanstackStart({
       // Statik dağıtımda her route için HTML üretilir. Crawler'ın bulduğu

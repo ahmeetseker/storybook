@@ -18,6 +18,12 @@ export interface ListingSummary {
   unitPrice: number
   city: string
   district: string
+  /**
+   * Mahalle — aramanın en ince coğrafi kırılımı. İl/ilçe çoğu kez fazla geniş:
+   * aynı ilçede fiyat iki katına çıkabildiği için kullanıcı mahalle düzeyinde
+   * daraltmak ister (araştırmada 7 ayrı kaynakta ayrı bir kriter olarak geçti).
+   */
+  neighbourhood: string
   image: { src: string; alt: string }
   imageCount: number
   verified: boolean
@@ -26,7 +32,27 @@ export interface ListingSummary {
   publishedDays: number
   attributes: Record<string, string>
   highlights: string[]
+  /** Şematik harita yüzeyi için 0-1 normalize konum (zemin yüklenemezse kullanılır) */
   map: { x: number; y: number }
+  /**
+   * Gerçek coğrafi konum. Harita yoğunluk rozetlerini bu koordinatlardan
+   * kümeler; şematik `map.x/y` ile karıştırılmamalıdır — o yalnız zeminsiz
+   * gerileme görünümü içindir.
+   */
+  coordinates: { lat: number; lng: number }
+  /**
+   * Filtre kataloğundaki ÇOKLU SEÇİM ve EVET/HAYIR facet'lerinin değerleri.
+   * `attributes` ilan detayında gösterilen beyan satırlarıdır ve tek değerlidir;
+   * burada bir ilan aynı facet'in birden çok değerini taşıyabilir (ör. iç
+   * özellikler: ankastre + şömine). İkisini ayırmak, detay sayfasındaki beyan
+   * künyesini filtreleme ihtiyacına göre bozmamak içindir.
+   */
+  facets: Record<string, string[]>
+  /**
+   * Filtre kataloğundaki SAYISAL ARALIK facet'lerinin değerleri (bina yaşı,
+   * banyo sayısı, aidat…). Aralık filtresi bu sözlükten okunur.
+   */
+  metrics: Record<string, number>
 }
 
 export interface FacetBucket {
@@ -238,12 +264,263 @@ export function placeholderImage(
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
+/**
+ * İlçe merkezlerinin yaklaşık koordinatları. Harita yoğunluk rozetleri gerçek
+ * coğrafyadan kümelenir: aynı ilçedeki ilanlar uzaktan tek rozette toplanır,
+ * yaklaşıldıkça ayrışır. Değerler ilçe merkezidir — parselin tam konumu
+ * değildir (mahremiyet; bkz. ListingLocationSection).
+ */
+const DISTRICT_COORDINATES: Record<string, [number, number]> = {
+  'istanbul/kadıköy': [40.99, 29.03],
+  'istanbul/ataşehir': [40.984, 29.107],
+  'izmir/urla': [38.323, 26.765],
+  'izmir/bayraklı': [38.462, 27.171],
+  'izmir/konak': [38.418, 27.128],
+  'izmir/çeşme': [38.324, 26.305],
+  'ankara/çankaya': [39.905, 32.854],
+  'ankara/gölbaşı': [39.79, 32.809],
+  'bursa/nilüfer': [40.213, 28.937],
+  'muğla/bodrum': [37.035, 27.43],
+  'antalya/kaş': [36.202, 29.639],
+  'afyonkarahisar/merkez': [38.757, 30.539],
+}
+
+/** Türkiye'nin kabaca merkezi — sözlükte olmayan ilçe için son çare. */
+const FALLBACK_COORDINATES: [number, number] = [39.0, 35.3]
+
+/**
+ * Aynı ilçedeki varyantlar tam olarak üst üste binmesin diye koordinat
+ * deterministik bir desenle azıcık dağıtılır (Math.random YASAK: aynı ilan
+ * her yüklemede aynı yerde durmalı). Kayma ~1 km ölçeğindedir; ilçe kimliği
+ * korunur, rozet sayıları doğru kalır.
+ */
+function spreadCoordinates(
+  city: string,
+  district: string,
+  index: number,
+): { lat: number; lng: number } {
+  const base = DISTRICT_COORDINATES[`${city}/${district}`] ?? FALLBACK_COORDINATES
+  // Altın oranlı açı adımı: ardışık indeksler birbirine en uzak açılara düşer.
+  const angle = index * 2.39996
+  const radius = 0.006 * Math.sqrt(index)
+  return {
+    lat: base[0] + radius * Math.cos(angle),
+    lng: base[1] + radius * Math.sin(angle),
+  }
+}
+
+/**
+ * Facet ve metrik üretimi.
+ *
+ * Filtre paneli ancak filtrelediği veri varsa dürüsttür: kriter gösterip
+ * sonucu daraltmamak yalancı bir kontroldür. Sabit kurgu kaydı bu yüzden
+ * katalogdaki her facet için değer taşır. Üretim DETERMİNİSTİKTİR
+ * (Math.random YASAK): aynı ilan her yüklemede aynı özelliklere sahiptir,
+ * aksi halde kullanıcı filtreyi uygulayıp geri döndüğünde sonuç değişirdi.
+ *
+ * Değerler indeksten türetilen sabit bir desenden seçilir; gerçek servis
+ * bağlandığında bu fonksiyonun yerini API cevabı alır, `ListingSummary`
+ * sözleşmesi değişmez.
+ */
+function pick<T>(values: readonly T[], seed: number): T {
+  return values[seed % values.length]
+}
+
+/** `seed`'e göre listeden 0-2 arası öğe seçer — çoklu seçim facet'leri için. */
+function pickSome(values: readonly string[], seed: number, count: number): string[] {
+  const chosen: string[] = []
+  for (let i = 0; i < count; i++) {
+    const value = values[(seed + i * 3) % values.length]
+    if (!chosen.includes(value)) chosen.push(value)
+  }
+  return chosen
+}
+
+/** Oda sayısı gösterimi — TR pazarının kendi biçimi (salon + oda). */
+const ROOM_VALUES = ['1+0', '1+1', '2+1', '3+1', '3+2', '4+1', '4+2', '5+1'] as const
+
+/**
+ * Mahalle adları. Türkiye genelinde yaygın mahalle adlarından deterministik
+ * olarak seçilir — kurgu kayıt için gerçekçi, uydurma bir yer adı üretmez.
+ */
+const NEIGHBOURHOODS = [
+  'merkez',
+  'cumhuriyet',
+  'atatürk',
+  'yeni',
+  'bahçelievler',
+  'fatih',
+  'yeşilyurt',
+  'çamlık',
+] as const
+
+function neighbourhoodFor(district: string, seed: number): string {
+  return NEIGHBOURHOODS[(seed + district.length) % NEIGHBOURHOODS.length]
+}
+
+/** Bina yaşı tek yerden türetilir: hem metrik hem deprem yönetmeliği bunu okur. */
+function buildingAgeFor(seed: number): number {
+  return (seed * 3) % 41
+}
+
+function roomsFor(seed: number): string {
+  return ROOM_VALUES[seed % ROOM_VALUES.length]
+}
+
+const BUILT_CATEGORIES = new Set(['residential', 'commercial', 'building', 'timeshare', 'touristic'])
+
+function buildFacets(
+  template: (typeof TEMPLATES)[number],
+  seed: number,
+  rooms: string,
+  buildingAge: number,
+): Record<string, string[]> {
+  const facets: Record<string, string[]> = {}
+  const built = BUILT_CATEGORIES.has(template.category)
+  const isLand = template.category === 'land'
+
+  // Her kategoride anlamlı olanlar
+  facets.deed = [pick(['condominium', 'easement', 'detached', 'shared'], seed)]
+  facets.view = pickSome(['sea', 'nature', 'city', 'lake', 'pool'], seed, 1 + (seed % 2))
+  facets['listing-age'] = [pick(['today', '3d', '7d', '30d'], seed)]
+  if (seed % 3 !== 0) facets['has-photo'] = ['1']
+  if (seed % 5 === 0) facets['has-video'] = ['1']
+  if (seed % 4 === 1) facets['has-virtual-tour'] = ['1']
+  // Yabancı alıcı için belirleyici: TR'de vatandaşlık eşiği fiyata bağlıdır,
+  // bu yüzden yüksek bedelli ilanlarda işaretlenir.
+  if (seed % 5 !== 4) facets['citizenship-eligible'] = ['1']
+  if (seed % 4 !== 3) facets['credit-eligible'] = ['1']
+  if (seed % 6 === 0) facets.exchange = ['1']
+  if (seed % 7 === 0) facets['price-reduced'] = ['1']
+  facets.neighbourhood = pickSome(['school', 'hospital', 'market', 'mall', 'seaside', 'park'], seed, 2)
+  facets.transport = pickSome(['metro', 'metrobus', 'bus', 'minibus', 'train', 'highway'], seed, 2)
+
+  if (built) {
+    facets.heating = [
+      pick(['natural-gas', 'central', 'central-share', 'floor-heating', 'air-conditioning', 'stove'], seed),
+    ]
+    facets.parking = [pick(['closed', 'open', 'garage', 'none'], seed)]
+    facets.furnished = [pick(['yes', 'no', 'partly'], seed)]
+    facets['usage-status'] = [pick(['empty', 'owner', 'tenant'], seed)]
+    facets['structure-type'] = [pick(['reinforced-concrete', 'steel', 'masonry', 'prefabricated'], seed)]
+    // Deprem yönetmeliği bina yaşıyla TUTARLI üretilir: 2018 sonrası bir bina
+    // 30 yaşında olamaz. Tutarsız kurgu veri, filtreyi test ederken yanlış
+    // güven verirdi.
+    facets['earthquake-code'] = [
+      buildingAge <= 8 ? 'post-2018' : buildingAge <= 26 ? '2000-2018' : 'pre-2000',
+    ]
+    facets['rent-period'] =
+      template.transaction === 'rent'
+        ? [pick(['monthly', 'weekly', 'daily', 'seasonal'], seed)]
+        : ['monthly']
+    facets['available-from'] = [pick(['now', '1m', '3m'], seed)]
+    facets.facade = pickSome(['north', 'south', 'east', 'west'], seed, 1 + (seed % 2))
+    facets['interior-features'] = pickSome(
+      ['built-in', 'fitted-kitchen', 'dressing-room', 'ensuite', 'fireplace', 'steel-door', 'laminate', 'pvc-window'],
+      seed,
+      2,
+    )
+    facets['exterior-features'] = pickSome(
+      ['pool', 'gym', 'security', 'generator', 'playground', 'garden', 'car-park', 'thermal-insulation'],
+      seed,
+      2,
+    )
+    if (seed % 2 === 0) facets.elevator = ['1']
+    if (seed % 3 === 0) facets['in-complex'] = ['1']
+    if (seed % 4 === 0) facets.accessible = ['1']
+    if (seed % 5 === 1) facets['habitation-certificate'] = ['1']
+  }
+
+  if (template.category === 'residential' || template.category === 'timeshare') {
+    facets.rooms = [rooms]
+    facets['housing-type'] = [
+      pick(['apartment', 'residence', 'detached-house', 'villa', 'summer-house', 'duplex', 'loft'], seed),
+    ]
+    facets.kitchen = [pick(['american', 'closed', 'open'], seed)]
+    if (seed % 3 !== 2) facets.balcony = ['1']
+  }
+  if (template.category === 'residential') {
+    if (seed % 4 === 1) facets['pets-allowed'] = ['1']
+    if (seed % 4 === 2) facets['students-allowed'] = ['1']
+  }
+  if (template.category === 'residential' || template.category === 'commercial' || template.category === 'timeshare') {
+    facets['floor-located'] = [
+      pick(['basement', 'garden-floor', 'ground', 'low-rise', 'mid-rise', 'high-rise', 'penthouse'], seed),
+    ]
+  }
+
+  if (template.category === 'commercial') {
+    facets['commercial-type'] = [
+      pick(['office', 'shop', 'depot', 'factory', 'workshop', 'plaza-floor'], seed),
+    ]
+  }
+  if (template.category === 'timeshare') {
+    facets['timeshare-period'] = [pick(['summer', 'winter', 'spring', 'autumn', 'fixed-week'], seed)]
+  }
+
+  if (isLand || template.category === 'building') {
+    facets.zoning = [
+      pick(['residential', 'commercial', 'tourism', 'industrial', 'agricultural', 'vineyard'], seed),
+    ]
+  }
+  if (isLand) {
+    facets.infrastructure = pickSome(
+      ['electricity', 'water', 'natural-gas', 'sewage', 'road', 'telephone'],
+      seed,
+      2 + (seed % 3),
+    )
+  }
+
+  return facets
+}
+
+function buildMetrics(
+  template: (typeof TEMPLATES)[number],
+  seed: number,
+  area: number,
+  unitPrice: number,
+  price: number,
+): Record<string, number> {
+  const metrics: Record<string, number> = { 'price-per-sqm': unitPrice }
+  // Denize uzaklık her kategoride anlamlı; kıyı ilanlarında küçük değer üretir.
+  metrics['distance-to-sea'] = 120 + ((seed * 613) % 24000)
+  const built = BUILT_CATEGORIES.has(template.category)
+
+  if (built) {
+    // Net alan brütün altındadır — beyanlar arasındaki bu fark gerçek pazarda
+    // da kritiktir, filtre onu ayırt edebilmelidir.
+    metrics['net-area'] = Math.round(area * 0.85)
+    metrics['building-age'] = buildingAgeFor(seed)
+    metrics['living-rooms'] = 1 + (seed % 2)
+    metrics['ceiling-height'] = Number((2.6 + ((seed % 8) * 0.35)).toFixed(2))
+    metrics['unit-count'] = 2 + ((seed * 3) % 40)
+    metrics.bathrooms = 1 + (seed % 3)
+    metrics['floor-count'] = 2 + (seed % 12)
+    metrics.dues = 250 + ((seed * 137) % 4000)
+    if (template.transaction === 'rent') metrics.deposit = price * (1 + (seed % 2))
+    if (seed % 3 === 0) metrics['open-area'] = 15 + ((seed * 7) % 120)
+  }
+  if (template.category === 'land' || template.category === 'building' || template.category === 'touristic') {
+    metrics['land-area'] = template.category === 'land' ? area : area * (2 + (seed % 3))
+  }
+  if (template.category === 'land') {
+    // KAKS iki ondalıklı taşınır; aralık filtresi ondalık eşiklerle çalışır.
+    metrics['floor-area-ratio'] = Number((0.3 + ((seed % 12) * 0.15)).toFixed(2))
+    metrics['road-width'] = 5 + ((seed * 2) % 20)
+    metrics['building-height-limit'] = 6.5 + ((seed % 6) * 3)
+  }
+  return metrics
+}
+
 export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
   (template, templateIndex) =>
     Array.from({ length: 6 }, (_, variantIndex) => {
       const multiplier = 1 + variantIndex * 0.045
       const area = Math.round(template.area * (1 + variantIndex * 0.018))
       const price = Math.round(template.price * multiplier)
+      // Tek tohum: aynı ilanın tüm türetilmiş özellikleri bundan çıkar, böylece
+      // kayıt her yüklemede aynı kalır.
+      const seed = templateIndex * 6 + variantIndex
       const label = `${CATEGORY_LABELS[template.category]} · ${template.district}`
       return {
         id: `listing-${templateIndex + 1}-${variantIndex + 1}`,
@@ -258,6 +535,7 @@ export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
         unitPrice: Math.round(price / area),
         city: template.city,
         district: template.district,
+        neighbourhood: neighbourhoodFor(template.district, seed),
         image: {
           src: placeholderImage(template.category, label),
           alt: `${label} ilan görseli`,
@@ -276,6 +554,13 @@ export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
           x: 0.08 + ((templateIndex * 17 + variantIndex * 9) % 84) / 100,
           y: 0.1 + ((templateIndex * 11 + variantIndex * 13) % 80) / 100,
         },
+        coordinates: spreadCoordinates(
+          template.city,
+          template.district,
+          templateIndex * 6 + variantIndex,
+        ),
+        facets: buildFacets(template, seed, roomsFor(seed), buildingAgeFor(seed)),
+        metrics: buildMetrics(template, seed, area, Math.round(price / area), price),
       }
     }),
 )
@@ -296,6 +581,12 @@ function matchesState(item: ListingSummary, state: ListingSearchState) {
   if (state.category !== 'all' && item.category !== state.category) return false
   if (state.city && item.city !== state.city) return false
   if (state.district && item.district !== state.district) return false
+  if (state.neighbourhood && item.neighbourhood !== state.neighbourhood) return false
+  if (state.mapArea) {
+    const [[south, west], [north, east]] = state.mapArea
+    const { lat, lng } = item.coordinates
+    if (lat < south || lat > north || lng < west || lng > east) return false
+  }
   if (item.transaction === 'sale' && !inRange(item.price, state.salePrice))
     return false
   if (item.transaction === 'rent' && !inRange(item.price, state.rentPrice))
@@ -304,9 +595,24 @@ function matchesState(item: ListingSummary, state: ListingSearchState) {
   if (!inRange(item.unitPrice, state.unitPrice)) return false
   if (state.verified && !item.verified) return false
   if (state.owners.length > 0 && !state.owners.includes(item.owner)) return false
-  return Object.entries(state.categoryFilters).every(([key, values]) => {
-    const actual = item.attributes[key]
-    return !actual || values.length === 0 || values.includes(actual)
+  // Katalog filtreleri: seçilen değerlerden EN AZ BİRİ ilanda bulunmalı (OR).
+  // Eskiden özelliği hiç taşımayan ilan da geçiyordu (`!actual || …`); bu,
+  // seçilen kriterin sonucu daraltmaması demekti — panelde işaretli duran
+  // filtre hiçbir şey yapmıyordu. Veri yoksa ilan artık ELENİR.
+  const facetsPass = Object.entries(state.categoryFilters).every(([key, values]) => {
+    if (values.length === 0) return true
+    const actual = item.facets[key]
+    if (!actual || actual.length === 0) return false
+    return values.some((value) => actual.includes(value))
+  })
+  if (!facetsPass) return false
+
+  // Sayısal aralık filtreleri aynı kuralı izler: ölçüsü olmayan ilan elenir.
+  return Object.entries(state.categoryRanges).every(([key, bounds]) => {
+    if (bounds.min === undefined && bounds.max === undefined) return true
+    const actual = item.metrics[key]
+    if (actual === undefined) return false
+    return inRange(actual, bounds)
   })
 }
 

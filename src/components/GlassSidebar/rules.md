@@ -255,9 +255,9 @@ viewport) · **HesapDegistirici** (menu açılışı, `menuitemradio`, Escape il
 odak dönüşü — play testi) · **Kompakt** (comfortable ↔ compact yan yana, aynı
 içerik) · **DaraltilmisRay** (68px ray; daralt/genişlet düğmesi + play testi:
 erişilebilir ad, `title`, `role="group"` adı ve monogram Switcher menüsü).
-**Eksik:** Playground (Controls matrisi) · Temalar (Kağıt/Grafit yan yana) ·
-`density="compact" collapsed` kombinasyonu için ayrı story (Controls'tan
-denenebilir). Sizes: N/A — `density` yoğunluk ekseni, `size` değil.
+**Eksik:** Playground (Controls matrisi) · `density="compact" collapsed`
+kombinasyonu için ayrı story (Controls'tan denenebilir). Sizes: N/A —
+`density` yoğunluk ekseni, `size` değil.
 
 ## 11. Test kabul kriterleri
 
@@ -289,7 +289,7 @@ denenebilir). Sizes: N/A — `density` yoğunluk ekseni, `size` değil.
 - [ ] Daraltılmış rayda rozet noktasının ikon sağ üstüne oturması (visual/Chromatic)
 - [ ] reduced-motion'da height animasyonu yerine opacity (visual)
 - [ ] Kayan highlight'ın satırlar arası geçişi (visual/Chromatic)
-- [ ] `material="flat"` katman kontrastı Kağıt/Grafit temada (visual)
+- [ ] `material="flat"` katman kontrastı (visual)
 
 ## 12. Do / Don't
 

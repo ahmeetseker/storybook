@@ -110,8 +110,7 @@ süresi/easing (`0.15s ease-out`) süre token'ı olmadığından raw.
 ## 10. Storybook kapsamı
 
 Var: Default, Severities (4'lü matris), WithActionAndDismiss, CustomIcon,
-MobileLayout (`viewport: mobile1`). **Eksik:** RTL, koyu tema forced görseli
-(tema toolbar'dan test ediliyor).
+MobileLayout (`viewport: mobile1`). **Eksik:** RTL.
 
 ## 11. Test kabul kriterleri
 

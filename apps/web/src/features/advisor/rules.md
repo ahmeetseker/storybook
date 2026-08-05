@@ -156,7 +156,7 @@ Tüm özel kontroller yalnız `:focus-visible` durumunda
 | Part | Property | Token | State override |
 |---|---|---|---|
 | Page/layout | gap, padding, ölçülen rail yüksekliği | `--lg-space-*`, `--lg-shell-dock-offset`, `--lg-advisor-profile-block-size` | Dış container ve iç frame ayrıdır; dar container’da daha sıkı ritim; safe-area korunur |
-| Flat surfaces | background, border, radius | `--lg-surface`, `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-card` | Tema token’ları Kağıt/Grafit değerlerini sağlar |
+| Flat surfaces | background, border, radius | `--lg-surface`, `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-card` | Değerler `:root` token’larından gelir |
 | Media | radius, background | `--lg-radius-media`, `--lg-bg` | N/A |
 | Chips/badges | radius, type | `--lg-radius-chip`, `--lg-radius-capsule`, `--lg-text-badge` | Verification semantik token kullanır |
 | Controls | height, radius | `--lg-control-sm/md`, `--lg-radius-chip/capsule` | Coarse pointer’da `--lg-control-md` minimum |
@@ -182,8 +182,6 @@ ve yerel shadow kullanılmaz. Token borcu yoktur.
 | `LongTurkishContent` | Var | Uzun sorgu ve başlık |
 | `NarrowContainer` | Var | Story-local full-bleed ile gerçek 390 container ve tam genişlik akışı |
 | `MediumContainer` | Var | Story-local full-bleed ile gerçek 768 container ve profil-önce akış |
-| `PaperResults` | Var | `backgroundKey: light` |
-| `GraphiteResults` | Var | `backgroundKey: dark` |
 | `Accessibility` | Var | Portal drawer, Escape/focus dönüşü, compare ARIA |
 
 Playground/controls: N/A — sayfa state’leri public görsel eksenler değil,
@@ -225,8 +223,8 @@ keyboard focus’unu kullanır.
 - 40rem ve altında dar dal; üstünde ve 64rem’e kadar orta dal kullanılır.
   Dar container’da aynı DOM/görsel sıra ve tam genişlik kartlar vardır.
 - İç içe scroll, yatay taşma ve global dock/safe-area çakışması yoktur.
-- Kağıt/Grafit, uzun Türkçe içerik ve reduced motion/transparency
-  koşulları Storybook/görsel denetime açıktır.
+- Uzun Türkçe içerik ve reduced motion/transparency koşulları
+  Storybook/görsel denetime açıktır.
 
 ## 12. Do / Don't + Bilinen kısıtlar + Açık kararlar + Changelog
 

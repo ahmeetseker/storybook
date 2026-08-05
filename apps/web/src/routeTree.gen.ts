@@ -14,6 +14,7 @@ import { Route as AiDanismanRouteImport } from './routes/ai-danisman'
 import { Route as ArsaAraRouteImport } from './routes/arsa-ara'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BolgelerRouteImport } from './routes/bolgeler'
+import { Route as EPostaDogrulaRouteImport } from './routes/e-posta-dogrula'
 import { Route as EmlakRouteImport } from './routes/emlak'
 import { Route as FavorilerRouteImport } from './routes/favoriler'
 import { Route as GirisRouteImport } from './routes/giris'
@@ -24,7 +25,13 @@ import { Route as KarsilastirRouteImport } from './routes/karsilastir'
 import { Route as KayitRouteImport } from './routes/kayit'
 import { Route as KonseptlerRouteImport } from './routes/konseptler'
 import { Route as OfislerRouteImport } from './routes/ofisler'
-import { Route as GirisBaglantiGonderildiRouteImport } from './routes/giris_.baglanti-gonderildi'
+import { Route as OrganizasyonSecRouteImport } from './routes/organizasyon-sec'
+import { Route as OturumSuresiDolduRouteImport } from './routes/oturum-suresi-doldu'
+import { Route as ParolaDegistirRouteImport } from './routes/parola-degistir'
+import { Route as ParolaSifirlaRouteImport } from './routes/parola-sifirla'
+import { Route as YetkisizRouteImport } from './routes/yetkisiz'
+import { Route as DavetTokenRouteImport } from './routes/davet.$token'
+import { Route as DavetGecersizRouteImport } from './routes/davet.gecersiz'
 import { Route as GirisHataRouteImport } from './routes/giris_.hata'
 import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
@@ -36,6 +43,7 @@ import { Route as HesabimIlanlarimRouteImport } from './routes/hesabim.ilanlarim
 import { Route as HesabimKayitliAramaRouteImport } from './routes/hesabim.kayitli-arama'
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim.mesajlar'
 import { Route as HesabimOdemelerRouteImport } from './routes/hesabim.odemeler'
+import { Route as HesapAskidaRouteImport } from './routes/hesap.askida'
 import { Route as HesapDogrulaRouteImport } from './routes/hesap.dogrula'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
 import { Route as KayitHesapVarRouteImport } from './routes/kayit_.hesap-var'
@@ -47,7 +55,11 @@ import { Route as KonseptlerAiKesifRouteImport } from './routes/konseptler.ai-ke
 import { Route as KonseptlerGuvenMerkeziRouteImport } from './routes/konseptler.guven-merkezi'
 import { Route as KonseptlerHaritaKesfiRouteImport } from './routes/konseptler.harita-kesfi'
 import { Route as KonseptlerPazarVitriniRouteImport } from './routes/konseptler.pazar-vitrini'
-import { Route as GirisBaglantiGecersizRouteImport } from './routes/giris_.baglanti_.gecersiz'
+import { Route as ParolaSifirlaGecersizRouteImport } from './routes/parola-sifirla_.gecersiz'
+import { Route as ParolaSifirlaGonderildiRouteImport } from './routes/parola-sifirla_.gonderildi'
+import { Route as ParolaSifirlaTamamRouteImport } from './routes/parola-sifirla_.tamam'
+import { Route as ParolaSifirlaYeniRouteImport } from './routes/parola-sifirla_.yeni'
+import { Route as GirisGoogleCallbackRouteImport } from './routes/giris_.google_.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -72,6 +84,11 @@ const BlogRoute = BlogRouteImport.update({
 const BolgelerRoute = BolgelerRouteImport.update({
   id: '/bolgeler',
   path: '/bolgeler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EPostaDogrulaRoute = EPostaDogrulaRouteImport.update({
+  id: '/e-posta-dogrula',
+  path: '/e-posta-dogrula',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmlakRoute = EmlakRouteImport.update({
@@ -124,9 +141,39 @@ const OfislerRoute = OfislerRouteImport.update({
   path: '/ofisler',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GirisBaglantiGonderildiRoute = GirisBaglantiGonderildiRouteImport.update({
-  id: '/giris_/baglanti-gonderildi',
-  path: '/giris/baglanti-gonderildi',
+const OrganizasyonSecRoute = OrganizasyonSecRouteImport.update({
+  id: '/organizasyon-sec',
+  path: '/organizasyon-sec',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OturumSuresiDolduRoute = OturumSuresiDolduRouteImport.update({
+  id: '/oturum-suresi-doldu',
+  path: '/oturum-suresi-doldu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaDegistirRoute = ParolaDegistirRouteImport.update({
+  id: '/parola-degistir',
+  path: '/parola-degistir',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaSifirlaRoute = ParolaSifirlaRouteImport.update({
+  id: '/parola-sifirla',
+  path: '/parola-sifirla',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YetkisizRoute = YetkisizRouteImport.update({
+  id: '/yetkisiz',
+  path: '/yetkisiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DavetTokenRoute = DavetTokenRouteImport.update({
+  id: '/davet/$token',
+  path: '/davet/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DavetGecersizRoute = DavetGecersizRouteImport.update({
+  id: '/davet/gecersiz',
+  path: '/davet/gecersiz',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GirisHataRoute = GirisHataRouteImport.update({
@@ -184,6 +231,11 @@ const HesabimOdemelerRoute = HesabimOdemelerRouteImport.update({
   path: '/odemeler',
   getParentRoute: () => HesabimRoute,
 } as any)
+const HesapAskidaRoute = HesapAskidaRouteImport.update({
+  id: '/hesap/askida',
+  path: '/hesap/askida',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HesapDogrulaRoute = HesapDogrulaRouteImport.update({
   id: '/hesap/dogrula',
   path: '/hesap/dogrula',
@@ -239,9 +291,29 @@ const KonseptlerPazarVitriniRoute = KonseptlerPazarVitriniRouteImport.update({
   path: '/pazar-vitrini',
   getParentRoute: () => KonseptlerRoute,
 } as any)
-const GirisBaglantiGecersizRoute = GirisBaglantiGecersizRouteImport.update({
-  id: '/giris_/baglanti_/gecersiz',
-  path: '/giris/baglanti/gecersiz',
+const ParolaSifirlaGecersizRoute = ParolaSifirlaGecersizRouteImport.update({
+  id: '/parola-sifirla_/gecersiz',
+  path: '/parola-sifirla/gecersiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaSifirlaGonderildiRoute = ParolaSifirlaGonderildiRouteImport.update({
+  id: '/parola-sifirla_/gonderildi',
+  path: '/parola-sifirla/gonderildi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaSifirlaTamamRoute = ParolaSifirlaTamamRouteImport.update({
+  id: '/parola-sifirla_/tamam',
+  path: '/parola-sifirla/tamam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParolaSifirlaYeniRoute = ParolaSifirlaYeniRouteImport.update({
+  id: '/parola-sifirla_/yeni',
+  path: '/parola-sifirla/yeni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GirisGoogleCallbackRoute = GirisGoogleCallbackRouteImport.update({
+  id: '/giris_/google_/callback',
+  path: '/giris/google/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -251,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/arsa-ara': typeof ArsaAraRoute
   '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
+  '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
@@ -261,7 +334,13 @@ export interface FileRoutesByFullPath {
   '/kayit': typeof KayitRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
-  '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/organizasyon-sec': typeof OrganizasyonSecRoute
+  '/oturum-suresi-doldu': typeof OturumSuresiDolduRoute
+  '/parola-degistir': typeof ParolaDegistirRoute
+  '/parola-sifirla': typeof ParolaSifirlaRoute
+  '/yetkisiz': typeof YetkisizRoute
+  '/davet/$token': typeof DavetTokenRoute
+  '/davet/gecersiz': typeof DavetGecersizRoute
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
@@ -272,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
+  '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
@@ -282,9 +362,13 @@ export interface FileRoutesByFullPath {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/parola-sifirla/gecersiz': typeof ParolaSifirlaGecersizRoute
+  '/parola-sifirla/gonderildi': typeof ParolaSifirlaGonderildiRoute
+  '/parola-sifirla/tamam': typeof ParolaSifirlaTamamRoute
+  '/parola-sifirla/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim/': typeof HesabimIndexRoute
   '/konseptler/': typeof KonseptlerIndexRoute
-  '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
+  '/giris/google/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -292,6 +376,7 @@ export interface FileRoutesByTo {
   '/arsa-ara': typeof ArsaAraRoute
   '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
+  '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
@@ -300,7 +385,13 @@ export interface FileRoutesByTo {
   '/karsilastir': typeof KarsilastirRoute
   '/kayit': typeof KayitRoute
   '/ofisler': typeof OfislerRoute
-  '/giris/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/organizasyon-sec': typeof OrganizasyonSecRoute
+  '/oturum-suresi-doldu': typeof OturumSuresiDolduRoute
+  '/parola-degistir': typeof ParolaDegistirRoute
+  '/parola-sifirla': typeof ParolaSifirlaRoute
+  '/yetkisiz': typeof YetkisizRoute
+  '/davet/$token': typeof DavetTokenRoute
+  '/davet/gecersiz': typeof DavetGecersizRoute
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
@@ -311,6 +402,7 @@ export interface FileRoutesByTo {
   '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
+  '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit/hesap-var': typeof KayitHesapVarRoute
@@ -321,9 +413,13 @@ export interface FileRoutesByTo {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/parola-sifirla/gecersiz': typeof ParolaSifirlaGecersizRoute
+  '/parola-sifirla/gonderildi': typeof ParolaSifirlaGonderildiRoute
+  '/parola-sifirla/tamam': typeof ParolaSifirlaTamamRoute
+  '/parola-sifirla/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim': typeof HesabimIndexRoute
   '/konseptler': typeof KonseptlerIndexRoute
-  '/giris/baglanti/gecersiz': typeof GirisBaglantiGecersizRoute
+  '/giris/google/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -332,6 +428,7 @@ export interface FileRoutesById {
   '/arsa-ara': typeof ArsaAraRoute
   '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
+  '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
   '/favoriler': typeof FavorilerRoute
   '/giris': typeof GirisRoute
@@ -342,7 +439,13 @@ export interface FileRoutesById {
   '/kayit': typeof KayitRoute
   '/konseptler': typeof KonseptlerRouteWithChildren
   '/ofisler': typeof OfislerRoute
-  '/giris_/baglanti-gonderildi': typeof GirisBaglantiGonderildiRoute
+  '/organizasyon-sec': typeof OrganizasyonSecRoute
+  '/oturum-suresi-doldu': typeof OturumSuresiDolduRoute
+  '/parola-degistir': typeof ParolaDegistirRoute
+  '/parola-sifirla': typeof ParolaSifirlaRoute
+  '/yetkisiz': typeof YetkisizRoute
+  '/davet/$token': typeof DavetTokenRoute
+  '/davet/gecersiz': typeof DavetGecersizRoute
   '/giris_/hata': typeof GirisHataRoute
   '/giris_/kod': typeof GirisKodRoute
   '/giris_/parola': typeof GirisParolaRoute
@@ -353,6 +456,7 @@ export interface FileRoutesById {
   '/hesabim/kayitli-arama': typeof HesabimKayitliAramaRoute
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
+  '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
   '/kayit_/hesap-var': typeof KayitHesapVarRoute
@@ -363,9 +467,13 @@ export interface FileRoutesById {
   '/konseptler/guven-merkezi': typeof KonseptlerGuvenMerkeziRoute
   '/konseptler/harita-kesfi': typeof KonseptlerHaritaKesfiRoute
   '/konseptler/pazar-vitrini': typeof KonseptlerPazarVitriniRoute
+  '/parola-sifirla_/gecersiz': typeof ParolaSifirlaGecersizRoute
+  '/parola-sifirla_/gonderildi': typeof ParolaSifirlaGonderildiRoute
+  '/parola-sifirla_/tamam': typeof ParolaSifirlaTamamRoute
+  '/parola-sifirla_/yeni': typeof ParolaSifirlaYeniRoute
   '/hesabim/': typeof HesabimIndexRoute
   '/konseptler/': typeof KonseptlerIndexRoute
-  '/giris_/baglanti_/gecersiz': typeof GirisBaglantiGecersizRoute
+  '/giris_/google_/callback': typeof GirisGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -375,6 +483,7 @@ export interface FileRouteTypes {
     | '/arsa-ara'
     | '/blog'
     | '/bolgeler'
+    | '/e-posta-dogrula'
     | '/emlak'
     | '/favoriler'
     | '/giris'
@@ -385,7 +494,13 @@ export interface FileRouteTypes {
     | '/kayit'
     | '/konseptler'
     | '/ofisler'
-    | '/giris/baglanti-gonderildi'
+    | '/organizasyon-sec'
+    | '/oturum-suresi-doldu'
+    | '/parola-degistir'
+    | '/parola-sifirla'
+    | '/yetkisiz'
+    | '/davet/$token'
+    | '/davet/gecersiz'
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
@@ -396,6 +511,7 @@ export interface FileRouteTypes {
     | '/hesabim/kayitli-arama'
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
+    | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
@@ -406,9 +522,13 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/parola-sifirla/gecersiz'
+    | '/parola-sifirla/gonderildi'
+    | '/parola-sifirla/tamam'
+    | '/parola-sifirla/yeni'
     | '/hesabim/'
     | '/konseptler/'
-    | '/giris/baglanti/gecersiz'
+    | '/giris/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -416,6 +536,7 @@ export interface FileRouteTypes {
     | '/arsa-ara'
     | '/blog'
     | '/bolgeler'
+    | '/e-posta-dogrula'
     | '/emlak'
     | '/favoriler'
     | '/giris'
@@ -424,7 +545,13 @@ export interface FileRouteTypes {
     | '/karsilastir'
     | '/kayit'
     | '/ofisler'
-    | '/giris/baglanti-gonderildi'
+    | '/organizasyon-sec'
+    | '/oturum-suresi-doldu'
+    | '/parola-degistir'
+    | '/parola-sifirla'
+    | '/yetkisiz'
+    | '/davet/$token'
+    | '/davet/gecersiz'
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
@@ -435,6 +562,7 @@ export interface FileRouteTypes {
     | '/hesabim/kayitli-arama'
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
+    | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit/hesap-var'
@@ -445,9 +573,13 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/parola-sifirla/gecersiz'
+    | '/parola-sifirla/gonderildi'
+    | '/parola-sifirla/tamam'
+    | '/parola-sifirla/yeni'
     | '/hesabim'
     | '/konseptler'
-    | '/giris/baglanti/gecersiz'
+    | '/giris/google/callback'
   id:
     | '__root__'
     | '/'
@@ -455,6 +587,7 @@ export interface FileRouteTypes {
     | '/arsa-ara'
     | '/blog'
     | '/bolgeler'
+    | '/e-posta-dogrula'
     | '/emlak'
     | '/favoriler'
     | '/giris'
@@ -465,7 +598,13 @@ export interface FileRouteTypes {
     | '/kayit'
     | '/konseptler'
     | '/ofisler'
-    | '/giris_/baglanti-gonderildi'
+    | '/organizasyon-sec'
+    | '/oturum-suresi-doldu'
+    | '/parola-degistir'
+    | '/parola-sifirla'
+    | '/yetkisiz'
+    | '/davet/$token'
+    | '/davet/gecersiz'
     | '/giris_/hata'
     | '/giris_/kod'
     | '/giris_/parola'
@@ -476,6 +615,7 @@ export interface FileRouteTypes {
     | '/hesabim/kayitli-arama'
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
+    | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
     | '/kayit_/hesap-var'
@@ -486,9 +626,13 @@ export interface FileRouteTypes {
     | '/konseptler/guven-merkezi'
     | '/konseptler/harita-kesfi'
     | '/konseptler/pazar-vitrini'
+    | '/parola-sifirla_/gecersiz'
+    | '/parola-sifirla_/gonderildi'
+    | '/parola-sifirla_/tamam'
+    | '/parola-sifirla_/yeni'
     | '/hesabim/'
     | '/konseptler/'
-    | '/giris_/baglanti_/gecersiz'
+    | '/giris_/google_/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -497,6 +641,7 @@ export interface RootRouteChildren {
   ArsaAraRoute: typeof ArsaAraRoute
   BlogRoute: typeof BlogRoute
   BolgelerRoute: typeof BolgelerRoute
+  EPostaDogrulaRoute: typeof EPostaDogrulaRoute
   EmlakRoute: typeof EmlakRoute
   FavorilerRoute: typeof FavorilerRoute
   GirisRoute: typeof GirisRoute
@@ -507,16 +652,27 @@ export interface RootRouteChildren {
   KayitRoute: typeof KayitRoute
   KonseptlerRoute: typeof KonseptlerRouteWithChildren
   OfislerRoute: typeof OfislerRoute
-  GirisBaglantiGonderildiRoute: typeof GirisBaglantiGonderildiRoute
+  OrganizasyonSecRoute: typeof OrganizasyonSecRoute
+  OturumSuresiDolduRoute: typeof OturumSuresiDolduRoute
+  ParolaDegistirRoute: typeof ParolaDegistirRoute
+  ParolaSifirlaRoute: typeof ParolaSifirlaRoute
+  YetkisizRoute: typeof YetkisizRoute
+  DavetTokenRoute: typeof DavetTokenRoute
+  DavetGecersizRoute: typeof DavetGecersizRoute
   GirisHataRoute: typeof GirisHataRoute
   GirisKodRoute: typeof GirisKodRoute
   GirisParolaRoute: typeof GirisParolaRoute
+  HesapAskidaRoute: typeof HesapAskidaRoute
   HesapDogrulaRoute: typeof HesapDogrulaRoute
   IlanListingIdRoute: typeof IlanListingIdRoute
   KayitHesapVarRoute: typeof KayitHesapVarRoute
   KayitKurumsalRoute: typeof KayitKurumsalRoute
   KayitProfilRoute: typeof KayitProfilRoute
-  GirisBaglantiGecersizRoute: typeof GirisBaglantiGecersizRoute
+  ParolaSifirlaGecersizRoute: typeof ParolaSifirlaGecersizRoute
+  ParolaSifirlaGonderildiRoute: typeof ParolaSifirlaGonderildiRoute
+  ParolaSifirlaTamamRoute: typeof ParolaSifirlaTamamRoute
+  ParolaSifirlaYeniRoute: typeof ParolaSifirlaYeniRoute
+  GirisGoogleCallbackRoute: typeof GirisGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -554,6 +710,13 @@ declare module '@tanstack/react-router' {
       path: '/bolgeler'
       fullPath: '/bolgeler'
       preLoaderRoute: typeof BolgelerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/e-posta-dogrula': {
+      id: '/e-posta-dogrula'
+      path: '/e-posta-dogrula'
+      fullPath: '/e-posta-dogrula'
+      preLoaderRoute: typeof EPostaDogrulaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/emlak': {
@@ -626,11 +789,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfislerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/giris_/baglanti-gonderildi': {
-      id: '/giris_/baglanti-gonderildi'
-      path: '/giris/baglanti-gonderildi'
-      fullPath: '/giris/baglanti-gonderildi'
-      preLoaderRoute: typeof GirisBaglantiGonderildiRouteImport
+    '/organizasyon-sec': {
+      id: '/organizasyon-sec'
+      path: '/organizasyon-sec'
+      fullPath: '/organizasyon-sec'
+      preLoaderRoute: typeof OrganizasyonSecRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oturum-suresi-doldu': {
+      id: '/oturum-suresi-doldu'
+      path: '/oturum-suresi-doldu'
+      fullPath: '/oturum-suresi-doldu'
+      preLoaderRoute: typeof OturumSuresiDolduRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-degistir': {
+      id: '/parola-degistir'
+      path: '/parola-degistir'
+      fullPath: '/parola-degistir'
+      preLoaderRoute: typeof ParolaDegistirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-sifirla': {
+      id: '/parola-sifirla'
+      path: '/parola-sifirla'
+      fullPath: '/parola-sifirla'
+      preLoaderRoute: typeof ParolaSifirlaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/yetkisiz': {
+      id: '/yetkisiz'
+      path: '/yetkisiz'
+      fullPath: '/yetkisiz'
+      preLoaderRoute: typeof YetkisizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/davet/$token': {
+      id: '/davet/$token'
+      path: '/davet/$token'
+      fullPath: '/davet/$token'
+      preLoaderRoute: typeof DavetTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/davet/gecersiz': {
+      id: '/davet/gecersiz'
+      path: '/davet/gecersiz'
+      fullPath: '/davet/gecersiz'
+      preLoaderRoute: typeof DavetGecersizRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/giris_/hata': {
@@ -710,6 +915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HesabimOdemelerRouteImport
       parentRoute: typeof HesabimRoute
     }
+    '/hesap/askida': {
+      id: '/hesap/askida'
+      path: '/hesap/askida'
+      fullPath: '/hesap/askida'
+      preLoaderRoute: typeof HesapAskidaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hesap/dogrula': {
       id: '/hesap/dogrula'
       path: '/hesap/dogrula'
@@ -787,11 +999,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KonseptlerPazarVitriniRouteImport
       parentRoute: typeof KonseptlerRoute
     }
-    '/giris_/baglanti_/gecersiz': {
-      id: '/giris_/baglanti_/gecersiz'
-      path: '/giris/baglanti/gecersiz'
-      fullPath: '/giris/baglanti/gecersiz'
-      preLoaderRoute: typeof GirisBaglantiGecersizRouteImport
+    '/parola-sifirla_/gecersiz': {
+      id: '/parola-sifirla_/gecersiz'
+      path: '/parola-sifirla/gecersiz'
+      fullPath: '/parola-sifirla/gecersiz'
+      preLoaderRoute: typeof ParolaSifirlaGecersizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-sifirla_/gonderildi': {
+      id: '/parola-sifirla_/gonderildi'
+      path: '/parola-sifirla/gonderildi'
+      fullPath: '/parola-sifirla/gonderildi'
+      preLoaderRoute: typeof ParolaSifirlaGonderildiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-sifirla_/tamam': {
+      id: '/parola-sifirla_/tamam'
+      path: '/parola-sifirla/tamam'
+      fullPath: '/parola-sifirla/tamam'
+      preLoaderRoute: typeof ParolaSifirlaTamamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parola-sifirla_/yeni': {
+      id: '/parola-sifirla_/yeni'
+      path: '/parola-sifirla/yeni'
+      fullPath: '/parola-sifirla/yeni'
+      preLoaderRoute: typeof ParolaSifirlaYeniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/giris_/google_/callback': {
+      id: '/giris_/google_/callback'
+      path: '/giris/google/callback'
+      fullPath: '/giris/google/callback'
+      preLoaderRoute: typeof GirisGoogleCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -850,6 +1090,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArsaAraRoute: ArsaAraRoute,
   BlogRoute: BlogRoute,
   BolgelerRoute: BolgelerRoute,
+  EPostaDogrulaRoute: EPostaDogrulaRoute,
   EmlakRoute: EmlakRoute,
   FavorilerRoute: FavorilerRoute,
   GirisRoute: GirisRoute,
@@ -860,16 +1101,27 @@ const rootRouteChildren: RootRouteChildren = {
   KayitRoute: KayitRoute,
   KonseptlerRoute: KonseptlerRouteWithChildren,
   OfislerRoute: OfislerRoute,
-  GirisBaglantiGonderildiRoute: GirisBaglantiGonderildiRoute,
+  OrganizasyonSecRoute: OrganizasyonSecRoute,
+  OturumSuresiDolduRoute: OturumSuresiDolduRoute,
+  ParolaDegistirRoute: ParolaDegistirRoute,
+  ParolaSifirlaRoute: ParolaSifirlaRoute,
+  YetkisizRoute: YetkisizRoute,
+  DavetTokenRoute: DavetTokenRoute,
+  DavetGecersizRoute: DavetGecersizRoute,
   GirisHataRoute: GirisHataRoute,
   GirisKodRoute: GirisKodRoute,
   GirisParolaRoute: GirisParolaRoute,
+  HesapAskidaRoute: HesapAskidaRoute,
   HesapDogrulaRoute: HesapDogrulaRoute,
   IlanListingIdRoute: IlanListingIdRoute,
   KayitHesapVarRoute: KayitHesapVarRoute,
   KayitKurumsalRoute: KayitKurumsalRoute,
   KayitProfilRoute: KayitProfilRoute,
-  GirisBaglantiGecersizRoute: GirisBaglantiGecersizRoute,
+  ParolaSifirlaGecersizRoute: ParolaSifirlaGecersizRoute,
+  ParolaSifirlaGonderildiRoute: ParolaSifirlaGonderildiRoute,
+  ParolaSifirlaTamamRoute: ParolaSifirlaTamamRoute,
+  ParolaSifirlaYeniRoute: ParolaSifirlaYeniRoute,
+  GirisGoogleCallbackRoute: GirisGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -183,9 +183,7 @@ Var: Default, Playground, Variants (`quote`/`inline`), Durumlar
 Erişilebilirlik (docs description'lı).
 
 `Sizes` ayrı story olarak yok: `size` ekseni tanımlı değil (avatar boyutu
-yalnız `variant`'a bağlı iki sabit değer). `Temalar` ayrı story olarak yok:
-tema toolbar'la otomatik doğrulanır (`GlassMatchScore`/`GlassReviewCard`
-ile aynı karar).
+yalnız `variant`'a bağlı iki sabit değer).
 
 ## 11. Test kabul kriterleri
 

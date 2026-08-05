@@ -84,12 +84,20 @@ describe('LeafletPropertyPicker', () => {
       />,
     )
 
+    // İşaret rengi SOMUT olmalı: `circleMarker` bir SVG şeklidir ve renk
+    // doğrudan attribute'a yazılır — `var(--lg-accent)` orada çözülmez ve
+    // işaret siyah çizilirdi. Beyaz halka + dolgu, harita pin diliyle aynıdır.
     await waitFor(() => {
       expect(circleMarker).toHaveBeenCalledWith(
         [41.043, 29.009],
-        expect.objectContaining({ color: 'var(--lg-accent)' }),
+        expect.objectContaining({ color: '#ffffff', fillOpacity: 1 }),
       )
     })
+    const lastCall = circleMarker.mock.calls.at(-1) as unknown as [
+      unknown,
+      { fillColor: string },
+    ]
+    expect(lastCall[1].fillColor).not.toContain('var(')
 
     rerender(
       <LeafletPropertyPicker

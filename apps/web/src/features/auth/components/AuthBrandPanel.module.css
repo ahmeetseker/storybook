@@ -1,0 +1,162 @@
+/* Auth kabuğunun dekoratif marka paneli.
+   CAM DEĞİLDİR — dolu bir yüzeydir. Cam bütçesi (sayfa başına 6) navigasyon
+   ve kontrol katmanına ayrılmıştır; burada `backdrop-filter` yok.
+
+   Katman sırası (alttan üste): `.panel` CSS degradesi → `.zemin` WebGL
+   canvas'ı → `.perde` → `.icerik`. Buradaki CSS degrade YEDEKTİR: WebGL2
+   kurulamazsa (eski tarayıcı, GPU engelli, SSR ilk kare) canvas hiç DOM
+   üretmez ve panel bu degradeyle görünür. Kurulursa canvas onu tamamen
+   örter.
+
+   Renk tek kaynaktan türetilir: `--lg-accent`. Yedek degradenin koyu zemini
+   accent'in üzerine İKİ kez `--lg-scrim` bindirilerek elde edilir (0.55 alfa
+   iki kez ≈ 0.80 örtme); shader tarafındaki rampa da aynı token'dan çıkar
+   (bkz. grain-rampasi.ts). Böylece iki yol da accent token'ıyla birlikte kayar ve
+   üzerindeki metin için `--lg-on-scrim` token çiftinin kontrast sözleşmesi
+   her iki durumda geçerli olur. */
+.panel {
+  /* Dar ekranda panel YOK: dekoratif bir blok formu ekranın altına iterdi.
+     ≥64rem'de görünür (aşağıdaki sorgu). */
+  display: none;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--lg-radius-card);
+  padding: var(--lg-space-8);
+  color: var(--lg-on-scrim);
+
+  background-color: var(--lg-accent);
+  /* Katman sırası: ÖNCE yazılan üstte kalır. Accent parıltıları en üstte,
+     onların altında iki scrim tabakası, en altta accent zemin. */
+  background-image:
+    radial-gradient(
+      70% 55% at 18% 12%,
+      color-mix(in oklab, var(--lg-accent) 60%, transparent),
+      transparent 68%
+    ),
+    radial-gradient(
+      62% 50% at 88% 84%,
+      color-mix(in oklab, var(--lg-accent) 42%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(var(--lg-scrim), var(--lg-scrim)),
+    linear-gradient(var(--lg-scrim), var(--lg-scrim));
+}
+
+/* WebGL canvas'ın kabı. Kendi köşe yarıçapı yok — `.panel`in `overflow:
+   hidden` + `isolation: isolate` çifti kırpıyor. */
+.zemin {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Metnin oturduğu üst ve alt bantları koyulaştırır; orta bant açık kalır ki
+   shader'ın canlı bandı görünsün. `--lg-scrim` iki uçta tam, ortada yok. */
+.perde {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to bottom,
+    var(--lg-scrim) 0%,
+    transparent 34%,
+    transparent 46%,
+    var(--lg-scrim) 82%,
+    var(--lg-scrim) 100%
+  );
+}
+
+.icerik {
+  position: relative;
+  z-index: 2;
+  block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--lg-space-7);
+}
+
+/* Ölçek `--lg-text-display`i AŞMAZ: 28px bu sistemde marka/hero tavanıdır
+   ve referans tasarımın 50-70px tipografisini almak tip ölçeğini çatallardı.
+   Kademelendirme `GlassHero`'daki desenin aynısı. */
+.slogan {
+  margin: 0;
+  font-size: clamp(var(--lg-text-title), 3.4vw, var(--lg-text-display));
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.taban {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+}
+
+.destek {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  /* Beyaz metnin ikincil kademesi: `--lg-label-secondary` aydınlık zemin
+     içindir, koyu panelde okunmaz. Token çiftinin kendi rengi seyreltilir. */
+  color: color-mix(in oklab, var(--lg-on-scrim) 78%, transparent);
+}
+
+.rozetler {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+}
+
+.rozet {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid color-mix(in oklab, var(--lg-on-scrim) 30%, transparent);
+  border-radius: var(--lg-radius-capsule);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+}
+
+@media (min-width: 64rem) {
+  /* Yapışkan: `/kayit/kurumsal` gibi uzun formlarda sütun ekran boyunu
+     kat kat aşıyor. Panel grid hücresini doldursaydı binlerce piksellik bir
+     degrade olur ve kullanıcı aşağı indiğinde marka tamamen kaybolurdu.
+     `align-self: start` olmadan grid öğesi hücreyi gerer ve `sticky` hiç
+     çalışmaz. */
+  .panel {
+    display: block;
+    position: sticky;
+    align-self: start;
+    inset-block-start: var(--lg-space-4);
+    block-size: calc(100dvh - 2 * var(--lg-space-4));
+  }
+}
+
+/* Hareketi azalt: shader döngüsü JS tarafında durdurulur ve tek kare çizilir
+   (bkz. AuthGrainGradient.tsx). Panel görsel olarak aynı kalır — animasyon
+   dekoratiftir, bilgi taşımaz. Burada CSS tarafında kapatılacak animasyon
+   yok; kural yine de belgeleniyor ki gelecekte eklenen bir CSS hareketi bu
+   bloğu atlamasın. */
+
+/* Saydamlığı azalt: canlı, sürekli kayan doku tek bir dolu accent zemine
+   iner. Canvas hiç gösterilmez — perdesi de gereksizleşir, metin altındaki
+   katman sayısı bire düşer. */
+@media (prefers-reduced-transparency: reduce) {
+  .panel {
+    background-image: linear-gradient(var(--lg-scrim), var(--lg-scrim)),
+      linear-gradient(var(--lg-scrim), var(--lg-scrim));
+  }
+
+  .zemin,
+  .perde {
+    display: none;
+  }
+}

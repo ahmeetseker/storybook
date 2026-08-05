@@ -6,7 +6,7 @@
 }
 
 /* Panel bilinçli olarak CAM DEĞİL: küçük metin yüzeyinde okunabilirlik önce gelir.
-   Ters kontrast: --lg-label zemin + --lg-bg metin (açık temada koyu panel, koyuda açık). */
+   Ters kontrast: --lg-label zemin + --lg-bg metin (fildişi sayfanın üstünde koyu panel). */
 .panel {
   position: absolute;
   z-index: 10;

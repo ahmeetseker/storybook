@@ -264,8 +264,8 @@ Yukleniyor (`loading`), TekDurak (bağlantı çizgisi/travelNote yokluğu),
 UzunIcerik, Responsive (mobile1 + dokunmatik hedefler), Erişilebilirlik (docs
 description'lı).
 
-`Sizes`/`Variants`/`Temalar` ayrı story olarak yok: `size`/`variant` ekseni
-tanımlı değil (tek sabit görsel biçim), tema toolbar'la otomatik doğrulanır.
+`Sizes`/`Variants` ayrı story olarak yok: `size`/`variant` ekseni tanımlı
+değil (tek sabit görsel biçim).
 
 ## 11. Test kabul kriterleri
 

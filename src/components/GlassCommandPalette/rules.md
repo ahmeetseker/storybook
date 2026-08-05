@@ -244,9 +244,8 @@ Var: Default, Playground (interaktif ⌘K demo — yerel `open` state + gerçek
 kısayol dinleyicisi), Boş Sonuç, UzunIcerik, Responsive, Erişilebilirlik
 (docs description'lı).
 
-`Sizes`/`Variants`/`Temalar` ayrı story olarak yok: `size`/`variant`
-ekseni tanımlı değil (tek sabit görsel biçim), tema toolbar'la otomatik
-doğrulanır (`GlassChatDock` ile aynı gerekçe).
+`Sizes`/`Variants` ayrı story olarak yok: `size`/`variant`
+ekseni tanımlı değil (tek sabit görsel biçim) (`GlassChatDock` ile aynı gerekçe).
 
 ## 11. Test kabul kriterleri
 

@@ -111,8 +111,8 @@ button.ogeIcerik {
   color: var(--lg-label);
 }
 
-/* Koyu temada success/accent zeminlerin üstündeki metin `--lg-accent-contrast`
-   ile zaten AAA; ayrıca ✓ işareti rengin tek kanal olmadığını garanti eder. */
+/* success/accent zeminlerin üstündeki metin `--lg-accent-contrast` ile zaten
+   AAA; ayrıca ✓ işareti rengin tek kanal olmadığını garanti eder. */
 
 /* Çubuğun kendi kalınlığı `size="sm"` ile gelir; burada yalnız şeridin tam
    genişliğine yayılması sabitlenir. Hareket azaltmada dolgu geçişini
@@ -121,10 +121,15 @@ button.ogeIcerik {
   inline-size: 100%;
 }
 
+/* Görsel-gizli metin. 1px kırpma geometrisidir, tasarım kararı değil — bu
+   yüzden token almaz. `--lg-stroke-hairline` KULLANILMAZ: o bir çizgi
+   kalınlığı token'ı ve kutu ölçüsü olarak kullanılırsa hairline ileride
+   yeniden ayarlandığında bu blok sessizce bozulur. Glass kütüphanesindeki
+   ~33 .srOnly bloğu da düz 1px kullanır. */
 .srOnly {
   position: absolute;
-  inline-size: var(--lg-stroke-hairline);
-  block-size: var(--lg-stroke-hairline);
+  inline-size: 1px;
+  block-size: 1px;
   margin: 0;
   overflow: hidden;
   clip-path: inset(50%);

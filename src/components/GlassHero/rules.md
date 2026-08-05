@@ -121,7 +121,7 @@ ease-in-out) token'sız raw kalır.
 
 Default(search), Playground, Split, SplitEyebrowVeArama (eyebrow + split'te search),
 Showcase, Centered, H1Baslik, VaryantKarsilastirma (4 varyant alt alta — seçim
-story'si). Temalar toolbar'dan.
+story'si).
 
 ## 11. Test kabul kriterleri
 

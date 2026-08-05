@@ -119,8 +119,9 @@ export const Responsive: Story = {
   ),
 }
 
-/** Kağıt + Grafit: tema toolbar'dan değişir; durum tonları ve fiyat okunurluğu her iki temada korunur. */
-export const Temalar: Story = {
+/** Düz fildişi zemin: durum tonları ve fiyat okunurluğu arka plan sabitlenerek denetlenir. */
+export const DuzZemin: Story = {
+  parameters: { globals: { backgroundKey: 'light' } },
   args: Playground.args,
   render: (args) => (
     <div style={{ maxWidth: 860, margin: '48px auto' }}>

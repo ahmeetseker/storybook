@@ -14,3 +14,50 @@
   font-weight: 700;
   letter-spacing: -0.02em;
 }
+
+/* ---- Marka işareti ----
+   Rayın en üstünde, öğe satırlarıyla aynı hizada: ikon kutusu, satır iç boşluğu
+   ve dokunma hedefi sidebar'ın kendi ölçeğinden gelir (fallback'ler token). */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--item-gap, var(--lg-space-3));
+  min-block-size: var(--touch-target, var(--lg-control-sm));
+  padding-inline: var(--row-pad-x, var(--lg-space-2));
+  margin-block-end: var(--lg-space-2);
+  border-radius: var(--lg-radius-media);
+  color: var(--lg-label);
+  font-size: var(--lg-text-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .brand:hover {
+    background: var(--hover-bg, color-mix(in srgb, var(--lg-label) 6%, transparent));
+  }
+}
+
+.brand:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.brandMark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  inline-size: var(--icon-box, var(--lg-space-5));
+  color: var(--lg-accent);
+}
+
+/* Daraltılmış rayda yalnız işaret kalır; ad `aria-label`da yaşamaya devam eder */
+.nav[data-collapsed='true'] .brand {
+  justify-content: center;
+  gap: 0;
+}
+
+.nav[data-collapsed='true'] .brandName {
+  display: none;
+}

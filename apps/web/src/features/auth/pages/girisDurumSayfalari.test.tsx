@@ -9,11 +9,7 @@ import {
   createRoute,
   createRouter,
 } from '@tanstack/react-router'
-import {
-  BaglantiGecersizPage,
-  BaglantiGonderildiPage,
-  GirisHataPage,
-} from './girisDurumSayfalari'
+import { GirisHataPage } from './girisDurumSayfalari'
 
 function durumRouter(Component: () => ReactElement) {
   const rootRoute = createRootRoute({ component: () => <Outlet /> })
@@ -34,14 +30,8 @@ function durumRouter(Component: () => ReactElement) {
 }
 
 describe('giriş durum sayfaları', () => {
-  it('bağlantı gönderildi bilgi tonunda çizilir ve alert kullanmaz', async () => {
-    render(<RouterProvider router={durumRouter(BaglantiGonderildiPage)} />)
-    expect(await screen.findByRole('heading', { level: 1 })).toBeTruthy()
-    expect(screen.queryByRole('alert')).toBeNull()
-  })
-
-  it('geçersiz bağlantı hata tonunda alert olarak duyurulur', async () => {
-    render(<RouterProvider router={durumRouter(BaglantiGecersizPage)} />)
+  it('genel hata sayfası hata tonunda alert olarak duyurulur', async () => {
+    render(<RouterProvider router={durumRouter(GirisHataPage)} />)
     expect(await screen.findByRole('alert')).toBeTruthy()
   })
 

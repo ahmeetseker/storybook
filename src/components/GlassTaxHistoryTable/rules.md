@@ -138,11 +138,9 @@ varyantı).
 var(--lg-label))` kullanır. Açık temada ham `--lg-success` beyaz zemine
 karşı ~2,2:1 kontrastta kalıp anlam taşıyan grafik için WCAG 3:1 eşiğini
 kaçırıyordu (ham `--lg-danger` ~3,55:1 ile sınırda geçiyordu, tutarlılık
-için o da aynı teknikle koyulaştırıldı). `--lg-label` token'ı temaya göre
-değiştiği için mix her iki temada da otomatik doğru yönde çalışır (açık
-temada koyulaşır, koyu temada zaten aydınlık olan label ile karışıp
-kontrastı daha da artırır) — aynı desen `GlassTimeline`'daki ton
-işaretlerinde de kullanılır, kasıtlı tekrar.
+için o da aynı teknikle koyulaştırıldı). `--lg-label` ile karışım açık
+temada rengi koyulaştırarak kontrastı doğru yönde artırır — aynı desen
+`GlassTimeline`'daki ton işaretlerinde de kullanılır, kasıtlı tekrar.
 
 **Borç (raw / mikro-geometri):** "Güncel" etiketi dikey padding'i component
 kökünde yerel değişken `--tax-latest-pad-block: 2px` olarak toplanır (token
@@ -157,8 +155,7 @@ kaldırılmasıyla kapandı.
 Var: Default, Playground, DegisimTurleri (dört değişim durumu bir arada:
 artış/azalış/nötr/veri yok), Empty, UzunIcerik, Responsive (mobile
 viewport), Erisilebilirlik (docs açıklamalı).
-**Eksik:** Temalar (ayrı story yok — toolbar'la Kağıt/Grafit doğrulanır, tüm
-token'lar üzerinden otomatik) · Sizes/Variants (N/A — eksen yok, §5).
+**Eksik:** Sizes/Variants (N/A — eksen yok, §5).
 
 ## 11. Test kabul kriterleri
 
@@ -178,7 +175,7 @@ token'lar üzerinden otomatik) · Sizes/Variants (N/A — eksen yok, §5).
 - [x] boş `rows` → varsayılan boş durum metni (unit)
 - [x] `caption` verilince görünür, verilmeyince hiç render edilmez (unit)
 - [ ] dar ekranda tablo yatay kaydırma davranışı (visual, Chrome)
-- [ ] Kağıt/Grafit tema kontrastı — özellikle ok ikonu renkleri (visual)
+- [ ] Ok ikonu renk kontrastı (visual)
 
 ## 12. Do / Don't
 

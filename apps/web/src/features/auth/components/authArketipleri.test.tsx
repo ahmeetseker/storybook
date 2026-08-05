@@ -156,13 +156,28 @@ describe('AuthStatusPage', () => {
 })
 
 describe('AuthCallbackPage', () => {
-  it('bekleme durumunu status olarak duyurur', () => {
+  // Canlı bölge `<main>`'e konursa açık `role` örtük olanı ezer ve landmark
+  // tamamen kaybolur — bu sayfa 2026-07-31 denetiminde tam olarak bu hatayı
+  // yapmıştı ve buradaki eski assertion bozuk şekli doğruluyordu. Aşağıdaki
+  // iki test artık canlı bölgenin main'in İÇİNDE ayrı bir düğüm olmasını şart
+  // koşar; regresyon sessizce geri gelemez.
+  it('bekleme durumunu status olarak duyurur ama main landmarkını korur', () => {
     render(<AuthCallbackPage durum="pending" baslik="Doğrulanıyor" />)
-    expect(screen.getByRole('status').textContent).toContain('Doğrulanıyor')
+    const main = screen.getByRole('main')
+    const status = screen.getByRole('status')
+    expect(status).not.toBe(main)
+    expect(main.getAttribute('role')).not.toBe('status')
+    expect(main.contains(status)).toBe(true)
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Doğrulanıyor')
   })
 
-  it('hata durumunda mesajı alert olarak duyurur', () => {
+  it('hata durumunda mesajı alert olarak duyurur ama main landmarkını korur', () => {
     render(<AuthCallbackPage durum="error" baslik="Doğrulanamadı" hataMesaji="Bağlantının süresi dolmuş." />)
-    expect(screen.getByRole('alert').textContent).toContain('Bağlantının süresi dolmuş.')
+    const main = screen.getByRole('main')
+    const alert = screen.getByRole('alert')
+    expect(alert).not.toBe(main)
+    expect(main.getAttribute('role')).not.toBe('alert')
+    expect(main.contains(alert)).toBe(true)
+    expect(alert.textContent).toContain('Bağlantının süresi dolmuş.')
   })
 })

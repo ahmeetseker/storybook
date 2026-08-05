@@ -129,7 +129,7 @@ yanındaki GlassButton ile aynı satır yüksekliğinde kalır. Hedefi görünü
 Var: Default, FavoriteOff, FavoriteOn, Large, Disabled, Sizes (üçü yan yana),
 States (default · aktif · disabled matrisi; hover/focus CSS state'i olduğundan
 zorlanmaz), UzunEtiket (uzun `label` tooltip/aria üzerinden — içerik N/A,
-tek ikon). **Eksik:** Playground, Responsive (coarse pointer), Temalar,
+tek ikon). **Eksik:** Playground, Responsive (coarse pointer),
 Erişilebilirlik (aria-pressed gösterimi — States kısmen kapsıyor).
 
 ## 11. Test kabul kriterleri

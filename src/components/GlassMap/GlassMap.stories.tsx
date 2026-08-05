@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { GlassMap, type GlassMapPin } from './GlassMap'
+import { GlassMapPopupCard } from './GlassMapPopupCard'
 
 const ARSA_PINS: GlassMapPin[] = [
   { id: 'p1', x: 0.22, y: 0.3, price: '4.250.000 TL' },
@@ -206,5 +207,108 @@ export const GercekZeminUyduToggle: Story = {
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     },
     label: 'Uydu geçişli harita',
+  },
+}
+
+// ── İniş zinciri (ülke → bölge → ilan) ────────────────────────────────────
+// Kümeleme rozetlerinin ortaya çıkması için haritada gerçek bir yoğunluk
+// gerekir; birkaç pin ile eşik hiç aşılmaz ve zincir başlamaz.
+const yogunPinler: GlassMapPin[] = [
+  { name: 'İstanbul', lat: 41.01, lng: 28.98, adet: 14 },
+  { name: 'İzmir', lat: 38.42, lng: 27.14, adet: 11 },
+  { name: 'Balıkesir', lat: 39.65, lng: 27.89, adet: 9 },
+  { name: 'Muğla', lat: 37.03, lng: 27.43, adet: 8 },
+  { name: 'Antalya', lat: 36.9, lng: 30.7, adet: 7 },
+  { name: 'Ankara', lat: 39.93, lng: 32.86, adet: 7 },
+].flatMap(({ name, lat, lng, adet }) =>
+  Array.from({ length: adet }, (_, index) => {
+    // Altın oranlı açı: ardışık ilanlar birbirine en uzak yönlere düşer.
+    const aci = index * 2.39996
+    const yaricap = 0.06 * Math.sqrt(index + 1)
+    return {
+      id: `${name}-${index}`,
+      lat: lat + yaricap * Math.cos(aci),
+      lng: lng + yaricap * Math.sin(aci) * 1.25,
+      price: `₺${(2 + ((index * 7) % 18) / 2).toFixed(1).replace('.', ',')}M`,
+    }
+  }),
+)
+
+/**
+ * Kümeleme açık: yakın ilanlar tek rozette toplanır. Rozete tıklamak kadrajı
+ * o bölgeye indirir, alt rozetler açılır ve zincir tek tek fiyat kapsüllerine
+ * kadar sürer. Rozet bir SEÇİM değil bir iniş kontrolüdür.
+ */
+export const KumelemeInisZinciri: Story = {
+  args: {
+    variant: 'panel',
+    pins: yogunPinler,
+    basemap: osmBasemap,
+    cluster: true,
+    label: 'Yoğunluk haritası',
+    popupContent: (id: string) => (
+      <GlassMapPopupCard
+        title={`${id.split('-')[0]} ilanı`}
+        meta="İlçe merkezi · 850 m²"
+        price="4.250.000 TL"
+        status={{ label: 'Doğrulanmış', tone: 'success' }}
+        actionLabel="Detayı aç"
+        onAction={() => undefined}
+      />
+    ),
+  },
+}
+
+/** Kümeleme eşiği geniş: aynı veri daha az, daha kalabalık rozete iner. */
+export const KumelemeGenisYaricap: Story = {
+  args: {
+    variant: 'panel',
+    pins: yogunPinler,
+    basemap: osmBasemap,
+    cluster: { radius: 110 },
+    label: 'Geniş eşikli yoğunluk haritası',
+  },
+}
+
+/** Pin tonları durum rengini semantic token'dan okur (birleşik variant değildir). */
+export const PinTonlari: Story = {
+  args: {
+    pins: [
+      { id: 't1', lat: 41.01, lng: 28.98, price: '₺12M', tone: 'accent' },
+      { id: 't2', lat: 39.93, lng: 32.86, price: '₺6,4M', tone: 'success' },
+      { id: 't3', lat: 38.42, lng: 27.14, price: '₺3,1M', tone: 'warning' },
+      { id: 't4', lat: 36.9, lng: 30.7, price: '₺2,7M', tone: 'danger' },
+    ],
+    basemap: osmBasemap,
+    label: 'Durum tonlu pinler',
+  },
+}
+
+/** Gerçek zemin üzerinde mahremiyet dairesi: merkez lat/lng, yarıçap metre. */
+export const GercekZeminMahremiyetDairesi: Story = {
+  args: {
+    pins: [],
+    basemap: { ...osmBasemap, center: [38.322, 26.764], zoom: 13 },
+    privacyCircle: { x: 0.5, y: 0.5, r: 0.18, lat: 38.322, lng: 26.764, radiusMeters: 750 },
+    label: 'Yaklaşık konum haritası',
+  },
+}
+
+/** Popup gövdesinin ortak biçimi — her haritada aynı sıra. */
+export const PopupKarti: Story = {
+  args: {
+    pins: geoPins,
+    basemap: osmBasemap,
+    defaultSelectedId: 'urla',
+    label: 'Detay kartlı harita',
+    popupContent: () => (
+      <GlassMapPopupCard
+        title="İzmir Urla İmarlı Köşe Parsel"
+        meta="Urla, İzmir · 850 m²"
+        price="4.250.000 TL"
+        status={{ label: 'Doğrulanmış', tone: 'success' }}
+        href="#urla"
+      />
+    ),
   },
 }

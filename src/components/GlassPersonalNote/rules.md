@@ -171,7 +171,7 @@ seçimi) → `editing` (editor'ün üstüne binmesi) → render.
 | not metni | color | `--lg-label` | — |
 | "Düzenle" butonu | color | `--lg-accent` | hover → `color-mix(var(--lg-accent) 10%, transparent)` zemin |
 | textarea | background/border/radius/color | `--lg-surface` / `--lg-hairline` / `--lg-radius-chip` / `--lg-label` | focus-visible → `--lg-accent` outline |
-| textarea placeholder | color/opacity | `--lg-label-secondary` / `opacity: 1` | `opacity` açıkça `1`'e kilitlenir — tarayıcı varsayılan placeholder opaklığı efektif kontrastı ~2.1-2.8:1'e düşürebiliyordu; `--lg-label-secondary` kendi başına açık temada ~4.74:1, koyu temada ~6.3:1 sağlıyor (≥4.5:1 eşiği) |
+| textarea placeholder | color/opacity | `--lg-label-secondary` / `opacity: 1` | `opacity` açıkça `1`'e kilitlenir — tarayıcı varsayılan placeholder opaklığı efektif kontrastı ~2.1-2.8:1'e düşürebiliyordu; `--lg-label-secondary` kendi başına açık temada ~4.74:1 sağlıyor (≥4.5:1 eşiği) |
 | sayaç | color | `--lg-label-secondary` | sınıra yaklaşınca (`data-near-limit`) → `color-mix(var(--lg-warning) 65%, var(--lg-label))` metin + `color-mix(var(--lg-warning) 16%, transparent)` zemin (AI rozeti tekniğiyle aynı: renk yalnız zemin/metin karışımına, ham semantik renk küçük metne doğrudan uygulanmaz) |
 | Vazgeç | — | `GlassButton size="sm"` compose eder — görsel token'lar GlassButton sözleşmesinden | GlassButton state'leri |
 | Kaydet | — | `GlassButton prominent size="sm"` compose eder — görsel token'lar GlassButton sözleşmesinden | GlassButton state'leri |
@@ -203,9 +203,8 @@ Duzenleme (uçtan uca controlled canlı demo), KarakterSiniri (düşük
 `maxLength` ile sayaç vurgusu), UzunIcerik, Responsive (mobile1 + dar
 konteyner), Erişilebilirlik (docs description'lı).
 
-`Sizes`/`Variants`/`Temalar` ayrı story olarak yok: `size`/`variant` ekseni
-tanımlı değil (üç durum state'ten türer, prop değil), tema toolbar'la
-otomatik doğrulanır.
+`Sizes`/`Variants` ayrı story olarak yok: `size`/`variant` ekseni
+tanımlı değil (üç durum state'ten türer, prop değil).
 
 ## 11. Test kabul kriterleri
 

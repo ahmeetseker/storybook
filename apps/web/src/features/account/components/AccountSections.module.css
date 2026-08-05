@@ -8,7 +8,8 @@
    Yüzey dili iki kademedir:
    - Bölüm kartı  → `--lg-surface` (kağıt)
    - Kart içi kutu → `--lg-bg` (oyuk/gömülü kutu: gündem satırı, metrik
-     karosu, ilan kartı, boş durum). Her iki temada da doğru yönde ayrışır.
+     karosu, ilan kartı, boş durum). Kart kağıdından bir kademe geri
+     çekilerek ayrışır.
 
    Kart kendi sorgu kabıdır (`container: account-section / inline-size`):
    bölümün iç yerleşimi, kabuğun onu 12'lik ızgarada kaç kolona koyduğundan
