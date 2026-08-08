@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GlassCheckbox } from '@repo/ui'
 import type {
   ListingContent,
   ListingLocation,
@@ -363,37 +364,35 @@ export function ContentPricingStep({
         requirement="required"
       >
         <div className={styles.consentBlock}>
-          <label>
-            <input
-              id="risk-accepted"
-              type="checkbox"
-              checked={value.riskAccepted}
-              required
-              onChange={(event) => set('riskAccepted', event.target.checked)}
-              aria-invalid={Boolean(errors.riskAccepted) || undefined}
-              aria-describedby={errors.riskAccepted ? 'risk-accepted-error' : undefined}
-            />
-            <span>
-              <strong>İlan bilgilerinin doğru olduğunu beyan ediyorum.</strong>
-              <small>Yanıltıcı, eksik veya doğrulanamayan bilgi yayınlamayacağım.</small>
-            </span>
-          </label>
+          <GlassCheckbox
+            id="risk-accepted"
+            checked={value.riskAccepted}
+            required
+            onChange={(event) => set('riskAccepted', event.target.checked)}
+            aria-invalid={Boolean(errors.riskAccepted) || undefined}
+            aria-describedby={errors.riskAccepted ? 'risk-accepted-error' : undefined}
+            label={
+              <>
+                <strong>İlan bilgilerinin doğru olduğunu beyan ediyorum.</strong>
+                <small>Yanıltıcı, eksik veya doğrulanamayan bilgi yayınlamayacağım.</small>
+              </>
+            }
+          />
           <p id="risk-accepted-error" className={styles.fieldError}>{errors.riskAccepted ?? ''}</p>
-          <label>
-            <input
-              id="legal-consent"
-              type="checkbox"
-              checked={value.legalConsent}
-              required
-              onChange={(event) => set('legalConsent', event.target.checked)}
-              aria-invalid={Boolean(errors.legalConsent) || undefined}
-              aria-describedby={errors.legalConsent ? 'legal-consent-error' : undefined}
-            />
-            <span>
-              <strong>İlan yayın koşullarını ve kişisel veri metnini kabul ediyorum.</strong>
-              <small>İlan, doğrulama tamamlandıktan sonra yayına alınır.</small>
-            </span>
-          </label>
+          <GlassCheckbox
+            id="legal-consent"
+            checked={value.legalConsent}
+            required
+            onChange={(event) => set('legalConsent', event.target.checked)}
+            aria-invalid={Boolean(errors.legalConsent) || undefined}
+            aria-describedby={errors.legalConsent ? 'legal-consent-error' : undefined}
+            label={
+              <>
+                <strong>İlan yayın koşullarını ve kişisel veri metnini kabul ediyorum.</strong>
+                <small>İlan, doğrulama tamamlandıktan sonra yayına alınır.</small>
+              </>
+            }
+          />
           <p id="legal-consent-error" className={styles.fieldError}>{errors.legalConsent ?? ''}</p>
         </div>
       </ListingGroup>

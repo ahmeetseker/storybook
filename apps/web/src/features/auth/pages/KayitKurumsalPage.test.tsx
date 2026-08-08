@@ -84,7 +84,7 @@ describe('KayitKurumsalPage', () => {
   it('ilk bölümde işletme kimliğini gösterir, sonraki bölümlerin alanlarını göstermez', async () => {
     render(<RouterProvider router={kurumsalRouter(sahteAdapters(ORNEK_OTURUM))} />)
     expect(await screen.findByLabelText('Ticaret ünvanı')).toBeTruthy()
-    expect(screen.getByText('Bölüm 1 / 4: İşletme kimliği')).toBeTruthy()
+    expect(screen.getByText('Bölüm 1 / 5: İşletme kimliği')).toBeTruthy()
     // Yetki bölümü henüz çizilmemiş olmalı.
     expect(screen.queryByLabelText('Yetki belgesi numarası')).toBeNull()
   })
@@ -95,7 +95,7 @@ describe('KayitKurumsalPage', () => {
     await screen.findByLabelText('Ticaret ünvanı')
     await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
     await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
-    expect(screen.getByText('Bölüm 1 / 4: İşletme kimliği')).toBeTruthy()
+    expect(screen.getByText('Bölüm 1 / 5: İşletme kimliği')).toBeTruthy()
     expect(screen.queryByLabelText('Yetki belgesi numarası')).toBeNull()
   })
 
@@ -166,11 +166,11 @@ describe('KayitKurumsalPage', () => {
     await screen.findByLabelText('Ticaret ünvanı')
     await kurumsalBolumleriniDoldur(kullanici)
 
-    expect(screen.getByText('Bölüm 4 / 4: Onay')).toBeTruthy()
+    expect(screen.getByText('Bölüm 5 / 5: Onay')).toBeTruthy()
     await kullanici.click(screen.getByRole('button', { name: 'Düzenle: Yetki ve yeterlilik' }))
 
     expect(await screen.findByLabelText('Yetki belgesi numarası')).toBeTruthy()
-    expect(screen.getByText('Bölüm 2 / 4: Yetki ve yeterlilik')).toBeTruthy()
+    expect(screen.getByText('Bölüm 2 / 5: Yetki ve yeterlilik')).toBeTruthy()
   })
 
   it('özette girilen bilgileri gösterir', async () => {

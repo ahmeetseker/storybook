@@ -15,16 +15,24 @@
   padding-block-start: var(--lg-space-3);
 }
 
+/* Künye beyaz plakada durur: sayfa zemininden ayrışır ve diğer panellerle
+   aynı yüzey dilini paylaşır. */
 .plate {
   min-inline-size: 0;
+  padding: var(--lg-space-4) var(--lg-space-5);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background-color: var(--lg-surface);
 }
 
+/* Dar kapta başlık dengeli sarar (en çok iki satır beklenir); geniş kapta
+   tek satır sözleşmesine geçer. */
 .title {
   margin: 0;
   font-size: var(--lg-text-title);
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 
@@ -37,7 +45,12 @@
 /* ═══ Tablet: kap ≥ 700px ═══ */
 @container page (min-width: 700px) {
   .title {
-    max-inline-size: 30ch;
-    font-size: var(--lg-text-display);
+    /* Tek satır: display ölçeği yerine title ölçeğinde kalır ki başlık
+       sığsın; olağan dışı uzun kuyruk üç noktayla kısalır, tam metin
+       erişilebilir ağaçta durur. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-wrap: initial;
   }
 }

@@ -6,7 +6,14 @@
   /* Akışkan tip: 22px (mobil) → 28px (masaüstü), ölçek tavanı --lg-text-display'i aşmaz.
      Çağıran `.root` üzerinden ezebilir. */
   --title-size: clamp(var(--lg-text-title), 3vw, var(--lg-text-display));
+  /* Alt başlık ölçüsü de aynı sözleşmeyle ezilebilir: dar kapta headline (17px)
+     gövdeye inebilmeli — ölçüyü çağıran bilir, bileşen varsayılanı taşır. */
+  --subtitle-size: var(--lg-text-headline);
   --pad-y: clamp(var(--lg-space-5), 2.4vw, var(--lg-space-7));
+  /* Yatay pay da ezilebilir: hero zaten kenar paylı bir kabın (PageContainer,
+     konsept çerçevesi) içindeyse kendi payı ÜST ÜSTE biner — dar ekranda
+     çağıran bunu sıfırlayıp tek kenar payına döner. */
+  --pad-x: var(--lg-space-5);
   --showcase-pad-top: var(--lg-space-10);
   --stack-gap: 18px;
   --actions-gap: 10px;
@@ -60,7 +67,7 @@
 .inner {
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--pad-y) var(--lg-space-5);
+  padding: var(--pad-y) var(--pad-x);
   display: flex;
   flex-direction: column;
   gap: var(--stack-gap);
@@ -77,14 +84,18 @@
   font-weight: 700;
   letter-spacing: -0.028em;
   color: var(--lg-label);
+  /* Dar kapta son satıra tek kelime düşürmek yerine satırları dengeler. */
+  text-wrap: balance;
 }
 .subtitle {
   margin: 0;
   max-width: var(--subtitle-max-w);
   min-height: calc(var(--subtitle-lines) * var(--subtitle-lh) * 1em);
-  font-size: var(--lg-text-headline);
+  font-size: var(--subtitle-size);
   line-height: var(--subtitle-lh);
   color: var(--lg-label-secondary);
+  /* Yetim kelime bırakmayan sarma — uzun alt başlıklar dar kapta düzgün kırılır. */
+  text-wrap: pretty;
 }
 .actionsRow { display: flex; flex-wrap: wrap; gap: var(--actions-gap); }
 .searchSlot { width: 100%; max-width: var(--search-max-w); }
@@ -115,7 +126,7 @@
   position: relative;
   max-width: var(--content-max);
   margin: 0 auto;
-  padding: var(--showcase-pad-top) var(--lg-space-5) var(--pad-y);
+  padding: var(--showcase-pad-top) var(--pad-x) var(--pad-y);
   display: flex;
   flex-direction: column;
   gap: var(--stack-gap);

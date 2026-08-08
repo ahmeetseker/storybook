@@ -6,6 +6,7 @@ import {
 } from 'react'
 import {
   GlassButton,
+  GlassCheckbox,
   GlassDrawer,
   GlassSelect,
   type GlassSelectOption,
@@ -567,22 +568,22 @@ function CriteriaFields({
         <legend>Emlak türleri</legend>
         <div className={styles.checkboxGrid}>
           {PROPERTY_TYPE_OPTIONS.map((option) => (
-            <label key={option.value} className={styles.checkboxField}>
-              <input
-                type="checkbox"
-                checked={criteria.propertyTypes.includes(option.value)}
-                onChange={(event) =>
-                  patchCriteria({
-                    propertyTypes: toggleValue(
-                      criteria.propertyTypes,
-                      option.value,
-                      event.currentTarget.checked,
-                    ),
-                  })
-                }
-              />
-              <span>{option.label}</span>
-            </label>
+            <GlassCheckbox
+              key={option.value}
+              className={styles.checkboxField}
+              size="sm"
+              label={option.label}
+              checked={criteria.propertyTypes.includes(option.value)}
+              onChange={(event) =>
+                patchCriteria({
+                  propertyTypes: toggleValue(
+                    criteria.propertyTypes,
+                    option.value,
+                    event.currentTarget.checked,
+                  ),
+                })
+              }
+            />
           ))}
         </div>
       </fieldset>
@@ -591,27 +592,27 @@ function CriteriaFields({
         <legend>Zorunlu özellikler</legend>
         <div className={styles.checkboxGrid}>
           {FEATURE_OPTIONS.map((option) => (
-            <label key={option.value} className={styles.checkboxField}>
-              <input
-                type="checkbox"
-                checked={criteria.mustHave.includes(option.value)}
-                onChange={(event) =>
-                  patchCriteria({
-                    mustHave: toggleValue(
-                      criteria.mustHave,
-                      option.value,
-                      event.currentTarget.checked,
-                    ),
-                    preferences: event.currentTarget.checked
-                      ? criteria.preferences.filter(
-                          (feature) => feature !== option.value,
-                        )
-                      : [...criteria.preferences],
-                  })
-                }
-              />
-              <span>{option.label}</span>
-            </label>
+            <GlassCheckbox
+              key={option.value}
+              className={styles.checkboxField}
+              size="sm"
+              label={option.label}
+              checked={criteria.mustHave.includes(option.value)}
+              onChange={(event) =>
+                patchCriteria({
+                  mustHave: toggleValue(
+                    criteria.mustHave,
+                    option.value,
+                    event.currentTarget.checked,
+                  ),
+                  preferences: event.currentTarget.checked
+                    ? criteria.preferences.filter(
+                        (feature) => feature !== option.value,
+                      )
+                    : [...criteria.preferences],
+                })
+              }
+            />
           ))}
         </div>
       </fieldset>
@@ -620,27 +621,27 @@ function CriteriaFields({
         <legend>Tercihler</legend>
         <div className={styles.checkboxGrid}>
           {FEATURE_OPTIONS.map((option) => (
-            <label key={option.value} className={styles.checkboxField}>
-              <input
-                type="checkbox"
-                checked={criteria.preferences.includes(option.value)}
-                onChange={(event) =>
-                  patchCriteria({
-                    mustHave: event.currentTarget.checked
-                      ? criteria.mustHave.filter(
-                          (feature) => feature !== option.value,
-                        )
-                      : [...criteria.mustHave],
-                    preferences: toggleValue(
-                      criteria.preferences,
-                      option.value,
-                      event.currentTarget.checked,
-                    ),
-                  })
-                }
-              />
-              <span>{option.label}</span>
-            </label>
+            <GlassCheckbox
+              key={option.value}
+              className={styles.checkboxField}
+              size="sm"
+              label={option.label}
+              checked={criteria.preferences.includes(option.value)}
+              onChange={(event) =>
+                patchCriteria({
+                  mustHave: event.currentTarget.checked
+                    ? criteria.mustHave.filter(
+                        (feature) => feature !== option.value,
+                      )
+                    : [...criteria.mustHave],
+                  preferences: toggleValue(
+                    criteria.preferences,
+                    option.value,
+                    event.currentTarget.checked,
+                  ),
+                })
+              }
+            />
           ))}
         </div>
       </fieldset>

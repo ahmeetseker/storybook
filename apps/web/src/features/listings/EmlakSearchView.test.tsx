@@ -230,18 +230,59 @@ describe('EmlakSearchView', () => {
     expect(next.mapArea).toBeUndefined()
   })
 
-  // Mobil çekmece tam ekran bir yüzey: kriterleri ikinci bir modala saklamak
-  // yerine core OLMAYANLAR da burada açılır. Aksi halde mobil kullanıcı
-  // katalogdaki kriterlerin çoğuna hiç ulaşamıyordu.
-  it('mobil çekmece core olmayan kriterleri de gösterir', async () => {
+  // Mobil çekmece KADEMELİ AKIŞ ile açılır: kataloğun tamamı tek yüzeyde.
+  // İkinci bir ekran, "Tüm filtreler" düğmesi ya da akordeon yok.
+  it('mobil çekmece kataloğun tamamını tek akışta açar', async () => {
     await renderSearch({ category: 'residential' })
 
     fireEvent.click(screen.getByRole('button', { name: 'Filtreleri aç' }))
     const drawer = await screen.findByRole('dialog', { name: 'Emlak filtreleri' })
 
-    // "Balkon" core değildir; kenar çubuğunda yok, çekmecede olmalı.
-    expect(within(drawer).getByText('Balkon')).toBeTruthy()
-    // Çekmecenin içinde ikinci bir "Tüm Seçenekler" girişi OLMAMALI.
-    expect(within(drawer).queryByRole('button', { name: /Tüm Seçenekler/ })).toBeNull()
+    // Temel kararlar en üstte.
+    expect(within(drawer).getByRole('radiogroup', { name: 'İşlem türü' })).toBeTruthy()
+    // Katalog bölümleri AYNI yüzeyde, başlıklarıyla.
+    expect(within(drawer).getByRole('heading', { name: /Bina ve tesisat/ })).toBeTruthy()
+    expect(within(drawer).getByRole('heading', { name: /Tapu ve kullanım/ })).toBeTruthy()
+    // Oda sayısı kendi bölümünde, ham 11 çip yerine segmentli kontrolle.
+    expect(within(drawer).getByRole('radiogroup', { name: 'Oda sayısı' })).toBeTruthy()
+    // Akordeon yok, ikinci yüzeye geçiş yok.
+    expect(drawer.querySelector('details')).toBeNull()
+    expect(within(drawer).queryByRole('button', { name: /Tüm filtreler/ })).toBeNull()
+  })
+
+  // Nadir kriterler gizlenmez, SAYILIR: "+N kriter" satırı dokununca
+  // kriterleri bulunduğu yere ekler — kullanıcı başka bir ekrana gitmez.
+  it('"+N kriter" nadir kriterleri yerinde açar', async () => {
+    await renderSearch({ category: 'residential' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filtreleri aç' }))
+    const drawer = await screen.findByRole('dialog', { name: 'Emlak filtreleri' })
+
+    // "Yapı tipi" nadir bir kriter: önce satırın arkasında.
+    expect(within(drawer).queryByText('Yapı tipi')).toBeNull()
+    const expanders = within(drawer).getAllByRole('button', { name: /^\+ \d+ kriter$/ })
+    expect(expanders.length).toBeGreaterThan(0)
+
+    const dialogCount = screen.getAllByRole('dialog').length
+    fireEvent.click(expanders[0])
+
+    // Aynı yüzeyde kaldık; yeni bir diyalog açılmadı.
+    expect(screen.getAllByRole('dialog')).toHaveLength(dialogCount)
+  })
+
+  // Alt eylem sonucu SAYAR: kullanıcı yaprağı kapatmadan seçiminin sonucu ne
+  // kadar daralttığını görür, boş sonuç tuzağına düşmez.
+  it('çekmecenin alt eylemi taslak seçimin sonucunu canlı sayar', async () => {
+    await renderSearch({ category: 'residential' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filtreleri aç' }))
+    const drawer = await screen.findByRole('dialog', { name: 'Emlak filtreleri' })
+    const before = within(drawer).getByRole('button', { name: /ilanı göster$/ }).textContent
+
+    const rooms = within(drawer).getByRole('radiogroup', { name: 'Oda sayısı' })
+    fireEvent.click(within(rooms).getByRole('radio', { name: '2+1' }))
+
+    const after = within(drawer).getByRole('button', { name: /ilanı göster$/ }).textContent
+    expect(after).not.toBe(before)
   })
 })

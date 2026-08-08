@@ -6,7 +6,9 @@ export interface AppRouteDefinition {
     | 'search'
     | 'offices'
     | 'regions'
+    | 'price-index'
     | 'blog'
+    | 'pricing'
     | 'ai-advisor'
     | 'compare'
     | 'favorites'
@@ -32,6 +34,7 @@ export interface AppRouteDefinition {
     | 'plus'
     | 'user'
     | 'message'
+    | 'card'
   group?: 'Şirket' | 'Hesap'
 }
 
@@ -69,6 +72,21 @@ export const appRoutes = [
     group: 'Şirket',
   },
   {
+    key: 'price-index',
+    label: 'Emlak Endeksi',
+    // Türkiye kökü landing görevini görür; derin seviyeler splat route'tan gelir.
+    href: '/emlak-endeksi',
+    description:
+      'İl, ilçe ve mahalle bazlı konut fiyat endeksi: nominal ve enflasyondan arındırılmış reel değişim, arz, kira getirisi ve veri güven skoru.',
+    statusTrail: ['Anasayfa', 'Emlak Endeksi'],
+    scope: 'public',
+    // Sayfa yapısı hazır ama veri fixture. Arama motoruna uydurma fiyat
+    // açılmaz: gerçek ilan verisine bağlandığında `true`'ya çevrilecek.
+    // Ürünün SEO değeri buna bağlı (bkz. docs/emlak-endeksi-...-2026-08-05.md §B).
+    indexable: false,
+    icon: 'compare',
+  },
+  {
     key: 'regions',
     label: 'Bölgeler',
     href: '/bolgeler',
@@ -88,6 +106,18 @@ export const appRoutes = [
     scope: 'public',
     indexable: false,
     icon: 'book',
+  },
+  {
+    key: 'pricing',
+    label: 'Paketler',
+    href: '/paketler',
+    description:
+      'Emlak ofisi paketleri: danışman koltuğuna göre kademelenen ilan, vitrin ve doğrulama kontenjanları.',
+    statusTrail: ['Anasayfa', 'Paketler'],
+    scope: 'public',
+    // Fiyat sayfası aramada bulunmalı: bir ofis "arsam ofis paketi" diye arar.
+    indexable: true,
+    icon: 'card',
   },
   {
     key: 'ai-advisor',
@@ -170,9 +200,9 @@ export const nonNavRoutes = [
     href: '/ilan',
     description:
       'Bir ilanın kaynaklı kanıt defteri: her değer kaynağı, tarihi ve kapsamıyla birlikte.',
-    // Boş: sayfa kendi kategori yolunu (`GlassBreadcrumb`) taşır, kabuk
-    // bunun üstüne ikinci bir durum izi basmaz.
-    statusTrail: [],
+    // Kabuk diğer sayfalarla aynı kırıntı yolunu basar; 'Emlak ara' arama
+    // rotasının etiketiyle eşleşip tıklanabilir ara düğüm olur.
+    statusTrail: ['Anasayfa', 'Emlak ara', 'İlan detayı'],
     scope: 'public',
     indexable: true,
     icon: 'pin',
@@ -183,7 +213,7 @@ export type AppRoute = (typeof appRoutes)[number]
 export type AppRouteKey = AppRoute['key']
 export type AppRouteHref = AppRoute['href']
 
-export const headerRouteKeys = ['search', 'offices', 'regions', 'blog'] as const
+export const headerRouteKeys = ['search', 'offices', 'price-index', 'regions', 'pricing', 'blog'] as const
 
 export function getRouteByKey(key: AppRouteKey): AppRouteDefinition {
   const route = appRoutes.find((item) => item.key === key)
@@ -212,6 +242,27 @@ export function getRouteByPath(pathname: string): AppRouteDefinition {
       .filter((route) => route.href !== '/' && path.startsWith(`${route.href}/`))
       .sort((a, b) => b.href.length - a.href.length)[0] ?? getRouteByKey('home')
   )
+}
+
+export interface BreadcrumbTrailItem {
+  label: string
+  href?: string
+}
+
+/**
+ * Rotanın `statusTrail` etiketlerini tıklanabilir bir kırıntı yoluna çözer.
+ *
+ * Ara etiketler `appRoutes` içinde aynı `label`'ı taşıyan rotanın href'ini
+ * alır ('Anasayfa' → '/', 'Hesabım' → '/hesabim'); eşleşme bulunamayan etiket
+ * href'siz kalır (tıklanamaz ara düğüm). Son etiket mevcut sayfadır — href
+ * verilmez; `GlassBreadcrumb` onu zaten `aria-current="page"` span'ı yapar.
+ */
+export function getBreadcrumbTrail(route: AppRouteDefinition): BreadcrumbTrailItem[] {
+  return route.statusTrail.map((label, index) => {
+    if (index === route.statusTrail.length - 1) return { label }
+    const match = appRoutes.find((item) => item.label === label)
+    return match ? { label, href: match.href } : { label }
+  })
 }
 
 const configuredOrigin = import.meta.env.VITE_APP_ORIGIN || 'https://arsam.net'

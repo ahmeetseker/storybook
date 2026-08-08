@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { loadListingDetail } from './data/listing-detail-adapter'
+import { LISTING_FIXTURES } from '@/features/listings/data/listing-adapter'
 import { ListingDetailWorkspace } from './ListingDetailWorkspace'
 
 const NOW = '2026-07-27T09:00:00.000Z'
@@ -24,7 +25,14 @@ describe('yansıtılmış ilan detayı sayfası', () => {
 
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading.textContent).toContain('Nilüfer')
-    expect(screen.getAllByText('6.750.000 ₺').length).toBeGreaterThan(0)
+    // Beklenen tutar KAYITTAN türetilir: sabit yazıldığında test, sayfanın
+    // kendi fiyatını yazdığını değil demo verisinin o günkü değerini
+    // doğruluyordu. İddianın özü aşağıdaki "defterin değeri görünmez".
+    const ilan = LISTING_FIXTURES.find((item) => item.id === VERIFIED_RESIDENTIAL)
+    expect(ilan).toBeDefined()
+    expect(
+      screen.getAllByText(`${ilan!.price.toLocaleString('tr-TR')} ₺`).length,
+    ).toBeGreaterThan(0)
     expect(container.textContent).toContain('Bursa')
 
     expect(container.textContent).not.toContain('Ören')
@@ -33,16 +41,16 @@ describe('yansıtılmış ilan detayı sayfası', () => {
   })
 
   // Yansıtılmış ilan da temsili kapak karesini arama tarafıyla aynı kaynaktan
-  // alır; kare taşınmazın kendi fotoğrafı olmadığı için açıklaması görünürdür.
-  it('temsili kapak görselini kendi başlığıyla ve açıklamasıyla gösterir', async () => {
+  // alır; açıklama cümlesi sayfada değil tam ekran görüntüleyicide durur.
+  it('temsili kapak görselini gösterir, açıklama cümlesini sayfaya yazmaz', async () => {
     await renderProjected()
     const cover = screen.getByAltText(/için temsili ilan fotoğrafı$/)
     expect(cover.getAttribute('src')).toBeTruthy()
     expect(
-      screen.getByText(
+      screen.queryByText(
         'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.',
       ),
-    ).toBeTruthy()
+    ).toBeNull()
   })
 
   it('konut ilanında parsel, imar ve tehlike bölümleri hiç render edilmez', async () => {

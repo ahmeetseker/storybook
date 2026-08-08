@@ -258,8 +258,9 @@
 .agencyGrid {
   display: grid;
   min-width: 0;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--lg-space-3);
+  /* Vurgu kartları yan yana ayrışır; dar ekranda tek kolona düşer */
+  grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+  gap: var(--lg-space-4);
 }
 
 .agencyCta {
@@ -311,9 +312,91 @@
 }
 
 @container (max-width: 32rem) {
+  /* Dar kapta hero sıkılaşır: masaüstü ritmi (18px yığın payı, 22px başlık,
+     17px alt başlık) telefonda ekranın yarısını tek bölüme veriyordu.
+     Tip bir adım, boşluklar bir kademe iner; kontrol YÜKSEKLİĞİNE dokunulmaz —
+     dokunmatikte 44px hedefi token katmanının kendisi zorlar (index.css,
+     pointer: coarse bloğu). */
   .hero > section {
     --pad-y: var(--lg-space-4);
+    /* Kenar payı ÜÇ kez biniyordu: PageContainer (16) + konsept çerçevesi (16)
+       + hero'nun kendi payı (20) = kenar başına 52px; 320'lik ekranda arama
+       kartı 216px'e sıkışıyordu. Dar kapta hero kendi payını bırakır, dıştaki
+       iki kap yeter — içerik kenar başına 32px'e döner. */
+    --pad-x: 0px;
     --split-min: 100%;
+    --stack-gap: var(--lg-space-3);
+    /* Mikro-geometri — token karşılığı yok: title (22) dar kapta baskın,
+       headline (17) h1 için cılız; ara adım ölçülerek seçildi. */
+    --title-size: 20px;
+    --subtitle-size: var(--lg-text-body);
+    --quicklink-gap: var(--lg-space-3);
+  }
+
+  /* Arama kartı da aynı kademeyi okur: iç boşluk bir adım iner, kontrol
+     yazısı gövdeden dipnota düşer. Dolgu space-3'te KALIR — kart yarıçapı
+     büyükken 8px dolgu alanları kenara yapıştırıyordu.
+
+     BİLİNÇLİ AAA İSTİSNASI (ürün kararı, 2026-08-07): kontrol yüksekliği bu
+     kartta dokunmatikte de 36px'e sabitlenir — coarse-pointer bloğunun 44px
+     pini KARTIN İÇİNDE ezilir. 36px, WCAG 2.5.8 AA (24px) üstünde kalır ama
+     2.5.5 AAA (44px) altındadır; hero'nun ilk ekrana sığması buna değer
+     görüldü. Select'in AÇILAN listesi bu istisnaya girmez: satırlar
+     `--lg-control-hit`'ten okur ve 44px kalır. */
+  .searchCard {
+    gap: var(--lg-space-2);
+    padding: var(--lg-space-3);
+    --lg-control-sm: 36px;
+    --lg-control-md: 36px;
+    --lg-text-body: var(--lg-text-footnote);
+  }
+
+  /* Sekme şeridi (kartın ilk çocuğu = segmented control'ün kökü):
+     - ayraç altı nefes bir adım iner (hairline ile select arasında 20px'lik
+       sahipsiz bant kalıyordu);
+     - şeridin ölçü değişkenleri kendi kökünde TANIMLI olduğundan mirasla
+       ezilemez; aynı elemana daha yüksek özgüllükle yazılır. Yapısal seçici
+       bilinçli — bileşenin hash'li sınıfına buradan uzanılamaz. */
+  .searchCard > div:first-child {
+    padding-block-end: var(--lg-space-2);
+    --pad-x-md: var(--lg-space-3);
+    --font-md: var(--lg-text-footnote);
+  }
+
+  /* Select değer yazısı: dokunmatik zoom koruması bu tetikleyicide gereksiz
+     (native alan değil) — kart kademesiyle aynı ölçüye iner. Değişken
+     select'in kendi kökünde tanımlı olduğundan aynı elemana daha yüksek
+     özgüllükle yazılır. */
+  .searchField > :first-child {
+    --value-size-touch: var(--lg-text-footnote);
+  }
+
+  /* Kart altı güven satırı bir adım geri çekilir. */
+  .heroStat {
+    font-size: var(--lg-text-caption);
+  }
+}
+
+/* ═══ En dar kap (≤ 352px): 320 sınıfı cihazlar ═══
+   32rem kademesi 360-390'lık telefonlara göre ayarlı; 320'de başlık üç
+   satıra kırılıyor, alt başlık + kart ilk ekranın tamamını yiyordu. Tip bir
+   adım daha iner, eyebrow izlemesi sıkılaşır. Kontrol yüksekliğine yine
+   dokunulmaz — dokunmatikte 44px'i token katmanı zorlar. */
+@container (max-width: 22rem) {
+  .hero > section {
+    --pad-y: var(--lg-space-3);
+    --stack-gap: var(--lg-space-2);
+    /* Mikro-geometri — token karşılığı yok: 20px bu genişlikte başlığı
+       üç satıra kırıyordu; 18px iki satırda tutuyor. */
+    --title-size: 18px;
+    --subtitle-size: var(--lg-text-footnote);
+    --quicklink-gap: var(--lg-space-2);
+  }
+
+  /* 0.16em izleme 11 karakterlik satırı kelime kelime koparıyordu. */
+  .heroEyebrow {
+    font-size: var(--lg-text-badge);
+    letter-spacing: 0.12em;
   }
 
   .mapRegion {
@@ -351,3 +434,74 @@
     min-height: var(--lg-control-lg);
   }
 }
+
+/* ═══ MOBIL-AJAN-1: Bölge kartları dar-kap kuralları — YALNIZ bu blok ═══ */
+
+/* Genel mobil (≤ 512px): iki kolonlu gridde masaüstü ölçüleri (16px dolgu,
+   5.25rem taban, 15px başlık) kartları hantallaştırıyordu; başlık iki satıra
+   kırılınca komşu kartlar dengesiz görünüyordu. Tip bir adım iner, dolgu bir
+   kademe geri çekilir, yükseklik içerikten gelir. Dokunma hedefi bozulmaz:
+   min-height 44px pinine (`--lg-control-hit`) sabitlenir — bu kural kaynak
+   sırasıyla coarse bloğunun 48px'lik görsel payını da dar kapta 44'e çeker,
+   WCAG 2.5.5 AAA sınırında kalır. */
+@container (max-width: 32rem) {
+  .regionLink {
+    min-height: var(--lg-control-hit);
+    gap: var(--lg-space-2);
+    padding: var(--lg-space-3);
+  }
+
+  .regionLink strong {
+    font-size: var(--lg-text-footnote);
+  }
+
+  /* Alt satır tabandan 1.55 satır yüksekliği miras alıyordu; iki satıra
+     kırılan detay metni kartı gereksiz uzatıyordu. */
+  .regionLink small {
+    font-size: var(--lg-text-caption);
+    line-height: 1.35;
+  }
+
+  .regionLink b {
+    font-size: var(--lg-text-caption);
+    line-height: 1.3;
+  }
+}
+
+/* 320 sınıfı (≤ 352px): kart bu kademede dikey dizilime geçer (üstteki
+   22rem bloğu) ama içerik ortalanıyordu — grid satırı komşuyla eşitlenince
+   kısa kartın içeriği havada kalıyordu. İçerik üstten başlar; 5.5rem taban
+   da yukarıdaki 32rem kuralıyla 44px pinine iner. */
+@container (max-width: 22rem) {
+  .regionLink {
+    justify-content: flex-start;
+    /* Yukarıdaki 32rem kuralının space-2'si, 22rem bloğunun space-1'ini
+       kaynak sırasıyla ezmişti; dikey dizilimde sıkı gap geri gelir. */
+    gap: var(--lg-space-1);
+  }
+}
+
+/* ═══ /MOBIL-AJAN-1 ═══ */
+
+/* ═══ MOBIL-AJAN-2: Pazar özeti dar-kap kuralları — YALNIZ bu blok ═══ */
+
+/* Dar kapta (sayfa kabı ≤512px) pazar özeti paneli sıkılaşır: kartlar
+   zaten kompakt moda geçtiği için panelin dikey nefesi de space-3'e iner. */
+@container (max-width: 512px) {
+  .metricPanel {
+    padding-block: var(--lg-space-3);
+  }
+}
+
+/* ═══ /MOBIL-AJAN-2 ═══ */
+
+/* ═══ MOBIL-AJAN-3: Ofis kartları dar-kap kuralları — YALNIZ bu blok ═══ */
+
+/* Ofis vurgu kartlarının mobil ölçeği BURADA DEĞİL, bileşendedir:
+   GlassHighlightCard kökü kendi sorgu kabıdır (container-type: inline-size,
+   GlassSiteHeader .root emsali) ve ≤24rem kapta tipografi/dolgu/rozet
+   kademelerini kendisi indirir — her kullanım yeri kendiliğinden düzelir.
+   `.agencyGrid` için ek dar-kap ayarı gerekmedi: tek kolona düşüş ve space-4
+   dizi boşluğu 320'de de doğru çalışıyor. */
+
+/* ═══ /MOBIL-AJAN-3 ═══ */

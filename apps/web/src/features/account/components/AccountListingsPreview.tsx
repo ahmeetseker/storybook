@@ -1,4 +1,4 @@
-import { GlassAlert, GlassEmptyState, GlassListingManagementCard } from '@repo/ui'
+import { GlassAlert, GlassEmptyState } from '@repo/ui'
 
 import type {
   AccountListingPreview as ListingPreview,
@@ -7,6 +7,7 @@ import type {
 } from '../domain/account-types'
 
 import { AccountActionLink } from './AccountActionLink'
+import { AccountListingRow } from './AccountListingRow'
 import styles from './AccountSections.module.css'
 
 export interface AccountListingsPreviewProps {
@@ -52,19 +53,7 @@ export function AccountListingsPreview({
       ) : hasListings ? (
         <div data-part="listing-list" className={styles.listingList}>
           {visibleListings.map((listing) => (
-            <GlassListingManagementCard
-              key={listing.id}
-              title={listing.title}
-              state={listing.state}
-              issue={listing.issue}
-              stats={listing.stats}
-              imageSrc={listing.imageSrc}
-              imageAlt={listing.imageAlt}
-              priceLabel={listing.priceLabel}
-              referenceLabel={listing.referenceLabel}
-              updatedLabel={listing.updatedLabel}
-              headingAs="h3"
-            />
+            <AccountListingRow key={listing.id} listing={listing} headingAs="h3" />
           ))}
         </div>
       ) : (

@@ -87,12 +87,22 @@
   appearance: none;
 }
 
-.submit {
+/* Gönder butonu: rayla AYNI yükseklikte soluk bir cam kapsüldü — raya
+   yapışık ve eylemsiz okunuyordu. Artık dolu eylem (prominent) dairesi:
+   raydan bir kademe küçük, üst/altında ve sağında nefes payıyla durur.
+   İki sınıf bilinçli — GlassButton'ın .sm min-height'ını kesin geçer
+   (.sellerCard.sellerCard emsali). */
+.submit.submit {
   flex: none;
-  inline-size: var(--lg-control-sm, 32px);
-  block-size: var(--lg-control-sm, 32px);
-  min-inline-size: var(--lg-control-sm, 32px);
+  inline-size: var(--lg-control-md, 40px);
+  block-size: var(--lg-control-md, 40px);
+  min-inline-size: var(--lg-control-md, 40px);
+  min-block-size: var(--lg-control-md, 40px);
   padding-inline: 0;
+  /* Rayın 16px iç payı butonun sağında 8px'e iner — daire içeride yüzer,
+     kenara yapışmaz ama sıkışık da durmaz. */
+  margin-inline-end: calc(-1 * var(--lg-space-2, 8px));
+  border-radius: var(--lg-radius-capsule, 999px);
 }
 
 /* Öneri listesi — basit buton dizisi, listbox/combobox DEĞİL */

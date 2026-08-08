@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { GlassSurface } from '@repo/ui'
 
-import { REPRESENTATIVE_IMAGE_NOTE } from '@/features/listings/data/listing-photos'
 import type { ListingMediaItem } from '../domain/listing-detail-types'
 import { formatDate } from '../format'
 import styles from './ListingMediaStage.module.css'
@@ -60,9 +59,9 @@ function useFallbackSrc(): [(src: string) => boolean, (src: string) => void] {
  * İlanın medya sahnesi: 16:9 kapak karesi, kare geçiş kontrolleri ve küçük
  * görsel şeridi.
  *
- * Görseller **temsilidir** — taşınmazın kendi fotoğrafı değildir — ve bu
- * sahnenin altında görünür metin olarak yazılıdır (`REPRESENTATIVE_IMAGE_NOTE`,
- * karşılaştırma tezgâhıyla tek kaynak). Fotoğraf olmayan kalemler (parsel
+ * Görseller **temsilidir** — taşınmazın kendi fotoğrafı değildir; açıklama
+ * cümlesi (`REPRESENTATIVE_IMAGE_NOTE`, karşılaştırma tezgâhıyla tek kaynak)
+ * sahne altına yazılmaz. Fotoğraf olmayan kalemler (parsel
  * görünümü, plan notu) kare taşımaz; künyeleriyle birlikte döküm olarak durur.
  *
  * Kontrol grubu sayfanın kontrol katmanına ait tek cam yüzeydir ve yalnız
@@ -166,8 +165,6 @@ export function ListingMediaStage({ media }: ListingMediaStageProps) {
           })}
         </ul>
       ) : null}
-
-      <p className={styles.note}>{REPRESENTATIVE_IMAGE_NOTE}</p>
 
       {others.length > 0 ? (
         <MediaInventory

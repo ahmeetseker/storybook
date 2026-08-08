@@ -197,10 +197,13 @@
   cursor: pointer;
 }
 
+/* Karttaki birincil eylem de dolu eylem dilidir: rengi kabuktaki "İlan ver"
+   ile aynı token'dan alır, kendi kahvesini uydurmaz. */
 .actions button:first-child {
-  border-color: var(--lg-accent);
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  border-color: transparent;
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
+  font-weight: var(--lg-action-weight);
 }
 
 .actions button[aria-pressed='true'] {

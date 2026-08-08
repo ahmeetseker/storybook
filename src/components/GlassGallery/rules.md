@@ -2,7 +2,7 @@
 name: GlassGallery
 category: içerik
 status: hazır
-lastReviewed: 2026-07-15
+lastReviewed: 2026-08-05
 ---
 
 # GlassGallery Kuralları
@@ -20,7 +20,8 @@ katmanı olduğu için **her zaman cam** kalır.
 | İlgili | Farkı |
 |---|---|
 | GlassCarousel | İçerik kartları kaydırır; index/lightbox kavramı yok |
-| GlassIconButton | Galerinin ok/kapat kontrolleri bundan kurulur |
+| GlassLightbox | Tam ekran katmanın kendisi; galeri onu sahnesinden açar |
+| GlassIconButton | Galerinin ok kontrolleri bundan kurulur |
 
 ## 2. Semantik sözleşme
 
@@ -28,9 +29,10 @@ katmanı olduğu için **her zaman cam** kalır.
 - Sahne görseli `<button type="button">` içindedir; accessible name
   `Görseli büyüt: {alt}`. Her görsel için `alt` **zorunlu** (API'de required).
 - Thumbnail'lar `<button type="button">`; aktif olan `aria-current` taşır.
-- Lightbox: `createPortal(document.body)` + `role="dialog"` + `aria-modal="true"`
-  + `aria-label="Görsel {n} / {m}: {alt}"` + `tabIndex={-1}`; açılışta dialog'a
-  `focus()` verilir.
+- Lightbox **bu bileşende yaşamaz**: tam ekran görünüm `GlassLightbox`'a
+  devredilir (portal + `role="dialog"` + `aria-modal` + focus trap + scroll
+  kilidi + focus dönüşü). Galeri yalnız `open` ve `index`'i sürer; sözleşmenin
+  tamamı `GlassLightbox/rules.md`'dedir.
 - DOM değişmezleri: sayaç metni `{n} / {m}`; ok ikonları `aria-hidden` SVG;
   `images` boşsa component **null** döner.
 
@@ -42,7 +44,7 @@ katmanı olduğu için **her zaman cam** kalır.
 | stage okları | `images.length > 1` | GlassIconButton çifti | Hep cam; `material`'dan etkilenmez |
 | counter | `images.length > 1` | `n / m` | Koyu pill, sağ-alt |
 | thumbs | `images.length > 1` | tüm görseller | Yatay scroll, scrollbar gizli; thumb `alt=""` (ad butonun aria-label'ında) |
-| lightbox | tıklamayla | büyük görsel + kontroller | Portal; aşağıda §7 |
+| lightbox | tıklamayla | `GlassLightbox` | Sahneyle tek indeks; şerit orada da var |
 
 ## 4. Public API
 
@@ -84,25 +86,21 @@ Varsayılan kombinasyon: `aspectRatio='4 / 3'`, `material` verilmez (cam), `tone
 
 ## 7. Davranış (overlay dahil)
 
-- **Açılış:** sahne butonuna tıklama/Enter → portal ile `document.body`'ye
-  lightbox; dialog `focus()` alır.
-- **Kapanış:** Escape · backdrop tıklaması (yalnız `e.target === currentTarget`)
-  · Kapat butonu.
-- **Keyboard (lightbox açıkken, window düzeyinde):** `Escape` kapatır,
-  `ArrowLeft`/`ArrowRight` gezinir — gezinme sayfadaki galeriye de yansır
-  (tek state).
-- **Focus dönüşü: uygulanmadı.** Kapanınca odak tetikleyen butona dönmez —
-  bilinen borç. Focus trap da yok; `aria-modal` var ama Tab arka plana
-  kaçabilir (bkz. Açık Kararlar).
-- Lightbox içi görsel gezinme butonları `size="lg"` (dokunma hedefi).
-- Controlled kullanım: N/A — index dışarıdan sürülemez.
+- **Açılış:** sahne butonuna tıklama/Enter → `GlassLightbox` `open=true`.
+- **Kapanış, klavye, focus trap, scroll kilidi, focus dönüşü:** tamamı
+  `GlassLightbox`'ın sözleşmesidir (bkz. onun §7). Galeri bunları kendi
+  yazmaz — daha önce eksik olan focus dönüşü ve scroll kilidi bu devirle
+  birlikte kapandı.
+- **Tek indeks:** lightbox'a `index` + `onIndexChange` controlled verilir;
+  orada gezinmek sayfadaki sahneyi de ilerletir, kapanışta aynı karede kalınır.
+- Controlled kullanım (dışarıdan): N/A — galerinin kendi indeksi dışarıdan
+  sürülemez.
 
 ## 8. İçerik
 
 - `alt` zorunlu ve anlamlı olmalı; a11y adları (`Görseli büyüt: …`,
   `{n}. görsele git: …`) alt'tan türetilir.
-- Sahne `object-fit: cover` (kırpar); lightbox `object-fit: contain` (tamamını
-  gösterir).
+- Sahne `object-fit: cover` (kırpar); lightbox `contain` (bkz. GlassLightbox).
 - Boş `images` → null; tek görsel → yalnız sahne. Yükleme/hata placeholder'ı yok
   (çağıranın işi).
 - Kontrol etiketleri Türkçe sabit ('Önceki görsel', 'Kapat' vb.) — i18n prop'u yok.
@@ -113,10 +111,10 @@ Varsayılan kombinasyon: `aspectRatio='4 / 3'`, `material` verilmez (cam), `tone
 |---|---|---|
 | stage | malzeme/gölge | GlassSurface (`thickness 0.4`) |
 | stage / thumb | focus outline | `--lg-accent` (fallback `#0a84ff`) |
-| oklar, kapat | tüm görünüm | GlassIconButton token'ları |
-| sayaç / lightbox sayacı | font-size | `--lg-text-caption` / `--lg-text-footnote` |
-| sayaç pilleri | radius / metin | `--lg-radius-capsule` / `--lg-on-scrim` (scrim üstünde sabit `#ffffff`) |
-| thumbs gap, lightbox ofsetleri | boşluk | `--lg-space-2` (8px) / `--lg-space-5` (20px, kapat) / `--lg-space-6` (24px, ok+sayaç) |
+| oklar | tüm görünüm | GlassIconButton token'ları |
+| sayaç | font-size | `--lg-text-caption` |
+| sayaç pili | radius / metin | `--lg-radius-capsule` / `--lg-on-scrim` (scrim üstünde sabit `#ffffff`) |
+| thumbs gap | boşluk | `--lg-space-2` (8px) |
 
 **Borç (raw / mikro-geometri):** token karşılığı olmayan ölçü ve renkler
 component kökünde yerel değişkende toplandı (`.gallery { --stack-gap: 10px;
@@ -125,14 +123,9 @@ component kökünde yerel değişkende toplandı (`.gallery { --stack-gap: 10px;
 rgba(255,255,255,.9); --media-placeholder: rgba(0,0,0,.2); --counter-bg:
 rgba(0,0,0,.55); --counter-pad: 3px 10px; }`). Sayaç zemini `rgba(0,0,0,.55)`
 alfa olarak `--lg-scrim` ile aynı görünse de scrim `rgba(10,12,16,.55)` — birebir
-örtüşmediğinden token'a bağlanmadı. Lightbox portal'da render edildiğinden kendi
-değişkenlerini `.lightbox` üzerinde taşır (`--overlay-bg: rgba(0,0,0,.82)` +
-`--overlay-blur: 18px` — scrim token'ından bilinçli daha koyu overlay malzemesi;
-`--image-radius: 16px`; `--image-max-w: 1200px`; `--pill-bg:
-rgba(255,255,255,.14)` beyaz-alfa malzeme; `--pill-pad: 4px 14px`). Lightbox
-görsel gölgesi `0 24px 80px rgba(0,0,0,.5)` hiçbir `--lg-shadow-*` ile birebir
-örtüşmez — yerinde raw bırakıldı. Geçiş süresi `0.18s ease` (süre token'ı yok),
-`z-index: 2/1000` ve `shape={20}` sayısal prop'u raw kalır.
+örtüşmediğinden token'a bağlanmadı. Geçiş süresi `0.18s ease` (süre token'ı yok),
+`z-index: 2` ve `shape={20}` sayısal prop'u raw kalır. Tam ekran katmanın raw
+değerleri artık burada değil, `GlassLightbox/rules.md` §9'dadır.
 
 ## 10. Storybook kapsamı
 
@@ -148,12 +141,12 @@ CSS state'idir — control/story yapılmaz; aktif thumb tüm story'lerde görün
 - [x] ilk görsel + sayaç (unit)
 - [x] ok gezinmesi + `onIndexChange`
 - [x] uçlarda sarma
-- [x] lightbox açılır, Escape kapatır
-- [x] lightbox'ta ok tuşları gezinir
+- [x] lightbox açılır, Escape kapatır (çıkış animasyonu bitince DOM'dan düşer)
+- [x] lightbox'ta ok tuşları gezinir ve sahne de aynı kareye gelir
 - [x] thumbnail atlaması
 - [x] boş `images` → null
-- [ ] kapanışta focus tetikleyiciye döner (yazılmadı — davranış da yok)
-- [ ] backdrop tıklaması kapatır, görsele tıklama kapatmaz
+- [x] kapanışta focus tetikleyiciye döner → `GlassLightbox` testinde
+- [x] backdrop tıklaması kapatır, görsele tıklama kapatmaz → `GlassLightbox`
 - [ ] `material='flat'`te okların cam kaldığı (visual)
 
 ## 12. Do / Don't
@@ -164,6 +157,12 @@ CSS state'idir — control/story yapılmaz; aktif thumb tüm story'lerde görün
 - ❌ Lightbox'ı kendi modal'ının içine koyma; portal `document.body`'ye gider.
 
 **Bilinen kısıtlar:** `images` dizisi kısalırsa mevcut `index` yeniden
-kıstırılmaz. **Açık kararlar:** focus dönüşü + focus trap eklenmesi · controlled
-`index` prop'u · kontrol etiketlerinin i18n'i · body scroll kilidi (lightbox
-açıkken sayfa kayabiliyor).
+kıstırılmaz. **Açık kararlar:** controlled `index` prop'u · kontrol
+etiketlerinin i18n'i.
+
+## Changelog
+
+- 2026-08-05 — Tam ekran görünüm `GlassLightbox`'a devredildi: iç lightbox
+  markup'ı ve `.lightbox*` CSS'i kaldırıldı. Bu devirle focus trap, `body`
+  scroll kilidi, kapanışta focus dönüşü ve tam ekranda thumbnail şeridi
+  bedava geldi; galerinin public API'si değişmedi.

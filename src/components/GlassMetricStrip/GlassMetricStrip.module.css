@@ -1,15 +1,32 @@
 /* İçerik katmanı: cam DEĞİL — düz okunabilir yüzey. Metrikler yatay akar,
    dar ekranda (flex-wrap) alt alta düşer. Trend rengi yalnız ikincil kanaldır;
-   asıl anlam sr-only metin + ok glifiyle taşınır. */
+   asıl anlam sr-only metin + ok glifiyle taşınır.
+   `gradient` varyantı da cam değildir: degrade yalnız semantik token'ın
+   düşük oranlı karışımıdır (bkz. rules.md §1/§9). */
 .root {
   /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9) */
   --strip-change-gap: 2px;
   --strip-item-basis: 140px;
+  --strip-tile-min-height: 158px;
+  --strip-dot-size: 7px;
+  --strip-arrow-size: 16px;
+  --strip-arrow-shift: 4px;
+  --strip-action-height: 24px;
+  /* Mikro-geometri — token karşılığı yok: dokunulabilir linkin dar kapta
+     görünür yükseklik alt sınırı (coarse pointer'da --lg-control-hit devrede) */
+  --strip-action-height-narrow: 36px;
+  --strip-motif-width: 58%;
+  --strip-motif-right: -14%;
+  --strip-motif-bottom: -20%;
+  --strip-lift: -4px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
   display: flex;
   flex-wrap: wrap;
   gap: var(--lg-space-5);
-  margin: 0;
-  font-variant-numeric: tabular-nums;
 }
 
 .item {
@@ -82,4 +99,231 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ══ variant="gradient" — her metrik kendi tonunda bir kart ══
+   Kırılımlar container query ile: şerit hem geniş anasayfada hem dar
+   panelde kullanılıyor, kart kendi kutusuna bakmalı (bkz. rules.md §7). */
+.gradient {
+  container-type: inline-size;
+}
+
+.gradient .grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--lg-space-3);
+}
+
+.gradient .item {
+  --tone: var(--lg-label);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  flex: initial;
+  gap: 0;
+  min-height: var(--strip-tile-min-height);
+  padding: var(--lg-space-5);
+  border: 1px solid color-mix(in srgb, var(--tone) 12%, var(--lg-hairline));
+  border-radius: var(--lg-radius-media);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--tone) 13%, var(--lg-surface)) 0%,
+    color-mix(in srgb, var(--tone) 4%, var(--lg-surface)) 100%
+  );
+  box-shadow: var(--lg-shadow-xs);
+  transition:
+    box-shadow var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+.gradient .item[data-tone='accent'] {
+  --tone: var(--lg-accent);
+}
+.gradient .item[data-tone='success'] {
+  --tone: var(--lg-success);
+}
+.gradient .item[data-tone='warning'] {
+  --tone: var(--lg-warning);
+}
+.gradient .item[data-tone='danger'] {
+  --tone: var(--lg-danger);
+}
+.gradient .item[data-tone='neutral'] {
+  --tone: var(--lg-label);
+}
+
+/* Motif dışındaki her şey motifin üstünde kalır. */
+.gradient .item > :not(.motif) {
+  position: relative;
+  z-index: 1;
+}
+
+.motif {
+  position: absolute;
+  right: var(--strip-motif-right);
+  bottom: var(--strip-motif-bottom);
+  z-index: 0;
+  width: var(--strip-motif-width);
+  height: auto;
+  aspect-ratio: 1;
+  color: var(--tone);
+  opacity: 0.11;
+  pointer-events: none;
+  transition:
+    transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    opacity var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+/* Etiket rozete dönüşür: nokta + metin. Nokta dekoratif, metin tek anlam kanalı. */
+.gradient .label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  width: fit-content;
+  margin-bottom: var(--lg-space-4);
+  padding: var(--lg-space-1) var(--lg-space-3) var(--lg-space-1) var(--lg-space-2);
+  border: 1px solid color-mix(in srgb, var(--tone) 10%, transparent);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-surface) 72%, transparent);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--lg-label) 86%, var(--tone));
+  white-space: nowrap;
+}
+
+.dot {
+  width: var(--strip-dot-size);
+  height: var(--strip-dot-size);
+  flex: none;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--tone);
+}
+
+.gradient .number {
+  font-size: var(--lg-text-display);
+  letter-spacing: -0.03em;
+}
+
+.gradient.sm .number {
+  font-size: var(--lg-text-title);
+}
+
+.gradient .hint {
+  margin-top: var(--lg-space-1);
+}
+
+.actionCell {
+  margin: 0;
+  margin-top: auto;
+  padding-top: var(--lg-space-4);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  min-height: var(--strip-action-height);
+  border-radius: var(--lg-radius-chip);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  color: color-mix(in srgb, var(--tone) 78%, var(--lg-label));
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.arrow {
+  width: var(--strip-arrow-size);
+  height: var(--strip-arrow-size);
+  flex: none;
+  transition: transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+/* Klavye kullanıcısı için hover ile aynı yükselme. */
+.gradient .item:focus-within {
+  box-shadow: var(--lg-shadow-md);
+}
+
+@media (hover: hover) {
+  .gradient .item:hover {
+    box-shadow: var(--lg-shadow-md);
+    transform: translateY(var(--strip-lift));
+  }
+  .gradient .item:hover .motif {
+    transform: scale(1.1) rotate(3deg);
+    opacity: 0.15;
+  }
+  .action:hover .arrow {
+    transform: translateX(var(--strip-arrow-shift));
+  }
+}
+
+/* Dokunmatikte bağlantı tam dokunma hedefine çıkar. */
+@media (pointer: coarse) {
+  .action {
+    min-height: var(--lg-control-hit);
+  }
+}
+
+/* bp-md: dört kart iki kolona iner. */
+@container (max-width: 860px) {
+  .gradient .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* bp-sm: kartlar akışta kalır (2 kolon, bp-md'den miras) ve bir kademe
+   sıkılaşır — dar kapta yatay taşma/kesilme olmaz. Eski yatay snap şeridi
+   kaldırıldı: kırpılan kart mobilde taşma gibi okunuyordu. */
+@container (max-width: 560px) {
+  /* Kart yoğunluğu düşer: sabit taban yükseklik kalkar, padding space-3'e iner. */
+  .gradient .item {
+    min-height: 0;
+    padding: var(--lg-space-3);
+  }
+  /* Sayı bir kademe iner (display → title); dar kartta satırı taşırmaz. */
+  .gradient .number {
+    font-size: var(--lg-text-title);
+  }
+  /* Rozet çipi caption ölçüsüne çıkar (mobil okunurluk) ve gerekirse
+     kırılabilir — nowrap dar kartta kesilmenin kaynağıydı. */
+  .gradient .label {
+    margin-bottom: var(--lg-space-3);
+    font-size: var(--lg-text-caption);
+    white-space: normal;
+  }
+  /* Link footnote kalır; görünür dokunma yüksekliği 36px tabana çekilir. */
+  .actionCell {
+    padding-top: var(--lg-space-3);
+  }
+  .action {
+    min-height: var(--strip-action-height-narrow);
+  }
+}
+
+/* çok dar kap (≈320-400px viewport): iki kolon 140px'in altına düşer,
+   rozet/link sığmaz — tek kolon alt alta akar. Kırılım genişliği için
+   token yok (bkz. --strip-item-basis notu, rules.md §9). */
+@container (max-width: 400px) {
+  .gradient .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gradient .item,
+  .motif,
+  .arrow {
+    transition: none;
+  }
+  .gradient .item:hover {
+    transform: none;
+  }
+  .gradient .item:hover .motif {
+    transform: none;
+  }
 }

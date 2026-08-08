@@ -121,7 +121,11 @@ export function CatalogFilterControls({
         // satıra sığar ve göz tek bakışta tarar); uzun etiketliler okunabilir
         // kalsın diye onay kutusu olarak alt alta durur.
         const options = facet.options ?? []
-        const asPills = options.every((option) => option.label.length <= 18)
+        // Eşik 18'den 24'e çıktı: "Merkezi (pay ölçer)" (19) ya da "2018
+        // yönetmeliği sonrası" (24) gibi etiketler kapsüle rahat sığıyor ama
+        // eskiden dokuz satırlık onay kutusu yığınına düşüyordu. Dar mobil
+        // akışta bu, tek bir kriterin ekranın yarısını yemesi demekti.
+        const asPills = options.every((option) => option.label.length <= 24)
         const setOption = (value: string, checked: boolean) =>
           setValues(
             facet.key,

@@ -9,6 +9,7 @@ import {
 import { AnimatePresence, motion } from 'motion/react'
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface'
 import { prefersReducedMotion } from '../../core/tier'
+import { presets } from '../../motion/presets'
 import { useGlassFieldContext } from '../GlassField'
 import styles from './GlassSelect.module.css'
 
@@ -30,8 +31,14 @@ export interface GlassSelectProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   placeholder?: string
   size?: 'sm' | 'md' | 'lg'
   tone?: 'light' | 'dark' | 'auto'
-  /** Trigger ve seçenek panelinin malzeme ekseni */
+  /** Trigger malzeme ekseni (panel için `panelMaterial`) */
   material?: 'glass' | 'flat'
+  /**
+   * Açılan seçenek panelinin malzemesi. Varsayılan `flat`: liste her zeminde
+   * okunur kalsın diye opak `--lg-surface`. `glass` yalnız arkası sade olan
+   * yerleşimlerde bilinçli olarak seçilir.
+   */
+  panelMaterial?: 'glass' | 'flat'
   /** aria-invalid + --lg-danger çerçeve. Verilmezse GlassField context'inden türetilir */
   invalid?: boolean
   disabled?: boolean
@@ -46,6 +53,7 @@ export function GlassSelect({
   size = 'md',
   tone = 'auto',
   material = 'glass',
+  panelMaterial = 'flat',
   invalid,
   disabled = false,
   className,
@@ -250,18 +258,40 @@ export function GlassSelect({
           {open ? (
             <motion.div
               className={styles.panelMotion}
-              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.98 }}
-              animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.98 }}
-              transition={{ duration: 0.16, ease: 'easeOut' }}
+              /* Materialize: cam yüzey blur + scale + hafif düşüşle "gelir",
+                 aynı yoldan geri döner (giriş/çıkış simetrisi). Yay kritik
+                 sönümlü — açılışta momentum yok, sekme de yok. */
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.96, filter: 'blur(8px)' }}
+              animate={reduced ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.96, filter: 'blur(8px)' }}
+              transition={reduced ? { duration: 0.12 } : { type: 'spring', ...presets.springs.popover }}
             >
-              <GlassSurface material={material} shape={12} thickness={0.5} tone={tone} className={styles.panel}>
+              <GlassSurface material={panelMaterial} shape={12} thickness={0.5} tone={tone} className={styles.panel}>
                 <div role="listbox" id={listboxId} aria-labelledby={triggerId} className={styles.list}>
                   {options.map((option, index) => {
                     const isSelected = option.value === current
                     return (
-                      <div
+                      <motion.div
                         key={option.value}
+                        /* Basamaklı giriş: satırlar panelle birlikte, hafif
+                           gecikmeyle yerine oturur. Uzun listelerde geç
+                           satırlar bekletilmesin diye gecikme 150ms'te kapanır;
+                           satır başına blur yok (81 satırlık listede filter
+                           maliyeti) — blur'u panel taşır. */
+                        initial={reduced ? false : { opacity: 0, y: -4 }}
+                        animate={
+                          reduced
+                            ? undefined
+                            : {
+                                opacity: 1,
+                                y: 0,
+                                transition: {
+                                  type: 'spring',
+                                  ...presets.springs.popover,
+                                  delay: Math.min(index * 0.025, 0.15),
+                                },
+                              }
+                        }
                         id={optionId(index)}
                         role="option"
                         aria-selected={isSelected}
@@ -285,7 +315,7 @@ export function GlassSelect({
                             <path d="M2 6.5L4.8 9L10 3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ) : null}
-                      </div>
+                      </motion.div>
                     )
                   })}
                 </div>

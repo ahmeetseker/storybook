@@ -75,7 +75,6 @@
 
 /* ── Kapak üstündeki işaretler ──────────────────────────────── */
 
-.number,
 .actions,
 .more {
   border: var(--lg-stroke-hairline) solid var(--lg-glass-line);
@@ -83,23 +82,6 @@
   backdrop-filter: blur(16px) saturate(1.6);
   -webkit-backdrop-filter: blur(16px) saturate(1.6);
   color: var(--lg-label);
-}
-
-.number {
-  position: absolute;
-  inset-block-start: var(--lg-space-3);
-  inset-inline-start: var(--lg-space-3);
-  display: inline-flex;
-  align-items: center;
-  max-inline-size: calc(100% - 2 * var(--lg-space-3));
-  overflow: hidden;
-  padding: var(--lg-space-1) var(--lg-space-3);
-  border-radius: var(--lg-radius-capsule);
-  font-size: var(--lg-text-badge);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* İki ikon-tek kontrol tek kapsülde: fotoğrafın üstünde tek cam yüzey. */
@@ -188,7 +170,6 @@
 
 /* ── Açıklama, durum ve döküm ───────────────────────────────── */
 
-.note,
 .status {
   margin: 0;
   color: var(--lg-label-secondary);
@@ -296,7 +277,6 @@
 
 /* Saydamlık azaltıldığında cam donuklaşır — malzeme kaybolur, katman kalır. */
 @media (prefers-reduced-transparency: reduce) {
-  .number,
   .actions,
   .counter,
   .more {

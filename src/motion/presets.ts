@@ -11,5 +11,10 @@ export const presets = {
     // Gerekçe: daralma "sisteme yanıt", büyüme "eve dönüş" — ikincisi aynı
     // hızda olduğunda ani hissettiriyor (bkz. GlassSiteHeader rules.md §7).
     settle: { stiffness: 160, damping: 25 },
+    // Küçük yüzen panellerin (select/menü/popover) "materialize" açılışı:
+    // blur + scale + hafif düşüş birlikte yaylanır. Momentum taşımayan bir
+    // açılışta sekme yanlış hissettirir → kritik sönüm (oran ~0.98),
+    // response ~0.28s — sidebar'dan (0.39s) belirgin daha çevik.
+    popover: { stiffness: 500, damping: 44 },
   },
 } as const

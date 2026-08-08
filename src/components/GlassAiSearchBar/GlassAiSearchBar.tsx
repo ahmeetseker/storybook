@@ -67,13 +67,16 @@ function SparkleIcon() {
 }
 
 function SendIcon() {
+  /* Kısa kuyruk + geniş uç: uzun ince çizgi (2→13.2, 1.6 kalınlık) küçük
+     yuvarlak butonda cılız ve sola kaçık okunuyordu; ok artık optik merkezde
+     ve dokunma yüzeyinin ağırlığıyla orantılı. */
   return (
-    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false">
       <path
-        d="M2 8h11.2M8.4 2.8L13.6 8l-5.2 5.2"
+        d="M3.6 8h8.8M8.2 3.8L12.4 8l-4.2 4.2"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.9"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -190,6 +193,7 @@ export function GlassAiSearchBar({
           <GlassButton
             type="submit"
             size="sm"
+            prominent
             loading={loading}
             disabled={loading}
             aria-label="Ara"

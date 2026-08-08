@@ -356,8 +356,41 @@
 }
 
 @container (max-width: 32rem) {
+  /* Dar kapta footer sıkılaşır: masaüstü ritmi (44px üst nefes, 28px bölüm
+     arası, dokunmatikte 44px link satırı + 8px liste payı = 52px satır aralığı)
+     telefonda link listesini sayfalarca uzatıyordu. Tip bir adım, boşluklar
+     bir kademe iner.
+
+     Ezmeler .root'a DEĞİL inner katmanına yazılır: sorgu kabı .root'un
+     kendisi ve bir öğe kendi kabına yanıt veremez (GlassSiteHeader'daki
+     dersin aynısı). Değişkenlerin tüm tüketicileri inner'ın altında. */
+  .inner,
+  .slimInner,
+  .centeredInner {
+    --pad-top: var(--lg-space-6);
+    --section-gap: var(--lg-space-5);
+    --row-gap: var(--lg-space-3);
+    --item-gap: var(--lg-space-2);
+    --text-sm: var(--lg-text-footnote);
+    /* BİLİNÇLİ AAA İSTİSNASI (arama kartı emsali, 2026-08-07): sosyal daire
+       ve link satırı dar kapta dokunmatikte de 36px görünür ölçüye iner —
+       WCAG 2.5.8 AA (24px) üstünde, 2.5.5 AAA (44px) altında. Coarse bloğu
+       değişkeni .root'a yazar; buradaki tanım tüketicilere daha yakın
+       olduğu için dar kapta kazanır. */
+    --social-size: 36px;
+  }
+  .link {
+    min-height: 36px;
+  }
+  .columnList {
+    gap: var(--lg-space-1);
+  }
+  .brand {
+    font-size: var(--lg-text-body);
+  }
   .columnsGrid {
     grid-template-columns: minmax(0, 1fr);
+    gap: var(--lg-space-4);
   }
   .legalRow {
     flex-direction: column;

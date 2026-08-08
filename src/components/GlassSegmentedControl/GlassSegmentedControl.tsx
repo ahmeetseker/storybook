@@ -29,8 +29,11 @@ export interface GlassSegmentedControlProps
    * - `bar`: kapsayıcı bir yüzeyin (kart/panel) başlık şeridi — cam yok, tam
    *   genişlik, segmentler eşit paylaşır, altta saç teli ayraç. İçerik
    *   katmanındaki flat kartların içinde kullanılır (cam üstüne cam yok).
+   * - `track`: dolu ray — cam yok, tam genişlik, sönük zemin üstünde seçili
+   *   segment kabarık beyaz pil olur. Beyaz yaprak/panel içinde kapsülün cam
+   *   kenarı okunmaz kaldığı için seçim burada dolgu ve gölgeyle taşınır.
    */
-  variant?: 'capsule' | 'bar'
+  variant?: 'capsule' | 'bar' | 'track'
   /**
    * `bar` içindeki segment genişliği.
    * - `equal` (varsayılan): segmentler şeridi eşit paylaşır — dar kartlarda,
@@ -42,6 +45,12 @@ export interface GlassSegmentedControlProps
    */
   fill?: 'equal' | 'content'
   tone?: 'light' | 'dark' | 'auto'
+  /**
+   * Etiketler yalnız ekran okuyucuya okunur; segment görsel olarak ikonla
+   * temsil edilir. Her seçenek `icon` TAŞIMALIDIR — ikonsuz seçenek görünmez
+   * kalır. Dar yüzeylerde (mobil araç kartı) kullanılır.
+   */
+  iconOnly?: boolean
   /** Grup etiketi → radiogroup aria-label; görünür etiket yoksa mutlaka ver */
   label?: string
   /** Tüm kontrolü kapatır */
@@ -57,6 +66,7 @@ export function GlassSegmentedControl({
   variant = 'capsule',
   fill = 'equal',
   tone = 'auto',
+  iconOnly = false,
   label,
   disabled = false,
   className,
@@ -95,6 +105,7 @@ export function GlassSegmentedControl({
     styles.root,
     styles[size],
     variant === 'bar' ? styles.bar : '',
+    variant === 'track' ? styles.track : '',
     variant === 'bar' && fill === 'content' ? styles.barContent : '',
     disabled ? styles.disabled : '',
     className,
@@ -137,15 +148,23 @@ export function GlassSegmentedControl({
                 {option.icon}
               </span>
             ) : null}
-            <span className={styles.segmentLabel}>{option.label}</span>
+            <span
+              className={
+                iconOnly
+                  ? `${styles.segmentLabel} ${styles.srLabel}`
+                  : styles.segmentLabel
+              }
+            >
+              {option.label}
+            </span>
           </button>
         )
       })}
     </div>
   )
 
-  // bar: kapsayıcı yüzeyin başlık şeridi — kendi cam katmanını kurmaz.
-  if (variant === 'bar') {
+  // bar/track: kapsayıcı yüzeyin içinde yaşar — kendi cam katmanını kurmaz.
+  if (variant === 'bar' || variant === 'track') {
     return (
       <div className={rootClass} {...rest}>
         {list}

@@ -98,6 +98,39 @@ describe('account overview presentation sections', () => {
     expect(screen.getByText('Değişiklik istendi')).toBeTruthy()
   })
 
+  it('carries the management data into the horizontal listing card slots', async () => {
+    renderWithRouter(
+      <AccountListingsPreview
+        role="seller"
+        listings={[
+          {
+            ...makeListing('changes-one', 'changes'),
+            imageSrc: '/gorsel.png',
+            priceLabel: '4.823.750 TL',
+            issue: 'İlan açıklamasında düzeltme bekleniyor.',
+            stats: [
+              { id: 'views', label: 'Görüntülenme', value: '248' },
+              { id: 'favorites', label: 'Favori', value: '16' },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    const card = (await screen.findAllByRole('article'))[0]
+    expect(card.getAttribute('data-state')).toBe('changes')
+    // Fiyat, durum, metrikler, işlem notu ve künye tek kartta okunur kalır.
+    expect(screen.getByText('4.823.750 TL')).toBeTruthy()
+    expect(screen.getByText('248 görüntülenme')).toBeTruthy()
+    expect(screen.getByText('16 favori')).toBeTruthy()
+    expect(
+      screen.getByText('İşlem gerekli: İlan açıklamasında düzeltme bekleniyor.'),
+    ).toBeTruthy()
+    expect(screen.getByText('Bugün güncellendi')).toBeTruthy()
+    expect(screen.getByText('İlan no: changes-one')).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'changes-one görseli' })).toBeTruthy()
+  })
+
   it('describes unavailable security data without a fake action', async () => {
     renderWithRouter(
       <AccountSecuritySummary

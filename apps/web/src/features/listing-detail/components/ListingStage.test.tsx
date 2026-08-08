@@ -1,4 +1,4 @@
-import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
@@ -48,20 +48,17 @@ describe('yansıtılmış ilanın foto bentosu', () => {
     expect(screen.queryByText(/Çekim:/)).toBeNull()
   })
 
-  it('temsili görsel notu ve bildirilen sayı künye satırı olarak durur', async () => {
+  it('temsili görsel notu ve bildirilen sayı satırı ızgara altına yazılmaz', async () => {
     const detail = await detailOf(PROJECTED)
     const { container } = render(<ListingStage detail={detail} />)
 
     expect(
-      screen.getByText(
+      screen.queryByText(
         'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.',
       ),
-    ).toBeTruthy()
-
-    const declared = container.querySelector('[data-part="declared-count"]')
-    expect(declared?.textContent).toContain(`İlanda ${detail.declaredMediaCount} görsel`)
-    // Sayı bir kare değil: bildirilen sayı kadar görsel çizilmez.
-    expect(declared?.textContent).toContain(`${detail.media.length} temsili kare`)
+    ).toBeNull()
+    expect(container.querySelector('[data-part="declared-count"]')).toBeNull()
+    // Sayı bir kare değil: bildirilen sayı kadar görsel yine de çizilmez.
     expect(container.querySelectorAll('img').length).toBeLessThan(
       detail.declaredMediaCount as number,
     )
@@ -101,10 +98,19 @@ describe('bento karesinden tam ekran galeri', () => {
     const trigger = screen.getAllByRole('button', { name: /Görseli büyüt/ })[0]
     await user.click(trigger)
 
+    // Tek tıklamada doğrudan tam ekran: arada panel yok, dialog'un kendisi
+    // görüntüleyicidir. Bağlam adı aria-label'da, sayaç ve temsili görsel
+    // cümlesi ekranda durur.
     const dialog = await screen.findByRole('dialog')
-    expect(dialog.textContent).toContain(`İlan görselleri (${detail.media.length})`)
+    expect(dialog.getAttribute('aria-label')).toContain(`İlan görselleri (${detail.media.length})`)
+    expect(dialog.textContent).toContain(`1 / ${detail.media.length}`)
+    expect(dialog.textContent).toContain('temsili')
+    // Alt şerit: her kare için bir atlama butonu.
+    expect(screen.getAllByRole('button', { name: /görsele git/ })).toHaveLength(detail.media.length)
 
-    const shown = () => (dialog.querySelector('img') as HTMLImageElement).src
+    // Ray bütün kareleri çizer; gösterilen kare aria-hidden OLMAYAN çerçevede.
+    const shown = () =>
+      (dialog.querySelector(':not([aria-hidden="true"]) > img') as HTMLImageElement).src
 
     // Ok butonu gezinir…
     const first = shown()
@@ -120,7 +126,9 @@ describe('bento karesinden tam ekran galeri', () => {
 
     // Kapanış animasyonlu: panel çıkış geçişini bitirince DOM'dan düşer.
     await user.keyboard('{Escape}')
-    await waitForElementToBeRemoved(() => screen.queryByRole('dialog'))
+    // Çıkış animasyonu bazen await'ten önce biter: waitForElementToBeRemoved o
+    // durumda hata atar, bu bekleme her iki sırayı da kabul eder.
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     // Kapanışta odak tetikleyiciye döner.
     await waitFor(() => expect(document.activeElement).toBe(trigger))
   })

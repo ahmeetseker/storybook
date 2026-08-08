@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   appRoutes,
+  getBreadcrumbTrail,
+  getRouteByKey,
   getRouteByPath,
   headerRouteKeys,
   isAuthPath,
@@ -20,13 +22,21 @@ describe('uygulama rota kaydı', () => {
     expect(getRouteByPath('/hesabim/mesajlar/arsam-123').key).toBe('messages')
   })
 
-  it('tamamlanan ana sayfa ve emlak aramasını indexler, taslak rotaları noindex tutar', () => {
+  it('tamamlanan sayfaları indexler, taslak rotaları noindex tutar', () => {
+    // Yayına hazır ve arama motoruna açık rotalar. Listeye ekleme yapmak
+    // bilinçli bir karardır: bir sayfa ancak içeriği tamamlandığında indexlenir.
+    const indexlenen = ['home', 'search', 'pricing']
+
     expect(getRouteByPath('/').indexable).toBe(true)
     expect(getRouteByPath('/emlak').key).toBe('search')
     expect(getRouteByPath('/emlak').indexable).toBe(true)
+    // Paket sayfası fiyat taşır: bir ofis "arsam ofis paketi" diye arar.
+    expect(getRouteByPath('/paketler').key).toBe('pricing')
+    expect(getRouteByPath('/paketler').indexable).toBe(true)
+
     expect(
       appRoutes
-        .filter((route) => !['home', 'search'].includes(route.key))
+        .filter((route) => !indexlenen.includes(route.key))
         .every((route) => route.indexable === false),
     ).toBe(true)
   })
@@ -41,8 +51,8 @@ describe('uygulama rota kaydı', () => {
     expect(navKeys).not.toContain('listing-detail')
     expect(headerRouteKeys as readonly string[]).not.toContain('listing-detail')
 
-    // Sayfa kendi kategori yolunu taşır; kabuk ikinci bir durum izi basmaz.
-    expect(route.statusTrail).toEqual([])
+    // Kabuk diğer sayfalarla aynı kırıntı yolunu basar.
+    expect(route.statusTrail).toEqual(['Anasayfa', 'Emlak ara', 'İlan detayı'])
   })
 
   it('ilan detayı öneki `/ilan-ver` rotasını yutmaz', () => {
@@ -86,5 +96,41 @@ describe('isAuthPath', () => {
 
   it('sondaki eğik çizgiyi yok sayar', () => {
     expect(isAuthPath('/giris/')).toBe(true)
+  })
+})
+
+describe('getBreadcrumbTrail', () => {
+  it('ara etiketleri rota href`lerine çözer, son etiket href`siz kalır', () => {
+    expect(getBreadcrumbTrail(getRouteByKey('messages'))).toEqual([
+      { label: 'Anasayfa', href: '/' },
+      { label: 'Hesabım', href: '/hesabim' },
+      { label: 'Mesajlar' },
+    ])
+  })
+
+  it('iki seviyeli rotada yalnız kök tıklanabilir', () => {
+    expect(getBreadcrumbTrail(getRouteByKey('search'))).toEqual([
+      { label: 'Anasayfa', href: '/' },
+      { label: 'Emlak ara' },
+    ])
+  })
+
+  it('ilan detayı izi ara düğümleri tıklanabilir çözer', () => {
+    const listingDetail = nonNavRoutes.find((route) => route.key === 'listing-detail')
+    expect(listingDetail).toBeDefined()
+    expect(getBreadcrumbTrail(listingDetail!)).toEqual([
+      { label: 'Anasayfa', href: '/' },
+      { label: 'Emlak ara', href: '/emlak' },
+      { label: 'İlan detayı' },
+    ])
+  })
+
+  it('her gezinme rotasının ara etiketleri bir rotaya çözülür — kırık kırıntı yok', () => {
+    for (const route of appRoutes) {
+      const trail = getBreadcrumbTrail(route)
+      for (const item of trail.slice(0, -1)) {
+        expect(item.href, `'${route.key}' rotasının '${item.label}' etiketi`).toBeDefined()
+      }
+    }
   })
 })

@@ -1212,10 +1212,16 @@
   /* Satır 1 sahnenindir (tam genişlik, otomatik yerleşir); akış ve ray
      satır 2'de yan yana, satıcı satır 3'te içerik kolonunun genişliğinde.
      Satırlar açıkça yazılmazsa sahne otomatik yerleşimde boş satır arar ve
-     ızgaranın SONUNA düşer. */
+     ızgaranın SONUNA düşer.
+
+     `row-gap: 0` sahne ile akışın payını da siler; ray o payı kendi üst
+     dolgusuyla taşıyordu ama akış taşımıyordu — künye plakası ile ilk yaprak
+     yapışık kalıyordu. Pay iki kolonda da AYNI adımdan okunur: akış ve karar
+     kartı sahnenin altından aynı hizada başlar. */
   .flow {
     grid-column: 1;
     grid-row: 2;
+    padding-block-start: var(--lg-space-5);
   }
 
   .rail {

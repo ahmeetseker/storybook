@@ -17,7 +17,7 @@ test('enterprise emlak araması filtreleri URL ile senkronize eder', async ({
 
   await expect(page).toHaveURL(/verified=1/)
   await expect(page.getByText('Doğrulanmış', { exact: true }).first()).toBeVisible()
-  await expect(page.getByRole('heading', { name: '48 ilan' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '192 ilan' })).toBeVisible()
 })
 
 test('eski arsa arama adresi arsa seçili emlak rotasına yönlenir', async ({
@@ -42,14 +42,34 @@ test('mobil filtre drawer değişiklikleri Uygula aksiyonuna kadar taslakta tuta
   const dialog = page.getByRole('dialog', { name: 'Emlak filtreleri' })
   await expect(dialog).toBeVisible()
 
-  await dialog
-    .getByRole('checkbox', { name: 'Yalnız doğrulanmış ilanlar' })
-    .check()
+  // Çekmece Karar Yaprağı ile açılır: anahtarlar ve segmentli kararlar.
+  await dialog.getByRole('switch', { name: 'Yalnız doğrulanmış ilanlar' }).click()
   await expect(page).not.toHaveURL(/verified=1/)
 
   await dialog.getByRole('button', { name: /ilanı göster$/ }).click()
   await expect(page).toHaveURL(/verified=1/)
   await expect(dialog).toBeHidden()
+})
+
+// Kademeli Akış: kataloğun TAMAMI tek yüzeyde. Nadir kriterler "+N kriter"
+// satırının arkasında ama başka bir ekranda değil — dokununca yerinde açılır.
+test('katalog tek akışta açılır ve nadir kriterler yerinde genişler', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/emlak?category=residential')
+  await expect(page.getByRole('heading', { name: 'Konut', level: 1 })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Filtreleri aç' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Emlak filtreleri' })
+  await expect(dialog.getByRole('radiogroup', { name: 'İşlem türü' })).toBeVisible()
+
+  // Katalog bölümleri aynı yüzeyde; ikinci bir giriş yok.
+  await expect(dialog.getByRole('heading', { name: /Bina ve tesisat/ })).toBeAttached()
+  await expect(dialog.getByRole('button', { name: /Tüm filtreler/ })).toHaveCount(0)
+
+  // Nadir kriter yerinde açılır, yeni diyalog açılmaz.
+  const expander = dialog.getByRole('button', { name: /^\+ \d+ kriter$/ }).first()
+  await expander.click()
+  await expect(page.getByRole('dialog')).toHaveCount(1)
 })
 
 test('emlak aramasında ciddi erişilebilirlik ihlali yoktur', async ({ page }) => {

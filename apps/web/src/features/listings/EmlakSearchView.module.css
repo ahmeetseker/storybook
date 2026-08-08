@@ -39,6 +39,32 @@
   text-transform: uppercase;
 }
 
+/* V5-başlıklı düzenin taban parçaları: başlık satırı geniş kapta da aynı
+   markup'ı taşır; sayaç ve kısa kaydet etiketi yalnız dar kapta açılır. */
+.heroText {
+  min-width: 0;
+}
+
+.heroTitleRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lg-space-3);
+  min-width: 0;
+}
+
+.heroCount {
+  display: none;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.saveShort {
+  display: none;
+}
+
 .searchArea {
   position: relative;
   z-index: 4;
@@ -141,9 +167,10 @@
   justify-content: center;
   gap: var(--lg-space-2);
   min-height: var(--lg-control-md);
-  margin-block-start: var(--lg-space-4);
+  /* Panelin gövde boşluğu (space-4) zaten bu düğmeyi listeden ayırır; ayrıca
+     margin vermek aradaki boşluğu iki katına çıkarıyordu. */
   padding: 0 var(--lg-space-3);
-  border: var(--lg-border-width, 1px) solid var(--lg-accent);
+  border: var(--lg-stroke-hairline) solid var(--lg-accent);
   border-radius: var(--lg-radius-chip);
   background: none;
   color: var(--lg-accent);
@@ -186,8 +213,7 @@
   gap: var(--lg-space-2);
 }
 
-.appliedFilters > button,
-.cardActions button {
+.appliedFilters > button {
   min-height: var(--lg-control-sm);
   border: 0;
   background: transparent;
@@ -222,6 +248,13 @@
   background: var(--lg-surface);
 }
 
+/* Akordeon listesi kendi ritmini kurar: panelin gövde boşluğu bölümler arasına
+   girmez, satırları yalnız hairline ayraçlar böler. */
+.filterSections {
+  display: grid;
+  border-bottom: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
 .filterSection {
   border-top: var(--lg-stroke-hairline) solid var(--lg-hairline);
 }
@@ -230,7 +263,9 @@
   min-height: var(--lg-control-lg);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--lg-space-3);
+  /* Kapalı satır tek yükseklikte durur; açılınca gövde kendi boşluğunu verir. */
+  padding-block: var(--lg-space-2);
   color: var(--lg-label);
   font-size: var(--lg-text-footnote);
   font-weight: 700;
@@ -242,14 +277,34 @@
   display: none;
 }
 
-.filterSection summary::after {
-  content: "⌄";
+/* Klavye kullanıcısı hangi bölümdeyse görsün: `summary` odaklanabilir bir
+   kontroldür ve halkası yoktu. */
+.filterSection summary:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+  border-radius: var(--lg-radius-chip);
+}
+
+/* Başlık boşluğu doldurur, sayaç ve ok sağ kenara yaslanır. */
+.filterSectionTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.filterChevron {
+  flex: none;
   color: var(--lg-label-secondary);
   transition: transform 160ms ease;
 }
 
-.filterSection[open] summary::after {
+.filterSection[open] .filterChevron {
   transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .filterSection summary:hover .filterChevron {
+    color: var(--lg-label);
+  }
 }
 
 .filterSectionBody {
@@ -288,10 +343,7 @@
 
 .field input:focus-visible,
 .range input:focus-visible,
-.appliedFilters > button:focus-visible,
-.cardActions button:focus-visible,
-.listingTitle:focus-visible,
-.media:focus-visible {
+.appliedFilters > button:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);
 }
@@ -437,72 +489,25 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.listing {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr) minmax(9rem, auto);
-  gap: var(--lg-space-4);
-  min-width: 0;
-  padding: var(--lg-space-3);
-  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
-  border-radius: var(--lg-radius-card);
-  background: var(--lg-surface);
+/* Liste kartı GlassListingRowCard'a devredildi. Kabuk yalnız iki şey taşır:
+   kolonu doldurma ve haritayla eşleşen seçim vurgusu (hover/focus → o ilanın
+   pini). Kartın kendi geometrisi ve iç stili tasarım sisteminde kalır. */
+.rowListing {
+  width: 100%;
   transition:
     border-color 160ms ease,
     transform 160ms ease;
 }
 
-.listing:hover,
-.listing:focus-within,
+.rowListing:hover,
+.rowListing:focus-within,
 .selectedListing {
   border-color: var(--lg-accent);
   transform: translateY(calc(var(--lg-space-1) * -0.25));
 }
 
-.media {
-  position: relative;
-  display: block;
-  min-height: 10rem;
-  overflow: hidden;
-  border-radius: var(--lg-radius-media);
-}
-
-.media img {
-  width: 100%;
-  height: 100%;
-  min-height: 10rem;
-  display: block;
-  object-fit: cover;
-}
-
-.media span {
-  position: absolute;
-  right: var(--lg-space-2);
-  bottom: var(--lg-space-2);
-  padding: var(--lg-space-1) var(--lg-space-2);
-  border-radius: var(--lg-radius-chip);
-  background: var(--lg-scrim);
-  color: var(--lg-on-scrim);
-  font-size: var(--lg-text-caption);
-  font-weight: 700;
-}
-
-.listingBody {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: var(--lg-space-2);
-}
-
-.listingTopline {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--lg-space-2);
-}
-
-.categoryTag,
-.verified,
+/* Doğrulanmış durum artık kapsül değil köşe şerididir (GlassRibbon,
+   2026-08-08); kapsül yalnız «Doğrulama bekliyor» için kaldı. */
 .unverified {
   display: inline-flex;
   align-items: center;
@@ -513,128 +518,18 @@
   font-weight: 700;
 }
 
-.categoryTag {
-  background: var(--lg-bg);
-  color: var(--lg-label-secondary);
-}
-
-.verified {
-  color: var(--lg-success);
-  background: color-mix(in srgb, var(--lg-success) 12%, transparent);
-}
-
 .unverified {
   color: var(--lg-warning);
   background: color-mix(in srgb, var(--lg-warning) 12%, transparent);
 }
 
-/* İlan başlığı karta giden birincil bağlantıdır; kutusu tek satır metin
-   yüksekliğinde (21px) kalıyordu — WCAG 2.2 AAA 2.5.5'in altında.
-   Görünmez ::after ile genişletme burada işe yaramaz: kural `overflow: hidden`
-   taşır (ellipsis için gerekli) ve pseudo-eleman kırpılır. Bu yüzden kutunun
-   kendisi kontrol yüksekliğine çıkar ve metin dikeyde ortalanır; tipografi
-   değişmez, yalnız tıklanabilir alan büyür. */
-.listingTitle {
-  display: flex;
-  align-items: center;
-  min-block-size: var(--lg-control-md);
-  overflow: hidden;
-  color: var(--lg-label);
-  font-size: var(--lg-text-headline);
-  font-weight: 750;
-  line-height: 1.25;
-  text-decoration: none;
-  text-overflow: ellipsis;
-}
-
-.location {
-  margin: 0;
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-footnote);
-  font-weight: 650;
-}
-
-.highlights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--lg-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.highlights li {
-  padding: var(--lg-space-1) var(--lg-space-2);
-  border-radius: var(--lg-radius-chip);
-  background: var(--lg-bg);
-  font-size: var(--lg-text-footnote);
-}
-
-.listingFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--lg-space-3);
-  margin-top: auto;
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-caption);
-}
-
-.priceBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--lg-space-4);
-  text-align: right;
-}
-
-.priceBlock strong {
-  font-size: var(--lg-text-title);
-  line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-}
-
-.cardActions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--lg-space-2);
-}
-
-.grid {
-  grid-template-columns: 1fr;
-}
-
-.grid .media {
-  min-height: 0;
-  aspect-ratio: 4 / 3;
-}
-
-.grid .media img {
-  min-height: 0;
-}
-
-.grid .listingTitle {
-  display: -webkit-box;
-  min-height: calc(var(--lg-text-headline) * 2.5);
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.grid .priceBlock {
-  align-items: flex-start;
-  text-align: left;
-}
-
-.grid .cardActions {
-  justify-content: flex-start;
-}
-
-.grid .listingFooter {
-  align-items: flex-start;
-  flex-direction: column;
+/* Rozet fotoğrafın ÜSTÜNDE durduğunda zemin opak olmalı. Yukarıdaki %12'lik
+   tonlu zemin beyaz kart için seçilmişti; bilinmeyen bir fotoğrafın üstünde
+   kontrastı fotoğrafa bırakır ve rozet okunmaz olur. Opak yüzeyde semantic
+   renkler AAA kontrastını korur (bkz. index.css renk notu). */
+.mediaBadge {
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-xs);
 }
 
 .mapPanel {
@@ -675,12 +570,6 @@
   display: none;
 }
 
-.drawerActions {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: var(--lg-space-3);
-}
-
 /* bp-2xl: geniş sonuç alanında daha yüksek tarama yoğunluğu. */
 @container page (min-width: 96rem) {
   .gridList {
@@ -710,19 +599,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .listing {
-    grid-template-columns: 10rem minmax(0, 1fr);
-  }
-
-  .priceBlock {
-    grid-column: 2;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .cardActions {
-    justify-content: flex-start;
-  }
 }
 
 /* bp-md: filter sidebar becomes the mobile drawer. */
@@ -731,10 +607,32 @@
     padding: var(--lg-space-4);
   }
 
+  /* ── V5-başlıklı hero (2026-08-08 tasarım kararı) ──
+     Eyebrow ve açıklama düşer; başlık + sayaç + kısa «Kaydet» tek satır olur.
+     Kurtarılan dikey alan sonuç listesine gider. */
   .hero {
-    align-items: flex-start;
-    flex-direction: column;
-    margin-block: var(--lg-space-6);
+    align-items: center;
+    flex-direction: row;
+    gap: var(--lg-space-3);
+    margin-block: var(--lg-space-4);
+  }
+
+  .hero h1 {
+    font-size: var(--lg-text-headline);
+  }
+
+  .eyebrow,
+  .heroDesc,
+  .saveLong {
+    display: none;
+  }
+
+  .heroCount {
+    display: inline;
+  }
+
+  .saveShort {
+    display: inline;
   }
 
   .appliedFilters {
@@ -762,26 +660,100 @@
     display: none;
   }
 
+  /* Tek denetim KARTI: satır 1 Filtreler + sıralama, altında iki tam
+     genişlik ray (harita modu, düzen). Denetimler tek beyaz yüzeyde durur —
+     ayrı ayrı yüzen kapsüllerin sağ kenarı yamuk okunuyordu; ray tam
+     genişlik olduğu için küme simetrik biter.
+
+     BİLİNÇLİ AAA İSTİSNASI (arama kartı emsali, 2026-08-07): kart içi
+     kontroller dokunmatikte de 36px görünür ölçüye iner; yazı dipnota düşer. */
   .mobileToolbar {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--lg-space-3);
-    margin-block: var(--lg-space-4);
+    flex-direction: column;
+    gap: var(--lg-space-2);
+    margin-block: var(--lg-space-3);
+    padding: var(--lg-space-3);
+    border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+    border-radius: var(--lg-radius-card);
+    background: var(--lg-surface);
+    box-shadow: var(--lg-shadow-xs);
+    --lg-control-sm: 36px;
+    --lg-control-md: 36px;
+    --lg-text-body: var(--lg-text-footnote);
   }
 
+  .mobileToolbarRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--lg-space-2);
+    min-width: 0;
+  }
+
+  .mobileSort {
+    flex: 1;
+    min-width: 9rem;
+  }
+
+  /* Select değer yazısı dokunmatik zoom korumasını bu tetikleyicide taşımaz
+     (native alan değil); değişken select kökünde tanımlı olduğundan aynı
+     elemana daha yüksek özgüllükle yazılır. */
+  .mobileSort > :first-child {
+    --value-size-touch: var(--lg-text-footnote);
+  }
+
+  /* İkonlu mod segmenti içerik genişliğinde durur (track sözleşmesinin
+     %100'ü aynı elemana daha yüksek özgüllükle ezilir); düzen rayı satırın
+     kalanını doldurur — ikisi tek satırda simetrik biter. */
+  .mobileMapMode {
+    flex: none;
+  }
+
+  .mobileToolbar .mobileMapMode > div {
+    width: auto;
+  }
+
+  .mobileMapMode [role='radio'] {
+    padding-inline: var(--lg-space-3);
+  }
+
+  .mobileLayout {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Arama çubuğu kart kümesiyle aynı kademeyi okur: ray 56→44, iç kontrol
+     36, yazı dipnot. Ölçüler bileşende token'dan türediği için ezme yeter. */
+  .searchArea {
+    --lg-control-xl: 44px;
+    --lg-control-md: 36px;
+    --lg-text-body: var(--lg-text-footnote);
+  }
+
+  /* Hero'daki «Kaydet» de aynı ölçüye iner. */
+  .hero {
+    --lg-control-md: 36px;
+    --lg-text-body: var(--lg-text-footnote);
+  }
+
+  /* Sayaç başlığı ve canlı durum dar kapta GÖRÜNMEZ ama DOM'da kalır:
+     h1 yanındaki sayaç dekoratif kopya, ekran okuyucunun sayacı burası.
+     display:none aria-live'ı susturur — blok clip ile gizlenir; içindeki
+     odaklanabilir masaüstü denetimleri ise display:none (görünmez odak
+     tuzağı olmasın). */
   .resultsToolbar {
-    align-items: flex-start;
-    flex-direction: column;
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .toolbarControls {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .sortField {
-    width: 100%;
+    display: none;
   }
 
   .resultStage.withMap {
@@ -796,55 +768,92 @@
     position: relative;
     top: auto;
     height: 32rem;
+    /* Popup ve köşe yüzeyleri haritanın DIŞINA akmasın: masaüstünde bilinçli
+       serbest bırakılan taşma (GlassMap .root yorumu) dar ekranda üstteki
+       denetim kartının üzerine biniyordu. Kenar pini popup'ı yön seçimini
+       (data-vertical/align) zaten içeriye doğru yapar; kalan taşma kırpılır. */
+    overflow: hidden;
+    border-radius: var(--lg-radius-card);
   }
 
+  /* Harita içi yüzeyler mobil kademeye iner. Değişkenler GlassMap kökünde
+     tanımlı olduğundan aynı elemana daha yüksek özgüllükle yazılır; zoom
+     düğmesinin 36px'i arama kartıyla aynı bilinçli AAA istisnasıdır. */
+  .mapPanel > :first-child {
+    --map-zoom-btn-size: 36px;
+    --map-popup-min-w: 150px;
+    --map-popup-max-w: 198px;
+    --lg-control-sm: 32px;
+    --lg-control-md: 36px;
+    --lg-text-body: var(--lg-text-footnote);
+  }
+
+  /* «Bu alanda ara» harita kökünün kardeşi — aynı kademeyi ayrıca okur. */
+  .mapSearchButton {
+    --lg-control-sm: 32px;
+    --lg-text-footnote: var(--lg-text-caption);
+  }
+
+  /* Izgara mobilde 2-YUKARI: tek kolonlu dev kartlar tarama hızını
+     öldürüyordu. Property kartı ölçülerini kap biriminden (cqi) okuduğu
+     için yarım genişlikte kendiliğinden küçülür. */
   .gridList {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--lg-space-2);
   }
 
-  .listing {
-    grid-template-columns: minmax(7rem, 9rem) minmax(0, 1fr);
-    gap: var(--lg-space-3);
+  /* Kabuk overlay kartı için 4/5'e kilitliydi; kompakt varyant kendi
+     yüksekliğini içerikten alır — kilit dar kapta çözülür. */
+  .gridListingShell {
+    aspect-ratio: auto;
   }
 
-  .media,
-  .media img {
-    min-height: 8rem;
+  .gridListingShell > button {
+    height: auto;
   }
 
-  .priceBlock {
-    grid-column: 1 / -1;
+  /* Yer imi düğmesi 140px kartta orantısız kalıyordu (sm dokunmatikte 44). */
+  .overlayActions {
+    top: var(--lg-space-2);
+    right: var(--lg-space-2);
   }
 
-  .listingFooter {
-    align-items: flex-start;
-    flex-direction: column;
+  .overlayActions button {
+    --lg-control-sm: 32px;
   }
+
+  /* Satır kartı bileşenin kendi `sm` yoğunluğunda (TSX'te dar ekran
+     anahtarı); çip/eylem gibi kontrol tabanlı ölçüler de bir kademe iner —
+     araç kartıyla aynı bilinçli AAA istisnası. */
+  .rowListing {
+    --lg-control-sm: 32px;
+    /* «Karşılaştır» eylemi lg tabanından (dokunmatikte 48) okunur; kart
+       kademesiyle birlikte iner. Genişlik tabanı da hit'ten geliyordu. */
+    --lg-control-lg: 36px;
+    --lg-control-hit: 36px;
+    --lg-text-body: var(--lg-text-footnote);
+  }
+
 }
 
 @media (pointer: coarse) {
   .filterSection summary,
-  .appliedFilters > button,
-  .cardActions button {
-    min-height: var(--lg-control-md);
+  .appliedFilters > button {
+    min-height: var(--lg-control-hit);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .listing,
-  .filterSection summary::after {
+  .rowListing,
+  .filterChevron {
     transition: none;
   }
 
-  .listing:hover,
-  .listing:focus-within,
+  .rowListing:hover,
+  .rowListing:focus-within,
   .selectedListing {
     transform: none;
   }
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .media span {
-    background: var(--lg-label);
-  }
-}
+

@@ -58,7 +58,8 @@ select-only combobox deseni uygular.
 | placeholder | prop | `string` | `'Seçin'` | Seçim yokken trigger metni |
 | size | prop | `'sm'\|'md'\|'lg'` | `'md'` | Yükseklik `--lg-control-*` token'ından |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | Zemin bağlamı ipucu |
-| material | prop | `'glass'\|'flat'` | `'glass'` | Trigger ve panel malzemesi |
+| material | prop | `'glass'\|'flat'` | `'glass'` | Trigger malzemesi |
+| panelMaterial | prop | `'glass'\|'flat'` | `'flat'` | Açılan panelin malzemesi; varsayılan opak `--lg-surface` |
 | invalid | prop | `boolean` | field context ?? `false` | `aria-invalid` + `--lg-danger` çerçeve |
 | disabled | prop | `boolean` | `false` | Trigger devre dışı; panel açılmaz |
 | ...rest | — | `Omit<HTMLAttributes, 'onChange'\|'defaultValue'>` | — | Genel nitelikler köke; adlandırma/required/describedBy ARIA'ları ve `id` trigger'a |
@@ -71,7 +72,8 @@ Varsayılan kombinasyon: `material=glass`, `size=md`, kapalı, seçimsiz
 | Yasak / türetilen | Davranış |
 |---|---|
 | `value` verildi | iç state devre dışı; etiket yalnız prop'la değişir |
-| `material` | trigger ve açılan panel aynı `glass` / `flat` değerini kullanır |
+| `material` | yalnız trigger'ı belirler; panel `panelMaterial` ekseninden gelir |
+| `panelMaterial` verilmedi | panel opaktır (`flat`) — trigger cam olsa bile liste okunur |
 | açılışta aktif öğe | seçili seçenek; yoksa ilk enabled seçenek |
 | `option.disabled` | klavye gezinmesi atlar, tıklama seçmez |
 | `invalid`/`id` verilmedi + GlassField içinde | context'ten türetilir |
@@ -96,8 +98,13 @@ Varsayılan kombinasyon: `material=glass`, `size=md`, kapalı, seçimsiz
 - Dış tıklama (`pointerdown` document listener) kapatır. Seçim/Escape sonrası
   focus trigger'da kalır/geri döner.
 - Aktif öğe panel scroll'unda `scrollIntoView({ block: 'nearest' })` ile görünür.
-- Animasyon: `AnimatePresence` + opacity/translate/scale (0.16s);
-  `prefers-reduced-motion`'da yalnız opacity, chevron dönüşü transition'sız.
+- Animasyon: `AnimatePresence` + "materialize" açılışı — panel blur(8px) +
+  scale(0.96) + −6px düşüşten `presets.springs.popover` yayıyla belirir
+  (kritik sönüm, sekme yok) ve **aynı yoldan** kapanır (giriş/çıkış simetrisi).
+  Seçenek satırları 25ms basamakla (tavan 150ms) opacity/translate ile oturur;
+  satır başına blur yok (uzun listede filter maliyeti). Kapanış basamaksız —
+  kapanış bekletmez. `prefers-reduced-motion`'da yalnız opacity (0.12s),
+  satır basamağı yok, chevron dönüşü transition'sız.
 - Responsive: genişlik %100. `pointer: coarse` yeteneğinde dokunmatik
   tipografi token'ı ve panelde `50vh` tavanı (içeride scroll) kullanılır;
   `pointer: fine` yeteneğinde liste tavanı kontrol token'ından türetilir.
@@ -113,7 +120,9 @@ düşünülmeli (Açık Kararlar).
 | Part | Property | Token |
 |---|---|---|
 | trigger | min-height | `--lg-control-{size}` |
-| trigger/panel | material | `material=glass` veya `material=flat` |
+| trigger | material | `material=glass` veya `material=flat` |
+| panel | material | `panelMaterial=flat` (opak `--lg-surface`) veya `glass` (%94 dolgu) |
+| panel | elevation | `--lg-surface-shadow: var(--lg-shadow-md)` |
 | trigger/panel | border / radius | `--lg-hairline`, `--lg-stroke-hairline`, `--lg-radius-chip` |
 | trigger | focus outline / invalid | `--lg-accent` / `--lg-danger` |
 | trigger/panel | background | `--lg-surface` tabanlı malzeme dolgusu |
@@ -134,7 +143,7 @@ Panel seçeneği ise bir "dokunma satırı"dır ve bu küçülmeye katılmaz:
 
 ## 10. Storybook kapsamı
 
-Var: Default, Preselected, Invalid, Required, Disabled, Materials,
+Var: Default, Preselected, Invalid, Required, Disabled, Materials, PanelMaterials,
 DisabledOption, Sizes, Controlled, Mobile (viewport mobile1, uzun il listesi
 ve 50vh scroll).
 **Eksik:** çok uzun label ellipsis görseli, RTL, gruplu seçenekler.
@@ -150,7 +159,8 @@ ve 50vh scroll).
 - [x] invalid → aria-invalid; controlled değer dışarıda kalır
 - [x] `aria-label` / `aria-labelledby` gerçek combobox'ı adlandırır
 - [x] GlassField required → trigger'da `aria-required`
-- [x] material ekseni trigger ve panelde birlikte uygulanır
+- [x] material ekseni trigger'a uygulanır
+- [x] panel varsayılanı opak (`flat`); `panelMaterial` ile cama çevrilebilir
 
 ## 12. Do / Don't
 
@@ -166,6 +176,14 @@ option grupları (`optgroup` eşleniği) · form submit için hidden input.
 
 ## Changelog
 
+- 2026-08-07: Panel açılışı "materialize" desenine geçirildi (Apple fluid
+  interfaces): tween (0.16s ease-out) yerine `presets.springs.popover` yayı;
+  blur + scale + düşüş birlikte animasyonlanır, çıkış girişin aynadaki hali.
+  Seçenek satırlarına 25ms basamaklı giriş eklendi (tavan 150ms, blur'suz).
+- 2026-08-06: Panel malzemesi trigger'dan ayrıldı (`panelMaterial`, varsayılan
+  `flat`). Açılan liste artık opak `--lg-surface` üzerinde ve `--lg-shadow-md`
+  yükseltisiyle geliyor — yoğun sayfa içeriği üzerinde okunmama sorunu giderildi.
+  `panelMaterial="glass"` seçilirse dolgu %72 → %94'e çıkarıldı.
 - 2026-08-03: Yeni kontrol ölçeği. Trigger imleçli cihazda 44/44/48 →
   36/40/44px (token değişimi). Seçenek satırı `--lg-control-sm`'den
   `--lg-control-hit`e alındı → 44px'te kaldı (aksi halde 36px'e düşecekti);

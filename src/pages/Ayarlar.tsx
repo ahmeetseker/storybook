@@ -2,6 +2,7 @@
 // hesabı kapatma (danger bölge). Bölümlenmiş flat kartlar; cam yalnız kabukta.
 import type { CSSProperties, ReactNode } from 'react'
 import { AccountShell } from './shared/shells'
+import { GlassCheckbox } from '../components/GlassCheckbox'
 import { CheckRow, Field, TextInput } from './shared/forms'
 
 const card: CSSProperties = {
@@ -149,10 +150,10 @@ export function Ayarlar() {
                     {t.label}
                   </th>
                   <td style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <input type="checkbox" defaultChecked={t.eposta} aria-label={`${t.label} — e-posta bildirimi`} style={{ accentColor: 'var(--lg-accent)' }} />
+                    <GlassCheckbox size="sm" label="" defaultChecked={t.eposta} aria-label={`${t.label} — e-posta bildirimi`} style={{ justifyContent: 'center' }} />
                   </td>
                   <td style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <input type="checkbox" defaultChecked={t.uygulama} aria-label={`${t.label} — uygulama içi bildirim`} style={{ accentColor: 'var(--lg-accent)' }} />
+                    <GlassCheckbox size="sm" label="" defaultChecked={t.uygulama} aria-label={`${t.label} — uygulama içi bildirim`} style={{ justifyContent: 'center' }} />
                   </td>
                 </tr>
               ))}

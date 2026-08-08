@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
-import { GlassButton } from '@repo/ui'
+import { GlassButton, GlassCheckbox, GlassPricingTable } from '@repo/ui'
+import {
+  OFFICE_PLANS,
+  officePlanById,
+  toPricingPlans,
+  type OfficePlanId,
+} from '@/features/pricing/data/office-plans'
 import { AuthFormPage } from '../components/AuthFormPage'
 import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { KorumaliSayfa } from '../components/KorumaliSayfa'
@@ -43,6 +49,25 @@ const BOLUM_SERIDI = KURUMSAL_ADIMLARI.map(({ anahtar, baslik, kisaEtiket }) => 
   kisaEtiket,
 }))
 
+/**
+ * Paket bölümünün tablosu — modül seviyesinde kurulur.
+ *
+ * Eylem etiketleri burada işlevsizdir: seçim satırın kendisiyle yapılır,
+ * alttaki buton yalnız seçili paketi tekrarlar. Formun ilerlemesi "Devam et"
+ * ile olur, tablodan değil — iki ayrı ilerletme düğmesi olsaydı hangisinin
+ * başvuruyu taşıdığı belirsizleşirdi.
+ */
+const PAKET_TABLOSU = toPricingPlans({ actionLabel: 'Seçili' })
+
+/** Varsayılan paket: vurgulanan plan, yoksa listenin ilki. */
+const VARSAYILAN_PAKET: OfficePlanId =
+  (OFFICE_PLANS.find((plan) => plan.prominent) ?? OFFICE_PLANS[0]).id
+
+/** `/paketler` sayfasından gelen `?paket=` değeri — tanınmıyorsa yok sayılır. */
+function paketKimligiCoz(ham: unknown): OfficePlanId {
+  return OFFICE_PLANS.some((plan) => plan.id === ham) ? (ham as OfficePlanId) : VARSAYILAN_PAKET
+}
+
 const BOS_BASVURU: KurumsalBasvuruBilgileri = {
   isletmeTuru: 'sahis',
   ticaretUnvani: '',
@@ -66,6 +91,8 @@ const BOS_BASVURU: KurumsalBasvuruBilgileri = {
   yetkiliAdSoyad: '',
   yetkiliEPosta: '',
   yetkiliTelefon: '',
+  paketId: VARSAYILAN_PAKET,
+  paketKoltuk: officePlanById(VARSAYILAN_PAKET).seats.included,
   kvkkOnayi: false,
   temsilBeyani: false,
   iysOnayi: false,
@@ -264,7 +291,13 @@ export function KayitKurumsalPage() {
   const navigate = useNavigate()
   const hareketAzalt = useReducedMotion()
 
-  const [bilgiler, setBilgiler] = useState<KurumsalBasvuruBilgileri>(BOS_BASVURU)
+  // `/paketler` sayfasından gelen seçim başlangıç değeridir, kilit değil:
+  // kullanıcı paket bölümünde fikrini değiştirebilir.
+  const arama = useSearch({ strict: false }) as { paket?: unknown }
+  const [bilgiler, setBilgiler] = useState<KurumsalBasvuruBilgileri>(() => {
+    const paketId = paketKimligiCoz(arama.paket)
+    return { ...BOS_BASVURU, paketId, paketKoltuk: officePlanById(paketId).seats.included }
+  })
   const [bolumIndeksi, setBolumIndeksi] = useState(0)
   const [yon, setYon] = useState<1 | -1>(1)
   const [alanHatalari, setAlanHatalari] = useState<KurumsalAlanHatalari>({})
@@ -279,6 +312,7 @@ export function KayitKurumsalPage() {
   const bolum = KURUMSAL_ADIMLARI[bolumIndeksi]
   const sonBolumde = bolumIndeksi === SON_BOLUM
   const tuzel = tuzelKisiMi(bilgiler.isletmeTuru)
+  const secilenPaket = officePlanById(bilgiler.paketId)
 
   useEffect(() => {
     // Bilet 0: ilk render. Sayfa açılışında odak çalınmaz.
@@ -428,17 +462,15 @@ export function KayitKurumsalPage() {
     const hataVar = Boolean(alanHatalari[ad])
     return (
       <div>
-        <label className={styles.onayRow} htmlFor={id}>
-          <input
-            id={id}
-            type="checkbox"
-            checked={bilgiler[ad]}
-            onChange={(event) => onayDegistir(ad, event.target.checked)}
-            aria-invalid={hataVar ? true : undefined}
-            aria-describedby={hataVar ? alanHataId(id) : undefined}
-          />
-          <span>{metin}</span>
-        </label>
+        <GlassCheckbox
+          className={styles.onayRow}
+          id={id}
+          checked={bilgiler[ad]}
+          onChange={(event) => onayDegistir(ad, event.target.checked)}
+          aria-invalid={hataVar ? true : undefined}
+          aria-describedby={hataVar ? alanHataId(id) : undefined}
+          label={metin}
+        />
         {alanHatasiNotu(ad, id)}
       </div>
     )
@@ -575,6 +607,13 @@ export function KayitKurumsalPage() {
             {ozetSatiri('Yetkili e-posta', bilgiler.yetkiliEPosta)}
           </>,
         )}
+        {ozetGrubu(
+          3,
+          <>
+            {ozetSatiri('Paket', secilenPaket.name)}
+            {ozetSatiri('Danışman koltuğu', `${bilgiler.paketKoltuk} koltuk`)}
+          </>,
+        )}
       </div>
 
       {onayKutusu(
@@ -592,6 +631,42 @@ export function KayitKurumsalPage() {
     </>
   )
 
+  /**
+   * Paket bölümü. Tablo dar bir form kartının içinde durduğu için `compact`
+   * yerleşime düşer: üç kart yan yana sığmaz, seçim listesi ise formun geri
+   * kalanıyla aynı ritimde okunur. Seçim ve koltuk adedi doğrudan başvuru
+   * verisine yazılır — ayrı bir yerel durum tutulmaz, "Geri" ile dönüldüğünde
+   * seçim korunur.
+   */
+  const paketBolumu = () => (
+    <div className={styles.paketBolumu}>
+      <GlassPricingTable
+        plans={PAKET_TABLOSU}
+        selectedPlanId={bilgiler.paketId}
+        onSelectedPlanChange={(id) =>
+          setBilgiler((onceki) => ({
+            ...onceki,
+            paketId: id as OfficePlanId,
+            // Paket değişince koltuk adedi yeni paketin tabanına çekilir:
+            // 2 koltuklu pakette seçilen 4 koltuk, 20 koltuk dahil eden pakete
+            // geçince anlamını yitirir.
+            paketKoltuk: officePlanById(id as OfficePlanId).seats.included,
+          }))
+        }
+        seats={{ [bilgiler.paketId]: bilgiler.paketKoltuk }}
+        onSeatsChange={(_planId, adet) =>
+          setBilgiler((onceki) => ({ ...onceki, paketKoltuk: adet }))
+        }
+        layout="compact"
+        compactActionLabel="{plan} seçildi"
+      />
+      <p className={styles.paketNotu}>
+        Ödeme şimdi alınmaz. Başvurunuz onaylandığında seçtiğiniz paket için ilk fatura
+        oluşturulur; o ana kadar paketi ve koltuk adedini değiştirebilirsiniz.
+      </p>
+    </div>
+  )
+
   const bolumIcerigi = () => {
     switch (bolum.anahtar) {
       case 'isletme':
@@ -600,6 +675,8 @@ export function KayitKurumsalPage() {
         return YETKI_ALANLARI.map(metinAlani)
       case 'ofis':
         return ofisBolumu()
+      case 'paket':
+        return paketBolumu()
       case 'onay':
         return onayBolumu()
     }

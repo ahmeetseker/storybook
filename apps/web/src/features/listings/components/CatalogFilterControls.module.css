@@ -1,10 +1,14 @@
+/* Örtük ızgara kolonu `auto`dur ve en geniş öğe kabı zorlar; dar bir yüzeyde
+   (mobil filtre akışı) bu yatay kaydırma çubuğu çıkarıyordu. */
 .stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--lg-space-4);
 }
 
 .facet {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--lg-space-2);
   margin: 0;
   padding: 0;

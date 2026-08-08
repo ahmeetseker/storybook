@@ -4,6 +4,11 @@
   width: 100%;
   font-family: var(--lg-font);
   color: var(--lg-label);
+  /* Dokunmatikte değer yazısının ölçüsü. 16px+ varsayılanı tarayıcının
+     odakta otomatik yakınlaştırmasına karşı; ancak tetikleyici NATIVE form
+     alanı değil (button + listbox), zoom yalnız input/select/textarea'da
+     tetiklenir — bu yüzden çağıran gerekirse ezebilir. */
+  --value-size-touch: var(--lg-text-headline);
 }
 
 /* ── Trigger ── */
@@ -64,7 +69,7 @@
   .sm .value,
   .md .value,
   .lg .value {
-    font-size: var(--lg-text-headline);
+    font-size: var(--value-size-touch);
   }
 }
 
@@ -114,12 +119,16 @@
   width: 100%;
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
   border-radius: var(--lg-radius-chip) !important;
-  box-shadow: none !important;
-  /* Cam liste okunur kalsın: yüzey token'ı üzerine yarı saydam dolgu */
-  background: color-mix(in srgb, var(--lg-surface) 72%, transparent);
+  /* Yüzen katman: yükseltisini gölgeyle taşır (GlassSurface sözleşmesi) */
+  --lg-surface-shadow: var(--lg-shadow-md);
 }
+/* Varsayılan panel opaktır: liste metni arkadaki içerikle karışmaz */
 .panel[data-material='flat'] {
   background: var(--lg-surface);
+}
+/* Cam panel bilinçli seçildiğinde de liste okunur kalsın: neredeyse opak dolgu */
+.panel[data-material='glass'] {
+  background: color-mix(in srgb, var(--lg-surface) 94%, transparent);
 }
 
 .list {

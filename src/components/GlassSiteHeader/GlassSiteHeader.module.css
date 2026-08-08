@@ -29,6 +29,11 @@
     var(--lg-container-gutter) 0;
   /* Ray tıklamayı yutmaz; yalnız kapsül etkileşim alır. */
   pointer-events: none;
+  /* Ray da sorgu kabıdır: kapsülün KENDİSİNE dokunan dar-ekran kuralları
+     (aşağıdaki ≤32rem bloğu) buradan okur — bir öğe kendi kabına yanıt
+     veremez. Kapsül içi kurallar en yakın kap olarak kapsülü bulmaya
+     devam eder. */
+  container-type: inline-size;
 }
 
 .capsule {
@@ -243,6 +248,43 @@
   .actions { display: inline-flex; }
   .burger { display: none; }
   .panel { display: none; }
+}
+
+/* ── Dar kapsül (≤32rem): telefon ölçüsü ──────────────────────────────
+   Masaüstü ritmi (44px satır + 17px wordmark + 15px panel linki) dar
+   ekranda kapsülü ve menüyü orantısız büyütüyordu. Görünür kontrol ölçüsü
+   36px'e iner; dokunma hedefleri KÜÇÜLMEZ — link ve panel linki `::after`
+   taşmasıyla `--lg-control-hit`e (44px) genişlemeye devam eder (taşma
+   hesapları görünür ölçüden bağımsız). Panel aksiyon butonları GlassButton
+   olduğu için taşma taşımaz — 36px orada bilinçli AAA istisnasıdır
+   (arama kartındaki kararla aynı, 2026-08-07). */
+@container (max-width: 32rem) {
+  .capsule {
+    --lg-control-sm: 36px;
+    --lg-control-md: 36px;
+    --capsule-pad-y: var(--lg-space-1);
+    --capsule-pad-x: var(--lg-space-3);
+  }
+
+  .wordmark {
+    font-size: var(--lg-text-body);
+    --wordmark-gap: 6px;
+  }
+
+  .panel {
+    gap: var(--lg-space-3);
+    margin-top: var(--lg-space-2);
+    padding-top: var(--lg-space-3);
+  }
+
+  .panelLink {
+    font-size: var(--lg-text-footnote);
+  }
+
+  .panelActions {
+    gap: var(--lg-space-2);
+    --lg-text-body: var(--lg-text-footnote);
+  }
 }
 
 /* ── Motion koruması — kullanıcı hareket azaltmayı tercih ettiğinde ─────── */

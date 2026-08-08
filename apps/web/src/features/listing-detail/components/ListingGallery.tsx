@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type UIEvent } from 'react'
-import { GlassGallery, GlassModal } from '@repo/ui'
+import { useState, type UIEvent } from 'react'
+import { GlassLightbox } from '@repo/ui'
 
 import { REPRESENTATIVE_IMAGE_NOTE } from '@/features/listings/data/listing-photos'
 import type {
@@ -112,55 +112,37 @@ function MediaInventory({ items, title }: { items: ListingMediaItem[]; title: st
  *   altlarında geniş bir kare; son karenin üstünde `Tümünü gör (N)` örtüsü.
  *
  * Görseller **temsilidir** — taşınmazın kendi fotoğrafı değildir — ve bu
- * gizlenmez: ızgaranın altında tek kaynaklı cümle (`REPRESENTATIVE_IMAGE_NOTE`)
- * görünür durur. Yalnız `representative` taşıyan kalemler kare olarak çizilir;
+ * gizlenmez: açıklama cümlesi (`REPRESENTATIVE_IMAGE_NOTE`) tam ekran
+ * görüntüleyicide (lightbox) durur; ızgara altına ayrıca yazılmaz.
+ * Yalnız `representative` taşıyan kalemler kare olarak çizilir;
  * fotoğraf olmayanlar (parsel görünümü, plan notu) döküm satırı olarak kalır.
  *
  * Yansıtılmış kayıtta kareler **temsili havuzdan çoğaltılır** ama kare başına
  * künye uydurulmaz: hepsi aynı nötr etiketi taşır ve çekim tarihi yazılmaz
- * (bkz. `rules.md` §1c). İlanda bildirilen görsel sayısı kare olarak değil,
- * ızgaranın altındaki künye satırında metin olarak durur.
+ * (bkz. `rules.md` §1c). Bildirilen görsel sayısı kare olarak çizilmez.
  *
- * Tam ekran görünüm kütüphaneden gelir: `GlassModal` + `GlassGallery`
- * (kendi ok/thumbnail/klavye sözleşmeleriyle). Bu sayfada yeni bir overlay
- * bileşeni yazılmaz.
+ * Tam ekran görünüm kütüphaneden gelir: `GlassLightbox` (portal, ok/thumbnail/
+ * klavye ve focus sözleşmeleriyle). Bir kareye tıklamak **doğrudan** tam ekranı
+ * açar — arada ikinci bir panel yoktur. Bu sayfada yeni bir overlay bileşeni
+ * yazılmaz.
  */
 export function ListingGallery({ detail }: ListingGalleryProps) {
   const photos = detail.media.filter(isPhoto)
   const others = detail.media.filter((item) => !item.representative)
 
   const [failed, setFailed] = useState<string[]>([])
-  const [openAt, setOpenAt] = useState<number | undefined>(undefined)
+  // Açıklık ve indeks ayrı tutulur: kapanış animasyonu sürerken gösterilen kare
+  // değişmesin (indeks sıfırlanmaz), bir sonraki açılışta tıklanan kare gelsin.
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
   const [slide, setSlide] = useState(0)
   const [saved, setSaved] = useState(false)
   const [shareNote, setShareNote] = useState<string | undefined>(undefined)
-  const viewerRef = useRef<HTMLDivElement>(null)
 
-  /**
-   * Tam ekran görünümde ok tuşlarıyla gezinme.
-   *
-   * `GlassGallery` ok tuşlarını yalnız kendi iç lightbox'ında dinler; bizim
-   * modalımızın içindeyken gezinme ok **butonlarıyla** yapılır. Dinleyici
-   * pencere düzeyindedir (odak modalın neresinde olursa olsun çalışsın diye)
-   * ve indeksi kendisi tutmaz: kütüphanenin kendi kontrolünü tetikler, böylece
-   * hangi karede olduğumuzun tek kaynağı yine galeridir. Buton yoksa (tek
-   * kare) hiçbir şey olmaz.
-   */
-  useEffect(() => {
-    if (openAt === undefined) return
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
-      const label = event.key === 'ArrowRight' ? 'Sonraki görsel' : 'Önceki görsel'
-      const control = viewerRef.current?.querySelector<HTMLButtonElement>(
-        `button[aria-label="${label}"]`,
-      )
-      if (!control) return
-      event.preventDefault()
-      control.click()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [openAt])
+  const openViewer = (index: number) => {
+    setViewerIndex(index)
+    setViewerOpen(true)
+  }
 
   const markFailed = (src: string) =>
     setFailed((current) => (current.includes(src) ? current : [...current, src]))
@@ -224,7 +206,7 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
             <button
               type="button"
               className={styles.frameButton}
-              onClick={() => setOpenAt(0)}
+              onClick={() => openViewer(0)}
               aria-label={frameLabel(cover, 0, photos.length)}
             >
               <img
@@ -234,8 +216,6 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
                 onError={() => markFailed(cover.representative.src)}
               />
             </button>
-
-            <span className={styles.number}>{`İlan no ${detail.listingNumber}`}</span>
 
             {/* İkon-tek kontroller tek bir kapsülde yaşar: fotoğrafın üstünde
                 tek cam yüzey açılır, cam üstüne cam gelmez. */}
@@ -270,7 +250,7 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
                 <button
                   type="button"
                   className={styles.frameButton}
-                  onClick={() => setOpenAt(i + 1)}
+                  onClick={() => openViewer(i + 1)}
                   aria-label={label}
                 >
                   <img
@@ -302,16 +282,6 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
         ) : null}
       </div>
 
-      <p className={styles.note}>{REPRESENTATIVE_IMAGE_NOTE}</p>
-      {/* İlanda bildirilen görsel sayısı bir KARE değil, künye satırıdır: sayı
-          kadar kare çizmek gösterilmeyen dosyaları gösteriliyormuş gibi
-          yapardı. Gösterilen kare sayısı da aynı satırda yazılır ki iki sayı
-          birbirinin yerine okunmasın (bkz. rules.md §1c). */}
-      {detail.declaredMediaCount !== undefined ? (
-        <p className={styles.note} data-part="declared-count">
-          {`İlanda ${detail.declaredMediaCount} görsel bildirildi; kaydın kendi görselleri bulunmadığı için burada ${photos.length} temsili kare gösteriliyor.`}
-        </p>
-      ) : null}
       <p className={styles.status} role="status">
         {shareNote}
       </p>
@@ -324,27 +294,23 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
       ) : null}
 
       {/* Tam ekran görünüm kütüphanenin sözleşmesidir: portal + focus trap +
-          scroll kilidi + kapanışta tetikleyiciye focus dönüşü GlassModal'da,
-          ok/thumbnail/klavye gezinmesi GlassGallery'de yaşar. Modal panelinin
-          kendisi cam olduğu için galerinin sahnesi `flat` verilir. */}
-      <GlassModal
-        open={openAt !== undefined}
-        onClose={() => setOpenAt(undefined)}
-        title={`İlan görselleri (${photos.length})`}
-        description={REPRESENTATIVE_IMAGE_NOTE}
-        size="lg"
-      >
-        <div ref={viewerRef}>
-          <GlassGallery
-            images={photos.map((item) => ({
-              src: sourceOf(item.representative),
-              alt: item.representative.alt,
-            }))}
-            initialIndex={openAt ?? 0}
-            material="flat"
-          />
-        </div>
-      </GlassModal>
+          scroll kilidi + kapanışta tetikleyiciye focus dönüşü, ok/thumbnail/
+          klavye gezinmesiyle birlikte GlassLightbox'ta yaşar. Karartılmış
+          katmanın üstüne cam panel açılmaz; kareye tıklamak doğrudan buraya
+          getirir. Temsili görsel cümlesi tam ekranda da görünür kalır — bu
+          yüzey de bir görsel yüzeyidir (bkz. `listing-photos.ts`). */}
+      <GlassLightbox
+        open={viewerOpen}
+        onClose={() => setViewerOpen(false)}
+        images={photos.map((item) => ({
+          src: sourceOf(item.representative),
+          alt: item.representative.alt,
+        }))}
+        index={viewerIndex}
+        onIndexChange={setViewerIndex}
+        label={`İlan görselleri (${photos.length})`}
+        note={REPRESENTATIVE_IMAGE_NOTE}
+      />
     </section>
   )
 }

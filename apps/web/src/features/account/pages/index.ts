@@ -7,3 +7,4 @@ export {
 } from './AccountSavedSearchPage'
 export { AccountPaymentsPage, type AccountPaymentsPageProps } from './AccountPaymentsPage'
 export { AccountInvoicesPage, type AccountInvoicesPageProps } from './AccountInvoicesPage'
+export { AccountPlanPage, type AccountPlanPageProps } from './AccountPlanPage'

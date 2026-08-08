@@ -16,11 +16,12 @@ dolgu + beyaz thumb çizilir.
 - **Kullan:** fiyat/kilometre/yıl gibi sayısal filtre üst sınırları,
   yüzde ayarları.
 - **Kullanma:** kesin sayı girişi (→ `GlassStepper`), aralık (iki uçlu)
-  seçimi — range varyantı yok.
+  seçimi (→ `GlassPriceRange`) — burada range varyantı yok.
 
 | İlgili | Farkı |
 |---|---|
 | GlassStepper | Ayrık, kesin değer; ± butonlarıyla |
+| GlassPriceRange | İki kol + dağılım histogramı + değer pilleri |
 
 ## 2. Semantik sözleşme
 

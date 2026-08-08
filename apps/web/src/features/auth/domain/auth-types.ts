@@ -1,4 +1,7 @@
 import type { TelefonUlkeKodu } from './telefon-ulkeler'
+// Yalnız tip: paket kimliğinin tek kaynağı fiyat verisidir, kopyalanmaz.
+// `import type` derlemede silinir; auth alanı çalışma zamanında pricing'e bağlanmaz.
+import type { OfficePlanId } from '@/features/pricing/data/office-plans'
 
 export type { TelefonUlkeKodu }
 
@@ -184,7 +187,19 @@ export interface KurumsalBasvuruBilgileri {
   yetkiliEPosta: string
   yetkiliTelefon: string
 
-  // — Aşama 4: onaylar —
+  // — Aşama 4: paket —
+  /**
+   * Seçilen ofis paketi (`OFFICE_PLANS` kimliği). Ödeme başvuru onaylandıktan
+   * sonra alınır; burada saklanan yalnız ofisin BEYAN ettiği tercihtir.
+   */
+  paketId: OfficePlanId
+  /**
+   * Danışman koltuğu adedi. Paketin dahil ettiğinden az olamaz; fazlası ek
+   * koltuk olarak faturaya girer, bu yüzden başvuruyla birlikte saklanır.
+   */
+  paketKoltuk: number
+
+  // — Aşama 5: onaylar —
   /**
    * İşletme ve yetkili kişi verilerinin işlenmesine ilişkin aydınlatma
    * onayı — zorunlu. Bireysel kayıttaki onay yalnız KİŞİSEL verileri

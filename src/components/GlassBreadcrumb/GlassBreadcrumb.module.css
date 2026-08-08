@@ -40,6 +40,8 @@
   border-radius: var(--lg-radius-chip);
   cursor: pointer;
   white-space: nowrap;
+  /* Öğe `<a>` da olabilir (href desteği) — link alt çizgisi cam şeritte gürültü. */
+  text-decoration: none;
 }
 @media (hover: hover) {
   .link:hover {

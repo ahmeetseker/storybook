@@ -49,4 +49,61 @@ describe('GlassMetricStrip', () => {
     expect(screen.getByLabelText('Doğru ad')).toBeTruthy()
     expect(screen.queryByLabelText('Yanlış ad')).toBeNull()
   })
+
+  describe('variant="gradient"', () => {
+    const gradientItems: GlassMetricStripItem[] = [
+      {
+        id: 'listing',
+        label: 'Aktif ilan',
+        value: '48',
+        hint: 'Ana sayfa portföyü',
+        tone: 'accent',
+        motif: 'parcels',
+        action: { label: 'Portföyü gör', href: '/ilanlar' },
+      },
+      { id: 'region', label: 'Bölge', value: '8', tone: 'neutral' },
+    ]
+
+    it('dl/dt/dd semantiği gradient varyantında da korunur', () => {
+      render(<GlassMetricStrip items={gradientItems} variant="gradient" label="Pazar özeti" />)
+      const list = screen.getByLabelText('Pazar özeti')
+      expect(list.tagName).toBe('DL')
+      expect(screen.getByText('Aktif ilan').tagName).toBe('DT')
+      expect(screen.getByText('48').closest('dd')).toBeTruthy()
+    })
+
+    it('action verilen metrik için bağlantı çizilir; görünür metin erişilebilir adın içindedir', () => {
+      render(<GlassMetricStrip items={gradientItems} variant="gradient" />)
+      const link = screen.getByRole('link', { name: 'Aktif ilan: Portföyü gör' })
+      expect(link.getAttribute('href')).toBe('/ilanlar')
+      // WCAG 2.5.3 — erişilebilir ad görünür etiketi içermeli
+      expect(link.getAttribute('aria-label')).toContain('Portföyü gör')
+      expect(link.textContent).toContain('Portföyü gör')
+    })
+
+    it('action verilmeyen metrikte bağlantı çizilmez', () => {
+      render(<GlassMetricStrip items={gradientItems} variant="gradient" />)
+      expect(screen.getAllByRole('link')).toHaveLength(1)
+    })
+
+    it('tone verilmezse neutral varsayılır', () => {
+      const { container } = render(
+        <GlassMetricStrip items={[{ id: 'x', label: 'Bölge', value: '8' }]} variant="gradient" />,
+      )
+      expect(container.querySelector('[data-tone="neutral"]')).toBeTruthy()
+    })
+
+    it('plain varyantta tone/motif/action okunmaz — mevcut tüketiciler etkilenmez', () => {
+      const { container } = render(<GlassMetricStrip items={gradientItems} />)
+      expect(screen.queryByRole('link')).toBeNull()
+      expect(container.querySelector('[data-tone]')).toBeNull()
+      expect(container.querySelector('svg')).toBeNull()
+    })
+
+    it('motif dekoratiftir — erişilebilirlik ağacından gizlenir', () => {
+      const { container } = render(<GlassMetricStrip items={gradientItems} variant="gradient" />)
+      const motif = container.querySelector('svg')
+      expect(motif?.getAttribute('aria-hidden')).toBe('true')
+    })
+  })
 })

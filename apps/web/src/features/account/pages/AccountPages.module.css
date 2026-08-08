@@ -747,3 +747,49 @@
     background-color: var(--lg-surface);
   }
 }
+
+/* ── Paketim ─────────────────────────────────────────────────────── */
+.planSummary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--lg-space-4) var(--lg-space-6);
+  margin: 0 0 var(--lg-space-8);
+  padding: var(--lg-space-5);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+.planSummary dt {
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+  margin-block-end: var(--lg-space-1);
+}
+.planSummary dd {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+
+.planTable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+.planTable h2 {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.planIntro {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.6;
+}

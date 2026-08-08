@@ -174,6 +174,9 @@ export function AccountNav({
       </GlassSidebar.Section>
 
       <GlassSidebar.Section label="Ödemeler ve faturalar">
+        <GlassSidebar.Item id="planim" icon={<NavigationIcon name="card" size={18} />}>
+          Paketim
+        </GlassSidebar.Item>
         <GlassSidebar.Item
           id="odemeler"
           icon={<NavigationIcon name="card" size={18} />}

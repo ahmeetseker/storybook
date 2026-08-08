@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import {render, screen} from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { MarketplaceShell } from './MarketplaceShell'
+import { usePageTrail } from './PageTrail'
 
 const routerState = vi.hoisted(() => ({
   pathname: '/ilan-ver',
@@ -42,6 +43,7 @@ vi.mock('@repo/ui', () => ({
       {action}
     </header>
   ),
+  GlassFooter: () => <footer data-testid="global-footer" />,
 }))
 
 describe('MarketplaceShell odaklı ilan akışı', () => {
@@ -62,6 +64,9 @@ describe('MarketplaceShell odaklı ilan akışı', () => {
 
     expect(screen.getByText('İlan oluşturma çalışma alanı')).toBeTruthy()
     expect(screen.queryByTestId('global-header')).toBeNull()
+    // Footer da gizlenir: sihirbazın altına site haritası koymak akıştan
+    // çıkmayı kolaylaştırır.
+    expect(screen.queryByTestId('global-footer')).toBeNull()
 
     routerState.pathname = '/emlak'
     rerender(
@@ -71,8 +76,42 @@ describe('MarketplaceShell odaklı ilan akışı', () => {
     )
 
     expect(screen.getByTestId('global-header')).toBeTruthy()
+    expect(screen.getByTestId('global-footer')).toBeTruthy()
     expect(screen.queryByTestId('global-search')).toBeNull()
   })
+})
+
+describe('MarketplaceShell footer', () => {
+  // Footer sayfaların değil kabuğun işidir: bir sayfa onu unutamaz.
+  it.each(['/', '/emlak', '/paketler', '/ofisler', '/bolgeler', '/ilan/arsa-214-7'])(
+    'rota %s iken footer çizilir',
+    (pathname) => {
+      routerState.pathname = pathname
+
+      render(
+        <MarketplaceShell>
+          <main>Rota içeriği</main>
+        </MarketplaceShell>,
+      )
+
+      expect(screen.getByTestId('global-footer')).toBeTruthy()
+    },
+  )
+
+  it.each(['/ilan-ver', '/hesabim', '/hesabim/planim', '/hesabim/mesajlar'])(
+    'odaklı akış %s iken footer çizilmez',
+    (pathname) => {
+      routerState.pathname = pathname
+
+      render(
+        <MarketplaceShell>
+          <main>Rota içeriği</main>
+        </MarketplaceShell>,
+      )
+
+      expect(screen.queryByTestId('global-footer')).toBeNull()
+    },
+  )
 })
 
 describe('MarketplaceShell hesap eylemi', () => {
@@ -102,9 +141,61 @@ describe('MarketplaceShell hesap eylemi', () => {
       )
 
       expect(screen.queryByTestId('global-header')).toBeNull()
+      expect(screen.queryByTestId('global-footer')).toBeNull()
       expect(screen.getByRole('link', { name: 'İçeriğe geç' })).toBeTruthy()
     },
   )
+})
+
+describe('MarketplaceShell kırıntı yolu kanalı', () => {
+  // Kabuk yolu üretir, `PageContainer` çizer; burada yalnız kanal sınanır.
+  function TrailProbe() {
+    const trail = usePageTrail()
+    return <output data-testid="trail">{trail.map((item) => item.label).join(' > ')}</output>
+  }
+
+  it.each([
+    ['/emlak', 'Anasayfa > Emlak ara'],
+    ['/paketler', 'Anasayfa > Paketler'],
+    ['/favoriler', 'Anasayfa > Favoriler'],
+  ])('rota %s iken statusTrail`den yolu sağlar', (pathname, beklenen) => {
+    routerState.pathname = pathname
+
+    render(
+      <MarketplaceShell>
+        <TrailProbe />
+      </MarketplaceShell>,
+    )
+
+    expect(screen.getByTestId('trail').textContent).toBe(beklenen)
+  })
+
+  it.each(['/ilan-ver', '/hesabim', '/hesabim/mesajlar'])(
+    'odaklı akış %s iken yol sağlanmaz — sayfa kendi üst şeridini kurar',
+    (pathname) => {
+      routerState.pathname = pathname
+
+      render(
+        <MarketplaceShell>
+          <TrailProbe />
+        </MarketplaceShell>,
+      )
+
+      expect(screen.getByTestId('trail').textContent).toBe('')
+    },
+  )
+
+  it('ilan detayında yol boştur — sayfa kendi kategori yolunu taşır', () => {
+    routerState.pathname = '/ilan/arsa-214-7'
+
+    render(
+      <MarketplaceShell>
+        <TrailProbe />
+      </MarketplaceShell>,
+    )
+
+    expect(screen.getByTestId('trail').textContent).toBe('')
+  })
 })
 
 describe('MarketplaceShell header aksiyonları', () => {

@@ -52,8 +52,8 @@
 /* Dolu eylem zemini token'dan gelir; oran ve kontrast kuralı burada tekrar
    yazılmaz (bkz. `--lg-action-prominent`). Böylece kabuktaki "İlan ver" ile
    sayfa içindeki her dolu eylem aynı rengi paylaşır. */
-/* `material="flat"` yüzeye hairline çerçeve verir; dolu eylemde o çerçeve
-   accent'in üstünde ikinci bir kenar olurdu — dolgu kendi sınırıdır. */
+/* Dolu eylem her zaman cam materyalde çizilir (GlassButton flat'ı yok sayar);
+   çerçeve yine şeffaflaşır — dolgu kendi sınırıdır. */
 .button.prominent { background-color: var(--lg-action-prominent); border-color: transparent; color: var(--lg-action-prominent-label) !important; }
 .button.prominent .label { color: var(--lg-action-prominent-label) !important; }
 

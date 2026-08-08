@@ -18,7 +18,7 @@ import {
   trustSignals,
 } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
-import { HomeFooter } from "../shared/HomeFooter";
+import { SiteFooter } from "@/components/SiteFooter";
 import styles from "./TrustFirstHome.module.css";
 
 const evidence: GlassAiEvidenceItem[] = [
@@ -78,7 +78,7 @@ export function TrustFirstHome() {
     <HomeConceptFrame
       className={styles.page}
       footer={
-        <HomeFooter
+        <SiteFooter
           variant="cta"
           cta={
             <section

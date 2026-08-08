@@ -491,10 +491,11 @@
   flex: none;
 }
 
+/* Gönder dolu eylemdir: rengi kabuktaki "İlan ver" ile aynı token'dan gelir. */
 .panels :global(.messageComposer__send) {
   flex: none;
-  background-color: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background-color: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
 }
 
 .panels :global(.messageComposer__send):disabled {

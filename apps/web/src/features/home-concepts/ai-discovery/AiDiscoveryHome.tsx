@@ -12,7 +12,7 @@ import {
 import { withBase } from "@/config/base-path";
 import { agencyFixtures, homeListings, homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
-import { HomeFooter } from "../shared/HomeFooter";
+import { SiteFooter } from "@/components/SiteFooter";
 import styles from "./AiDiscoveryHome.module.css";
 
 const parsedFilters: GlassAiSearchBarFilter[] = [
@@ -35,7 +35,7 @@ export function AiDiscoveryHome() {
   return (
     <HomeConceptFrame
       className={styles.page}
-      footer={<HomeFooter variant="columns" />}
+      footer={<SiteFooter variant="columns" />}
     >
       <GlassHero
         variant="search"

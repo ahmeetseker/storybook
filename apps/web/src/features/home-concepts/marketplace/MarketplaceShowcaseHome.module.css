@@ -71,8 +71,9 @@
   min-height: var(--lg-control-md);
   align-items: center;
   align-self: flex-start;
-  padding-inline: var(--lg-space-4);
-  border-radius: var(--lg-radius-chip);
+  /* Dolu eylem formu kabuktaki "İlan ver" ile aynıdır: kapsül + space-5. */
+  padding-inline: var(--lg-space-5);
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-action-prominent);
   color: var(--lg-action-prominent-label);
   font-size: var(--lg-text-footnote);

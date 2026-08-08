@@ -1098,18 +1098,17 @@
   font-weight: 600;
 }
 
+/* Radyo kontrolleri hâlâ native; onay kutuları GlassCheckbox'a taşındı. */
 .segmentChoice input,
 .roleChoice input,
-.radioLine input,
-.consentBlock input {
+.radioLine input {
   flex: none;
   margin: 0;
   accent-color: var(--lg-accent);
 }
 
 .roleChoice input,
-.radioLine input,
-.consentBlock input {
+.radioLine input {
   margin-block-start: var(--lg-space-1);
 }
 
@@ -1142,8 +1141,11 @@
   gap: var(--lg-space-3);
 }
 
+/* Onay satırı GlassCheckbox'tır (kök öğesi <label>); kart formu buradan gelir.
+   İki satırlı metinde kutu üste hizalanır, ortaya değil. */
 .consentBlock > label {
   display: flex;
+  align-items: flex-start;
   gap: var(--lg-space-3);
   padding: var(--lg-space-4);
   border: var(--lg-stroke-hairline) solid var(--lg-hairline);
@@ -2238,7 +2240,8 @@
 .segmentChoice:has(input:focus-visible),
 .roleChoice:has(input:focus-visible),
 .radioLine:has(input:focus-visible),
-.consentBlock > label:has(input:focus-visible),
+/* Onay kutusunun odak halkasını GlassCheckbox kendi çiziyor; kart kenarına
+   ikinci bir halka eklemiyoruz. */
 .reviewItem > button:focus-visible,
 .mediaCoverAction:focus-visible,
 .mediaIconActions button:focus-visible,

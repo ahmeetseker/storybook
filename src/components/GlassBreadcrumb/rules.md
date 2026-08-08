@@ -12,10 +12,11 @@ lastReviewed: 2026-07-15
 Kategori yolu (breadcrumb): capsule cam şerit içinde hiyerarşik konum gösterir;
 ara öğeler tıklanarak üst kategoriye dönülür, son öğe mevcut sayfadır.
 
-- **Kullan:** ilan/detay sayfası üstünde kategori hiyerarşisi.
+- **Kullan:** ilan/detay sayfası üstünde kategori hiyerarşisi; sayfa üstü rota
+  yolu (kabuk `statusTrail`'i). SEO-kritik yerlerde `href` ver — öğe gerçek
+  `<a>` render edilir.
 - **Kullanma:** sekme/adım gezintisi (→ Tabs/Stepper), tek seviyeli geri linki
-  (tek buton yeter), URL tabanlı gerçek link gereken SEO-kritik yerlerde
-  (bkz. Bilinen kısıtlar — `href` yok).
+  (tek buton yeter).
 
 | İlgili | Farkı |
 |---|---|
@@ -27,30 +28,38 @@ ara öğeler tıklanarak üst kategoriye dönülür, son öğe mevcut sayfadır.
 - Element: `<nav>` (`GlassSurface as="nav"`) + içinde `<ol>`/`<li>` sıralı liste.
 - Landmark: `aria-label="Kategori yolu"` default — `...rest` sonda yayıldığı
   için çağıran override edebilir.
-- Son öğe: `<span aria-current="page">`. Ara öğeler `onClick` varsa
-  `<button type="button">`, yoksa düz `<span>`.
+- Son öğe: `<span aria-current="page">`. Ara öğeler `href` varsa `<a>`,
+  yalnız `onClick` varsa `<button type="button">`, ikisi de yoksa düz `<span>`.
+- `href` + `onClick` birlikteyse sade sol tık `preventDefault` + `onClick`
+  (SPA gezinmesi); modifier'lı/orta tık tarayıcıya bırakılır —
+  `GlassSiteHeader.linkClick` ile aynı sözleşme.
 - Ayraçlar `aria-hidden` — ekran okuyucu yalnız öğeleri okur.
+- Daraltılmış yolda "…" bir `<button>`'dır; `aria-label` gizlenen seviye
+  sayısını söyler ("Gizlenen N seviyeyi göster").
 - DOM değişmezleri: (1) `nav > ol > li` yapısı korunur, (2) son öğe asla
-  buton olmaz, (3) `aria-current="page"` yalnız son öğede.
+  buton/link olmaz, (3) `aria-current="page"` yalnız son öğede.
 
 ## 3. Anatomy
 
 | Slot | Zorunlu | İçerik | Kurallar |
 |---|---|---|---|
-| items | ✅ | `{ label, onClick? }[]` | Sıra = hiyerarşi; son öğe mevcut sayfa |
+| items | ✅ | `{ label, href?, onClick? }[]` | Sıra = hiyerarşi; son öğe mevcut sayfa |
 | separator | — | ReactNode (default `'›'`) | Her ara öğeden sonra, `aria-hidden` |
+| "…" (türetilen) | — | `maxItems` aşımında | Yerinde açar; menü/overlay açmaz |
 
 ## 4. Public API
 
 | Ad | Tür | Type | Default | Açıklama |
 |---|---|---|---|---|
-| items | prop | `GlassBreadcrumbItem[]` | — (zorunlu) | `{ label: string; onClick?: () => void }` |
+| items | prop | `GlassBreadcrumbItem[]` | — (zorunlu) | `{ label: string; href?: string; onClick?: () => void }` |
 | separator | prop | `ReactNode` | `'›'` | Ayraç karakteri/ikonu |
 | tone | prop | `'light'\|'dark'\|'auto'` | `'auto'` | Zemin bağlamı ipucu (GlassSurface'a geçer) |
+| maxItems | prop | `number` | `undefined` | Görünür öğe tavanı ("…" dahil; 3'ün altı 3'e yuvarlanır). `undefined` = daraltma yok |
 | ...rest | — | `HTMLAttributes<HTMLElement>` | — | Köke (`nav`) geçer; `aria-label` override edilebilir |
 
 Event: öğe başına `item.onClick` — yalnız ara öğelerde çalışır; son öğeye
-verilse bile render edilen span tıklanamaz. Ref hedefi: yok (forwardRef edilmemiş).
+verilse bile render edilen span tıklanamaz. `href` yalnız ara öğelerde `<a>`
+üretir; son öğede yok sayılır. Ref hedefi: yok (forwardRef edilmemiş).
 
 ## 5. Seçenek eksenleri
 
@@ -68,6 +77,8 @@ Varsayılan kombinasyon: default ayraç, `tone=auto`.
 | State | Kaynak | Bastırdığı | Görsel / ARIA |
 |---|---|---|---|
 | current (son öğe) | items sırası | tıklanabilirlik | `font-weight: 600` + `aria-current="page"` |
+| collapsed | `maxItems` < items sayısı, iç `expanded=false` | ara seviyelerin görünürlüğü | "…" butonu + gizli seviye sayısı `aria-label`'da |
+| expanded | "…" tıklaması (tek yönlü — tekrar daralmaz) | collapsed | Tam yol; odak ilk açılan öğeye taşınır |
 | hover (link) | CSS `:hover` | — | opacity .75 → 1 + `rgba(255,255,255,.14)` zemin |
 | focus-visible (link) | CSS | — | 2px `--lg-accent` halka, offset 1px |
 | disabled | — | — | N/A — öğe bazlı disabled desteklenmiyor |
@@ -77,18 +88,25 @@ yapışık hover kalabilir (borç).
 
 ## 7. Davranış
 
-- Keyboard: linkler native `<button>` — Tab ile sırayla gezilir, Enter/Space
-  aktive eder. Span öğeleri focus almaz.
+- Keyboard: öğeler native `<a href>`/`<button>` — Tab ile sırayla gezilir,
+  Enter (linkte) / Enter+Space (butonda) aktive eder. Span öğeleri focus almaz.
 - Pointer: yalnız click; basınç animasyonu/useGlassPress **yok** (bilinçli —
   metin linki, cam buton değil).
+- Daraltma "…" yerinde açar, overlay/menü **açmaz**: kök `GlassSurface`
+  `overflow: hidden` panel açılışını kırpardı ve cam kapsül üstüne cam panel
+  katman modelini (cam üstüne cam yok) ihlal ederdi. Açılış tek yönlüdür;
+  items değişince (yeni sayfa) component yeniden kurulup daralır.
+- Odak: "…" DOM'dan kalkarken odak ilk açılan öğeye taşınır — odak belgede
+  kaybolmaz (WCAG 2.4.3).
 - `prefers-reduced-motion`: N/A — animasyon yok.
-- Controlled/uncontrolled: N/A — state tutmaz, tamamen `items`'tan render.
+- Controlled/uncontrolled: yalnız iç `expanded` state'i; dışarıdan kontrol yok.
 
 ## 8. İçerik
 
 - Uzun yol: `flex-wrap: wrap` — öğeler satır atlar, kırpma/ellipsis yok; öğe
   içi `white-space: nowrap` (TR uzun kategori adı bölünmez, bütün öğe atlar).
-- Derin hiyerarşide (5+) kısaltma/collapse davranışı yok — çağıran items'ı kırpar.
+- Derin hiyerarşi: `maxItems` ile daraltma — ilk öğe + "…" + son
+  `maxItems - 2` öğe görünür; gizlenenler "…" tıklamasıyla yerinde açılır.
 - Boş `items`: boş `ol` render edilir — sözleşme ihlali, en az 1 öğe verilmeli.
 - Lokalizasyon: `label`'lar çağırandan; ancak `aria-label="Kategori yolu"`
   default'u **Türkçe hardcoded** — farklı dilde çağıran override etmeli (borç).
@@ -121,17 +139,22 @@ raw.
 
 ## 10. Storybook kapsamı
 
-Var: Default (4 seviye), TwoLevels, CustomSeparator, UzunIcerik (çok seviyeli +
-uzun TR kategori adları, dar container'da wrap). **Eksik:** Playground,
-Erişilebilirlik (landmark + aria-current gösterimi). States: hover/focus
-CSS state'i olduğundan zorlanmaz. Variants/Sizes: N/A — eksen yok.
+Var: Default (4 seviye), TwoLevels, CustomSeparator, GercekLinkler (href +
+SPA devri), DaraltilmisYol (maxItems + "…" yerinde açılış), UzunIcerik (çok
+seviyeli + uzun TR kategori adları, dar container'da wrap). **Eksik:**
+Playground, Erişilebilirlik (landmark + aria-current gösterimi). States:
+hover/focus CSS state'i olduğundan zorlanmaz. Variants/Sizes: N/A — eksen yok.
 
 ## 11. Test kabul kriterleri
 
 - [x] ara öğeler tıklanabilir; onClick çağrılır (unit)
 - [x] son öğe span + `aria-current="page"`
 - [x] navigation landmark adıyla render olur
-- [ ] son öğeye verilen onClick yok sayılır
+- [x] `href` verilen ara öğe `<a>` render olur; sade sol tık SPA'ya devreder
+- [x] modifier'lı tık tarayıcıya bırakılır (onClick çağrılmaz)
+- [x] son öğeye verilen `href` yok sayılır (span kalır)
+- [x] `maxItems` aşımında ara seviyeler gizlenir; "…" `aria-label`'ı sayı verir
+- [x] "…" tıklaması yolu yerinde açar; odak ilk açılan öğeye taşınır
 - [ ] klavye gezintisi Tab sırası (interaction)
 - [ ] dar container'da wrap (visual)
 
@@ -142,14 +165,18 @@ CSS state'i olduğundan zorlanmaz. Variants/Sizes: N/A — eksen yok.
 - ❌ Ayraca tıklanabilir öğe koyma (`aria-hidden`).
 - ❌ Sekme/adım gezintisi için kullanma.
 
-**Bilinen kısıtlar:** `href` desteği yok — öğeler buton olarak render edilir;
-orta tık/yeni sekme/SEO çalışmaz. Öğe bazlı disabled yok. **Açık kararlar:**
-`GlassBreadcrumbItem`'a `href` eklenip `<a>` render'ı desteklenmeli mi? ·
-default `aria-label`'ın i18n'i · link hover'ına `hover:hover` guard'ı ·
-derin hiyerarşi için collapse ("…") deseni.
+**Bilinen kısıtlar:** Öğe bazlı disabled yok. Daraltma tek yönlü — açılan yol
+tekrar daraltılamaz (items değişince sıfırlanır). "…" ve gizli etiketler
+Türkçe hardcoded (default `aria-label` gibi i18n borcu). **Açık kararlar:**
+default `aria-label`'ın i18n'i.
 
 ## Changelog
 
+- 2026-08-07: `href` desteği eklendi — ara öğeler gerçek `<a>` render edilir,
+  `onClick` ile birlikteyken sade sol tık SPA'ya devredilir (GlassSiteHeader
+  `linkClick` sözleşmesi). `maxItems` daraltması eklendi: aşan ara seviyeler
+  "…" butonunda toplanır, tıklanınca yerinde açılır (overlay yok — kök
+  `overflow: hidden` + cam üstüne cam yasağı). İki açık karar kapandı.
 - 2026-08-03: Yeni kontrol ölçeğine uyarlandı. Şerit/öğe dolgu dengesi
   token'a bağlandı (`--bar-pad-block` 6px → `--lg-space-1`, `--item-pad`
   `2px 6px` → `--lg-space-1 --lg-space-2`), link radius `--lg-radius-chip`e

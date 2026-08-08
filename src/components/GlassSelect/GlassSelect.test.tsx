@@ -155,6 +155,30 @@ describe('GlassSelect', () => {
     ).toBe('flat')
   })
 
+  it('panel varsayılan olarak opak (flat) açılır — trigger cam olsa bile', () => {
+    renderSelect({ material: 'glass' })
+    const button = trigger()
+
+    expect(button.getAttribute('data-material')).toBe('glass')
+    fireEvent.click(button)
+    expect(
+      screen.getByRole('listbox').closest('[data-material]')?.getAttribute(
+        'data-material',
+      ),
+    ).toBe('flat')
+  })
+
+  it('panelMaterial paneli bağımsız olarak cama çevirir', () => {
+    renderSelect({ material: 'glass', panelMaterial: 'glass' })
+    fireEvent.click(trigger())
+
+    expect(
+      screen.getByRole('listbox').closest('[data-material]')?.getAttribute(
+        'data-material',
+      ),
+    ).toBe('glass')
+  })
+
   it('controlled: value prop\'u dışarıdan yönetilir, iç state devreye girmez', () => {
     const onChange = vi.fn()
     renderSelect({ value: 'manuel', onChange })

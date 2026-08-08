@@ -16,7 +16,7 @@ import {
 import { withBase } from "@/config/base-path";
 import { homeListings, homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
-import { HomeFooter } from "../shared/HomeFooter";
+import { SiteFooter } from "@/components/SiteFooter";
 import styles from "./AiAdvisorHome.module.css";
 
 const parsedFilters: GlassAiSearchBarFilter[] = [
@@ -122,7 +122,7 @@ export function AiAdvisorHome() {
   return (
     <HomeConceptFrame
       className={styles.page}
-      footer={<HomeFooter variant="columns" />}
+      footer={<SiteFooter variant="columns" />}
     >
       <GlassHero
         variant="split"

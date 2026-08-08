@@ -31,6 +31,7 @@ const meta = {
   args: { onChange: fn(), options: vitesOptions, 'aria-label': 'Vites' },
   argTypes: {
     material: { control: 'select', options: ['glass', 'flat'] },
+    panelMaterial: { control: 'select', options: ['glass', 'flat'] },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     invalid: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -61,7 +62,7 @@ export const Required: Story = {
 
 export const Disabled: Story = { args: { placeholder: 'Vites seçin', disabled: true } }
 
-/** Malzeme ekseni trigger ve seçenek panelinde birlikte uygulanır. */
+/** `material` trigger'ı belirler; panel varsayılan olarak opak kalır. */
 export const Materials: Story = {
   render: () => (
     <div
@@ -81,6 +82,35 @@ export const Materials: Story = {
         material="flat"
         aria-label="Düz malzeme"
         placeholder="Düz malzeme"
+        options={vitesOptions}
+      />
+    </div>
+  ),
+}
+
+/**
+ * Panel malzemesi trigger'dan bağımsız eksendir. Varsayılan `flat` (opak
+ * `--lg-surface`): yoğun içerik üzerinde açılan liste her zaman okunur kalır.
+ * `glass` yalnız arkası sade yerleşimlerde bilinçli seçilir.
+ */
+export const PanelMaterials: Story = {
+  render: () => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--lg-space-3)',
+      }}
+    >
+      <GlassSelect
+        aria-label="Opak panel"
+        placeholder="Opak panel (varsayılan)"
+        options={vitesOptions}
+      />
+      <GlassSelect
+        panelMaterial="glass"
+        aria-label="Cam panel"
+        placeholder="Cam panel"
         options={vitesOptions}
       />
     </div>

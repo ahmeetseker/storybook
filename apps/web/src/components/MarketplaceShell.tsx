@@ -2,6 +2,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import { GlassButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
 import {
+  getBreadcrumbTrail,
   getRouteByKey,
   getRouteByPath,
   headerRouteKeys,
@@ -9,6 +10,8 @@ import {
 } from '@/config/routes'
 import { stripBase, withBase } from '@/config/base-path'
 import { NavigationIcon } from './NavigationIcon'
+import { PageTrailContext, type PageTrailItem } from './PageTrail'
+import { SiteFooter } from './SiteFooter'
 
 export interface MarketplaceShellProps {
   children: ReactNode
@@ -22,8 +25,12 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
   const currentRoute = getRouteByPath(pathname)
   // Kendi kabuğunu kuran rotalar: ilan verme sihirbazı (odaklı akış) ve
   // hesap panosu (sol ray + kendi üst şeridi). İkisinde de pazar yeri
-  // header'ı gizlenir — iki gezinme katmanı üst üste binmez.
-  const isFocusedListingFlow =
+  // header'ı VE footer'ı gizlenir — iki gezinme katmanı üst üste binmez.
+  //
+  // Footer aynı koşulu paylaşır çünkü aynı soruyu sorar: bu sayfa siteyi mi
+  // geziyor, yoksa bir işi mi bitiriyor? Sihirbazın ve mesaj çalışma
+  // masasının altına site haritası koymak, akıştan çıkmayı kolaylaştırır.
+  const isFocusedFlow =
     currentRoute.key === 'create-listing'
     || currentRoute.key === 'account'
     || currentRoute.key === 'messages'
@@ -36,6 +43,18 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     },
     [router],
   )
+
+  // Kırıntı yolu kabuğun işidir (footer gibi): rotanın `statusTrail`'inden
+  // üretilir, `PageContainer` çizer — bir sayfa onu unutamaz. Odaklı akışlar
+  // (sihirbaz, hesap panosu) kendi üst şeridini kurar; onlara yol verilmez.
+  const pageTrail = useMemo<readonly PageTrailItem[]>(() => {
+    if (isFocusedFlow) return []
+    return getBreadcrumbTrail(currentRoute).map(({ label, href }) => ({
+      label,
+      href: href !== undefined ? withBase(href) : undefined,
+      onClick: href !== undefined ? () => routeTo(withBase(href)) : undefined,
+    }))
+  }, [currentRoute, isFocusedFlow, routeTo])
 
   const headerLinks = useMemo<GlassSiteHeaderLink[]>(
     () =>
@@ -79,7 +98,7 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
       <a className="skip-link" href="#main-content">
         İçeriğe geç
       </a>
-      {!isFocusedListingFlow ? (
+      {!isFocusedFlow ? (
         <GlassSiteHeader
           logo={logo}
           links={headerLinks}
@@ -87,7 +106,10 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
           action={createAction}
         />
       ) : null}
-      {children}
+      <PageTrailContext.Provider value={pageTrail}>{children}</PageTrailContext.Provider>
+      {/* Footer sayfanın değil kabuğun işidir: tek yerde durur, her sayfada
+          aynıdır ve bir sayfanın onu unutması mümkün olmaz. */}
+      {!isFocusedFlow ? <SiteFooter /> : null}
     </div>
   )
 }

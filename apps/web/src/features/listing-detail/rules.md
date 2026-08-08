@@ -201,18 +201,22 @@ genişliğidir (`@container page`, kap `PageContainer`):
   `aria-pressed` ile durumunu bildirir, paylaş `navigator.share` yoksa
   bağlantıyı panoya kopyalar ve sonucu `role="status"` satırında yazar —
   hiçbiri tıklandığında sessiz kalmaz.
-- **Tam ekran görünüm kütüphaneden gelir**: `GlassModal` + `GlassGallery`
-  (portal, focus trap, scroll kilidi, kapanışta tetikleyiciye focus dönüşü,
-  ok/thumbnail/klavye gezinmesi). Bu sayfa kendi overlay'ini yazmaz ve
-  kütüphaneye yeni bileşen eklemez. Modal paneli cam olduğu için galerinin
-  sahnesi `material="flat"` verilir — cam üstüne cam yoktur.
+- **Tam ekran görünüm kütüphaneden gelir**: `GlassLightbox` (portal, focus trap,
+  scroll kilidi, kapanışta tetikleyiciye focus dönüşü, ok/thumbnail/klavye
+  gezinmesi). Bu sayfa kendi overlay'ini yazmaz. Bir kareye tıklamak **tek
+  adımda** tam ekranı açar — arada panel yoktur; tıklanan karenin indeksi
+  görüntüleyiciye controlled (`index` + `onIndexChange`) verilir, kareler
+  arasında geçiş alttaki thumbnail şeridinden, oklardan veya ok tuşlarından
+  yapılır. Katman karartmadır, üstüne cam panel açılmaz — yalnız kontroller
+  camdır.
 - Kayıtlarda **gerçek ilan fotoğrafı yoktur**. Gösterilen kareler kategoriyi
   temsil eden stok fotoğraflardır ve kaynak tek yerdedir:
   `features/listings/data/listing-photos.ts`. Arama, karşılaştırma ve ilan
   detayı aynı havuzdan okur.
-- Temsili kullanım **gizlenmez**: medya sahnesinin altında tek kaynaklı cümle
-  görünür durur — `REPRESENTATIVE_IMAGE_NOTE`
+- Temsili kullanım **gizlenmez**: tam ekran görünümde (`GlassLightbox`'ın
+  `note` satırı) tek kaynaklı cümle görünür durur — `REPRESENTATIVE_IMAGE_NOTE`
   (`Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.`).
+  Sayfa içinde ızgara altına ayrıca yazılmaz (ürün kararı, 2026-08-07).
   Karşılaştırma tezgâhı aynı sabiti kullanır; iki ayrı cümle iki ayrı iddia
   demek olurdu.
 - **Hero her ilanda foto bento'dur; temsili kareler çoğaltılır ama kare başına
@@ -228,11 +232,10 @@ genişliğidir (`@container page`, kap `PageContainer`):
   göstermek "iki ayrı görsel var" izlenimi verirdi. Erişilebilir adlar
   ızgaradaki konumla ayrışır (`… · 2/4`) — bu kayıttan gelen bir iddia değil,
   hücrenin yeridir.
-- **İlanda bildirilen görsel sayısı kare değil, künye satırıdır.**
-  `declaredMediaCount` ızgaranın altında tek cümlede gösterilen kare sayısıyla
-  **birlikte** yazılır (`İlanda N görsel bildirildi; … burada M temsili kare
-  gösteriliyor.`), böylece iki sayı birbirinin yerine okunmaz. Bildirilen sayı
-  kadar kare çizmek, gösterilmeyen dosyaları gösteriliyormuş gibi yapardı.
+- **İlanda bildirilen görsel sayısı kare olarak çizilmez.**
+  `declaredMediaCount` ekrana yazılmaz (künye satırı 2026-08-07'de üründen
+  kaldırıldı) ama sınır ilkesi durur: bildirilen sayı kadar kare çizmek,
+  gösterilmeyen dosyaları gösteriliyormuş gibi yapardı.
 - **Fotoğraf olmayan kaleme temsili kare iliştirilmez.** Parsel görünümü ve
   plan notu (PDF) `representative` alanını hiç taşımaz; künyeleriyle (tür,
   çekim tarihi, yapay zekâ düzenleme etiketi) birlikte döküm satırı olarak
@@ -409,7 +412,8 @@ bütçesine girmez (bkz. §1b). Cam üstüne cam yoktur — karar
 kartının fiyat/panel/eylem blokları, `GlassDataProvenance` künyeleri ve
 sahnenin künyesi düz yüzeydir; hero örtüleri camdır ama fotoğrafın
 üstündedir, camın üstünde değil. Tam ekran görünümde de aynı kural işler:
-`GlassModal` paneli camdır, içindeki `GlassGallery` sahnesi `flat` verilir.
+`GlassLightbox`'ın karartılmış katmanı düz bir malzemedir, üstünde yalnız cam
+kontroller (ok, kapat) durur.
 
 ## 3. EİDS ve doğrulama dili
 
@@ -730,6 +734,16 @@ keyfî radius yoktur. Radius yalnız chip/media/card/capsule ölçeğinden gelir
 
 ## Changelog
 
+- 2026-08-05 — **Görsel tek tıkta tam ekran açılıyor** (§1c, §2). Bento
+  karesine tıklamak önce cam bir panel (`GlassModal` + `GlassGallery`) açıyor,
+  tam ekrana ancak ikinci tıklamayla geçiliyordu: aynı iş için iki katman, iki
+  tıklama. Panel kaldırıldı; kare doğrudan `GlassLightbox`'a açılıyor ve
+  kareler arasında geçiş katmanın **alt thumbnail şeridinden** yapılıyor.
+  Görüntüleyici kütüphaneye yeni bir overlay olarak eklendi (`GlassGallery`'nin
+  iç lightbox'ı oraya taşındı) — böylece focus trap, `body` scroll kilidi ve
+  kapanışta tetikleyiciye focus dönüşü artık sözleşmenin parçası. Medya
+  dürüstlük kuralları değişmedi: temsili görsel cümlesi tam ekranda da `note`
+  satırı olarak görünür durur.
 - 2026-08-04 — **Görüşme gündemi satır olmaktan çıkıp kart oldu** (§1b, §4,
   §9, §10). Üç ayrı şikâyet aynı kökten geliyordu: gündem, ölçüsü içeriğinden
   değil **kolondan** gelen bir satır listesiydi.

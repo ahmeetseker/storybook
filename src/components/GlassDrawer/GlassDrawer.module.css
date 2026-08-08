@@ -27,7 +27,11 @@
   color: var(--lg-label, #24211b);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
   padding: var(--lg-space-5, 20px) var(--lg-space-4, 16px);
-  overflow: auto;
+  /* Kaydırma GÖVDEDE yaşar, panelde değil: panel bütün olarak kaydığında
+     başlık ve footer aksiyonu ekranı terk ediyordu — oysa sözleşme (rules §7)
+     footer'ın görünür kalmasını söylüyor. Uzun bir filtre yaprağında "sonucu
+     göster" düğmesine ulaşmak için sonuna kadar kaydırmak gerekiyordu. */
+  overflow: hidden;
   outline: none;
 }
 
@@ -76,20 +80,48 @@
   font-size: var(--lg-text-footnote, 13px);
 }
 
-/* body flex:1 → yan çekmecede footer alta yapışır */
+/* body flex:1 → footer alta yapışır; taşan içerik burada kayar */
 .body {
   flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
   margin-top: var(--lg-space-4, 16px);
   font-size: var(--lg-text-body, 15px);
 }
 .body:first-child { margin-top: 0; }
 
 .footer {
+  position: relative;
   display: flex;
+  flex: none;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--lg-space-2, 8px);
-  margin-top: var(--lg-space-5, 20px);
+  margin-top: var(--lg-space-4, 16px);
+  padding-top: var(--lg-space-3, 12px);
+}
+
+/* İçerik footer'ın altından kayarken sert bir ayraç yerine yumuşak bir kenar:
+   çizgi, kaydırma olmadığında da bölünme çiziyordu. */
+.footer::before {
+  content: '';
+  position: absolute;
+  inset-inline: calc(-1 * var(--lg-space-4, 16px));
+  top: calc(-1 * var(--lg-space-4, 16px));
+  height: var(--lg-space-4, 16px);
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    var(--lg-surface, #ffffff),
+    color-mix(in srgb, var(--lg-surface, #ffffff) 0%, transparent)
+  );
+}
+
+@media (min-width: 640px) {
+  .footer::before {
+    inset-inline: calc(-1 * var(--lg-space-6, 24px));
+  }
 }
 
 .panel:focus-visible {

@@ -9,7 +9,7 @@ import {
 import { withBase } from "@/config/base-path";
 import { homeVitrinItems } from "../fixtures";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
-import { HomeFooter } from "../shared/HomeFooter";
+import { SiteFooter } from "@/components/SiteFooter";
 import styles from "./MarketplaceShowcaseHome.module.css";
 
 const categories = [
@@ -35,7 +35,7 @@ export function MarketplaceShowcaseHome() {
   return (
     <HomeConceptFrame
       className={styles.page}
-      footer={<HomeFooter variant="slim" />}
+      footer={<SiteFooter variant="slim" />}
     >
       <GlassHero
         variant="search"

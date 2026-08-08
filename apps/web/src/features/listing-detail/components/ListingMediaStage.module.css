@@ -186,13 +186,6 @@
   font-weight: 600;
 }
 
-.note {
-  margin: 0;
-  color: var(--lg-label-secondary);
-  font-size: var(--lg-text-caption);
-  line-height: 1.45;
-}
-
 /* Görsel dosyası olmayan kalemlerin dökümü — derli toplu blok. */
 .inventory {
   display: grid;

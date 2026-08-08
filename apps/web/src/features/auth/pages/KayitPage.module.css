@@ -105,16 +105,14 @@
 
 /* ---------- Onay adımı ---------- */
 
-.onayRow {
+/* Onay satırı GlassCheckbox'tır; kökü <label> olduğu için eleman+sınıf
+   seçicisiyle yazıyoruz — böylece hizalama component'in kendi kuralını
+   (align-items: center) stil sırasından bağımsız olarak ezer. */
+label.onayRow {
   display: flex;
   align-items: flex-start;
   gap: var(--lg-space-3);
   font-size: var(--lg-text-footnote);
-}
-
-.onayRow input {
-  margin: var(--lg-space-1) 0 0;
-  accent-color: var(--lg-accent);
 }
 
 .ozet {
@@ -255,4 +253,21 @@
   .tipSecenek[data-secili] {
     background-color: var(--lg-surface);
   }
+}
+
+/* Paket bölümü — fiyat tablosu form kartının içinde.
+   Tablo kendi iç ritmini taşır; kart yalnız alt notu ondan ayırır. */
+.paketBolumu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+}
+
+.paketNotu {
+  margin: 0;
+  padding-block-start: var(--lg-space-4);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.6;
 }

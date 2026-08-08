@@ -9,7 +9,8 @@
   min-height: var(--lg-control-md);
   align-items: center;
   justify-content: center;
-  padding-inline: var(--lg-space-4);
+  /* Dolu eylem formu kabuktaki "İlan ver" ile aynıdır: kapsül + space-5. */
+  padding-inline: var(--lg-space-5);
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-action-prominent);
   color: var(--lg-action-prominent-label);

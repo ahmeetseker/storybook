@@ -167,8 +167,31 @@ export const ServisHatasi: Story = {
   render: () => <StatefulScene status="error" />,
 }
 
+/**
+ * Mobil filtre çekmecesi — **Karar Yaprağı**.
+ *
+ * "Filtreler" düğmesi kataloğun 12 grubunu akordeon olarak dizmez: yaprakta
+ * yalnız kararı gerçekten değiştiren kriterler durur (işlem türü, tutar/alan
+ * histogramı, kategoriye özgü iki kriter) ve iki anahtar. Alt eylem sonucu
+ * SAYAR — her dokunuşta güncellenir, kullanıcı paneli kapatmadan seçiminin ne
+ * kadar daralttığını görür. Kalan katalog "Tüm filtreler" ile AYNI çekmecede
+ * açılır; ayrı bir modal odak tuzağını iç içe geçirirdi.
+ */
 export const MobilFiltreler: Story = {
   render: () => <StatefulScene />,
+  parameters: {
+    viewport: { defaultViewport: 'mobile390' },
+  },
+}
+
+/**
+ * Karar seti kategoriye göre değişir: arsada oda/banyo sormak her zaman sıfır
+ * sonuç üretirdi; yaprak orada imar ve tapu durumunu sorar.
+ */
+export const MobilFiltrelerArsa: Story = {
+  render: () => (
+    <StatefulScene initialState={LAND_STATE} initialResponse={LAND_RESPONSE} />
+  ),
   parameters: {
     viewport: { defaultViewport: 'mobile390' },
   },

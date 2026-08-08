@@ -12,6 +12,23 @@ Tasarım sistemi `src/design/*.mdx` dokümanlarında tanımlıdır ve **her comp
 - `src/design/ErisilebilirlikMotionResponsive.mdx` — focus halkası `outline: 2px solid var(--lg-accent)` yalnız `:focus-visible`; ikon-tek butonlarda `label` zorunlu; `prefers-reduced-motion`/`-transparency` desteği; animasyon yalnız transform/opacity/filter; breakpoint yerine `pointer: coarse` / `hover: hover` yetenek sorguları.
 - `src/design/ComponentSablonu.mdx` — `rules.md` şablonu ve zorunlu Storybook story matrisi.
 
+## Tek kaynak kuralı (guard'lı)
+
+Kütüphanede karşılığı olan bir kontrol feature kodunda **yeniden çizilmez**;
+token'da tanımlı bir renk **ham değerle tekrar yazılmaz**. İki sapma tekrar
+tekrar geri geldiği için artık test koruyor — `src/design/tasarim-guardlari.test.ts`
+kod tabanını tarar ve `npm test` ile kırılır:
+
+- Native `<input type="checkbox">` yalnız `GlassCheckbox` içinde olabilir.
+  Onay kutusu her yerde `GlassCheckbox`tır (filtre paneli, formlar, onaylar).
+- Dolu eylem zemini `--lg-action-prominent` (+ `-label`, `-hover`) token'ından
+  gelir; buton/CTA seçicisine `background: var(--lg-accent)` yazılmaz — kabuktaki
+  "İlan ver" ile sayfa içi eylemler aynı kahveyi paylaşır.
+
+Bilinçli istisna gerekiyorsa testteki `IZINLI_*` listesine **gerekçesiyle**
+eklenir; sessiz sapma yok. Aynı desende yeni bir tekrar fark edilirse guard
+oraya da bir kural olarak yazılır.
+
 ## Component konvansiyonu
 
 Her component klasörü şu seti içerir (eksiksiz):

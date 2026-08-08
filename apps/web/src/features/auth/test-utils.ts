@@ -143,13 +143,15 @@ export const gecerliKurumsalBasvuru: KurumsalBasvuruBilgileri = {
   yetkiliAdSoyad: 'Ayşe Kaya',
   yetkiliEPosta: 'ayse@arsam.net',
   yetkiliTelefon: '5551112233',
+  paketId: 'profesyonel',
+  paketKoltuk: 6,
   kvkkOnayi: true,
   temsilBeyani: true,
   iysOnayi: false,
 }
 
 /**
- * `KayitKurumsalPage`'in dört bölümünü geçerli değerlerle doldurur ve son
+ * `KayitKurumsalPage`'in beş bölümünü geçerli değerlerle doldurur ve son
  * bölümde BEKLER — gönderim çağıranın işidir (bazı testler göndermeden
  * önce bir alanı bozmak ister).
  *
@@ -206,7 +208,11 @@ export async function kurumsalBolumleriniDoldur(
   await yaz('Yetkili telefon', veri.yetkiliTelefon)
   await devam()
 
-  // 4. Onay
+  // 4. Paket — varsayılan seçim geçerlidir, yalnız geçilir.
+  await screen.findByRole('radiogroup', { name: 'Plan seçimi' })
+  await devam()
+
+  // 5. Onay
   await screen.findByLabelText(/aydınlatma metnini/i)
   await kullanici.click(screen.getByLabelText(/aydınlatma metnini/i))
   await kullanici.click(screen.getByLabelText(/temsile yetkili/i))

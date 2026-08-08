@@ -105,6 +105,32 @@
   --lg-listing-card-property-price-fluid: 6cqi;
   --lg-listing-card-property-ratio: 4 / 5;
 
+  /* Yatay (satır) ilan kartı — medya solda, künye sağda.
+     `media-min` + `body-min` toplamı sarma eşiğidir: kart bu genişliğin
+     altına inince flex sarması medyayı tek başına üst satıra alır ve kart
+     dikey düzene döner. Breakpoint yerine içeriğin kendi ölçüsü karar verir. */
+  --lg-listing-row-card-width: 1040px;
+  --lg-listing-row-media-width: 30%;
+  --lg-listing-row-media-min: 240px;
+  --lg-listing-row-body-min: 300px;
+  /* Medyanın YÜKSEKLİĞİ oranla değil tabanla verilir: sabit bir en-boy oranı,
+     geniş bir kolonda medyayı künyeden uzun yapıp kartın altında ölü boşluk
+     bırakıyordu. Taban, satırın kısa içerikte de çökmemesini sağlar; fazlası
+     künyeden gelir ve medya `align-self: stretch` ile ona uyar. */
+  --lg-listing-row-media-height: 15rem;
+  /* `sm` yoğunlukta künye de kısalır (daha küçük fiyat, başlık, rozet); taban
+     aynı kalsaydı medya künyeden uzun düşer ve gövdenin altında ölü boşluk
+     kalırdı. Dar kolonlarda ve kart içine gömülü listelerde kullanılır. */
+  --lg-listing-row-media-height-sm: 11rem;
+
+  /* Fiyat planı rakamı — tipografi ölçeğinin ÜSTÜNDE bilinçli bir kademe.
+     Gerekçe `--lg-listing-card-property-price-fluid` ile aynıdır: bir fiyat
+     kartında rakam gövde metni değil, kartın kendisidir; display (28px) onu
+     komşusu olan plan adından (title 22px) yeterince ayırmıyordu. Akışkan
+     kısım kartın KENDİ genişliğini (`cqi`) okur, viewport'u değil — üç kolonlu
+     ızgarada ve tek kolonlu telefonda aynı optik ağırlığı verir. */
+  --lg-pricing-price-size: clamp(34px, 4.6cqi + 18px, 52px);
+
   /* Okuma genişliği (measure) — WCAG 2.2 AAA 1.4.8 gövde metni satırının
      80 karakteri aşmamasını ister.
 

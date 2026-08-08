@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GlassGallery } from './GlassGallery'
 import { GlassTierProvider } from '../GlassSurface/GlassTierContext'
 
@@ -38,19 +38,25 @@ describe('GlassGallery', () => {
     expect(screen.getByText('3 / 3')).toBeDefined()
   })
 
-  it('ana görsele tıklayınca lightbox açılır, Escape ile kapanır', () => {
+  it('ana görsele tıklayınca lightbox açılır, Escape ile kapanır', async () => {
     renderGallery()
     fireEvent.click(screen.getByRole('button', { name: /Görseli büyüt/ }))
     expect(screen.getByRole('dialog')).toBeDefined()
     fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.queryByRole('dialog')).toBeNull()
+    // Kapanış animasyonlu: katman çıkış geçişini bitirince DOM'dan düşer.
+    // Çıkış animasyonu bazen await'ten önce biter: waitForElementToBeRemoved o
+    // durumda hata atar, bu bekleme her iki sırayı da kabul eder.
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  it('lightbox açıkken ok tuşları gezinir', () => {
+  it('lightbox açıkken ok tuşları gezinir ve sahne de ilerler', () => {
     renderGallery()
     fireEvent.click(screen.getByRole('button', { name: /Görseli büyüt/ }))
     fireEvent.keyDown(window, { key: 'ArrowRight' })
     expect(screen.getByRole('dialog').getAttribute('aria-label')).toContain('2 / 3')
+    // Tek indeks: sahnenin sayacı da ilerler (lightbox kapanınca aynı karede
+    // kalır) — bu yüzden aynı metin iki yerde (sahne + lightbox) görünür.
+    expect(screen.getAllByText('2 / 3')).toHaveLength(2)
   })
 
   it('thumbnail tıklaması ilgili görsele atlar', () => {

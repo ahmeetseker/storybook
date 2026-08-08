@@ -5,6 +5,7 @@ import type {
   KurumsalAlanHatalari,
   KurumsalBasvuruBilgileri,
 } from './auth-types'
+import { OFFICE_PLANS } from '@/features/pricing/data/office-plans'
 import { ilGecerliMi } from './iller'
 import { parolaBuyukHarfTamam, parolaRakamTamam, parolaUzunlukTamam } from './parola-gucu'
 import { VARSAYILAN_TELEFON_ULKESI, ulkeTelefonHatasi } from './telefon-ulkeler'
@@ -225,7 +226,21 @@ export function kurumsalBasvuruyuDogrula(
   const yetkiliTelefon = telefonHatasi(bilgiler.yetkiliTelefon)
   if (yetkiliTelefon) hatalar.yetkiliTelefon = yetkiliTelefon
 
-  // — Aşama 4: onaylar. `iysOnayi` bilinçli olarak DOĞRULANMAZ: ticari
+  // — Aşama 4: paket. Arayüz her zaman geçerli bir seçim tutar; buradaki
+  // kontrol eski bir bağlantıdan (`/kayit/kurumsal?paket=…`) gelen bilinmeyen
+  // kimliğe ve elle bozulmuş koltuk adedine karşıdır.
+  const paket = OFFICE_PLANS.find((item) => item.id === bilgiler.paketId)
+  if (!paket) {
+    hatalar.paketId = 'Bir paket seçin.'
+  } else if (
+    !Number.isInteger(bilgiler.paketKoltuk) ||
+    bilgiler.paketKoltuk < paket.seats.included ||
+    bilgiler.paketKoltuk > paket.seats.max
+  ) {
+    hatalar.paketKoltuk = `Koltuk adedi ${paket.seats.included} ile ${paket.seats.max} arasında olmalı.`
+  }
+
+  // — Aşama 5: onaylar. `iysOnayi` bilinçli olarak DOĞRULANMAZ: ticari
   // elektronik ileti izni açık rıza gerektirir, hizmetin koşulu yapılamaz.
   if (!bilgiler.kvkkOnayi) {
     hatalar.kvkkOnayi = 'Başvuruyu göndermek için aydınlatma metnini onaylayın.'

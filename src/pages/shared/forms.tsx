@@ -2,6 +2,7 @@
 // Not: bunlar demo-grade'dir; kütüphaneye Glass form componentleri ayrıca tasarlanacak.
 import type { CSSProperties, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 import { useId } from 'react'
+import { GlassCheckbox } from '../../components/GlassCheckbox'
 
 const fieldBase: CSSProperties = {
   width: '100%',
@@ -50,13 +51,26 @@ export function Select({ style, children, ...rest }: SelectHTMLAttributes<HTMLSe
   )
 }
 
-export function CheckRow({ label, ...rest }: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode }) {
-  return (
-    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, lineHeight: 1.5, cursor: 'pointer' }}>
-      <input type="checkbox" style={{ marginTop: 3, accentColor: 'var(--lg-accent)' }} {...rest} />
-      <span>{label}</span>
-    </label>
-  )
+/**
+ * Onay satırı. Checkbox hâli GlassCheckbox'tır — kutu görünümü tüm ürün
+ * yüzeylerinde tek component'ten gelir (demo sayfaları dahil). `type="radio"`
+ * verildiğinde satır native radyo olarak çizilir: radyo ayrı bir kontroldür ve
+ * checkbox kutusuyla aynı görünümü paylaşmaz.
+ */
+export function CheckRow({
+  label,
+  type = 'checkbox',
+  ...rest
+}: Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & { label: ReactNode }) {
+  if (type === 'radio') {
+    return (
+      <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, lineHeight: 1.5, cursor: 'pointer' }}>
+        <input type="radio" style={{ marginTop: 3, accentColor: 'var(--lg-accent)' }} {...rest} />
+        <span>{label}</span>
+      </label>
+    )
+  }
+  return <GlassCheckbox label={label} style={{ alignItems: 'flex-start' }} {...rest} />
 }
 
 /** Durum rozeti — durum makinesi renkleri semantic token'lardan */

@@ -5,6 +5,7 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { GlassButton } from '../components/GlassButton'
 import { GlassBackButton } from '../components/GlassNavbar'
 import { GlassBadge } from '../components/GlassBadge'
+import { GlassRibbon } from '../components/GlassRibbon'
 import { GlassSwitch } from '../components/GlassSwitch'
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl'
 import { GlassSearchField } from '../components/GlassSearchField'
@@ -56,6 +57,13 @@ const ENTRIES: CatalogEntry[] = [
     category: 'Kontroller',
     status: 'hazır',
     storyPath: '/story/components-glassslider--default',
+  },
+  {
+    name: 'PriceRange',
+    description: 'Dağılım histogramlı çift kollu fiyat aralığı — seçili bantlar vurgulanır, piller kolları izler.',
+    category: 'Kontroller',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-form-glasspricerange--default',
   },
   {
     name: 'Stepper',
@@ -320,11 +328,27 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassvitrin--default',
   },
   {
+    name: 'Fiyat Planı Tablosu',
+    description:
+      'Abonelik planları — aylık/yıllık anahtarı, odometreyle dönen fiyat, koltuk tabanlı adet kontrolü. Geniş konteynerde kart ızgarası, dar konteynerde seçilebilir liste.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasspricingtable--default',
+  },
+  {
     name: 'Dönen Şerit',
     description: 'Footer üstü tam genişlikte ilan şeridi — kesintisiz döngü, sabit hız, duraklat düğmesi + hover/odakla durma.',
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/components-glassmarquee--default',
+  },
+  {
+    name: 'SSS Rafı',
+    description:
+      'SSS kartlarının yatay raflar halinde aktığı vitrin bölümü — satır başına hız/yön, fadeInUp başlık, duraklat düğmesi + hover/odakla durma, reduced-motion’da statik raf.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-vitrin-ve-yerlesim-glassfaqmarquee--default',
   },
   {
     name: 'SEO Keşif Rafı',
@@ -339,6 +363,13 @@ const ENTRIES: CatalogEntry[] = [
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/components-glasscomparebar--default',
+  },
+  {
+    name: 'Vurgu Kartı',
+    description: 'Tonlu gradyan vurgu kartı — noktalı doku, yer imi rozeti, büyük metrik, kapsül aksiyon; doğrulanmış ofis vitrini deseni.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-pazar-yeri-glasshighlightcard--default',
   },
   {
     name: "Vergi Geçmişi",
@@ -593,12 +624,57 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glasschart--default',
   },
   {
+    name: 'Trend Grafiği',
+    description:
+      'Çok serili zaman serisi — bölgeyi üst bölge ve resmî endeksle aynı eksende kıyaslar. Seri sınıfı çizgi desenine bağlı (düz / uzun kesik / kısa kesik), paylaşımlı balon, sr-only veri tablosu.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-veri-gosterimi-glasstrendchart--default',
+  },
+  {
+    name: 'Dağılım Grafiği',
+    description:
+      'Fiyat dağılımı histogramı — son bandı değil MEDYAN bandını vurgular, altında persentil şeridi taşır. Örneklem büyüklüğü künyede görünür.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-veri-gosterimi-glassdistributionchart--default',
+  },
+  {
+    name: 'Sparkline',
+    description:
+      'Tablo hücresine sığan eksensiz mikro trend. Dekoratif değil veridir: role="img" + zorunlu label, yön ve uç değerler ekran okuyucuya cümle olarak geçer.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-veri-gosterimi-glasssparkline--default',
+  },
+  {
     name: 'Badge',
     description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/components-glassbadge--default',
     preview: <GlassBadge tint="#ff453a">Acil</GlassBadge>,
+  },
+  {
+    name: 'Ribbon',
+    description: 'Köşe şeridi — kart medyasını 45° saran ince vitrin vurgusu; "Doğrulanmış" gibi tekil durumlar için.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-veri-gösterimi-glassribbon--default',
+    preview: (
+      <div
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          width: 132,
+          height: 88,
+          borderRadius: 'var(--lg-radius-media)',
+          background: 'linear-gradient(160deg, #b9cf93, #55772f)',
+        }}
+      >
+        <GlassRibbon label="Doğrulanmış" />
+      </div>
+    ),
   },
   {
     name: 'Avatar',
@@ -665,6 +741,13 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/components-glassgallery--default',
   },
   {
+    name: 'Lightbox',
+    description: 'Tam ekran görsel görüntüleyici — karartılmış katman, cam oklar, sayaç ve alt thumbnail şeridi.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/components-glasslightbox--default',
+  },
+  {
     name: 'Carousel',
     description: 'Scroll-snap yatay şerit — cam ok butonlarıyla sayfa sayfa kaydırma.',
     category: 'İçerik',
@@ -719,6 +802,14 @@ const ENTRIES: CatalogEntry[] = [
     category: 'İçerik',
     status: 'hazır',
     storyPath: '/story/bileşenler-pazar-yeri-glasslistingcard--sag-kart-referansi',
+  },
+  {
+    name: 'Listing Row Card',
+    description:
+      'Yatay ilan kartı — solda medya, sağda fiyat/puan/özellik künyesi ve danışman + iletişim ayağı; kart button değil, iç kontroller bağımsız.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-pazar-yeri-glasslistingrowcard--default',
   },
   // ── Dalga 5: Codex boşluk kapatma ──────────────────────────────────────
   {

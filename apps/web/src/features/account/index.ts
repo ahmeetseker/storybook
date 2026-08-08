@@ -9,6 +9,7 @@ export {
   AccountSavedSearchPage,
   AccountPaymentsPage,
   AccountInvoicesPage,
+  AccountPlanPage,
 } from './pages'
 export type { AccountWorkspaceProps } from './domain/account-types'
 export { ACCOUNT_FIXTURES } from './data/account-fixtures'

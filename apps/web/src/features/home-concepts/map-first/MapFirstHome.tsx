@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
-  GlassAgencyCard,
   GlassAiSearchBar,
   GlassButton,
   GlassChip,
   GlassHero,
+  GlassHighlightCard,
   GlassMap,
   GlassMapPopupCard,
   GlassMarquee,
@@ -18,11 +18,10 @@ import {
 } from "@repo/ui";
 import { withBase } from "@/config/base-path";
 import { EXPLORE_BASEMAP } from "@/config/basemap";
-import { agencyFixtures, homeVitrinItems } from "../fixtures";
+import { agencyHighlightFixtures, homeVitrinItems } from "../fixtures";
 import { buildSeoDiscoveryColumns } from "../shared/seo-discovery-links";
 import { HERO_TABS, heroTab, type HeroTabId, type HeroParsedFilter } from "./heroTabs";
 import { HomeConceptFrame } from "../shared/HomeConceptFrame";
-import { HomeFooter } from "../shared/HomeFooter";
 import styles from "./MapFirstHome.module.css";
 
 // Zemin sabit referans: her render'da yeni nesne üretilirse harita yeniden
@@ -146,6 +145,19 @@ const ShieldIcon = () => (
   </svg>
 );
 
+/* Dar ekranda arama kartının sekme şeridi `fill="content"` ile sola kümelenip
+   sağda ölü boşluk bırakıyor (geniş şeritte ise eşit paylaşım devasa seçim
+   damlası üretir — bkz. GlassSegmentedControl rules §6). `fill` bir prop
+   olduğu için kırılma CSS'te değil burada: şerit dar viewport'ta eşit üçe
+   bölünür. Eşik, hero'nun dar kap sorgusuyla aynı (32rem). */
+const DAR_EKRAN_SORGUSU = "(max-width: 32rem)";
+const subscribeDarEkran = (onChange: () => void) => {
+  const mql = window.matchMedia(DAR_EKRAN_SORGUSU);
+  mql.addEventListener("change", onChange);
+  return () => mql.removeEventListener("change", onChange);
+};
+const darEkranMi = () => window.matchMedia(DAR_EKRAN_SORGUSU).matches;
+
 export interface MapFirstHomeProps {
   /**
    * Hero yerleşimi — "map": haritalı split hero (konsept galerisi),
@@ -166,6 +178,7 @@ export function MapFirstHome({
   onTabChange,
 }: MapFirstHomeProps) {
   const navigate = useNavigate();
+  const darEkran = useSyncExternalStore(subscribeDarEkran, darEkranMi, () => false);
   const [innerTab, setInnerTab] = useState<HeroTabId>(defaultTab);
   const activeTabId = tab ?? innerTab;
   const active = heroTab(activeTabId);
@@ -201,16 +214,14 @@ export function MapFirstHome({
     <HomeConceptFrame
       className={styles.page}
       footer={
-        <>
-          {/* Şerit sayfa container'ının dışında yaşar: tam genişlikte bant
-              kırpılmadan footer'a yaslanır. */}
-          <GlassMarquee
-            items={marqueeListings}
-            label="Öne çıkan ilanlar"
-            variant="accent"
-          />
-          <HomeFooter variant="columns" />
-        </>
+        /* Şerit sayfa container'ının dışında yaşar: tam genişlikte bant
+           kırpılmadan footer'a yaslanır. Footer'ın KENDİSİ burada değil:
+           artık `MarketplaceShell` her sayfada çiziyor (bkz. SiteFooter). */
+        <GlassMarquee
+          items={marqueeListings}
+          label="Öne çıkan ilanlar"
+          variant="accent"
+        />
       }
     >
       <div className={styles.hero}>
@@ -240,7 +251,7 @@ export function MapFirstHome({
                 <GlassSegmentedControl
                   label="İlan türü"
                   variant="bar"
-                  fill="content"
+                  fill={darEkran ? "equal" : "content"}
                   options={HERO_TABS.map((item) => ({ value: item.id, label: item.label }))}
                   value={activeTabId}
                   onChange={selectTab}
@@ -420,7 +431,7 @@ export function MapFirstHome({
         </header>
         <div className={styles.metricPanel}>
           <GlassMetricStrip
-            size="sm"
+            variant="gradient"
             label="Arsa pazarı göstergeleri"
             items={[
               {
@@ -428,18 +439,34 @@ export function MapFirstHome({
                 label: "Aktif ilan",
                 value: String(homeVitrinItems.length),
                 hint: "Ana sayfa portföyü",
+                tone: "accent",
+                motif: "parcels",
+                action: { label: "Portföyü gör", href: withBase("/emlak") },
               },
               {
                 id: "verified-count",
                 label: "EİDS işaretli",
                 value: String(verifiedListingCount),
                 hint: "Kaynağı görünür",
+                tone: "success",
+                motif: "seal",
+                action: {
+                  // `verified` gerçek bir arama filtresi (search-state.ts)
+                  label: "Doğrulanmışları süz",
+                  href: withBase("/emlak?verified=1"),
+                },
               },
               {
                 id: "region-count",
                 label: "Bölge",
                 value: String(regions.length),
                 hint: "Hızlı keşif bağlantısı",
+                tone: "neutral",
+                motif: "pins",
+                action: {
+                  label: "Bölgeleri keşfet",
+                  href: withBase("/bolgeler"),
+                },
               },
               {
                 id: "featured-count",
@@ -448,6 +475,11 @@ export function MapFirstHome({
                   homeVitrinItems.filter((item) => item.featured).length,
                 ),
                 hint: "Öne çıkan seçim",
+                tone: "warning",
+                motif: "star",
+                // Aksiyon yok: arama durumunda "vitrin/featured" filtresi
+                // bulunmuyor (search-state.ts). Filtre eklenene kadar
+                // yanlış hedefe götüren bir bağlantı koymuyoruz.
               },
             ]}
           />
@@ -498,11 +530,23 @@ export function MapFirstHome({
           </p>
         </header>
         <div className={styles.agencyGrid}>
-          {agencyFixtures.slice(0, 3).map((agency) => (
-            <GlassAgencyCard {...agency} key={agency.name} variant="inline" />
+          {agencyHighlightFixtures.slice(0, 3).map((agency) => (
+            <GlassHighlightCard
+              {...agency}
+              key={agency.title}
+              href={withBase("/ofisler")}
+              onNavigate={goToAgencies}
+            />
           ))}
         </div>
-        <GlassButton className={styles.agencyCta} onClick={goToAgencies}>
+        {/* Kabuktaki "İlan ver" ile aynı reçete: sm + prominent (tek kaynak
+            --lg-action-prominent, bkz. tasarim-guardlari) */}
+        <GlassButton
+          size="sm"
+          prominent
+          className={styles.agencyCta}
+          onClick={goToAgencies}
+        >
           Tüm doğrulanmış ofisleri gör
         </GlassButton>
       </section>

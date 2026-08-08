@@ -27,16 +27,16 @@ describe('ListingDetailWorkspace', () => {
   })
 
   // Medya sahnesi: kayıt gerçek fotoğraf taşımadığı için kareler temsilidir
-  // ve bu gizlenmez — görselin yanında tek kaynaklı açıklama cümlesi durur.
-  it('temsili kapak görselini ve görünür açıklamasını gösterir', async () => {
+  // açıklama cümlesi sayfada değil tam ekran görüntüleyicide durur.
+  it('temsili kapak görselini gösterir, açıklama cümlesini sayfaya yazmaz', async () => {
     await renderWorkspace()
     const cover = screen.getByAltText(/temsili fotoğraf — parselden deniz yönü/i)
     expect(cover.getAttribute('src')).toBeTruthy()
     expect(
-      screen.getByText(
+      screen.queryByText(
         'Görseller temsili fotoğraflardır; yüklenemezse mevcut ilan görseli gösterilir.',
       ),
-    ).toBeTruthy()
+    ).toBeNull()
   })
 
   // Fotoğrafı olmayan kalemler (parsel görünümü, plan notu) temsili bir kare

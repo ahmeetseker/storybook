@@ -6,8 +6,8 @@ import {
   type GlassFooterSocialLink,
 } from "@repo/ui";
 import { withBase } from "@/config/base-path";
-import { homeVitrinItems } from "../fixtures";
-import styles from "./HomeFooter.module.css";
+import { homeVitrinItems } from "@/features/home-concepts/fixtures";
+import styles from "./SiteFooter.module.css";
 
 const footerColumns: GlassFooterColumn[] = [
   {
@@ -31,6 +31,7 @@ const footerColumns: GlassFooterColumn[] = [
     title: "İlan ve hesap",
     links: [
       { label: "İlan ver", href: "/ilan-ver" },
+      { label: "Paketler", href: "/paketler" },
       { label: "Hesabım", href: "/hesabim" },
       { label: "Mesajlar", href: "/hesabim/mesajlar" },
     ],
@@ -111,7 +112,9 @@ const socialLinks: GlassFooterSocialLink[] = [
 
 // Footer'ın son kolonu: portföyün başındaki dört ilan. Vitrin verisiyle aynı
 // kaynaktan beslenir; ayrı bir "footer ilanları" listesi tutulmaz.
-const highlights: GlassFooterHighlights = {
+// Bugün fixture'dan okur — ilan ucu açıldığında `highlights` prop'u üzerinden
+// gerçek "son eklenenler" sorgusu bağlanır, bileşen değişmez.
+const defaultHighlights: GlassFooterHighlights = {
   title: "Son eklenen ilanlar",
   items: homeVitrinItems.slice(0, 4).map((item) => ({
     id: item.id,
@@ -122,17 +125,30 @@ const highlights: GlassFooterHighlights = {
   })),
 };
 
-export type HomeFooterProps = Pick<
+export type SiteFooterProps = Pick<
   GlassFooterProps,
   "variant" | "cta" | "newsletter" | "social"
->;
+> & {
+  /** Son kolondaki ilan listesi; verilmezse vitrin verisinin ilk dördü. */
+  highlights?: GlassFooterHighlights;
+};
 
-export function HomeFooter({
+/**
+ * Sitenin ortak footer'ı.
+ *
+ * `MarketplaceShell` tarafından her pazar yeri sayfasında çizilir — sayfaların
+ * kendi footer'ı yoktur. Kabuğun kendi gezinmesini kuran odaklı akışlar
+ * (ilan verme sihirbazı, hesap panosu, mesajlar) ve kimlik doğrulama
+ * sayfaları bunun dışındadır: oralarda ikinci bir gezinme katmanı, akıştan
+ * çıkmayı kolaylaştırdığı için istenmez.
+ */
+export function SiteFooter({
   variant = "columns",
   cta,
   newsletter,
   social,
-}: HomeFooterProps) {
+  highlights = defaultHighlights,
+}: SiteFooterProps) {
   const isSlim = variant === "slim";
   const baseColumns = isSlim ? slimColumns : footerColumns;
   const columns = baseColumns.map((column) => ({

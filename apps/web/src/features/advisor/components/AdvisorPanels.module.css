@@ -473,9 +473,6 @@
   cursor: pointer;
 }
 
-.checkboxField input {
-  accent-color: var(--lg-accent);
-}
 
 .closeAction {
   min-block-size: var(--lg-control-md);
@@ -709,7 +706,7 @@
 .textAction:focus-visible,
 .decisionActions button:focus-visible,
 .drawerInput:focus-visible,
-.checkboxField input:focus-visible,
+/* Onay kutusunun halkasını GlassCheckbox kendi çiziyor. */
 .closeAction:focus-visible {
   outline: var(--lg-focus-ring-width) solid var(--lg-accent);
   outline-offset: var(--lg-focus-ring-offset);

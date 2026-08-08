@@ -2,7 +2,7 @@
 name: GlassFilterPanel
 category: navigasyon
 status: hazır
-lastReviewed: 2026-07-18
+lastReviewed: 2026-08-06
 ---
 
 # GlassFilterPanel Kuralları
@@ -96,7 +96,13 @@ Raw px: yok. Borç (yerel değişkenler, kökte): `--glass-filterpanel-blur`
 ## 10. Storybook kapsamı
 
 Default, Sıfırlamasız, Sonuç Sayısız, Footer Aksiyonlu, Cam Yüzey, Responsive
-(mobile1), Erişilebilirlik (docs).
+(mobile1), **Referans Emlak Filtresi**, Erişilebilirlik (docs).
+
+`Referans Emlak Filtresi` panelin bütünsel kullanımını gösterir: segmentli
+oda/banyo satırları (`GlassSegmentedControl`), dağılım histogramlı fiyat
+aralığı (`GlassPriceRange`), anahtar satırları (`GlassSwitch`) ve footer'da
+sonucu **sayan** birincil eylem. Sonuç sayısı seçimden türer — kullanıcı
+paneli kapatmadan kaç ilan kaldığını görür (sıfır sonuç sürprizi olmaz).
 
 ## 11. Test kabul kriterleri
 
@@ -111,12 +117,15 @@ Default, Sıfırlamasız, Sonuç Sayısız, Footer Aksiyonlu, Cam Yüzey, Respon
 
 ## 12. Do / Don't
 
-- ✅ Panel içine `GlassCheckbox`/`GlassChip`/`GlassSlider` gibi gerçek kontroller koy.
+- ✅ Panel içine `GlassCheckbox`/`GlassChip`/`GlassPriceRange` gibi gerçek kontroller koy.
 - ✅ Sonuç değişince `resultCount`'u güncelle — canlı bölge otomatik duyurur.
 - ❌ `material="glass"`'ı içerik listesi üstüne koyma (cam üstüne cam yasağı).
 - ❌ Sıfırlama butonunu boş callback ile "görünsün diye" ekleme (false affordance).
 
 ## Changelog
 
+- 2026-08-06: `Referans Emlak Filtresi` story'si eklendi — panelin
+  `GlassPriceRange` + `GlassSegmentedControl` + `GlassSwitch` ile bütünsel
+  kullanımı ve canlı sayan footer eylemi. Component API'si değişmedi.
 - 2026-07-18: İlk sürüm — complementary landmark, `aria-live` sonuç sayısı,
   koşullu reset. Codex `CodexFilterPanel` deseninden türetildi.

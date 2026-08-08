@@ -32,17 +32,20 @@ const BOS_BASVURU: KurumsalBasvuruBilgileri = {
   yetkiliAdSoyad: '',
   yetkiliEPosta: '',
   yetkiliTelefon: '',
+  paketId: 'profesyonel',
+  paketKoltuk: 6,
   kvkkOnayi: false,
   temsilBeyani: false,
   iysOnayi: false,
 }
 
 describe('kurumsal adım sözleşmesi', () => {
-  it('dört bölümden oluşur', () => {
+  it('beş bölümden oluşur', () => {
     expect(KURUMSAL_ADIMLARI.map((adim) => adim.anahtar)).toEqual([
       'isletme',
       'yetki',
       'ofis',
+      'paket',
       'onay',
     ])
   })

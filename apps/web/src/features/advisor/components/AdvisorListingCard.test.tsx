@@ -46,9 +46,12 @@ describe('AdvisorListingCard', () => {
       screen.getByText(`${match.listing.imageCount} fotoğraf`),
     ).toBeTruthy()
     expect(screen.getByText('EİDS doğrulandı')).toBeTruthy()
-    expect(screen.getByText('4.250.000 TL')).toBeTruthy()
-    expect(screen.getByText('512 m²')).toBeTruthy()
-    expect(screen.getByText('8.301 TL/m²')).toBeTruthy()
+    // Tutarlar kayıttan TÜRETİLİR: sabit yazıldığında test, kartın ne
+    // gösterdiğini değil demo verisinin o günkü değerini doğruluyordu.
+    const tr = (value: number) => value.toLocaleString('tr-TR')
+    expect(screen.getByText(`${tr(match.listing.price)} TL`)).toBeTruthy()
+    expect(screen.getByText(`${tr(match.listing.area)} m²`)).toBeTruthy()
+    expect(screen.getByText(`${tr(match.listing.unitPrice)} TL/m²`)).toBeTruthy()
     expect(screen.getByText('%92 eşleşme')).toBeTruthy()
     expect(screen.getByText(match.reasons[0])).toBeTruthy()
   })

@@ -9,6 +9,7 @@ const meta = {
   argTypes: {
     separator: { control: 'text', description: 'Ayraç (aria-hidden render edilir); default ›' },
     tone: { control: 'select', options: ['light', 'dark', 'auto'] },
+    maxItems: { control: 'number', description: 'Görünür öğe tavanı (min 3); aşan ara seviyeler "…" altında toplanır' },
     // hover/focus control değildir — CSS state'idir (bkz. rules.md)
   },
 } satisfies Meta<typeof GlassBreadcrumb>
@@ -41,6 +42,39 @@ export const CustomSeparator: Story = {
       { label: 'İkinci El ve Sıfır Alışveriş', onClick: fn() },
       { label: 'Bilgisayar', onClick: fn() },
       { label: 'Dizüstü' },
+    ],
+  },
+}
+
+/**
+ * Gerçek URL'li öğeler: `href` verilen ara öğeler `<a>` render edilir — orta tık,
+ * yeni sekme ve SEO çalışır. `onClick` birlikte verildiğinde sade sol tık SPA
+ * gezinmesine devredilir; modifier'lı tık tarayıcıda kalır.
+ */
+export const GercekLinkler: Story = {
+  args: {
+    items: [
+      { label: 'Anasayfa', href: '/', onClick: fn() },
+      { label: 'Emlak ara', href: '/emlak', onClick: fn() },
+      { label: 'Satılık Daire' },
+    ],
+  },
+}
+
+/**
+ * Derin hiyerarşi daraltması: `maxItems` tavanını aşan ara seviyeler "…" butonunda
+ * toplanır. Buton yerinde açar — cam kapsülün içine ikinci bir cam panel (menü)
+ * açılmaz (cam üstüne cam yok); odak açılan ilk öğeye taşınır.
+ */
+export const DaraltilmisYol: Story = {
+  args: {
+    maxItems: 3,
+    items: [
+      { label: 'Anasayfa', href: '/', onClick: fn() },
+      { label: 'İkinci El ve Sıfır Alışveriş', href: '#', onClick: fn() },
+      { label: 'Mobilya ve Aksesuar', href: '#', onClick: fn() },
+      { label: 'Oturma Odası Takımları', href: '#', onClick: fn() },
+      { label: 'Üçlü Kanepe Modelleri' },
     ],
   },
 }

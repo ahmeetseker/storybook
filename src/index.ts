@@ -24,9 +24,15 @@ export {
   type GlassSidebarDensity,
 } from './components/GlassSidebar'
 export { GlassBadge, type GlassBadgeProps } from './components/GlassBadge'
+export { GlassRibbon, type GlassRibbonProps } from './components/GlassRibbon'
 export { GlassIconButton, type GlassIconButtonProps } from './components/GlassIconButton'
 export { GlassBreadcrumb, type GlassBreadcrumbProps, type GlassBreadcrumbItem } from './components/GlassBreadcrumb'
 export { GlassGallery, type GlassGalleryProps, type GlassGalleryImage } from './components/GlassGallery'
+export {
+  GlassLightbox,
+  type GlassLightboxProps,
+  type GlassLightboxImage,
+} from './components/GlassLightbox'
 export { GlassPriceHeader, type GlassPriceHeaderProps } from './components/GlassPriceHeader'
 export { GlassSpecTable, type GlassSpecTableProps, type GlassSpecItem } from './components/GlassSpecTable'
 export {
@@ -52,6 +58,13 @@ export {
   type GlassListingCardProps,
   type GlassListingCardVariant,
 } from './components/GlassListingCard'
+export {
+  GlassListingRowCard,
+  type GlassListingRowCardAction,
+  type GlassListingRowCardAgent,
+  type GlassListingRowCardFeature,
+  type GlassListingRowCardProps,
+} from './components/GlassListingRowCard'
 export { GlassCarousel, type GlassCarouselProps } from './components/GlassCarousel'
 export { GlassHero, type GlassHeroProps } from './components/GlassHero'
 export {
@@ -64,6 +77,12 @@ export {
 } from './components/GlassBento'
 export { GlassVitrin, type GlassVitrinProps, type GlassVitrinItem } from './components/GlassVitrin'
 export { GlassMarquee, type GlassMarqueeProps, type GlassMarqueeItem } from './components/GlassMarquee'
+export {
+  GlassFaqMarquee,
+  type GlassFaqMarqueeProps,
+  type GlassFaqMarqueeRow,
+  type GlassFaqMarqueeItem,
+} from './components/GlassFaqMarquee'
 export {
   GlassSeoDiscovery,
   type GlassSeoDiscoveryProps,
@@ -143,6 +162,11 @@ export type {
 } from './components/GlassRating'
 export { GlassReviewCard, type GlassReviewCardProps } from './components/GlassReviewCard'
 export { GlassAgencyCard, type GlassAgencyCardProps, type GlassAgencyCardStat } from './components/GlassAgencyCard'
+export {
+  GlassHighlightCard,
+  type GlassHighlightCardProps,
+  type GlassHighlightCardMetric,
+} from './components/GlassHighlightCard'
 export { GlassClimateRiskPanel } from './components/GlassClimateRiskPanel'
 export type { GlassClimateRiskPanelProps, GlassClimateRiskHazard } from './components/GlassClimateRiskPanel'
 export {
@@ -175,6 +199,15 @@ export {
 } from './components/GlassTourScheduler'
 export { GlassFeatureGroup } from './components/GlassFeatureGroup'
 export type { GlassFeatureGroupProps, GlassFeatureGroupItem, GlassFeatureGroupSection } from './components/GlassFeatureGroup'
+export { GlassPricingTable } from './components/GlassPricingTable'
+export type {
+  GlassPricingTableProps,
+  GlassPricingPlan,
+  GlassPricingSeats,
+  GlassPricingAction,
+  GlassPricingPeriod,
+  GlassPricingLayout,
+} from './components/GlassPricingTable'
 export { GlassFloorPlanViewer } from './components/GlassFloorPlanViewer'
 export type { GlassFloorPlanViewerProps, GlassFloorPlanPlan, GlassFloorPlanHotspot } from './components/GlassFloorPlanViewer'
 export { GlassScoreMeter } from './components/GlassScoreMeter'
@@ -187,6 +220,20 @@ export {
   type GlassTableSortDirection,
 } from './components/GlassTable'
 export { GlassChart, type GlassChartProps, type GlassChartPoint, type GlassChartType } from './components/GlassChart'
+export {
+  GlassTrendChart,
+  type GlassTrendChartProps,
+  type GlassTrendSeries,
+  type GlassTrendSeriesKind,
+  type GlassTrendPoint,
+} from './components/GlassTrendChart'
+export {
+  GlassDistributionChart,
+  type GlassDistributionChartProps,
+  type GlassDistributionBin,
+  type GlassDistributionMarker,
+} from './components/GlassDistributionChart'
+export { GlassSparkline, type GlassSparklineProps, type GlassSparklineTrend } from './components/GlassSparkline'
 export {
   GlassFooter,
   type GlassFooterProps,
@@ -226,6 +273,11 @@ export { GlassSelect, type GlassSelectProps, type GlassSelectOption } from './co
 export { GlassSheet, type GlassSheetProps } from './components/GlassSheet'
 export { GlassSkeleton, type GlassSkeletonProps } from './components/GlassSkeleton'
 export { GlassSlider, type GlassSliderProps } from './components/GlassSlider'
+export {
+  GlassPriceRange,
+  type GlassPriceRangeProps,
+  type GlassPriceRangeValue,
+} from './components/GlassPriceRange'
 export { GlassStepper, type GlassStepperProps } from './components/GlassStepper'
 export { GlassSwitch, type GlassSwitchProps } from './components/GlassSwitch'
 export { GlassTextarea, type GlassTextareaProps } from './components/GlassTextarea'
@@ -245,7 +297,10 @@ export {
   GlassMetricStrip,
   type GlassMetricStripProps,
   type GlassMetricStripItem,
+  type GlassMetricStripAction,
   type GlassMetricTrend,
+  type GlassMetricTone,
+  type GlassMetricMotif,
 } from './components/GlassMetricStrip'
 export { GlassFilterPanel, type GlassFilterPanelProps } from './components/GlassFilterPanel'
 export {

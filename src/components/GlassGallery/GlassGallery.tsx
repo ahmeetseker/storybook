@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState, type HTMLAttributes } from 'react'
-import { createPortal } from 'react-dom'
+import { useCallback, useState, type HTMLAttributes } from 'react'
 import { GlassSurface } from '../GlassSurface'
 import { GlassIconButton } from '../GlassIconButton'
+import { GlassLightbox } from '../GlassLightbox'
 import styles from './GlassGallery.module.css'
 
 export interface GlassGalleryImage {
@@ -32,12 +32,6 @@ const ChevronRight = () => (
   </svg>
 )
 
-const CloseIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
-    <path d="M6 6l12 12M18 6L6 18" />
-  </svg>
-)
-
 export function GlassGallery({
   images,
   aspectRatio = '4 / 3',
@@ -50,7 +44,6 @@ export function GlassGallery({
 }: GlassGalleryProps) {
   const [index, setIndex] = useState(() => Math.min(Math.max(initialIndex, 0), Math.max(images.length - 1, 0)))
   const [lightboxOpen, setLightboxOpen] = useState(false)
-  const dialogRef = useRef<HTMLDivElement>(null)
 
   const goTo = useCallback(
     (next: number) => {
@@ -62,61 +55,8 @@ export function GlassGallery({
     [images.length, onIndexChange],
   )
 
-  useEffect(() => {
-    if (!lightboxOpen) return
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightboxOpen(false)
-      if (e.key === 'ArrowLeft') goTo(index - 1)
-      if (e.key === 'ArrowRight') goTo(index + 1)
-    }
-    window.addEventListener('keydown', onKeyDown)
-    dialogRef.current?.focus()
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [lightboxOpen, index, goTo])
-
   if (images.length === 0) return null
   const current = images[index]
-
-  const lightbox = lightboxOpen
-    ? createPortal(
-        <div
-          ref={dialogRef}
-          className={styles.lightbox}
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Görsel ${index + 1} / ${images.length}: ${current.alt}`}
-          tabIndex={-1}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setLightboxOpen(false)
-          }}
-        >
-          <img className={styles.lightboxImage} src={current.src} alt={current.alt} />
-          <div className={styles.lightboxClose}>
-            <GlassIconButton label="Kapat" tone="light" onClick={() => setLightboxOpen(false)}>
-              <CloseIcon />
-            </GlassIconButton>
-          </div>
-          {images.length > 1 && (
-            <>
-              <div className={`${styles.lightboxNav} ${styles.navLeft}`}>
-                <GlassIconButton label="Önceki görsel" size="lg" tone="light" onClick={() => goTo(index - 1)}>
-                  <ChevronLeft />
-                </GlassIconButton>
-              </div>
-              <div className={`${styles.lightboxNav} ${styles.navRight}`}>
-                <GlassIconButton label="Sonraki görsel" size="lg" tone="light" onClick={() => goTo(index + 1)}>
-                  <ChevronRight />
-                </GlassIconButton>
-              </div>
-            </>
-          )}
-          <span className={styles.lightboxCounter}>
-            {index + 1} / {images.length}
-          </span>
-        </div>,
-        document.body,
-      )
-    : null
 
   return (
     <div className={[styles.gallery, className].filter(Boolean).join(' ')} {...rest}>
@@ -164,7 +104,17 @@ export function GlassGallery({
           ))}
         </div>
       )}
-      {lightbox}
+      {/* Tam ekran görünüm kütüphanenin overlay sözleşmesidir (portal + focus
+          trap + scroll kilidi + kapanışta focus dönüşü): GlassLightbox. Sahne
+          ile tek indeks paylaşılır — lightbox'ta gezinmek sayfadaki sahneyi de
+          ilerletir. */}
+      <GlassLightbox
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        images={images}
+        index={index}
+        onIndexChange={goTo}
+      />
     </div>
   )
 }

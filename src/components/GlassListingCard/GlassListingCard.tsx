@@ -47,6 +47,12 @@ export interface GlassListingCardProps extends Omit<ButtonHTMLAttributes<HTMLBut
   listedAt?: string
   /** Kompakt düzende görselin sol üst köşesinde gösterilen rozet. */
   badge?: ReactNode
+  /**
+   * Rozetin yerleşimi: `inset` köşeden boşluklu kapsül (varsayılan);
+   * `corner` rozeti medya köşesine sıfır yerleştirir — `GlassRibbon` gibi
+   * kendi konumunu kuran köşe bileşenleri için.
+   */
+  badgePlacement?: 'inset' | 'corner'
   /** Yerleşim ekseni: mevcut kompakt kart, detaylı açık kart veya görsel üstü kart. */
   variant?: GlassListingCardVariant
   tone?: 'light' | 'dark' | 'auto'
@@ -77,6 +83,7 @@ export function GlassListingCard({
   seller,
   listedAt,
   badge,
+  badgePlacement = 'inset',
   variant = 'compact',
   tone = 'auto',
   material,
@@ -107,7 +114,11 @@ export function GlassListingCard({
       <span className={styles.layout}>
       <span className={styles.media}>
         <img className={styles.image} src={image.src} alt={image.alt ?? ''} />
-        {badge && (variant === 'compact' || variant === 'propertyOverlay') ? <span className={styles.badge}>{badge}</span> : null}
+        {badge && (variant === 'compact' || variant === 'propertyOverlay')
+          ? badgePlacement === 'corner'
+            ? badge
+            : <span className={styles.badge}>{badge}</span>
+          : null}
         {variant === 'overlay' || variant === 'propertyOverlay' ? <span className={styles.scrim} aria-hidden="true" /> : null}
       </span>
 

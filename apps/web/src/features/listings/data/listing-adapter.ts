@@ -512,15 +512,48 @@ function buildMetrics(
   return metrics
 }
 
+/**
+ * Şablon başına kaç ilan türetildiği.
+ *
+ * Altı varyant, bir kategoriyi iki dar fiyat kümesine sıkıştırıyordu: filtre
+ * yaprağındaki dağılım histogramı gerçek bir dağılım değil iki kule çiziyordu,
+ * bu yüzden de hiç çizilmiyordu (bkz. `DISTRIBUTION_MIN_SAMPLE`). Portföy
+ * derinliği bir pazar yerinin kendi kayıtlarından gelir; mock veri de o
+ * yoğunluğu taşımazsa dağılıma dayanan hiçbir yüzey denenemez.
+ */
+const VARIANTS_PER_TEMPLATE = 24
+
+/** Deterministik sözde-rastgele [0,1) — tohum aynıysa kayıt her yüklemede aynı. */
+function noise(seed: number): number {
+  const value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453
+  return value - Math.floor(value)
+}
+
+/**
+ * Şablon değerinin etrafındaki yayılım. İki bağımsız üniform değerin
+ * ortalaması üçgen dağılım verir: uçlar seyrek, orta yoğun — gerçek bir
+ * portföyün fiyat/alan dağılımı da böyle okunur. Düz üniform yayılım
+ * histogramda dümdüz bir plato çizerdi.
+ */
+function spread(seed: number, low: number, high: number): number {
+  const shape = (noise(seed) + noise(seed * 7 + 13)) / 2
+  return low + shape * (high - low)
+}
+
+/** Tutarı büyüklük mertebesine göre okunur bir basamağa yuvarlar. */
+function tidyPrice(value: number): number {
+  const step = value >= 1_000_000 ? 50_000 : value >= 100_000 ? 5_000 : 500
+  return Math.max(step, Math.round(value / step) * step)
+}
+
 export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
   (template, templateIndex) =>
-    Array.from({ length: 6 }, (_, variantIndex) => {
-      const multiplier = 1 + variantIndex * 0.045
-      const area = Math.round(template.area * (1 + variantIndex * 0.018))
-      const price = Math.round(template.price * multiplier)
+    Array.from({ length: VARIANTS_PER_TEMPLATE }, (_, variantIndex) => {
       // Tek tohum: aynı ilanın tüm türetilmiş özellikleri bundan çıkar, böylece
       // kayıt her yüklemede aynı kalır.
-      const seed = templateIndex * 6 + variantIndex
+      const seed = templateIndex * VARIANTS_PER_TEMPLATE + variantIndex
+      const area = Math.round(template.area * spread(seed * 3 + 5, 0.6, 1.7))
+      const price = tidyPrice(template.price * spread(seed, 0.55, 1.9))
       const label = `${CATEGORY_LABELS[template.category]} · ${template.district}`
       return {
         id: `listing-${templateIndex + 1}-${variantIndex + 1}`,
@@ -674,6 +707,120 @@ function makeFacets(items: ListingSummary[]) {
       (item) => item.verified,
     ),
   }
+}
+
+/**
+ * Verilen duruma kaç ilan düştüğü — SAYFALAMASIZ, eşzamanlı.
+ *
+ * Karar yaprağının alt eylemi ("128 ilanı göster") her dokunuşta güncellenir;
+ * bunun için taslak durumun sonucu ağ turu beklemeden bilinmelidir. Kullanıcı
+ * paneli kapatmadan seçiminin sonucu daralttığını görür, boş sonuca gitmez.
+ */
+export function countListings(state: ListingSearchState): number {
+  return LISTING_FIXTURES.filter((item) => matchesState(item, state)).length
+}
+
+export interface ListingDistribution {
+  /** Skalanın sol ucu — yuvarlanmış */
+  min: number
+  /** Skalanın sağ ucu — yuvarlanmış */
+  max: number
+  /** Soldan sağa eşit genişlikteki bantların ilan sayısı */
+  bins: number[]
+}
+
+/** Ölçek ucunu okunur bir basamağa yuvarlar (3.180 → 3.000 / 118.400 → 120.000). */
+function roundEdge(value: number, direction: 'down' | 'up', step: number) {
+  const rounded =
+    direction === 'down'
+      ? Math.floor(value / step) * step
+      : Math.ceil(value / step) * step
+  return rounded
+}
+
+/**
+ * Histogramın anlamlı olması için gereken en az gözlem sayısı.
+ *
+ * Bu sayının altında sütunlar dağılımı DEĞİL, tek tek ilanları çizer: on iki
+ * ilandan çıkan altı kuleli grafik, olmayan bir yoğunluğu varmış gibi okutur.
+ */
+const DISTRIBUTION_MIN_SAMPLE = 16
+
+/**
+ * Bir eksenin (fiyat veya alan) dağılımı — histogramın kaynağı.
+ *
+ * Dağılım PAZARIN kesitidir, kullanıcının o anki seçiminin değil: yalnız
+ * işlem türü, kategori ve konum uygulanır. Kriter filtreleri de uygulansaydı
+ * kullanıcı daralttıkça histogram çöker, ölçek her dokunuşta yerinden oynar ve
+ * "bütçem piyasada nereye düşüyor" sorusu cevapsız kalırdı.
+ *
+ * Gözlem azsa (`DISTRIBUTION_MIN_SAMPLE`) sütun ÇİZİLMEZ: altı ilandan
+ * uydurulmuş bir dağılım, olmayan bir yoğunluk varmış gibi okunur. Ölçek yine
+ * döner, kullanıcı aralığı sütunsuz rayda seçer.
+ */
+export function listingDistribution(
+  state: ListingSearchState,
+  axis: 'price' | 'area',
+): ListingDistribution {
+  const market: ListingSearchState = {
+    ...state,
+    query: '',
+    salePrice: undefined,
+    rentPrice: undefined,
+    area: undefined,
+    unitPrice: undefined,
+    mapArea: undefined,
+    verified: false,
+    owners: [],
+    categoryFilters: {},
+    categoryRanges: {},
+  }
+  const values = LISTING_FIXTURES.filter((item) => matchesState(item, market)).map(
+    (item) => (axis === 'price' ? item.price : item.area),
+  )
+
+  if (values.length === 0) return { min: 0, max: 0, bins: [] }
+  // Sütun sayısı gözleme uyar ama 16'nın altına inmez: az sayıda kalın sütun
+  // dağılım değil, sütun grafiği gibi okunur.
+  const binCount = Math.min(28, Math.max(16, Math.round(values.length / 3)))
+
+  const lowest = Math.min(...values)
+  const highest = Math.max(...values)
+  const span = Math.max(highest - lowest, 1)
+  // Adım, aralığın büyüklük mertebesinden türer: kirada binler, satışta
+  // yüz binler okunur uçlar üretir.
+  const step = 10 ** Math.max(0, Math.floor(Math.log10(span)) - 1)
+  // Alt uç sıfıra çökmemeli: 50 m²'lik en küçük ilanı "0 m²" diye etiketlemek
+  // ölçeğin başında var olmayan bir aralık gösterir. Sıfıra düşerse adım,
+  // pozitif bir uç verene kadar incelir.
+  let min = roundEdge(lowest, 'down', step)
+  let fineStep = step
+  while (min === 0 && lowest > 0 && fineStep > 1) {
+    fineStep = Math.max(1, fineStep / 10)
+    min = roundEdge(lowest, 'down', fineStep)
+  }
+  const max = Math.max(roundEdge(highest, 'up', step), min + step)
+
+  if (values.length < DISTRIBUTION_MIN_SAMPLE) return { min, max, bins: [] }
+
+  // Karışık popülasyon histogram çizdirmez. Satılık ile kiralık tek bir fiyat
+  // ekseninde toplanamaz (biri on milyonlar, diğeri binler); daire ile arsa da
+  // tek bir m² ekseninde toplanamaz (50 m² ile 3.300 m²). İkisinde de sütunlar
+  // bütün bir grubu en sola yığıp geri kalanı düzleştirir — dağılım gibi
+  // görünen ama hiçbir şey anlatmayan bir grafik. Ölçek yine döner (ray
+  // çalışır), sütun çizilmez; kullanıcı kesiti daraltınca grafik açılır.
+  const mixed =
+    axis === 'price' ? state.transactions.length !== 1 : state.category === 'all'
+  if (mixed) return { min, max, bins: [] }
+
+  const bins = Array.from({ length: binCount }, () => 0)
+  const width = (max - min) / binCount
+  for (const value of values) {
+    const index = Math.min(binCount - 1, Math.floor((value - min) / width))
+    bins[index] += 1
+  }
+
+  return { min, max, bins }
 }
 
 export async function searchListings({

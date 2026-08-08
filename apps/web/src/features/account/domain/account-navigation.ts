@@ -13,6 +13,7 @@ export type AccountNavId =
   | 'guvenlik'
   | 'hareketler'
   | 'kayitli-arama'
+  | 'planim'
   | 'odemeler'
   | 'faturalarim'
   | 'ilan-ver'
@@ -52,6 +53,7 @@ export const accountNavEntries: readonly AccountNavEntry[] = [
   { id: 'guvenlik', label: 'Güvenlik', title: 'Güvenlik ve doğrulama', href: '/hesabim/guvenlik', matchPrefix: true },
   { id: 'hareketler', label: 'Hesap hareketleri', title: 'Hesap hareketleri', href: '/hesabim/hareketler', matchPrefix: true },
   { id: 'kayitli-arama', label: 'Kayıtlı arama', title: 'Kayıtlı arama', href: '/hesabim/kayitli-arama', matchPrefix: true },
+  { id: 'planim', label: 'Paketim', title: 'Paketim', href: '/hesabim/planim', matchPrefix: true },
   { id: 'odemeler', label: 'Ödemeler', title: 'Ödemeler', href: '/hesabim/odemeler', matchPrefix: true },
   { id: 'faturalarim', label: 'Faturalarım', title: 'Faturalarım', href: '/hesabim/faturalarim', matchPrefix: true },
   { id: 'ilan-ver', label: 'İlan ver', title: 'İlan ver', href: '/ilan-ver', matchPrefix: true },

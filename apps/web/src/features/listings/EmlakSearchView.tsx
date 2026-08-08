@@ -1,4 +1,12 @@
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react'
 import {
   GlassAiSearchBar,
   GlassButton,
@@ -8,9 +16,11 @@ import {
   GlassEmptyState,
   GlassFilterPanel,
   GlassListingCard,
+  GlassListingRowCard,
   GlassMap,
   GlassMapPopupCard,
   GlassPagination,
+  GlassRibbon,
   GlassSegmentedControl,
   GlassSelect,
   GlassSkeleton,
@@ -21,11 +31,13 @@ import { FACET_BY_KEY, FILTER_SECTIONS } from './domain/filter-catalog'
 import { sectionFacets } from './domain/filter-catalog-types'
 import { CatalogFilterControls } from './components/CatalogFilterControls'
 import { AllFiltersModal } from './components/AllFiltersModal'
+import { FilterStream } from './components/FilterStream'
 import { PageContainer } from '@/components/PageContainer'
-import type {
-  AiFilterProposal,
-  ListingSearchResponse,
-  ListingSummary,
+import {
+  countListings,
+  type AiFilterProposal,
+  type ListingSearchResponse,
+  type ListingSummary,
 } from './data/listing-adapter'
 import {
   changeCategory,
@@ -92,6 +104,37 @@ const SORT_OPTIONS = [
 ] as const
 
 const formatter = new Intl.NumberFormat('tr-TR')
+
+/* Dar ekran algısı: satır kartı mobilde bileşenin kendi `sm` yoğunluğuna
+   iner — yoğunluk bir prop olduğu için kırılma CSS'te değil burada
+   (MapFirstHome'daki fill anahtarıyla aynı desen). Eşik, sayfanın mobil
+   kap sorgusuyla aynı (48rem). */
+const DAR_EKRAN_SORGUSU = '(max-width: 48rem)'
+const subscribeDarEkran = (onChange: () => void) => {
+  const mql = window.matchMedia(DAR_EKRAN_SORGUSU)
+  mql.addEventListener('change', onChange)
+  return () => mql.removeEventListener('change', onChange)
+}
+const darEkranMi = () => window.matchMedia(DAR_EKRAN_SORGUSU).matches
+
+/* Mobil mod segmentinin ikonları — dekoratif (aria-hidden segment içinde);
+   erişilebilir ad seçenek etiketinden gelir. */
+function ListGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden focusable="false">
+      <path d="M3 4.5h10M3 8h10M3 11.5h10" />
+    </svg>
+  )
+}
+
+function MapGlyph() {
+  return (
+    <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
+      <path d="M2.5 4.2 6 2.8l4 1.4 3.5-1.4v9.4L10 13.6l-4-1.4-3.5 1.4Z" />
+      <path d="M6 2.8v9.4M10 4.2v9.4" />
+    </svg>
+  )
+}
 
 function currency(value: number, transaction: TransactionType) {
   return `${formatter.format(value)} TL${transaction === 'rent' ? ' / ay' : ''}`
@@ -163,7 +206,7 @@ function FilterSection({
   return (
     <details className={styles.filterSection} open={open}>
       <summary>
-        {title}
+        <span className={styles.filterSectionTitle}>{title}</span>
         {selectedCount > 0 ? (
           <span
             className={styles.sectionCount}
@@ -172,6 +215,25 @@ function FilterSection({
             {selectedCount}
           </span>
         ) : null}
+        {/* Ok, GlassSelect'in chevron'uyla aynı çizim: metin karakteri
+            (`⌄`) fontla birlikte değişiyor ve satır ortasına oturmuyordu. */}
+        <svg
+          className={styles.filterChevron}
+          viewBox="0 0 12 12"
+          width="12"
+          height="12"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M2.5 4.5L6 8l3.5-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </summary>
       <div className={styles.filterSectionBody}>{children}</div>
     </details>
@@ -218,7 +280,9 @@ function FilterForm({
       label="Emlak filtreleri"
       title={
         <span className={styles.panelTitle}>
-          Filtreler
+          {/* Çekmecede başlık "Emlak filtreleri" zaten diyalogun adı; aynı
+              sözü tekrar etmemek için katalog görünümü kendi adını söyler. */}
+          {surface === 'sheet' ? 'Tüm kriterler' : 'Filtreler'}
           {activeCount > 0 ? (
             <span
               className={styles.sectionCount}
@@ -236,254 +300,260 @@ function FilterForm({
       material="flat"
       className={styles.filterPanel}
     >
-      <FilterSection title="İlan türü ve kategori">
-        <div className={styles.checkStack}>
-          <GlassCheckbox
-            label="Satılık"
-            checked={state.transactions.includes('sale')}
-            onChange={() => {
-              const transactions = toggleValue(state.transactions, 'sale')
-              if (transactions.length > 0)
-                onChange({ ...state, transactions, page: 1 })
-            }}
-          />
-          <GlassCheckbox
-            label="Kiralık"
-            checked={state.transactions.includes('rent')}
-            onChange={() => {
-              const transactions = toggleValue(state.transactions, 'rent')
-              if (transactions.length > 0)
-                onChange({ ...state, transactions, page: 1 })
-            }}
-          />
-        </div>
-        <div className={styles.field}>
-          <label htmlFor={`${selectId}-category`}>Kategori</label>
-          <GlassSelect
-            id={`${selectId}-category`}
-            options={CATEGORY_OPTIONS}
-            value={state.category}
-            onChange={(category) =>
-              onChange(
-                changeCategory(
-                  state,
-                  category as PropertyCategory,
-                ),
-              )
-            }
-          />
-        </div>
-      </FilterSection>
-
-      <FilterSection title="Konum">
-        <div className={styles.field}>
-          <label htmlFor={`${selectId}-city`}>Şehir</label>
-          <GlassSelect
-            id={`${selectId}-city`}
-            options={CITY_OPTIONS.map(([value, label]) => ({ value, label }))}
-            value={state.city ?? ''}
-            onChange={(city) =>
-              onChange({
-                ...state,
-                city: city || undefined,
-                district: undefined,
-                page: 1,
-              })
-            }
-          />
-        </div>
-        <label className={styles.field}>
-          <span>İlçe</span>
-          <input
-            value={state.district ?? ''}
-            placeholder="İlçe ara"
-            onChange={(event) =>
-              onChange({
-                ...state,
-                district: event.target.value || undefined,
-                // İlçe değişince mahalle anlamını yitirir.
-                neighbourhood: undefined,
-                page: 1,
-              })
-            }
-          />
-        </label>
-        <label className={styles.field}>
-          <span>Mahalle</span>
-          <input
-            value={state.neighbourhood ?? ''}
-            placeholder="Mahalle ara"
-            onChange={(event) =>
-              onChange({
-                ...state,
-                neighbourhood: event.target.value || undefined,
-                page: 1,
-              })
-            }
-          />
-        </label>
-      </FilterSection>
-
-      {state.transactions.includes('sale') ? (
-        <FilterSection title="Satılık fiyatı">
-          <div className={styles.range}>
-            <label>
-              <span>En az</span>
-              <input
-                inputMode="numeric"
-                aria-label="En düşük satılık fiyatı"
-                value={state.salePrice?.min ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    updateRange(state, 'salePrice', 'min', event.target.value),
-                  )
-                }
-              />
-            </label>
-            <label>
-              <span>En çok</span>
-              <input
-                inputMode="numeric"
-                aria-label="En yüksek satılık fiyatı"
-                value={state.salePrice?.max ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    updateRange(state, 'salePrice', 'max', event.target.value),
-                  )
-                }
-              />
-            </label>
+      {/* Akordeon satırları TEK liste: panelin gövde boşluğu (space-4) her
+          bölümün altına ekleniyor, ayraç ise üstünde duruyordu — başlık
+          çizgiye yapışıp altında boşluk kalıyordu. Liste kendi ritmini
+          kurar: ayraçlar arası tek satır yüksekliği. */}
+      <div className={styles.filterSections}>
+        <FilterSection title="İlan türü ve kategori">
+          <div className={styles.checkStack}>
+            <GlassCheckbox
+              label="Satılık"
+              checked={state.transactions.includes('sale')}
+              onChange={() => {
+                const transactions = toggleValue(state.transactions, 'sale')
+                if (transactions.length > 0)
+                  onChange({ ...state, transactions, page: 1 })
+              }}
+            />
+            <GlassCheckbox
+              label="Kiralık"
+              checked={state.transactions.includes('rent')}
+              onChange={() => {
+                const transactions = toggleValue(state.transactions, 'rent')
+                if (transactions.length > 0)
+                  onChange({ ...state, transactions, page: 1 })
+              }}
+            />
+          </div>
+          <div className={styles.field}>
+            <label htmlFor={`${selectId}-category`}>Kategori</label>
+            <GlassSelect
+              id={`${selectId}-category`}
+              options={CATEGORY_OPTIONS}
+              value={state.category}
+              onChange={(category) =>
+                onChange(
+                  changeCategory(
+                    state,
+                    category as PropertyCategory,
+                  ),
+                )
+              }
+            />
           </div>
         </FilterSection>
-      ) : null}
 
-      {state.transactions.includes('rent') ? (
-        <FilterSection title="Aylık kira">
-          <div className={styles.range}>
-            <label>
-              <span>En az</span>
-              <input
-                inputMode="numeric"
-                aria-label="En düşük aylık kira"
-                value={state.rentPrice?.min ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    updateRange(state, 'rentPrice', 'min', event.target.value),
-                  )
-                }
-              />
-            </label>
-            <label>
-              <span>En çok</span>
-              <input
-                inputMode="numeric"
-                aria-label="En yüksek aylık kira"
-                value={state.rentPrice?.max ?? ''}
-                onChange={(event) =>
-                  onChange(
-                    updateRange(state, 'rentPrice', 'max', event.target.value),
-                  )
-                }
-              />
-            </label>
+        <FilterSection title="Konum">
+          <div className={styles.field}>
+            <label htmlFor={`${selectId}-city`}>Şehir</label>
+            <GlassSelect
+              id={`${selectId}-city`}
+              options={CITY_OPTIONS.map(([value, label]) => ({ value, label }))}
+              value={state.city ?? ''}
+              onChange={(city) =>
+                onChange({
+                  ...state,
+                  city: city || undefined,
+                  district: undefined,
+                  page: 1,
+                })
+              }
+            />
           </div>
-        </FilterSection>
-      ) : null}
-
-      <FilterSection title="Alan">
-        <div className={styles.range}>
-          <label>
-            <span>En az m²</span>
+          <label className={styles.field}>
+            <span>İlçe</span>
             <input
-              inputMode="numeric"
-              aria-label="En düşük alan"
-              value={state.area?.min ?? ''}
+              value={state.district ?? ''}
+              placeholder="İlçe ara"
               onChange={(event) =>
-                onChange(updateRange(state, 'area', 'min', event.target.value))
+                onChange({
+                  ...state,
+                  district: event.target.value || undefined,
+                  // İlçe değişince mahalle anlamını yitirir.
+                  neighbourhood: undefined,
+                  page: 1,
+                })
               }
             />
           </label>
-          <label>
-            <span>En çok m²</span>
+          <label className={styles.field}>
+            <span>Mahalle</span>
             <input
-              inputMode="numeric"
-              aria-label="En yüksek alan"
-              value={state.area?.max ?? ''}
+              value={state.neighbourhood ?? ''}
+              placeholder="Mahalle ara"
               onChange={(event) =>
-                onChange(updateRange(state, 'area', 'max', event.target.value))
+                onChange({
+                  ...state,
+                  neighbourhood: event.target.value || undefined,
+                  page: 1,
+                })
               }
             />
           </label>
-        </div>
-      </FilterSection>
+        </FilterSection>
 
-      {/* Katalog tabanlı bölümler: elle yazılmış kategori blokları yerine tek
-          kaynaktan (filter-catalog.ts) gelir. Kenar çubuğunda YALNIZ `core`
-          kriterler durur; gerisi "Tüm Seçenekler" modalında yaşar — dar bir
-          kolona 60+ kriter sığdırmaya çalışmak hepsini okunmaz kılıyordu. */}
-      {FILTER_SECTIONS.map((section) => {
-        const all = sectionFacets(section, state.category)
-        const facets = surface === 'sheet' ? all : all.filter((facet) => facet.importance === 'core')
-        if (facets.length === 0) return null
-        const chosen = facets.reduce(
-          (total, facet) =>
-            total +
-            (facet.type === 'range'
-              ? state.categoryRanges[facet.key]
-                ? 1
-                : 0
-              : (state.categoryFilters[facet.key] ?? []).length > 0
-                ? 1
-                : 0),
-          0,
-        )
-        return (
-          <FilterSection
-            key={section.id}
-            title={section.title}
-            selectedCount={chosen}
-            // Seçim yapılmamış bölümler kapalı başlar: dar kolonda 12 bölüm
-            // birden açıkken kullanıcı hiçbirini göremiyordu.
-            open={chosen > 0}
-          >
-            <CatalogFilterControls facets={facets} state={state} onChange={onChange} />
+        {state.transactions.includes('sale') ? (
+          <FilterSection title="Satılık fiyatı">
+            <div className={styles.range}>
+              <label>
+                <span>En az</span>
+                <input
+                  inputMode="numeric"
+                  aria-label="En düşük satılık fiyatı"
+                  value={state.salePrice?.min ?? ''}
+                  onChange={(event) =>
+                    onChange(
+                      updateRange(state, 'salePrice', 'min', event.target.value),
+                    )
+                  }
+                />
+              </label>
+              <label>
+                <span>En çok</span>
+                <input
+                  inputMode="numeric"
+                  aria-label="En yüksek satılık fiyatı"
+                  value={state.salePrice?.max ?? ''}
+                  onChange={(event) =>
+                    onChange(
+                      updateRange(state, 'salePrice', 'max', event.target.value),
+                    )
+                  }
+                />
+              </label>
+            </div>
           </FilterSection>
-        )
-      })}
+        ) : null}
 
-      <FilterSection title="Güven ve satıcı">
-        <div className={styles.checkStack}>
-          <GlassCheckbox
-            label="Yalnız doğrulanmış ilanlar"
-            checked={state.verified}
-            onChange={() =>
-              onChange({ ...state, verified: !state.verified, page: 1 })
-            }
-          />
-          <GlassCheckbox
-            label="Sahibinden"
-            checked={state.owners.includes('owner')}
-            onChange={() =>
-              onChange({
-                ...state,
-                owners: toggleValue(state.owners, 'owner'),
-                page: 1,
-              })
-            }
-          />
-          <GlassCheckbox
-            label="Emlak ofisinden"
-            checked={state.owners.includes('agency')}
-            onChange={() =>
-              onChange({
-                ...state,
-                owners: toggleValue(state.owners, 'agency'),
-                page: 1,
-              })
-            }
-          />
-        </div>
-      </FilterSection>
+        {state.transactions.includes('rent') ? (
+          <FilterSection title="Aylık kira">
+            <div className={styles.range}>
+              <label>
+                <span>En az</span>
+                <input
+                  inputMode="numeric"
+                  aria-label="En düşük aylık kira"
+                  value={state.rentPrice?.min ?? ''}
+                  onChange={(event) =>
+                    onChange(
+                      updateRange(state, 'rentPrice', 'min', event.target.value),
+                    )
+                  }
+                />
+              </label>
+              <label>
+                <span>En çok</span>
+                <input
+                  inputMode="numeric"
+                  aria-label="En yüksek aylık kira"
+                  value={state.rentPrice?.max ?? ''}
+                  onChange={(event) =>
+                    onChange(
+                      updateRange(state, 'rentPrice', 'max', event.target.value),
+                    )
+                  }
+                />
+              </label>
+            </div>
+          </FilterSection>
+        ) : null}
+
+        <FilterSection title="Alan">
+          <div className={styles.range}>
+            <label>
+              <span>En az m²</span>
+              <input
+                inputMode="numeric"
+                aria-label="En düşük alan"
+                value={state.area?.min ?? ''}
+                onChange={(event) =>
+                  onChange(updateRange(state, 'area', 'min', event.target.value))
+                }
+              />
+            </label>
+            <label>
+              <span>En çok m²</span>
+              <input
+                inputMode="numeric"
+                aria-label="En yüksek alan"
+                value={state.area?.max ?? ''}
+                onChange={(event) =>
+                  onChange(updateRange(state, 'area', 'max', event.target.value))
+                }
+              />
+            </label>
+          </div>
+        </FilterSection>
+
+        {/* Katalog tabanlı bölümler: elle yazılmış kategori blokları yerine tek
+            kaynaktan (filter-catalog.ts) gelir. Kenar çubuğunda YALNIZ `core`
+            kriterler durur; gerisi "Tüm Seçenekler" modalında yaşar — dar bir
+            kolona 60+ kriter sığdırmaya çalışmak hepsini okunmaz kılıyordu. */}
+        {FILTER_SECTIONS.map((section) => {
+          const all = sectionFacets(section, state.category)
+          const facets = surface === 'sheet' ? all : all.filter((facet) => facet.importance === 'core')
+          if (facets.length === 0) return null
+          const chosen = facets.reduce(
+            (total, facet) =>
+              total +
+              (facet.type === 'range'
+                ? state.categoryRanges[facet.key]
+                  ? 1
+                  : 0
+                : (state.categoryFilters[facet.key] ?? []).length > 0
+                  ? 1
+                  : 0),
+            0,
+          )
+          return (
+            <FilterSection
+              key={section.id}
+              title={section.title}
+              selectedCount={chosen}
+              // Seçim yapılmamış bölümler kapalı başlar: dar kolonda 12 bölüm
+              // birden açıkken kullanıcı hiçbirini göremiyordu.
+              open={chosen > 0}
+            >
+              <CatalogFilterControls facets={facets} state={state} onChange={onChange} />
+            </FilterSection>
+          )
+        })}
+
+        <FilterSection title="Güven ve satıcı">
+          <div className={styles.checkStack}>
+            <GlassCheckbox
+              label="Yalnız doğrulanmış ilanlar"
+              checked={state.verified}
+              onChange={() =>
+                onChange({ ...state, verified: !state.verified, page: 1 })
+              }
+            />
+            <GlassCheckbox
+              label="Sahibinden"
+              checked={state.owners.includes('owner')}
+              onChange={() =>
+                onChange({
+                  ...state,
+                  owners: toggleValue(state.owners, 'owner'),
+                  page: 1,
+                })
+              }
+            />
+            <GlassCheckbox
+              label="Emlak ofisinden"
+              checked={state.owners.includes('agency')}
+              onChange={() =>
+                onChange({
+                  ...state,
+                  owners: toggleValue(state.owners, 'agency'),
+                  page: 1,
+                })
+              }
+            />
+          </div>
+        </FilterSection>
+      </div>
 
       {onOpenAllFilters ? (
         <button type="button" className={styles.allFiltersTrigger} onClick={onOpenAllFilters}>
@@ -507,9 +577,12 @@ function ListingCard({
   onSelect: () => void
 }) {
   const [favorite, setFavorite] = useState(false)
+  const darEkran = useSyncExternalStore(subscribeDarEkran, darEkranMi, () => false)
+  // Her iki düzen de aynı temsili kareyi kullanır; ilan verisinde taşınmazın
+  // kendi fotoğrafı yok (bkz. REPRESENTATIVE_IMAGE_NOTE).
+  const representativeImage = getRepresentativeListingImage(item)
 
   if (layout === 'grid') {
-    const representativeImage = getRepresentativeListingImage(item)
     return (
       <article
         aria-label={`${item.title} ilanı`}
@@ -520,15 +593,21 @@ function ListingCard({
         onMouseEnter={onSelect}
         onFocusCapture={onSelect}
       >
+        {/* 2-yukarı mobil ızgarada overlay yerleşimi 140px karta sığmıyor
+            (metrikler kurdele/yer imiyle çakışıyor) — dar ekran kompakt
+            varyanta düşer: görsel + başlık + konum + fiyat. */}
         <GlassListingCard
-          variant="propertyOverlay"
+          variant={darEkran ? 'compact' : 'propertyOverlay'}
           material="flat"
           image={{ src: representativeImage.src, alt: representativeImage.alt }}
           badge={
-            <span className={item.verified ? styles.verified : styles.unverified}>
-              {item.verified ? 'Doğrulanmış · Temsili' : 'Yetki bekliyor · Temsili'}
-            </span>
+            item.verified ? (
+              <GlassRibbon label="Doğrulanmış" note="Temsili görsel" />
+            ) : (
+              <span className={styles.unverified}>Yetki bekliyor · Temsili</span>
+            )
           }
+          badgePlacement={item.verified ? 'corner' : 'inset'}
           pricePrefix={item.transaction === 'sale' ? 'Liste:' : 'Kira:'}
           price={currency(item.price, item.transaction)}
           title={item.title}
@@ -565,67 +644,47 @@ function ListingCard({
     )
   }
 
+  // Liste düzeni tasarım sistemindeki yatay karta devredildi; kabuk yalnız
+  // harita eşlemesi (hover/focus → seçili ilan) ve seçim vurgusunu taşır.
   return (
-    <article
+    <GlassListingRowCard
       aria-label={`${item.title} ilanı`}
-      className={[
-        styles.listing,
-        styles[layout],
-        selected ? styles.selectedListing : '',
-      ]
+      size={darEkran ? 'sm' : 'md'}
+      className={[styles.rowListing, selected ? styles.selectedListing : '']
         .filter(Boolean)
         .join(' ')}
       onMouseEnter={onSelect}
       onFocusCapture={onSelect}
-    >
-      <a href={withBase(`/ilan/${item.id}`)} className={styles.media}>
-        <img src={item.image.src} alt={item.image.alt} />
-        <span>{item.imageCount} fotoğraf</span>
-      </a>
-      <div className={styles.listingBody}>
-        <div className={styles.listingTopline}>
-          <span className={styles.categoryTag}>
-            {CATEGORY_LABELS[item.category]} ·{' '}
-            {item.transaction === 'sale' ? 'Satılık' : 'Kiralık'}
+      image={representativeImage}
+      mediaCaption={`${item.imageCount} fotoğraf`}
+      badge={
+        item.verified ? (
+          // Izgara kartıyla aynı dil: doğrulama köşe şerididir, kapsül değil.
+          <GlassRibbon label="Doğrulanmış" note="Temsili görsel" />
+        ) : (
+          <span className={[styles.mediaBadge, styles.unverified].join(' ')}>
+            Doğrulama bekliyor
           </span>
-          {item.verified ? (
-            <span className={styles.verified}>Doğrulanmış</span>
-          ) : (
-            <span className={styles.unverified}>Doğrulama bekliyor</span>
-          )}
-        </div>
-        <a href={withBase(`/ilan/${item.id}`)} className={styles.listingTitle}>
-          {item.title}
-        </a>
-        <p className={styles.location}>
-          {item.city.toLocaleUpperCase('tr-TR')} ·{' '}
-          {item.district.toLocaleUpperCase('tr-TR')}
-        </p>
-        <ul className={styles.highlights} aria-label="Temel özellikler">
-          <li>{formatter.format(item.area)} m²</li>
-          {item.highlights.map((highlight) => (
-            <li key={highlight}>{highlight}</li>
-          ))}
-        </ul>
-        <div className={styles.listingFooter}>
-          <span>
-            {item.sellerName} · {item.publishedDays} gün önce
-          </span>
-          <span>{formatter.format(item.unitPrice)} TL/m²</span>
-        </div>
-      </div>
-      <div className={styles.priceBlock}>
-        <strong>{currency(item.price, item.transaction)}</strong>
-        <div className={styles.cardActions}>
-          <button type="button" aria-label="Karşılaştırmaya ekle">
-            Karşılaştır
-          </button>
-          <button type="button" aria-label="Favoriye ekle">
-            Kaydet
-          </button>
-        </div>
-      </div>
-    </article>
+        )
+      }
+      badgePlacement={item.verified ? 'corner' : 'inset'}
+      price={currency(item.price, item.transaction)}
+      title={item.title}
+      href={withBase(`/ilan/${item.id}`)}
+      location={`${CATEGORY_LABELS[item.category]} · ${
+        item.transaction === 'sale' ? 'Satılık' : 'Kiralık'
+      } · ${locationLabel(item)}`}
+      features={[
+        { label: `${formatter.format(item.area)} m²` },
+        ...item.highlights.map((highlight) => ({ label: highlight })),
+      ]}
+      agent={{ name: item.sellerName }}
+      listedAt={`${item.publishedDays} gün önce`}
+      footerMeta={`${formatter.format(item.unitPrice)} TL/m²`}
+      favorite={favorite}
+      onFavoriteChange={setFavorite}
+      actions={[{ id: 'compare', label: 'Karşılaştır' }]}
+    />
   )
 }
 
@@ -782,6 +841,9 @@ export function EmlakSearchView({
   const catalogFilterCount =
     Object.values(state.categoryFilters).filter((values) => values.length > 0).length +
     Object.keys(state.categoryRanges).length
+  // Karar yaprağının alt eylemi taslak durumun sonucunu SAYAR; ağ turu
+  // beklemeden hesaplanır ki her dokunuşta güncel kalsın.
+  const draftCount = useMemo(() => countListings(draftState), [draftState])
   // Pin etiketi haritada okunabilir kalmalı: tam fiyat kapsülü zemini kapatır,
   // bu yüzden büyüklük mertebesine yuvarlanır (₺6,8M / ₺45B). Tam tutar
   // popup'ta ve kartta zaten yazılı.
@@ -806,17 +868,30 @@ export function EmlakSearchView({
 
   return (
     <PageContainer size="wide" className={styles.page}>
+      {/* Dar kapta başlık «V5-başlıklı» düzenine iner: eyebrow ve açıklama
+          gizlenir, sayaç başlığın yanına gelir, kaydet kısa etiketle satırda
+          kalır. Masaüstü blok aynı — davranış tamamen CSS kademesinde. */}
       <header className={styles.hero}>
-        <div>
+        <div className={styles.heroText}>
           <p className={styles.eyebrow}>Türkiye emlak pazarı</p>
-          <h1>{CATEGORY_LABELS[state.category]}</h1>
-          <p>
+          <div className={styles.heroTitleRow}>
+            <h1>{CATEGORY_LABELS[state.category]}</h1>
+            {/* Sayaç yalnız dar kapta görünür; erişilebilir sayaç results
+                başlığında yaşamaya devam eder (orada sr-only'ye iner). */}
+            <span className={styles.heroCount} aria-hidden>
+              {total} ilan
+            </span>
+          </div>
+          <p className={styles.heroDesc}>
             Konut, arsa, iş yeri ve yatırım fırsatlarını tek çalışma alanında
             karşılaştırın.
           </p>
         </div>
         <GlassButton size="md" onClick={onSaveSearch}>
-          Aramayı kaydet
+          <span className={styles.saveLong}>Aramayı kaydet</span>
+          <span className={styles.saveShort} aria-hidden>
+            Kaydet
+          </span>
         </GlassButton>
       </header>
 
@@ -895,15 +970,87 @@ export function EmlakSearchView({
         </section>
       ) : null}
 
+      {/* Dar kabın tek denetim çubuğu (V5-başlıklı): sayaç artık hero'da,
+          sıralama/düzen/harita denetimleri buraya iner — results toolbar'ın
+          masaüstü kopyaları dar kapta gizlenir, durum aynı state'ten okunur. */}
       <div className={styles.mobileToolbar}>
-        <GlassButton
-          size="md"
-          onClick={() => setMobileFiltersOpen(true)}
-          aria-label="Filtreleri aç"
-        >
-          Filtreler
-        </GlassButton>
-        <span>{total} ilan</span>
+        <div className={styles.mobileToolbarRow}>
+          <GlassButton
+            size="sm"
+            onClick={() => setMobileFiltersOpen(true)}
+            aria-label="Filtreleri aç"
+          >
+            Filtreler{catalogFilterCount > 0 ? ` (${catalogFilterCount})` : ''}
+          </GlassButton>
+          <div className={styles.mobileSort}>
+            <GlassSelect
+              aria-label="Sıralama"
+              size="sm"
+              material="flat"
+              options={SORT_OPTIONS.map(([value, label]) => ({ value, label }))}
+              value={state.sort}
+              onChange={(sort) =>
+                onStateChange(
+                  {
+                    ...state,
+                    sort: sort as ListingSearchState['sort'],
+                    page: 1,
+                  },
+                  { history: 'replace' },
+                )
+              }
+            />
+          </div>
+        </div>
+        <div className={styles.mobileToolbarRow}>
+          {/* Mobilde «Bölünmüş» yok: dar ekranda split zaten tam haritaya
+              düşüyordu (resultStage.withMap .list gizli) — seçenek olarak
+              sunmak yanıltıcıydı. URL'den split gelirse kontrol Harita'yı
+              işaretler; iki mod ikonla temsil edilir, etiket ekran okuyucuda. */}
+          <div className={styles.mobileMapMode}>
+            <GlassSegmentedControl
+              size="sm"
+              variant="track"
+              iconOnly
+              label="Harita görünümü"
+              value={state.mapMode === 'off' ? 'off' : 'full'}
+              options={[
+                { value: 'off', label: 'Sonuçlar', icon: <ListGlyph /> },
+                { value: 'full', label: 'Harita', icon: <MapGlyph /> },
+              ]}
+              onChange={(mapMode) =>
+                onStateChange(
+                  {
+                    ...state,
+                    mapMode: mapMode as ListingSearchState['mapMode'],
+                  },
+                  { history: 'replace' },
+                )
+              }
+            />
+          </div>
+          <div className={styles.mobileLayout}>
+            <GlassSegmentedControl
+              size="sm"
+              variant="track"
+              label="Sonuç düzeni"
+              value={state.layout}
+              options={[
+                { value: 'row', label: 'Liste' },
+                { value: 'grid', label: 'Izgara' },
+              ]}
+              onChange={(layout) =>
+                onStateChange(
+                  {
+                    ...state,
+                    layout: layout as ListingSearchState['layout'],
+                  },
+                  { history: 'replace' },
+                )
+              }
+            />
+          </div>
+        </div>
       </div>
 
       <div className={styles.workspace}>
@@ -1155,47 +1302,30 @@ export function EmlakSearchView({
         side="bottom"
         size="lg"
         footer={
-          <div className={styles.drawerActions}>
-            <GlassButton
-              onClick={() => setDraftState(state)}
-            >
-              Değişiklikleri sıfırla
-            </GlassButton>
-            <GlassButton
-              prominent
-              onClick={() => {
-                onStateChange(draftState, { history: 'push' })
-                setMobileFiltersOpen(false)
-              }}
-            >
-              {response?.total ?? 0} ilanı göster
-            </GlassButton>
-          </div>
+          /* Alt eylem sonucu SAYAR: taslak durumun sonucu her dokunuşta
+             yeniden hesaplanır, kullanıcı yaprağı kapatmadan seçiminin ne
+             kadar daralttığını görür. */
+          <GlassButton
+            prominent
+            size="lg"
+            onClick={() => {
+              onStateChange(draftState, { history: 'push' })
+              setMobileFiltersOpen(false)
+            }}
+            style={{ width: '100%' }}
+          >
+            {formatter.format(draftCount)} ilanı göster
+          </GlassButton>
         }
       >
-        <FilterForm
+        {/* Kademeli Akış: kataloğun TAMAMI bu tek yüzeyde. İkinci bir ekran,
+            "Tüm filtreler" düğmesi ya da akordeon yok — nadir kriterler kendi
+            bölümlerinin içinde "+N kriter" ile yerinde açılır. */}
+        <FilterStream
           state={draftState}
-          resultCount={response?.total ?? 0}
+          resultCount={draftCount}
           onChange={setDraftState}
-          // Çekmece tam ekran bir yüzey: kriterleri ikinci bir modala saklamak
-          // yerine hepsi burada açılır (bkz. FilterFormProps.surface).
-          surface="sheet"
-          onReset={() =>
-            setDraftState({
-              ...state,
-              category: 'all',
-              city: undefined,
-              district: undefined,
-              salePrice: undefined,
-              rentPrice: undefined,
-              area: undefined,
-              unitPrice: undefined,
-              owners: [],
-              verified: false,
-              categoryFilters: {},
-              page: 1,
-            })
-          }
+          onReset={() => setDraftState(clearListingFilters(state))}
         />
       </GlassDrawer>
     </PageContainer>

@@ -60,7 +60,7 @@ Varsayılan kombinasyon: `size=md`, cam, nötr.
 |---|---|
 | `prominent` + `tint` yok | tint `--lg-accent`'ten türetilir |
 | `tinted` + `prominent` birlikte | prominent kazanır (className sırası) |
-| `material="flat"` + `prominent` | dolgu kendi sınırıdır; `.flat` hairline'ı şeffaflaşır |
+| `material="flat"` + `prominent` | flat yok sayılır — dolu eylem her zaman cam çizilir |
 | hover/focus/active prop olarak | ❌ — yalnız CSS |
 
 **`material` bir stil tercihi değil katman kararıdır.** `'glass'` butonu
@@ -78,6 +78,13 @@ Eksenin varlığı `'flat'` kullanma zorunluluğu değildir: bir sayfa bütün
 butonlarının aynı malzemeyi paylaşmasını tercih edip bütçeyi bilerek aşabilir
 (ilan detayı böyle yapar). O zaman bedeli görmek gerekir — cam zeminini
 arkasındaki yüzeyden alır, tonlu bir bandın üstünde soluklaşır.
+
+**İstisna — `prominent` ekseni dinlemez.** Dolu eylem markanın tek sesli
+yüzüdür: kabuktaki "İlan ver" ile sayfa içindeki her CTA aynı cam materyalde
+çizilir. Çağıran `material="flat"` verse bile prominent buton cam kalır;
+flat/cam katman kararı yalnız ikincil (dolgusuz) eylemlere uygulanır.
+Karar 2026-08-07'de alındı: paket kartlarındaki mat CTA'lar kabuktaki
+"İlan ver" ile yan yana iki farklı dil konuşuyordu.
 
 ## 6. State modeli
 
@@ -171,3 +178,6 @@ pseudo-state story'leri için addon değerlendirmesi.
   kaldırıldı, birebir `--lg-space-*` token'ına bağlandı; `xl` font-size'ı
   `--lg-focus-ring-width` içeren hesaptan `--lg-text-headline`'a (17px)
   indirgendi — focus halkası token'ı artık yalnız outline'da kullanılıyor.
+- 2026-08-07: `prominent` buton artık `material` eksenini dinlemiyor, her
+  zaman cam çiziliyor — dolu eylem her yerde kabuktaki "İlan ver" ile aynı
+  görünümü paylaşır. flat/cam kararı ikincil eylemlerde geçerli.

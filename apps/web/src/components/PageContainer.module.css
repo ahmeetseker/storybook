@@ -38,6 +38,15 @@
    Pay, kabuğun kendi token'larından okunur (`--lg-shell-*-offset`), böylece
    header ölçüsü değişince sayfa kendiliğinden hizada kalır.
    Fallback'ler kabuk dışında (Storybook, izole test) sıfır pay verir. */
+/* Kabuğun kırıntı yolu — içerikten önce gelir, içerikle aynı sol hizada durur.
+   Alt boşluk sayfanın kendi üst ritmine karışmayacak kadar küçük tutulur.
+   Sayfa container'ı flex/grid kursa bile (ör. Paketler) sola yaslı kalır. */
+.trail {
+  margin-block-end: var(--lg-space-5);
+  align-self: start;
+  justify-self: start;
+}
+
 .shellInsets {
   padding-block-start: calc(
     var(--lg-shell-header-offset, 0px) + var(--page-breath) +

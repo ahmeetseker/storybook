@@ -95,6 +95,13 @@ değildir: kartın hiçbir başka satırı ortalı değildir.
   Kayış **yalnız konum** animasyonudur (`layout="position"`): damla ilk kareden
   hedef segmentin boyutunu alır, boyut morph'u (scale) yapılmaz — farklı
   genişlikte segmentler arasında pil büyüyüp esniyormuş gibi görünmez.
+- Yanıt **basışta** verilir: `:active` segmenti `scale(0.96)` ile çökertir.
+  Geri bildirimi bırakışa ertelemek kontrolü ölü hissettirir.
+- Etiketler damlanın üstünde kalır (`z-index: 1`). Damla seçili segmentin
+  çocuğudur; süzülürken üstünden geçtiği komşu segmentin etiketini örter ve
+  yarı saydam olduğu için o etiket geçiş boyunca solardı.
+- Sönüm (`opacity`) geçişi damlanın süzülüşüyle aynı ritimdedir
+  (`--lg-motion-duration-normal`): renk anında atlarsa iki hareket kopuk okunur.
 - Keyboard (radiogroup deseni): Ok tuşları önceki/sonraki **etkin** segmente
   sarar; Home/End ilk/son; seçim focus'u izler (roving tabindex).
 - Controlled/uncontrolled: `value` verilirse iç state yazılmaz.
@@ -181,3 +188,6 @@ LongContent, Mobile (viewport).
   Küçülen yükseklikte 14/18px yatay dolgu kapsülü yayvan bıraktığı için
   `--pad-x-sm/md` token'a çekildi: 14→12 (`--lg-space-3`), 18→16
   (`--lg-space-4`). Font ölçüleri değişmedi.
+- 2026-08-08 — `iconOnly` prop'u: etiketler clip ile yalnız ekran okuyucuya
+  iner, segment ikonla temsil edilir (her seçenek `icon` taşımalı). İlk
+  kullanım: /emlak mobil araç kartındaki Sonuçlar/Harita modu.

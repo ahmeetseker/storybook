@@ -19,6 +19,11 @@ export interface GlassButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
    * içinde duran buton camı hak etmez. Bu eksen açılmadan önce böyle her
    * buton feature CSS'inde elle çiziliyordu ve her biri kendi rengini
    * uyduruyordu.
+   *
+   * İstisna: `prominent` buton bu ekseni dinlemez, her zaman cam çizilir.
+   * Dolu eylem markanın tek sesli yüzüdür — kabuktaki "İlan ver" ile sayfa
+   * içindeki her CTA aynı materyali paylaşır; flat/cam ayrımı yalnız ikincil
+   * eylemlere uygulanır.
    */
   material?: 'glass' | 'flat'
   /** Async işlem sürerken: tekrar aktivasyon engellenir, genişlik korunur, aria-busy verilir */
@@ -42,6 +47,10 @@ export function GlassButton({
 }: GlassButtonProps) {
   const press = useGlassPress({ disabled: disabled || loading })
 
+  // Dolu eylem her zaman camdır (bkz. material JSDoc'u): çağıran flat istese
+  // bile prominent görünüm kabuktaki "İlan ver" ile aynı materyalde kalır.
+  const resolvedMaterial = prominent ? 'glass' : material
+
   const classes = [
     styles.button,
     styles[size],
@@ -64,7 +73,7 @@ export function GlassButton({
       as={motion.button}
       shape="capsule"
       interactive
-      material={material}
+      material={resolvedMaterial}
       tone={tone}
       thickness={0.35}
       displacementScale={press.displacementScale}

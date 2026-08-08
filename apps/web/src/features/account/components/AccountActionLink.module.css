@@ -13,7 +13,7 @@
 }
 
 .primary {
-  color: var(--lg-accent-contrast);
+  color: var(--lg-action-prominent-label);
   min-block-size: var(--lg-control-lg);
   padding-inline: var(--lg-space-5);
   /* Birincil etiket kapsülün içinde kırılmaz; dar kapta kapsül tam
@@ -38,8 +38,10 @@
   min-block-size: auto;
 }
 
+/* Dolu eylem rengi tek kaynaktan gelir: kabuktaki "İlan ver" butonuyla aynı
+   token, aynı kahve. Ham `--lg-accent` burada ikinci bir ton üretiyordu. */
 .primarySurface {
-  background-color: var(--lg-accent);
+  background-color: var(--lg-action-prominent);
 }
 
 .primary:focus-visible,
@@ -63,7 +65,7 @@
 
 @media (hover: hover) {
   .primary:hover {
-    background-color: color-mix(in srgb, var(--lg-accent) 84%, var(--lg-surface));
+    background-color: var(--lg-action-prominent-hover);
   }
 
   .secondary:hover {

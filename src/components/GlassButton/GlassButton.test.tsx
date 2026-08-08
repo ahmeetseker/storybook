@@ -47,6 +47,13 @@ describe('GlassButton', () => {
     expect(screen.getByRole('button').getAttribute('data-material')).toBe('flat')
   })
 
+  // Dolu eylem tek görünüm konuşur: prominent buton, çağıran flat istese bile
+  // kabuktaki "İlan ver" ile aynı cam materyalde çizilir.
+  it('prominent buton flat malzemeyle çağrılsa da cam çizilir', () => {
+    renderBtn({ material: 'flat', prominent: true })
+    expect(screen.getByRole('button').getAttribute('data-material')).toBe('glass')
+  })
+
   it('boyut sınıfı uygulanır', () => {
     renderBtn({ size: 'xl' })
     expect(screen.getByRole('button').className).toMatch(/xl/)

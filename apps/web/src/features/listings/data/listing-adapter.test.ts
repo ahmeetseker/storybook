@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { parseListingSearch } from '../domain/search-state'
 import {
+  countListings,
+  listingDistribution,
   parseNaturalLanguage,
   searchListings,
 } from './listing-adapter'
@@ -168,4 +170,98 @@ describe('listing mock adapter', () => {
       expect(item.neighbourhood).toBe('merkez')
     }
   })
+})
+
+// Karar yaprağının alt eylemi taslak durumun sonucunu ağ turu beklemeden
+// sayar; sayfalama uygulanmaz.
+describe('countListings', () => {
+  it('sayfalamasız toplam sonucu döndürür', async () => {
+    const state = parseListingSearch({ category: 'land' })
+    const response = await searchListings({ state, pageSize: 5 })
+
+    expect(response.items).toHaveLength(5)
+    expect(countListings(state)).toBe(response.total)
+  })
+
+  it('kriter eklendikçe daralır', () => {
+    const all = countListings(parseListingSearch({}))
+    const narrowed = countListings(parseListingSearch({ category: 'land', verified: '1' }))
+
+    expect(narrowed).toBeGreaterThan(0)
+    expect(narrowed).toBeLessThan(all)
+  })
+})
+
+describe('listingDistribution', () => {
+  // Histogram PAZARIN kesitidir: kullanıcının seçimiyle çökerse "bütçem
+  // piyasada nereye düşüyor" sorusu cevapsız kalır.
+  it('kullanıcının kendi aralığı ölçeği daraltmaz', () => {
+    const open = listingDistribution(parseListingSearch({}), 'price')
+    const bounded = listingDistribution(
+      parseListingSearch({ salePriceMin: '5000000', salePriceMax: '6000000' }),
+      'price',
+    )
+
+    expect(bounded.min).toBe(open.min)
+    expect(bounded.max).toBe(open.max)
+  })
+
+  // Az gözlemden çizilen sütunlar dağılımı değil tek tek ilanları gösterir.
+  // Mahalle kırılımı bir avuç ilana iner: burada ray çalışır, sütun çizilmez.
+  it('gözlem azsa sütun çizmez ama ölçeği korur', () => {
+    const state = parseListingSearch({ category: 'land', neighbourhood: 'merkez' })
+    const sparse = listingDistribution(state, 'area')
+
+    expect(countListings(state)).toBeLessThan(16)
+    expect(sparse.bins).toHaveLength(0)
+    expect(sparse.max).toBeGreaterThan(sparse.min)
+  })
+
+  // Kategori kırılımı histogram için yeterli yoğunluktadır: dağılıma dayanan
+  // yaprak, "Tüm Emlak" dışındaki kategorilerde de sütunlarını çizebilmeli.
+  it('her kategoride sütun çizilecek yoğunluk vardır', () => {
+    for (const category of ['residential', 'land', 'commercial', 'building'] as const) {
+      const distribution = listingDistribution(
+        parseListingSearch({ category, type: 'sale' }),
+        'price',
+      )
+      expect(distribution.bins.length).toBeGreaterThanOrEqual(16)
+    }
+  })
+
+  it('yeterli gözlemde sütunları toplam gözleme eşitler', () => {
+    const state = parseListingSearch({ type: 'sale' })
+    const distribution = listingDistribution(state, 'price')
+
+    expect(distribution.bins.length).toBeGreaterThanOrEqual(16)
+    expect(distribution.bins.reduce((sum, count) => sum + count, 0)).toBe(
+      countListings(state),
+    )
+  })
+
+  // Karışık popülasyon histogram çizdirmez: satılık+kiralık tek fiyat
+  // ekseninde, daire+arsa tek m² ekseninde toplanamaz. Kesit daralınca açılır.
+  it('karışık popülasyonda sütun çizmez, kesit daralınca çizer', () => {
+    const mixedPrice = listingDistribution(parseListingSearch({}), 'price')
+    expect(mixedPrice.bins).toHaveLength(0)
+    expect(mixedPrice.max).toBeGreaterThan(mixedPrice.min)
+
+    const mixedArea = listingDistribution(parseListingSearch({}), 'area')
+    expect(mixedArea.bins).toHaveLength(0)
+
+    expect(
+      listingDistribution(parseListingSearch({ type: 'sale' }), 'price').bins.length,
+    ).toBeGreaterThanOrEqual(16)
+    expect(
+      listingDistribution(parseListingSearch({ category: 'land' }), 'area').bins.length,
+    ).toBeGreaterThanOrEqual(16)
+  })
+
+  // Ölçeğin başında var olmayan bir aralık gösterilmemeli.
+  it('alt ucu sıfıra çökertmez', () => {
+    for (const axis of ['price', 'area'] as const) {
+      expect(listingDistribution(parseListingSearch({}), axis).min).toBeGreaterThan(0)
+    }
+  })
+
 })

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
-import { GlassButton } from '@repo/ui'
+import { GlassButton, GlassCheckbox } from '@repo/ui'
 import { AuthFormPage } from '../components/AuthFormPage'
 import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { ParolaAlani } from '../components/ParolaAlani'
@@ -196,7 +196,7 @@ export function KayitPage() {
       // orijinal dönüş hedefine (`/hesabim` vb.) geri dönmez. `/kayit/kurumsal`
       // `validateSearch` taşıdığından `search` açıkça `undefined` verilir —
       // elle taşımamak kasıtlıdır, unutulmuş değil.
-      navigate({ to: '/kayit/kurumsal', search: { donus: undefined } })
+      navigate({ to: '/kayit/kurumsal', search: { donus: undefined, paket: undefined } })
       return
     }
     navigate({ to: guvenliDonusYolu(donus), replace: true })
@@ -386,17 +386,15 @@ export function KayitPage() {
       </div>
 
       <div>
-        <label className={styles.onayRow} htmlFor="kayit-kvkk">
-          <input
-            id="kayit-kvkk"
-            type="checkbox"
-            checked={kvkkOnayi}
-            onChange={(event) => setKvkkOnayi(event.target.checked)}
-            aria-invalid={alanHatalari.kvkkOnayi ? true : undefined}
-            aria-describedby={alanHatalari.kvkkOnayi ? alanHataId('kayit-kvkk') : undefined}
-          />
-          <span>Aydınlatma metnini ve kullanım koşullarını okudum, onaylıyorum.</span>
-        </label>
+        <GlassCheckbox
+          className={styles.onayRow}
+          id="kayit-kvkk"
+          checked={kvkkOnayi}
+          onChange={(event) => setKvkkOnayi(event.target.checked)}
+          aria-invalid={alanHatalari.kvkkOnayi ? true : undefined}
+          aria-describedby={alanHatalari.kvkkOnayi ? alanHataId('kayit-kvkk') : undefined}
+          label="Aydınlatma metnini ve kullanım koşullarını okudum, onaylıyorum."
+        />
         {alanHatasi('kvkkOnayi', 'kayit-kvkk')}
       </div>
     </>

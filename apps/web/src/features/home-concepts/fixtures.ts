@@ -1,5 +1,6 @@
 import type {
   GlassAgencyCardProps,
+  GlassHighlightCardProps,
   GlassListingCardProps,
   GlassTrustSignal,
   GlassVitrinItem,
@@ -266,3 +267,21 @@ export const agencyFixtures: GlassAgencyCardProps[] = [
     variant: 'inline',
   },
 ]
+
+/* Ana sayfa vurgu vitrini: agencyFixtures ile AYNI ofisler, GlassHighlightCard
+   biçiminde. Tint'ler ofis logolarının baz renkleridir (placeholderImage ilk
+   argümanı) — kart ve avatar aynı kurumsal rengi paylaşır. */
+const agencyTints = ['#b45309', '#3a7a8a', '#8a6f3a'] as const
+
+export const agencyHighlightFixtures: GlassHighlightCardProps[] =
+  agencyFixtures.map((agency, i) => ({
+    title: agency.name,
+    description: agency.tagline,
+    metrics: agency.stats,
+    actionLabel: agency.phone,
+    actionHref: agency.phone
+      ? `tel:${agency.phone.replace(/[^+\d]/g, '')}`
+      : undefined,
+    iconLabel: agency.verified ? 'Doğrulanmış kurumsal ofis' : undefined,
+    tint: agencyTints[i % agencyTints.length],
+  }))

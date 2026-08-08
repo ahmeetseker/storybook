@@ -523,9 +523,11 @@
   cursor: pointer;
 }
 
+/* Dolu eylem rengi tek kaynaktan: kabuktaki "İlan ver" ile aynı token. */
 .submit {
-  background: var(--lg-accent);
-  color: var(--lg-accent-contrast);
+  background: var(--lg-action-prominent);
+  color: var(--lg-action-prominent-label);
+  font-weight: var(--lg-action-weight);
 }
 
 .cancel {
@@ -542,7 +544,7 @@
 
 @media (hover: hover) {
   .submit:hover {
-    background: color-mix(in srgb, var(--lg-accent) 88%, var(--lg-label));
+    background: var(--lg-action-prominent-hover);
   }
 
   .cancel:hover {

@@ -16,7 +16,7 @@ import { adimHatalariniSuz, hataliAdimIndeksiniBul } from './adim-suzgeci'
  * ofisin kendisinden okunur. Kullanıcı her aşamada tek bir belgeye bakar.
  */
 
-export type KurumsalAdimAnahtari = 'isletme' | 'yetki' | 'ofis' | 'onay'
+export type KurumsalAdimAnahtari = 'isletme' | 'yetki' | 'ofis' | 'paket' | 'onay'
 
 export interface KurumsalAdimi {
   anahtar: KurumsalAdimAnahtari
@@ -91,6 +91,17 @@ export const KURUMSAL_ADIMLARI: readonly KurumsalAdimi[] = [
       alan('yetkiliEPosta'),
       alan('yetkiliTelefon'),
     ],
+  },
+  {
+    anahtar: 'paket',
+    baslik: 'Paket',
+    kisaEtiket: 'Paket',
+    aciklama:
+      'Ofisinizin kadrosuna göre bir paket seçin. Ödeme başvurunuz onaylandıktan sonra alınır; paketi onaya kadar değiştirebilirsiniz.',
+    // Paket her zaman doludur (varsayılan seçim vardır) ve doğrulama normalde
+    // hata üretmez; alan yine de listelenir ki bilinmeyen bir paket kimliği
+    // gelirse (ör. eski bir bağlantı) hatası bu bölümde görünsün.
+    alanlar: [alan('paketId'), alan('paketKoltuk')],
   },
   {
     anahtar: 'onay',
