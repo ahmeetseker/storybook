@@ -6,6 +6,7 @@ import { GlassButton } from '../components/GlassButton'
 import { GlassBackButton } from '../components/GlassNavbar'
 import { GlassBadge } from '../components/GlassBadge'
 import { GlassRibbon } from '../components/GlassRibbon'
+import { GlassStarsCard, GlassStarsCardTitle } from '../components/GlassStarsCard'
 import { GlassSwitch } from '../components/GlassSwitch'
 import { GlassSegmentedControl } from '../components/GlassSegmentedControl'
 import { GlassSearchField } from '../components/GlassSearchField'
@@ -673,6 +674,21 @@ const ENTRIES: CatalogEntry[] = [
         }}
       >
         <GlassRibbon label="Doğrulanmış" />
+      </div>
+    ),
+  },
+  {
+    name: 'Stars Card',
+    description:
+      'Yıldızlı gece kartı — mürekkep zeminde kırpışan yıldız matrisi; imleçle tüm matris tutuşur. Bölge dizini gibi vitrin özetleri için.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bileşenler-vitrin-ve-yerleşim-glassstarscard--default',
+    preview: (
+      <div style={{ width: 220 }}>
+        <GlassStarsCard size="sm">
+          <GlassStarsCardTitle>Bodrum</GlassStarsCardTitle>
+        </GlassStarsCard>
       </div>
     ),
   },

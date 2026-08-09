@@ -281,3 +281,9 @@ DOM değişmezine bağlıdır.
 - 2026-08-05 — `image.fallbackSrc` eklendi: uzak (stok) fotoğraf
   yüklenemediğinde yerel yer tutucuya düşer. `REPRESENTATIVE_IMAGE_NOTE`
   bunu kullanıcıya zaten söz veriyordu, karşılığı yoktu.
+
+- 2026-08-08 — «Liste yatay» ekseni: `media="thumb"` kart her genişlikte
+  yatay tutar (görsel `--row-thumb-w` sol sütunu; çağıran kademelendirir),
+  özellik satırı tek sıra kayar, satıcı satırı tek katlı. `images[]` 2+
+  kare ile medya scroll-snap galeri şeridine döner (nokta göstergesi scroll
+  konumunun aynası, klavyede sol/sağ ok). İlk kare = `image` kapak sözleşmesi.

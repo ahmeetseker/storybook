@@ -167,6 +167,12 @@ export {
   type GlassHighlightCardProps,
   type GlassHighlightCardMetric,
 } from './components/GlassHighlightCard'
+export {
+  GlassStarsCard,
+  GlassStarsCardTitle,
+  GlassStarsCardDescription,
+  type GlassStarsCardProps,
+} from './components/GlassStarsCard'
 export { GlassClimateRiskPanel } from './components/GlassClimateRiskPanel'
 export type { GlassClimateRiskPanelProps, GlassClimateRiskHazard } from './components/GlassClimateRiskPanel'
 export {

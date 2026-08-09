@@ -513,6 +513,10 @@
 }
 
 .card[data-media='thumb'] .media {
+  /* wide'ın 240px akış tabanı grid kolonundan taşıp gövdeyi örtüyordu —
+     thumb'da sütun ölçüsü tek otorite. */
+  min-width: 0;
+  width: 100%;
   min-height: var(--row-thumb-w, 108px);
   height: 100%;
 }
@@ -550,8 +554,21 @@
   color: var(--lg-accent);
 }
 
-/* Satıcı satırı TEK katlı: isim ve zaman yan yana, uzun isim kırpılır. */
+/* Başlık thumb'da 2 satır kilitli: tek satır ellipsis dar kolonda başlığın
+   ayırt edici kuyruğunu yutuyordu. */
+.card[data-media='thumb'] .titleAction {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Satıcı satırı TEK katlı: isim ve zaman yan yana, uzun isim kırpılır.
+   `flex:1` şart — ayak sarmadığı için isim, sağ uç (fiyat+eylem) karşısında
+   ezilip yok oluyordu. */
 .card[data-media='thumb'] .agent {
+  flex: 1 1 auto;
   gap: var(--lg-space-2);
 }
 
@@ -571,4 +588,11 @@
 .card[data-media='thumb'] .footerEnd {
   flex: none;
   gap: var(--lg-space-2);
+}
+
+/* En yoğun kademe (sm + thumb, 108px görsel): ayakta isim ile m² fiyatı
+   aynı anda sığmıyor; öncelik SATICI KİMLİĞİNDE — birim fiyat ana fiyatın
+   türevidir ve detayda zaten var. Geniş thumb kademelerinde meta geri gelir. */
+.card[data-size='sm'][data-media='thumb'] .footerMeta {
+  display: none;
 }

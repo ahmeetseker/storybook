@@ -46,7 +46,11 @@ import {
   type PropertyCategory,
   type TransactionType,
 } from './domain/search-state'
-import { getRepresentativeListingImage } from './data/listing-photos'
+import {
+  getCategoryStockPhoto,
+  getRepresentativeListingImage,
+  stockPhotoCount,
+} from './data/listing-photos'
 import styles from './EmlakSearchView.module.css'
 
 type HistoryMode = 'push' | 'replace'
@@ -134,6 +138,59 @@ function MapGlyph() {
       <path d="M6 2.8v9.4M10 4.2v9.4" />
     </svg>
   )
+}
+
+/* Özellik rozetlerinin ikonları — rozet salt bilgi, ikon dekoratif. */
+function AreaGlyph() {
+  return (
+    <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden focusable="false">
+      <rect x="1.8" y="1.8" width="8.4" height="8.4" rx="1" />
+      <path d="M1.8 6h8.4M6 1.8v8.4" />
+    </svg>
+  )
+}
+
+function ZoningGlyph() {
+  return (
+    <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" aria-hidden focusable="false">
+      <path d="M2 10.5V4.8L6 2l4 2.8v5.7M4.5 10.5V7h3v3.5" />
+    </svg>
+  )
+}
+
+function DeedGlyph() {
+  return (
+    <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" aria-hidden focusable="false">
+      <path d="M3 1.8h4.5L9.5 4v6.2H3Z" />
+      <path d="M7.2 1.8V4h2.3" />
+    </svg>
+  )
+}
+
+function RoadGlyph() {
+  return (
+    <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" aria-hidden focusable="false">
+      <path d="M2.5 10.5 5 1.5M9.5 10.5 7 1.5M5.7 4.2h.9M5.4 7.2h1.4" />
+    </svg>
+  )
+}
+
+function CompareGlyph() {
+  return (
+    <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden focusable="false">
+      <path d="M5 2 2.5 4.5 5 7M2.5 4.5h9M9 7l2.5 2.5L9 12M11.5 9.5h-9" />
+    </svg>
+  )
+}
+
+/* Serbest metin öne çıkanı ikona bağlar: sınıflandırma anahtar kelimeyle —
+   eşleşmeyen rozet ikonsuz kalır (yanlış ikon, ikonsuzdan kötüdür). */
+function highlightGlyph(label: string): ReactNode {
+  const l = label.toLocaleLowerCase('tr-TR')
+  if (/imar|konut|ticari|tarla|bina/.test(l)) return <ZoningGlyph />
+  if (/tapu|kat mülkiyeti|iskân|iskan/.test(l)) return <DeedGlyph />
+  if (/yol|cephe|kadastro/.test(l)) return <RoadGlyph />
+  return undefined
 }
 
 function currency(value: number, transaction: TransactionType) {
@@ -578,6 +635,18 @@ function ListingCard({
 }) {
   const [favorite, setFavorite] = useState(false)
   const darEkran = useSyncExternalStore(subscribeDarEkran, darEkranMi, () => false)
+  // Galeri kareleri: kategori stok havuzundan, ilk kare = temsili kapak.
+  // Havuz uzunluğunu aşma — aynı kare iki kez görünürse "iki görsel var"
+  // izlenimi doğar (listing-photos yorumu).
+  const galleryImages = useMemo(
+    () =>
+      Array.from(
+        { length: Math.min(item.imageCount, stockPhotoCount(item.category)) },
+        (_, index) =>
+          getCategoryStockPhoto(item.category, index, `${item.title} — temsili görsel ${index + 1}`),
+      ),
+    [item.category, item.imageCount, item.title],
+  )
   // Her iki düzen de aynı temsili kareyi kullanır; ilan verisinde taşınmazın
   // kendi fotoğrafı yok (bkz. REPRESENTATIVE_IMAGE_NOTE).
   const representativeImage = getRepresentativeListingImage(item)
@@ -650,17 +719,21 @@ function ListingCard({
     <GlassListingRowCard
       aria-label={`${item.title} ilanı`}
       size={darEkran ? 'sm' : 'md'}
+      /* Liste görünümünün kimliği: HER genişlikte yatay kart (Varyant A,
+         2026-08-08). Görsel sütun genişliği view CSS'inde kademelenir. */
+      media="thumb"
       className={[styles.rowListing, selected ? styles.selectedListing : '']
         .filter(Boolean)
         .join(' ')}
       onMouseEnter={onSelect}
       onFocusCapture={onSelect}
       image={representativeImage}
-      mediaCaption={`${item.imageCount} fotoğraf`}
+      images={galleryImages}
+      mediaCaption={darEkran ? `${item.imageCount}` : `${item.imageCount} fotoğraf`}
       badge={
         item.verified ? (
           // Izgara kartıyla aynı dil: doğrulama köşe şerididir, kapsül değil.
-          <GlassRibbon label="Doğrulanmış" note="Temsili görsel" />
+          <GlassRibbon label="Doğrulanmış" note="Temsili görsel" size={darEkran ? 'xs' : 'sm'} />
         ) : (
           <span className={[styles.mediaBadge, styles.unverified].join(' ')}>
             Doğrulama bekliyor
@@ -675,15 +748,22 @@ function ListingCard({
         item.transaction === 'sale' ? 'Satılık' : 'Kiralık'
       } · ${locationLabel(item)}`}
       features={[
-        { label: `${formatter.format(item.area)} m²` },
-        ...item.highlights.map((highlight) => ({ label: highlight })),
+        { label: `${formatter.format(item.area)} m²`, icon: <AreaGlyph /> },
+        ...item.highlights.map((highlight) => ({
+          label: highlight,
+          icon: highlightGlyph(highlight),
+        })),
       ]}
       agent={{ name: item.sellerName }}
-      listedAt={`${item.publishedDays} gün önce`}
+      listedAt={darEkran ? `${item.publishedDays}g` : `${item.publishedDays} gün önce`}
       footerMeta={`${formatter.format(item.unitPrice)} TL/m²`}
       favorite={favorite}
       onFavoriteChange={setFavorite}
-      actions={[{ id: 'compare', label: 'Karşılaştır' }]}
+      actions={[
+        darEkran
+          ? { id: 'compare', label: 'Karşılaştır', icon: <CompareGlyph /> }
+          : { id: 'compare', label: 'Karşılaştır' },
+      ]}
     />
   )
 }

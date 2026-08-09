@@ -494,6 +494,9 @@
    pini). Kartın kendi geometrisi ve iç stili tasarım sisteminde kalır. */
 .rowListing {
   width: 100%;
+  /* Yatay kartın görsel sütunu — kap kademesine göre 224/150/108 (Varyant A,
+     2026-08-08). Mikro-geometri: kart oranını koruyan ölçüler. */
+  --row-thumb-w: 224px;
   transition:
     border-color 160ms ease,
     transform 160ms ease;
@@ -597,6 +600,10 @@
 
   .gridList {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rowListing {
+    --row-thumb-w: 150px;
   }
 
 }
@@ -826,10 +833,11 @@
      anahtarı); çip/eylem gibi kontrol tabanlı ölçüler de bir kademe iner —
      araç kartıyla aynı bilinçli AAA istisnası. */
   .rowListing {
+    --row-thumb-w: 108px;
     --lg-control-sm: 32px;
     /* «Karşılaştır» eylemi lg tabanından (dokunmatikte 48) okunur; kart
        kademesiyle birlikte iner. Genişlik tabanı da hit'ten geliyordu. */
-    --lg-control-lg: 36px;
+    --lg-control-lg: 32px;
     --lg-control-hit: 36px;
     --lg-text-body: var(--lg-text-footnote);
   }

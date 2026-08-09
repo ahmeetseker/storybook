@@ -87,3 +87,5 @@ Yok — statik. `prefers-reduced-motion` etkisi yoktur.
   dışında kalan mikro-geometri (GlassBadge §9 ile aynı gerekçe).
 - Kırpma kaba devredildiği için Storybook dışında konumlandırılmamış bir kapta
   şerit köşeye oturmaz; kap sözleşmesi §3'te belgelidir.
+- 2026-08-08 — `size="xs"` (60px pencere, 9px bant): kompakt yatay kartın
+  108px medyası için; sm mevcut kullanımlarda kalır.
