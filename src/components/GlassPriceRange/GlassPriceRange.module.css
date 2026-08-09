@@ -1,0 +1,266 @@
+/* GlassPriceRange — içerik katmanı: kendi cam yüzeyini kurmaz, taşıyıcı
+   yüzeyin (panel/kart) üstünde düz çizilir. */
+.root {
+  /* Yerel değişkenler (token karşılığı yok — bkz. rules.md §9 borç notu) */
+  --price-accent: var(--lg-accent);
+  --price-thumb: 20px;
+  --plot-h: 56px;
+  --bin-gap: 2px;
+  --bin-min-h: 3px;
+  --bin-radius: 2px;
+  --track-h: 6px;
+  --slider-h: 24px;
+  --pill-pad-y: 3px;
+  --pill-radius: var(--lg-radius-capsule, 999px);
+  --scale-h: 24px;
+  --fade: 0.18s var(--lg-motion-ease-standard, ease);
+
+  /* Kol merkezleri: native range gibi thumb uçlarda raydan taşmaz —
+     konum, thumb genişliğiyle telafi edilir (GlassSlider ile aynı formül). */
+  --pos-min: calc(var(--pct-min) * 1% + (50 - var(--pct-min)) * 0.01 * var(--price-thumb));
+  --pos-max: calc(var(--pct-max) * 1% + (50 - var(--pct-max)) * 0.01 * var(--price-thumb));
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.disabled {
+  opacity: 0.45;
+}
+
+/* Başlık satırı: ad solda, ikincil not sağda (referans düzeni) */
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.label {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  color: var(--lg-label);
+}
+
+.hint {
+  min-width: 0;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Histogram: sütunlar alanı eşit böler, seçili banda düşenler vurgulanır */
+/* Sütunlar rayın üstüne oturur: dağılım ile seçim tek bir grafik gibi okunur */
+.plot {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--bin-gap);
+  height: var(--plot-h);
+  margin-bottom: calc(var(--lg-space-2) * -1);
+}
+
+.bin {
+  flex: 1 1 0;
+  min-width: 0;
+  height: max(var(--bin-min-h), calc(var(--bin-h) * 1%));
+  border-radius: var(--bin-radius) var(--bin-radius) 0 0;
+  background: color-mix(in srgb, var(--lg-label) 14%, transparent);
+  transition: background-color var(--fade);
+}
+
+.bin[data-active='true'] {
+  background: var(--price-accent);
+}
+
+/* Ray + kollar */
+.slider {
+  position: relative;
+  height: var(--slider-h);
+}
+
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: var(--track-h);
+  transform: translateY(-50%);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label) 10%, transparent);
+  box-shadow: inset 0 0 0 1px var(--lg-hairline);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Seçili bant: iki kol arası */
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos-min);
+  right: calc(100% - var(--pos-max));
+  background: var(--price-accent);
+}
+
+/* İki native range üst üste: sürükleme, odak ve `slider` rolü onlardan gelir.
+   Girdi kutusu tıklamayı yutmasın diye `pointer-events` yalnız thumb'da açık —
+   böylece iki kol da bağımsız yakalanabilir. */
+.input {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  width: 100%;
+  height: var(--lg-control-hit);
+  margin: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--price-thumb);
+  /* Dikeyde tam dokunma hedefi (44px): thumb görünmez, yalnız hedef alanıdır */
+  height: var(--lg-control-hit);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.input::-moz-range-thumb {
+  width: var(--price-thumb);
+  height: var(--lg-control-hit);
+  border: 0;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.input:disabled::-webkit-slider-thumb {
+  pointer-events: none;
+  cursor: default;
+}
+
+.input:disabled::-moz-range-thumb {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* Üstteki kol: normalde sağ kol; sağ kol uca yapıştıysa sol kol öne alınır */
+.slider[data-front='max'] .input[data-handle='max'],
+.slider[data-front='min'] .input[data-handle='min'] {
+  z-index: 2;
+}
+
+.thumb {
+  position: absolute;
+  top: 50%;
+  width: var(--price-thumb);
+  height: var(--price-thumb);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-sm), 0 0 0 1px var(--lg-hairline);
+  pointer-events: none;
+}
+
+.thumb[data-handle='min'] {
+  left: var(--pos-min);
+}
+
+.thumb[data-handle='max'] {
+  left: var(--pos-max);
+}
+
+.input[data-handle='min']:focus-visible ~ .thumb[data-handle='min'],
+.input[data-handle='max']:focus-visible ~ .thumb[data-handle='max'] {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+/* Skala: alan sınırları uçlarda, değer pilleri kolların altında */
+.scale {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--scale-h);
+}
+
+.bound {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--fade);
+}
+
+/* Pil sınırın üstüne binmek üzereyken sınır söner — değer pilde okunuyor */
+.bound[data-dim='true'] {
+  opacity: 0;
+}
+
+/* Pil konumu kendi genişliğiyle kıstırılır: %0'da sola, %100'de sağa yaslanır,
+   arada orantılı kayar — böylece hiçbir zaman kaptan taşmaz. */
+.pill {
+  position: absolute;
+  top: 50%;
+  left: var(--pos);
+  transform: translate(calc(var(--pct) * -1%), -50%);
+  padding: var(--pill-pad-y) var(--lg-space-2);
+  border-radius: var(--pill-radius);
+  background: var(--lg-label);
+  color: var(--lg-bg);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pill[data-handle='min'] {
+  --pos: var(--pos-min);
+}
+
+.pill[data-handle='max'] {
+  --pos: var(--pos-max);
+}
+
+.pill[data-merged='true'] {
+  --pos: calc((var(--pos-min) + var(--pos-max)) / 2);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Dokunmatik: kol büyür, ray kalınlaşır (hedef zaten 44px) */
+@media (pointer: coarse) {
+  .root {
+    --price-thumb: 28px;
+    --track-h: 8px;
+    --slider-h: var(--lg-control-hit);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bin,
+  .bound {
+    transition: none;
+  }
+}

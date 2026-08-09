@@ -1,0 +1,44 @@
+/* Yatay ilan kartının hesap alanına özgü iki yaması: medyanın üstündeki durum
+   rozeti ve "işlem gerekli" notunun ikon rengi. Kartın kendi düzeni
+   GlassListingRowCard'dadır; burada yalnız yönetim dili taşınır. */
+
+/* Rozet bilinmeyen bir fotoğrafın üstünde durur: zemin saydam değil, durum
+   renginin yüzeyle karışımıdır — kontrast fotoğraftan bağımsız kalır. */
+.state {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  box-shadow: var(--lg-shadow-xs);
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.state[data-state='live'] {
+  background: color-mix(in srgb, var(--lg-success) 16%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-success) 70%, var(--lg-label));
+}
+
+.state[data-state='review'] {
+  background: color-mix(in srgb, var(--lg-warning) 18%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-warning) 72%, var(--lg-label));
+}
+
+.state[data-state='changes'],
+.state[data-state='expired'] {
+  background: color-mix(in srgb, var(--lg-danger) 14%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-danger) 78%, var(--lg-label));
+}
+
+.state[data-state='draft'],
+.state[data-state='paused'] {
+  background: color-mix(in srgb, var(--lg-label-secondary) 12%, var(--lg-surface));
+  color: var(--lg-label-secondary);
+}
+
+/* Not satırının ikonu varsayılan olarak "doğrulandı" yeşilidir; işlem gerektiren
+   ilanda uyarı rengine döner. Bilgi renkte DEĞİL, "İşlem gerekli:" metnindedir. */
+.issueIcon {
+  color: var(--lg-danger);
+}

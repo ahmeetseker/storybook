@@ -1,0 +1,58 @@
+/* shadcn breadcrumb görünümünün token karşılığı:
+   text-sm text-muted-foreground → footnote + ikincil etiket rengi;
+   hover:text-foreground → birincil etiket; ayraç chevron ikonu. */
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+  overflow-wrap: break-word;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  border-radius: var(--lg-radius-chip);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--lg-label);
+  }
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+.page {
+  color: var(--lg-label);
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lg-space-5);
+  height: var(--lg-space-5);
+}

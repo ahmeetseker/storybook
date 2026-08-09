@@ -1,0 +1,188 @@
+/* Portal (document.body) — çağıranın yerel değişkenleri buraya ulaşmaz;
+   token karşılığı olmayan malzeme/mikro-geometri kökte toplanır (rules.md §9). */
+.lightbox {
+  --overlay-bg: rgba(0, 0, 0, 0.82);
+  --overlay-blur: 18px;
+  --image-radius: 16px;
+  --image-max-w: 1200px;
+  --image-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  --pill-bg: rgba(255, 255, 255, 0.14);
+  --pill-pad: 4px 14px;
+  --thumb-h: 54px;
+  --thumb-gap: 2px;
+  --thumb-radius: 12px;
+  --thumb-ring: 2px;
+  --thumb-active-border: rgba(255, 255, 255, 0.9);
+  --media-placeholder: rgba(0, 0, 0, 0.2);
+  --fade: 0.18s ease;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--overlay-bg);
+  -webkit-backdrop-filter: blur(var(--overlay-blur));
+  backdrop-filter: blur(var(--overlay-blur));
+}
+.lightbox:focus {
+  outline: none;
+}
+
+/* Karartma zaten katmandır: saydamlık kapalıyken bulanıklık düşer, zemin koyulaşır. */
+@media (prefers-reduced-transparency: reduce) {
+  .lightbox {
+    --overlay-bg: rgba(0, 0, 0, 0.94);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Ray: kareler yan yana, sahne genişliğinde. Konum motion'dan (x) gelir. */
+.track {
+  display: flex;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.track:active {
+  cursor: grabbing;
+}
+
+.frame {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lg-space-6);
+}
+
+.image {
+  max-width: min(100%, var(--image-max-w));
+  max-height: 100%;
+  border-radius: var(--image-radius);
+  object-fit: contain;
+  box-shadow: var(--image-shadow);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+.navLeft {
+  left: var(--lg-space-6);
+}
+.navRight {
+  right: var(--lg-space-6);
+}
+
+.close {
+  position: absolute;
+  top: var(--lg-space-5);
+  right: var(--lg-space-5);
+  z-index: 2;
+}
+
+.footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lg-space-3);
+  padding: 0 var(--lg-space-6) var(--lg-space-5);
+}
+
+.counter {
+  padding: var(--pill-pad);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--pill-bg);
+  color: var(--lg-on-scrim);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.thumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--thumb-gap);
+  max-width: min(92vw, var(--image-max-w));
+  overflow-x: auto;
+  padding: var(--thumb-ring);
+  scrollbar-width: none;
+}
+.thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Genişlik CSS'te yazılmaz: aktif kare film şeridi gibi genişler, komşular
+   daralır; iki genişlik de motion tarafından (TSX sabitleri) sürülür. */
+.thumb {
+  flex: none;
+  height: var(--thumb-h);
+  padding: 0;
+  border: var(--thumb-ring) solid transparent;
+  border-radius: var(--thumb-radius);
+  overflow: hidden;
+  background: var(--media-placeholder);
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--fade), border-color var(--fade);
+}
+@media (hover: hover) {
+  .thumb:hover {
+    opacity: 1;
+  }
+}
+.thumb:focus-visible {
+  outline: 2px solid var(--lg-accent, #0a84ff);
+  outline-offset: 2px;
+}
+
+/* Dokunmatikte kare şeridi büyür: 44px dokunma hedefinin altına inmez
+   (daralmış genişlik de TSX'te aynı eşiğe çekilir). */
+@media (pointer: coarse) {
+  .thumb {
+    height: 44px;
+  }
+}
+
+.thumbActive {
+  opacity: 1;
+  border-color: var(--thumb-active-border);
+}
+
+.thumbImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.note {
+  margin: 0;
+  max-width: min(92vw, var(--image-max-w));
+  color: var(--lg-on-scrim);
+  opacity: 0.72;
+  font-size: var(--lg-text-caption);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thumb {
+    transition: none;
+  }
+}

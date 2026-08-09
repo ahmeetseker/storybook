@@ -1,0 +1,208 @@
+/* GlassFaqMarquee — SSS kartlarının yatay aktığı vitrin bölümü. Flat içerik
+   katmanı: kartlar sayfa zemininde durur, cam burada okunmaz ve sayfanın cam
+   bütçesini (max 6 yüzey) boşa harcar. */
+
+.root {
+  /* Mikro geometri — token karşılığı yok (bkz. rules.md §9 borç notu) */
+  --faq-card-inline: 24rem; /* kart genişliği; dar ekranda %80 vw'ye iner */
+  --faq-fade: 3rem; /* kenarlarda eriyerek giriş/çıkış payı */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-8);
+  width: 100%;
+}
+
+/* ── Başlık ─────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  align-items: center;
+  max-inline-size: 60ch;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  color: var(--lg-label);
+  animation: faqIntro 0.7s ease-out 0.2s both;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--lg-text-body);
+  line-height: 1.55;
+  color: var(--lg-label-secondary);
+  animation: faqIntro 0.7s ease-out 0.4s both;
+}
+
+/* Giriş yalnız transform/opacity oynatır (motion sözleşmesi). */
+@keyframes faqIntro {
+  from {
+    opacity: 0;
+    transform: translateY(var(--lg-space-5));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Raflar ─────────────────────────────────────────────────────── */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-6);
+}
+
+/* Satır kenarlarda kesilmez, erir: kesik kart "yarım kaldı" hissi verir. */
+.row {
+  overflow: hidden;
+  min-width: 0;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--faq-fade),
+    #000 calc(100% - var(--faq-fade)),
+    transparent
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: faqStart var(--faq-duration, 40s) linear infinite;
+}
+
+[data-direction='end'] .track {
+  animation-name: faqEnd;
+}
+
+/* İki grup yan yana; bir grup genişliği kadar kayınca desen başa döner. */
+@keyframes faqStart {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes faqEnd {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.group {
+  display: flex;
+  align-items: stretch;
+  gap: var(--lg-space-6);
+  margin: 0;
+  padding-block: var(--lg-space-2); /* gölge maskede kırpılmasın */
+  padding-inline: calc(var(--lg-space-6) / 2);
+  list-style: none;
+}
+
+/* ── Kart ───────────────────────────────────────────────────────── */
+/* Paket kartlarıyla aynı yüzey dili: --lg-surface + hairline + xs gölge. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  inline-size: min(var(--faq-card-inline), 80vw);
+  flex: none;
+  padding: var(--lg-space-6);
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  box-shadow: var(--lg-shadow-xs);
+}
+
+.question {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--lg-label);
+}
+
+.answer {
+  margin: 0;
+  font-size: var(--lg-text-body);
+  line-height: 1.55;
+  color: var(--lg-label-secondary);
+}
+
+/* ── Duraklatma ─────────────────────────────────────────────────── */
+/* Kontrol bölümün sağ üstünde sabit durur — raflarla birlikte kaymaz,
+   yoksa durdurulacak düğmenin kendisi kaçar. */
+.toggle {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  min-inline-size: var(--lg-control-hit);
+  min-block-size: var(--lg-control-hit);
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+}
+
+.toggle:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* Duraklatma: kullanıcı düğmesi, imleç rafın üstündeyken ve içeride odak
+   varken. Hareket eden metni okumak aksi halde kovalamaca olur. */
+[data-paused='true'] .track,
+.root:focus-within .track {
+  animation-play-state: paused;
+}
+
+@media (hover: hover) {
+  .row:hover .track {
+    animation-play-state: paused;
+  }
+}
+
+/* Hareket istenmiyorsa raflar hiç dönmez: kopya kaldırılır, satır yatay
+   kaydırılabilir bir kart rafına iner, duraklat düğmesi anlamsızlaşır.
+   Başlık girişleri de oynamaz. */
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .subtitle {
+    animation: none;
+  }
+
+  .track {
+    animation: none;
+  }
+
+  .track > .group + .group {
+    display: none;
+  }
+
+  .row {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .toggle {
+    display: none;
+  }
+}

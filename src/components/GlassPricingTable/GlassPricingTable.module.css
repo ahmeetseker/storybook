@@ -1,0 +1,749 @@
+/* GlassPricingTable — fiyat planı tablosu.
+   Katman: içerik. Kartlar FLAT'tir; component'in tek cam yüzeyi dönem
+   anahtarıdır (GlassSegmentedControl). Cam üstüne cam yoktur.
+
+   Kırılma noktaları viewport'a değil KONTEYNERE bağlıdır: aynı tablo sayfada,
+   çekmecede veya dar bir kolonda doğru yerleşimi seçer. */
+.root {
+  container: lg-pricing / inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-8);
+}
+
+/* ── Dönem anahtarı ─────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  flex-wrap: wrap;
+}
+
+.periodSwitch {
+  flex: 0 0 auto;
+}
+
+/* İndirim ipucu anahtarın YANINDA durur, içinde değil: segment etiketi düz
+   metindir (GlassSegmentedControl sözleşmesi) ve ikinci bir rozet dili
+   açmamak için kontrol olduğu gibi yeniden kullanılır. Aylık seçiliyken de
+   görünür — kazancı ilan etmek işidir; yıllıkta vurgusu artar. */
+.discount {
+  flex: 0 0 auto;
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  color: var(--lg-success);
+  background: color-mix(in srgb, var(--lg-success) 8%, var(--lg-surface));
+  border: var(--lg-stroke-hairline) solid transparent;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    border-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+.discount[data-active='true'] {
+  background: color-mix(in srgb, var(--lg-success) 12%, var(--lg-surface));
+  border-color: color-mix(in srgb, var(--lg-success) 30%, transparent);
+}
+
+/* ── Izgara yerleşimi ───────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--lg-space-5);
+  align-items: stretch; /* kart altları hizalanır; prominent yukarı taşar */
+}
+
+.card {
+  container-type: inline-size; /* fiyat ölçeği kartın KENDİ genişliğini okur */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+  padding: var(--lg-space-6);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  box-shadow: var(--lg-shadow-xs);
+  transition:
+    transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    box-shadow var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--lg-shadow-sm);
+  }
+}
+
+/* ── Kenar ışığı ────────────────────────────────────────────────────
+   Çerçeve tek renk değildir: ışık kartın ÜSTÜNDEN gelir, bu yüzden accent
+   üst kenarda toplanır ve yanlara inerken hairline'a döner. Kartın gerçek
+   `border`'ı hairline olarak KALIR; bu katman onun üzerine biner, yani
+   maske desteklenmese de kart çerçevesiz kalmaz.
+
+   Halka `padding` kadar kalınlıkta bir maske farkıyla üretilir: dış dikdörtgen
+   eksi iç (content-box) dikdörtgen = tam olarak `--lg-stroke-hairline`lık
+   çerçeve. Maske yalnız alfa okur, bu yüzden `currentColor` yeterlidir. */
+.card::before,
+.planRow::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--lg-stroke-hairline) * -1);
+  padding: var(--lg-stroke-hairline);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.85;
+  background: radial-gradient(
+    120% 90% at 50% -10%,
+    color-mix(in srgb, var(--lg-accent) 42%, transparent) 0%,
+    color-mix(in srgb, var(--lg-accent) 16%, transparent) 40%,
+    transparent 72%
+  );
+  -webkit-mask:
+    linear-gradient(currentColor 0 0) content-box,
+    linear-gradient(currentColor 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(currentColor 0 0) content-box,
+    linear-gradient(currentColor 0 0);
+  mask-composite: exclude;
+  transition: opacity var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+/* Kenar hover'da ısınır. Gradient'in kendisi değil yalnız `opacity` animasyonu
+   olur — ErisilebilirlikMotionResponsive.mdx: transform/opacity/filter. */
+@media (hover: hover) {
+  .card:hover::before {
+    opacity: 1;
+  }
+}
+
+/* Vurgulanan plan: ton değil MALZEME YOĞUNLUĞU ile ayrışır — üründe koyu
+   tema yoktur (GenelBakis.mdx), bu yüzden accent zemine karıştırılır.
+   Düz tint yerine üstten inen bir yıkama: ışık kaynağı kenar halkasıyla aynı
+   yerdedir, kart tek parça okunur. */
+.card[data-prominent] {
+  background:
+    radial-gradient(
+      130% 70% at 50% 0%,
+      color-mix(in srgb, var(--lg-accent) 11%, transparent) 0%,
+      color-mix(in srgb, var(--lg-accent) 4%, transparent) 45%,
+      transparent 75%
+    ),
+    var(--lg-surface);
+  border-color: color-mix(in srgb, var(--lg-accent) 32%, transparent);
+  box-shadow: var(--lg-shadow-sm);
+}
+
+/* Vurgulanan kartta halka tabandaki tonlu çerçevenin üstüne biner: üst kenar
+   belirgin bir accent çizgisi olur, yanlar %32'lik tona döner. */
+.card[data-prominent]::before {
+  opacity: 1;
+  background: radial-gradient(
+    120% 90% at 50% -10%,
+    color-mix(in srgb, var(--lg-accent) 70%, transparent) 0%,
+    color-mix(in srgb, var(--lg-accent) 34%, transparent) 42%,
+    transparent 78%
+  );
+}
+
+.cardMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-5);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Üç açıklama farklı uzunlukta; sabit üç satır ayrılır ki fiyatlar
+   kolonlar arasında aynı hizada başlasın. */
+.cardDescription {
+  margin: 0;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.55;
+  min-height: calc(var(--lg-text-footnote) * 1.55 * 3);
+}
+
+.badge {
+  flex: 0 0 auto;
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--lg-space-1) var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  color: var(--lg-accent);
+  background: color-mix(in srgb, var(--lg-accent) 10%, var(--lg-surface));
+  border: var(--lg-stroke-hairline) solid color-mix(in srgb, var(--lg-accent) 22%, transparent);
+  white-space: nowrap;
+}
+
+/* ── Fiyat ──────────────────────────────────────────────────────── */
+.priceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lg-space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: var(--lg-pricing-price-size);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.currency {
+  font-size: 0.62em;
+  font-weight: 700;
+  margin-right: 0.06em;
+  letter-spacing: -0.02em;
+}
+
+.slots {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.slot {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+.separator {
+  width: 0.3em;
+  text-align: center;
+}
+
+/* Odometre şeridi: 0–9 alt alta, hedef basamağa `translateY` ile kayar. */
+.reel {
+  display: flex;
+  flex-direction: column;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reel > span {
+  height: 1em;
+  line-height: 1;
+}
+
+.period {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+}
+
+/* Kullanıcı adedi varsayılandan farklıysa gerekçesi fiyatın yanında durur. */
+.seatCaption {
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gizliyken de yer ayırır: aylık↔yıllık geçişinde yerleşim zıplamaz. */
+.savings {
+  min-height: calc(var(--lg-text-caption) * 1.5);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  color: var(--lg-success);
+  font-variant-numeric: tabular-nums;
+  transition:
+    opacity var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+.savings[data-visible='false'] {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+/* ── Eylemler ───────────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; /* GlassButton flex öğesi olarak tam genişliğe yayılır */
+  gap: var(--lg-space-2);
+}
+.action {
+  justify-content: center;
+}
+
+/* ── Özellik listesi ────────────────────────────────────────────── */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  padding-top: var(--lg-space-4);
+  border-top: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.featuresTitle {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+.featureList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.45;
+}
+
+.tick {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--lg-accent);
+}
+.tick circle {
+  fill: color-mix(in srgb, var(--lg-accent) 12%, transparent);
+}
+.tick path {
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* ── Tablet: iki kolon; yalnız kalan son plan tam genişlik banda döner.
+   `:last-child:nth-child(odd)` plan sayısından bağımsızdır — 3 planda bant,
+   4 planda 2×2 ızgara olur, ekstra prop gerekmez. ─────────────────── */
+@container lg-pricing (min-width: 620px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--lg-space-8);
+  }
+  .card:last-child:nth-child(odd) .cardMain {
+    flex: 1 1 42%;
+    min-width: 0;
+  }
+  .card:last-child:nth-child(odd) .cardDescription {
+    min-height: 0;
+  }
+  .card:last-child:nth-child(odd) .actions {
+    flex-direction: row;
+  }
+  .card:last-child:nth-child(odd) .action {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .card:last-child:nth-child(odd) .features {
+    flex: 1 1 58%;
+    min-width: 0;
+    align-self: stretch;
+    padding-top: 0;
+    border-top: none;
+    padding-left: var(--lg-space-7);
+    border-left: var(--lg-stroke-hairline) solid var(--lg-hairline);
+    /* Ayraç tam boy kalır; kısa olan liste dikeyde ortalanır — aksi hâlde
+       sağ altta boş bir cep oluşuyor. */
+    justify-content: center;
+  }
+  .card:last-child:nth-child(odd) .featureList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--lg-space-3) var(--lg-space-5);
+  }
+}
+
+/* ── Masaüstü: üç kolon, vurgulanan plan bir adım yükselir ───────── */
+@container lg-pricing (min-width: 880px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .card[data-prominent] {
+    margin-top: calc(var(--lg-space-4) * -1);
+    padding-bottom: var(--lg-space-7);
+  }
+  .card:last-child:nth-child(odd) {
+    grid-column: auto;
+    flex-direction: column;
+    gap: var(--lg-space-5);
+  }
+  .card:last-child:nth-child(odd) .cardMain {
+    flex: none;
+  }
+  .card:last-child:nth-child(odd) .cardDescription {
+    min-height: calc(var(--lg-text-footnote) * 1.55 * 3);
+  }
+  .card:last-child:nth-child(odd) .actions {
+    flex-direction: column;
+  }
+  .card:last-child:nth-child(odd) .action {
+    flex: none;
+  }
+  .card:last-child:nth-child(odd) .features {
+    flex: none;
+    padding-top: var(--lg-space-4);
+    border-top: var(--lg-stroke-hairline) solid var(--lg-hairline);
+    padding-left: 0;
+    border-left: none;
+  }
+  .card:last-child:nth-child(odd) .featureList {
+    display: flex;
+    gap: var(--lg-space-3);
+  }
+}
+
+/* ── Kompakt yerleşim — dar konteynerde seçim listesi ───────────────
+   Dar ekranda üç tam kart dört ekran boyu sürüyor ve karşılaştırma
+   kayboluyor. Kompaktta planlar tek dokunuşluk bir listeye döner; yalnız
+   seçili plan açılır. Bu bir GÖRÜNÜM değil ETKİLEŞİM farkıdır: DOM da
+   değişir (radiogroup + genişleyen gövde). */
+/* Anahtar kompaktta da içeriği kadar kalır: `GlassSegmentedControl` kapsül
+   varyantında segmentler içerik genişliğindedir (`fill` yalnız `bar` için),
+   kapsülü germek sağda ölü boşluk bırakır. */
+
+.planList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+}
+
+.planRow {
+  position: relative; /* kenar ışığı halkası (::before) buna göre konumlanır */
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  box-shadow: var(--lg-shadow-xs);
+  transition:
+    border-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard),
+    background-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+.planRow[data-selected='true'] {
+  border-color: color-mix(in srgb, var(--lg-accent) 42%, transparent);
+  background:
+    radial-gradient(
+      130% 90% at 50% 0%,
+      color-mix(in srgb, var(--lg-accent) 10%, transparent) 0%,
+      color-mix(in srgb, var(--lg-accent) 3%, transparent) 50%,
+      transparent 80%
+    ),
+    var(--lg-surface);
+  box-shadow: var(--lg-shadow-sm);
+}
+.planRow[data-selected='true']::before {
+  opacity: 1;
+  background: radial-gradient(
+    120% 90% at 50% -10%,
+    color-mix(in srgb, var(--lg-accent) 70%, transparent) 0%,
+    color-mix(in srgb, var(--lg-accent) 34%, transparent) 42%,
+    transparent 78%
+  );
+}
+
+/* Satırın tamamı hedeftir — küçük radyo düğmesine nişan almak gerekmez. */
+.planHit {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  width: 100%;
+  min-height: var(--lg-control-hit);
+  padding: var(--lg-space-4);
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.planHit:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: -3px;
+}
+
+.dot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--lg-radius-capsule);
+  border: 2px solid color-mix(in srgb, var(--lg-label) 18%, transparent);
+  transition: border-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+.planRow[data-selected='true'] .dot {
+  border-color: var(--lg-accent);
+}
+.dot i {
+  width: 11px;
+  height: 11px;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-accent);
+  transform: scale(0);
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.planRow[data-selected='true'] .dot i {
+  transform: scale(1);
+}
+
+.planIdentity {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.planName {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+/* Rozet ad satırına sığmıyor (dar satırda fiyatla yarışıyor) — alt satırda,
+   plan türünün yanında durur. */
+.planSub {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  flex-wrap: wrap;
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+.planSub .badge {
+  font-size: var(--lg-text-badge);
+  padding: 1px var(--lg-space-2);
+  letter-spacing: 0.04em;
+}
+
+.planPrice {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+.planPrice .price {
+  font-size: var(--lg-text-title);
+  letter-spacing: -0.03em;
+}
+.periodSuffix {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+.planPrice .savings {
+  font-size: var(--lg-text-badge);
+  min-height: calc(var(--lg-text-badge) * 1.5);
+}
+
+/* Açılan gövde — 0fr→1fr ile ölçü hesabı olmadan yüksekliğe animasyon.
+   Kapalıyken içerik gerçekten sıfır yükseklikte kalır. */
+.planBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 420ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.planBody[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.planBody > div {
+  overflow: hidden;
+}
+
+.planBodyInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+  padding: 0 var(--lg-space-4) var(--lg-space-4);
+}
+
+.planBody .feature {
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity 320ms var(--lg-motion-ease-standard) var(--lg-pricing-stagger, 0ms),
+    transform 320ms var(--lg-motion-ease-standard) var(--lg-pricing-stagger, 0ms);
+}
+.planBody[data-open='true'] .feature {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Kullanıcı adedi ────────────────────────────────────────────── */
+.seats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  padding-top: var(--lg-space-4);
+  border-top: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.seatsLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.seatsLabel b {
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+}
+.seatsLabel small {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.stepper {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-1);
+  border-radius: var(--lg-radius-chip);
+  background: color-mix(in srgb, var(--lg-label) 4%, transparent);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+.stepper button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-label);
+  cursor: pointer;
+  transition:
+    background-color 180ms var(--lg-motion-ease-standard),
+    transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+  -webkit-tap-highlight-color: transparent;
+}
+/* Görünür kutu 32px kalır; dokunma hedefi görünmez uzantıyla --lg-control-hit
+   (44px) değerine çıkar — WCAG 2.2 AAA 2.5.5. */
+.stepper button::after {
+  content: '';
+  position: absolute;
+  inset: calc((var(--lg-control-hit) - 32px) / -2);
+}
+@media (hover: hover) {
+  .stepper button:hover {
+    background: var(--lg-surface);
+  }
+}
+.stepper button:active {
+  transform: scale(0.92);
+}
+.stepper button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.stepper button:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: 1px;
+}
+.stepper svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+}
+.stepper output {
+  min-width: 3ch;
+  text-align: center;
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Seçim zaten yapıldı; tek eylem onu onaylar. */
+.compactAction {
+  align-self: stretch;
+  justify-content: center;
+}
+
+/* ── Ortak ──────────────────────────────────────────────────────── */
+.footnote {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.liveRegion {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before,
+  .planRow::before,
+  .reel,
+  .savings,
+  .discount,
+  .planRow,
+  .planBody,
+  .planBody .feature,
+  .dot,
+  .dot i,
+  .stepper button {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+  .card:hover {
+    transform: none;
+  }
+  .stepper button:active {
+    transform: none;
+  }
+}

@@ -1,0 +1,33 @@
+/* GlassSparkline — kendi yüzeyi yoktur; içine konduğu hücrenin/kartın zeminini
+   kullanır. Animasyon yoktur, bu yüzden reduced-motion kuralı gerekmez. */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Yetersiz veri: çizgi yerine tire — hücre yüksekliği bozulmaz */
+.dash {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary);
+  line-height: 1;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

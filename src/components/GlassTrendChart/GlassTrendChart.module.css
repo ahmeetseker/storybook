@@ -1,0 +1,171 @@
+/* GlassTrendChart — içerik katmanı FLAT kart: cam/backdrop-filter yok, yalnız
+   `--lg-surface` + `--lg-hairline`. Giriş animasyonu yoktur; kılavuz ve balon
+   geçişsiz görünür/gizlenir, bu yüzden ayrı bir reduced-motion kuralı gerekmez. */
+
+.root {
+  /* Mikro-geometri (token karşılığı yok — bkz. rules.md §9):
+     künye çizgi örneği 24×8, tooltip noktası 8px, tooltip satır arası 2px. */
+  --glass-trend-swatch-w: 24px;
+  --glass-trend-swatch-h: 8px;
+  --glass-trend-dot: 8px;
+  --glass-trend-row-gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3, 12px);
+  box-sizing: border-box;
+  padding: var(--lg-space-5, 20px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  color: var(--lg-label);
+  font-family: var(--lg-font, inherit);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-headline, 17px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ── Künye ─────────────────────────────────────────────────────────────── */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2, 8px) var(--lg-space-5, 20px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.swatch {
+  width: var(--glass-trend-swatch-w);
+  height: var(--glass-trend-swatch-h);
+  flex: none;
+}
+
+.legendLabel {
+  font-weight: 600;
+}
+
+/* Seri sınıfı rozeti — "referans"/"tahmin". Çizgi deseniyle birlikte ikinci kanal. */
+.legendNote {
+  font-size: var(--lg-text-badge, 11px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  padding: 0 var(--lg-space-2, 8px);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule, 999px);
+}
+
+/* ── Çizim ─────────────────────────────────────────────────────────────── */
+
+.plot {
+  position: relative;
+  width: 100%;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+}
+
+.yLabel {
+  position: absolute;
+  left: 0;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--lg-surface) 82%, transparent);
+  padding-right: var(--lg-space-1, 4px);
+}
+
+/* ── Paylaşımlı balon ──────────────────────────────────────────────────── */
+
+.tooltip {
+  position: absolute;
+  top: var(--lg-space-1, 4px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: var(--glass-trend-row-gap);
+  padding: var(--lg-space-2, 8px) var(--lg-space-3, 12px);
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  box-shadow: var(--lg-shadow-sm);
+  font-size: var(--lg-text-caption, 12px);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.tooltipX {
+  color: var(--lg-label-secondary);
+  font-weight: 600;
+  padding-bottom: var(--lg-space-1, 4px);
+  border-bottom: 1px solid var(--lg-hairline);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-2, 8px);
+}
+
+.tooltipDot {
+  width: var(--glass-trend-dot);
+  height: var(--glass-trend-dot);
+  border-radius: var(--lg-radius-capsule, 999px);
+  flex: none;
+}
+
+.tooltipName {
+  flex: 1;
+  color: var(--lg-label-secondary);
+}
+
+.tooltipValue {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Eksen ve boş durum ────────────────────────────────────────────────── */
+
+.xLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+}
+
+.empty {
+  margin: 0;
+  font-size: var(--lg-text-body, 15px);
+  color: var(--lg-label-secondary);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

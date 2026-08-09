@@ -1,0 +1,574 @@
+/* Yatay ilan kartı — düz "kağıt" yüzey. Cam kullanılmaz: kart içerik
+   katmanındadır ve listede onlarca kez tekrarlanır (sayfa başına max 6 cam
+   yüzey kuralı, GenelBakis.mdx). */
+.card {
+  display: flex;
+  overflow: hidden;
+  width: min(100%, var(--lg-listing-row-card-width));
+  flex-wrap: wrap;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-xs);
+  color: var(--lg-label);
+}
+
+/* ── Medya ──────────────────────────────────────────────────────────────
+   `min-height` satırın taban yüksekliğidir; künye daha uzunsa
+   `align-self: stretch` medyayı satır yüksekliğine kadar esnetir. Kart
+   daraldığında flex sarması medyayı tek başına üst satıra alır. */
+.media {
+  position: relative;
+  align-self: stretch;
+  flex: 1 1 var(--lg-listing-row-media-width);
+  min-width: var(--lg-listing-row-media-min);
+  min-height: var(--lg-listing-row-media-height);
+}
+
+.image {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  inset: 0;
+}
+
+/* ── Galeri şeridi: kaydırılabilir kareler ──────────────────────────────
+   Nokta göstergesi şeridin aynasıdır (scroll konumundan türetilir, TSX).
+   Kaydırma çubuğu çizilmez — göstergeyi noktalar taşır. */
+.strip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.strip:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-focus-ring-width, 2px));
+}
+
+.strip .image {
+  position: relative;
+  flex: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .strip {
+    scroll-behavior: smooth;
+  }
+}
+
+.badge {
+  position: absolute;
+  top: var(--lg-space-3);
+  left: var(--lg-space-3);
+  display: inline-flex;
+}
+
+.favorite {
+  position: absolute;
+  top: var(--lg-space-2);
+  right: var(--lg-space-2);
+  display: inline-flex;
+  min-width: var(--lg-control-hit);
+  min-height: var(--lg-control-hit);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--lg-radius-capsule);
+  background: none;
+  color: var(--lg-on-scrim);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Kalp bilinmeyen bir fotoğrafın üstünde durur: kontrast, zemin yerine
+   glif gölgesiyle güvenceye alınır (ErisilebilirlikMotionResponsive.mdx). */
+.favorite svg {
+  width: var(--lg-space-6);
+  height: var(--lg-space-6);
+  filter: drop-shadow(0 var(--lg-stroke-hairline) var(--lg-space-1) var(--lg-scrim));
+  transition: transform var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+.favorite[data-favorite='true'] svg {
+  color: var(--lg-on-scrim);
+}
+
+.dots {
+  position: absolute;
+  bottom: var(--lg-space-3);
+  left: 50%;
+  display: flex;
+  gap: var(--lg-space-1);
+  transform: translateX(-50%);
+}
+
+.dot {
+  width: var(--lg-space-1);
+  height: var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-on-scrim) 55%, transparent);
+}
+
+.dot[data-active='true'] {
+  background: var(--lg-on-scrim);
+}
+
+/* Fotoğraf sayısı gibi kısa medya etiketi. Zemin scrim'dir: altındaki fotoğraf
+   bilinmeyen olduğu için kontrast fotoğrafa bırakılmaz. */
+.mediaCaption {
+  position: absolute;
+  right: var(--lg-space-3);
+  bottom: var(--lg-space-3);
+  display: inline-flex;
+  align-items: center;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-scrim);
+  color: var(--lg-on-scrim);
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+}
+
+/* ── Gövde ──────────────────────────────────────────────────────────── */
+.body {
+  display: flex;
+  min-width: 0;
+  flex: 3 1 var(--lg-listing-row-body-min);
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--lg-space-3);
+  padding: var(--lg-space-5);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.identity {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.price {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.priceSuffix {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-headline);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--lg-text-body);
+  font-weight: 500;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Kesme (ellipsis) başlığın kendisinde değil, İÇİNDEKİ kontrolde çalışır:
+   inline bir `<a>`/`<button>`, dış kutunun `text-overflow`'unu miras almaz ve
+   metin üç noktasız kesilirdi. */
+.titleAction {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rating {
+  display: flex;
+  margin: 0;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
+.stars {
+  font-size: var(--lg-text-caption);
+}
+
+.location {
+  display: flex;
+  margin: 0;
+  align-items: center;
+  gap: var(--lg-space-2);
+  color: var(--lg-success);
+  font-size: var(--lg-text-footnote);
+}
+
+.location svg {
+  width: var(--lg-space-4);
+  height: var(--lg-space-4);
+  flex: none;
+}
+
+.locationText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.features {
+  display: flex;
+  margin: 0;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.feature {
+  display: inline-flex;
+  min-height: var(--lg-control-sm);
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding-inline: var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-chip);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  white-space: nowrap;
+}
+
+.featureIcon,
+.featureIcon svg,
+.noteIcon,
+.noteIcon svg {
+  display: inline-flex;
+  width: var(--lg-space-4);
+  height: var(--lg-space-4);
+  flex: none;
+}
+
+.note {
+  display: flex;
+  min-height: var(--lg-control-sm);
+  margin: 0;
+  align-items: center;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border-radius: var(--lg-radius-chip);
+  background: color-mix(in srgb, var(--lg-label) 4%, var(--lg-surface));
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
+.noteIcon {
+  color: var(--lg-success);
+}
+
+/* ── Ayak ───────────────────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  margin-top: auto;
+  padding-top: var(--lg-space-3);
+  border-top: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.agent {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--lg-space-3);
+}
+
+.agentText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+}
+
+.agentName {
+  overflow: hidden;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listedAt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+.listedAt svg {
+  width: var(--lg-space-4);
+  height: var(--lg-space-4);
+  flex: none;
+}
+
+.footerEnd {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--lg-space-4);
+}
+
+.footerMeta {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  white-space: nowrap;
+}
+
+/* İletişim kümesi tek kapsül: dolgu ve metin rengi eylem dilinden okunur
+   (--lg-action-*), böylece kabuğun diğer dolu aksiyonlarıyla aynı kahveyi
+   kullanır (Tokenlar.mdx → Eylem dili). */
+.actions {
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-action-prominent);
+}
+
+.action {
+  display: inline-flex;
+  min-width: var(--lg-control-hit);
+  min-height: var(--lg-control-lg);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--lg-action-prominent-label);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* İkonsuz eylem: etiket metni görünür, bu yüzden kare hedef yerine yatay
+   dolgu alır. Yükseklik değişmez — kapsül tek parça kalır. */
+.action[data-text='true'] {
+  padding-inline: var(--lg-space-5);
+  font-size: var(--lg-text-footnote);
+  font-weight: var(--lg-action-weight);
+  white-space: nowrap;
+}
+
+.action + .action {
+  border-left: var(--lg-stroke-hairline) solid
+    color-mix(in srgb, var(--lg-action-prominent-label) 34%, transparent);
+}
+
+.action svg {
+  width: var(--lg-space-5);
+  height: var(--lg-space-5);
+}
+
+/* ── Menü tetikleyicisi ─────────────────────────────────────────────── */
+.menu {
+  display: inline-flex;
+  width: var(--lg-control-md);
+  height: var(--lg-control-md);
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.menu svg {
+  width: var(--lg-space-5);
+  height: var(--lg-space-5);
+}
+
+/* ── Yoğunluk ekseni ────────────────────────────────────────────────── */
+.card[data-size='sm'] .body {
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-4);
+}
+
+/* Künye `sm`'de kısalır; medyanın tabanı da onunla birlikte iner ki satırın
+   altında ölü boşluk kalmasın. */
+.card[data-size='sm'] .media {
+  min-height: var(--lg-listing-row-media-height-sm);
+}
+
+.card[data-size='sm'] .price {
+  font-size: var(--lg-text-headline);
+}
+
+.card[data-size='sm'] .priceSuffix {
+  font-size: var(--lg-text-body);
+}
+
+.card[data-size='sm'] .title {
+  font-size: var(--lg-text-footnote);
+}
+
+.card[data-size='sm'] .feature,
+.card[data-size='sm'] .note {
+  font-size: var(--lg-text-caption);
+}
+
+/* ── State ──────────────────────────────────────────────────────────── */
+.titleAction:focus-visible,
+.favorite:focus-visible,
+.menu:focus-visible,
+.action:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+.favorite:focus-visible,
+.action:focus-visible {
+  border-radius: var(--lg-radius-capsule);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    box-shadow: var(--lg-shadow-sm);
+  }
+
+  .titleAction:hover {
+    text-decoration: underline;
+    text-underline-offset: var(--lg-space-1);
+  }
+
+  .favorite:hover svg {
+    transform: scale(1.08);
+  }
+
+  .menu:hover {
+    background: color-mix(in srgb, var(--lg-label) 5%, var(--lg-surface));
+  }
+
+  .action:hover {
+    background: color-mix(in srgb, var(--lg-label) 12%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .favorite svg {
+    transition: none;
+  }
+
+  .favorite:hover svg {
+    transform: none;
+  }
+}
+
+/* ── media="thumb": her genişlikte yatay kart ──────────────────────────
+   Liste görünümünün kimliği (2026-08-08 «Liste yatay × Izgara dikey»
+   kararı): görsel `--row-thumb-w` genişliğinde sol sütun, gövde sıkı tek
+   kolon. `wide`'ın flex sarması burada yoktur — kart dar kapta da yatay
+   kalır. Sütun genişliğini çağıran kademelendirir (view CSS'i). */
+.card[data-media='thumb'] {
+  display: grid;
+  grid-template-columns: var(--row-thumb-w, 108px) minmax(0, 1fr);
+  width: 100%;
+}
+
+.card[data-media='thumb'] .media {
+  min-height: var(--row-thumb-w, 108px);
+  height: 100%;
+}
+
+.card[data-media='thumb'] .body {
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-3);
+}
+
+/* Özellikler TEK sıra: sarmaz, satır içinde kayar; rozet mikro ölçeğe iner.
+   24px görünür satır — rozet salt bilgidir, dokunma hedefi değildir. */
+.card[data-media='thumb'] .features {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: var(--lg-space-1);
+  scrollbar-width: none;
+}
+
+.card[data-media='thumb'] .features::-webkit-scrollbar {
+  display: none;
+}
+
+.card[data-media='thumb'] .feature {
+  min-height: var(--lg-space-6);
+  gap: var(--lg-space-1);
+  padding-inline: var(--lg-space-2);
+  background: var(--lg-bg);
+  font-size: var(--lg-text-caption);
+}
+
+.card[data-media='thumb'] .featureIcon,
+.card[data-media='thumb'] .featureIcon svg {
+  width: var(--lg-space-3);
+  height: var(--lg-space-3);
+  color: var(--lg-accent);
+}
+
+/* Satıcı satırı TEK katlı: isim ve zaman yan yana, uzun isim kırpılır. */
+.card[data-media='thumb'] .agent {
+  gap: var(--lg-space-2);
+}
+
+.card[data-media='thumb'] .agentText {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--lg-space-1);
+  overflow: hidden;
+}
+
+.card[data-media='thumb'] .footer {
+  flex-wrap: nowrap;
+  gap: var(--lg-space-2);
+  padding-top: var(--lg-space-2);
+}
+
+.card[data-media='thumb'] .footerEnd {
+  flex: none;
+  gap: var(--lg-space-2);
+}

@@ -1,0 +1,164 @@
+/* Filtre yaprağı yön denemeleri — KARAR ÖNCESİ demo yüzeyi.
+   Telefon/maket kabuğu tasarım sisteminin parçası değildir (component değil,
+   sunum çerçevesi); seçilen yön component'e taşınırken bu dosya atılır. */
+
+.stage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-8);
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--lg-space-8) var(--lg-space-6);
+}
+
+.case {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  align-items: center;
+}
+
+.caseHead {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 390px;
+  text-align: center;
+}
+
+.caseName {
+  font-size: var(--lg-text-headline);
+  font-weight: 700;
+  color: var(--lg-label);
+}
+
+.caseNote {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── maket kabuğu ───────────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 760px;
+  padding: 10px;
+  border-radius: 46px;
+  background: var(--lg-label);
+  box-shadow: var(--lg-shadow-md);
+  flex: none;
+}
+
+.screen {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: 36px;
+  background: var(--lg-bg);
+  isolation: isolate;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Yaprak: ekranın altına yapışır, üstü yuvarlanır */
+.sheet {
+  border-radius: 28px 28px 0 0;
+  max-height: 92%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sheet::-webkit-scrollbar {
+  display: none;
+}
+
+.handle {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-label) 18%, transparent);
+}
+
+/* ── ortak içerik ───────────────────────────────────────────── */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+/* Referansın hiyerarşisi: alan adı SÖNÜK ve küçük, kontrol baskın */
+.groupLabel {
+  font-size: var(--lg-text-footnote);
+  font-weight: 500;
+  color: var(--lg-label-secondary);
+}
+
+.segmentRow {
+  width: 100%;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  min-height: var(--lg-control-hit);
+}
+
+.switchLabel {
+  font-size: var(--lg-text-body);
+  color: var(--lg-label);
+}
+
+.cta {
+  width: 100%;
+}
+
+/* Özet satırı: seçimin cümlesi (dokunmatik varyantı) */
+.summary {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── D: masaüstü rayı ───────────────────────────────────────── */
+.railStage {
+  display: flex;
+  gap: var(--lg-space-5);
+  align-items: flex-start;
+  width: 720px;
+  padding: var(--lg-space-5);
+  border-radius: var(--lg-radius-card);
+  background: var(--lg-bg);
+}
+
+.rail {
+  position: sticky;
+  top: var(--lg-space-5);
+  width: 288px;
+  flex: none;
+}
+
+.railResults {
+  display: grid;
+  flex: 1;
+  gap: var(--lg-space-3);
+  grid-template-columns: 1fr 1fr;
+}
+
+.resultCard {
+  height: 132px;
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+}

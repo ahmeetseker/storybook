@@ -1,0 +1,284 @@
+/* GlassHighlightCard — tonlu vurgu kartı.
+   Tüm renkler tek eksenden türer: --hl-tint (default --lg-accent).
+   Gradyanın açık ucu tint'in --lg-surface'e, koyu ucu --lg-label'a
+   karışımıdır; metin her zaman --lg-accent-contrast (beyaz) kalır.
+   Nokta dokusu ve ayraç da aynı kontrast renginin şeffaf karışımlarıdır —
+   kartta tek bir ham renk değeri yoktur. */
+
+.card {
+  --hl-tint: var(--lg-accent);
+  --hl-foreground: var(--lg-accent-contrast);
+  --hl-from: color-mix(in srgb, var(--hl-tint) 86%, var(--lg-surface));
+  --hl-to: color-mix(in srgb, var(--hl-tint) 76%, var(--lg-label));
+
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  border-radius: var(--lg-radius-card);
+  color: var(--hl-foreground);
+  /* Kök sorgu kabıdır (GlassSiteHeader .root emsali): dar-kap mobil ölçek
+     viewport'a değil kartın KENDİ genişliğine bağlanır — her kullanım yeri
+     kendiliğinden doğru kademeyi alır. Bir öğe kendi kabına yanıt veremez;
+     bu yüzden iç dolgu .body'dedir. */
+  container-type: inline-size;
+  background-image:
+    radial-gradient(
+      circle at var(--lg-stroke-hairline) var(--lg-stroke-hairline),
+      color-mix(in srgb, var(--hl-foreground) 15%, transparent) var(--lg-stroke-hairline),
+      transparent 0
+    ),
+    linear-gradient(135deg, var(--hl-from), var(--hl-to));
+  background-size:
+    var(--lg-space-2) var(--lg-space-2),
+    100% 100%;
+  box-shadow: var(--lg-shadow-sm);
+  transition: box-shadow var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+/* ── Yer imi rozeti ──────────────────────────────────────────────────── */
+
+.bookmark {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: var(--lg-space-6);
+  inline-size: var(--lg-space-9);
+  block-size: var(--lg-space-10);
+  display: grid;
+  place-items: center;
+  /* Çentik alt %25'te; ikonu görünür gövdeye ortalamak için alt pay */
+  padding-block-end: var(--lg-space-4);
+  background: color-mix(in srgb, var(--lg-surface) 95%, transparent);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 75%, 0% 100%);
+  color: var(--hl-tint);
+}
+
+.bookmarkIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badgeIcon {
+  inline-size: var(--lg-space-6);
+  block-size: var(--lg-space-6);
+}
+
+/* ── Gövde ───────────────────────────────────────────────────────────── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  /* Kart dolgusu burada: .card sorgu kabı olduğundan kendi @container
+     kuralına yanıt veremez; dolguyu çocuk taşır (görsel sonuç aynı). */
+  padding: var(--lg-space-6);
+}
+
+.intro {
+  display: grid;
+  gap: var(--lg-space-1);
+  /* Başlık yer imiyle çakışmasın */
+  padding-inline-end: var(--lg-space-10);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Başlık linki tüm kartı kaplar (stretched link) — kartın her yeri gezinme
+   hedefi olur; aksiyon kapsülü z-index ile üstte bağımsız kalır. */
+.titleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titleLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.titleLink:focus-visible {
+  /* Halka metne değil kartın tamamına çizilir (aşağıdaki :has kuralı) */
+  outline: none;
+}
+
+.card:has(.titleLink:focus-visible) {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (hover: hover) {
+  .card:has(.titleLink):hover {
+    box-shadow: var(--lg-shadow-md);
+  }
+}
+
+.description {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  line-height: 1.5;
+  opacity: 0.9;
+  max-inline-size: var(--lg-measure);
+}
+
+.divider {
+  block-size: var(--lg-stroke-hairline);
+  inline-size: 100%;
+  margin-block: var(--lg-space-4);
+  background: color-mix(in srgb, var(--hl-foreground) 20%, transparent);
+}
+
+/* ── Alt satır: metrikler + aksiyon ──────────────────────────────────── */
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--lg-space-4);
+  flex-wrap: wrap;
+  margin-block-start: auto;
+}
+
+.metrics {
+  margin: 0;
+  display: flex;
+  gap: var(--lg-space-6);
+  min-width: 0;
+}
+
+.metric {
+  /* dt (etiket) DOM'da önce gelir; görselde değer üstte durur */
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--lg-space-1);
+  min-width: 0;
+}
+
+.metricValue {
+  margin: 0;
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.metricLabel {
+  font-size: var(--lg-text-footnote);
+  opacity: 0.9;
+}
+
+.action {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  /* Stretched başlık linkinin üstünde bağımsız tıklanabilir kalır */
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--lg-control-sm);
+  padding-inline: var(--lg-space-4);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--hl-foreground) 28%, transparent);
+  color: var(--hl-foreground);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: var(--lg-action-weight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--lg-motion-duration-normal) var(--lg-motion-ease-standard);
+}
+
+@media (hover: hover) {
+  .action:hover {
+    background: color-mix(in srgb, var(--hl-foreground) 40%, transparent);
+  }
+}
+
+.action:focus-visible {
+  /* Tonlu zeminde --lg-accent halkası kaybolur; kontrast rengiyle çizilir
+     (bilinçli sapma — bkz. rules.md §9). */
+  outline: var(--lg-focus-ring-width, 2px) solid var(--hl-foreground);
+  outline-offset: var(--lg-focus-ring-offset, 2px);
+}
+
+@media (pointer: coarse) {
+  .action {
+    min-block-size: var(--lg-control-hit);
+  }
+}
+
+/* ── Dar kap (≤ 24rem ≈ 384px): mobil ölçek ──────────────────────────────
+   320-390'lık telefonlarda tek kolon karta masaüstü oranları kalıyordu:
+   22px başlık, 28px metrik ve 24px dolgu kartı ekrana hakim kılıyordu.
+   Tip ve boşluk birer kademe iner, kimlik (tint, doku, yer imi) korunur.
+   Kaynak sırası bilinçli: blok, coarse-pointer kuralından SONRA gelir ki
+   dar kapta aksiyon yüksekliği dokunmatikte de burada belirlensin. */
+@container (max-width: 24rem) {
+  .body {
+    padding: var(--lg-space-4);
+  }
+
+  .title {
+    font-size: var(--lg-text-headline);
+  }
+
+  /* Yer imi bir kademe küçülür; başlık payı da onunla daralır. */
+  .bookmark {
+    inset-inline-end: var(--lg-space-4);
+    inline-size: var(--lg-space-8);
+    block-size: var(--lg-space-9);
+    padding-block-end: var(--lg-space-3);
+  }
+
+  .badgeIcon {
+    inline-size: var(--lg-space-5);
+    block-size: var(--lg-space-5);
+  }
+
+  .intro {
+    /* Dolgu (16) + bu pay (40) ≥ yer imi işgali (16 + 40) — çakışma yok. */
+    padding-inline-end: var(--lg-space-8);
+  }
+
+  .divider {
+    margin-block: var(--lg-space-3);
+  }
+
+  .footer {
+    gap: var(--lg-space-3);
+  }
+
+  .metrics {
+    gap: var(--lg-space-4);
+  }
+
+  .metricValue {
+    font-size: var(--lg-text-title);
+  }
+
+  .metricLabel {
+    font-size: var(--lg-text-caption);
+  }
+
+  .action {
+    /* BİLİNÇLİ AAA İSTİSNASI (emsal: MapFirstHome arama kartı, 2026-08-07):
+       görünür yükseklik dokunmatikte de 36px — coarse katmanı hem
+       --lg-control-sm'i 44'e çektiği hem de yukarıdaki coarse kuralı
+       --lg-control-hit okuduğu için token bu kademede 36'yı ifade edemez;
+       raw px zorunlu. WCAG 2.5.8 AA (24px) üstünde kalır. */
+    min-block-size: 36px;
+    /* Metriklerin altına tam genişlik satır olarak iner — dar kapta sağa
+       sıkışmış kapsül yerine rahat tek dokunma bandı. */
+    inline-size: 100%;
+  }
+}

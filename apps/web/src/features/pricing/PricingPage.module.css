@@ -1,0 +1,55 @@
+/* Genişlik, kenar boşluğu ve kabuk payı PageContainer'dadır. */
+.page {
+  color: var(--lg-label);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-9);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-3);
+  padding-block-end: var(--lg-space-6);
+  border-block-end: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--lg-accent);
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(var(--lg-text-display), 4cqi, 42px);
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+  text-wrap: balance;
+  max-inline-size: 22ch;
+}
+
+.lede {
+  margin: 0;
+  max-inline-size: var(--lg-measure);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-headline);
+  line-height: 1.55;
+}
+
+.table {
+  /* Tablo kendi kırılma noktalarını konteynerinden okur; burada yalnız
+     bölüm ritmi verilir. */
+  margin: 0;
+}
+
+/* SSS rafı kendi iç düzenini taşır (GlassFaqMarquee); burada yalnız bölüm
+   ritmi verilir. */
+.faq {
+  padding-block-start: var(--lg-space-7);
+  border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline);
+}

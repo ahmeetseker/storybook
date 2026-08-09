@@ -1,0 +1,104 @@
+.holder {
+  /* Mikro-geometri (token karşılığı yok — GlassBadge rules.md §9 borcuyla
+     aynı gerekçe): 45°'lik bandın köşe geometrisi space ölçeğinin dışındadır.
+     `--ribbon-offset` bandın köşeye dik uzaklığıdır; görünen şerit uzunluğu
+     bunun iki katıdır ve `--ribbon-size` karesi tarafından kırpılır. */
+  --ribbon-size: 76px;
+  --ribbon-offset: 39px;
+  --ribbon-pad: 2px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ribbon-size);
+  height: var(--ribbon-size);
+  overflow: hidden;
+  border-top-left-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Bant kaptan uzun tutulur; açılı uçları köşe karesi kırpar. */
+  width: calc(var(--ribbon-size) * 3);
+  transform: translate(-50%, -50%) rotate(-45deg) translateY(var(--ribbon-offset));
+  padding-block: var(--ribbon-pad);
+  text-align: center;
+  white-space: nowrap;
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  box-shadow: var(--lg-shadow-sm);
+}
+
+/* Kompakt kart kademesi (yatay Liste kartı, 108px medya): sm'in 76px
+   penceresi küçük karede görseli boğuyordu. Mikro-geometri — köşe bandı
+   geometrisi token ölçeği dışında (üstteki borç notuyla aynı gerekçe). */
+.xs {
+  --ribbon-size: 60px;
+  --ribbon-offset: 31px;
+  --ribbon-pad: 1px;
+}
+
+.xs .band {
+  /* badge(11) bu pencereye sığmıyor; 9px yalnız bu tek kelimelik bant için. */
+  font-size: 9px;
+  letter-spacing: 0.01em;
+}
+
+.md {
+  --ribbon-size: 88px;
+  --ribbon-offset: 45px;
+  --ribbon-pad: 3px;
+}
+
+.md .band {
+  font-size: var(--lg-text-caption);
+}
+
+/* Kabuktaki "İlan ver" ile aynı kahve: dolu vurgu zemini tek kaynaktan gelir. */
+.accent .band {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--lg-action-prominent) 86%, var(--lg-accent-contrast)),
+    var(--lg-action-prominent)
+  );
+  color: var(--lg-action-prominent-label);
+}
+
+/* Fotoğraf üstünde durduğu için zemin opaktır (bkz. EmlakSearchView
+   `.mediaBadge` notu): kontrast bilinmeyen görsele bırakılmaz. */
+.neutral .band {
+  background: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+/* Dar kartlarda (mobil grid) md ölçeği sm geometrisine iner; kap
+   `container-type: inline-size` tanımlıysa (örn. GlassListingCard
+   propertyOverlay) kendiliğinden devreye girer. */
+@container (max-width: 259px) {
+  .md {
+    --ribbon-size: 72px;
+    --ribbon-offset: 36px;
+    --ribbon-pad: 2px;
+  }
+
+  .md .band {
+    font-size: var(--lg-text-badge);
+  }
+}
+
+/* Ekran okuyucuya ek bağlam; görsel yerleşimi etkilemez. */
+.note {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

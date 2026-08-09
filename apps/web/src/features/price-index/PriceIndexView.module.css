@@ -1,0 +1,232 @@
+/* Emlak Endeksi sayfa yerleşimi.
+   Zemin fildişi olduğu için okunacak her şey beyaz yüzeye oturur; kendi kartını
+   çizen component'ler (GlassTrendChart, GlassDistributionChart, GlassTable,
+   GlassAccordion, GlassSeoDiscovery) tekrar sarılmaz. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-9);
+  padding-bottom: var(--lg-space-10);
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.stamp {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lg-accent);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 34ch;
+}
+
+.lede {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--lg-text-headline);
+  line-height: 1.55;
+  color: var(--lg-label-secondary);
+}
+
+.lede strong {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--lg-space-3);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  box-shadow: var(--lg-shadow-xs);
+}
+
+@media (max-width: 40rem) {
+  .controls {
+    width: 100%;
+    border-radius: var(--lg-radius-card);
+  }
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+}
+
+.card {
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  padding: var(--lg-space-6);
+  box-shadow: var(--lg-shadow-xs);
+  box-sizing: border-box;
+}
+
+/* Güven bandı — vurgu tonu %8, Token'lar dokümanındaki %12 tavanının altında. */
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-6);
+  background: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 28%, var(--lg-hairline));
+  border-radius: var(--lg-radius-card);
+  padding: var(--lg-space-6);
+  box-sizing: border-box;
+}
+
+.trustBody {
+  flex: 1 1 18rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.trustTitle {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+}
+
+.trustText {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  line-height: 1.6;
+  color: var(--lg-label-secondary);
+}
+
+.trustText strong {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+.yield {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-7);
+  align-items: flex-start;
+}
+
+.yieldMeter {
+  flex: 0 1 16rem;
+  min-width: 0;
+}
+
+.yieldSpecs {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+/* Tablo hücresi yardımcıları */
+
+.rowSelf {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--lg-label-secondary);
+}
+
+.suppressed {
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.regionLink {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.regionLink:hover {
+  border-bottom-color: var(--lg-accent);
+}
+
+.regionLink:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  border-radius: var(--lg-radius-chip);
+}
+
+/* Tablo içi arama — sayfalama yerine (plan §C.7a) */
+.tableSearch {
+  display: flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+  flex-wrap: wrap;
+}
+
+.tableSearch input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  padding: var(--lg-space-2) var(--lg-space-4);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+}
+
+.tableSearch input:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 1px;
+}
+
+.tableCount {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,250 @@
+/* Emlak Endeksi sayfa yerleşimi.
+   Zemin fildişi (--lg-bg) olduğu için okunacak her şey beyaz yüzeye (--lg-surface)
+   oturur: metin doğrudan zeminin üstünde bırakılmaz. Kendi kartını çizen
+   component'ler (GlassChart, GlassTable, GlassAccordion, GlassSeoDiscovery)
+   tekrar sarılmaz — kart içinde kart olmaz; onların bölümünde yalnız başlık
+   zeminde durur. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-9);
+}
+
+/* ── Üst şerit ─────────────────────────────────────────────────────────── */
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+}
+
+.stamp {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+/* ── Başlık ────────────────────────────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lg-accent);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--lg-text-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  max-width: 34ch;
+}
+
+.lede {
+  margin: 0;
+  max-width: 60ch;
+  font-size: var(--lg-text-headline);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--lg-label-secondary);
+}
+
+.lede strong {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+/* ── Kontrol çubuğu ────────────────────────────────────────────────────── */
+
+/* Kontrol çubuğu yalnız kendi genişliği kadar yer kaplar — tam genişlikte boş
+   beyaz bir bant bırakmaz. Dar ekranda sarar ve doğal olarak tam genişliğe gelir. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--lg-space-3);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-capsule);
+  box-shadow: var(--lg-shadow-xs);
+}
+
+@media (max-width: 40rem) {
+  .controls {
+    width: 100%;
+    border-radius: var(--lg-radius-card);
+  }
+}
+
+/* ── Bölüm ─────────────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-4);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--lg-text-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--lg-text-caption);
+  line-height: 1.5;
+  color: var(--lg-label-secondary);
+}
+
+.note code {
+  font-size: inherit;
+}
+
+/* ── Kart ──────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card);
+  padding: var(--lg-space-6);
+  box-shadow: var(--lg-shadow-xs);
+  box-sizing: border-box;
+}
+
+/* KPI şeridi başlığı taşımaz; kart tek başına duran ilk veri yüzeyidir. */
+.kpiCard {
+  padding: var(--lg-space-6) var(--lg-space-6) var(--lg-space-5);
+}
+
+/* ── Güven bandı ───────────────────────────────────────────────────────── */
+
+/* Vurgu tonu %6 — Token'lar dokümanındaki %12 tavanının altında, AAA korunur. */
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-6);
+  background: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 28%, var(--lg-hairline));
+  border-radius: var(--lg-radius-card);
+  padding: var(--lg-space-6);
+  box-sizing: border-box;
+}
+
+/* min-width: 0 olmadan flex öğesi içeriğinin min-content genişliğinin altına
+   inemez ve dar ekranda sayfayı yatay taşırır. */
+.trustBody {
+  flex: 1 1 18rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.trustTitle {
+  margin: 0;
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+}
+
+.trustText {
+  margin: 0;
+  font-size: var(--lg-text-footnote);
+  line-height: 1.6;
+  color: var(--lg-label-secondary);
+}
+
+.trustText strong {
+  color: var(--lg-label);
+  font-weight: 600;
+}
+
+/* ── Getiri bloğu ──────────────────────────────────────────────────────── */
+
+.yield {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-7);
+  align-items: flex-start;
+}
+
+.yieldMeter {
+  flex: 0 1 16rem;
+  min-width: 0;
+}
+
+.yieldSpecs {
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+/* ── Persentil ızgarası ────────────────────────────────────────────────── */
+
+.percentiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--lg-space-4) var(--lg-space-6);
+}
+
+.percentile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  padding-bottom: var(--lg-space-3);
+  border-bottom: 1px solid var(--lg-hairline);
+}
+
+.percentileLabel {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+.percentileValue {
+  font-size: var(--lg-text-headline);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Medyan bandı vurgulu — dağılımın okunma noktası odur. */
+.percentileStrong .percentileValue {
+  color: var(--lg-accent);
+}
+
+.percentileStrong {
+  border-bottom-color: color-mix(in srgb, var(--lg-accent) 32%, var(--lg-hairline));
+}
+
+/* ── Tablo hücresi yardımcıları ────────────────────────────────────────── */
+
+.rowSelf {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--lg-label-secondary);
+}
+
+.suppressed {
+  color: var(--lg-label-secondary);
+  font-variant-numeric: tabular-nums;
+}
