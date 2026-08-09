@@ -596,3 +596,15 @@
 .card[data-size='sm'][data-media='thumb'] .footerMeta {
   display: none;
 }
+
+/* Aynı kademede künye bir adım küçülür ki isim üç harfte kırpılmasın. */
+.card[data-size='sm'][data-media='thumb'] .agent > *:first-child {
+  width: var(--lg-space-6);
+  min-width: var(--lg-space-6);
+  height: var(--lg-space-6);
+  font-size: 9px;
+}
+
+.card[data-size='sm'][data-media='thumb'] .agentName {
+  font-size: var(--lg-text-caption);
+}

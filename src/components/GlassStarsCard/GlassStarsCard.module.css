@@ -1,0 +1,107 @@
+/* Yıldızlı gece kartı — Kağıt temanın tek koyu vitrin yüzeyi. Zemin mürekkep
+   (--lg-label) tonundan, parıltı accent'ten color-mix ile türer; ham hex yok.
+   Yıldızların hareketi motion/react tarafında yalnız transform/opacity oynar. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--lg-label) 86%, var(--lg-accent)),
+    color-mix(in srgb, var(--lg-label) 97%, var(--lg-accent)) 62%
+  );
+  border: var(--lg-stroke-hairline) solid color-mix(in srgb, var(--lg-bg) 18%, transparent);
+  border-radius: var(--lg-radius-card);
+  /* Kartın kendi padding'i yoktur: şeffaf blur paneli (body) kartı kenardan
+     kenara kaplar, yanlarda net yıldız şeridi kalmaz. */
+  padding: 0;
+  color: var(--lg-bg);
+  overflow: hidden;
+}
+
+/* Yıldız alanı kartın TAMAMINI kaplar: içerik üstte (z-index) durur,
+   matris dekoratif fon olarak arkada kalır ve etkileşim almaz. */
+.starField {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-auto-rows: 1fr;
+  gap: var(--lg-stroke-hairline);
+  padding: var(--lg-space-2);
+  pointer-events: none;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star {
+  position: relative;
+  z-index: 2;
+  inline-size: calc(var(--lg-space-1) / 2);
+  block-size: calc(var(--lg-space-1) / 2);
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-bg);
+  opacity: 0.45;
+}
+
+/* Parıltı halesi: kaynaktaki mavi yerine kehribar accent'in aydınlatılmışı.
+   Panelin arkasından da net okunması için hale büyük ve parlak tutulur;
+   yumuşaklığı panelin blur'u verir. */
+.glow {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1;
+  inline-size: calc(var(--lg-space-1) * 1.5);
+  block-size: calc(var(--lg-space-1) * 1.5);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 60%, var(--lg-bg));
+  filter: blur(calc(var(--lg-space-1) / 4));
+  box-shadow: 0 0 var(--lg-space-3) color-mix(in srgb, var(--lg-accent) 65%, transparent);
+}
+
+/* İçerik yıldız fonunun üstünde, kartı KENARDAN KENARA kaplayan şeffaf bir
+   blur paneli içinde durur: zemin boyanmaz, yalnız backdrop blur uygulanır —
+   parıltılar panelin arkasında yumuşak ışık lekeleri olarak görünür, keskin
+   yıldız noktaları pusa döndüğü için metin her yerde okunur. */
+.body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-4);
+  min-block-size: 100%;
+  /* Blur hafif tutulur: parlamalar panelin arkasından net okunur, yalnız
+     keskin nokta kenarları yumuşar — metin önde kalır. */
+  -webkit-backdrop-filter: blur(calc(var(--lg-space-1) / 2));
+  backdrop-filter: blur(calc(var(--lg-space-1) / 2));
+}
+
+/* Saydamlık azaltıldığında pus yerine düz mürekkep zemin: okunurluk aynı. */
+@media (prefers-reduced-transparency: reduce) {
+  .body {
+    background: color-mix(in srgb, var(--lg-label) 94%, var(--lg-accent));
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.title {
+  margin: 0;
+  color: var(--lg-bg);
+  font-size: var(--lg-text-title);
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: 0;
+  color: color-mix(in srgb, var(--lg-bg) 72%, transparent);
+  font-size: var(--lg-text-body);
+  max-inline-size: var(--lg-measure);
+}

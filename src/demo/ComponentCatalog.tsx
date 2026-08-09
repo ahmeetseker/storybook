@@ -686,7 +686,7 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/bileşenler-vitrin-ve-yerleşim-glassstarscard--default',
     preview: (
       <div style={{ width: 220 }}>
-        <GlassStarsCard size="sm">
+        <GlassStarsCard>
           <GlassStarsCardTitle>Bodrum</GlassStarsCardTitle>
         </GlassStarsCard>
       </div>
