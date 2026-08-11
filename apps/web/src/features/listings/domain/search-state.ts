@@ -48,6 +48,8 @@ export interface ListingSearchState {
   unitPrice?: NumericRange
   owners: OwnerType[]
   verified: boolean
+  /** Yalnız vitrin (öne çıkan) ilanlar — ana sayfadaki vitrin kartı buraya bağlanır. */
+  featured: boolean
   /**
    * Katalog tabanlı çoklu seçim filtreleri: `key` bir facet anahtarı,
    * değer seçilen seçeneklerdir. URL'de `f_<key>=a,b` olarak taşınır.
@@ -72,6 +74,7 @@ export const DEFAULT_LISTING_SEARCH_STATE: ListingSearchState = {
   category: 'all',
   owners: [],
   verified: false,
+  featured: false,
   categoryFilters: {},
   categoryRanges: {},
   sort: 'recommended',
@@ -232,6 +235,7 @@ export function parseListingSearch(raw: RawSearch): ListingSearchState {
     unitPrice: range(raw.unitPriceMin, raw.unitPriceMax),
     owners,
     verified: raw.verified === '1' || raw.verified === true,
+    featured: raw.featured === '1' || raw.featured === true,
     categoryFilters: categoryFilters(raw),
     categoryRanges: categoryRanges(raw),
     sort: enumValue(raw.sort, SORTS, DEFAULT_LISTING_SEARCH_STATE.sort),
@@ -283,6 +287,7 @@ export function serializeListingSearch(
   appendRange(search, 'unitPrice', state.unitPrice)
   if (state.owners.length > 0) search.owner = state.owners.join(',')
   if (state.verified) search.verified = '1'
+  if (state.featured) search.featured = '1'
   if (state.sort !== 'recommended') search.sort = state.sort
   if (state.page !== 1) search.page = state.page
   if (state.layout !== 'row') search.view = state.layout
@@ -324,6 +329,7 @@ export function clearListingFilters(state: ListingSearchState): ListingSearchSta
     unitPrice: undefined,
     owners: [],
     verified: false,
+    featured: false,
     categoryFilters: {},
     categoryRanges: {},
     page: 1,

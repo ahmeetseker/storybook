@@ -184,7 +184,10 @@ export function FilterStream({ state, resultCount, onChange, onReset }: FilterSt
 
   const locationCount =
     (state.city ? 1 : 0) + (state.district ? 1 : 0) + (state.neighbourhood ? 1 : 0)
-  const trustCount = (state.verified ? 1 : 0) + (state.owners.length > 0 ? 1 : 0)
+  const trustCount =
+    (state.verified ? 1 : 0) +
+    (state.featured ? 1 : 0) +
+    (state.owners.length > 0 ? 1 : 0)
 
   // Atlama şeridi: hiyerarşi değil kısayol — bölüm aynı akışta durur.
   const jumpTo = useCallback((id: string) => {
@@ -327,6 +330,14 @@ export function FilterStream({ state, resultCount, onChange, onReset }: FilterSt
             label="Yalnız doğrulanmış ilanlar"
             checked={state.verified}
             onChange={(checked) => onChange({ ...state, verified: checked, page: 1 })}
+          />
+        </div>
+        <div className={styles.switchRow}>
+          <span>Yalnız vitrin ilanları</span>
+          <GlassSwitch
+            label="Yalnız vitrin ilanları"
+            checked={state.featured}
+            onChange={(checked) => onChange({ ...state, featured: checked, page: 1 })}
           />
         </div>
         <div className={styles.switchRow}>

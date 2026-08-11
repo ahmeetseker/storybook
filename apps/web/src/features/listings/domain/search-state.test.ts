@@ -24,6 +24,7 @@ describe('listing search URL state', () => {
         salePriceMax: '3000000',
         areaMin: '500',
         verified: '1',
+        featured: '1',
         owner: 'agency,owner',
         sort: 'price-asc',
         page: '3',
@@ -40,6 +41,7 @@ describe('listing search URL state', () => {
       salePrice: { max: 3_000_000 },
       area: { min: 500 },
       verified: true,
+      featured: true,
       owners: ['owner', 'agency'],
       sort: 'price-asc',
       page: 3,
@@ -65,6 +67,16 @@ describe('listing search URL state', () => {
       rentPriceMax: 45_000,
       f_rooms: '2+1,3+1',
     })
+  })
+
+  // Vitrin kartı ana sayfadan `/emlak?featured=1` bağlantısı verir: paylaşılan
+  // bağlantı aynı süzülmüş sonucu göstermelidir.
+  it('vitrin (featured) filtresini URL ile gidiş-dönüş taşır', () => {
+    const state = parseListingSearch({ featured: '1' })
+    expect(state.featured).toBe(true)
+    expect(serializeListingSearch(state)).toEqual({ featured: '1' })
+    // Geçersiz değer filtre uygulamaz.
+    expect(parseListingSearch({ featured: 'yes' }).featured).toBe(false)
   })
 
   it('keeps common filters and removes category-specific filters when category changes', () => {
@@ -117,6 +129,7 @@ describe('listing search URL state', () => {
       f_zoning: 'residential',
       'r_road-widthMin': '7',
       verified: '1',
+      featured: '1',
       sort: 'newest',
       view: 'grid',
     })
@@ -126,6 +139,7 @@ describe('listing search URL state', () => {
     expect(cleared.category).toBe('all')
     expect(cleared.city).toBeUndefined()
     expect(cleared.verified).toBe(false)
+    expect(cleared.featured).toBe(false)
     // Görünüm tercihleri daraltıcı değildir, korunur.
     expect(cleared.sort).toBe('newest')
     expect(cleared.layout).toBe('grid')

@@ -587,6 +587,13 @@ function FilterForm({
               }
             />
             <GlassCheckbox
+              label="Yalnız vitrin ilanları"
+              checked={state.featured}
+              onChange={() =>
+                onChange({ ...state, featured: !state.featured, page: 1 })
+              }
+            />
+            <GlassCheckbox
               label="Sahibinden"
               checked={state.owners.includes('owner')}
               onChange={() =>
@@ -845,6 +852,13 @@ function activeFilterChips(state: ListingSearchState) {
       key: 'verified',
       label: 'Doğrulanmış',
       state: { ...state, verified: false, page: 1 },
+    })
+  }
+  if (state.featured) {
+    chips.push({
+      key: 'featured',
+      label: 'Vitrin ilanları',
+      state: { ...state, featured: false, page: 1 },
     })
   }
 

@@ -477,9 +477,11 @@ export function MapFirstHome({
                 hint: "Öne çıkan seçim",
                 tone: "warning",
                 motif: "star",
-                // Aksiyon yok: arama durumunda "vitrin/featured" filtresi
-                // bulunmuyor (search-state.ts). Filtre eklenene kadar
-                // yanlış hedefe götüren bir bağlantı koymuyoruz.
+                action: {
+                  // `featured` gerçek bir arama filtresi (search-state.ts)
+                  label: "Vitrin ilanlarına git",
+                  href: withBase("/emlak?featured=1"),
+                },
               },
             ]}
           />

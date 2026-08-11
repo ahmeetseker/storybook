@@ -27,6 +27,8 @@ export interface ListingSummary {
   image: { src: string; alt: string }
   imageCount: number
   verified: boolean
+  /** Vitrin (öne çıkan) ilan — ana sayfa vitrin kartının `featured=1` filtresi bunu süzer. */
+  featured: boolean
   owner: OwnerType
   sellerName: string
   publishedDays: number
@@ -575,6 +577,8 @@ export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
         },
         imageCount: 8 + ((templateIndex + variantIndex) % 24),
         verified: variantIndex % 3 !== 2,
+        // Vitrin küçük bir seçkidir: ~%8'lik deterministik alt küme.
+        featured: seed % 12 === 0,
         owner: variantIndex % 4 === 0 ? 'owner' : 'agency',
         sellerName:
           variantIndex % 4 === 0
@@ -627,6 +631,7 @@ function matchesState(item: ListingSummary, state: ListingSearchState) {
   if (!inRange(item.area, state.area)) return false
   if (!inRange(item.unitPrice, state.unitPrice)) return false
   if (state.verified && !item.verified) return false
+  if (state.featured && !item.featured) return false
   if (state.owners.length > 0 && !state.owners.includes(item.owner)) return false
   // Katalog filtreleri: seçilen değerlerden EN AZ BİRİ ilanda bulunmalı (OR).
   // Eskiden özelliği hiç taşımayan ilan da geçiyordu (`!actual || …`); bu,
@@ -771,6 +776,7 @@ export function listingDistribution(
     unitPrice: undefined,
     mapArea: undefined,
     verified: false,
+    featured: false,
     owners: [],
     categoryFilters: {},
     categoryRanges: {},
