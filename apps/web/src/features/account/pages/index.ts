@@ -1,3 +1,4 @@
+export { AccountAppointmentsPage } from './AccountAppointmentsPage'
 export { AccountListingsPage, type AccountListingsPageProps } from './AccountListingsPage'
 export { AccountSecurityPage, type AccountSecurityPageProps } from './AccountSecurityPage'
 export { AccountActivityPage, type AccountActivityPageProps } from './AccountActivityPage'

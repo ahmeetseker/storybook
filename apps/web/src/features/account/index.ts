@@ -3,6 +3,7 @@ export type { AccountAppShellProps } from './AccountAppShell'
 export { AccountPageFrame } from './AccountPageFrame'
 export { AccountWorkspace } from './AccountWorkspace'
 export {
+  AccountAppointmentsPage,
   AccountListingsPage,
   AccountSecurityPage,
   AccountActivityPage,

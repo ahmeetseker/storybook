@@ -793,3 +793,36 @@
   font-size: var(--lg-text-footnote);
   line-height: 1.6;
 }
+
+/* ---------- Randevu listesi (Randevularım) ---------- */
+
+.appointmentList {
+  display: grid;
+  gap: var(--lg-space-3);
+}
+
+.appointmentRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3) var(--lg-space-4);
+  padding: var(--lg-space-4);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+}
+
+.appointmentNote {
+  margin-block-start: var(--lg-space-1);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+  line-height: 1.4;
+}
+
+.appointmentActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lg-space-2) var(--lg-space-3);
+}

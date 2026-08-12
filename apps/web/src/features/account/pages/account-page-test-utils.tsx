@@ -44,12 +44,18 @@ export async function renderAccountPage(content: ReactNode) {
     path: '/favoriler',
     component: () => <p>Favoriler</p>,
   })
+  const officesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/ofisler',
+    component: () => <p>Ofisler</p>,
+  })
 
   const routeTree = rootRoute.addChildren([
     homeRoute,
     listingsRoute,
     createListingRoute,
     favoritesRoute,
+    officesRoute,
   ])
   const router = createRouter({
     routeTree,

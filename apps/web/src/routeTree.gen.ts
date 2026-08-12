@@ -46,6 +46,7 @@ import { Route as HesabimKayitliAramaRouteImport } from './routes/hesabim.kayitl
 import { Route as HesabimMesajlarRouteImport } from './routes/hesabim.mesajlar'
 import { Route as HesabimOdemelerRouteImport } from './routes/hesabim.odemeler'
 import { Route as HesabimPlanimRouteImport } from './routes/hesabim.planim'
+import { Route as HesabimRandevularimRouteImport } from './routes/hesabim.randevularim'
 import { Route as HesapAskidaRouteImport } from './routes/hesap.askida'
 import { Route as HesapDogrulaRouteImport } from './routes/hesap.dogrula'
 import { Route as IlanListingIdRouteImport } from './routes/ilan.$listingId'
@@ -243,6 +244,11 @@ const HesabimPlanimRoute = HesabimPlanimRouteImport.update({
   path: '/planim',
   getParentRoute: () => HesabimRoute,
 } as any)
+const HesabimRandevularimRoute = HesabimRandevularimRouteImport.update({
+  id: '/randevularim',
+  path: '/randevularim',
+  getParentRoute: () => HesabimRoute,
+} as any)
 const HesapAskidaRoute = HesapAskidaRouteImport.update({
   id: '/hesap/askida',
   path: '/hesap/askida',
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesabim/planim': typeof HesabimPlanimRoute
+  '/hesabim/randevularim': typeof HesabimRandevularimRoute
   '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesabim/planim': typeof HesabimPlanimRoute
+  '/hesabim/randevularim': typeof HesabimRandevularimRoute
   '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/hesabim/mesajlar': typeof HesabimMesajlarRoute
   '/hesabim/odemeler': typeof HesabimOdemelerRoute
   '/hesabim/planim': typeof HesabimPlanimRoute
+  '/hesabim/randevularim': typeof HesabimRandevularimRoute
   '/hesap/askida': typeof HesapAskidaRoute
   '/hesap/dogrula': typeof HesapDogrulaRoute
   '/ilan/$listingId': typeof IlanListingIdRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
     | '/hesabim/planim'
+    | '/hesabim/randevularim'
     | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
@@ -536,6 +546,7 @@ export interface FileRouteTypes {
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
     | '/hesabim/planim'
+    | '/hesabim/randevularim'
     | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/hesabim/mesajlar'
     | '/hesabim/odemeler'
     | '/hesabim/planim'
+    | '/hesabim/randevularim'
     | '/hesap/askida'
     | '/hesap/dogrula'
     | '/ilan/$listingId'
@@ -904,6 +916,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HesabimPlanimRouteImport
       parentRoute: typeof HesabimRoute
     }
+    '/hesabim/randevularim': {
+      id: '/hesabim/randevularim'
+      path: '/randevularim'
+      fullPath: '/hesabim/randevularim'
+      preLoaderRoute: typeof HesabimRandevularimRouteImport
+      parentRoute: typeof HesabimRoute
+    }
     '/hesap/askida': {
       id: '/hesap/askida'
       path: '/hesap/askida'
@@ -993,6 +1012,7 @@ interface HesabimRouteChildren {
   HesabimMesajlarRoute: typeof HesabimMesajlarRoute
   HesabimOdemelerRoute: typeof HesabimOdemelerRoute
   HesabimPlanimRoute: typeof HesabimPlanimRoute
+  HesabimRandevularimRoute: typeof HesabimRandevularimRoute
   HesabimIndexRoute: typeof HesabimIndexRoute
 }
 
@@ -1005,6 +1025,7 @@ const HesabimRouteChildren: HesabimRouteChildren = {
   HesabimMesajlarRoute: HesabimMesajlarRoute,
   HesabimOdemelerRoute: HesabimOdemelerRoute,
   HesabimPlanimRoute: HesabimPlanimRoute,
+  HesabimRandevularimRoute: HesabimRandevularimRoute,
   HesabimIndexRoute: HesabimIndexRoute,
 }
 

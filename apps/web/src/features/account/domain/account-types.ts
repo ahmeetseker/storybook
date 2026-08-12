@@ -29,8 +29,9 @@ export interface AccountAction {
    * Hesap alanından çıkan aksiyon rotaları. Liste kasıtlı olarak dar: yeni
    * bir hedef eklemek bilinçli bir karar olmalı, serbest string değil.
    * `/parola-degistir` 2026-08-04'te eklendi (güvenlik sayfasından).
+   * `/ofisler` 2026-08-12'de eklendi (randevularım boş durumundan).
    */
-  to: '/ilan-ver' | '/favoriler' | '/emlak' | '/parola-degistir'
+  to: '/ilan-ver' | '/favoriler' | '/emlak' | '/parola-degistir' | '/ofisler'
 }
 
 export interface AccountMetricItem {
