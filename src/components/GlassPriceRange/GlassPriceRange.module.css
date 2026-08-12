@@ -168,22 +168,30 @@
   height: var(--price-thumb);
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: var(--lg-surface);
-  box-shadow: var(--lg-shadow-sm), 0 0 0 1px var(--lg-hairline);
   pointer-events: none;
-  /* Sıvı basış geçişi: cam ↔ beyaz ve büyüme yumuşak döner */
-  transition:
-    transform var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
-    background-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
-    box-shadow var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
+  /* Sıvı basış: büyüme yalnız transform'da — compositor'da kalır */
+  transition: transform var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
 
-/* Sıvı basış (Apple liquid glass): sürüklenen kol cama dönüp büyür — yarı
-   saydam yüzey + backdrop blur + specular rim. Raw beyazlar GlassSurface rim
-   reçetesiyle aynı ailedendir (bilinçli raw). */
-.thumb[data-liquid] {
-  transform: translate(-50%, -50%) scale(1.25);
-  background: color-mix(in srgb, var(--lg-surface, #fff) 45%, transparent);
+/* Sıvı basış (Apple liquid glass): kol İKİ sabit katmandır — beyaz disk +
+   cam disk — geçiş YALNIZ opacity crossfade'idir. background/box-shadow/
+   backdrop-filter animasyonu paint aşamasında her karede backdrop'u yeniden
+   süzdüğü için takılıyordu. Raw beyazlar GlassSurface rim reçetesiyle aynı
+   ailedendir (bilinçli raw). */
+.thumb::before,
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
+}
+.thumb::before {
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-sm), 0 0 0 1px var(--lg-hairline);
+}
+.thumb::after {
+  background: color-mix(in srgb, var(--lg-surface, #fff) 40%, transparent);
   -webkit-backdrop-filter: blur(4px) saturate(180%);
   backdrop-filter: blur(4px) saturate(180%);
   box-shadow:
@@ -191,7 +199,14 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
     inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  opacity: 0;
 }
+/* Sürüklerken: 1.25× büyür, cam öne çıkar (beyaz tümüyle sönmez) */
+.thumb[data-liquid] {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+.thumb[data-liquid]::before { opacity: 0.25; }
+.thumb[data-liquid]::after { opacity: 1; }
 
 .thumb[data-handle='min'] {
   left: var(--pos-min);
@@ -283,13 +298,15 @@
   .bound {
     transition: none;
   }
-  .thumb { transition: none; }
+  .thumb,
+  .thumb::before,
+  .thumb::after { transition: none; }
   .thumb[data-liquid] { transform: translate(-50%, -50%); }
 }
 
-/* Saydamlık azaltılmışsa cam durum opak kalır (blur/refraction yok) */
+/* Saydamlık azaltılmışsa cam katman opak kalır (blur/refraction yok) */
 @media (prefers-reduced-transparency: reduce) {
-  .thumb[data-liquid] {
+  .thumb::after {
     background: var(--lg-surface, #fff);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

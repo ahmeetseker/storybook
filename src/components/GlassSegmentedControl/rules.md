@@ -198,3 +198,8 @@ LongContent, Mobile (viewport).
   basılı tutulurken de aynı cam görünüm (`:active`, salt CSS). Tüm
   varyantlarda (`capsule`/`bar`/`track`) geçerli; `prefers-reduced-motion`'da
   kurulmaz, `prefers-reduced-transparency`'de cam durum opak kalır.
+- 2026-08-12 (rev 2): Takılma düzeltmesi. background/box-shadow/backdrop-filter
+  transition'ı paint aşamasında donmaya yol açıyordu; damla artık iki sabit alt
+  katman (`::before` opak pil / `::after` cam pil) ve geçiş yalnız opacity
+  crossfade (compositor). Opak pilin border'ı inset ring gölgeye taşındı —
+  crossfade tek özellikte kalır.

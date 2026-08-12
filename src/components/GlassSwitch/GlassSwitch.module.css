@@ -43,22 +43,32 @@
 }
 
 .thumb {
+  position: relative;
   width: var(--lg-switch-thumb);
   height: var(--lg-switch-thumb);
   border-radius: var(--lg-radius-capsule, 999px); /* daire = kapsülün özel hali; uzama kapsülde kalır */
-  background: #fff; /* beyaz thumb — bilinçli raw (cam üstü kontrast) */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
-  /* Sıvı basış geçişi: cam ↔ beyaz renk/gölge yumuşak döner (konum/uzama motion springinde) */
-  transition:
-    background-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
-    box-shadow var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
 
-/* Sıvı basış (Apple liquid glass): basılıyken ve toggle süzülürken thumb cama
-   döner — yarı saydam yüzey + backdrop blur + specular rim. Raw beyazlar
-   GlassSurface rim reçetesiyle aynı ailedendir (bilinçli raw). */
-.thumb[data-liquid] {
-  background: color-mix(in srgb, var(--lg-surface, #fff) 45%, transparent);
+/* Sıvı basış (Apple liquid glass): thumb İKİ sabit katmandır — beyaz disk +
+   cam disk — ve aralarındaki geçiş YALNIZ opacity crossfade'idir.
+   background/box-shadow/backdrop-filter animasyonu paint aşamasında çalışır ve
+   her karede backdrop'u yeniden süzdüğü için takılıyordu; opacity ise
+   compositor'da kalır (animasyon yalnız transform/opacity/filter kuralı).
+   Raw beyazlar GlassSurface rim reçetesiyle aynı ailedendir (bilinçli raw). */
+.thumb::before,
+.thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
+}
+.thumb::before {
+  background: #fff; /* beyaz thumb — bilinçli raw (cam üstü kontrast) */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.thumb::after {
+  background: color-mix(in srgb, var(--lg-surface, #fff) 40%, transparent);
   -webkit-backdrop-filter: blur(4px) saturate(180%);
   backdrop-filter: blur(4px) saturate(180%);
   box-shadow:
@@ -66,10 +76,15 @@
     inset 0 0 0 1px rgba(255, 255, 255, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
     inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  opacity: 0;
 }
+/* Basılıyken/süzülürken: beyaz tümüyle gitmez (Apple'da cam hâlâ süt beyazı taşır) */
+.thumb[data-liquid]::before { opacity: 0.25; }
+.thumb[data-liquid]::after { opacity: 1; }
 
 /* Basılı tutarken thumb hareket yönüne doğru uzar: ray hizası (flex) sabit
-   kenarı tutar, genişleme serbest uca akar — kapalıyken sağa, açıkken sola. */
+   kenarı tutar, genişleme serbest uca akar — kapalıyken sağa, açıkken sola.
+   Genişlik motion layout FLIP'iyle (transform) animasyonlanır, paint yok. */
 .thumb[data-pressed] {
   width: calc(var(--lg-switch-thumb) * 1.35);
 }
@@ -88,13 +103,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .root { transition: none; }
-  .thumb { transition: none; }
+  .thumb::before,
+  .thumb::after { transition: none; }
   .thumb[data-pressed] { width: var(--lg-switch-thumb); }
 }
 
-/* Saydamlık azaltılmışsa cam durum opak kalır (blur/refraction yok) */
+/* Saydamlık azaltılmışsa cam katman opak kalır (blur/refraction yok) */
 @media (prefers-reduced-transparency: reduce) {
-  .thumb[data-liquid] {
+  .thumb::after {
     background: var(--lg-surface, #fff);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

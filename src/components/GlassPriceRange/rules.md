@@ -227,3 +227,6 @@ sürüklenirken canlı sonuç sayısını debounce'lu duyurması.
   blur + specular rim), bırakınca beyaza oturur; diğer kol etkilenmez.
   GlassSlider ile aynı reçete. `prefers-reduced-motion`'da büyüme yok;
   `prefers-reduced-transparency`'de cam durum opak kalır.
+- 2026-08-12 (rev 2): Takılma düzeltmesi — GlassSlider ile aynı: iki sabit
+  katman (`::before` beyaz / `::after` cam), geçiş yalnız transform + opacity
+  crossfade (compositor); paint transition'ları kaldırıldı.

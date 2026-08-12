@@ -138,27 +138,56 @@
   flex: 1;
   min-width: 0;
 }
-.track .drop {
+.track .drop::before {
   background: var(--lg-surface, #fff);
-  border: none;
   box-shadow: var(--lg-shadow-sm);
 }
 
-/* Seçim damlası — segmentler arasında FLIP ile süzülen cam katman */
+/* Seçim damlası — segmentler arasında FLIP ile süzülen katman.
+   Sıvı geçiş (Apple liquid glass): damla İKİ sabit alt katmandır — opak pil +
+   cam pil — ve aralarındaki geçiş YALNIZ opacity crossfade'idir.
+   background/box-shadow/backdrop-filter animasyonu paint aşamasında çalışır
+   ve her karede backdrop'u yeniden süzdüğü için takılıyordu; opacity
+   compositor'da kalır (animasyon yalnız transform/opacity/filter kuralı). */
 .drop {
   position: absolute;
   inset: 0;
   border-radius: var(--lg-radius-capsule, 999px);
-  /* Gölgesiz damla: seçim, yüzey token'ından türeyen dolgu + rim ile okunur (bkz. rules.md §7).
-     Sabit beyaz yerine yüzey token'ı → etiket kontrastı yüzeyle birlikte korunur. */
-  background: color-mix(in srgb, var(--lg-surface, #fff) 80%, transparent);
-  border: 1px solid color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
-  /* Sıvı geçiş: cam ↔ opak dönüşü damlanın süzülüşüyle aynı ritimde */
-  transition:
-    background-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
-    box-shadow var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
-    border-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
+.drop::before,
+.drop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
+}
+/* Opak pil: gölgesiz damla — seçim, yüzey token'ından türeyen dolgu + rim ile
+   okunur (bkz. rules.md §7). Sabit beyaz yerine yüzey token'ı → etiket
+   kontrastı yüzeyle birlikte korunur. Border yerine inset ring: crossfade tek
+   özellikte (opacity) kalır. */
+.drop::before {
+  background: color-mix(in srgb, var(--lg-surface, #fff) 80%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
+}
+/* Cam pil: yarı saydam yüzey + backdrop blur + specular rim (raw beyazlar
+   GlassSurface rim reçetesiyle aynı ailedendir — bilinçli raw). */
+.drop::after {
+  background: color-mix(in srgb, var(--lg-surface, #fff) 35%, transparent);
+  -webkit-backdrop-filter: blur(4px) saturate(180%);
+  backdrop-filter: blur(4px) saturate(180%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  opacity: 0;
+}
+/* Süzülürken ve seçili segment basılıyken cam öne çıkar (opak pil tümüyle
+   sönmez — Apple'da cam süt beyazı taşır) */
+.drop[data-liquid]::before,
+.segment:not(:disabled):active .drop::before { opacity: 0.2; }
+.drop[data-liquid]::after,
+.segment:not(:disabled):active .drop::after { opacity: 1; }
 
 /* Etiketler HER damlanın üstünde kalır — kendi segmentininkinin de, üstünden
    süzülen komşununkinin de.
@@ -193,33 +222,16 @@
   display: block;
 }
 
-/* Sıvı geçiş (Apple liquid glass): damla segmentler arasında süzülürken ve
-   seçili segment basılı tutulurken cama döner — yarı saydam yüzey + backdrop
-   blur + specular rim. Dosyanın sonunda durur ki `.track .drop` gibi varyant
-   dolgularını da eşit özgüllükte geçsin. Raw beyazlar GlassSurface rim
-   reçetesiyle aynı ailedendir (bilinçli raw). */
-.drop[data-liquid],
-.segment:not(:disabled):active .drop {
-  background: color-mix(in srgb, var(--lg-surface, #fff) 35%, transparent);
-  -webkit-backdrop-filter: blur(4px) saturate(180%);
-  backdrop-filter: blur(4px) saturate(180%);
-  border-color: transparent;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .segment { transition: none; }
   .segment:not(:disabled):active { transform: none; }
-  .drop { transition: none; }
+  .drop::before,
+  .drop::after { transition: none; }
 }
 
-/* Saydamlık azaltılmışsa cam durum opak kalır (blur/refraction yok) */
+/* Saydamlık azaltılmışsa cam katman opak kalır (blur/refraction yok) */
 @media (prefers-reduced-transparency: reduce) {
-  .drop[data-liquid],
-  .segment:not(:disabled):active .drop {
+  .drop::after {
     background: var(--lg-surface, #fff);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;

@@ -153,3 +153,11 @@ değerlendirilecek.
   geçiş yok; `prefers-reduced-transparency`'de cam durum opak kalır. Thumb
   border-radius'u 50%'den kapsül token'ına alındı — daire, kapsülün özel hali;
   uzama sırasında köşe morph'u oluşmaz.
+- 2026-08-12 (rev 2): Takılma düzeltmesi + kapsül liquefy. İlk sürüm
+  background/box-shadow/backdrop-filter'ı transition'lıyordu — paint
+  aşamasında her kare backdrop yeniden süzülüyor, düşük güçlü cihazda
+  donuyordu. Thumb artık İKİ sabit katman (`::before` beyaz disk / `::after`
+  cam disk) ve geçiş yalnız opacity crossfade (compositor). Ayrıca kapsüle
+  `useGlassPress` bağlandı (GlassButton dili): basınca lens kırılması artar
+  (`displacementScale`), gövde jöle yayıyla 0.96'ya çöker — Denetim
+  Merkezi'ndeki "hafif efekt".

@@ -157,3 +157,7 @@ sarmalayıcı boyutlandırması çözülürse.
   pointerup her durumda input'a düşer — pencere dinleyicisi yok.
   `prefers-reduced-motion`'da büyüme yok; `prefers-reduced-transparency`'de
   cam durum opak kalır.
+- 2026-08-12 (rev 2): Takılma düzeltmesi. background/box-shadow/backdrop-filter
+  transition'ı paint aşamasında donmaya yol açıyordu; thumb artık iki sabit
+  katman (`::before` beyaz disk / `::after` cam disk) ve geçiş yalnız
+  transform (büyüme) + opacity crossfade (compositor).

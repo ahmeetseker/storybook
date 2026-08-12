@@ -11,6 +11,7 @@ import { motion } from 'motion/react'
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface'
 import { prefersReducedMotion } from '../../core/tier'
 import { presets } from '../../motion/presets'
+import { useGlassPress } from '../../motion/useGlassPress'
 import styles from './GlassSwitch.module.css'
 
 export interface GlassSwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange'> {
@@ -90,24 +91,33 @@ export function GlassSwitch({
     }
   }
 
+  // Kapsülün kendisi de basınca sıvılaşır (GlassButton ile aynı dil):
+  // lens kırılması artar, gövde jöle yayıyla hafifçe çöker — Apple'ın
+  // Denetim Merkezi'ndeki "hafif efekt" budur.
+  const press = useGlassPress({ disabled })
+
   const setPress = (next: boolean) => {
     if (disabled || reduced) return
     setPressed(next)
   }
   const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     onPointerDown?.(e)
+    press.handlers.onPointerDown()
     setPress(true)
   }
   const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     onPointerUp?.(e)
+    press.handlers.onPointerUp()
     setPress(false)
   }
   const handlePointerLeave = (e: PointerEvent<HTMLButtonElement>) => {
     onPointerLeave?.(e)
+    press.handlers.onPointerLeave()
     setPress(false)
   }
   const handlePointerCancel = (e: PointerEvent<HTMLButtonElement>) => {
     onPointerCancel?.(e)
+    press.handlers.onPointerCancel()
     setPress(false)
   }
 
@@ -116,13 +126,14 @@ export function GlassSwitch({
 
   return (
     <GlassSurface
-      as="button"
+      as={motion.button}
       shape="capsule"
       interactive={!disabled}
       tone={tone}
       thickness={0.25}
+      displacementScale={press.displacementScale}
       className={classes}
-      style={{ ...cssVars, ...style }}
+      style={{ ...cssVars, scale: press.transformScale, ...style } as CSSProperties}
       {...({
         type: 'button',
         role: 'switch',
