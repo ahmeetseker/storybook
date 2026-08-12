@@ -1,0 +1,17 @@
+.panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--lg-space-6);
+}
+@media (max-width: 40rem) {
+  .panels { grid-template-columns: 1fr; }
+}
+.datePanel { display: flex; flex-direction: column; gap: var(--lg-space-3); }
+.fullDayHint { margin: 0; font-size: 0.85rem; opacity: 0.75; }
+.detailPanel { display: flex; flex-direction: column; gap: var(--lg-space-4); }
+.slotGrid { display: flex; flex-wrap: wrap; gap: var(--lg-space-2); }
+.slotEmpty { margin: 0; font-size: 0.9rem; opacity: 0.75; }
+.slotFull { opacity: 0.45; pointer-events: none; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: var(--lg-space-4); width: 100%; }
+.summary { margin: 0; font-size: 0.85rem; opacity: 0.8; }
+.footerActions { display: flex; gap: var(--lg-space-2); }
