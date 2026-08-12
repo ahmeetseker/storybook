@@ -132,6 +132,14 @@ export function AccountNav({
       >
         Mesajlar
       </GlassSidebar.Item>
+      {/*
+        Takvim/randevu ikonu ikon setinde yok; `clock` zaten Paketim/Ödemeler
+        için `card`ın tekrar kullanıldığı gibi zaman anlamı taşıyan en yakın
+        ikon olduğundan tekrar kullanılır (yeni SVG varlığı eklenmedi).
+      */}
+      <GlassSidebar.Item id="randevularim" icon={<NavigationIcon name="clock" size={18} />}>
+        Randevularım
+      </GlassSidebar.Item>
 
       <GlassSidebar.Section label="Portföyüm">
         <GlassSidebar.Item

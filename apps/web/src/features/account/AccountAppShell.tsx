@@ -191,6 +191,7 @@ export function AccountAppShell({ data, children, onCikis }: AccountAppShellProp
           { id: 'g-ozet', label: 'Hesap özetine git', group: 'Git', onSelect: () => routeTo('/hesabim') },
           { id: 'g-ilanlar', label: 'İlanlarıma git', group: 'Git', onSelect: () => routeTo('/hesabim/ilanlarim') },
           { id: 'g-mesaj', label: 'Mesajlara git', group: 'Git', onSelect: () => routeTo('/hesabim/mesajlar') },
+          { id: 'g-randevu', label: 'Randevularıma git', group: 'Git', onSelect: () => routeTo('/hesabim/randevularim') },
           { id: 'g-guvenlik', label: 'Güvenlik ayarlarına git', group: 'Git', onSelect: () => routeTo('/hesabim/guvenlik') },
           { id: 'g-hareket', label: 'Hesap hareketlerine git', group: 'Git', onSelect: () => routeTo('/hesabim/hareketler') },
           { id: 'g-alarm', label: 'Kayıtlı aramaya git', group: 'Git', onSelect: () => routeTo('/hesabim/kayitli-arama') },
