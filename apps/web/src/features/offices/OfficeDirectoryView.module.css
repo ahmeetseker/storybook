@@ -40,15 +40,23 @@
 .resultCard, .skeletonCard, .insightPanel, .insightEmpty { background: var(--lg-surface); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-card); }
 .resultCard { padding: var(--lg-space-4); }
 .cardTopline { margin-block-end: var(--lg-space-3); }
-.insightTrigger, .compareButton, .secondaryAction, .closeButton { background: transparent; border: 0; color: var(--lg-label-secondary); cursor: pointer; font: inherit; min-height: var(--lg-control-sm); padding-inline: var(--lg-space-2); }
+.insightTrigger, .compareButton, .closeButton { background: transparent; border: 0; color: var(--lg-label-secondary); cursor: pointer; font: inherit; min-height: var(--lg-control-sm); padding-inline: var(--lg-space-2); }
 .insightTrigger, .compareButton { color: var(--lg-accent); font-size: var(--lg-text-footnote); font-weight: 600; }
 .compareButton[disabled] { color: var(--lg-label-secondary); cursor: not-allowed; }
 .cardMeta { color: var(--lg-label-secondary); font-size: var(--lg-text-caption); margin-block-start: var(--lg-space-3); }
-.cardTrust { display: grid; gap: var(--lg-space-2); margin-block: var(--lg-space-3); }
-.cardReason { font-size: var(--lg-text-footnote); margin: 0; }
 .evidenceBadge { align-self: start; background: var(--lg-bg); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-chip); color: var(--lg-label-secondary); font-size: var(--lg-text-badge); padding: var(--lg-space-1) var(--lg-space-2); }
 .evidenceBadge[data-empty] { color: var(--lg-warning); }
-.cardActions { border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline); padding-block-start: var(--lg-space-3); }
+.cardActions { align-items: center; border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline); padding-block-start: var(--lg-space-3); }
+.cardIdentity { display: flex; gap: var(--lg-space-3); align-items: flex-start; }
+.cardLogo, .cardLogoFallback { width: 44px; height: 44px; border-radius: 12px; }
+.cardLogoFallback { display: grid; place-items: center; font-weight: 600; background: var(--lg-surface-2, rgba(0, 0, 0, .06)); }
+.cardName { margin: 0; display: flex; gap: var(--lg-space-1); align-items: center; }
+.verifiedMark { color: var(--lg-success, #2c7a4b); }
+.cardTagline { margin: 0; font-size: .9rem; opacity: .75; }
+.cardStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--lg-space-2); margin: var(--lg-space-3) 0 0; }
+.cardStats dt { font-size: .75rem; opacity: .65; }
+.cardStats dd { margin: 0; font-weight: 600; }
+.cardAvailability { color: var(--lg-label-secondary); margin: var(--lg-space-2) 0 0; font-size: .85rem; }
 .skeletonCard { align-items: center; display: grid; gap: var(--lg-space-3); grid-template-columns: auto minmax(0, 1fr); padding: var(--lg-space-4); }
 .insightPanel, .insightEmpty { padding: var(--lg-space-5); }
 .insightEmpty { color: var(--lg-label-secondary); }
@@ -77,11 +85,11 @@
 .consentQuestion { color: var(--lg-label) !important; font-weight: 600; margin-block-start: var(--lg-space-5) !important; }
 .editProposal { background: transparent; border: 0; color: var(--lg-accent); cursor: pointer; font: inherit; font-weight: 600; padding: 0; text-decoration: underline; }
 
-.insightTrigger:focus-visible, .compareButton:focus-visible, .secondaryAction:focus-visible, .closeButton:focus-visible, .editProposal:focus-visible { outline: var(--lg-focus-ring-width) solid var(--lg-accent); outline-offset: var(--lg-focus-ring-offset); }
+.insightTrigger:focus-visible, .compareButton:focus-visible, .closeButton:focus-visible, .editProposal:focus-visible { outline: var(--lg-focus-ring-width) solid var(--lg-accent); outline-offset: var(--lg-focus-ring-offset); }
 
 @media (prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce) { .refreshing { animation: none; } }
 
-@media (pointer: coarse) { .insightTrigger, .compareButton, .secondaryAction, .closeButton { min-height: var(--lg-control-md); } }
+@media (pointer: coarse) { .insightTrigger, .compareButton, .closeButton { min-height: var(--lg-control-md); } }
 
 @container (width > 48rem) {
   .workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }

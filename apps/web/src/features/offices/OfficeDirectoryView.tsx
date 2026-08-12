@@ -1,6 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
-  GlassAgencyCard,
   GlassAiSearchBar,
   GlassAlert,
   GlassButton,
@@ -13,7 +12,9 @@ import {
   GlassFilterPanel,
   GlassSkeleton,
   GlassSelect,
+  useGlassToast,
 } from '@repo/ui'
+import { AppointmentSchedulerModal, availabilityPreview } from '@/features/appointments'
 import { officeProposalFilterId } from './domain/office-ai'
 import type { OfficeSearchResponse } from './data/office-adapter'
 import type { OfficeSearchState } from './domain/office-search-state'
@@ -353,45 +354,36 @@ function OfficeResultCard({
           Neden önerildi?
         </button>
       </div>
-      <GlassAgencyCard
-        variant="inline"
-        name={office.name}
-        logoSrc={office.logoSrc}
-        tagline={office.tagline}
-        verified={office.verified}
-        verifiedBy={office.verifiedBy}
-        stats={[
-          { label: 'Aktif ilan', value: String(office.activeListings) },
-          { label: 'Yanıt', value: `${office.responseMinutes} dk` },
-          { label: 'Puan', value: `${office.rating} (${office.reviewCount})` },
-        ]}
-        onMessage={() => onStartAction('message')}
-      />
+      <div className={styles.cardIdentity}>
+        {office.logoSrc ? (
+          <img className={styles.cardLogo} src={office.logoSrc} alt="" />
+        ) : (
+          <span className={styles.cardLogoFallback} aria-hidden>{office.name.slice(0, 2).toUpperCase()}</span>
+        )}
+        <div>
+          <h3 className={styles.cardName}>
+            {office.name}
+            {office.verified ? <span className={styles.verifiedMark} title={office.verifiedBy ?? 'Doğrulanmış'}>✓</span> : null}
+          </h3>
+          <p className={styles.cardTagline}>{office.tagline}</p>
+        </div>
+      </div>
+      <dl className={styles.cardStats}>
+        <div><dt>Aktif ilan</dt><dd>{office.activeListings}</dd></div>
+        <div><dt>Yanıt</dt><dd>{office.responseMinutes} dk</dd></div>
+        <div><dt>Puan</dt><dd>{office.rating} ({office.reviewCount})</dd></div>
+      </dl>
+      <p className={styles.cardAvailability}>{availabilityPreview(office.id, new Date())}</p>
       <div className={styles.cardMeta}>
         <span>{office.districts.slice(0, 2).join(' · ')}</span>
+        {evidence ? <span className={styles.evidenceBadge} title={evidence.value}>{EVIDENCE_SOURCE_LABELS[evidence.source]} · {evidence.label}</span> : null}
         <span>{office.lastActiveLabel}</span>
       </div>
-      <div className={styles.cardTrust}>
-        {match ? <p className={styles.cardReason}>{match.reasons[0]}</p> : <p className={styles.cardReason}>Profil eşleşmesi değerlendirildi.</p>}
-        {evidence ? (
-          <span className={styles.evidenceBadge} title={evidence.value}>
-            {EVIDENCE_SOURCE_LABELS[evidence.source]} · {evidence.label}
-          </span>
-        ) : (
-          <span className={styles.evidenceBadge} data-empty>Veri yok · Doğrulanmadı</span>
-        )}
-      </div>
       <div className={styles.cardActions}>
-        <button
-          type="button"
-          className={styles.compareButton}
-          onClick={onToggleCompare}
-          disabled={!compared && compareLimitReached}
-        >
-          {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle'}
-        </button>
-        <button type="button" className={styles.secondaryAction} onClick={() => onStartAction('meeting')}>
-          Görüşme talep et
+        <GlassButton prominent onClick={() => onStartAction('meeting')}>Görüşme talep et</GlassButton>
+        <GlassButton onClick={() => onStartAction('message')}>Mesaj</GlassButton>
+        <button type="button" className={styles.compareButton} onClick={onToggleCompare} disabled={!compared && compareLimitReached}>
+          {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
         </button>
       </div>
     </article>
@@ -438,7 +430,9 @@ export function OfficeDirectoryView({
   const [insightOpen, setInsightOpen] = useState(false)
   const [compareOpen, setCompareOpen] = useState(false)
   const [aiInput, setAiInput] = useState(state.query)
+  const [meetingOffice, setMeetingOffice] = useState<OfficeSummary | null>(null)
   const aiSearchRef = useRef<HTMLDivElement>(null)
+  const toast = useGlassToast()
   const matchIndex = useMemo(() => new Map(matches?.map((match) => [match.officeId, match])), [matches])
   const activeOffice = selectedOffice(response, selectedOfficeId)
   const comparedOffices = response?.items.filter((office) => compareIds.includes(office.id)) ?? []
@@ -452,6 +446,28 @@ export function OfficeDirectoryView({
   const resetFilters = () => onStateChange({ ...state, propertyType: undefined, city: undefined, district: undefined, expertise: [], verifiedOnly: false, maxResponseMinutes: undefined, language: undefined, minConsultants: undefined, minActiveListings: undefined, transactionExperience: undefined, sort: 'match', page: 1 }, { history: 'replace' })
   const chooseIntent = (intent: OfficeSearchState['intent']) => onStateChange(updateState(state, { intent, expertise: [] }), { history: 'push' })
   const handleAiSearch = (query: string) => onAiSearch(query)
+
+  // "Görüşme" aksiyonu artık onay çekmecesine değil doğrudan randevu
+  // planlayıcı modalına gider; diğer aksiyonlar (mesaj/teklif) rota
+  // seviyesindeki onay akışına (onStartAction) devam eder.
+  const startAction = (action: OfficeActionType, office: OfficeSummary) => {
+    if (action === 'meeting') {
+      setMeetingOffice(office)
+      return
+    }
+    onStartAction(action, office.id)
+  }
+
+  // İçgörü panelleri ofis kimliğiyle çağırıyor; panelin kendisi ofis
+  // nesnesini bilmediği için burada response'tan geri buluyoruz.
+  const handlePanelAction = (action: OfficeActionType, officeId: string) => {
+    const office = selectedOffice(response, officeId)
+    if (action === 'meeting' && office) {
+      setMeetingOffice(office)
+      return
+    }
+    onStartAction(action, officeId)
+  }
 
   return (
     <PageContainer className={styles.page}>
@@ -536,14 +552,14 @@ export function OfficeDirectoryView({
                   compareLimitReached={compareLimitReached}
                   onSelect={() => onSelectOffice(office.id)}
                   onToggleCompare={() => onToggleCompare(office.id)}
-                  onStartAction={(action) => onStartAction(action, office.id)}
+                  onStartAction={(action) => startAction(action, office)}
                 />
               ))}
             </div>
           ) : null}
         </section>
         <div className={styles.desktopInsights}>
-          <OfficeInsightPanel office={activeOffice} match={selectedOfficeId ? matchFor(selectedOfficeId, matches) : undefined} onAction={onStartAction} />
+          <OfficeInsightPanel office={activeOffice} match={selectedOfficeId ? matchFor(selectedOfficeId, matches) : undefined} onAction={handlePanelAction} />
         </div>
       </div>
 
@@ -611,7 +627,7 @@ export function OfficeDirectoryView({
         side="right"
         size="lg"
       >
-        <OfficeInsightPanel office={mobileInsightOffice} match={selectedOfficeId ? matchFor(selectedOfficeId, matches) : undefined} onAction={onStartAction} />
+        <OfficeInsightPanel office={mobileInsightOffice} match={selectedOfficeId ? matchFor(selectedOfficeId, matches) : undefined} onAction={handlePanelAction} />
       </GlassDrawer>
 
       <GlassDrawer
@@ -641,6 +657,18 @@ export function OfficeDirectoryView({
           </div>
         ) : null}
       </GlassDrawer>
+
+      <AppointmentSchedulerModal
+        office={meetingOffice ? { id: meetingOffice.id, name: meetingOffice.name, responseMinutes: meetingOffice.responseMinutes } : null}
+        onClose={() => setMeetingOffice(null)}
+        onScheduled={() =>
+          toast({
+            title: 'Randevu talebiniz iletildi',
+            description: 'Durumunu Hesabım → Randevularım altında takip edebilirsiniz.',
+            severity: 'success',
+          })
+        }
+      />
     </PageContainer>
   )
 }
