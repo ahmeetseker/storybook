@@ -64,4 +64,29 @@ describe('AppointmentSchedulerModal', () => {
       vi.useRealTimers()
     }
   })
+
+  it('hafta sonu seçilince yalnız "ofis kapalı" mesajı görünür; "dolu" mesajıyla çakışmaz', async () => {
+    // Regresyon: officeAvailability hafta içi günü asla tümüyle dolu
+    // bırakmaz (Task 1 sözleşmesi) — yani "gün dolu" ipucu yalnız hafta
+    // sonu (slots === []) tetiklenebiliyordu ve "ofis kapalı" mesajıyla
+    // aynı anda render oluyordu. Burada takvimden gerçek bir hafta sonu
+    // günü seçilip yalnız tek mesajın çizildiği doğrulanıyor.
+    const user = userEvent.setup()
+    render(<AppointmentSchedulerModal office={OFIS} onClose={() => {}} />)
+
+    const weekend = new Date()
+    weekend.setDate(weekend.getDate() + 1)
+    while (weekend.getDay() !== 0 && weekend.getDay() !== 6) {
+      weekend.setDate(weekend.getDate() + 1)
+    }
+    const weekendKey = `${weekend.getFullYear()}-${weekend.getMonth() + 1}-${weekend.getDate()}`
+
+    await user.click(screen.getByRole('combobox'))
+    const cell = document.querySelector<HTMLElement>(`[data-date="${weekendKey}"]`)
+    expect(cell).toBeTruthy()
+    await user.click(cell!)
+
+    expect(screen.queryByText(/bu gün dolu/i)).toBeNull()
+    expect(screen.getByText(/bu gün ofis kapalı/i)).toBeTruthy()
+  })
 })

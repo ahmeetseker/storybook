@@ -60,7 +60,12 @@ function SchedulerContent({ office, onClose, onScheduled }: {
   const [note, setNote] = useState('')
 
   const slots = date ? officeAvailability(office.id, date) : []
-  const nextOpen = date && !slots.some((s) => s.available)
+  // Task 1'in officeAvailability sözleşmesi gereği hafta içi gün asla tümüyle
+  // dolu görünmez (en az bir müsait saat garanti) — `slots` boşsa (hafta
+  // sonu, ofis kapalı) bu "dolu gün" dalı hiç tetiklenmemeli; aksi halde
+  // "Bu gün dolu" ve "Bu gün ofis kapalı" mesajları hafta sonu için birlikte
+  // render olur ve birbiriyle çelişir.
+  const nextOpen = date && slots.length > 0 && !slots.some((s) => s.available)
     ? firstAvailableDay(office.id, date)
     : undefined
 
