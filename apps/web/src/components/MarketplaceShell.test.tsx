@@ -9,6 +9,10 @@ const routerState = vi.hoisted(() => ({
   navigate: vi.fn(),
 }))
 
+// Oturum durumu test başına değiştirilir: satıcı eylemleri (İlan ver, zil)
+// yalnız kimlikli oturumda çizilir.
+const authState = vi.hoisted(() => ({ girisYapildi: false }))
+
 vi.mock('@tanstack/react-router', () => ({
   useRouter: () => ({ navigate: routerState.navigate }),
   useRouterState: ({
@@ -16,6 +20,10 @@ vi.mock('@tanstack/react-router', () => ({
   }: {
     select: (state: { location: { pathname: string } }) => string
   }) => select({ location: { pathname: routerState.pathname } }),
+}))
+
+vi.mock('@/features/auth', () => ({
+  useAuthSession: () => authState,
 }))
 
 vi.mock('@repo/ui', () => ({
@@ -31,14 +39,30 @@ vi.mock('@repo/ui', () => ({
       {children}
     </button>
   ),
+  GlassIconButton: ({
+    children,
+    label,
+    onClick,
+  }: {
+    children: ReactNode
+    label: string
+    onClick?: () => void
+  }) => (
+    <button aria-label={label} onClick={onClick}>
+      {children}
+    </button>
+  ),
   GlassSiteHeader: ({
+    utility,
     secondaryAction,
     action,
   }: {
+    utility?: ReactNode
     secondaryAction?: ReactNode
     action?: ReactNode
   }) => (
     <header data-testid="global-header">
+      {utility}
       {secondaryAction}
       {action}
     </header>
@@ -199,12 +223,12 @@ describe('MarketplaceShell kırıntı yolu kanalı', () => {
 })
 
 describe('MarketplaceShell header aksiyonları', () => {
-  // Not: jsdom her zaman scrollY = 0'da kalır, bu yüzden bu test yalnız rest
-  // durumunu kanıtlar. Gerçek düğüm: kabuk header'ın `secondaryAction` ve
-  // `action` slotlarını dolduruyor (utility slotu tema anahtarı kaldırıldıktan
-  // sonra boş; condensedAction da verilmiyor, bkz. rules.md/PR notu).
-  it('hesap ve ilan verme eylemleri header slotlarına render edilir', () => {
+  // Not: jsdom her zaman scrollY = 0'da kalır, bu yüzden bu testler yalnız
+  // rest durumunu kanıtlar. Satıcı eylemleri (İlan ver, bildirim zili)
+  // yalnız kimlikli oturumda çizilir — anonim ziyaretçi önce giriş yapar.
+  it('anonim ziyarette yalnız Üye girişi görünür; İlan ver ve zil çizilmez', () => {
     routerState.pathname = '/emlak'
+    authState.girisYapildi = false
 
     render(
       <MarketplaceShell>
@@ -213,7 +237,27 @@ describe('MarketplaceShell header aksiyonları', () => {
     )
 
     const header = screen.getByTestId('global-header')
-    expect(header.querySelector('#shell-account-action')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'İlan ver' })).toBeTruthy()
+    expect(header.querySelector('#shell-account-action')?.textContent).toBe('Üye girişi')
+    expect(screen.queryByRole('button', { name: 'İlan ver' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Bildirimler' })).toBeNull()
+  })
+
+  it('kimlikli oturumda Hesabım + bildirim zili + İlan ver render edilir', () => {
+    routerState.pathname = '/emlak'
+    authState.girisYapildi = true
+    try {
+      render(
+        <MarketplaceShell>
+          <main>Rota içeriği</main>
+        </MarketplaceShell>,
+      )
+
+      const header = screen.getByTestId('global-header')
+      expect(header.querySelector('#shell-account-action')?.textContent).toBe('Hesabım')
+      expect(screen.getByRole('button', { name: 'İlan ver' })).toBeTruthy()
+      expect(screen.getByRole('button', { name: 'Bildirimler' })).toBeTruthy()
+    } finally {
+      authState.girisYapildi = false
+    }
   })
 })

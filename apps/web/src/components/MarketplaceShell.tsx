@@ -1,6 +1,7 @@
 import { useCallback, useMemo, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
-import { GlassButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
+import { GlassButton, GlassIconButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
+import { useAuthSession } from '@/features/auth'
 import {
   getBreadcrumbTrail,
   getRouteByKey,
@@ -17,8 +18,20 @@ export interface MarketplaceShellProps {
   children: ReactNode
 }
 
+const BellIcon = (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M18 9.5a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17s-2.5-1-2.5-7" />
+    <path d="M10.3 20a2 2 0 0 0 3.4 0" />
+  </svg>
+)
+
 export function MarketplaceShell({ children }: MarketplaceShellProps) {
   const router = useRouter()
+  // Giriş yapılmadan satıcı eylemleri gösterilmez: "İlan ver" ve bildirim
+  // zili yalnız kimlikli oturumda çizilir. Sunucu `bilinmiyor` durumunda
+  // anonim varyantı basar; hidrasyon sonrası oturum çözülünce butonlar gelir
+  // (durum efektte değiştiği için sunucu/istemci ilk çıktısı hep eşleşir).
+  const { girisYapildi } = useAuthSession()
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
@@ -81,9 +94,9 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     <GlassButton
       id="shell-account-action"
       size="sm"
-      onClick={() => routeTo('/hesabim')}
+      onClick={() => routeTo(girisYapildi ? '/hesabim' : '/giris')}
     >
-      {currentRoute.scope === 'account' ? 'Hesabım' : 'Üye girişi'}
+      {girisYapildi ? 'Hesabım' : 'Üye girişi'}
     </GlassButton>
   )
 
@@ -91,6 +104,14 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     <GlassButton size="sm" prominent onClick={() => routeTo('/ilan-ver')}>
       İlan ver
     </GlassButton>
+  )
+
+  // Bildirim zili: adanmış bir bildirim sayfası yok — en yakın karşılık olan
+  // hesap hareketleri akışına götürür.
+  const notificationsAction = (
+    <GlassIconButton size="sm" label="Bildirimler" onClick={() => routeTo('/hesabim/hareketler')}>
+      {BellIcon}
+    </GlassIconButton>
   )
 
   return (
@@ -102,8 +123,9 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
         <GlassSiteHeader
           logo={logo}
           links={headerLinks}
+          utility={girisYapildi ? notificationsAction : undefined}
           secondaryAction={accountAction}
-          action={createAction}
+          action={girisYapildi ? createAction : undefined}
         />
       ) : null}
       <PageTrailContext.Provider value={pageTrail}>{children}</PageTrailContext.Provider>
