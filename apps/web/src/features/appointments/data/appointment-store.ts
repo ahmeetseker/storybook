@@ -42,6 +42,19 @@ interface PersistedState {
   nextId: number
 }
 
+/**
+ * useSyncExternalStore'un `getServerSnapshot`'ı için SABİT boş referans.
+ * `hydrate()` modül yüklenirken çalışır ve istemcide `appointments`'ı
+ * sessionStorage'dan doldurur — React DOM'u hydrate ederken sunucuda
+ * üretilen (boş) HTML ile eşleşmesini beklediği için `getServerSnapshot`
+ * `listAppointments`'ı YENİDEN KULLANAMAZ: hydrate sonrası artık dolu döner
+ * ve bu, sunucu/istemci uyuşmazlığına (React hydration mismatch) yol açar.
+ * Bu sabit, `hydrate()`'ten tamamen bağımsız kalır; her çağrıda AYNI
+ * referansı döndürmesi de useSyncExternalStore'un sonsuz döngüye
+ * girmemesi için zorunludur.
+ */
+const EMPTY_SERVER_SNAPSHOT: Appointment[] = []
+
 let appointments: Appointment[] = []
 let nextId = 1
 /** appointments dizisinde tutulmayan tek bilgi: id → autoConfirm eşlemesi. */
@@ -162,7 +175,12 @@ export function subscribeAppointments(listener: () => void): () => void {
 }
 
 export function useAppointments(): Appointment[] {
-  return useSyncExternalStore(subscribeAppointments, listAppointments, listAppointments)
+  return useSyncExternalStore(subscribeAppointments, listAppointments, () => EMPTY_SERVER_SNAPSHOT)
+}
+
+/** Yalnız testler için: getServerSnapshot'ın döndürdüğü sabit referansı doğrulamaya açar. */
+export function __getServerSnapshotForTests(): Appointment[] {
+  return EMPTY_SERVER_SNAPSHOT
 }
 
 /** Yalnız testler için: modül durumunu ve sessionStorage'daki kaydı sıfırlar */

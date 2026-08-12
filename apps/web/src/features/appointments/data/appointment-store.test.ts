@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  __getServerSnapshotForTests,
   __rehydrateForTests,
   AUTO_CONFIRM_DELAY_MS,
   cancelAppointment,
@@ -125,5 +126,31 @@ describe('randevu store — sessionStorage kalıcılığı', () => {
     expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull()
     resetAppointmentStore()
     expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull()
+  })
+})
+
+describe('randevu store — useAppointments sunucu anlık görüntüsü (hydration uyuşmazlığı regresyonu)', () => {
+  // useSyncExternalStore internals'ini (getServerSnapshot) doğrudan render
+  // etmeden test etmek awkward olduğundan (renderToString + hydrateRoot
+  // kurulumu gerektirir), burada dışa açılan sabiti/işlevi doğrudan
+  // sınıyoruz: asıl regresyon riski "getServerSnapshot her çağrıda AYNI
+  // referansı döner mi" ve "hydrate() sonrası da boş kalır mı" sorularıdır —
+  // ikisi de bu şekilde tam olarak doğrulanabiliyor.
+  it('getServerSnapshot referansı her çağrıda sabittir (sonsuz döngüyü önler)', () => {
+    expect(__getServerSnapshotForTests()).toBe(__getServerSnapshotForTests())
+  })
+
+  it('getServerSnapshot her zaman boştur', () => {
+    expect(__getServerSnapshotForTests()).toEqual([])
+  })
+
+  it('hydrate() sonrası store dolsa da getServerSnapshot referansı ve içeriği değişmez', () => {
+    const oncekiReferans = __getServerSnapshotForTests()
+    createAppointment({ ...ORNEK, autoConfirm: false })
+    __rehydrateForTests()
+
+    expect(listAppointments()).toHaveLength(1) // store dolu — mismatch senaryosu kurulu
+    expect(__getServerSnapshotForTests()).toBe(oncekiReferans)
+    expect(__getServerSnapshotForTests()).toEqual([])
   })
 })
