@@ -12,6 +12,7 @@ import '@fontsource-variable/manrope/index.css'
 import '@repo/ui/styles'
 import '@/styles/app.css'
 import { MarketplaceShell } from '@/components/MarketplaceShell'
+import { NotFound } from '@/components/NotFound/NotFound'
 import { isAuthPath } from '@/config/routes'
 import { AuthSessionProvider } from '@/features/auth'
 import { AuthShell } from '@/features/auth/components/AuthShell'
@@ -73,22 +74,6 @@ function RootComponent() {
         </AuthSessionProvider>
       </QueryClientProvider>
     </RootDocument>
-  )
-}
-
-function NotFound() {
-  return (
-    <main id="main-content" className="route-stage">
-      <section className="route-intro">
-        <span className="route-rule" aria-hidden="true" />
-        <p className="route-context">Sayfa bulunamadı</p>
-        <h1>Bu adres henüz arsam.net’te yok.</h1>
-        <p className="route-description">
-          Ana sayfaya dönmek için üstteki markayı veya alttaki Dock’u
-          kullanabilirsiniz.
-        </p>
-      </section>
-    </main>
   )
 }
 
