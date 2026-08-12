@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  __rehydrateForTests,
   AUTO_CONFIRM_DELAY_MS,
   cancelAppointment,
   createAppointment,
@@ -7,6 +8,8 @@ import {
   resetAppointmentStore,
   subscribeAppointments,
 } from './appointment-store'
+
+const STORAGE_KEY = 'arsam:randevular'
 
 const ORNEK = {
   officeId: 'office-1',
@@ -64,5 +67,63 @@ describe('randevu store', () => {
   it('listAppointments referansı değişiklik olmadıkça sabittir (useSyncExternalStore sözleşmesi)', () => {
     createAppointment({ ...ORNEK, autoConfirm: false })
     expect(listAppointments()).toBe(listAppointments())
+  })
+})
+
+describe('randevu store — sessionStorage kalıcılığı', () => {
+  it('tam sayfa yenilemesini simüle eden rehydrate sonrasında randevu korunur', () => {
+    createAppointment({ ...ORNEK, autoConfirm: false })
+    expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull()
+
+    __rehydrateForTests()
+
+    const items = listAppointments()
+    expect(items).toHaveLength(1)
+    expect(items[0].officeName).toBe('Kadıköy Anahtar Ofis')
+    expect(items[0].status).toBe('pending')
+  })
+
+  it('yeni id sayacı yenileme sonrasında çakışma üretmez', () => {
+    const ilk = createAppointment({ ...ORNEK, autoConfirm: false })
+    __rehydrateForTests()
+    const ikinci = createAppointment({ ...ORNEK, slot: '11:00', autoConfirm: false })
+    expect(ikinci.id).not.toBe(ilk.id)
+  })
+
+  it('iptal edilen randevu rehydrate sonrasında cancelled kalır', () => {
+    const randevu = createAppointment({ ...ORNEK, autoConfirm: false })
+    cancelAppointment(randevu.id)
+    __rehydrateForTests()
+    expect(listAppointments()[0].status).toBe('cancelled')
+  })
+
+  it('onay zamanlayıcısı tamamlanmadan yenilenen pending+autoConfirm kayıt hydrate anında confirmed olur', () => {
+    createAppointment({ ...ORNEK, autoConfirm: true })
+    // 4sn dolmadan "sayfa yenilendi": gerçek setTimeout kaybolur, yalnız
+    // sessionStorage'daki kayıt kalır.
+    __rehydrateForTests()
+    expect(listAppointments()[0].status).toBe('confirmed')
+  })
+
+  it('cancelAppointment daha önce autoConfirm istenmiş bir kaydı hydrate sırasında geri açtırmaz', () => {
+    const randevu = createAppointment({ ...ORNEK, autoConfirm: true })
+    cancelAppointment(randevu.id)
+    __rehydrateForTests()
+    expect(listAppointments()[0].status).toBe('cancelled')
+  })
+
+  it('bozuk JSON ile hydrate boş listeye düşer, çökmez', () => {
+    resetAppointmentStore()
+    sessionStorage.setItem(STORAGE_KEY, '{bozuk-json')
+
+    expect(() => __rehydrateForTests()).not.toThrow()
+    expect(listAppointments()).toEqual([])
+  })
+
+  it('resetAppointmentStore sessionStorage kaydını da temizler', () => {
+    createAppointment({ ...ORNEK, autoConfirm: false })
+    expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull()
+    resetAppointmentStore()
+    expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull()
   })
 })
