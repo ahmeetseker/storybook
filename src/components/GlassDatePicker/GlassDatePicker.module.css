@@ -95,6 +95,17 @@
 }
 .panel > span:last-child { display: block; }
 
+/* ── Inline varyant: tetikleyicisiz, her zaman açık, DÜZ zeminli takvim ──
+   Overflow'lu kap (modal/panel) içinde absolute popover kırpılır ve cam
+   zemin altındaki içeriği okutur; gömülü kullanım bu yüzden opak yüzeydir. */
+.inlineRoot { display: block; }
+.panelInline {
+  padding: var(--lg-space-3);
+  background-color: var(--lg-bg);
+  border: 1px solid var(--lg-hairline);
+  border-radius: 16px;
+}
+
 /* ── Başlık: ay gezinme ─────────────────────────────────────────────────── */
 
 .header {

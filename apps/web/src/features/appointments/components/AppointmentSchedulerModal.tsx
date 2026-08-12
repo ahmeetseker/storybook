@@ -109,7 +109,10 @@ function SchedulerContent({ office, onClose, onScheduled }: {
     >
       <div className={styles.panels}>
         <div className={styles.datePanel}>
+          {/* Inline + opak: modalın overflow'u popover'ı kırpıyordu, cam zemin
+              de altındaki özeti okutuyordu — gömülü takvim ikisini birden çözer. */}
           <GlassDatePicker
+            variant="inline"
             value={date}
             onChange={(next) => {
               setDate(next)
@@ -117,7 +120,6 @@ function SchedulerContent({ office, onClose, onScheduled }: {
             }}
             min={today}
             max={maxDate}
-            placeholder="Gün seç"
           />
           {nextOpen ? (
             <p className={styles.fullDayHint}>
@@ -148,6 +150,7 @@ function SchedulerContent({ office, onClose, onScheduled }: {
             value={type}
             onChange={(next) => setType(next as AppointmentType)}
             variant="track"
+            size="sm"
             label="Görüşme türü"
           />
           <GlassTextarea

@@ -30,6 +30,13 @@ export interface GlassDatePickerProps
   disabled?: boolean
   /** Ay/gün adları ve tarih formatı için BCP 47 locale (hafta her zaman Pazartesi başlar) */
   locale?: string
+  /**
+   * - `popover` (varsayılan): input görünümlü tetikleyici + açılır takvim.
+   * - `inline`: tetikleyicisiz, HER ZAMAN AÇIK ve OPAK zeminli takvim.
+   *   Overflow'lu kaplarda (modal/panel) absolute popover kırpılır; gömülü
+   *   takvim ihtiyacının kalıcı cevabı budur — bkz. rules.md.
+   */
+  variant?: 'popover' | 'inline'
 }
 
 /* ── Tarih yardımcıları (bilinçli olarak lokal — date-fns yok) ─────────────── */
@@ -89,9 +96,11 @@ export function GlassDatePicker({
   invalid = false,
   disabled = false,
   locale = 'tr-TR',
+  variant = 'popover',
   className,
   ...rest
 }: GlassDatePickerProps) {
+  const isInline = variant === 'inline'
   const baseId = useId()
   const panelId = `${baseId}-panel`
   const titleId = `${baseId}-title`
@@ -140,7 +149,8 @@ export function GlassDatePicker({
     const picked = startOfDay(day)
     if (value === undefined) setInner(picked)
     onChange?.(picked)
-    close(true)
+    // Inline modda kapatılacak panel ve dönülecek tetikleyici yok.
+    if (!isInline) close(true)
   }
 
   /** Klavye gezinmesi: hedef günü aralığa kıstırır, ay görünümünü izler, focus ister */
@@ -171,7 +181,7 @@ export function GlassDatePicker({
   }
 
   const onRootKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape' && open) {
+    if (e.key === 'Escape' && open && !isInline) {
       e.stopPropagation()
       close(true)
     }
@@ -179,14 +189,14 @@ export function GlassDatePicker({
 
   // Klavye/açılış kaynaklı focus isteği: hedef gün hücresine odaklan
   useEffect(() => {
-    if (!open || !focusRequest.current) return
+    if (!(open || isInline) || !focusRequest.current) return
     focusRequest.current = false
     rootRef.current?.querySelector<HTMLButtonElement>(`[data-date="${toKey(focusedDate)}"]`)?.focus()
-  }, [open, focusedDate])
+  }, [open, isInline, focusedDate])
 
   // Dış tıklama kapatır (focus çalınmaz — kullanıcı zaten başka yere gitti)
   useEffect(() => {
-    if (!open) return
+    if (!open || isInline) return
     const onPointerDown = (e: PointerEvent) => {
       if (rootRef.current && e.target instanceof Node && !rootRef.current.contains(e.target)) {
         setOpen(false)
@@ -194,9 +204,98 @@ export function GlassDatePicker({
     }
     document.addEventListener('pointerdown', onPointerDown)
     return () => document.removeEventListener('pointerdown', onPointerDown)
-  }, [open])
+  }, [open, isInline])
 
   const triggerClasses = [styles.trigger, styles[size], invalid ? styles.invalid : ''].filter(Boolean).join(' ')
+
+  // Başlık + ay grid'i: popover ve inline aynı gövdeyi paylaşır — davranış
+  // (klavye gezinme, roving tabindex, aria) iki varyantta da birebir aynıdır.
+  const panelBody = (
+    <>
+      <div className={styles.header}>
+        <button
+          type="button"
+          className={styles.nav}
+          aria-label="Önceki ay"
+          onClick={() => setViewMonth((m) => startOfMonth(addMonthsKeepDay(m, -1)))}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <span id={titleId} className={styles.title}>
+          {monthFmt.format(viewMonth)}
+        </span>
+        <button
+          type="button"
+          className={styles.nav}
+          aria-label="Sonraki ay"
+          onClick={() => setViewMonth((m) => startOfMonth(addMonthsKeepDay(m, 1)))}
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="m6 3 5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div role="grid" aria-labelledby={titleId} className={styles.grid} onKeyDown={onGridKeyDown}>
+        <div role="row" className={styles.row}>
+          {weekdays.map((name, i) => (
+            <span key={i} role="columnheader" className={styles.weekday}>
+              {name}
+            </span>
+          ))}
+        </div>
+        {weeks.map((week, wi) => (
+          <div key={wi} role="row" className={styles.row}>
+            {week.map((day) => {
+              const outOfRange = isOutOfRange(day, min, max)
+              const isSelected = selected !== null && selected !== undefined && isSameDay(day, selected)
+              const cellClasses = [
+                styles.day,
+                isSameMonth(day, viewMonth) ? '' : styles.dayOutside,
+                isSameDay(day, today) ? styles.dayToday : '',
+                isSelected ? styles.daySelected : '',
+              ]
+                .filter(Boolean)
+                .join(' ')
+              return (
+                <button
+                  key={toKey(day)}
+                  type="button"
+                  role="gridcell"
+                  data-date={toKey(day)}
+                  className={cellClasses}
+                  aria-label={dayFmt.format(day)}
+                  aria-selected={isSelected || undefined}
+                  aria-current={isSameDay(day, today) ? 'date' : undefined}
+                  tabIndex={isSameDay(day, focusedDate) ? 0 : -1}
+                  disabled={outOfRange}
+                  onClick={() => select(day)}
+                  onFocus={() => setFocusedDate(startOfDay(day))}
+                >
+                  {day.getDate()}
+                </button>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+    </>
+  )
+
+  if (isInline) {
+    return (
+      <div
+        ref={rootRef}
+        className={[styles.root, styles.inlineRoot, className].filter(Boolean).join(' ')}
+        {...rest}
+      >
+        {/* Cam yok: gömülü takvim, altındaki içerik okunmasın diye düz zemin taşır */}
+        <div className={styles.panelInline}>{panelBody}</div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -246,75 +345,7 @@ export function GlassDatePicker({
             transition={{ duration: 0.16, ease: 'easeOut' }}
           >
             <GlassSurface shape={16} tone={tone} thickness={0.5} className={styles.panel}>
-              <div className={styles.header}>
-                <button
-                  type="button"
-                  className={styles.nav}
-                  aria-label="Önceki ay"
-                  onClick={() => setViewMonth((m) => startOfMonth(addMonthsKeepDay(m, -1)))}
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M10 3 5 8l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <span id={titleId} className={styles.title}>
-                  {monthFmt.format(viewMonth)}
-                </span>
-                <button
-                  type="button"
-                  className={styles.nav}
-                  aria-label="Sonraki ay"
-                  onClick={() => setViewMonth((m) => startOfMonth(addMonthsKeepDay(m, 1)))}
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="m6 3 5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-
-              <div role="grid" aria-labelledby={titleId} className={styles.grid} onKeyDown={onGridKeyDown}>
-                <div role="row" className={styles.row}>
-                  {weekdays.map((name, i) => (
-                    <span key={i} role="columnheader" className={styles.weekday}>
-                      {name}
-                    </span>
-                  ))}
-                </div>
-                {weeks.map((week, wi) => (
-                  <div key={wi} role="row" className={styles.row}>
-                    {week.map((day) => {
-                      const outOfRange = isOutOfRange(day, min, max)
-                      const isSelected = selected !== null && selected !== undefined && isSameDay(day, selected)
-                      const cellClasses = [
-                        styles.day,
-                        isSameMonth(day, viewMonth) ? '' : styles.dayOutside,
-                        isSameDay(day, today) ? styles.dayToday : '',
-                        isSelected ? styles.daySelected : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')
-                      return (
-                        <button
-                          key={toKey(day)}
-                          type="button"
-                          role="gridcell"
-                          data-date={toKey(day)}
-                          className={cellClasses}
-                          aria-label={dayFmt.format(day)}
-                          aria-selected={isSelected || undefined}
-                          aria-current={isSameDay(day, today) ? 'date' : undefined}
-                          tabIndex={isSameDay(day, focusedDate) ? 0 : -1}
-                          disabled={outOfRange}
-                          onClick={() => select(day)}
-                          onFocus={() => setFocusedDate(startOfDay(day))}
-                        >
-                          {day.getDate()}
-                        </button>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
+              {panelBody}
             </GlassSurface>
           </motion.div>
         ) : null}

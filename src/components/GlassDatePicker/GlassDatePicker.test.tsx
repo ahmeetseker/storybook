@@ -95,4 +95,33 @@ describe('GlassDatePicker', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Önceki ay' }))
     expect(screen.getByText('Temmuz 2026')).toBeTruthy()
   })
+
+  // Inline varyant: modal/panel içine gömülü, her zaman açık takvim.
+  // Popover kırpılma sorunlarının (overflow'lu kap içinde absolute panel)
+  // kalıcı çözümü bu varyanttır — bkz. rules.md §"inline".
+  describe('variant="inline"', () => {
+    it('tetikleyici olmadan grid her zaman görünür ve ay başlığı vardır', () => {
+      renderPicker({ variant: 'inline' })
+      expect(screen.queryByRole('combobox')).toBeNull()
+      expect(screen.getByRole('grid')).toBeTruthy()
+      expect(screen.getByText('Temmuz 2026')).toBeTruthy()
+    })
+
+    it('gün seçimi onChange çağırır ve takvim AÇIK kalır', () => {
+      const onChange = vi.fn()
+      renderPicker({ variant: 'inline', onChange })
+      fireEvent.click(screen.getByRole('gridcell', { name: '16 Temmuz 2026' }))
+      expect(onChange).toHaveBeenCalledWith(new Date(2026, 6, 16))
+      expect(screen.getByRole('grid')).toBeTruthy()
+    })
+
+    it('min/max dışı günler inline modda da seçilemez', () => {
+      const onChange = vi.fn()
+      renderPicker({ variant: 'inline', onChange, min: new Date(2026, 6, 10), max: new Date(2026, 6, 20) })
+      const disabledDay = screen.getByRole('gridcell', { name: '25 Temmuz 2026' })
+      expect((disabledDay as HTMLButtonElement).disabled).toBe(true)
+      fireEvent.click(disabledDay)
+      expect(onChange).not.toHaveBeenCalled()
+    })
+  })
 })

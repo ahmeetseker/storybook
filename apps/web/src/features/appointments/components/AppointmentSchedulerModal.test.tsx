@@ -81,7 +81,7 @@ describe('AppointmentSchedulerModal', () => {
     }
     const weekendKey = `${weekend.getFullYear()}-${weekend.getMonth() + 1}-${weekend.getDate()}`
 
-    await user.click(screen.getByRole('combobox'))
+    // Inline takvim her zaman açık — popover tetikleyicisi yok.
     const cell = document.querySelector<HTMLElement>(`[data-date="${weekendKey}"]`)
     expect(cell).toBeTruthy()
     await user.click(cell!)

@@ -21,6 +21,16 @@ başlangıçlı ay grid'i. Tek tarih seçer; aralık seçimi kapsam dışıdır.
 | GlassTabs | Kapalı küme seçim; takvim değil |
 | GlassButton | Aksiyon; değer tutmaz |
 
+### Varyantlar
+
+- `popover` (varsayılan): input görünümlü cam trigger + açılır panel.
+- `inline`: tetikleyicisiz, HER ZAMAN AÇIK ve **opak** (`--lg-bg` + hairline
+  çerçeve) takvim. Overflow'lu kaplarda (GlassModal gövdesi gibi) absolute
+  popover kırpılır ve cam zemin altındaki içeriği okutur; gömülü takvim
+  ihtiyacında bu varyant kullanılır (ör. randevu planlama modalı). Grid,
+  klavye gezinme ve aria sözleşmesi popover ile birebir aynıdır; Escape/dış
+  tıklama davranışı yoktur çünkü kapanacak panel yoktur.
+
 ## 2. Semantik sözleşme
 
 - Trigger: `<button role="combobox">` + `aria-expanded` + `aria-haspopup="grid"`
