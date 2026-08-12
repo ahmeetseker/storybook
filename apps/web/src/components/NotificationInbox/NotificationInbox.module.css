@@ -1,4 +1,13 @@
 /* Bildirim kutusu — popover içi düz (flat) içerik; cam katmanı GlassPopover kurar. */
+
+/* Popover kökü: kartın varsayılan 320px tavanı gelen kutusu için dar —
+   liste satırları sağdan kırpılıyordu. GlassPopover'ın mikro-geometri
+   kancası (--panel-max-width) panel içeriğine göre genişletilir
+   (360px içerik + 2×16px kart dolgusu + pay). */
+.inboxRoot {
+  --panel-max-width: 404px;
+}
+
 .bellWrap {
   position: relative;
   display: inline-flex;
@@ -24,7 +33,9 @@
 }
 
 .panel {
-  width: min(360px, 82vw);
+  /* Kart dolgusu (2×16px) + kartın mobil tavanı (100vw - 32px) hesaba katılır:
+     içerik ≤ 100vw - 64px → kart hiçbir viewport'ta taşmaz/kırpmaz */
+  width: min(360px, calc(100vw - var(--lg-space-10, 64px)));
 }
 
 .head {

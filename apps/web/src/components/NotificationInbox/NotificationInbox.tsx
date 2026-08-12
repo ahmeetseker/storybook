@@ -122,6 +122,7 @@ export function NotificationInbox({ onViewAll, bildirimler }: NotificationInboxP
 
   return (
     <GlassPopover
+      className={styles.inboxRoot}
       open={acik}
       onOpenChange={setAcik}
       placement="bottom"
