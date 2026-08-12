@@ -58,8 +58,8 @@ export interface NotFoundViewProps {
 }
 
 export function NotFoundView({
-  title = 'Aradığınız sayfa uzayda kaybolmuş',
-  description = 'Bu adres taşınmış ya da hiç var olmamış olabilir. Sizi güvenli bir yere geri götürelim.',
+  title = 'Bu adres haritada yok',
+  description = 'Aradığınız sayfa taşınmış ya da yayından kaldırılmış olabilir. Dilerseniz arsa aramaya kaldığınız yerden devam edin.',
   backText = 'Geri dön',
   onBack,
 }: NotFoundViewProps) {

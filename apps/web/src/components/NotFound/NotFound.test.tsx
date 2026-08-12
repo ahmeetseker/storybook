@@ -10,8 +10,8 @@ vi.mock('cobe', () => ({
 describe('NotFoundView', () => {
   it('başlık, açıklama ve ekran okuyucu 404 metniyle render olur', () => {
     render(<NotFoundView onBack={() => {}} />)
-    expect(screen.getByRole('heading', { name: /uzayda kaybolmuş/i })).toBeTruthy()
-    expect(screen.getByText(/taşınmış ya da hiç var olmamış/i)).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /haritada yok/i })).toBeTruthy()
+    expect(screen.getByText(/taşınmış ya da yayından kaldırılmış/i)).toBeTruthy()
     expect(screen.getByText(/hata kodu 404/i)).toBeTruthy()
   })
 
