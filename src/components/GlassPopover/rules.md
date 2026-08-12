@@ -130,3 +130,8 @@ Viewport çarpışmasında otomatik flip yok (floating-ui yasağı; basitlik kar
 
 - 2026-07-16: İlk sürüm — placement/align eksenleri, controlled/uncontrolled,
   non-modal dialog sözleşmesi, oksuz tasarım kararı.
+- 2026-08-12: `material` ekseni (`glass` | `flat`, varsayılan `glass`).
+  Yoğun metin içerikli paneller (bildirim gelen kutusu gibi) cam zeminde
+  altta akan sayfayla yarışıp okunmaz kalıyordu; `flat` opak yüzey +
+  hairline verir, yükselti (`--lg-shadow-md`) iki malzemede de aynı kalır.
+  İlk kullanım: kabuk bildirim kutusu.

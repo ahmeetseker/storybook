@@ -57,4 +57,12 @@ describe('GlassPopover', () => {
     const dialog = screen.getByRole('dialog')
     expect(dialog.getAttribute('aria-labelledby')).toBeNull()
   })
+
+  it('material ekseni: varsayılan cam, flat verilirse opak yüzey', () => {
+    const { unmount } = renderPopover({ defaultOpen: true })
+    expect(screen.getByRole('dialog').getAttribute('data-material')).toBe('glass')
+    unmount()
+    renderPopover({ defaultOpen: true, material: 'flat' })
+    expect(screen.getByRole('dialog').getAttribute('data-material')).toBe('flat')
+  })
 })

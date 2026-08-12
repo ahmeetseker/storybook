@@ -26,6 +26,12 @@ export interface GlassPopoverProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   /** Panel başlığı; verilirse aria-labelledby ile panele bağlanır */
   title?: string
   tone?: 'light' | 'dark' | 'auto'
+  /**
+   * Panel malzemesi. `'glass'` (varsayılan) cam paneldir; `'flat'` opak yüzey —
+   * yoğun metin içeriği (liste, gelen kutusu, form) altta akan sayfayla
+   * yarışmasın diye. Yükselti değişmez: iki malzeme de `--lg-shadow-md` taşır.
+   */
+  material?: 'glass' | 'flat'
   /** Panel içeriği */
   children?: ReactNode
 }
@@ -46,6 +52,7 @@ export function GlassPopover({
   align = 'center',
   title,
   tone = 'auto',
+  material = 'glass',
   className,
   children,
   ...rest
@@ -110,6 +117,7 @@ export function GlassPopover({
                 aria-labelledby={title ? titleId : undefined}
                 shape={14} /* --lg-radius-media */
                 tone={tone}
+                material={material}
                 thickness={0.5}
                 className={styles.card}
               >

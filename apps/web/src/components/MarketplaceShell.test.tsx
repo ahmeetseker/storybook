@@ -26,6 +26,12 @@ vi.mock('@/features/auth', () => ({
   useAuthSession: () => authState,
 }))
 
+// Gerçek gelen kutusu kendi test dosyasında sınanır; kabuk yalnız
+// "kimlikliyken zil var" sözleşmesini doğrular.
+vi.mock('./NotificationInbox/NotificationInbox', () => ({
+  NotificationInbox: () => <button type="button" aria-label="Bildirimler" />,
+}))
+
 vi.mock('@repo/ui', () => ({
   GlassButton: ({
     children,

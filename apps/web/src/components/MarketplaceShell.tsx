@@ -1,7 +1,8 @@
 import { useCallback, useMemo, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
-import { GlassButton, GlassIconButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
+import { GlassButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
 import { useAuthSession } from '@/features/auth'
+import { NotificationInbox } from './NotificationInbox/NotificationInbox'
 import {
   getBreadcrumbTrail,
   getRouteByKey,
@@ -17,13 +18,6 @@ import { SiteFooter } from './SiteFooter'
 export interface MarketplaceShellProps {
   children: ReactNode
 }
-
-const BellIcon = (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M18 9.5a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17s-2.5-1-2.5-7" />
-    <path d="M10.3 20a2 2 0 0 0 3.4 0" />
-  </svg>
-)
 
 export function MarketplaceShell({ children }: MarketplaceShellProps) {
   const router = useRouter()
@@ -106,12 +100,10 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     </GlassButton>
   )
 
-  // Bildirim zili: adanmış bir bildirim sayfası yok — en yakın karşılık olan
-  // hesap hareketleri akışına götürür.
+  // Bildirim zili popover gelen kutusunu açar; "Tüm bildirimleri gör"
+  // adanmış sayfa olmadığı için hesap hareketleri akışına götürür.
   const notificationsAction = (
-    <GlassIconButton size="sm" label="Bildirimler" onClick={() => routeTo('/hesabim/hareketler')}>
-      {BellIcon}
-    </GlassIconButton>
+    <NotificationInbox onViewAll={() => routeTo('/hesabim/hareketler')} />
   )
 
   return (

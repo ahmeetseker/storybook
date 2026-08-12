@@ -1,0 +1,135 @@
+/* Bildirim kutusu — popover içi düz (flat) içerik; cam katmanı GlassPopover kurar. */
+.bellWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Okunmamış sayacı: zilin sağ üst köşesine oturan accent kapsül */
+.unreadBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--lg-space-1);
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: var(--lg-accent, #7c3806);
+  color: var(--lg-accent-contrast, #fff);
+  font-size: var(--lg-text-badge, 11px);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.panel {
+  width: min(360px, 82vw);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lg-space-3);
+  padding-block-end: var(--lg-space-3);
+  border-block-end: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+}
+
+.markAll {
+  border: 0;
+  background: none;
+  padding: var(--lg-space-1);
+  color: var(--lg-accent, #7c3806);
+  font: inherit;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.markAll:hover {
+  text-decoration: underline;
+}
+
+.list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--lg-space-6) var(--lg-space-3);
+  text-align: center;
+  color: var(--lg-label-secondary, #4f4b45);
+  font-size: var(--lg-text-footnote, 13px);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  width: 100%;
+  padding: var(--lg-space-3) var(--lg-space-2);
+  border: 0;
+  border-block-end: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.row:hover {
+  background: color-mix(in srgb, var(--lg-label, #24211b) 4%, transparent);
+}
+.row:focus-visible {
+  outline: 2px solid var(--lg-accent, #7c3806);
+  outline-offset: -2px;
+}
+
+.rowIcon {
+  margin-block-start: 2px;
+  color: var(--lg-label-secondary, #4f4b45);
+  flex-shrink: 0;
+}
+
+.rowBody {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowTitle {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label, #24211b);
+}
+.row[data-unread] .rowTitle {
+  font-weight: 600;
+}
+
+.rowDetail {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary, #4f4b45);
+}
+
+.rowTime {
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary, #4f4b45);
+}
+
+/* Okunmamış noktası */
+.dot {
+  flex-shrink: 0;
+  margin-block-start: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lg-accent, #7c3806);
+}
+
+.footer {
+  padding-block-start: var(--lg-space-2);
+}
+
+.viewAll {
+  width: 100%;
+}
