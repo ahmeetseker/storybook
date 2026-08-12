@@ -363,7 +363,16 @@ function OfficeResultCard({
         <div>
           <h3 className={styles.cardName}>
             {office.name}
-            {office.verified ? <span className={styles.verifiedMark} title={office.verifiedBy ?? 'Doğrulanmış'}>✓</span> : null}
+            {office.verified ? (
+              <span
+                className={styles.verifiedMark}
+                role="img"
+                aria-label={office.verifiedBy ? `Doğrulanmış kurumsal ofis: ${office.verifiedBy}` : 'Doğrulanmış kurumsal ofis'}
+                title={office.verifiedBy ?? 'Doğrulanmış'}
+              >
+                ✓
+              </span>
+            ) : null}
           </h3>
           <p className={styles.cardTagline}>{office.tagline}</p>
         </div>
@@ -381,7 +390,7 @@ function OfficeResultCard({
       </div>
       <div className={styles.cardActions}>
         <GlassButton prominent onClick={() => onStartAction('meeting')}>Görüşme talep et</GlassButton>
-        <GlassButton onClick={() => onStartAction('message')}>Mesaj</GlassButton>
+        <GlassButton material="flat" onClick={() => onStartAction('message')}>Mesaj</GlassButton>
         <button type="button" className={styles.compareButton} onClick={onToggleCompare} disabled={!compared && compareLimitReached}>
           {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
         </button>

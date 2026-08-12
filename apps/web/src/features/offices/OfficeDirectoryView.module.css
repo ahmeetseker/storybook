@@ -45,7 +45,6 @@
 .compareButton[disabled] { color: var(--lg-label-secondary); cursor: not-allowed; }
 .cardMeta { color: var(--lg-label-secondary); font-size: var(--lg-text-caption); margin-block-start: var(--lg-space-3); }
 .evidenceBadge { align-self: start; background: var(--lg-bg); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-chip); color: var(--lg-label-secondary); font-size: var(--lg-text-badge); padding: var(--lg-space-1) var(--lg-space-2); }
-.evidenceBadge[data-empty] { color: var(--lg-warning); }
 .cardActions { align-items: center; border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline); padding-block-start: var(--lg-space-3); }
 .cardIdentity { display: flex; gap: var(--lg-space-3); align-items: flex-start; }
 .cardLogo, .cardLogoFallback { width: 44px; height: 44px; border-radius: 12px; }
