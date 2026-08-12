@@ -1,4 +1,11 @@
-import { useState, type ChangeEvent, type CSSProperties, type InputHTMLAttributes, type KeyboardEvent } from 'react'
+import {
+  useState,
+  type ChangeEvent,
+  type CSSProperties,
+  type InputHTMLAttributes,
+  type KeyboardEvent,
+  type PointerEvent,
+} from 'react'
 import styles from './GlassSlider.module.css'
 
 export interface GlassSliderProps
@@ -37,10 +44,18 @@ export function GlassSlider({
   className,
   style,
   onKeyDown,
+  onPointerDown,
+  onPointerUp,
+  onPointerCancel,
   ...rest
 }: GlassSliderProps) {
   // Kontrollü/kontrolsüz kalıbı (GlassTabs ile aynı)
   const [inner, setInner] = useState(defaultValue ?? min)
+
+  // Sıvı basış (Apple liquid glass): sürükleme boyunca thumb cama dönüp büyür.
+  // Native range pointer'ı örtük yakalar — bırakış nerede olursa olsun
+  // pointerup input'a düşer, ayrıca pencere dinleyicisi gerekmez.
+  const [dragging, setDragging] = useState(false)
   const current = clampTo(value ?? inner, min, max)
   const pct = max > min ? ((current - min) / (max - min)) * 100 : 0
 
@@ -71,6 +86,19 @@ export function GlassSlider({
     commit(next)
   }
 
+  const handlePointerDown = (e: PointerEvent<HTMLInputElement>) => {
+    onPointerDown?.(e)
+    if (!disabled) setDragging(true)
+  }
+  const handlePointerUp = (e: PointerEvent<HTMLInputElement>) => {
+    onPointerUp?.(e)
+    setDragging(false)
+  }
+  const handlePointerCancel = (e: PointerEvent<HTMLInputElement>) => {
+    onPointerCancel?.(e)
+    setDragging(false)
+  }
+
   const fmt = formatValue ?? ((v: number) => String(v))
   const classes = [styles.root, disabled ? styles.disabled : '', className].filter(Boolean).join(' ')
 
@@ -86,6 +114,9 @@ export function GlassSlider({
         value={current}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         disabled={disabled}
         aria-label={label}
         aria-valuetext={formatValue ? fmt(current) : undefined}
@@ -94,7 +125,7 @@ export function GlassSlider({
       <span className={styles.track} aria-hidden>
         <span className={styles.fill} />
       </span>
-      <span className={styles.thumb} aria-hidden>
+      <span className={styles.thumb} data-liquid={dragging || undefined} aria-hidden>
         {showValue ? <span className={styles.bubble}>{fmt(current)}</span> : null}
       </span>
     </span>

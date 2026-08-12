@@ -222,3 +222,8 @@ sürüklenirken canlı sonuç sayısını debounce'lu duyurması.
   karşılığı: histogram + çift kol + kolları izleyen değer pilleri tek
   sözleşmede toplandı. `GlassSlider` tek kollu kaldı, `GlassDistributionChart`
   okuma yüzeyi olarak ayrıldı.
+- 2026-08-12 — Sıvı basış (Apple liquid glass davranışı). Sürüklenen kolun
+  thumb'ı cama dönüp 1.25× büyür (`data-liquid`: yarı saydam yüzey + backdrop
+  blur + specular rim), bırakınca beyaza oturur; diğer kol etkilenmez.
+  GlassSlider ile aynı reçete. `prefers-reduced-motion`'da büyüme yok;
+  `prefers-reduced-transparency`'de cam durum opak kalır.

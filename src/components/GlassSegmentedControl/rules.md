@@ -191,3 +191,10 @@ LongContent, Mobile (viewport).
 - 2026-08-08 — `iconOnly` prop'u: etiketler clip ile yalnız ekran okuyucuya
   iner, segment ikonla temsil edilir (her seçenek `icon` taşımalı). İlk
   kullanım: /emlak mobil araç kartındaki Sonuçlar/Harita modu.
+- 2026-08-12 — Sıvı geçiş (Apple liquid glass davranışı). Seçim değişince
+  damla FLIP süzülüşü boyunca cama döner (`data-liquid`: yarı saydam yüzey +
+  backdrop blur + specular rim), yeni segmente varınca (layout animasyonu
+  bitince ya da 700ms emniyet tavanında) opak dolguya oturur. Seçili segment
+  basılı tutulurken de aynı cam görünüm (`:active`, salt CSS). Tüm
+  varyantlarda (`capsule`/`bar`/`track`) geçerli; `prefers-reduced-motion`'da
+  kurulmaz, `prefers-reduced-transparency`'de cam durum opak kalır.

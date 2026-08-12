@@ -122,6 +122,9 @@ MobileSettings (viewport: mobile1).
 - [x] disabled aktivasyonu engeller
 - [x] controlled değer dışarıdan yönetilir
 - [x] tint CSS var + type=button
+- [x] sıvı basış: pointer basılıyken `data-liquid` + `data-pressed`, bırakınca temiz
+- [x] sıvı geçiş: toggle süzülüşünde `data-liquid`, bitince temiz
+- [x] disabled iken sıvı durum kurulmaz
 - [ ] reduced-motion'da spring kapalı (visual)
 
 ## 12. Do / Don't
@@ -142,3 +145,11 @@ değerlendirilecek.
   (`.root::after`) kaldırıldı — kök GlassSurface'in `overflow: hidden`'ı
   nedeniyle hiç çalışmıyordu (ölü kod). Ray/thumb ölçüleri değişmedi;
   gerçek hedef ve AAA 2.5.5 kısıtı §9'da açıkça belgelendi.
+- 2026-08-12: Sıvı basış (Apple liquid glass davranışı). Basılı tutarken thumb
+  cama döner (yarı saydam yüzey + backdrop blur + specular rim) ve hareket
+  yönüne %35 uzar (`data-pressed`); toggle süzülüşü boyunca cam kalır
+  (`data-liquid`), yeni uca varınca (layout animasyonu bitince ya da 700ms
+  emniyet tavanında) beyaza oturur. `prefers-reduced-motion`'da uzama ve
+  geçiş yok; `prefers-reduced-transparency`'de cam durum opak kalır. Thumb
+  border-radius'u 50%'den kapsül token'ına alındı — daire, kapsülün özel hali;
+  uzama sırasında köşe morph'u oluşmaz.

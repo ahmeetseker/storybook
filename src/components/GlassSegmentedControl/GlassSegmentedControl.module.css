@@ -153,6 +153,11 @@
      Sabit beyaz yerine yüzey token'ı → etiket kontrastı yüzeyle birlikte korunur. */
   background: color-mix(in srgb, var(--lg-surface, #fff) 80%, transparent);
   border: 1px solid color-mix(in srgb, var(--lg-label, #24211b) 10%, transparent);
+  /* Sıvı geçiş: cam ↔ opak dönüşü damlanın süzülüşüyle aynı ritimde */
+  transition:
+    background-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
+    box-shadow var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease),
+    border-color var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
 
 /* Etiketler HER damlanın üstünde kalır — kendi segmentininkinin de, üstünden
@@ -188,7 +193,35 @@
   display: block;
 }
 
+/* Sıvı geçiş (Apple liquid glass): damla segmentler arasında süzülürken ve
+   seçili segment basılı tutulurken cama döner — yarı saydam yüzey + backdrop
+   blur + specular rim. Dosyanın sonunda durur ki `.track .drop` gibi varyant
+   dolgularını da eşit özgüllükte geçsin. Raw beyazlar GlassSurface rim
+   reçetesiyle aynı ailedendir (bilinçli raw). */
+.drop[data-liquid],
+.segment:not(:disabled):active .drop {
+  background: color-mix(in srgb, var(--lg-surface, #fff) 35%, transparent);
+  -webkit-backdrop-filter: blur(4px) saturate(180%);
+  backdrop-filter: blur(4px) saturate(180%);
+  border-color: transparent;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .segment { transition: none; }
   .segment:not(:disabled):active { transform: none; }
+  .drop { transition: none; }
+}
+
+/* Saydamlık azaltılmışsa cam durum opak kalır (blur/refraction yok) */
+@media (prefers-reduced-transparency: reduce) {
+  .drop[data-liquid],
+  .segment:not(:disabled):active .drop {
+    background: var(--lg-surface, #fff);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }

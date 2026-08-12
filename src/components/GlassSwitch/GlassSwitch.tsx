@@ -1,4 +1,12 @@
-import { useState, type ButtonHTMLAttributes, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react'
+import {
+  useEffect,
+  useState,
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from 'react'
 import { motion } from 'motion/react'
 import { GlassSurface, type GlassSurfaceProps } from '../GlassSurface'
 import { prefersReducedMotion } from '../../core/tier'
@@ -35,6 +43,10 @@ export function GlassSwitch({
   style,
   onClick,
   onKeyDown,
+  onPointerDown,
+  onPointerUp,
+  onPointerLeave,
+  onPointerCancel,
   ...rest
 }: GlassSwitchProps) {
   // Kontrollü/kontrolsüz kalıbı (GlassTabs ile aynı)
@@ -42,8 +54,23 @@ export function GlassSwitch({
   const isChecked = checked ?? inner
   const reduced = prefersReducedMotion()
 
+  // Sıvı basış (Apple liquid glass): basılı tutarken thumb cama dönüp hareket
+  // yönüne uzar; toggle sonrası süzülme boyunca cam kalır, varınca beyaza döner.
+  // `pressed` parmağın raydaki anı, `traveling` FLIP süzülüşünün ömrüdür.
+  const [pressed, setPressed] = useState(false)
+  const [traveling, setTraveling] = useState(false)
+
+  // Emniyet: layout animasyonu hiç koşmazsa (ör. controlled parent değeri
+  // yutarsa) cam durum asılı kalmasın — spring ömründen uzun bir tavanla kapat.
+  useEffect(() => {
+    if (!traveling) return
+    const t = setTimeout(() => setTraveling(false), 700)
+    return () => clearTimeout(t)
+  }, [traveling])
+
   const toggle = () => {
     if (disabled) return
+    if (!reduced) setTraveling(true)
     if (checked === undefined) setInner(!isChecked)
     onChange?.(!isChecked)
   }
@@ -61,6 +88,27 @@ export function GlassSwitch({
       e.preventDefault()
       toggle()
     }
+  }
+
+  const setPress = (next: boolean) => {
+    if (disabled || reduced) return
+    setPressed(next)
+  }
+  const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
+    onPointerDown?.(e)
+    setPress(true)
+  }
+  const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
+    onPointerUp?.(e)
+    setPress(false)
+  }
+  const handlePointerLeave = (e: PointerEvent<HTMLButtonElement>) => {
+    onPointerLeave?.(e)
+    setPress(false)
+  }
+  const handlePointerCancel = (e: PointerEvent<HTMLButtonElement>) => {
+    onPointerCancel?.(e)
+    setPress(false)
   }
 
   const cssVars: CSSProperties = tint ? ({ '--glass-tint': tint } as CSSProperties) : {}
@@ -83,14 +131,23 @@ export function GlassSwitch({
         disabled,
         onClick: handleClick,
         onKeyDown: handleKeyDown,
+        onPointerDown: handlePointerDown,
+        onPointerUp: handlePointerUp,
+        onPointerLeave: handlePointerLeave,
+        onPointerCancel: handlePointerCancel,
         ...rest,
       } as unknown as GlassSurfaceProps)}
     >
       <span className={styles.track}>
-        {/* Thumb, layout animasyonuyla kayar: justify-content değişimini spring izler */}
+        {/* Thumb, layout animasyonuyla kayar: justify-content değişimini spring izler.
+            data-liquid cam görünümü, data-pressed kapsül uzamasını taşır — ikisi de
+            CSS'te yaşar, layout FLIP genişleme/dönüşü de springle animasyonlar. */}
         <motion.span
           className={styles.thumb}
+          data-liquid={pressed || traveling || undefined}
+          data-pressed={pressed || undefined}
           layout
+          onLayoutAnimationComplete={() => setTraveling(false)}
           transition={reduced ? { duration: 0 } : { type: 'spring', ...presets.springs.sidebar }}
           aria-hidden
         />

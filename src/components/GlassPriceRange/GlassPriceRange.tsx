@@ -104,6 +104,11 @@ export function GlassPriceRange({
   const labelId = `pr-${rawId.replace(/[^a-zA-Z0-9]/g, '')}`
   const [inner, setInner] = useState<GlassPriceRangeValue>(defaultValue ?? [min, max])
 
+  // Sıvı basış (Apple liquid glass): sürüklenen kolun thumb'ı cama dönüp büyür.
+  // Native range pointer'ı örtük yakalar — bırakış nerede olursa olsun pointerup
+  // aynı input'a düşer, ayrıca pencere dinleyicisi gerekmez.
+  const [activeHandle, setActiveHandle] = useState<0 | 1 | null>(null)
+
   const span = max - min
   const gap = minGap ?? step
   const raw = value ?? inner
@@ -226,6 +231,11 @@ export function GlassPriceRange({
 
   const classes = [styles.root, disabled ? styles.disabled : '', className].filter(Boolean).join(' ')
 
+  const handlePointerDown = (handle: 0 | 1) => () => {
+    if (!disabled) setActiveHandle(handle)
+  }
+  const releaseHandle = () => setActiveHandle(null)
+
   const rangeInput = (handle: 0 | 1) => (
     <input
       type="range"
@@ -237,6 +247,9 @@ export function GlassPriceRange({
       value={current[handle]}
       onChange={handleChange(handle)}
       onKeyDown={handleKeyDown(handle)}
+      onPointerDown={handlePointerDown(handle)}
+      onPointerUp={releaseHandle}
+      onPointerCancel={releaseHandle}
       disabled={disabled}
       aria-label={`${baseName}: ${handle === 0 ? 'en düşük' : 'en yüksek'}`}
       aria-valuetext={formatValue(current[handle])}
@@ -287,8 +300,8 @@ export function GlassPriceRange({
         </span>
         {rangeInput(0)}
         {rangeInput(1)}
-        <span className={styles.thumb} data-handle="min" aria-hidden="true" />
-        <span className={styles.thumb} data-handle="max" aria-hidden="true" />
+        <span className={styles.thumb} data-handle="min" data-liquid={activeHandle === 0 || undefined} aria-hidden="true" />
+        <span className={styles.thumb} data-handle="max" data-liquid={activeHandle === 1 || undefined} aria-hidden="true" />
       </div>
 
       {/* Skala satırı ekran okuyucudan gizli: alan sınırları `aria-valuemin/max`,

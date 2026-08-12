@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { GlassSwitch, type GlassSwitchProps } from './GlassSwitch'
 import { GlassTierProvider } from '../GlassSurface/GlassTierContext'
 
@@ -64,5 +64,35 @@ describe('GlassSwitch', () => {
     const sw = screen.getByRole('switch') as HTMLButtonElement
     expect(sw.style.getPropertyValue('--glass-tint')).toBe('#34c759')
     expect(sw.getAttribute('type')).toBe('button')
+  })
+
+  it('sıvı basış: pointer basılıyken thumb cam + uzamış, bırakınca normale döner', () => {
+    const { container } = renderSwitch()
+    const sw = screen.getByRole('switch')
+    fireEvent.pointerDown(sw)
+    expect(container.querySelector('[data-liquid][data-pressed]')).not.toBeNull()
+    fireEvent.pointerUp(sw)
+    expect(container.querySelector('[data-pressed]')).toBeNull()
+  })
+
+  it('sıvı geçiş: toggle süzülüşü boyunca thumb cam kalır, sonra oturur', () => {
+    vi.useFakeTimers()
+    try {
+      const { container } = renderSwitch()
+      fireEvent.click(screen.getByRole('switch'))
+      expect(container.querySelector('[data-liquid]')).not.toBeNull()
+      act(() => {
+        vi.advanceTimersByTime(750)
+      })
+      expect(container.querySelector('[data-liquid]')).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('sıvı basış: disabled iken pointer thumb durumunu değiştirmez', () => {
+    const { container } = renderSwitch({ disabled: true })
+    fireEvent.pointerDown(screen.getByRole('switch'))
+    expect(container.querySelector('[data-liquid]')).toBeNull()
   })
 })

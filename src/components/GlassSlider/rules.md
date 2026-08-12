@@ -150,3 +150,10 @@ sarmalayıcı boyutlandırması çözülürse.
   ölçeği küçülse de sabit). İmleçli cihazda görünür yükseklik 28px'te kaldı
   ama native input `inset-block` ile dikeyde 44px hedefe genişletildi
   (görsel değişiklik yok, sürükleme alanı 28→44px).
+- 2026-08-12: Sıvı basış (Apple liquid glass davranışı). Sürükleme boyunca
+  thumb cama dönüp 1.25× büyür (`data-liquid`: yarı saydam yüzey + backdrop
+  blur + specular rim), bırakınca beyaza oturur. Değer baloncuğu ters ölçekle
+  telafi edilir (büyümez). Native range pointer'ı örtük yakaladığı için
+  pointerup her durumda input'a düşer — pencere dinleyicisi yok.
+  `prefers-reduced-motion`'da büyüme yok; `prefers-reduced-transparency`'de
+  cam durum opak kalır.

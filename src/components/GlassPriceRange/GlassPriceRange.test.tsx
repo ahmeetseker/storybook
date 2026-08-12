@@ -121,4 +121,14 @@ describe('GlassPriceRange', () => {
     fireEvent.keyDown(low, { key: 'ArrowRight' })
     expect(onChange).not.toHaveBeenCalled()
   })
+
+  it('sıvı basış: sürüklenen kolun thumbı cam olur, diğeri kalmaz; bırakınca temizlenir', () => {
+    const { container } = setup()
+    const { low } = handles()
+    fireEvent.pointerDown(low)
+    expect(container.querySelector('span[data-handle="min"][data-liquid]')).not.toBeNull()
+    expect(container.querySelector('span[data-handle="max"][data-liquid]')).toBeNull()
+    fireEvent.pointerUp(low)
+    expect(container.querySelector('[data-liquid]')).toBeNull()
+  })
 })
