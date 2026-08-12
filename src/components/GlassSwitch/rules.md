@@ -161,3 +161,11 @@ değerlendirilecek.
   `useGlassPress` bağlandı (GlassButton dili): basınca lens kırılması artar
   (`displacementScale`), gövde jöle yayıyla 0.96'ya çöker — Denetim
   Merkezi'ndeki "hafif efekt".
+- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
+  okunmuyordu (beyazın blur'u beyazdır); Apple'daki görünürlük merceğin rayı
+  BÜKMESİNDEN gelir. Thumb'ın beyaz diski üstte kapak oldu (`::after`),
+  basışta altına gerçek GlassSurface (displacement filtresi) monte edilir ve
+  kapak 0.25'e söner. Mercek DOM'da sürekli durmaz — basışta kurulur
+  (haritalar boyuta göre cache'li), bırakış solması bitince sökülür (boşta
+  filtre maliyeti yok). `prefers-reduced-transparency`'de mercek hiç
+  kurulmaz, kapak tam kalır.

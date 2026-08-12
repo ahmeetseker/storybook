@@ -89,6 +89,19 @@ export function GlassSegmentedControl({
     return () => clearTimeout(t)
   }, [traveling])
 
+  // Mercek yaşam döngüsü (GlassSlider ile aynı gerekçe): gerçek refraction
+  // sürekli DOM'da durmaz; süzülüş başlarken kurulur, bitince sökülür.
+  const [lensAlive, setLensAlive] = useState(false)
+  useEffect(() => {
+    if (traveling) {
+      setLensAlive(true)
+      return
+    }
+    if (!lensAlive) return
+    const t = setTimeout(() => setLensAlive(false), 320)
+    return () => clearTimeout(t)
+  }, [traveling, lensAlive])
+
   const select = (next: string) => {
     if (disabled) return
     if (next !== currentValue && !reduced) setTraveling(true)
@@ -156,7 +169,19 @@ export function GlassSegmentedControl({
                 onLayoutAnimationComplete={() => setTraveling(false)}
                 transition={reduced ? { duration: 0 } : { type: 'spring', ...presets.springs.sidebar }}
                 aria-hidden
-              />
+              >
+                {/* Gerçek mercek: süzülürken altındaki etiketi/rayı büker —
+                    opak pil (::before) sönerek merceği gösterir */}
+                {lensAlive ? (
+                  <GlassSurface
+                    as="span"
+                    shape="capsule"
+                    thickness={1}
+                    className={styles.lens}
+                    style={{ position: 'absolute', inset: 0 }}
+                  />
+                ) : null}
+              </motion.span>
             ) : null}
             {option.icon ? (
               <span className={styles.icon} aria-hidden>

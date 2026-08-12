@@ -96,6 +96,20 @@ export function GlassSwitch({
   // Denetim Merkezi'ndeki "hafif efekt" budur.
   const press = useGlassPress({ disabled })
 
+  // Mercek yaşam döngüsü (GlassSlider ile aynı gerekçe): gerçek refraction
+  // sürekli DOM'da durmaz; basışta/süzülüşte kurulur, sonra sökülür.
+  const liquid = pressed || traveling
+  const [lensAlive, setLensAlive] = useState(false)
+  useEffect(() => {
+    if (liquid) {
+      setLensAlive(true)
+      return
+    }
+    if (!lensAlive) return
+    const t = setTimeout(() => setLensAlive(false), 320)
+    return () => clearTimeout(t)
+  }, [liquid, lensAlive])
+
   const setPress = (next: boolean) => {
     if (disabled || reduced) return
     setPressed(next)
@@ -155,13 +169,25 @@ export function GlassSwitch({
             CSS'te yaşar, layout FLIP genişleme/dönüşü de springle animasyonlar. */}
         <motion.span
           className={styles.thumb}
-          data-liquid={pressed || traveling || undefined}
+          data-liquid={liquid || undefined}
           data-pressed={pressed || undefined}
           layout
           onLayoutAnimationComplete={() => setTraveling(false)}
           transition={reduced ? { duration: 0 } : { type: 'spring', ...presets.springs.sidebar }}
           aria-hidden
-        />
+        >
+          {/* Gerçek mercek: rayı büken displacement filtresi — beyaz kapak
+              (::after) basılıyken sönerek altındaki camı gösterir */}
+          {lensAlive ? (
+            <GlassSurface
+              as="span"
+              shape="capsule"
+              thickness={1}
+              className={styles.lens}
+              style={{ position: 'absolute', inset: 0 }}
+            />
+          ) : null}
+        </motion.span>
       </span>
     </GlassSurface>
   )

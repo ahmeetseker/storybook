@@ -189,6 +189,21 @@
 .drop[data-liquid]::after,
 .segment:not(:disabled):active .drop::after { opacity: 1; }
 
+/* Gerçek mercek: süzülüş boyunca damlanın altında yaşayan GlassSurface
+   displacement filtresi — altından geçen etiketi/rayı büker */
+.lens {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
+}
+.drop[data-liquid] .lens {
+  opacity: 1;
+  animation: lensIn 160ms var(--lg-motion-ease-standard, ease);
+}
+@keyframes lensIn {
+  from { opacity: 0; }
+}
+
 /* Etiketler HER damlanın üstünde kalır — kendi segmentininkinin de, üstünden
    süzülen komşununkinin de.
    Damla seçili segmentin ÇOCUĞUDUR; süzülürken hâlâ o segmentin boyama
@@ -226,11 +241,13 @@
   .segment { transition: none; }
   .segment:not(:disabled):active { transform: none; }
   .drop::before,
-  .drop::after { transition: none; }
+  .drop::after,
+  .lens { transition: none; animation: none; }
 }
 
-/* Saydamlık azaltılmışsa cam katman opak kalır (blur/refraction yok) */
+/* Saydamlık azaltılmışsa cam katman opak kalır, mercek gizlenir */
 @media (prefers-reduced-transparency: reduce) {
+  .lens { display: none; }
   .drop::after {
     background: var(--lg-surface, #fff);
     -webkit-backdrop-filter: none;

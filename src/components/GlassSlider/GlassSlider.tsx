@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
   type ChangeEvent,
   type CSSProperties,
@@ -6,6 +7,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from 'react'
+import { GlassSurface } from '../GlassSurface'
 import styles from './GlassSlider.module.css'
 
 export interface GlassSliderProps
@@ -56,6 +58,21 @@ export function GlassSlider({
   // Native range pointer'ı örtük yakalar — bırakış nerede olursa olsun
   // pointerup input'a düşer, ayrıca pencere dinleyicisi gerekmez.
   const [dragging, setDragging] = useState(false)
+
+  // Mercek yaşam döngüsü: gerçek refraction (GlassSurface) sürekli DOM'da
+  // durmaz — SVG displacement filtresi boşta bile backdrop maliyeti taşır.
+  // Basışta anında kurulur (harita boyuta göre cache'li), bırakışta solma
+  // geçişi bitene dek yaşar, sonra sökülür.
+  const [lensAlive, setLensAlive] = useState(false)
+  useEffect(() => {
+    if (dragging) {
+      setLensAlive(true)
+      return
+    }
+    if (!lensAlive) return
+    const t = setTimeout(() => setLensAlive(false), 320)
+    return () => clearTimeout(t)
+  }, [dragging, lensAlive])
   const current = clampTo(value ?? inner, min, max)
   const pct = max > min ? ((current - min) / (max - min)) * 100 : 0
 
@@ -126,6 +143,17 @@ export function GlassSlider({
         <span className={styles.fill} />
       </span>
       <span className={styles.thumb} data-liquid={dragging || undefined} aria-hidden>
+        {/* Gerçek mercek: rayı büküp büyüten displacement filtresi — beyaz
+            kapak (::after) basılıyken sönerek altındaki camı gösterir */}
+        {lensAlive ? (
+          <GlassSurface
+            as="span"
+            shape="capsule"
+            thickness={1}
+            className={styles.lens}
+            style={{ position: 'absolute', inset: 0 }}
+          />
+        ) : null}
         {showValue ? <span className={styles.bubble}>{fmt(current)}</span> : null}
       </span>
     </span>

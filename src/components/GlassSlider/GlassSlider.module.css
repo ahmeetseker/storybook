@@ -72,40 +72,41 @@
   transition: transform var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
 
-/* Sıvı basış (Apple liquid glass): thumb İKİ sabit katmandır — beyaz disk +
-   cam disk — geçiş YALNIZ opacity crossfade'idir. background/box-shadow/
-   backdrop-filter animasyonu paint aşamasında her karede backdrop'u yeniden
-   süzdüğü için takılıyordu. Raw beyazlar GlassSurface rim reçetesiyle aynı
-   ailedendir (bilinçli raw). */
-.thumb::before,
+/* Sıvı basış (Apple liquid glass): beyaz disk ÜSTTE duran bir kapaktır
+   (::after — pseudo çocukların üstünde boyanır), altında basışta kurulan
+   GERÇEK mercek (.lens, GlassSurface displacement filtresi) yaşar. Basılınca
+   kapak 0.25'e söner ve mercek rayı bükerek görünür — Apple'ın süt beyazı
+   cam kolu. Geçişler yalnız opacity/transform'dadır (compositor). */
 .thumb::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
-}
-.thumb::before {
   background: #fff; /* beyaz thumb — bilinçli raw (kontrast) */
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.2);
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
-.thumb::after {
-  background: color-mix(in srgb, var(--lg-surface, #fff) 40%, transparent);
-  -webkit-backdrop-filter: blur(4px) saturate(180%);
-  backdrop-filter: blur(4px) saturate(180%);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+/* Mercek: dış gölgeyi GlassSurface'in gölge kancasıyla taşır; girişte hızla
+   belirir, bırakışta sönerek sökülür (mount solmayı animation yapar —
+   transition mount karesinde koşmaz) */
+.lens {
+  --lg-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  pointer-events: none;
   opacity: 0;
+  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
-/* Sürüklerken: 1.25× büyür, cam öne çıkar (beyaz tümüyle sönmez) */
+.thumb[data-liquid] .lens {
+  opacity: 1;
+  animation: lensIn 160ms var(--lg-motion-ease-standard, ease);
+}
+@keyframes lensIn {
+  from { opacity: 0; }
+}
+/* Sürüklerken: 1.25× büyür, kapak söner (beyaz tümüyle gitmez) */
 .thumb[data-liquid] {
   transform: translate(-50%, -50%) scale(1.25);
 }
-.thumb[data-liquid]::before { opacity: 0.25; }
-.thumb[data-liquid]::after { opacity: 1; }
+.thumb[data-liquid]::after { opacity: 0.25; }
 /* Değer baloncuğu thumb'ın çocuğudur: büyümeyi ters ölçekle telafi eder */
 .thumb[data-liquid] .bubble {
   transform: translateX(-50%) scale(0.8);
@@ -145,17 +146,14 @@
 
 @media (prefers-reduced-motion: reduce) {
   .thumb,
-  .thumb::before,
-  .thumb::after { transition: none; }
+  .thumb::after,
+  .lens { transition: none; animation: none; }
   .thumb[data-liquid] { transform: translate(-50%, -50%); }
   .thumb[data-liquid] .bubble { transform: translateX(-50%); }
 }
 
-/* Saydamlık azaltılmışsa cam katman opak kalır (blur/refraction yok) */
+/* Saydamlık azaltılmışsa mercek gizlenir, beyaz kapak tam kalır */
 @media (prefers-reduced-transparency: reduce) {
-  .thumb::after {
-    background: var(--lg-surface, #fff);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+  .lens { display: none; }
+  .thumb[data-liquid]::after { opacity: 1; }
 }

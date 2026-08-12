@@ -161,3 +161,8 @@ sarmalayıcı boyutlandırması çözülürse.
   transition'ı paint aşamasında donmaya yol açıyordu; thumb artık iki sabit
   katman (`::before` beyaz disk / `::after` cam disk) ve geçiş yalnız
   transform (büyüme) + opacity crossfade (compositor).
+- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
+  okunmuyordu; basışta/süzülüşte beyaz kapağın altına gerçek GlassSurface
+  (displacement filtresi) monte edilir, kapak sönerek merceği gösterir.
+  Mercek DOM'da sürekli durmaz — durum bitince sökülür (boşta filtre
+  maliyeti yok). `prefers-reduced-transparency`'de mercek hiç kurulmaz.
