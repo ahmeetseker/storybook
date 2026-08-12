@@ -24,17 +24,8 @@ const GLOBE_CONFIG: COBEOptions = {
   baseColor: [1, 1, 1],
   markerColor: ACCENT_RGB,
   glowColor: [1, 1, 1],
-  // İşaretçiler küreye DAĞILIR: hepsi Türkiye'de olunca bu ölçekte tek bir
-  // lekeye birleşiyordu — İstanbul kalır, kalanı kıtalara yayılır.
-  markers: [
-    { location: [41.0082, 28.9784], size: 0.07 }, // İstanbul
-    { location: [51.5074, -0.1278], size: 0.05 }, // Londra
-    { location: [40.7128, -74.006], size: 0.06 }, // New York
-    { location: [-23.5505, -46.6333], size: 0.06 }, // São Paulo
-    { location: [25.2048, 55.2708], size: 0.05 }, // Dubai
-    { location: [35.6762, 139.6503], size: 0.05 }, // Tokyo
-    { location: [-33.8688, 151.2093], size: 0.05 }, // Sidney
-  ],
+  // Tek işaretçi: İstanbul — kaybolan adresin evi belli olsun.
+  markers: [{ location: [41.0082, 28.9784], size: 0.08 }],
 }
 
 export function Globe() {

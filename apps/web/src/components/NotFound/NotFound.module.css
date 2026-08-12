@@ -18,8 +18,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--lg-space-6);
-  margin-bottom: var(--lg-space-8);
+  gap: var(--lg-space-7);
+  margin-bottom: var(--lg-space-10);
 }
 
 .digit {
@@ -59,7 +59,7 @@
 }
 
 .title {
-  margin: 0 0 var(--lg-space-4);
+  margin: 0 0 var(--lg-space-5);
   font-size: clamp(var(--lg-text-display, 28px), 4.5vw, 40px);
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -67,7 +67,7 @@
 }
 
 .description {
-  margin: 0 auto var(--lg-space-8);
+  margin: 0 auto var(--lg-space-9);
   max-width: 44ch;
   font-size: var(--lg-text-headline, 17px);
   line-height: 1.55;
