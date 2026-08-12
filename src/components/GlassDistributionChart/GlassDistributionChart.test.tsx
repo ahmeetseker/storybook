@@ -9,30 +9,35 @@ const bins: GlassDistributionBin[] = [
   { id: 'd', label: '100 bin +', count: 11 },
 ]
 
+// Recharts jsdom notu: genişlik ölçülemediği için 600px fallback ile çizilir.
+// Sütunlar Cell sırasıyla render edilir; vurgu CSS modül sınıfından okunur.
+const sutunlar = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll<SVGPathElement>('.recharts-bar-rectangle path'))
+
 describe('GlassDistributionChart', () => {
   it('her bant için bir sütun çizer', () => {
     const { container } = render(<GlassDistributionChart bins={bins} />)
-    expect(container.querySelectorAll('[data-part="bin"]')).toHaveLength(4)
+    expect(sutunlar(container)).toHaveLength(4)
   })
 
   it('son bandı değil MEDYAN bandını vurgular', () => {
     const { container } = render(<GlassDistributionChart bins={bins} />)
-    const vurgulu = container.querySelectorAll('[data-median="true"]')
+    const vurgulu = sutunlar(container).filter((p) => (p.getAttribute('class') ?? '').includes('binMedian'))
     expect(vurgulu).toHaveLength(1)
     // Vurgulanan üçüncü bant (medyan), dördüncü (son) değil.
-    const hepsi = Array.from(container.querySelectorAll('[data-part="bin"]'))
-    expect(hepsi.indexOf(vurgulu[0])).toBe(2)
+    expect(sutunlar(container).indexOf(vurgulu[0])).toBe(2)
   })
 
   it('medyan bandına renkten bağımsız dikey işaret koyar', () => {
     const { container } = render(<GlassDistributionChart bins={bins} />)
-    expect(container.querySelector('[data-part="median-mark"]')).toBeTruthy()
+    expect(container.querySelector('.recharts-reference-line')).toBeTruthy()
   })
 
   it('medyan bandı yoksa hiçbir sütun vurgulanmaz', () => {
     const { container } = render(<GlassDistributionChart bins={bins.map((b) => ({ ...b, containsMedian: false }))} />)
-    expect(container.querySelectorAll('[data-median="true"]')).toHaveLength(0)
-    expect(container.querySelector('[data-part="median-mark"]')).toBeNull()
+    const vurgulu = sutunlar(container).filter((p) => (p.getAttribute('class') ?? '').includes('binMedian'))
+    expect(vurgulu).toHaveLength(0)
+    expect(container.querySelector('.recharts-reference-line')).toBeNull()
   })
 
   it('örneklem büyüklüğünü künyede gösterir', () => {

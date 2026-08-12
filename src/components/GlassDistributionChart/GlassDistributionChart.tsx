@@ -1,12 +1,27 @@
-// GlassDistributionChart — fiyat dağılımı histogramı. GlassChart'ın `bar` türü
-// bunun yerine geçmez: o SON sütunu vurgular (zaman serisinde "bugünkü değer"
-// doğru davranıştır), oysa dağılımda son bant en pahalı bantdır ve özel bir
-// anlamı yoktur — vurgulanması yanıltıcıdır. Burada vurgulanan MEDYANIN
-// düştüğü banttır; okuma noktası odur (bkz. rules.md §1).
+// GlassDistributionChart — fiyat dağılımı histogramı, Recharts 3 üstünde.
+// GlassChart'ın `bar` türü bunun yerine geçmez: o SON sütunu vurgular (zaman
+// serisinde "bugünkü değer" doğru davranıştır), oysa dağılımda son bant en
+// pahalı bantdır ve özel bir anlamı yoktur — vurgulanması yanıltıcıdır. Burada
+// vurgulanan MEDYANIN düştüğü banttır; okuma noktası odur (bkz. rules.md §1).
 //
 // İkinci fark: histogramın altında persentil şeridi vardır. Dağılımın tek
 // sayıya indirgenmesini engellemek bu component'in varlık sebebidir.
+//
+// Recharts kararları GlassChart ile ortak (bkz. rules.md changelog 2026-08-12):
+// useElementSize genişliği (jsdom/SSR 600 fallback), custom tooltip (bant +
+// gözlem sayısı — hover artık her bandı okutur), animasyon kapalı.
 import { useId, type HTMLAttributes } from 'react'
+import {
+  Bar,
+  BarChart,
+  Cell,
+  ReferenceLine,
+  Tooltip,
+  XAxis,
+  YAxis,
+  type TooltipContentProps,
+} from 'recharts'
+import { useElementSize } from '../GlassSurface/useElementSize'
 import styles from './GlassDistributionChart.module.css'
 
 export interface GlassDistributionBin {
@@ -44,8 +59,7 @@ export interface GlassDistributionChartProps extends Omit<HTMLAttributes<HTMLDiv
   sampleSize?: number
 }
 
-const VIEW_WIDTH = 600
-const PAD_Y = 8
+const FALLBACK_WIDTH = 600
 
 const formatNumber = (n: number) => Math.round(n).toLocaleString('tr-TR')
 
@@ -65,15 +79,10 @@ export function GlassDistributionChart({
 }: GlassDistributionChartProps) {
   const rawId = useId()
   const tableId = `dist-${rawId.replace(/[^a-zA-Z0-9]/g, '')}`
+  const { ref, size } = useElementSize<HTMLDivElement>()
 
   const hasData = bins.length > 0
-  const maxCount = hasData ? Math.max(...bins.map((b) => b.count)) : 0
-  const plotTop = PAD_Y
-  const plotBottom = Math.max(plotTop + 32, height - PAD_Y)
-  const plotHeight = plotBottom - plotTop
-
-  const slot = hasData ? VIEW_WIDTH / bins.length : VIEW_WIDTH
-  const barWidth = Math.max(6, slot * 0.62)
+  const width = size?.width && size.width > 0 ? size.width : FALLBACK_WIDTH
 
   const total = bins.reduce((sum, b) => sum + b.count, 0)
   const medianBin = bins.find((b) => b.containsMedian)
@@ -102,54 +111,55 @@ export function GlassDistributionChart({
 
       {hasData ? (
         <>
-          <div className={styles.plot}>
-            <svg
-              className={styles.svg}
-              viewBox={`0 0 ${VIEW_WIDTH} ${height}`}
-              preserveAspectRatio="none"
-              style={{ height }}
-              role="img"
-              aria-label={ariaSummary}
+          <div ref={ref} className={styles.plot} role="img" aria-label={ariaSummary}>
+            <BarChart
+              width={width}
+              height={height}
+              data={bins}
+              margin={{ top: 8, right: 4, bottom: 0, left: 4 }}
+              barCategoryGap="19%"
             >
-              {bins.map((b, i) => {
-                const h = maxCount > 0 ? (b.count / maxCount) * plotHeight : 0
-                const cx = slot * i + slot / 2
-                return (
-                  <rect
-                    key={b.id}
-                    data-part="bin"
-                    data-median={b.containsMedian ? 'true' : undefined}
-                    x={cx - barWidth / 2}
-                    y={plotBottom - h}
-                    width={barWidth}
-                    height={Math.max(0, h)}
-                    rx={2}
-                    className={b.containsMedian ? styles.binMedian : styles.bin}
-                  />
-                )
-              })}
+              <XAxis dataKey="label" hide />
+              <YAxis hide domain={[0, 'auto']} />
+
+              <Tooltip
+                content={(props: TooltipContentProps) => {
+                  const { active, payload, label } = props
+                  if (!active || !payload?.length) return null
+                  const bin = payload[0].payload as GlassDistributionBin
+                  return (
+                    <div data-part="tooltip" className={styles.tooltip}>
+                      <span className={styles.tooltipX}>
+                        {label}
+                        {bin.containsMedian ? ' · medyan bandı' : ''}
+                      </span>
+                      <span className={styles.tooltipY}>
+                        {formatNumber(bin.count)} {countLabel}
+                      </span>
+                    </div>
+                  )
+                }}
+                cursor={{ fill: 'color-mix(in srgb, var(--lg-label) 5%, transparent)' }}
+                isAnimationActive={false}
+              />
 
               {/* Medyan bandının üstüne dikey işaret — renkten bağımsız ikinci kanal */}
-              {medianBin
-                ? (() => {
-                    const i = bins.indexOf(medianBin)
-                    const cx = slot * i + slot / 2
-                    return (
-                      <line
-                        data-part="median-mark"
-                        x1={cx}
-                        x2={cx}
-                        y1={plotTop}
-                        y2={plotBottom}
-                        stroke="var(--lg-accent)"
-                        strokeWidth={1}
-                        strokeDasharray="4 3"
-                        opacity={0.55}
-                      />
-                    )
-                  })()
-                : null}
-            </svg>
+              {medianBin ? (
+                <ReferenceLine
+                  x={medianBin.label}
+                  stroke="var(--lg-accent)"
+                  strokeWidth={1}
+                  strokeDasharray="4 3"
+                  opacity={0.55}
+                />
+              ) : null}
+
+              <Bar dataKey="count" radius={[4, 4, 0, 0]} minPointSize={2} isAnimationActive={false}>
+                {bins.map((b) => (
+                  <Cell key={b.id} className={b.containsMedian ? styles.binMedian : styles.bin} />
+                ))}
+              </Bar>
+            </BarChart>
           </div>
 
           <div className={styles.binLabels} aria-hidden="true">

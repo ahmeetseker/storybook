@@ -39,38 +39,17 @@
   width: 100%;
 }
 
-/* Y max/min etiketleri — grid çizgisine hizalı, sayılar tabular */
-.yLabel {
-  position: absolute;
-  left: 0;
-  font-size: var(--lg-text-caption, 12px);
-  font-weight: 600;
-  color: var(--lg-label-secondary);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  pointer-events: none;
-  background: color-mix(in srgb, var(--lg-surface) 82%, transparent);
-  padding-right: var(--lg-space-1, 4px);
-}
-
-/* Son nokta değer etiketi — sağ kenara sabit, taşma olmaz */
+/* Son nokta değer etiketi — SVG text (Recharts label renderer'ı çizer) */
 .lastLabel {
-  position: absolute;
-  right: var(--glass-chart-edge-inset);
-  transform: translateY(-135%);
   font-size: var(--lg-text-footnote, 13px);
   font-weight: 700;
-  color: var(--lg-accent);
+  fill: var(--lg-accent);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
   pointer-events: none;
 }
 
-/* Pointer/tap balonu — tek örnek, flat chip (cam yok) */
+/* Hover balonu — Recharts konumlar, görünüm bizim: flat chip (cam yok) */
 .tooltip {
-  position: absolute;
-  top: var(--lg-space-1, 4px);
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,7 +62,6 @@
   font-size: var(--lg-text-caption, 12px);
   pointer-events: none;
   white-space: nowrap;
-  z-index: 2;
 }
 .tooltipX {
   color: var(--lg-label-secondary);
@@ -91,14 +69,6 @@
 .tooltipY {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-}
-
-/* X ekseni — yalnız ilk/orta/son, seyrek */
-.xLabels {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--lg-text-caption, 12px);
-  color: var(--lg-label-secondary);
 }
 
 .empty {

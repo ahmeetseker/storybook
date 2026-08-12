@@ -160,3 +160,12 @@ Katman sırası: availability (veri var mı) → value (seri değerleri) → int
 
 - 2026-08-05 — ilk sürüm. Emlak Endeksi mahalle sayfasının "mahalle ↔ ilçe ↔ TCMB" kıyas bloğu için yazıldı.
 - 2026-08-05 — kesik deseni artık benchmark'lar arasında hiyerarşik uzaklığı da kodluyor (`8 4` / `2 3` / `1 5`); önceki sürümde tüm referanslar `7 5` paylaşıyor ve yalnız renkle ayrılıyordu. `estimated` deseni `2 4` → `5 3 1 3` (çizgi-nokta) olarak ayrıştırıldı.
+- 2026-08-12: Recharts 3 geçişi. Saf SVG geometri Recharts'a devredildi;
+  public sözleşme (props, sr-only veri tablosu, boş durum, tr-TR biçim)
+  değişmedi. ResponsiveContainer yerine `useElementSize` (jsdom/SSR 600px
+  fallback — deterministik test/hidrasyon). Tooltip içeriği bizim, konum ve
+  crosshair Recharts'ın; `accessibilityLayer` v3 varsayılanıyla grafik
+  klavyeyle gezilebilir (sparkline'da bilinçli kapalı). Giriş animasyonu
+  kapalı kaldı. Eksenler gerçek tiklerle çizilir (kısa biçim). Varsayılan
+  palet açıklık zıtlığıyla yeniden dizildi — dataviz doğrulayıcısında komşu
+  çiftler ΔE ≥ 25 (eskisi 5.9 ile normal görüşte bile ayırt edilemiyordu).

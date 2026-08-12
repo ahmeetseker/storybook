@@ -1,19 +1,31 @@
-// GlassTrendChart — çok serili zaman serisi. GlassChart'ın tek serili sözleşmesini
-// genişletmez, onun YANINDA yaşar: GlassChart bir değerin seyrini gösterir, bu
-// component bir değeri BAŞKA bir seriyle kıyaslar (mahalle ↔ ilçe ↔ resmî endeks).
+// GlassTrendChart — çok serili zaman serisi, Recharts 3 üstünde. GlassChart'ın
+// tek serili sözleşmesini genişletmez, onun YANINDA yaşar: GlassChart bir değerin
+// seyrini gösterir, bu component bir değeri BAŞKA bir seriyle kıyaslar
+// (mahalle ↔ ilçe ↔ resmî endeks).
 //
-// Üç karar bu component'in şeklini belirledi:
+// Üç karar bu component'in şeklini belirlemeye devam eder:
 //   1. Seri türü çizgi desenine bağlıdır, yalnız renge değil: `observed` düz,
 //      `benchmark` uzun kesikli, `estimated` kısa kesikli. Renk körlüğünde ve
-//      tek renkli baskıda seriler yine ayırt edilir (Erişilebilirlik dokümanı:
-//      "renk tek başına anlam taşımaz").
+//      tek renkli baskıda seriler yine ayırt edilir.
 //   2. Tooltip PAYLAŞIMLIDIR — imleç bir x'e geldiğinde tüm serilerin o
-//      dönemdeki değeri birlikte okunur. Kıyas component'inde tek seri değeri
-//      göstermek amacı boşa çıkarır.
-//   3. Varsayılan palet semantik token kullanmaz. success/danger "iyi/kötü"
-//      demektir; bir kıyas serisi ne iyidir ne kötü. Palet accent + nötr
-//      etiket renginden türetilir.
-import { useEffect, useId, useRef, useState, type HTMLAttributes, type PointerEvent as ReactPointerEvent } from 'react'
+//      dönemdeki değeri birlikte okunur (Recharts shared tooltip).
+//   3. Varsayılan palet semantik token kullanmaz: success/danger "iyi/kötü"
+//      demektir; bir kıyas serisi ne iyidir ne kötü.
+//
+// Recharts kararları GlassChart ile ortak (bkz. rules.md changelog 2026-08-12):
+// ResponsiveContainer yerine useElementSize (jsdom/SSR 600 fallback), custom
+// tooltip içeriği, animasyon kapalı, `accessibilityLayer` v3 varsayılanı açık.
+import { type HTMLAttributes, useId } from 'react'
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+  type TooltipContentProps,
+} from 'recharts'
+import { useElementSize } from '../GlassSurface/useElementSize'
 import styles from './GlassTrendChart.module.css'
 
 export interface GlassTrendPoint {
@@ -53,16 +65,21 @@ export interface GlassTrendChartProps extends Omit<HTMLAttributes<HTMLDivElement
   title?: string
 }
 
-const VIEW_WIDTH = 600
-const PAD_Y = 16
-const GRID_FRACTIONS = [0, 1 / 3, 2 / 3, 1]
+const FALLBACK_WIDTH = 600
 
-/** Semantik olmayan palet: vurgu → nötr → ikisinin karışımı → soluk nötr. */
+/**
+ * Semantik olmayan palet — sıra AÇIKLIK ZITLIĞIYLA serpiştirilir (koyu vurgu →
+ * açık ten → koyu nötr → açık nötr). Eski sıralamada 2.-3. seriler normal
+ * görüşte bile ayırt edilemiyordu (dataviz doğrulayıcısı ΔE 5.9, taban 15);
+ * bu dizilim komşu çiftlerde ΔE ≥ 25 verir (CVD dahil). Nötrlerin düşük
+ * kroması bilinçlidir: kıyas serileri eşit kategori değil bağlamdır ve
+ * kimlikleri kesik deseni + künyeyle (ikincil kanal) taşınır.
+ */
 const DEFAULT_TINTS = [
   'var(--lg-accent)',
+  'color-mix(in srgb, var(--lg-accent) 55%, var(--lg-surface))',
   'var(--lg-label-secondary)',
-  'color-mix(in srgb, var(--lg-accent) 50%, var(--lg-label-secondary))',
-  'color-mix(in srgb, var(--lg-label-secondary) 55%, var(--lg-surface))',
+  'color-mix(in srgb, var(--lg-label-secondary) 45%, var(--lg-surface))',
 ]
 
 /**
@@ -87,7 +104,17 @@ const KIND_NOTE: Record<GlassTrendSeriesKind, string> = {
 }
 
 const formatNumber = (n: number) => Math.round(n).toLocaleString('tr-TR')
-const clampPct = (pct: number) => Math.min(92, Math.max(8, pct))
+
+function formatCompact(n: number): string {
+  const abs = Math.abs(n)
+  const unit = abs >= 1_000_000 ? 1_000_000 : abs >= 1_000 ? 1_000 : 1
+  if (unit === 1) return formatNumber(n)
+  const suffix = unit === 1_000_000 ? 'M' : 'K'
+  const scaled = Math.round((n / unit) * 100) / 100
+  return `${scaled.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}${suffix}`
+}
+
+const AXIS_TICK = { fill: 'var(--lg-label-secondary)', fontSize: 11 } as const
 
 /**
  * Çok serili zaman serisi grafiği — bir bölgenin seyrini üst bölge veya resmî
@@ -104,46 +131,14 @@ export function GlassTrendChart({
 }: GlassTrendChartProps) {
   const rawId = useId()
   const safeId = rawId.replace(/[^a-zA-Z0-9]/g, '')
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
-  const plotRef = useRef<HTMLDivElement>(null)
+  const { ref, size } = useElementSize<HTMLDivElement>()
 
   const axis = series[0]?.points ?? []
   const hasData = series.length > 0 && axis.length > 0
-  const lastIndex = axis.length - 1
-  const midIndex = axis.length >= 3 ? Math.round(lastIndex / 2) : -1
-  const showMid = midIndex > 0 && midIndex < lastIndex
+  const width = size?.width && size.width > 0 ? size.width : FALLBACK_WIDTH
 
-  // Seri sayısı/uzunluğu değişince eski hoverIndex sınır dışı kalabilir.
-  useEffect(() => {
-    setHoverIndex((prev) => {
-      if (prev === null) return prev
-      if (!hasData) return null
-      return prev > lastIndex ? lastIndex : prev
-    })
-  }, [hasData, lastIndex])
-
-  const clampedHover = hasData && hoverIndex !== null ? Math.min(hoverIndex, lastIndex) : null
-
-  const plotTop = PAD_Y
-  const plotBottom = Math.max(plotTop + 40, height - PAD_Y)
-  const plotHeight = plotBottom - plotTop
-
-  const allValues = series.flatMap((s) => s.points.map((p) => p.y)).filter((v): v is number => v !== null)
-  const dataMax = allValues.length ? Math.max(...allValues) : 0
-  const dataMin = allValues.length ? Math.min(...allValues) : 0
-  let yMin = dataMin
-  let yRange = dataMax - dataMin
-  if (yRange === 0) {
-    // Dejenere durum (tüm değerler eşit): yapay ±%5 aralıkla çizgi ortada dursun.
-    const pad = Math.max(Math.abs(dataMax), 1) * 0.05
-    yMin -= pad
-    yRange = pad * 2
-  }
-
-  const xScale = (i: number) => (axis.length > 1 ? (i / (axis.length - 1)) * VIEW_WIDTH : VIEW_WIDTH / 2)
-  const yScale = (v: number) => plotTop + (1 - (v - yMin) / yRange) * plotHeight
-
-  const formatValue = (v: number | null) => (v === null ? 'veri yok' : `${formatNumber(v)}${valueSuffix}`)
+  const formatValue = (v: number | null | undefined) =>
+    v === null || v === undefined ? 'veri yok' : `${formatNumber(v)}${valueSuffix}`
 
   let benchmarkSayaci = 0
   const resolved = series.map((s, i) => {
@@ -152,44 +147,38 @@ export function GlassTrendChart({
     return { ...s, kind, dash, tint: s.tint ?? DEFAULT_TINTS[i % DEFAULT_TINTS.length] }
   })
 
+  // Recharts tek veri dizisi ister: seriler x eksenine göre satırlara birleşir.
+  // İlk seri ekseni belirler (sözleşme); null değer satırda korunur — Recharts
+  // connectNulls=false (varsayılan) ile çizgide boşluk bırakır.
+  const rows = axis.map((p, i) => {
+    const row: Record<string, string | number | null> = { x: p.x }
+    for (const s of resolved) row[s.id] = s.points[i]?.y ?? null
+    return row
+  })
+
   const summaryLabel = title ?? 'Karşılaştırmalı seyir grafiği'
   const ariaSummary = !hasData
     ? `${summaryLabel}: veri yok`
     : `${summaryLabel}: ${resolved.map((s) => s.label).join(', ')} — ${axis.length} dönem`
 
-  const indexFromClientX = (clientX: number): number | null => {
-    const el = plotRef.current
-    if (!el || !hasData) return null
-    const rect = el.getBoundingClientRect()
-    if (rect.width <= 0) return null
-    const fraction = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-    return Math.round(fraction * lastIndex)
-  }
-
-  const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const idx = indexFromClientX(e.clientX)
-    if (idx !== null) setHoverIndex(idx)
-  }
-  const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const idx = indexFromClientX(e.clientX)
-    if (idx !== null) setHoverIndex(idx)
-  }
-  const handlePointerLeave = () => setHoverIndex(null)
-
-  /** null değerlerde çizgiyi koparır — "veri yayımlanmadı" düz çizgiyle doldurulmaz. */
-  const pathFor = (points: GlassTrendPoint[]) => {
-    let d = ''
-    let open = false
-    points.forEach((p, i) => {
-      if (p.y === null) {
-        open = false
-        return
-      }
-      const cmd = open ? 'L' : 'M'
-      d += `${d ? ' ' : ''}${cmd} ${xScale(i).toFixed(2)},${yScale(p.y).toFixed(2)}`
-      open = true
-    })
-    return d
+  const tooltipContent = (props: TooltipContentProps) => {
+    const { active, payload, label } = props
+    if (!active || !payload?.length) return null
+    return (
+      <div data-part="tooltip" className={styles.tooltip}>
+        <span className={styles.tooltipX}>{label}</span>
+        {resolved.map((s) => {
+          const entry = payload.find((p) => p.dataKey === s.id)
+          return (
+            <span key={s.id} className={styles.tooltipRow}>
+              <span className={styles.tooltipDot} style={{ background: s.tint }} aria-hidden="true" />
+              <span className={styles.tooltipName}>{s.label}</span>
+              <span className={styles.tooltipValue}>{formatValue(entry?.value as number | null | undefined)}</span>
+            </span>
+          )
+        })}
+      </div>
+    )
   }
 
   const classes = [styles.root, className].filter(Boolean).join(' ')
@@ -221,113 +210,58 @@ export function GlassTrendChart({
             ))}
           </ul>
 
-          <div
-            ref={plotRef}
-            className={styles.plot}
-            onPointerMove={handlePointerMove}
-            onPointerDown={handlePointerDown}
-            onPointerLeave={handlePointerLeave}
-          >
-            <span data-part="y-max" className={styles.yLabel} style={{ top: plotTop, transform: 'translateY(-50%)' }}>
-              {formatValue(dataMax)}
-            </span>
-            <span data-part="y-min" className={styles.yLabel} style={{ top: plotBottom, transform: 'translateY(-50%)' }}>
-              {formatValue(yMin)}
-            </span>
-
-            <svg
-              className={styles.svg}
-              viewBox={`0 0 ${VIEW_WIDTH} ${height}`}
-              preserveAspectRatio="none"
-              style={{ height }}
-              role="img"
-              aria-label={ariaSummary}
+          <div ref={ref} className={styles.plot} role="img" aria-label={ariaSummary}>
+            <LineChart
+              width={width}
+              height={height}
+              data={rows}
+              margin={{ top: 8, right: 8, bottom: 4, left: 0 }}
             >
-              {showGrid
-                ? GRID_FRACTIONS.map((f) => (
-                    <line
-                      key={f}
-                      data-part="grid"
-                      x1={0}
-                      x2={VIEW_WIDTH}
-                      y1={plotTop + f * plotHeight}
-                      y2={plotTop + f * plotHeight}
-                      stroke="var(--lg-hairline)"
-                      strokeWidth={1}
-                    />
-                  ))
-                : null}
+              {showGrid ? (
+                <CartesianGrid vertical={false} stroke="var(--lg-hairline)" strokeWidth={1} />
+              ) : null}
+
+              <XAxis
+                dataKey="x"
+                tickLine={false}
+                axisLine={false}
+                tick={AXIS_TICK}
+                minTickGap={32}
+                interval="preserveStartEnd"
+                tickMargin={8}
+              />
+              <YAxis
+                width={56}
+                domain={['auto', 'auto']}
+                tickCount={4}
+                tickLine={false}
+                axisLine={false}
+                tick={AXIS_TICK}
+                tickFormatter={formatCompact}
+              />
+
+              <Tooltip
+                content={tooltipContent}
+                cursor={{ stroke: 'var(--lg-label-secondary)', strokeWidth: 1, strokeDasharray: '3 3' }}
+                isAnimationActive={false}
+              />
 
               {resolved.map((s) => (
-                <path
+                <Line
                   key={s.id}
-                  data-part="line"
-                  data-series={s.id}
-                  data-kind={s.kind}
-                  d={pathFor(s.points)}
-                  fill="none"
+                  dataKey={s.id}
                   stroke={s.tint}
                   strokeWidth={s.kind === 'observed' ? 2.5 : 2}
                   strokeDasharray={s.dash}
-                  strokeLinejoin="round"
                   strokeLinecap="round"
+                  strokeLinejoin="round"
                   opacity={s.kind === 'observed' ? 1 : 0.85}
+                  dot={false}
+                  activeDot={{ r: 4, fill: s.tint, stroke: 'var(--lg-surface)', strokeWidth: 2 }}
+                  isAnimationActive={false}
                 />
               ))}
-
-              {clampedHover !== null ? (
-                <g aria-hidden="true">
-                  <line
-                    data-part="guide"
-                    x1={xScale(clampedHover)}
-                    x2={xScale(clampedHover)}
-                    y1={plotTop}
-                    y2={plotBottom}
-                    stroke="var(--lg-label-secondary)"
-                    strokeWidth={1}
-                    strokeDasharray="3 3"
-                  />
-                  {resolved.map((s) => {
-                    const v = s.points[clampedHover]?.y
-                    if (v === null || v === undefined) return null
-                    return (
-                      <circle
-                        key={s.id}
-                        data-part="guide-dot"
-                        cx={xScale(clampedHover)}
-                        cy={yScale(v)}
-                        r={4}
-                        fill={s.tint}
-                      />
-                    )
-                  })}
-                </g>
-              ) : null}
-            </svg>
-
-            {clampedHover !== null ? (
-              <div
-                data-part="tooltip"
-                className={styles.tooltip}
-                aria-hidden="true"
-                style={{ left: `${clampPct((xScale(clampedHover) / VIEW_WIDTH) * 100)}%` }}
-              >
-                <span className={styles.tooltipX}>{axis[clampedHover]?.x}</span>
-                {resolved.map((s) => (
-                  <span key={s.id} className={styles.tooltipRow}>
-                    <span className={styles.tooltipDot} style={{ background: s.tint }} aria-hidden="true" />
-                    <span className={styles.tooltipName}>{s.label}</span>
-                    <span className={styles.tooltipValue}>{formatValue(s.points[clampedHover]?.y ?? null)}</span>
-                  </span>
-                ))}
-              </div>
-            ) : null}
-          </div>
-
-          <div data-part="x-labels" className={styles.xLabels} aria-hidden="true">
-            <span>{axis[0]?.x}</span>
-            <span>{showMid ? axis[midIndex].x : ''}</span>
-            <span>{lastIndex > 0 ? axis[lastIndex].x : ''}</span>
+            </LineChart>
           </div>
 
           {/* Ekran okuyucu tablosu — blok kapta gizlenir (overflow table'da yok sayılır). */}

@@ -1,13 +1,14 @@
-// GlassSparkline — tablo hücresine sığan eksensiz mikro trend. GlassChart'ın
-// küçültülmüşü DEĞİLDİR: eksen etiketi, grid, tooltip ve başlık taşımaz; tek işi
-// bir satırın yönünü tek bakışta okutmaktır. GlassChart min 220px yüksekliğiyle
-// hücreye giremez, bu yüzden ayrı component (bkz. rules.md §1).
+// GlassSparkline — tablo hücresine sığan eksensiz mikro trend, Recharts 3
+// üstünde. GlassChart'ın küçültülmüşü DEĞİLDİR: eksen etiketi, grid, tooltip ve
+// başlık taşımaz; tek işi bir satırın yönünü tek bakışta okutmaktır.
 //
-// Erişilebilirlik kararı: sparkline dekoratif DEĞİL, veridir. SVG `role="img"`
+// Erişilebilirlik kararı: sparkline dekoratif DEĞİL, veridir. Kap `role="img"`
 // alır ve `label` zorunludur — ekran okuyucu "Göztepe 12 aylık trend: yükseliş,
-// 78.400'den 91.200'e" cümlesini okur. Yön ayrıca son noktanın konumundan değil,
-// açıkça `trend` prop'undan gelir; renk tek başına kanal değildir.
+// 78.400'den 91.200'e" cümlesini okur. Recharts'ın klavye katmanı burada
+// BİLİNÇLİ kapalıdır (accessibilityLayer={false}): sıralama tablosundaki her
+// satırın odak durağı olması gezinmeyi boğar; özet zaten kapta okunur.
 import type { HTMLAttributes } from 'react'
+import { Line, LineChart, YAxis } from 'recharts'
 import styles from './GlassSparkline.module.css'
 
 /** Serinin yön anlamı — sr-only metnin ve rengin kaynağı. */
@@ -86,35 +87,41 @@ export function GlassSparkline({
     )
   }
 
-  const max = Math.max(...points)
-  const min = Math.min(...points)
-  const range = max - min || Math.max(Math.abs(max), 1) * 0.05
-  const pad = 2
-  const plotH = height - pad * 2
-
-  const x = (i: number) => (i / (points.length - 1)) * width
-  const y = (v: number) => pad + (1 - (v - min) / range) * plotH
-
-  const d = `M ${points.map((v, i) => `${x(i).toFixed(2)},${y(v).toFixed(2)}`).join(' L ')}`
-  const lastX = x(points.length - 1)
-  const lastY = y(points[points.length - 1])
-
   const summary = `${label}: ${TREND_TEXT[resolvedTrend]}, ${formatNumber(points[0])}'den ${formatNumber(points[points.length - 1])}'e`
 
+  const lastIndex = points.length - 1
+  const data = points.map((v, i) => ({ i, v }))
+
+  // Son nokta vurgusu: yalnız son index'te küçük dolu daire.
+  const lastDot = (props: { cx?: number; cy?: number; index?: number }) => {
+    const { cx, cy, index } = props
+    if (index !== lastIndex || cx === undefined || cy === undefined) return <g key={`dot-${index}`} />
+    return <circle key={`dot-${index}`} data-part="last-point" cx={cx} cy={cy} r={2} fill={stroke} />
+  }
+
   return (
-    <span className={classes} {...rest}>
-      <svg
-        className={styles.svg}
+    <span className={classes} role="img" aria-label={summary} data-trend={resolvedTrend} {...rest}>
+      <LineChart
         width={width}
         height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label={summary}
-        data-trend={resolvedTrend}
+        data={data}
+        margin={{ top: 3, right: 3, bottom: 3, left: 3 }}
+        accessibilityLayer={false}
       >
-        <path d={d} fill="none" stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
-        <circle cx={lastX} cy={lastY} r={2} fill={stroke} />
-      </svg>
+        {/* Gizli eksen: aralık veri min–max'ıdır — Recharts'ın 0 tabanı mikro
+            trendde çizgiyi düzleştirirdi */}
+        <YAxis hide domain={['dataMin', 'dataMax']} />
+        <Line
+          dataKey="v"
+          stroke={stroke}
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          dot={lastDot}
+          activeDot={false}
+          isAnimationActive={false}
+        />
+      </LineChart>
     </span>
   )
 }

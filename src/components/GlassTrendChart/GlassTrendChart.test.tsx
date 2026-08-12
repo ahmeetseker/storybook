@@ -1,8 +1,11 @@
 import { render, screen, within } from '@testing-library/react'
-import { userEvent } from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { GlassTrendChart, type GlassTrendSeries } from './GlassTrendChart'
 
+// Recharts jsdom notu: genişlik ölçülemediği için 600px fallback ile çizilir.
+// Çizgiler Line sırasıyla render edilir — seri sırası = path sırası; kesik
+// desenleri path'in stroke-dasharray'inden okunur. Hover/tooltip etkileşimi
+// Recharts'ın kendi sözleşmesidir (upstream test edilir).
 const mahalle: GlassTrendSeries = {
   id: 'mahalle',
   label: 'Feneryolu',
@@ -24,22 +27,23 @@ const ilce: GlassTrendSeries = {
   ],
 }
 
+const curves = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll<SVGPathElement>('.recharts-line-curve'))
+
 describe('GlassTrendChart', () => {
   it('her seri için künye satırı ve çizgi çizer', () => {
     const { container } = render(<GlassTrendChart series={[mahalle, ilce]} valueSuffix=" TL/m²" />)
     const kunye = screen.getByRole('list')
     expect(within(kunye).getByText('Feneryolu')).toBeTruthy()
     expect(within(kunye).getByText('Kadıköy ortalaması')).toBeTruthy()
-    expect(container.querySelectorAll('[data-part="line"]')).toHaveLength(2)
+    expect(curves(container)).toHaveLength(2)
   })
 
   it('seri sınıfını renkten bağımsız ikinci kanalla iletir: kesikli çizgi + rozet', () => {
     const { container } = render(<GlassTrendChart series={[mahalle, ilce]} />)
-    const cizgiler = container.querySelectorAll('[data-part="line"]')
-    const gozlem = Array.from(cizgiler).find((l) => l.getAttribute('data-kind') === 'observed')
-    const referans = Array.from(cizgiler).find((l) => l.getAttribute('data-kind') === 'benchmark')
-    expect(gozlem?.getAttribute('stroke-dasharray')).toBeNull()
-    expect(referans?.getAttribute('stroke-dasharray')).toBe('8 4')
+    const [gozlem, referans] = curves(container)
+    expect(gozlem.getAttribute('stroke-dasharray')).toBeNull()
+    expect(referans.getAttribute('stroke-dasharray')).toBe('8 4')
     expect(screen.getByText('referans')).toBeTruthy()
   })
 
@@ -47,8 +51,8 @@ describe('GlassTrendChart', () => {
     const { container } = render(
       <GlassTrendChart series={[mahalle, { ...ilce, id: 'th', label: 'Model', kind: 'estimated' }]} />,
     )
-    const tahmin = container.querySelector('[data-kind="estimated"]')
-    expect(tahmin?.getAttribute('stroke-dasharray')).toBe('5 3 1 3')
+    const [, tahmin] = curves(container)
+    expect(tahmin.getAttribute('stroke-dasharray')).toBe('5 3 1 3')
     expect(screen.getByText('tahmin')).toBeTruthy()
   })
 
@@ -62,9 +66,9 @@ describe('GlassTrendChart', () => {
         ]}
       />,
     )
-    const desenler = Array.from(container.querySelectorAll('[data-kind="benchmark"]')).map((l) =>
-      l.getAttribute('stroke-dasharray'),
-    )
+    const desenler = curves(container)
+      .slice(1)
+      .map((l) => l.getAttribute('stroke-dasharray'))
     // Yakın referans yoğun, uzak referans seyrek: yalnız renge kalmaz.
     expect(desenler).toEqual(['8 4', '2 3'])
   })
@@ -89,9 +93,9 @@ describe('GlassTrendChart', () => {
       ],
     }
     const { container } = render(<GlassTrendChart series={[bosluklu]} />)
-    const d = container.querySelector('[data-part="line"]')?.getAttribute('d') ?? ''
-    // İki ayrı M komutu = iki kopuk parça.
-    expect(d.match(/M /g)).toHaveLength(2)
+    const d = curves(container)[0]?.getAttribute('d') ?? ''
+    // İki ayrı M komutu = iki kopuk parça (connectNulls kapalı).
+    expect(d.match(/M/g)).toHaveLength(2)
   })
 
   it('null değer veri tablosunda "veri yok" olarak okunur', () => {
@@ -103,16 +107,10 @@ describe('GlassTrendChart', () => {
     expect(screen.getByText('veri yok')).toBeTruthy()
   })
 
-  it('imleç bir döneme geldiğinde tüm serilerin değeri birlikte görünür', async () => {
-    const user = userEvent.setup()
-    const { container } = render(<GlassTrendChart series={[mahalle, ilce]} valueSuffix=" TL/m²" />)
-    const plot = container.querySelector('[data-part="line"]')?.closest('div')
-    expect(plot).toBeTruthy()
-    await user.pointer({ target: plot as Element, coords: { clientX: 0, clientY: 0 } })
-    const balon = container.querySelector('[data-part="tooltip"]')
-    // jsdom'da getBoundingClientRect sıfır genişlik döndürür; balon açılırsa
-    // içinde iki seri satırı bulunmalıdır.
-    if (balon) expect(balon.textContent).toContain('Feneryolu')
+  it('çizim alanı role="img" + seri adlarını içeren aria özet taşır', () => {
+    render(<GlassTrendChart series={[mahalle, ilce]} title="Seyir" />)
+    const plot = screen.getByRole('img')
+    expect(plot.getAttribute('aria-label')).toBe('Seyir: Feneryolu, Kadıköy ortalaması — 3 dönem')
   })
 
   it('boş seride "Veri yok" gösterir', () => {

@@ -56,6 +56,29 @@
   fill: var(--lg-accent);
 }
 
+/* Hover balonu — Recharts konumlar, görünüm bizim: flat chip (GlassChart ile aynı dil) */
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: var(--lg-space-1, 4px) var(--lg-space-2, 8px);
+  border-radius: var(--lg-radius-chip, 10px);
+  background: var(--lg-surface);
+  border: 1px solid var(--lg-hairline);
+  box-shadow: var(--lg-shadow-sm);
+  font-size: var(--lg-text-caption, 12px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.tooltipX {
+  color: var(--lg-label-secondary);
+}
+.tooltipY {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
 .binLabels {
   display: flex;
   font-size: var(--lg-text-caption, 12px);

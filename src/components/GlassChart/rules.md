@@ -237,3 +237,10 @@ oluşabilecek sınır dışı `hoverIndex` erişimi giderildi (render'da clamp +
 yoksa `0`'a sabitlendi (eşit değerli serilerde sütunların sıfır yükseklikte
 kaybolması giderildi) ve `line`/`area` için dejenere (`yMax===yMin`) aralıkta
 yapay ±%5 (min ±1) dikey boşluk eklendi.
+- 2026-08-12: Recharts 3 geçişi. Saf SVG geometri Recharts'a devredildi;
+  public sözleşme (props, sr-only veri tablosu, boş durum, tr-TR biçim)
+  değişmedi. ResponsiveContainer yerine `useElementSize` (jsdom/SSR 600px
+  fallback — deterministik test/hidrasyon). Tooltip içeriği bizim, konum ve
+  crosshair Recharts'ın; `accessibilityLayer` v3 varsayılanıyla grafik
+  klavyeyle gezilebilir (sparkline'da bilinçli kapalı). Giriş animasyonu
+  kapalı kaldı. Eksenler gerçek tiklerle çizilir (kısa biçim).

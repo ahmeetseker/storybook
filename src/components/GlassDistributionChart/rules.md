@@ -144,3 +144,10 @@ Etkileşim state'i yoktur: hover/focus yok, odaklanmaz.
 ### Changelog
 
 - 2026-08-05 — ilk sürüm. Emlak Endeksi mahalle sayfasının fiyat dağılımı bloğu için yazıldı; `GlassChart type="bar"`'ın son-sütun vurgusunun histogramda yanıltıcı olması gerekçesiyle.
+- 2026-08-12: Recharts 3 geçişi. Saf SVG geometri Recharts'a devredildi;
+  public sözleşme (props, sr-only veri tablosu, boş durum, tr-TR biçim)
+  değişmedi. ResponsiveContainer yerine `useElementSize` (jsdom/SSR 600px
+  fallback — deterministik test/hidrasyon). Tooltip içeriği bizim, konum ve
+  crosshair Recharts'ın; `accessibilityLayer` v3 varsayılanıyla grafik
+  klavyeyle gezilebilir (sparkline'da bilinçli kapalı). Giriş animasyonu
+  kapalı kaldı. Eksenler gerçek tiklerle çizilir (kısa biçim).
