@@ -22,7 +22,8 @@ function formatOccurredAt(occurredAt: string) {
 /**
  * En çok üç maddelik gündem. Her satır sol kenarda önem şeridi, okuma
  * ölçüsünde bir gerekçe ve zamanın yanında açıklama kaynağı etiketi taşır;
- * aksiyon bağlantısı satırın sağında dikey ortalanır, dar kartta alta iner.
+ * aksiyon bağlantısı gövde metninin hemen sağında dikey ortalanır (kartın
+ * uzak sağ kenarına savrulmaz), dar kartta alta iner.
  */
 export function AccountAttentionQueue({ items }: AccountAttentionQueueProps) {
   const visibleItems = items.slice(0, 3)

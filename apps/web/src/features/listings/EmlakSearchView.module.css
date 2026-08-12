@@ -494,8 +494,9 @@
    pini). Kartın kendi geometrisi ve iç stili tasarım sisteminde kalır. */
 .rowListing {
   width: 100%;
-  /* Yatay kartın görsel sütunu — kap kademesine göre 224/150/108 (Varyant A,
-     2026-08-08). Mikro-geometri: kart oranını koruyan ölçüler. */
+  /* Yatay kartın görsel sütunu — kap kademesine göre 224 / 150 / ~%38
+     (Varyant A, 2026-08-08; dar kademe yüzdeye alındı 2026-08-12).
+     Mikro-geometri: kart oranını koruyan ölçüler. */
   --row-thumb-w: 224px;
   transition:
     border-color 160ms ease,
@@ -833,7 +834,15 @@
      anahtarı); çip/eylem gibi kontrol tabanlı ölçüler de bir kademe iner —
      araç kartıyla aynı bilinçli AAA istisnası. */
   .rowListing {
-    --row-thumb-w: 108px;
+    /* Görsel sütunu kartın ~%38'i (2026-08-12 ekran görüntüsü şikâyeti):
+       sabit 108px, künye 4-5 satıra uzayınca fotoğrafı uzun-ince şeride
+       çeviriyordu — foto kartın yıldızı, yüzde kart genişliğiyle ölçeklenir.
+       Mikro-geometri (clamp uçları): 118px tabanı en dar kapta çipleri
+       ezmemek için, 180px tavanı bp-lg'nin 150px kademesine yumuşak
+       bağlanmak için. Yüzde min-height'ta çözülemediğinden taban yükseklik
+       px olarak ayrı değişkende (--row-thumb-min-h, kart CSS'i 2026-08-12). */
+    --row-thumb-w: clamp(118px, 38%, 180px);
+    --row-thumb-min-h: 132px;
     --lg-control-sm: 32px;
     /* «Karşılaştır» eylemi lg tabanından (dokunmatikte 48) okunur; kart
        kademesiyle birlikte iner. Genişlik tabanı da hit'ten geliyordu. */

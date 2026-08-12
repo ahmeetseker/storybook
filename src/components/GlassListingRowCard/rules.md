@@ -2,7 +2,7 @@
 name: GlassListingRowCard
 category: içerik
 status: hazır
-lastReviewed: 2026-08-05
+lastReviewed: 2026-08-12
 ---
 
 # GlassListingRowCard Kuralları
@@ -287,3 +287,13 @@ DOM değişmezine bağlıdır.
   özellik satırı tek sıra kayar, satıcı satırı tek katlı. `images[]` 2+
   kare ile medya scroll-snap galeri şeridine döner (nokta göstergesi scroll
   konumunun aynası, klavyede sol/sağ ok). İlk kare = `image` kapak sözleşmesi.
+- 2026-08-12 — `thumb` simetri cilası (mobil ekran görüntüsü şikâyetleri):
+  özellik çipleri tek sıra kaydırmadan **sarmaya** döndü — kenarda yarım
+  kırpılmış çip («Müstak…») ve görünmez kaydırma yerine ikinci satır; §8'in
+  "rozetler sarar, kesilmez" kuralı artık `thumb`'da da geçerli. Gövde dikey
+  ritmi space-1'den space-2'ye oturdu. Nokta göstergesi `thumb`'da sola
+  yaslanır (ortalanmış hali sağ alttaki `mediaCaption` kapsülüne biniyordu);
+  ikisi aynı alt ofseti (space-2) paylaşır. Medya taban yüksekliği sütun
+  genişliğinden ayrıştı: çağıran `--row-thumb-w`'yi yüzdeyle verebilir
+  (EmlakSearchView dar kapta ~%38 kullanır), px tabanı `--row-thumb-min-h`
+  taşır; değişken verilmezse eski kare taban korunur.

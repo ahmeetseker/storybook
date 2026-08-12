@@ -57,7 +57,7 @@ export function AccountOverviewHeader({
     <section
       data-account-section="identity"
       aria-labelledby="account-identity-title"
-      className={`${styles.card} ${styles.identity}`}
+      className={styles.card}
     >
       <div className={styles.identityGrid}>
         <GlassAvatar
@@ -86,22 +86,26 @@ export function AccountOverviewHeader({
               ) : null}
             </div>
           </div>
-          <div
-            data-part="verification"
-            className={styles.identityBadges}
-            aria-label="Doğrulama durumu"
-          >
-            {verificationChips.map((chip) => (
-              <span key={chip.key} className={styles.verifyChip} data-state={chip.state}>
-                {verificationLabel(chip.label, chip.state)}
-              </span>
-            ))}
+          {/* Rozetler ve rozetlere bağlı not tek ritim grubudur: not,
+              çiplerin dipnotu olarak bir kademe dar boşlukla bağlanır. */}
+          <div className={styles.identityVerification}>
+            <div
+              data-part="verification"
+              className={styles.identityBadges}
+              aria-label="Doğrulama durumu"
+            >
+              {verificationChips.map((chip) => (
+                <span key={chip.key} className={styles.verifyChip} data-state={chip.state}>
+                  {verificationLabel(chip.label, chip.state)}
+                </span>
+              ))}
+            </div>
+            {verification.eids === 'pending' ? (
+              <p data-part="eids-notice" className={styles.identityNotice}>
+                Doğrulama ilan verme adımında tamamlanır.
+              </p>
+            ) : null}
           </div>
-          {verification.eids === 'pending' ? (
-            <p data-part="eids-notice" className={styles.identityNotice}>
-              Doğrulama ilan verme adımında tamamlanır.
-            </p>
-          ) : null}
         </div>
         <div data-part="primary-action" className={styles.identityAction}>
           <AccountActionLink action={primaryAction} variant="primary" />

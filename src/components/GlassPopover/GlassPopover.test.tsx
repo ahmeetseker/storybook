@@ -65,4 +65,42 @@ describe('GlassPopover', () => {
     renderPopover({ defaultOpen: true, material: 'flat' })
     expect(screen.getByRole('dialog').getAttribute('data-material')).toBe('flat')
   })
+
+  // Viewport kıstırması: positioner soldan taşarsa --pop-shift-x ile içeri itilir.
+  // jsdom layout yapmadığı için ölçüm getBoundingClientRect mock'uyla beslenir;
+  // positioner, dialog'un iki üst sarmalayıcısıdır (positioner > motion.div > dialog).
+  it('viewport kıstırması: soldan taşan panel --pop-shift-x ile içeri itilir', () => {
+    const rect = { left: -120, right: 180, width: 300, top: 40, bottom: 240, height: 200, x: -120, y: 40, toJSON: () => ({}) }
+    const spy = vi
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockReturnValue(rect as DOMRect)
+    try {
+      renderPopover({ defaultOpen: true, align: 'end' })
+      const positioner = screen.getByRole('dialog').parentElement!.parentElement!
+      // gutter 16px: shift = 16 - (-120) = 136px
+      expect(positioner.style.getPropertyValue('--pop-shift-x')).toBe('136px')
+    } finally {
+      spy.mockRestore()
+    }
+  })
+
+  it('viewport kıstırması: sığan panelde shift yazılmaz (masaüstü davranışı değişmez)', () => {
+    const rect = { left: 40, right: 340, width: 300, top: 40, bottom: 240, height: 200, x: 40, y: 40, toJSON: () => ({}) }
+    const spy = vi
+      .spyOn(Element.prototype, 'getBoundingClientRect')
+      .mockReturnValue(rect as DOMRect)
+    try {
+      renderPopover({ defaultOpen: true, align: 'end' })
+      const positioner = screen.getByRole('dialog').parentElement!.parentElement!
+      expect(positioner.style.getPropertyValue('--pop-shift-x')).toBe('')
+    } finally {
+      spy.mockRestore()
+    }
+  })
+
+  it('viewport kıstırması: layout\'suz ortamda (genişlik 0) dokunulmaz', () => {
+    renderPopover({ defaultOpen: true, align: 'end' })
+    const positioner = screen.getByRole('dialog').parentElement!.parentElement!
+    expect(positioner.style.getPropertyValue('--pop-shift-x')).toBe('')
+  })
 })

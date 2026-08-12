@@ -244,3 +244,13 @@ yapay ±%5 (min ±1) dikey boşluk eklendi.
   crosshair Recharts'ın; `accessibilityLayer` v3 varsayılanıyla grafik
   klavyeyle gezilebilir (sparkline'da bilinçli kapalı). Giriş animasyonu
   kapalı kaldı. Eksenler gerçek tiklerle çizilir (kısa biçim).
+- 2026-08-12: Grafik hata düzeltmeleri. (1) Tooltip balonu çizim alanına
+  kilitlendi: `allowEscapeViewBox={{x:false, y:false}}` (v3 varsayılanı,
+  sözleşme olarak sabitlendi) — Recharts wrapper'ı ölçüp balonu kenarlarda
+  plot içine iter, imleci takip eder; eksen bandına taşmaz, kart dışına
+  kırpılmaz. Bunun ön koşulu tooltip içeriğinin wrapper içinde STATİK akışta
+  kalması — `.tooltip`'e position/transform verilmez (wrapper 0×0 ölçülür,
+  konumlama bozulur). (2) `type='bar'`: 0 değerli kategoriler `minPointSize=2`
+  ile 2px taban izi bırakır (Recharts `Rectangle` height=0'ı hiç çizmiyordu —
+  ay etiketi var, sütun tamamen yoktu); `maxBarSize` 44→56 ve `barCategoryGap`
+  %25→%20 — az kategoride sütunlar aşırı ince/kopuk durmasın.

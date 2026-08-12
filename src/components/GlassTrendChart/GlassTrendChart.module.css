@@ -98,10 +98,13 @@
 
 /* ── Paylaşımlı balon ──────────────────────────────────────────────────── */
 
+/* DİKKAT: Bu içerik Recharts tooltip wrapper'ının İÇİNDE statik akışta
+   yaşamalıdır — position/transform VERİLMEZ. Recharts wrapper'ı
+   getBoundingClientRect ile ölçüp balonu çizim alanına kilitler
+   (allowEscapeViewBox=false); içerik absolute olursa wrapper 0×0 ölçülür,
+   konumlama hiç uygulanmaz ve balon sol üst köşede eksen/künye üstüne
+   biner (Recharts 3 geçişinden kalan regresyon — bkz. changelog 2026-08-12). */
 .tooltip {
-  position: absolute;
-  top: var(--lg-space-1, 4px);
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   gap: var(--glass-trend-row-gap);
@@ -113,7 +116,6 @@
   font-size: var(--lg-text-caption, 12px);
   pointer-events: none;
   white-space: nowrap;
-  z-index: 2;
 }
 
 .tooltipX {

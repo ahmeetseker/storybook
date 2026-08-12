@@ -514,29 +514,31 @@
 
 .card[data-media='thumb'] .media {
   /* wide'ın 240px akış tabanı grid kolonundan taşıp gövdeyi örtüyordu —
-     thumb'da sütun ölçüsü tek otorite. */
+     thumb'da sütun ölçüsü tek otorite. Taban yükseklik sütun genişliğinden
+     AYRIŞTI (--row-thumb-min-h, 2026-08-12): çağıran sütunu yüzdeyle
+     kademelendirebilir ve yüzde, min-height'ta çözülemez (grid satır
+     yüksekliği belirsizken auto'ya düşer) — px tabanı ayrı değişkende kalır.
+     Değişken verilmezse eski kare taban (sütun genişliği) korunur. */
   min-width: 0;
   width: 100%;
-  min-height: var(--row-thumb-w, 108px);
+  min-height: var(--row-thumb-min-h, var(--row-thumb-w, 108px));
   height: 100%;
 }
 
 .card[data-media='thumb'] .body {
-  gap: var(--lg-space-1);
+  /* Tek ritim: fiyat/başlık bloğu, konum, çipler ve ayak arası hep space-2 —
+     space-1 kademesi satırları birbirine yapıştırıp düzensiz okutuyordu
+     (2026-08-12 simetri cilası). */
+  gap: var(--lg-space-2);
   padding: var(--lg-space-3);
 }
 
-/* Özellikler TEK sıra: sarmaz, satır içinde kayar; rozet mikro ölçeğe iner.
-   24px görünür satır — rozet salt bilgidir, dokunma hedefi değildir. */
+/* Özellik çipleri SARAR (2026-08-12): tek sıra kaydırma, kenarda yarım
+   kırpılmış çip bırakıyordu («Müstak…») ve kaydırılabilirliği belli eden
+   hiçbir iz yoktu — görünmez içerik yerine ikinci satır. Rozet mikro ölçeğe
+   iner; 24px görünür satır — rozet salt bilgidir, dokunma hedefi değildir. */
 .card[data-media='thumb'] .features {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  gap: var(--lg-space-1);
-  scrollbar-width: none;
-}
-
-.card[data-media='thumb'] .features::-webkit-scrollbar {
-  display: none;
+  gap: var(--lg-space-1) var(--lg-space-2);
 }
 
 .card[data-media='thumb'] .feature {
@@ -552,6 +554,22 @@
   width: var(--lg-space-3);
   height: var(--lg-space-3);
   color: var(--lg-accent);
+}
+
+/* Dar medya sütununda ortalanmış noktalar, sağ alttaki foto sayacının
+   kapsülüne biniyordu — noktalar sola yaslanır, sayaç sağda kalır; alt
+   kenar ikisinde de aynı ofsete (space-2) oturur ki taban çizgisi tek
+   okunsun (2026-08-12 simetri cilası). */
+.card[data-media='thumb'] .dots {
+  left: var(--lg-space-2);
+  bottom: var(--lg-space-2);
+  transform: none;
+}
+
+.card[data-media='thumb'] .mediaCaption {
+  right: var(--lg-space-2);
+  bottom: var(--lg-space-2);
+  padding-inline: var(--lg-space-2);
 }
 
 /* Başlık thumb'da 2 satır kilitli: tek satır ellipsis dar kolonda başlığın

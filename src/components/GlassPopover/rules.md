@@ -76,6 +76,10 @@ mini form) tetikleyicinin yanında açılır; sayfa akışını kesmez.
   Tab ile girer — panel DOM'da tetikleyicinin ardında olduğundan sıra doğrudur.
 - Konumlama saf CSS (absolute + translate); floating-ui yok. Viewport'a çarpan
   placement otomatik çevrilmez — placement seçimi çağıranın sorumluluğu.
+- **Yatay viewport kıstırması:** açılışta positioner ölçülür; panel yatayda
+  viewport'tan taşıyorsa `--pop-shift-x` ile içeri itilir (16px pay, resize'da
+  yeniden ölçülür). Sığan panelde shift 0 — flip DEĞİLDİR, panel tetikleyiciye
+  bağlı kalır, yalnız kaydırılır.
 - Responsive: panel `max-width: calc(100vw - 32px)`; `/* bp-sm */ ≥640px`'de 320px.
 
 ## 8. İçerik
@@ -99,7 +103,9 @@ olmadığından component kökünde yerel değişkende toplandı
 (`.root { --panel-min-width: 220px; --panel-max-width: 320px; }`); mobil
 viewport taşma marjı `calc(100vw - var(--lg-space-7))` token'a bağlandı
 (birebir 32px). `@media (min-width: 640px)` bp-sm breakpoint istisnası;
-`line-height: 1.45` oransal, token yok.
+`line-height: 1.45` oransal, token yok. Viewport kıstırma payı JS'te raw
+`16` (px, `--lg-space-4` karşılığı) — jsdom CSS değişkenini çözemediği
+için koddan okunur.
 
 ## 10. Storybook kapsamı
 
@@ -112,6 +118,7 @@ Mobile (viewport: mobile1). **Eksik:** align matrisi story'si, RTL.
 - [x] aria-modal yok; trigger'a aria-haspopup/expanded yazılır
 - [x] Escape ve dış tıklama kapatır; iç tıklama kapatmaz
 - [x] Controlled modda kendi kendine kapanmaz, onOpenChange bildirir
+- [x] Yatay taşmada --pop-shift-x yazılır; sığan panelde ve layout'suz ortamda yazılmaz
 - [ ] Placement/align görsel doğrulama (visual)
 
 ## 12. Do / Don't
@@ -124,7 +131,9 @@ Mobile (viewport: mobile1). **Eksik:** align matrisi story'si, RTL.
 **Açık kararlar:** Ok (arrow) ucu bilinçli eklenmedi — döndürülmüş kare,
 backdrop-filter'lı cam zeminde panelden ayrık ve kirli göründüğü için oksuz
 bırakıldı; ihtiyaç doğarsa SVG clip-path'li tek parça çözüm değerlendirilecek.
-Viewport çarpışmasında otomatik flip yok (floating-ui yasağı; basitlik kararı).
+Viewport çarpışmasında otomatik flip yok (floating-ui yasağı; basitlik kararı);
+yalnız yatay kıstırma var — panel yön değiştirmez, taşarsa içeri kaydırılır
+(2026-08-12).
 
 ## Changelog
 
@@ -135,3 +144,12 @@ Viewport çarpışmasında otomatik flip yok (floating-ui yasağı; basitlik kar
   altta akan sayfayla yarışıp okunmaz kalıyordu; `flat` opak yüzey +
   hairline verir, yükselti (`--lg-shadow-md`) iki malzemede de aynı kalır.
   İlk kullanım: kabuk bildirim kutusu.
+- 2026-08-12: Yatay viewport kıstırması. Tetikleyici viewport kenarına
+  yakınken (dar ekranda hamburger menü içindeki bildirim zili + `align="end"`)
+  panel sol kenardan taşıp kırpılıyordu. Açılışta positioner'ın layout kutusu
+  ölçülür, taşma varsa `--pop-shift-x` CSS değişkeniyle (translate'e eklenir)
+  içeri itilir; sığan panelde shift 0, geniş ekran davranışı değişmez.
+  `position: fixed` bilinçli seçilmedi: transformlu ata (motion layout kapsülü)
+  fixed'in içerme bloğunu değiştirir; ölçüm gerçek ekran konumuna bakar.
+  Flip hâlâ yok — panel tetikleyiciye bağlı kalır, yalnız kaydırılır.
+  16px pay `--lg-space-4` karşılığı, JS'te raw (§9 borç listesine eklendi).

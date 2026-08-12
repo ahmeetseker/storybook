@@ -11,12 +11,16 @@
 }
 
 /* Panel konumlandırıcı: floating-ui yok — placement + align eksenleri saf CSS.
-   translate özelliği kullanılır ki içteki motion transform'uyla (scale) çakışmasın. */
+   translate özelliği kullanılır ki içteki motion transform'uyla (scale) çakışmasın.
+   --pop-shift-x: viewport kıstırma kaydırması — panel yatayda viewport'tan
+   taşarsa JS ölçümüyle yazılır (bkz. GlassPopover.tsx), sığıyorsa 0 kalır. */
 .positioner {
   position: absolute;
   z-index: 30;
   /* abspos shrink-to-fit tetikleyici genişliğine sıkışmasın */
   width: max-content;
+  --pop-shift-x: 0px;
+  translate: var(--pop-shift-x) 0;
 }
 
 .bottom { top: calc(100% + var(--lg-space-2)); }
@@ -24,14 +28,14 @@
 .left { right: calc(100% + var(--lg-space-2)); }
 .right { left: calc(100% + var(--lg-space-2)); }
 
-/* top/bottom → yatay hizalama */
+/* top/bottom → yatay hizalama (center, kaydırmayı kendi -50%'siyle birleştirir) */
 .alignStartX { left: 0; }
-.alignCenterX { left: 50%; translate: -50% 0; }
+.alignCenterX { left: 50%; translate: calc(-50% + var(--pop-shift-x)) 0; }
 .alignEndX { right: 0; }
 
 /* left/right → dikey hizalama */
 .alignStartY { top: 0; }
-.alignCenterY { top: 50%; translate: 0 -50%; }
+.alignCenterY { top: 50%; translate: var(--pop-shift-x) -50%; }
 .alignEndY { bottom: 0; }
 
 .card {

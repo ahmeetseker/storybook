@@ -241,8 +241,14 @@ export function GlassTrendChart({
                 tickFormatter={formatCompact}
               />
 
+              {/* Balon çizim alanına kilitlidir: allowEscapeViewBox=false (v3
+                  varsayılanı, sözleşme olarak sabitlendi) ile Recharts wrapper'ı
+                  ölçer, imleci takip eder ve kenarlarda plot içine iter. Bunun
+                  çalışması için tooltip içeriği statik akışta kalmalı —
+                  .tooltip'e position/transform verilmez (bkz. module.css notu). */}
               <Tooltip
                 content={tooltipContent}
+                allowEscapeViewBox={{ x: false, y: false }}
                 cursor={{ stroke: 'var(--lg-label-secondary)', strokeWidth: 1, strokeDasharray: '3 3' }}
                 isAnimationActive={false}
               />

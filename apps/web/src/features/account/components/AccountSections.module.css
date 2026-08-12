@@ -118,12 +118,11 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- Kimlik bandı ---------- */
+/* ---------- Kimlik bandı ----------
 
-.identity {
-  /* Band: diğer kartlardan daha kompakt bir dikey ritim taşır. */
-  padding-block: var(--lg-space-4);
-}
+   Band, kart kabuğunun (.card) dolgu ve ritmini olduğu gibi kullanır:
+   dikeyde daraltılmış özel bir dolgu YOK — bölümler arası boşluk algısı
+   tüm kartlarda aynı kalsın diye. */
 
 .identityGrid {
   display: grid;
@@ -184,6 +183,16 @@
 .identityMeta + .identityMeta::before {
   content: '·';
   margin-inline-end: var(--lg-space-2);
+}
+
+/* Rozetler + rozetlere bağlı not tek grup: aralarındaki mesafe (space-2)
+   gövde bloklarının mesafesinden (space-3) bir kademe dardır — not,
+   bağımsız bir paragraf değil çipin dipnotudur. Dikey ritim kademesi:
+   ızgara satırı 4 → gövde blokları 3 → grup içi 2 → künye satırları 1. */
+.identityVerification {
+  display: grid;
+  justify-items: start;
+  gap: var(--lg-space-2);
 }
 
 .identityBadges {
@@ -247,7 +256,12 @@
 .attentionItem {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  /* Gövde kolonu içerik ölçüsünde durur (fit-content, üst sınır okuma
+     ölçüsü); aksiyon gövdenin hemen sağına oturur. `justify-content: start`
+     olmadan auto kolon artan alanı yutar ve aksiyon kartın uzak sağ
+     kenarına savrulur — metinle görsel ilişkisi kopar. */
+  grid-template-columns: fit-content(var(--lg-measure)) auto;
+  justify-content: start;
   align-items: center;
   gap: var(--lg-space-3) var(--lg-space-5);
   padding: var(--lg-space-4);
@@ -276,9 +290,11 @@
   background-color: var(--lg-warning);
 }
 
+/* Kolonlar içerik ölçüsünde paketlendiği için aksiyon her genişlikte
+   gövdeyi izler; dar kartta (tek kolon) sola yaslı kalır, şişmez. */
 .attentionItem > a {
   align-self: center;
-  justify-self: end;
+  justify-self: start;
 }
 
 .attentionBody {
@@ -523,10 +539,6 @@
 
   .attentionItem {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .attentionItem > a {
-    justify-self: start;
   }
 }
 

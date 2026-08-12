@@ -96,6 +96,23 @@ describe('GlassChart', () => {
     expect(container.querySelector('[data-part="last-label"]')?.textContent).toBe('130.000 TL')
   })
 
+  it("type='bar' 0 değerli ayda sütun tamamen kaybolmaz — minimum taban izi çizilir", () => {
+    // Regresyon: Recharts Rectangle height=0'ı hiç render etmiyor; minPointSize
+    // olmadan 0 TL'lik ay eksende etiketli ama tamamen boş kalıyordu.
+    const sifirliAylar = [
+      { x: 'Oca 26', y: 4200 },
+      { x: 'Şub 26', y: 0 },
+      { x: 'Mar 26', y: 2800 },
+    ]
+    const { container } = renderChart({ type: 'bar', points: sifirliAylar })
+    const bars = container.querySelectorAll('.recharts-bar-rectangle path')
+    // 0 değerli ay dahil her kategori bir iz bırakır
+    expect(bars).toHaveLength(3)
+    for (const bar of Array.from(bars)) {
+      expect(bar.getAttribute('d')).toBeTruthy()
+    }
+  })
+
   it("type='bar' tek değerli (eşit) seride sütunlar kaybolmaz", () => {
     const equalPoints = [
       { x: 'Oca 26', y: 150000 },

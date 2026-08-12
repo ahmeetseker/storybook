@@ -169,3 +169,11 @@ Katman sırası: availability (veri var mı) → value (seri değerleri) → int
   kapalı kaldı. Eksenler gerçek tiklerle çizilir (kısa biçim). Varsayılan
   palet açıklık zıtlığıyla yeniden dizildi — dataviz doğrulayıcısında komşu
   çiftler ΔE ≥ 25 (eskisi 5.9 ile normal görüşte bile ayırt edilemiyordu).
+- 2026-08-12: Tooltip kenar taşması düzeltildi (Recharts 3 geçiş regresyonu).
+  `.tooltip`'te saf-SVG döneminden kalan `position: absolute` +
+  `translateX(-50%)` kaldırıldı: Recharts kendi wrapper'ını
+  getBoundingClientRect ile ölçüp konumladığından, absolute içerik wrapper'ı
+  0×0 ölçtürüyor, konumlama hiç uygulanmıyor ve balon sol üst köşede Y ekseni
+  etiketi/künye üstüne binip kart dışına kırpılabiliyordu. İçerik artık statik
+  akışta; `allowEscapeViewBox={{x:false, y:false}}` (v3 varsayılanı) sözleşme
+  olarak sabitlendi — balon imleci takip eder, kenarlarda plot içine itilir.

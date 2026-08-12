@@ -3,6 +3,7 @@ import {
   isValidElement,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type HTMLAttributes,
@@ -58,6 +59,7 @@ export function GlassPopover({
   ...rest
 }: GlassPopoverProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const positionerRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
   const [innerOpen, setInnerOpen] = useState(defaultOpen)
   const isOpen = open ?? innerOpen
@@ -87,6 +89,36 @@ export function GlassPopover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, open])
 
+  // Viewport kıstırması (yalnız yatay) — floating-ui yok, flip yok (bkz.
+  // rules.md "Açık kararlar"). Panel açılınca positioner'ın layout kutusu
+  // ölçülür; viewport'tan taşıyorsa `--pop-shift-x` ile içeri itilir
+  // (CSS'te translate'e eklenir). Tetikleyici viewport kenarına yakınken
+  // (örn. dar ekranda hamburger menü içindeki zil + align="end") panel
+  // ekran dışına taşıyordu. Sığan panelde shift 0 — geniş ekran davranışı
+  // değişmez. `position: fixed` yerine ölçüm seçildi: transformlu bir ata
+  // (örn. motion layout kapsülü) fixed'in içerme bloğunu sessizce değiştirir;
+  // ölçüm ise gerçek ekran konumuna bakar. Positioner'ın kendi kutusu içteki
+  // motion scale'inden etkilenmez (transform layout'u değiştirmez) — ölçüm net.
+  useLayoutEffect(() => {
+    if (!isOpen) return
+    const clamp = () => {
+      const node = positionerRef.current
+      if (!node) return
+      // Önceki kaydırmayı sıfırla ki ölçüm hizalama sınıfının saf konumunu görsün
+      node.style.removeProperty('--pop-shift-x')
+      const rect = node.getBoundingClientRect()
+      if (rect.width === 0) return // layout'suz ortam (jsdom): dokunma
+      const gutter = 16 // px — --lg-space-4 karşılığı; JS'te raw (bkz. rules.md §9 borç)
+      const soldanTasma = gutter - rect.left
+      const sagdanTasma = rect.right - (window.innerWidth - gutter)
+      const shift = soldanTasma > 0 ? soldanTasma : sagdanTasma > 0 ? -sagdanTasma : 0
+      if (shift !== 0) node.style.setProperty('--pop-shift-x', `${shift}px`)
+    }
+    clamp()
+    window.addEventListener('resize', clamp)
+    return () => window.removeEventListener('resize', clamp)
+  }, [isOpen, placement, align])
+
   // Eksen: top/bottom → yatay hizalama, left/right → dikey hizalama
   const axis = placement === 'top' || placement === 'bottom' ? 'X' : 'Y'
   const alignClass = styles[`align${align.charAt(0).toUpperCase()}${align.slice(1)}${axis}`]
@@ -104,7 +136,11 @@ export function GlassPopover({
       </div>
       <AnimatePresence>
         {isOpen ? (
-          <div key="panel" className={[styles.positioner, styles[placement], alignClass].filter(Boolean).join(' ')}>
+          <div
+            key="panel"
+            ref={positionerRef}
+            className={[styles.positioner, styles[placement], alignClass].filter(Boolean).join(' ')}
+          >
             <motion.div
               initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.97 }}
               animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1 }}

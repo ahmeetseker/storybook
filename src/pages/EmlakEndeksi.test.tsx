@@ -61,10 +61,12 @@ describe('Emlak Endeksi — mahalle sayfası', () => {
   })
 
   it('dağılım histogramı son bandı değil medyan bandını vurgular', () => {
+    // Recharts geçişi sonrası sütunlar Cell path'leridir; vurgu CSS modül
+    // sınıfından okunur (bkz. GlassDistributionChart.test.tsx ile aynı desen).
     const { container } = render(<EmlakEndeksi />)
-    const vurgulu = container.querySelectorAll('[data-median="true"]')
+    const hepsi = Array.from(container.querySelectorAll('.recharts-bar-rectangle path'))
+    const vurgulu = hepsi.filter((p) => (p.getAttribute('class') ?? '').includes('binMedian'))
     expect(vurgulu).toHaveLength(1)
-    const hepsi = Array.from(container.querySelectorAll('[data-part="bin"]'))
     expect(hepsi.indexOf(vurgulu[0])).toBe(3)
     expect(hepsi).toHaveLength(6)
   })

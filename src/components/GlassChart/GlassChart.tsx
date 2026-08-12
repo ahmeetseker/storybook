@@ -166,7 +166,7 @@ export function GlassChart({
               height={height}
               data={points}
               margin={{ top: 24, right: 16, bottom: 4, left: 0 }}
-              barCategoryGap="25%"
+              barCategoryGap="20%"
             >
               {type === 'area' ? (
                 <defs>
@@ -201,14 +201,35 @@ export function GlassChart({
                 tickFormatter={formatCompact}
               />
 
+              {/* Balon çizim alanına kilitlidir: allowEscapeViewBox=false (v3
+                  varsayılanı, sözleşme olarak sabitlendi) ile Recharts wrapper'ı
+                  ölçer, imleci takip eder ve kenarlarda plot içine iter — eksen
+                  bandına taşmaz, kart dışına kırpılmaz. Bunun çalışması için
+                  tooltip içeriği statik akışta kalmalı; .tooltip'e
+                  position/transform verilmez (wrapper ölçümü 0×0'a düşer,
+                  konumlama bozulur). */}
               <Tooltip
                 content={tooltipContent}
+                allowEscapeViewBox={{ x: false, y: false }}
                 cursor={{ stroke: 'var(--lg-label-secondary)', strokeWidth: 1, strokeDasharray: '3 3' }}
                 isAnimationActive={false}
               />
 
               {type === 'bar' ? (
-                <Bar dataKey="y" fill={tint} radius={[4, 4, 0, 0]} maxBarSize={44} isAnimationActive={false}>
+                /* minPointSize=2: 0 değerli kategoriler eksende TAMAMEN
+                   kaybolmaz (Recharts Rectangle height=0'ı hiç çizmez), 2px'lik
+                   taban izi kalır — "ay var ama harcama 0" okunur. maxBarSize
+                   56 + barCategoryGap %20, az kategoride sütunların aşırı
+                   ince/kopuk durmasını dengeler (çok kategoride bant zaten dar,
+                   üst sınır devreye girmez). */
+                <Bar
+                  dataKey="y"
+                  fill={tint}
+                  radius={[4, 4, 0, 0]}
+                  minPointSize={2}
+                  maxBarSize={56}
+                  isAnimationActive={false}
+                >
                   {points.map((p, i) => (
                     <Cell key={`${p.x}-${i}`} opacity={i === lastIndex ? 1 : 0.5} />
                   ))}
