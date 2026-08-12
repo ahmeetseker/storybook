@@ -12,9 +12,11 @@ import {
   GlassFilterPanel,
   GlassSkeleton,
   GlassSelect,
+  GlassTextarea,
   useGlassToast,
 } from '@repo/ui'
 import { AppointmentSchedulerModal, availabilityPreview } from '@/features/appointments'
+import { sendOfficeMessage } from '@/features/messages/data/office-message-store'
 import { officeProposalFilterId } from './domain/office-ai'
 import type { OfficeSearchResponse } from './data/office-adapter'
 import type { OfficeSearchState } from './domain/office-search-state'
@@ -450,6 +452,8 @@ export function OfficeDirectoryView({
   const [compareOpen, setCompareOpen] = useState(false)
   const [aiInput, setAiInput] = useState(state.query)
   const [meetingOffice, setMeetingOffice] = useState<OfficeSummary | null>(null)
+  const [messageOffice, setMessageOffice] = useState<OfficeSummary | null>(null)
+  const [messageText, setMessageText] = useState('')
   const aiSearchRef = useRef<HTMLDivElement>(null)
   const toast = useGlassToast()
   const matchIndex = useMemo(() => new Map(matches?.map((match) => [match.officeId, match])), [matches])
@@ -466,12 +470,17 @@ export function OfficeDirectoryView({
   const chooseIntent = (intent: OfficeSearchState['intent']) => onStateChange(updateState(state, { intent, expertise: [] }), { history: 'push' })
   const handleAiSearch = (query: string) => onAiSearch(query)
 
-  // "Görüşme" aksiyonu artık onay çekmecesine değil doğrudan randevu
-  // planlayıcı modalına gider; diğer aksiyonlar (mesaj/teklif) rota
-  // seviyesindeki onay akışına (onStartAction) devam eder.
+  // "Görüşme" randevu modalına, "Mesaj" serbest metinli yazma çekmecesine
+  // gider — ikisi de view içinde çözülür. Yalnız "teklif" rota seviyesindeki
+  // taslak-onay akışına (onStartAction) devam eder.
   const startAction = (action: OfficeActionType, office: OfficeSummary) => {
     if (action === 'meeting') {
       setMeetingOffice(office)
+      return
+    }
+    if (action === 'message') {
+      setMessageText('')
+      setMessageOffice(office)
       return
     }
     onStartAction(action, office.id)
@@ -481,11 +490,27 @@ export function OfficeDirectoryView({
   // nesnesini bilmediği için burada response'tan geri buluyoruz.
   const handlePanelAction = (action: OfficeActionType, officeId: string) => {
     const office = selectedOffice(response, officeId)
-    if (action === 'meeting' && office) {
-      setMeetingOffice(office)
+    if (office && (action === 'meeting' || action === 'message')) {
+      startAction(action, office)
       return
     }
     onStartAction(action, officeId)
+  }
+
+  const sendMessageToOffice = () => {
+    if (!messageOffice || !messageText.trim()) return
+    sendOfficeMessage({
+      officeId: messageOffice.id,
+      officeName: messageOffice.name,
+      district: messageOffice.districts[0],
+      body: messageText,
+    })
+    setMessageOffice(null)
+    toast({
+      title: 'Mesajınız ofise iletildi',
+      description: 'Yanıtları Hesabım → Mesajlar altında takip edebilirsiniz.',
+      severity: 'success',
+    })
   }
 
   return (
@@ -673,6 +698,40 @@ export function OfficeDirectoryView({
               {actionDraft.fields.map((field) => <div key={field.label}><dt>{field.label}</dt><dd>{field.value}</dd></div>)}
             </dl>
             <p className={styles.consentQuestion}>Bu bilgileri seçtiğiniz ofise iletmek istediğinizi onaylıyor musunuz?</p>
+          </div>
+        ) : null}
+      </GlassDrawer>
+
+      <GlassDrawer
+        open={Boolean(messageOffice)}
+        onClose={() => setMessageOffice(null)}
+        title="Ofise mesaj gönder"
+        description="Mesajınız yalnız seçtiğiniz ofise iletilir."
+        side="right"
+        size="md"
+        footer={(
+          <div className={styles.consentFooter}>
+            <GlassButton onClick={() => setMessageOffice(null)}>Vazgeç</GlassButton>
+            <GlassButton prominent disabled={!messageText.trim()} onClick={sendMessageToOffice}>
+              Mesajı gönder
+            </GlassButton>
+          </div>
+        )}
+      >
+        {messageOffice ? (
+          <div className={styles.consentBody}>
+            <p><strong>Alıcı:</strong> {messageOffice.name}</p>
+            <GlassTextarea
+              value={messageText}
+              onChange={(event) => setMessageText(event.target.value)}
+              minRows={5}
+              autoResize
+              placeholder="Örn. Urla tarafında imarlı arsa arıyorum; portföyünüzü görüşmek isterim."
+              aria-label="Mesajınız"
+            />
+            <p className={styles.consentQuestion}>
+              Gönderdiğiniz mesajı ve ofis yanıtlarını Hesabım → Mesajlar altında bulabilirsiniz.
+            </p>
           </div>
         ) : null}
       </GlassDrawer>

@@ -1,6 +1,7 @@
 /* oxlint-disable react/only-export-components -- TanStack file routes export Route beside route-local components. */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute, redirect } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import { createPageHead } from '@/config/routes'
 import {
   MessagesWorkspace,
@@ -9,8 +10,13 @@ import {
 } from '@/features/messages'
 import {
   conversationInfiniteQueryOptions,
+  messagesQueryKeys,
   threadInfiniteQueryOptions,
 } from '@/features/messages/data/messages-query'
+import {
+  officeThreadCount,
+  withOfficeConversations,
+} from '@/features/messages/data/office-message-store'
 import {
   parseMessagesRouteSearch,
   serializeMessagesRouteSearch,
@@ -54,7 +60,9 @@ export const Route = createFileRoute('/hesabim/mesajlar')({
   loaderDeps: ({ search }) =>
     parseMessagesRouteSearch(search as Record<string, unknown>),
   loader: async ({ context, deps }) => {
-    const dataSource = createMessagesFixtureDataSource()
+    // Sunucuda sessionStorage yoktur → ofis sohbetleri boş döner; istemci
+    // mount sonrası cache'i tazeleyip kendi birleşimini gösterir (aşağıda).
+    const dataSource = createMessagesFixtureDataSource(withOfficeConversations())
     const prefetches: Array<() => Promise<unknown>> = [
       () =>
         context.queryClient.ensureInfiniteQueryData(
@@ -94,9 +102,18 @@ export const Route = createFileRoute('/hesabim/mesajlar')({
 function MessagesRoutePage() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
-  const [dataSource] = useState<MessagesDataSource>(
-    createMessagesFixtureDataSource,
+  const [dataSource] = useState<MessagesDataSource>(() =>
+    createMessagesFixtureDataSource(withOfficeConversations()),
   )
+  const queryClient = useQueryClient()
+  // SSR prefetch'i ofis sohbetlerini bilemez (sessionStorage sunucuda yok);
+  // hidrasyon bittikten SONRA cache tazelenir ki HTML uyuşmazlığı doğmadan
+  // /ofisler'den yazılan mesajlar listede görünsün.
+  useEffect(() => {
+    if (officeThreadCount() > 0) {
+      void queryClient.invalidateQueries({ queryKey: messagesQueryKeys.all })
+    }
+  }, [queryClient])
   const routeState = parseMessagesRouteSearch(search)
   const currentSearch = serializeMessagesRouteSearch(routeState)
 

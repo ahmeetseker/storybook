@@ -8,6 +8,7 @@ import { parseOfficePrompt, matchOffices } from './domain/office-ai'
 import { parseOfficeSearch } from './domain/office-search-state'
 import type { OfficeActionDraft, OfficeAiProposal } from './domain/office-types'
 import { OfficeDirectoryView } from './OfficeDirectoryView'
+import { officeThreadCount, resetOfficeMessageStore } from '@/features/messages/data/office-message-store'
 
 // View, randevu modalı için useGlassToast kullanıyor; gerçek kompozisyonda
 // (ofisler.tsx) olduğu gibi GlassToastProvider ile sarmalanmalı.
@@ -226,5 +227,30 @@ describe('OfficeDirectoryView', () => {
     renderView(<OfficeDirectoryView {...props} />)
 
     expect(screen.getAllByText(/boş saat/i).length).toBeGreaterThan(0)
+  })
+
+  it('Mesaj yazma çekmecesini açar; boşken gönderilmez, yazınca ofis sohbeti oluşur', async () => {
+    resetOfficeMessageStore()
+    const user = userEvent.setup()
+    const onStartAction = vi.fn()
+    const props = await buildProps({ onStartAction })
+    renderView(<OfficeDirectoryView {...props} />)
+
+    const kart = screen.getAllByRole('article')[0]!
+    await user.click(within(kart).getByRole('button', { name: 'Mesaj' }))
+
+    // Serbest metin yazılabilen gerçek bir çekmece açılır; taslak akışı devreye girmez.
+    expect(onStartAction).not.toHaveBeenCalled()
+    const dialog = screen.getByRole('dialog', { name: /ofise mesaj/i })
+    const gonder = within(dialog).getByRole('button', { name: /mesajı gönder/i })
+    expect(gonder).toHaveProperty('disabled', true)
+
+    await user.type(
+      within(dialog).getByRole('textbox', { name: /mesajınız/i }),
+      'Arsa portföyünüzü görüşmek istiyorum.',
+    )
+    await user.click(within(dialog).getByRole('button', { name: /mesajı gönder/i }))
+
+    expect(officeThreadCount()).toBe(1)
   })
 })
