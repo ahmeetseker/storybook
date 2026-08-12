@@ -346,6 +346,14 @@ function OfficeResultCard({
   onStartAction: (action: OfficeActionType) => void
 }) {
   const evidence = match?.evidence[0] ?? office.evidence[0]
+  // Müsaitlik önizlemesi `new Date()`e bağlı: sunucu render'ı ile istemcinin
+  // ilk render'ı arasında saat gece yarısını/saat dilimi sınırını geçerse
+  // metin FARKLI üretilir → React hydration mismatch uyarısı. `mounted`
+  // bayrağı sunucu HTML'inde her zaman sabit bir yer tutucu üretir; gerçek
+  // (saate bağlı) metin yalnız istemcide, ilk commit sonrası effect'te
+  // devreye girer — böylece sunucu/istemci ilk render çıktısı hep eşleşir.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   return (
     <article className={styles.resultCard} aria-label={`${office.name} ofisi`}>
       <div className={styles.cardTopline}>
@@ -382,7 +390,9 @@ function OfficeResultCard({
         <div><dt>Yanıt</dt><dd>{office.responseMinutes} dk</dd></div>
         <div><dt>Puan</dt><dd>{office.rating} ({office.reviewCount})</dd></div>
       </dl>
-      <p className={styles.cardAvailability}>{availabilityPreview(office.id, new Date())}</p>
+      <p className={styles.cardAvailability}>
+        {mounted ? availabilityPreview(office.id, new Date()) : 'Müsaitlik yükleniyor…'}
+      </p>
       <div className={styles.cardMeta}>
         <span>{office.districts.slice(0, 2).join(' · ')}</span>
         {evidence ? <span className={styles.evidenceBadge} title={evidence.value}>{EVIDENCE_SOURCE_LABELS[evidence.source]} · {evidence.label}</span> : null}

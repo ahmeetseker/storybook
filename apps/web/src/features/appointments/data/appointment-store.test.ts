@@ -129,6 +129,80 @@ describe('randevu store — sessionStorage kalıcılığı', () => {
   })
 })
 
+describe('randevu store — şema sürümü ve kayıt doğrulama', () => {
+  it('sürüm uyuşmazlığı olan payload tamamen atılır, boş listeye düşer', () => {
+    resetAppointmentStore()
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 999,
+        nextId: 5,
+        records: [{ appointment: { ...ORNEK, id: 'randevu-1', status: 'pending', createdAt: 1 }, autoConfirm: false }],
+      }),
+    )
+
+    __rehydrateForTests()
+
+    expect(listAppointments()).toEqual([])
+  })
+
+  it('sürüm alanı hiç yoksa (eski format) payload atılır', () => {
+    resetAppointmentStore()
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        nextId: 5,
+        records: [{ appointment: { ...ORNEK, id: 'randevu-1', status: 'pending', createdAt: 1 }, autoConfirm: false }],
+      }),
+    )
+
+    __rehydrateForTests()
+
+    expect(listAppointments()).toEqual([])
+  })
+
+  it('bozuk tarihli kayıt hydrate edilmez, diğer geçerli kayıtlar korunur', () => {
+    resetAppointmentStore()
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        nextId: 3,
+        records: [
+          { appointment: { ...ORNEK, id: 'randevu-1', date: 'gecersiz-tarih', status: 'pending', createdAt: 1 }, autoConfirm: false },
+          { appointment: { ...ORNEK, id: 'randevu-2', status: 'pending', createdAt: 2 }, autoConfirm: false },
+        ],
+      }),
+    )
+
+    __rehydrateForTests()
+
+    const items = listAppointments()
+    expect(items).toHaveLength(1)
+    expect(items[0].id).toBe('randevu-2')
+  })
+
+  it('geçersiz slot/status/type alanına sahip kayıt atılır', () => {
+    resetAppointmentStore()
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        nextId: 2,
+        records: [
+          { appointment: { ...ORNEK, id: 'r-slot', slot: '10', status: 'pending', createdAt: 1 }, autoConfirm: false },
+          { appointment: { ...ORNEK, id: 'r-status', status: 'onaylandı', createdAt: 1 }, autoConfirm: false },
+          { appointment: { ...ORNEK, id: 'r-type', type: 'telefon', status: 'pending', createdAt: 1 }, autoConfirm: false },
+        ],
+      }),
+    )
+
+    __rehydrateForTests()
+
+    expect(listAppointments()).toEqual([])
+  })
+})
+
 describe('randevu store — useAppointments sunucu anlık görüntüsü (hydration uyuşmazlığı regresyonu)', () => {
   // useSyncExternalStore internals'ini (getServerSnapshot) doğrudan render
   // etmeden test etmek awkward olduğundan (renderToString + hydrateRoot

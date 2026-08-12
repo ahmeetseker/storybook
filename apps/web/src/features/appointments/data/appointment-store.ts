@@ -38,8 +38,45 @@ interface PersistedRecord {
 }
 
 interface PersistedState {
+  version: number
   records: PersistedRecord[]
   nextId: number
+}
+
+/**
+ * Kalıcı JSON'un şema sürümü. Kayıt şeklini (alan adı, tip, format)
+ * DEĞİŞTİRDİĞİMİZDE bunu artırırız; hydrate() sürüm uyuşmazlığında TÜM
+ * payload'ı atar — eski/yarım yorumlanmış alanlarla "doğru görünen ama
+ * yanlış" bir randevu üretmektense boş listeyle başlamak daha güvenli.
+ * Takip listesi zaten mock/oturum ömürlü olduğu için bu kayıp zararsızdır.
+ */
+const SCHEMA_VERSION = 1
+
+const APPOINTMENT_STATUSES: ReadonlySet<Appointment['status']> = new Set(['pending', 'confirmed', 'cancelled'])
+const APPOINTMENT_TYPES: ReadonlySet<AppointmentType> = new Set(['office', 'video'])
+const DATE_KEY_RE = /^\d{4}-\d{2}-\d{2}$/
+const SLOT_RE = /^\d{2}:\d{2}$/
+
+/**
+ * Tek bir kaydın şeklini doğrular. Sürüm doğru olsa bile kayıt elle
+ * düzenlenmiş/bozulmuş sessionStorage'dan gelebilir (ör. `date: "geçersiz"`)
+ * — bunu `AccountAppointmentsPage` `dateFmt.format(parseDay(item.date))`
+ * ile biçimlendirirken Date RangeError fırlatıp TÜM sayfayı çökertiyordu.
+ * Kayıt bazında doğrulayıp yalnız GEÇERSİZ kaydı atarız (tüm payload'ı değil)
+ * çünkü tek bozuk randevu yüzünden kullanıcının diğer geçerli randevularının
+ * da kaybolması gereksiz bir kayıp olurdu.
+ */
+function isValidPersistedRecord(record: unknown): record is PersistedRecord {
+  if (!record || typeof record !== 'object') return false
+  const appointment = (record as { appointment?: unknown }).appointment
+  if (!appointment || typeof appointment !== 'object') return false
+  const a = appointment as Partial<Appointment>
+  if (!a.id) return false
+  if (typeof a.date !== 'string' || !DATE_KEY_RE.test(a.date)) return false
+  if (typeof a.slot !== 'string' || !SLOT_RE.test(a.slot)) return false
+  if (!a.status || !APPOINTMENT_STATUSES.has(a.status)) return false
+  if (!a.type || !APPOINTMENT_TYPES.has(a.type)) return false
+  return true
 }
 
 /**
@@ -78,7 +115,7 @@ function persist() {
       appointment,
       autoConfirm: autoConfirmFlags.get(appointment.id) ?? false,
     }))
-    const state: PersistedState = { records, nextId }
+    const state: PersistedState = { version: SCHEMA_VERSION, records, nextId }
     store.setItem(STORAGE_KEY, JSON.stringify(state))
   } catch {
     /* Kota dolu ya da erişim engelli: bellek içi durum akışa devam eder. */
@@ -97,12 +134,15 @@ function hydrate() {
     if (!raw) return
     const parsed = JSON.parse(raw) as Partial<PersistedState> | null
     if (!parsed || !Array.isArray(parsed.records)) return
+    // Sürüm alanı yok (eski format) ya da farklı: bkz. SCHEMA_VERSION yorumu —
+    // tüm payload'ı at, boş listeyle devam et.
+    if (parsed.version !== SCHEMA_VERSION) return
 
     const nextAppointments: Appointment[] = []
     const nextFlags = new Map<string, boolean>()
     for (const record of parsed.records) {
-      const appointment = record?.appointment
-      if (!appointment || typeof appointment !== 'object' || !appointment.id) continue
+      if (!isValidPersistedRecord(record)) continue
+      const appointment = record.appointment
       const autoConfirm = Boolean(record.autoConfirm)
       nextFlags.set(appointment.id, autoConfirm)
       // Yarım kalmış onay zamanlayıcısı: sayfa 4sn dolmadan tam yenilendiyse
