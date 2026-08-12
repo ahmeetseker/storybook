@@ -70,7 +70,10 @@
 
 .plot {
   position: relative;
-  width: 100%;
+  /* İçsel genişlik nötrleme (bkz. GlassChart .plot): sabit px'lik SVG kabın
+     küçülmesini engellemesin — width: 0 içsel katkıyı sıfırlar. */
+  width: 0;
+  min-width: 100%;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
 }

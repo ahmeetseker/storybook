@@ -29,7 +29,13 @@
 
 .plot {
   position: relative;
-  width: 100%;
+  /* İçsel genişlik nötrleme: sabit px'lik Recharts SVG'si kartın
+     `min-width: auto` değerini şişirip grid hücresinin küçülmesini
+     engelliyordu (ölçüm eski genişlikte kilitleniyor, grafik karttan
+     taşıyordu). `width: 0` içsel katkıyı sıfırlar, gerçek genişlik
+     `min-width: 100%`'den gelir — kap daralınca ölçüm de daralır. */
+  width: 0;
+  min-width: 100%;
   touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
 }

@@ -215,7 +215,7 @@ export function GlassTrendChart({
               width={width}
               height={height}
               data={rows}
-              margin={{ top: 8, right: 8, bottom: 4, left: 0 }}
+              margin={{ top: 8, right: 16, bottom: 4, left: 0 }}
             >
               {showGrid ? (
                 <CartesianGrid vertical={false} stroke="var(--lg-hairline)" strokeWidth={1} />
@@ -231,9 +231,10 @@ export function GlassTrendChart({
                 tickMargin={8}
               />
               <YAxis
-                width={56}
+                width={44}
                 domain={['auto', 'auto']}
                 tickCount={4}
+                allowDecimals={false}
                 tickLine={false}
                 axisLine={false}
                 tick={AXIS_TICK}

@@ -102,14 +102,10 @@ export function GlassChart({
       : `${summaryLabel}: ${formatCompact(points[0].y)}'den ${formatCompact(points[lastIndex].y)}'ye`
 
   // Bar tabanı 0'dır (negatif yoksa) — eşit/az değişken serilerde sütunlar
-  // kaybolmasın; line/area veri aralığına oturur, %5 nefes payıyla.
+  // kaybolmasın. line/area 'auto': Recharts ölçeği YUVARLAK tiklere oturtur
+  // (12/9/5/1 gibi kırık değerler yerine 12/8/4/0) — elle %5 pay bunu bozuyordu.
   const yDomain: [unknown, unknown] =
-    type === 'bar'
-      ? [(dataMin: number) => Math.min(0, dataMin), 'auto']
-      : [
-          (dataMin: number) => (dataMin === 0 ? 0 : dataMin - Math.abs(dataMin) * 0.05),
-          (dataMax: number) => dataMax + Math.abs(dataMax) * 0.05,
-        ]
+    type === 'bar' ? [(dataMin: number) => Math.min(0, dataMin), 'auto'] : ['auto', 'auto']
 
   // Son nokta vurgusu: yalnız son index'te dolu daire + değer etiketi.
   const lastDot = (props: { cx?: number; cy?: number; index?: number }) => {
@@ -169,7 +165,7 @@ export function GlassChart({
               width={width}
               height={height}
               data={points}
-              margin={{ top: 24, right: 8, bottom: 4, left: 0 }}
+              margin={{ top: 24, right: 16, bottom: 4, left: 0 }}
               barCategoryGap="25%"
             >
               {type === 'area' ? (
@@ -195,9 +191,10 @@ export function GlassChart({
                 tickMargin={8}
               />
               <YAxis
-                width={56}
+                width={44}
                 domain={yDomain as [number, number]}
                 tickCount={4}
+                allowDecimals={false}
                 tickLine={false}
                 axisLine={false}
                 tick={AXIS_TICK}
