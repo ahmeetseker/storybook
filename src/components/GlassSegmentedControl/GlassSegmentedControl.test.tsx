@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { GlassSegmentedControl, type GlassSegmentedControlProps } from './GlassSegmentedControl'
 import { GlassTierProvider } from '../GlassSurface/GlassTierContext'
 
@@ -104,26 +104,5 @@ describe('GlassSegmentedControl', () => {
     const { container } = renderControl({})
     expect(container.querySelector('[class*="root"]')).not.toBeNull()
     expect(screen.getByRole('radiogroup')).not.toBeNull()
-  })
-
-  it('sıvı geçiş: seçim değişince damla süzülüş boyunca cam olur, sonra oturur', () => {
-    vi.useFakeTimers()
-    try {
-      const { container } = renderControl()
-      fireEvent.click(screen.getByRole('radio', { name: 'Harita' }))
-      expect(container.querySelector('[data-liquid]')).not.toBeNull()
-      act(() => {
-        vi.advanceTimersByTime(750)
-      })
-      expect(container.querySelector('[data-liquid]')).toBeNull()
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('sıvı geçiş: zaten seçili segmente tıklamak damlayı camlaştırmaz', () => {
-    const { container } = renderControl()
-    fireEvent.click(screen.getByRole('radio', { name: 'Liste' }))
-    expect(container.querySelector('[data-liquid]')).toBeNull()
   })
 })

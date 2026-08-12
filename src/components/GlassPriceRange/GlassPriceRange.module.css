@@ -168,46 +168,10 @@
   height: var(--price-thumb);
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  pointer-events: none;
-  /* Sıvı basış: büyüme yalnız transform'da — compositor'da kalır */
-  transition: transform var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
-}
-
-/* Sıvı basış (Apple liquid glass): beyaz disk ÜSTTE duran bir kapaktır
-   (::after — pseudo çocukların üstünde boyanır), altında basışta kurulan
-   GERÇEK mercek (.lens, GlassSurface displacement filtresi) yaşar. Basılınca
-   kapak 0.25'e söner ve mercek rayı bükerek görünür — Apple'ın süt beyazı
-   cam kolu. Geçişler yalnız opacity/transform'dadır (compositor). */
-.thumb::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
   background: var(--lg-surface);
   box-shadow: var(--lg-shadow-sm), 0 0 0 1px var(--lg-hairline);
-  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
-}
-/* Mercek: dış gölgeyi GlassSurface'in gölge kancasıyla taşır; girişte hızla
-   belirir (mount solmayı animation yapar — transition mount karesinde
-   koşmaz), bırakışta sönerek sökülür */
-.lens {
-  --lg-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
   pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
 }
-.thumb[data-liquid] .lens {
-  opacity: 1;
-  animation: lensIn 160ms var(--lg-motion-ease-standard, ease);
-}
-@keyframes lensIn {
-  from { opacity: 0; }
-}
-/* Sürüklerken: 1.25× büyür, kapak söner (beyaz tümüyle gitmez) */
-.thumb[data-liquid] {
-  transform: translate(-50%, -50%) scale(1.25);
-}
-.thumb[data-liquid]::after { opacity: 0.25; }
 
 .thumb[data-handle='min'] {
   left: var(--pos-min);
@@ -299,14 +263,4 @@
   .bound {
     transition: none;
   }
-  .thumb,
-  .thumb::after,
-  .lens { transition: none; animation: none; }
-  .thumb[data-liquid] { transform: translate(-50%, -50%); }
-}
-
-/* Saydamlık azaltılmışsa mercek gizlenir, beyaz kapak tam kalır */
-@media (prefers-reduced-transparency: reduce) {
-  .lens { display: none; }
-  .thumb[data-liquid]::after { opacity: 1; }
 }

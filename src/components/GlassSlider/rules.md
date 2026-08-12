@@ -150,19 +150,3 @@ sarmalayıcı boyutlandırması çözülürse.
   ölçeği küçülse de sabit). İmleçli cihazda görünür yükseklik 28px'te kaldı
   ama native input `inset-block` ile dikeyde 44px hedefe genişletildi
   (görsel değişiklik yok, sürükleme alanı 28→44px).
-- 2026-08-12: Sıvı basış (Apple liquid glass davranışı). Sürükleme boyunca
-  thumb cama dönüp 1.25× büyür (`data-liquid`: yarı saydam yüzey + backdrop
-  blur + specular rim), bırakınca beyaza oturur. Değer baloncuğu ters ölçekle
-  telafi edilir (büyümez). Native range pointer'ı örtük yakaladığı için
-  pointerup her durumda input'a düşer — pencere dinleyicisi yok.
-  `prefers-reduced-motion`'da büyüme yok; `prefers-reduced-transparency`'de
-  cam durum opak kalır.
-- 2026-08-12 (rev 2): Takılma düzeltmesi. background/box-shadow/backdrop-filter
-  transition'ı paint aşamasında donmaya yol açıyordu; thumb artık iki sabit
-  katman (`::before` beyaz disk / `::after` cam disk) ve geçiş yalnız
-  transform (büyüme) + opacity crossfade (compositor).
-- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
-  okunmuyordu; basışta/süzülüşte beyaz kapağın altına gerçek GlassSurface
-  (displacement filtresi) monte edilir, kapak sönerek merceği gösterir.
-  Mercek DOM'da sürekli durmaz — durum bitince sökülür (boşta filtre
-  maliyeti yok). `prefers-reduced-transparency`'de mercek hiç kurulmaz.

@@ -191,20 +191,3 @@ LongContent, Mobile (viewport).
 - 2026-08-08 — `iconOnly` prop'u: etiketler clip ile yalnız ekran okuyucuya
   iner, segment ikonla temsil edilir (her seçenek `icon` taşımalı). İlk
   kullanım: /emlak mobil araç kartındaki Sonuçlar/Harita modu.
-- 2026-08-12 — Sıvı geçiş (Apple liquid glass davranışı). Seçim değişince
-  damla FLIP süzülüşü boyunca cama döner (`data-liquid`: yarı saydam yüzey +
-  backdrop blur + specular rim), yeni segmente varınca (layout animasyonu
-  bitince ya da 700ms emniyet tavanında) opak dolguya oturur. Seçili segment
-  basılı tutulurken de aynı cam görünüm (`:active`, salt CSS). Tüm
-  varyantlarda (`capsule`/`bar`/`track`) geçerli; `prefers-reduced-motion`'da
-  kurulmaz, `prefers-reduced-transparency`'de cam durum opak kalır.
-- 2026-08-12 (rev 2): Takılma düzeltmesi. background/box-shadow/backdrop-filter
-  transition'ı paint aşamasında donmaya yol açıyordu; damla artık iki sabit alt
-  katman (`::before` opak pil / `::after` cam pil) ve geçiş yalnız opacity
-  crossfade (compositor). Opak pilin border'ı inset ring gölgeye taşındı —
-  crossfade tek özellikte kalır.
-- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
-  okunmuyordu; basışta/süzülüşte beyaz kapağın altına gerçek GlassSurface
-  (displacement filtresi) monte edilir, kapak sönerek merceği gösterir.
-  Mercek DOM'da sürekli durmaz — durum bitince sökülür (boşta filtre
-  maliyeti yok). `prefers-reduced-transparency`'de mercek hiç kurulmaz.

@@ -6,7 +6,6 @@
 // parçasıdır: seçili banda düşen sütunlar vurgulanır, kullanıcı aralığı
 // seçmeden ÖNCE yoğunluğun nerede olduğunu görür (bkz. rules.md §1).
 import {
-  useEffect,
   useId,
   useLayoutEffect,
   useRef,
@@ -17,7 +16,6 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react'
-import { GlassSurface } from '../GlassSurface'
 import styles from './GlassPriceRange.module.css'
 
 /** `[enDüşük, enYüksek]` — her zaman artan sırada normalize edilir */
@@ -105,24 +103,6 @@ export function GlassPriceRange({
   const rawId = useId()
   const labelId = `pr-${rawId.replace(/[^a-zA-Z0-9]/g, '')}`
   const [inner, setInner] = useState<GlassPriceRangeValue>(defaultValue ?? [min, max])
-
-  // Sıvı basış (Apple liquid glass): sürüklenen kolun thumb'ı cama dönüp büyür.
-  // Native range pointer'ı örtük yakalar — bırakış nerede olursa olsun pointerup
-  // aynı input'a düşer, ayrıca pencere dinleyicisi gerekmez.
-  const [activeHandle, setActiveHandle] = useState<0 | 1 | null>(null)
-
-  // Mercek yaşam döngüsü (GlassSlider ile aynı gerekçe): gerçek refraction
-  // sürekli DOM'da durmaz; basışta kurulur, bırakışta solma bitene dek yaşar.
-  const [lensHandle, setLensHandle] = useState<0 | 1 | null>(null)
-  useEffect(() => {
-    if (activeHandle !== null) {
-      setLensHandle(activeHandle)
-      return
-    }
-    if (lensHandle === null) return
-    const t = setTimeout(() => setLensHandle(null), 320)
-    return () => clearTimeout(t)
-  }, [activeHandle, lensHandle])
 
   const span = max - min
   const gap = minGap ?? step
@@ -246,11 +226,6 @@ export function GlassPriceRange({
 
   const classes = [styles.root, disabled ? styles.disabled : '', className].filter(Boolean).join(' ')
 
-  const handlePointerDown = (handle: 0 | 1) => () => {
-    if (!disabled) setActiveHandle(handle)
-  }
-  const releaseHandle = () => setActiveHandle(null)
-
   const rangeInput = (handle: 0 | 1) => (
     <input
       type="range"
@@ -262,9 +237,6 @@ export function GlassPriceRange({
       value={current[handle]}
       onChange={handleChange(handle)}
       onKeyDown={handleKeyDown(handle)}
-      onPointerDown={handlePointerDown(handle)}
-      onPointerUp={releaseHandle}
-      onPointerCancel={releaseHandle}
       disabled={disabled}
       aria-label={`${baseName}: ${handle === 0 ? 'en düşük' : 'en yüksek'}`}
       aria-valuetext={formatValue(current[handle])}
@@ -315,27 +287,8 @@ export function GlassPriceRange({
         </span>
         {rangeInput(0)}
         {rangeInput(1)}
-        {([0, 1] as const).map((handle) => (
-          <span
-            key={handle}
-            className={styles.thumb}
-            data-handle={handle === 0 ? 'min' : 'max'}
-            data-liquid={activeHandle === handle || undefined}
-            aria-hidden="true"
-          >
-            {/* Gerçek mercek: rayı büken displacement filtresi — beyaz kapak
-                (::after) basılıyken sönerek altındaki camı gösterir */}
-            {lensHandle === handle ? (
-              <GlassSurface
-                as="span"
-                shape="capsule"
-                thickness={1}
-                className={styles.lens}
-                style={{ position: 'absolute', inset: 0 }}
-              />
-            ) : null}
-          </span>
-        ))}
+        <span className={styles.thumb} data-handle="min" aria-hidden="true" />
+        <span className={styles.thumb} data-handle="max" aria-hidden="true" />
       </div>
 
       {/* Skala satırı ekran okuyucudan gizli: alan sınırları `aria-valuemin/max`,

@@ -222,16 +222,3 @@ sürüklenirken canlı sonuç sayısını debounce'lu duyurması.
   karşılığı: histogram + çift kol + kolları izleyen değer pilleri tek
   sözleşmede toplandı. `GlassSlider` tek kollu kaldı, `GlassDistributionChart`
   okuma yüzeyi olarak ayrıldı.
-- 2026-08-12 — Sıvı basış (Apple liquid glass davranışı). Sürüklenen kolun
-  thumb'ı cama dönüp 1.25× büyür (`data-liquid`: yarı saydam yüzey + backdrop
-  blur + specular rim), bırakınca beyaza oturur; diğer kol etkilenmez.
-  GlassSlider ile aynı reçete. `prefers-reduced-motion`'da büyüme yok;
-  `prefers-reduced-transparency`'de cam durum opak kalır.
-- 2026-08-12 (rev 2): Takılma düzeltmesi — GlassSlider ile aynı: iki sabit
-  katman (`::before` beyaz / `::after` cam), geçiş yalnız transform + opacity
-  crossfade (compositor); paint transition'ları kaldırıldı.
-- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
-  okunmuyordu; basışta/süzülüşte beyaz kapağın altına gerçek GlassSurface
-  (displacement filtresi) monte edilir, kapak sönerek merceği gösterir.
-  Mercek DOM'da sürekli durmaz — durum bitince sökülür (boşta filtre
-  maliyeti yok). `prefers-reduced-transparency`'de mercek hiç kurulmaz.

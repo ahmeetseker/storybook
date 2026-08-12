@@ -73,19 +73,4 @@ describe('GlassSlider', () => {
     expect(input.getAttribute('aria-valuetext')).toBe('%75')
     expect(screen.getByText('%75')).toBeTruthy()
   })
-
-  it('sıvı basış: sürükleme boyunca thumb cam (data-liquid), bırakınca temizlenir', () => {
-    const { container } = renderSlider({ min: 0, max: 100, defaultValue: 40 })
-    const input = screen.getByRole('slider')
-    fireEvent.pointerDown(input)
-    expect(container.querySelector('[data-liquid]')).not.toBeNull()
-    fireEvent.pointerUp(input)
-    expect(container.querySelector('[data-liquid]')).toBeNull()
-  })
-
-  it('sıvı basış: disabled iken pointer thumb durumunu değiştirmez', () => {
-    const { container } = renderSlider({ disabled: true })
-    fireEvent.pointerDown(screen.getByRole('slider'))
-    expect(container.querySelector('[data-liquid]')).toBeNull()
-  })
 })

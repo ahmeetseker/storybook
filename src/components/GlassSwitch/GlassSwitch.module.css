@@ -43,50 +43,11 @@
 }
 
 .thumb {
-  position: relative;
   width: var(--lg-switch-thumb);
   height: var(--lg-switch-thumb);
-  border-radius: var(--lg-radius-capsule, 999px); /* daire = kapsülün özel hali; uzama kapsülde kalır */
-}
-
-/* Sıvı basış (Apple liquid glass): beyaz disk ÜSTTE duran bir kapaktır
-   (::after — pseudo çocukların üstünde boyanır), altında basışta kurulan
-   GERÇEK mercek (.lens, GlassSurface displacement filtresi) yaşar. Basılınca
-   kapak 0.25'e söner ve mercek rayı bükerek görünür — Apple'ın süt beyazı
-   cam kolu. Geçişler yalnız opacity/transform'dadır (compositor). */
-.thumb::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  border-radius: 50%;
   background: #fff; /* beyaz thumb — bilinçli raw (cam üstü kontrast) */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.15);
-  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
-}
-/* Mercek: dış gölgeyi GlassSurface'in gölge kancasıyla taşır; girişte hızla
-   belirir (mount solmayı animation yapar), bırakışta sönerek sökülür */
-.lens {
-  --lg-surface-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--lg-motion-duration-normal, 240ms) var(--lg-motion-ease-standard, ease);
-}
-.thumb[data-liquid] .lens {
-  opacity: 1;
-  animation: lensIn 160ms var(--lg-motion-ease-standard, ease);
-}
-@keyframes lensIn {
-  from { opacity: 0; }
-}
-/* Basılıyken/süzülürken: kapak söner ama beyaz tümüyle gitmez (Apple'da cam
-   hâlâ süt beyazı taşır) */
-.thumb[data-liquid]::after { opacity: 0.25; }
-
-/* Basılı tutarken thumb hareket yönüne doğru uzar: ray hizası (flex) sabit
-   kenarı tutar, genişleme serbest uca akar — kapalıyken sağa, açıkken sola.
-   Genişlik motion layout FLIP'iyle (transform) animasyonlanır, paint yok. */
-.thumb[data-pressed] {
-  width: calc(var(--lg-switch-thumb) * 1.35);
 }
 
 /* Dokunmatik: ray ve thumb parmak için büyür.
@@ -103,13 +64,4 @@
 
 @media (prefers-reduced-motion: reduce) {
   .root { transition: none; }
-  .thumb::after,
-  .lens { transition: none; animation: none; }
-  .thumb[data-pressed] { width: var(--lg-switch-thumb); }
-}
-
-/* Saydamlık azaltılmışsa mercek gizlenir, beyaz kapak tam kalır */
-@media (prefers-reduced-transparency: reduce) {
-  .lens { display: none; }
-  .thumb[data-liquid]::after { opacity: 1; }
 }

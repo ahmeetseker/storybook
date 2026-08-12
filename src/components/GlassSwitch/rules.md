@@ -122,9 +122,6 @@ MobileSettings (viewport: mobile1).
 - [x] disabled aktivasyonu engeller
 - [x] controlled değer dışarıdan yönetilir
 - [x] tint CSS var + type=button
-- [x] sıvı basış: pointer basılıyken `data-liquid` + `data-pressed`, bırakınca temiz
-- [x] sıvı geçiş: toggle süzülüşünde `data-liquid`, bitince temiz
-- [x] disabled iken sıvı durum kurulmaz
 - [ ] reduced-motion'da spring kapalı (visual)
 
 ## 12. Do / Don't
@@ -145,27 +142,3 @@ değerlendirilecek.
   (`.root::after`) kaldırıldı — kök GlassSurface'in `overflow: hidden`'ı
   nedeniyle hiç çalışmıyordu (ölü kod). Ray/thumb ölçüleri değişmedi;
   gerçek hedef ve AAA 2.5.5 kısıtı §9'da açıkça belgelendi.
-- 2026-08-12: Sıvı basış (Apple liquid glass davranışı). Basılı tutarken thumb
-  cama döner (yarı saydam yüzey + backdrop blur + specular rim) ve hareket
-  yönüne %35 uzar (`data-pressed`); toggle süzülüşü boyunca cam kalır
-  (`data-liquid`), yeni uca varınca (layout animasyonu bitince ya da 700ms
-  emniyet tavanında) beyaza oturur. `prefers-reduced-motion`'da uzama ve
-  geçiş yok; `prefers-reduced-transparency`'de cam durum opak kalır. Thumb
-  border-radius'u 50%'den kapsül token'ına alındı — daire, kapsülün özel hali;
-  uzama sırasında köşe morph'u oluşmaz.
-- 2026-08-12 (rev 2): Takılma düzeltmesi + kapsül liquefy. İlk sürüm
-  background/box-shadow/backdrop-filter'ı transition'lıyordu — paint
-  aşamasında her kare backdrop yeniden süzülüyor, düşük güçlü cihazda
-  donuyordu. Thumb artık İKİ sabit katman (`::before` beyaz disk / `::after`
-  cam disk) ve geçiş yalnız opacity crossfade (compositor). Ayrıca kapsüle
-  `useGlassPress` bağlandı (GlassButton dili): basınca lens kırılması artar
-  (`displacementScale`), gövde jöle yayıyla 0.96'ya çöker — Denetim
-  Merkezi'ndeki "hafif efekt".
-- 2026-08-12 (rev 3): Gerçek mercek. Blur tabanlı cam beyaz zeminde
-  okunmuyordu (beyazın blur'u beyazdır); Apple'daki görünürlük merceğin rayı
-  BÜKMESİNDEN gelir. Thumb'ın beyaz diski üstte kapak oldu (`::after`),
-  basışta altına gerçek GlassSurface (displacement filtresi) monte edilir ve
-  kapak 0.25'e söner. Mercek DOM'da sürekli durmaz — basışta kurulur
-  (haritalar boyuta göre cache'li), bırakış solması bitince sökülür (boşta
-  filtre maliyeti yok). `prefers-reduced-transparency`'de mercek hiç
-  kurulmaz, kapak tam kalır.
