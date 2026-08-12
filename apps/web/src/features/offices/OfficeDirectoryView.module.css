@@ -38,24 +38,52 @@
 .cardList, .skeletonList { display: grid; gap: var(--lg-space-3); margin-block-start: var(--lg-space-4); }
 .loadingLabel { color: var(--lg-label-secondary); font-size: var(--lg-text-footnote); margin: 0; }
 .resultCard, .skeletonCard, .insightPanel, .insightEmpty { background: var(--lg-surface); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-card); }
-.resultCard { padding: var(--lg-space-4); }
+/* Referans kart düzeni: üstte pastel tonlu panel, altta beyaz aksiyon şeridi.
+   Panel tonları mevcut semantik renklerden %5-7 karışımla türer (ham renk yok)
+   ve kart sırasına göre döner — komşu kartlar aynı tonda görünmez. */
+.resultCard { padding: var(--lg-space-2); }
+.cardTint {
+  background: color-mix(in srgb, var(--lg-accent) 6%, var(--lg-surface));
+  border-radius: calc(var(--lg-radius-card) - var(--lg-space-1));
+  padding: var(--lg-space-4);
+}
+.resultCard[data-hue='success'] .cardTint { background: color-mix(in srgb, var(--lg-success) 7%, var(--lg-surface)); }
+.resultCard[data-hue='warning'] .cardTint { background: color-mix(in srgb, var(--lg-warning) 7%, var(--lg-surface)); }
+.resultCard[data-hue='neutral'] .cardTint { background: color-mix(in srgb, var(--lg-label) 5%, var(--lg-surface)); }
 .cardTopline { margin-block-end: var(--lg-space-3); }
+/* Rozet: pastel panel üstünde beyaz kapsül çip */
+.cardTopline .matchScore {
+  background: var(--lg-surface);
+  border-radius: var(--lg-radius-capsule, 999px);
+  padding: var(--lg-space-1) var(--lg-space-3);
+}
 .insightTrigger, .compareButton, .closeButton { background: transparent; border: 0; color: var(--lg-label-secondary); cursor: pointer; font: inherit; min-height: var(--lg-control-sm); padding-inline: var(--lg-space-2); }
 .insightTrigger, .compareButton { color: var(--lg-accent); font-size: var(--lg-text-footnote); font-weight: 600; }
 .compareButton[disabled] { color: var(--lg-label-secondary); cursor: not-allowed; }
 .cardMeta { color: var(--lg-label-secondary); font-size: var(--lg-text-caption); margin-block-start: var(--lg-space-3); }
-.evidenceBadge { align-self: start; background: var(--lg-bg); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-chip); color: var(--lg-label-secondary); font-size: var(--lg-text-badge); padding: var(--lg-space-1) var(--lg-space-2); }
-.cardActions { align-items: center; border-block-start: var(--lg-stroke-hairline) solid var(--lg-hairline); padding-block-start: var(--lg-space-3); }
-.cardIdentity { display: flex; gap: var(--lg-space-3); align-items: flex-start; }
-.cardLogo, .cardLogoFallback { width: 44px; height: 44px; border-radius: 12px; }
-.cardLogoFallback { display: grid; place-items: center; font-weight: 600; background: var(--lg-surface-2, rgba(0, 0, 0, .06)); }
-.cardName { margin: 0; display: flex; gap: var(--lg-space-1); align-items: center; }
+.evidenceBadge { align-self: start; background: var(--lg-surface); border: var(--lg-stroke-hairline) solid var(--lg-hairline); border-radius: var(--lg-radius-chip); color: var(--lg-label-secondary); font-size: var(--lg-text-badge); padding: var(--lg-space-1) var(--lg-space-2); }
+.cardIdentity { display: flex; gap: var(--lg-space-4); align-items: flex-start; justify-content: space-between; }
+.cardWho { min-width: 0; }
+.cardLogo, .cardLogoFallback { flex-shrink: 0; width: 56px; height: 56px; border-radius: var(--lg-radius-media, 16px); }
+.cardLogoFallback { display: grid; place-items: center; font-weight: 600; background: var(--lg-surface); border: var(--lg-stroke-hairline) solid var(--lg-hairline); color: var(--lg-label-secondary); }
+.cardName { margin: 0; display: flex; gap: var(--lg-space-1); align-items: center; font-size: var(--lg-text-headline); }
 .verifiedMark { color: var(--lg-success, #2c7a4b); }
-.cardTagline { margin: 0; font-size: .9rem; opacity: .75; }
-.cardStats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--lg-space-2); margin: var(--lg-space-3) 0 0; }
-.cardStats dt { font-size: .75rem; opacity: .65; }
-.cardStats dd { margin: 0; font-weight: 600; }
-.cardAvailability { color: var(--lg-label-secondary); margin: var(--lg-space-2) 0 0; font-size: .85rem; }
+.cardTagline { margin: var(--lg-space-1) 0 0; font-size: var(--lg-text-footnote); color: var(--lg-label-secondary); }
+/* İkonlu metrik satırı: 83 ilan · 9 dk yanıt · ★ 4.8 (312) */
+.cardMetrics { display: flex; align-items: center; flex-wrap: wrap; gap: var(--lg-space-2); margin: var(--lg-space-4) 0 0; font-size: var(--lg-text-footnote); font-weight: 600; }
+.metric { display: inline-flex; align-items: center; gap: var(--lg-space-1); }
+.metric svg { opacity: 0.7; }
+.metricDot { color: var(--lg-label-secondary); }
+/* Eşleşme çubuğu: koyu dolgu (referans dili), ray sönük mürekkep */
+.cardProgress { margin-block-start: var(--lg-space-4); }
+.progressHead { display: flex; align-items: center; justify-content: space-between; font-size: var(--lg-text-footnote); margin-block-end: var(--lg-space-2); }
+.progressHead strong { font-variant-numeric: tabular-nums; }
+.progressTrack { display: block; height: 4px; border-radius: var(--lg-radius-capsule, 999px); background: color-mix(in srgb, var(--lg-label) 12%, transparent); overflow: hidden; }
+.progressFill { display: block; height: 100%; border-radius: inherit; background: var(--lg-label); }
+/* Alt şerit: müsaitlik solda, aksiyonlar sağda — dar kartta alt alta sarar */
+.cardFooter { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--lg-space-3); padding: var(--lg-space-3) var(--lg-space-2) var(--lg-space-1); }
+.cardActions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--lg-space-2); }
+.cardAvailability { color: var(--lg-label-secondary); margin: 0; font-size: var(--lg-text-footnote); }
 .skeletonCard { align-items: center; display: grid; gap: var(--lg-space-3); grid-template-columns: auto minmax(0, 1fr); padding: var(--lg-space-4); }
 .insightPanel, .insightEmpty { padding: var(--lg-space-5); }
 .insightEmpty { color: var(--lg-label-secondary); }

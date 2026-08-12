@@ -330,9 +330,35 @@ function OfficeInsightPanel({
   )
 }
 
+// Pastel panel tonları (referans kart dili): sırayla döner, hepsi mevcut
+// semantik renklerden %6-7 karışımla türer — ham renk yok.
+const CARD_HUES = ['accent', 'success', 'neutral', 'warning'] as const
+type CardHue = (typeof CARD_HUES)[number]
+
+const ListingsIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="M9 9h6M9 13h6M9 17h3" />
+  </svg>
+)
+
+const ClockIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="8.25" />
+    <path d="M12 8v4.4l2.8 1.6" />
+  </svg>
+)
+
+const StarIcon = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="m12 4.6 2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 9.9l5-.7z" />
+  </svg>
+)
+
 function OfficeResultCard({
   office,
   match,
+  hue,
   compared,
   compareLimitReached,
   onSelect,
@@ -341,6 +367,7 @@ function OfficeResultCard({
 }: {
   office: OfficeSummary
   match?: OfficeMatch
+  hue: CardHue
   compared: boolean
   compareLimitReached: boolean
   onSelect: () => void
@@ -357,55 +384,76 @@ function OfficeResultCard({
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
   return (
-    <article className={styles.resultCard} aria-label={`${office.name} ofisi`}>
-      <div className={styles.cardTopline}>
-        {match ? <span className={styles.matchScore}>%{match.score} eşleşme</span> : <span className={styles.matchScore}>Profil eşleşmesi</span>}
-        <button type="button" className={styles.insightTrigger} onClick={onSelect} aria-label={`${office.name} içgörülerini aç`}>
-          Neden önerildi?
-        </button>
-      </div>
-      <div className={styles.cardIdentity}>
-        {office.logoSrc ? (
-          <img className={styles.cardLogo} src={office.logoSrc} alt="" />
-        ) : (
-          <span className={styles.cardLogoFallback} aria-hidden>{office.name.slice(0, 2).toUpperCase()}</span>
-        )}
-        <div>
-          <h3 className={styles.cardName}>
-            {office.name}
-            {office.verified ? (
-              <span
-                className={styles.verifiedMark}
-                role="img"
-                aria-label={office.verifiedBy ? `Doğrulanmış kurumsal ofis: ${office.verifiedBy}` : 'Doğrulanmış kurumsal ofis'}
-                title={office.verifiedBy ?? 'Doğrulanmış'}
-              >
-                ✓
-              </span>
-            ) : null}
-          </h3>
-          <p className={styles.cardTagline}>{office.tagline}</p>
+    <article className={styles.resultCard} data-hue={hue} aria-label={`${office.name} ofisi`}>
+      {/* Üst bölge: pastel panel — rozet, kimlik, ikonlu metrikler, eşleşme çubuğu */}
+      <div className={styles.cardTint}>
+        <div className={styles.cardTopline}>
+          {match ? <span className={styles.matchScore}>%{match.score} eşleşme</span> : <span className={styles.matchScore}>Profil eşleşmesi</span>}
+          <button type="button" className={styles.insightTrigger} onClick={onSelect} aria-label={`${office.name} içgörülerini aç`}>
+            Neden önerildi?
+          </button>
+        </div>
+        <div className={styles.cardIdentity}>
+          <div className={styles.cardWho}>
+            <h3 className={styles.cardName}>
+              {office.name}
+              {office.verified ? (
+                <span
+                  className={styles.verifiedMark}
+                  role="img"
+                  aria-label={office.verifiedBy ? `Doğrulanmış kurumsal ofis: ${office.verifiedBy}` : 'Doğrulanmış kurumsal ofis'}
+                  title={office.verifiedBy ?? 'Doğrulanmış'}
+                >
+                  ✓
+                </span>
+              ) : null}
+            </h3>
+            <p className={styles.cardTagline}>{office.tagline}</p>
+          </div>
+          {office.logoSrc ? (
+            <img className={styles.cardLogo} src={office.logoSrc} alt="" />
+          ) : (
+            <span className={styles.cardLogoFallback} aria-hidden>{office.name.slice(0, 2).toUpperCase()}</span>
+          )}
+        </div>
+        <p className={styles.cardMetrics}>
+          <span className={styles.metric}><ListingsIcon /> {office.activeListings} ilan</span>
+          <span className={styles.metricDot} aria-hidden>·</span>
+          <span className={styles.metric}><ClockIcon /> {office.responseMinutes} dk yanıt</span>
+          <span className={styles.metricDot} aria-hidden>·</span>
+          <span className={styles.metric}><StarIcon /> {office.rating} ({office.reviewCount})</span>
+        </p>
+        {match ? (
+          // Skor metin olarak zaten duyuruluyor; çubuk dekoratif kalır.
+          <div className={styles.cardProgress} aria-hidden>
+            <div className={styles.progressHead}>
+              <span>Eşleşme</span>
+              <strong>%{match.score}</strong>
+            </div>
+            <div className={styles.progressTrack}>
+              <span className={styles.progressFill} style={{ width: `${match.score}%` }} />
+            </div>
+          </div>
+        ) : null}
+        <div className={styles.cardMeta}>
+          <span>{office.districts.slice(0, 2).join(' · ')}</span>
+          {evidence ? <span className={styles.evidenceBadge} title={evidence.value}>{EVIDENCE_SOURCE_LABELS[evidence.source]} · {evidence.label}</span> : null}
+          <span>{office.lastActiveLabel}</span>
         </div>
       </div>
-      <dl className={styles.cardStats}>
-        <div><dt>Aktif ilan</dt><dd>{office.activeListings}</dd></div>
-        <div><dt>Yanıt</dt><dd>{office.responseMinutes} dk</dd></div>
-        <div><dt>Puan</dt><dd>{office.rating} ({office.reviewCount})</dd></div>
-      </dl>
-      <p className={styles.cardAvailability}>
-        {mounted ? availabilityPreview(office.id, new Date()) : 'Müsaitlik yükleniyor…'}
-      </p>
-      <div className={styles.cardMeta}>
-        <span>{office.districts.slice(0, 2).join(' · ')}</span>
-        {evidence ? <span className={styles.evidenceBadge} title={evidence.value}>{EVIDENCE_SOURCE_LABELS[evidence.source]} · {evidence.label}</span> : null}
-        <span>{office.lastActiveLabel}</span>
-      </div>
-      <div className={styles.cardActions}>
-        <GlassButton prominent onClick={() => onStartAction('meeting')}>Görüşme talep et</GlassButton>
-        <GlassButton material="flat" onClick={() => onStartAction('message')}>Mesaj</GlassButton>
-        <button type="button" className={styles.compareButton} onClick={onToggleCompare} disabled={!compared && compareLimitReached}>
-          {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
-        </button>
+
+      {/* Alt bölge: beyaz şerit — müsaitlik solda, aksiyonlar sağda */}
+      <div className={styles.cardFooter}>
+        <p className={styles.cardAvailability}>
+          {mounted ? availabilityPreview(office.id, new Date()) : 'Müsaitlik yükleniyor…'}
+        </p>
+        <div className={styles.cardActions}>
+          <button type="button" className={styles.compareButton} onClick={onToggleCompare} disabled={!compared && compareLimitReached}>
+            {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
+          </button>
+          <GlassButton material="flat" onClick={() => onStartAction('message')}>Mesaj</GlassButton>
+          <GlassButton prominent onClick={() => onStartAction('meeting')}>Görüşme talep et</GlassButton>
+        </div>
       </div>
     </article>
   )
@@ -587,10 +635,11 @@ export function OfficeDirectoryView({
           {status !== 'loading' && status !== 'error' && response?.items.length === 0 ? <GlassEmptyState title="Bu filtrelerle eşleşen ofis bulunamadı" description="Niyetinizi veya uzmanlık filtrelerinizi genişletmeyi deneyin." /> : null}
           {status !== 'loading' && status !== 'error' && response?.items.length ? (
             <div className={styles.cardList}>
-              {response.items.map((office) => (
+              {response.items.map((office, index) => (
                 <OfficeResultCard
                   key={office.id}
                   office={office}
+                  hue={CARD_HUES[index % CARD_HUES.length]}
                   match={matchIndex.get(office.id)}
                   compared={compareIds.includes(office.id)}
                   compareLimitReached={compareLimitReached}
