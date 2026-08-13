@@ -32,6 +32,7 @@ export function AiChatLauncher() {
   const [mesajlar, setMesajlar] = useState<GlassChatDockMessage[]>([KARSILAMA])
   const fabRef = useRef<HTMLButtonElement>(null)
   const sayacRef = useRef(0)
+  const sonMesaj = mesajlar[mesajlar.length - 1]
 
   const gonder = (text: string) => {
     const n = ++sayacRef.current
@@ -85,7 +86,11 @@ export function AiChatLauncher() {
           onSend={gonder}
           title="AI danışman"
           placeholder="Arsa arayışınızı anlatın…"
-          composerOrnament={<AiOrb />}
+          composerOrnament={
+            // Motor yanıt üretirken küre niyetin durumuna geçer (searching/
+            // solving/…); boştayken sakin 'breathing' durur.
+            <AiOrb state={sonMesaj?.pending ? (sonMesaj.pendingState ?? 'working') : 'breathing'} />
+          }
           placeholders={[
             'Arsa arayışınızı anlatın…',
             'Urla’da denize yakın imarlı parsel…',
