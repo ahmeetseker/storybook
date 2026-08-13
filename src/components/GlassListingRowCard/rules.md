@@ -297,3 +297,12 @@ DOM değişmezine bağlıdır.
   genişliğinden ayrıştı: çağıran `--row-thumb-w`'yi yüzdeyle verebilir
   (EmlakSearchView dar kapta ~%38 kullanır), px tabanı `--row-thumb-min-h`
   taşır; değişken verilmezse eski kare taban korunur.
+- 2026-08-13: Hesap alanı kartları pazar yeriyle aynı `media="thumb"`
+  görünümüne geçti; bunun ortaya çıkardığı iki avatarsız-kullanım hatası
+  düzeltildi: (1) sm+thumb künye küçültme kuralı `> :first-child` ile ilk
+  çocuğu avatar sanıyordu — `agent` verilmeyince metin kolonu 24px'e
+  sıkışıp "Bugün güncellendi" harf harf kırılıyordu; seçici
+  `:not(.agentText)` ile yalnız avatarı hedefler. (2) sm+thumb'da
+  `footerMeta` gizleme kuralı `:has(.agentName)` koşuluna bağlandı —
+  satıcı kimliği yoksa (hesap kartı) meta ile yarışan isim de yoktur,
+  "İlan no" görünür kalır.

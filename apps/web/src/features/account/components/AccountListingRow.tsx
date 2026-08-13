@@ -66,6 +66,10 @@ export function AccountListingRow({
     <GlassListingRowCard
       data-state={listing.state}
       size={size}
+      // Pazar yerindeki liste kartıyla AYNI görünüm: /emlak `media="thumb"`
+      // kullanır — hesap alanı varsayılan `wide`da (yarım-görsel) kalınca
+      // aynı ilan iki yerde bambaşka görünüyordu.
+      media="thumb"
       headingAs={headingAs}
       image={{ src: listing.imageSrc ?? FALLBACK_IMAGE, alt: listing.imageAlt }}
       badge={

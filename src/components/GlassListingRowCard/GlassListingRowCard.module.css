@@ -610,13 +610,19 @@
 
 /* En yoğun kademe (sm + thumb, 108px görsel): ayakta isim ile m² fiyatı
    aynı anda sığmıyor; öncelik SATICI KİMLİĞİNDE — birim fiyat ana fiyatın
-   türevidir ve detayda zaten var. Geniş thumb kademelerinde meta geri gelir. */
-.card[data-size='sm'][data-media='thumb'] .footerMeta {
+   türevidir ve detayda zaten var. Geniş thumb kademelerinde meta geri gelir.
+   Koşul `:has(.agentName)`: satıcı kimliği YOKSA (hesap alanı kartı yalnız
+   güncellenme + ilan no taşır) yarışan bir isim de yoktur — meta gizlenmez,
+   yoksa ayağın sağ ucu bomboş kalıyordu. */
+.card[data-size='sm'][data-media='thumb'] .footer:has(.agentName) .footerMeta {
   display: none;
 }
 
-/* Aynı kademede künye bir adım küçülür ki isim üç harfte kırpılmasın. */
-.card[data-size='sm'][data-media='thumb'] .agent > *:first-child {
+/* Aynı kademede künye (avatar) bir adım küçülür ki isim üç harfte kırpılmasın.
+   Seçici `:not(.agentText)`: avatar yalnız `agent` verilince render edilir —
+   verilmeyince ilk çocuk metin kolonudur ve 24px'e sabitlenirse "Bugün
+   güncellendi" harf harf kırılıyordu (hesap alanı regresyonu). */
+.card[data-size='sm'][data-media='thumb'] .agent > :first-child:not(.agentText) {
   width: var(--lg-space-6);
   min-width: var(--lg-space-6);
   height: var(--lg-space-6);
