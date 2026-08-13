@@ -1,15 +1,21 @@
-// AI küresi — composer kapsülünün solundaki marka küresi. Dış asset (gif)
-// yerine tamamen token türevi renklerle CSS'te çizilir: zemin `--lg-accent`
-// kahvesinin radyal degradesi, üstünde yavaşça dönen bir parlama şeridi
-// (yalnız transform animasyonu; prefers-reduced-motion'da durağan).
-// Salt dekoratif — GlassChatDock'un composerOrnament yuvası kapsayıcıyı
-// zaten aria-hidden işaretler.
+// AI küresi — OrbInput'taki ORİJİNAL animasyonlu küre gif'i, CSS filtresiyle
+// marka kahvesine ("Görüşme talep et" CTA tonu) boyanır: görünüm/animasyon
+// aynı, yalnız renk değişir. Gif yüklenemezse alttaki token türevi kahve
+// küre yedek olarak görünür. Salt dekoratif — GlassChatDock'un
+// composerOrnament yuvası kapsayıcıyı zaten aria-hidden işaretler.
 import styles from './AiOrb.module.css'
 
 export function AiOrb() {
   return (
     <span className={styles.orb}>
-      <span className={styles.sheen} />
+      <img
+        className={styles.gif}
+        src="https://media.giphy.com/media/26gsuUjoEBmLrNBxC/giphy.gif"
+        alt=""
+        onError={(e) => {
+          e.currentTarget.style.display = 'none'
+        }}
+      />
     </span>
   )
 }
