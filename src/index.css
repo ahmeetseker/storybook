@@ -152,6 +152,24 @@
     var(--lg-space-8)
   );
 
+  /* Sayfa container STANDARDI — tüm rotaların ortak genişlik formülü.
+     Kademeli genişlikler (narrow/base/wide) rotalar arasında yatay kayma
+     üretiyordu; içerik artık her sayfada aynı kurala oturur: ~%80, merkezli.
+
+     Yüzde, kullanım yerindeki kapsayıcı bloğa göre çözülür — pazar yeri
+     kabuğunda viewport, hesap kabuğunda soldaki ray düşüldükten sonra kalan
+     sütun. Böylece raylı ekranlar da aynı orana uyar.
+
+     Tek formülde üç davranış:
+     - dar ekran  (%80 < narrow tabanı): kap `min(100%, …)` ile kenara dayanır,
+       yatay ritim yalnız --lg-container-gutter'dan gelir (iki yanda eşit)
+     - orta/geniş: içerik ~%80, kalan boşluk iki yana eşit dağılır
+     - çok geniş  (%80 > wide tavanı): wide'da durur, satırlar sonsuz uzamaz */
+  --lg-container-page: min(
+    max(80%, var(--lg-container-narrow)),
+    var(--lg-container-wide)
+  );
+
   /* Kontrol yükseklikleri — GÖRÜNÜR ölçü.
 
      WCAG 2.2 AAA 2.5.5 (Target Size, Enhanced) dokunma HEDEFİNİ şart koşar,

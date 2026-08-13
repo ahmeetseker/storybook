@@ -585,6 +585,29 @@ Adım geçişi `motion/react` ile yalnız `opacity` + `x`; `useReducedMotion()`
 doğruysa geçiş kapanır. Şeritteki durum renkten bağımsız da okunur
 (✓ işareti, sıra numarası, `aria-current="step"`, görsel-gizli durum metni).
 
+**Onay metinleri (WCAG 2.2, 2026-08-13).** Onay adımının andığı hukuki
+metinler `components/HukukiMetinler.tsx`'te yaşar ve `GlassModal` ile
+açılır. Sözleşme:
+
+- Metin kontrolleri onay kutusunun `<label>`'ına GÖMÜLMEZ — etiket yalnız
+  kutuyu adlandırır, kontroller bitişik durur (tıklama çakışması + ad
+  şişmesi). Kontroller `<a>` değil `<button>`'dur (hedef dialog'dur, sayfa
+  değil) ve `aria-haspopup="dialog"` taşır.
+- Hedef ölçüsü `--lg-control-md` (WCAG 2.5.8); odak halkası `:focus-visible`
+  ile `--lg-accent`.
+- `/kayit` her iki metni, `/kayit/kurumsal` yalnız aydınlatma metnini
+  gösterir (kutuları kullanım koşullarını anmaz).
+- Parola alanına yapıştırma HİÇBİR yerde engellenmez (WCAG 3.3.8) —
+  `AuthAccessibility.test.tsx`'teki WCAG 2.2 geçidi bunların hepsini sınar.
+
+Changelog: 2026-08-13 — WCAG 2.2 denetimi: onay kutusu "okudum,
+onaylıyorum" derken metinler hiçbir yere bağlanmıyordu. `components/
+HukukiMetinler.tsx` (+ module.css) eklendi: KVKK aydınlatma metni ve
+kullanım koşulları TASLAKLARI iki `GlassModal`'da; `KayitPage` ve
+`KayitKurumsalPage` onay adımlarına düğmeler bağlandı. Erişilebilirlik
+geçidine dört test eklendi (dialog açılışı, odak dönüşü, etikete gömülü
+olmama, parola yapıştırma). DS component'lerine dokunulmadı.
+
 ## 16. Parola sıfırlama (İP-2)
 
 Beş rota, hepsi `/parola-sifirla` önekinin altında:

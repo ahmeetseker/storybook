@@ -1,7 +1,8 @@
 /* Genişlik, kenar boşluğu, kabuk payı ve sorgu kabı PageContainer'dadır;
    kabın adı `page`. 96rem eşiği bu sayfada uzun süre ölüydü: kap 92rem'de
-   sınırlıyken min-width: 96rem hiç eşleşmiyordu. Kademe `wide` (104rem)
-   olunca dört kolonlu ızgara ilk kez gerçekten açılıyor. */
+   sınırlıyken min-width: 96rem hiç eşleşmiyordu. Kap artık site geneli
+   `--lg-container-page` standardı (~%80, wide tavanlı): dört kolonlu ızgara
+   yalnız kabın kendisi 96rem'i aştığı çok geniş ekranlarda açılır. */
 .page {
   color: var(--lg-label);
 }
@@ -511,29 +512,21 @@
 }
 
 /* Doğrulanmış durum artık kapsül değil köşe şerididir (GlassRibbon,
-   2026-08-08); kapsül yalnız «Doğrulama bekliyor» için kaldı. */
+   2026-08-08); kapsül yalnız «Doğrulama bekliyor» için kaldı. Zemin OPAK:
+   kapsül fotoğrafın üstünde durur, %12'lik tonlu zemin kontrastı fotoğrafa
+   bırakıp okunmaz oluyordu — GlassListingCard'ın statü kapsülü standardıyla
+   aynı dil (opak yüzey + semantic metin, 2026-08-13). */
 .unverified {
   display: inline-flex;
   align-items: center;
   min-height: calc(var(--lg-control-sm) - var(--lg-space-2));
   padding-inline: var(--lg-space-2);
   border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-warning);
+  box-shadow: var(--lg-shadow-xs);
   font-size: var(--lg-text-caption);
   font-weight: 700;
-}
-
-.unverified {
-  color: var(--lg-warning);
-  background: color-mix(in srgb, var(--lg-warning) 12%, transparent);
-}
-
-/* Rozet fotoğrafın ÜSTÜNDE durduğunda zemin opak olmalı. Yukarıdaki %12'lik
-   tonlu zemin beyaz kart için seçilmişti; bilinmeyen bir fotoğrafın üstünde
-   kontrastı fotoğrafa bırakır ve rozet okunmaz olur. Opak yüzeyde semantic
-   renkler AAA kontrastını korur (bkz. index.css renk notu). */
-.mediaBadge {
-  background: var(--lg-surface);
-  box-shadow: var(--lg-shadow-xs);
 }
 
 .mapPanel {

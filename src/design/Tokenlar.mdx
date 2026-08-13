@@ -131,12 +131,16 @@ component'te iki space token'ı toplanmaz.
 
 | Token | Değer | Kullanım |
 |---|---|---|
-| `--lg-container-narrow` | `72rem` (1152px) | Okuma, tek kolonlu karar akışı |
-| `--lg-container-base` | `88rem` (1408px) | Liste, dizin, hesap ekranları |
-| `--lg-container-wide` | `104rem` (1664px) | Panelli çalışma masaları, harita |
+| `--lg-container-page` | `min(max(80%, 72rem), 104rem)` | **Standart** — her rotanın kap genişliği |
+| `--lg-container-narrow` | `72rem` (1152px) | Standardın dar-ekran tabanı |
+| `--lg-container-base` | `88rem` (1408px) | (eski kademe — yeni kullanım eklenmez) |
+| `--lg-container-wide` | `104rem` (1664px) | Standardın çok-geniş tavanı |
 | `--lg-container-gutter` | `clamp(16px, 4vw, 40px)` | Sayfa kenar boşluğu |
 
-Sayfa **kendi genişliğini tanımlamaz**, yalnız kademesini seçer. Genişlik,
+Sayfa **kendi genişliğini tanımlamaz**; her rota aynı standarda oturur:
+kapsayıcının ~%80'i, merkezli, iki yanda eşit boşluk. Yüzde kullanım yerinde
+çözülür — raylı kabuklarda (hesabım) ray düşüldükten sonra kalan sütunun
+%80'idir. Genişlik,
 kenar boşluğu, yüzen kabuk payı ve container-query kabı tek bir yerdedir
 (`apps/web`'de `PageContainer`). Bir feature CSS'inde `inline-size: min(100%, …)`,
 `margin-inline: auto` veya `--lg-shell-*-offset` görürseniz o sorumluluk

@@ -1,9 +1,12 @@
 .chip {
   --chip-pad-x-sm: var(--lg-space-3);
   --chip-pad-x-md: var(--lg-space-4);
+  /* Mikro-geometri (yerel, gerekçeli): ikon/metin arası nefes payı fontla
+     ölçeklenir; .remove marjı da bu değeri telafi ederek token boşluğa tamamlar */
+  --chip-gap: 0.4em;
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
+  gap: var(--chip-gap);
   font: inherit;
   font-weight: 600;
   white-space: nowrap;
@@ -23,8 +26,8 @@
    Görünmez bir ::after ile hedefi büyütmek mümkün değil: GlassSurface kendi
    köşe kırpması için `overflow: hidden` taşır, pseudo-eleman kutunun dışına
    taşamaz. Kompaktlığı taşıyan asıl oran yatay dolgudur, o korunur. */
-.sm { min-height: var(--lg-control-sm, 36px); padding: 0 var(--chip-pad-x-sm); font-size: var(--lg-text-caption, 12px); }
-.md { min-height: var(--lg-control-md, 40px); padding: 0 var(--chip-pad-x-md); font-size: var(--lg-text-footnote, 13px); }
+.sm { --chip-pad-x: var(--chip-pad-x-sm); min-height: var(--lg-control-sm, 36px); padding: 0 var(--chip-pad-x); font-size: var(--lg-text-caption, 12px); }
+.md { --chip-pad-x: var(--chip-pad-x-md); min-height: var(--lg-control-md, 40px); padding: 0 var(--chip-pad-x); font-size: var(--lg-text-footnote, 13px); }
 
 /* Adaptif ton: seçili değilken yarı saydam tint (Apple tint kuralı) */
 .tinted { background-color: color-mix(in srgb, var(--glass-tint) 30%, transparent); }
@@ -53,27 +56,42 @@
 .icon { display: inline-flex; align-items: center; }
 .label { display: inline-flex; align-items: center; }
 
-/* Kaldırma butonu: currentColor tabanlı — seçili/tint'li her zeminde okunur */
+/* Kaldırma butonu: currentColor tabanlı — seçili/tint'li her zeminde okunur.
+   Görünür daire ile dokunma hedefi ayrıştı (GlassSiteHeader/GlassSlider deseni):
+   buton kutusu 16px'lik zarif daire, görünmez ::after taşması hedefi 24px'e
+   (AA 2.5.8) genişletir. Taşma (4px) chip'in içinde kalır — kırpan
+   `overflow: hidden` chip kökündedir, butonda değil; 24px < chip yüksekliği. */
 .remove {
+  --remove-visual: var(--lg-space-4); /* 16px görünür daire */
+  --remove-hit: var(--lg-space-6); /* 24px dokunma hedefi (AA 2.5.8) */
   appearance: none;
   border: 0;
   padding: 0;
-  margin-inline-end: -0.3em;
-  /* İkon-tek kontrol: em ile ölçeklenir ama AA 2.5.8'in 24px tabanının altına
-     inmez (sm chip'te 1.5em = 18px kalıyordu). Chip kökü `overflow: hidden`
-     taşıdığı için hedefi ::after ile 44px'e taşımak mümkün değil. */
-  width: max(1.5em, var(--lg-space-6));
-  height: max(1.5em, var(--lg-space-6));
+  position: relative;
+  /* Simetri: metin↔daire ve daire↔kapsül kenarı aynı token boşluk
+     (--lg-space-2). Soldaki marj chip gap'ini 8px'e tamamlar, sağdaki
+     kapsül dolgusunu 8px'e indirir. */
+  margin-inline-start: calc(var(--lg-space-2) - var(--chip-gap));
+  margin-inline-end: calc(var(--lg-space-2) - var(--chip-pad-x));
+  width: var(--remove-visual);
+  height: var(--remove-visual);
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background-color: color-mix(in srgb, currentColor 12%, transparent);
   color: inherit;
-  font: inherit;
-  line-height: 1;
   cursor: pointer;
   transition: background-color 0.16s ease-out;
+}
+/* Görünmez dokunma hedefi büyütmesi — görünür daire tokenle 24'ün üstüne
+   çıkarsa min() taşmayı 0'a indirir */
+.remove::after {
+  content: '';
+  position: absolute;
+  inset: min(0px, calc((var(--remove-visual) - var(--remove-hit)) / 2));
+  border-radius: 50%;
 }
 @media (hover: hover) {
   .remove:hover:not(:disabled) {

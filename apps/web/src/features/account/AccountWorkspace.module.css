@@ -5,21 +5,18 @@
    `components/AccountSections.module.css` dosyasındadır; burada yalnız
    kabuk, ızgara ve durum ekranları tanımlıdır. */
 
-/* PageContainer'ın ölçü kademesini ez: pano kenardan kenara akar,
-   yatay nefes kabuğun kendi parçalarından gelir. */
-.page.page {
-  inline-size: 100%;
-  max-inline-size: none;
-  padding: 0;
+/* Yatay ölçünün tek kaynağı PageContainer'dır (`--lg-container-page`
+   standardı): pano da tüm site gibi merkezli ~%80 kapta, iki yanda eşit
+   boşlukla akar. Önceki tam-genişlik ezmesi + `justify-self: center`'lı
+   88rem çerçeve, `main` grid olmadığı için hiç ortalanmıyor ve panoyu
+   asimetrik bırakıyordu. */
+.page {
   background-color: var(--lg-bg);
 }
 
 .frame {
   display: grid;
   gap: var(--lg-space-5);
-  justify-self: center;
-  inline-size: 100%;
-  max-inline-size: var(--lg-container-base);
 }
 
 .mainGrid,

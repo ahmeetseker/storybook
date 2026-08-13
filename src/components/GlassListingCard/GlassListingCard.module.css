@@ -70,6 +70,16 @@
   left: var(--lg-space-4);
 }
 
+.propertyOverlay .statuses {
+  top: var(--lg-space-4);
+  left: var(--lg-space-4);
+  max-width: calc(100% - var(--lg-space-4) * 2);
+}
+
+.propertyOverlay .statuses[data-with-ribbon] {
+  top: var(--status-ribbon-clearance);
+}
+
 .propertyContent {
   position: relative;
   z-index: 1;
@@ -193,6 +203,57 @@
   top: var(--lg-space-2);
   left: var(--lg-space-2);
   display: inline-flex;
+}
+
+/* Statü kapsülleri: doğrulama kurdelesi dışındaki TÜM statü metinlerinin tek
+   dili. Fotoğrafın üstünde durdukları için zemin opaktır (bkz. GlassRibbon
+   `.neutral` ve EmlakSearchView `.mediaBadge` notu): kontrast bilinmeyen
+   görsele bırakılmaz, semantic metin renkleri opak yüzeyde AAA'yı korur. */
+.statuses {
+  position: absolute;
+  top: var(--lg-space-2);
+  left: var(--lg-space-2);
+  z-index: 1;
+  display: flex;
+  max-width: calc(100% - var(--lg-space-2) * 2);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lg-space-1);
+  pointer-events: none;
+}
+
+/* Mikro-geometri: köşe kurdelesinin sm penceresi (GlassRibbon --ribbon-size,
+   76px) token ölçeği dışındadır; kapsül istifi çakışmamak için o pencerenin
+   altından başlar. */
+.statuses[data-with-ribbon] {
+  --status-ribbon-clearance: 76px;
+  top: var(--status-ribbon-clearance);
+}
+
+.status {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: calc(var(--lg-control-sm) - var(--lg-space-2));
+  align-items: center;
+  padding-inline: var(--lg-space-2);
+  overflow: hidden;
+  border-radius: var(--lg-radius-chip);
+  background: var(--lg-surface);
+  color: var(--lg-label);
+  box-shadow: var(--lg-shadow-xs);
+  font-size: var(--lg-text-caption);
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status[data-tone='warning'] {
+  color: var(--lg-warning);
+}
+
+.status[data-tone='success'] {
+  color: var(--lg-success);
 }
 
 .body {

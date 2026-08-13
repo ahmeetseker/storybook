@@ -1,19 +1,12 @@
-/* Alt sayfa çerçevesi — PageContainer'ın ölçü kademesini pano akışına uydurur.
-   Yatay ölçünün tek kaynağı yine PageContainer'dır; burada yalnız pano
-   genişliği ve bölümler arası dikey ritim tanımlanır. */
-
-.page.page {
-  inline-size: 100%;
-  max-inline-size: none;
-  padding-block: 0;
-}
+/* Alt sayfa çerçevesi — yatay ölçünün tek kaynağı PageContainer'dır
+   (`--lg-container-page` standardı); burada yalnız bölümler arası dikey
+   ritim tanımlanır. Önceki tam-genişlik ezmesi + `justify-self: center`'lı
+   88rem çerçeve, `main` grid olmadığı için ortalanmıyor ve içeriği sola
+   yapıştırıyordu. */
 
 .frame {
   display: grid;
   gap: var(--lg-space-5);
-  justify-self: center;
-  inline-size: 100%;
-  max-inline-size: var(--lg-container-base);
 }
 
 .frame > h1 {

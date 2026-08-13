@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { GlassListingCard } from './GlassListingCard'
 import { GlassBadge } from '../GlassBadge'
+import { GlassRibbon } from '../GlassRibbon'
 import { placeholderImage } from '../../demo/placeholderImage'
 
 const meta = {
@@ -136,6 +137,40 @@ export const WithBadge: Story = {
     ...Default.args,
     badge: <GlassBadge tint="#ff453a">Acil</GlassBadge>,
   },
+}
+
+/**
+ * Statü sunumu standardı (2026-08-13): doğrulama köşe KURDELESİDİR
+ * (`badge` + `badgePlacement="corner"`), diğer tüm statüler sol üstte opak
+ * kapsül istifi (`statuses`). Kurdeleyle birlikte istif kurdele penceresinin
+ * altından başlar — çakışma/kırpılma olmaz.
+ */
+export const StatuKapsulleri: Story = {
+  name: 'Statü kapsülleri',
+  args: { ...Default.args },
+  render: (args) => (
+    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center', padding: 32 }}>
+      <div>
+        <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600 }}>Yalnız statü</p>
+        <GlassListingCard
+          {...args}
+          statuses={[{ label: 'Yetki bekliyor · Temsili', tone: 'warning' }]}
+        />
+      </div>
+      <div>
+        <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 600 }}>Kurdele + statü istifi</p>
+        <GlassListingCard
+          {...args}
+          badge={<GlassRibbon label="Doğrulanmış" note="Temsili görsel" />}
+          badgePlacement="corner"
+          statuses={[
+            { label: 'Fiyat düştü', tone: 'success' },
+            { label: 'İnceleniyor', tone: 'warning' },
+          ]}
+        />
+      </div>
+    </div>
+  ),
 }
 
 /** Malzeme ekseni yan yana: içerik listelerinde `flat` önerilir, cam navigasyon katmanına aittir (bkz. rules.md Do/Don't). */

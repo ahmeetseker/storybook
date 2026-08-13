@@ -18,20 +18,13 @@ describe('PageContainer', () => {
     expect(main.textContent).toBe('İçerik')
   })
 
-  it('varsayılan kademe base`tir; narrow ve wide ayrı sınıf taşır', () => {
-    const { rerender } = render(<PageContainer>base</PageContainer>)
-    const base = screen.getByRole('main')
-    expect(base.className).toContain(styles.container)
-    expect(base.className).not.toContain(styles.narrow)
-    expect(base.className).not.toContain(styles.wide)
-
-    rerender(<PageContainer size="narrow">narrow</PageContainer>)
-    expect(screen.getByRole('main').className).toContain(styles.narrow)
-
-    rerender(<PageContainer size="wide">wide</PageContainer>)
-    const wide = screen.getByRole('main')
-    expect(wide.className).toContain(styles.wide)
-    expect(wide.className).not.toContain(styles.narrow)
+  it('genişlik tek standarttır — kademe sınıfı yoktur, yalnız container sınıfı basılır', () => {
+    // Eski narrow/base/wide kademeleri sayfalar arası yatay kayma ürettiği
+    // için kaldırıldı; ölçünün tek kaynağı `--lg-container-page` formülüdür.
+    render(<PageContainer>içerik</PageContainer>)
+    const main = screen.getByRole('main')
+    expect(main.className).toContain(styles.container)
+    expect(main.className.split(' ')).toHaveLength(2) // container + shellInsets
   })
 
   it('kabuk payını varsayılan olarak ayırır, kabuksuz akışta bırakır', () => {

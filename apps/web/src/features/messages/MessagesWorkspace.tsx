@@ -792,7 +792,6 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
     return (
       <PageContainer
         shellInsets={false}
-        size="wide"
         className={styles.page}
         aria-busy={mode === 'loading' || undefined}
       >
@@ -835,7 +834,7 @@ export function MessagesWorkspace(props: MessagesWorkspaceProps) {
       : undefined
 
   return (
-    <PageContainer size="wide" shellInsets={false} className={styles.page}>
+    <PageContainer shellInsets={false} className={styles.page}>
       <div className={styles.frame}>
         <header className={styles.pageHeader}>
           <div>

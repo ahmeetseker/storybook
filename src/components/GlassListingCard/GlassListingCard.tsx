@@ -20,6 +20,13 @@ export interface GlassListingCardMetric {
   label: string
 }
 
+export interface GlassListingCardStatus {
+  /** Kapsülde görünen kısa statü metni; örneğin `Fiyat düştü`. */
+  label: string
+  /** Renk ekseni: metin rengi semantic token'dan gelir, zemin hep opak yüzeydir. */
+  tone?: 'neutral' | 'success' | 'warning'
+}
+
 export interface GlassListingCardProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
   /** Kartın ana görseli. */
   image: { src: string; alt?: string }
@@ -53,6 +60,15 @@ export interface GlassListingCardProps extends Omit<ButtonHTMLAttributes<HTMLBut
    * kendi konumunu kuran köşe bileşenleri için.
    */
   badgePlacement?: 'inset' | 'corner'
+  /**
+   * Görselin üstünde sol üstte dikey istiflenen statü kapsülleri
+   * (`Fiyat düştü`, `Yetki bekliyor · Temsili` vb.). Zemin HER ZAMAN opak
+   * yüzeydir — kontrast bilinmeyen fotoğrafa bırakılmaz. Doğrulama bir statü
+   * DEĞİLDİR; o `badge` yuvasındaki köşe kurdelesiyle (GlassRibbon) anlatılır.
+   * Köşe kurdelesiyle birlikte kullanıldığında kapsüller kurdele penceresinin
+   * altından başlar, çakışmaz.
+   */
+  statuses?: readonly GlassListingCardStatus[]
   /** Yerleşim ekseni: mevcut kompakt kart, detaylı açık kart veya görsel üstü kart. */
   variant?: GlassListingCardVariant
   tone?: 'light' | 'dark' | 'auto'
@@ -84,6 +100,7 @@ export function GlassListingCard({
   listedAt,
   badge,
   badgePlacement = 'inset',
+  statuses,
   variant = 'compact',
   tone = 'auto',
   material,
@@ -119,6 +136,29 @@ export function GlassListingCard({
             ? badge
             : <span className={styles.badge}>{badge}</span>
           : null}
+        {statuses?.length ? (
+          <span
+            className={styles.statuses}
+            // Köşe kurdelesi varken istif kurdele penceresinin altından başlar.
+            data-with-ribbon={
+              badge &&
+              badgePlacement === 'corner' &&
+              (variant === 'compact' || variant === 'propertyOverlay')
+                ? 'true'
+                : undefined
+            }
+          >
+            {statuses.map((status) => (
+              <span
+                key={status.label}
+                className={styles.status}
+                data-tone={status.tone ?? 'neutral'}
+              >
+                {status.label}
+              </span>
+            ))}
+          </span>
+        ) : null}
         {variant === 'overlay' || variant === 'propertyOverlay' ? <span className={styles.scrim} aria-hidden="true" /> : null}
       </span>
 

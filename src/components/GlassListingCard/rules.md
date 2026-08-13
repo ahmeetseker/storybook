@@ -45,6 +45,7 @@ tek bir `<button>`'dur; basınca `useGlassPress` ile sıvılaşır/jöle salın�
 | location | — | string | İkincil metin, opacity .65 |
 | price | ✅ | string (biçimlenmiş) | Component para biçimlemez; '785.000 TL' hazır gelir |
 | badge | — | ReactNode (GlassBadge) | Sol üst overlay; metni a11y adına karışır — kısa tut |
+| statuses | — | `{ label, tone? }[]` | Sol üst dikey istif; opak kapsül (yüzey zemin + semantic metin) — doğrulama HARİÇ tüm statülerin tek dili |
 | amenities | — | `{ label, icon? }[]` | Zengin varyantlarda tek satırlık olanak chip'leri |
 | reviewCount | — | string | Konum satırının karşı ucundaki hazır değerlendirme metni |
 | actionLabel | — | string | Görsel eylem etiketi; ayrı bir iç buton değildir |
@@ -58,6 +59,8 @@ tek bir `<button>`'dur; basınca `useGlassPress` ile sıvılaşır/jöle salın�
 | price | prop | `string` | — | Hazır biçimli fiyat metni |
 | location | prop | `string` | — | Opsiyonel konum satırı |
 | badge | prop | `ReactNode` | — | Sol üst rozet |
+| badgePlacement | prop | `'inset'\|'corner'` | `'inset'` | `corner` GlassRibbon gibi köşeye kilitli bileşenler için |
+| statuses | prop | `GlassListingCardStatus[]` | — | Opak statü kapsülleri (`tone: 'neutral'\|'success'\|'warning'`); köşe kurdelesi varken istif kurdele penceresinin altından başlar |
 | variant | prop | `'compact'\|'details'\|'overlay'` | `'compact'` | Bağımsız yerleşim ekseni |
 | priceSuffix | prop | `string` | — | Fiyat dönemi (`/Ay`) |
 | reviewCount | prop | `string` | — | Hazır değerlendirme sayısı |
@@ -180,3 +183,16 @@ hook state'idir — control/story yapılmaz (bkz. GlassButton kuralı).
 ezilir; genişlik sabit olduğundan grid'de esnemez. **Açık kararlar:** genişliğin
 prop/parent'a taşınması · fiyat ağırlığının 700'e çekilmesi (token kuralı) ·
 tipografinin `--lg-text-*` token'larına bağlanması · `type="button"` default'u.
+
+**Changelog**
+
+- 2026-08-13 — Statü sunumu standardı: yeni `statuses` prop'u. Doğrulama köşe
+  kurdelesi (GlassRibbon, `badge` + `badgePlacement="corner"`) olarak kalır;
+  DİĞER tüm statü metinleri («Yetki bekliyor · Temsili», «Fiyat düştü»,
+  «İnceleniyor» vb.) görselin sol üstünde OPAK, yüksek kontrastlı kapsül
+  istifidir (`--lg-surface` zemin + semantic metin rengi + `--lg-shadow-xs`).
+  Yarı saydam tonlu pill'ler fotoğraf üstünde okunmuyordu; kontrast artık
+  görsele bırakılmaz. Köşe kurdelesiyle birlikte kullanımda istif kurdelenin
+  76px penceresinin (GlassRibbon sm `--ribbon-size`, mikro-geometri) altından
+  başlar — kırpılma/çakışma olmaz. İlk tüketiciler: `EmlakSearchView` ızgara
+  kartı ve `FavoritesWorkspace`.

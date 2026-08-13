@@ -679,11 +679,16 @@ function ListingCard({
           badge={
             item.verified ? (
               <GlassRibbon label="Doğrulanmış" note="Temsili görsel" />
-            ) : (
-              <span className={styles.unverified}>Yetki bekliyor · Temsili</span>
-            )
+            ) : undefined
           }
-          badgePlacement={item.verified ? 'corner' : 'inset'}
+          badgePlacement="corner"
+          /* Doğrulama dışındaki statüler kartın opak kapsül dilinde: yarı
+             saydam pill fotoğraf üstünde okunmuyordu (2026-08-13 standardı). */
+          statuses={
+            item.verified
+              ? undefined
+              : [{ label: 'Yetki bekliyor · Temsili', tone: 'warning' }]
+          }
           pricePrefix={item.transaction === 'sale' ? 'Liste:' : 'Kira:'}
           price={currency(item.price, item.transaction)}
           title={item.title}
@@ -704,15 +709,17 @@ function ListingCard({
           style={{ width: '100%' }}
         />
         <span className={styles.overlayActions} aria-label="İlan eylemleri">
+          {/* Favori dili KALPTİR — yatay kartla (GlassListingRowCard) aynı
+              glif; yer imi ikonu iki ayrı dil doğuruyordu (2026-08-13). */}
           <button
             type="button"
-            aria-label={favorite ? 'Favorilerden çıkar' : 'Favoriye ekle'}
+            aria-label={favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
             aria-pressed={favorite}
-            title={favorite ? 'Favorilerden çıkar' : 'Favoriye ekle'}
+            title={favorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
             onClick={() => setFavorite((current) => !current)}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 3h12v18l-6-4-6 4V3Z" />
+              <path d="M12 20.2 4.9 13.3a4.6 4.6 0 0 1 0-6.6 4.8 4.8 0 0 1 6.7 0l.4.4.4-.4a4.8 4.8 0 0 1 6.7 0 4.6 4.6 0 0 1 0 6.6Z" />
             </svg>
           </button>
         </span>
@@ -742,9 +749,7 @@ function ListingCard({
           // Izgara kartıyla aynı dil: doğrulama köşe şerididir, kapsül değil.
           <GlassRibbon label="Doğrulanmış" note="Temsili görsel" size={darEkran ? 'xs' : 'sm'} />
         ) : (
-          <span className={[styles.mediaBadge, styles.unverified].join(' ')}>
-            Doğrulama bekliyor
-          </span>
+          <span className={styles.unverified}>Doğrulama bekliyor</span>
         )
       }
       badgePlacement={item.verified ? 'corner' : 'inset'}
@@ -961,7 +966,7 @@ export function EmlakSearchView({
     onStateChange(next, { history: 'replace' })
 
   return (
-    <PageContainer size="wide" className={styles.page}>
+    <PageContainer className={styles.page}>
       {/* Dar kapta başlık «V5-başlıklı» düzenine iner: eyebrow ve açıklama
           gizlenir, sayaç başlığın yanına gelir, kaydet kısa etiketle satırda
           kalır. Masaüstü blok aynı — davranış tamamen CSS kademesinde. */}

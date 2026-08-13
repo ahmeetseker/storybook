@@ -3,6 +3,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
 import { GlassButton, GlassCheckbox } from '@repo/ui'
 import { AuthFormPage } from '../components/AuthFormPage'
+import { HukukiMetinDugmeleri } from '../components/HukukiMetinler'
 import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { ParolaAlani } from '../components/ParolaAlani'
 import { ParolaGucu } from '../components/ParolaGucu'
@@ -385,7 +386,12 @@ export function KayitPage() {
         )}
       </div>
 
-      <div>
+      {/* Onay kutusunun andığı metinler gerçekten OKUNABİLİR (WCAG 2.4.4):
+          düğmeler kutunun etiketine gömülmez, hemen ÜSTÜNDE durur — okuma ve
+          klavye sırası "metinleri aç → oku → onayla" olur. Gerekçe ve dialog
+          davranışı: components/HukukiMetinler.tsx. */}
+      <div className={styles.onayBlogu}>
+        <HukukiMetinDugmeleri />
         <GlassCheckbox
           className={styles.onayRow}
           id="kayit-kvkk"

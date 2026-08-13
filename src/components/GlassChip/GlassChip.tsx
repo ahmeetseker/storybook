@@ -121,7 +121,20 @@ export function GlassChip({
           // Kaldırma basıncı chip'in sıvılaşma animasyonunu tetiklemesin
           onPointerDown={(e) => e.stopPropagation()}
         >
-          <span aria-hidden="true">×</span>
+          {/* İnce çizgili × — font glyph'i yerine stroke SVG: dikeyde güvenilir ortalanır */}
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M3 3l6 6M9 3l-6 6" />
+          </svg>
         </button>
       ) : null}
     </GlassSurface>

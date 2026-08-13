@@ -62,6 +62,41 @@ describe('GlassListingCard', () => {
     expect(screen.getByRole('button').getAttribute('data-variant')).toBe(variant)
   })
 
+  // Statü sunumu standardı (2026-08-13): doğrulama dışındaki statüler tek
+  // dilde — opak kapsül, semantic ton, sol üst istif.
+  it('statü kapsüllerini tonlarıyla render eder', () => {
+    render(
+      <GlassTierProvider tier="fallback">
+        <GlassListingCard
+          {...baseProps}
+          statuses={[
+            { label: 'Fiyat düştü', tone: 'success' },
+            { label: 'Yetki bekliyor · Temsili', tone: 'warning' },
+          ]}
+        />
+      </GlassTierProvider>,
+    )
+    expect(screen.getByText('Fiyat düştü').getAttribute('data-tone')).toBe('success')
+    expect(screen.getByText('Yetki bekliyor · Temsili').getAttribute('data-tone')).toBe('warning')
+  })
+
+  it('köşe kurdelesiyle birlikte statü istifi kurdele payını işaretler', () => {
+    render(
+      <GlassTierProvider tier="fallback">
+        <GlassListingCard
+          {...baseProps}
+          badge={<span>Doğrulanmış</span>}
+          badgePlacement="corner"
+          statuses={[{ label: 'İnceleniyor' }]}
+        />
+      </GlassTierProvider>,
+    )
+    const status = screen.getByText('İnceleniyor')
+    // Ton verilmezse nötr kapsül.
+    expect(status.getAttribute('data-tone')).toBe('neutral')
+    expect(status.parentElement?.getAttribute('data-with-ribbon')).toBe('true')
+  })
+
   it('varsayılan olarak form göndermeyen button tipini kullanır', () => {
     render(<GlassListingCard {...baseProps} />)
     expect(screen.getByRole('button').getAttribute('type')).toBe('button')

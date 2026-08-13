@@ -17,7 +17,7 @@ export interface AccountPageFrameProps {
  */
 export function AccountPageFrame({ children }: AccountPageFrameProps) {
   return (
-    <PageContainer className={styles.page} size="wide" shellInsets={false}>
+    <PageContainer shellInsets={false}>
       <div className={styles.frame}>{children}</div>
     </PageContainer>
   )

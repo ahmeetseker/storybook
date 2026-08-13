@@ -41,6 +41,29 @@ describe('EmlakSearchView', () => {
     ).toHaveLength(24)
   })
 
+  // Izgara kartı: favori dili KALP (yatay kartla aynı glif ve etiket) ve
+  // doğrulama dışındaki statüler opak kapsül dilinde (2026-08-13 standardı).
+  it('ızgara görünümü kalp favori butonu ve statü kapsülüyle çizilir', async () => {
+    // Önerilen sıralama doğrulanmışları öne aldığından ilk sayfa tamamen
+    // doğrulanmış olabiliyor; fiyat sıralaması iki durumu da sayfaya sokar.
+    await renderSearch({ view: 'grid', sort: 'price-asc' })
+
+    const hearts = screen.getAllByRole('button', { name: 'Favorilere ekle' })
+    expect(hearts.length).toBeGreaterThan(0)
+    expect(hearts[0].getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(hearts[0])
+    expect(
+      screen.getAllByRole('button', { name: 'Favorilerden çıkar' })[0]
+        .getAttribute('aria-pressed'),
+    ).toBe('true')
+
+    // Doğrulanmamış ilan: yarı saydam pill değil, tonlu opak kapsül.
+    const status = screen.getAllByText('Yetki bekliyor · Temsili')[0]
+    expect(status.getAttribute('data-tone')).toBe('warning')
+    // Doğrulanmış ilanlarda kurdele dili değişmedi.
+    expect(screen.getAllByText('Doğrulanmış').length).toBeGreaterThan(0)
+  })
+
   // Filtreler artık tek bir katalogdan (filter-catalog.ts) render ediliyor;
   // bölüm başlıkları oradan gelir.
   it('shows land-specialist filter groups for the land category', async () => {

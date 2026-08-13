@@ -9,6 +9,7 @@ import {
   type OfficePlanId,
 } from '@/features/pricing/data/office-plans'
 import { AuthFormPage } from '../components/AuthFormPage'
+import { HukukiMetinDugmeleri } from '../components/HukukiMetinler'
 import { KayitAdimSayaci, KayitAdimSeridi } from '../components/KayitAdimSeridi'
 import { KorumaliSayfa } from '../components/KorumaliSayfa'
 import { useAuthSession } from '../AuthSessionProvider'
@@ -616,6 +617,11 @@ export function KayitKurumsalPage() {
         )}
       </div>
 
+      {/* Onay kutusunun andığı aydınlatma metni gerçekten OKUNABİLİR
+          (WCAG 2.4.4) — düğme etikete gömülmez, kutunun üstünde durur.
+          Bu bölümün kutuları kullanım koşullarını anmadığı için yalnız
+          aydınlatma metni verilir. Gerekçe: components/HukukiMetinler.tsx. */}
+      <HukukiMetinDugmeleri metinler={['aydinlatma']} />
       {onayKutusu(
         'kvkkOnayi',
         'İşletme ve yetkili kişi verilerinin işlenmesine ilişkin aydınlatma metnini okudum, onaylıyorum.',

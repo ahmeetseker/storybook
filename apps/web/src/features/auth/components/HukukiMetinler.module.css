@@ -1,0 +1,74 @@
+/* Onay adımının hukuki metin düğmeleri ve dialog içeriği.
+
+   Düğmeler onay kutusunun etiketine GÖMÜLMEZ (tıklama çakışması + etiket
+   adının şişmesi); kutunun bitişiğinde ayrı satırda dururlar. Gerekçe:
+   HukukiMetinler.tsx üst yorumu (WCAG 2.2 denetimi, 2026-08-13). */
+
+.baglantilar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lg-space-2) var(--lg-space-4);
+}
+
+/* WCAG 2.5.8 Target Size (Minimum): görünür metin footnote ölçüsünde kalır
+   ama tıklama hedefi `--lg-control-md` yüksekliğindedir (≥24px) — özet
+   kartındaki `.ozetDuzenle` ile aynı ölçü ve aynı odak halkası. */
+.baglanti {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--lg-control-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--lg-radius-chip);
+  background: none;
+  color: var(--lg-accent);
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.baglanti:focus-visible {
+  outline: var(--lg-focus-ring-width) solid var(--lg-accent);
+  outline-offset: var(--lg-focus-ring-offset);
+}
+
+/* ---------- Dialog gövdesi ---------- */
+
+.metin {
+  display: grid;
+  gap: var(--lg-space-3);
+  color: var(--lg-label);
+  font-size: var(--lg-text-footnote);
+  line-height: 1.6;
+}
+
+.metin h3 {
+  margin: var(--lg-space-2) 0 0;
+  font-size: var(--lg-text-body);
+  font-weight: 700;
+}
+
+.metin p {
+  margin: 0;
+}
+
+.metin ul {
+  margin: 0;
+  padding-inline-start: var(--lg-space-4);
+  display: grid;
+  gap: var(--lg-space-1);
+}
+
+/* Taslak uyarısı gömülü kutu kademesinde — içerikten görünür biçimde ayrılır. */
+.taslakNotu {
+  margin: 0;
+  padding: var(--lg-space-2) var(--lg-space-3);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background-color: var(--lg-bg);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}

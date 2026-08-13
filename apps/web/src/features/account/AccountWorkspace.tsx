@@ -233,7 +233,6 @@ export function AccountWorkspace({
   return (
     <PageContainer
       className={styles.page}
-      size="wide"
       shellInsets={false}
       aria-busy={resolvedMode === 'loading' || undefined}
     >

@@ -13,7 +13,7 @@ import {
 import { AuthSessionProvider } from './AuthSessionProvider'
 import type { AuthAdapters } from './data/auth-adapters'
 import type { Oturum } from './domain/auth-types'
-import { kurumsalBolumleriniDoldur, sahteAuthAdapters } from './test-utils'
+import { kayitAdimlariniDoldur, kurumsalBolumleriniDoldur, sahteAuthAdapters } from './test-utils'
 import { GirisPage } from './pages/GirisPage'
 import { GirisKodPage } from './pages/GirisKodPage'
 import { GirisParolaPage } from './pages/GirisParolaPage'
@@ -371,5 +371,84 @@ describe('auth erişilebilirlik geçidi', () => {
     // İsteğe bağlı izin hiçbir zaman hatalı işaretlenmez.
     const iys = screen.getByLabelText(/ticari elektronik ileti/i)
     expect(iys.getAttribute('aria-invalid')).toBeNull()
+  })
+})
+
+/**
+ * WCAG 2.2 denetimi (2026-08-13): onay kutusu "okudum, onaylıyorum" derken
+ * metinler hiçbir yere bağlanmıyordu — kullanıcı okuyamadığı bir şeyi
+ * onaylıyordu. Bu blok, metinlerin erişilebilir adlı kontrollerle (2.4.4)
+ * gerçekten açılabildiğini (4.1.2, dialog), odağın kapanışta tetikleyiciye
+ * döndüğünü (2.4.3) ve parola alanına yapıştırmanın engellenmediğini
+ * (3.3.8 Accessible Authentication) kalıcı olarak güvenceye alır.
+ */
+describe('onay metinleri ve kimlik doğrulama — WCAG 2.2 geçidi', () => {
+  it('KayitPage onay adımında aydınlatma metni ve kullanım koşulları dialog ile açılır', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
+    await kayitAdimlariniDoldur(kullanici, { kvkkOnayi: false })
+
+    const aydinlatma = screen.getByRole('button', { name: 'Aydınlatma metnini görüntüle' })
+    const kosullar = screen.getByRole('button', { name: 'Kullanım koşullarını görüntüle' })
+    // Rol gerçeği söyler: hedef bir sayfa değil dialog'dur; haspopup bunu duyurur.
+    expect(aydinlatma.getAttribute('aria-haspopup')).toBe('dialog')
+    expect(kosullar.getAttribute('aria-haspopup')).toBe('dialog')
+
+    await kullanici.click(aydinlatma)
+    const dialog = await screen.findByRole('dialog', { name: /aydınlatma metni/i })
+    expect(dialog.textContent).toContain('Veri sorumlusu')
+
+    await kullanici.click(screen.getByRole('button', { name: 'Kapat' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    // Kapanışta odak tetikleyen düğmeye döner (GlassModal sözleşmesi).
+    await waitFor(() => expect(document.activeElement).toBe(aydinlatma))
+
+    await kullanici.click(kosullar)
+    const kosulDialogu = await screen.findByRole('dialog', { name: /kullanım koşulları/i })
+    expect(kosulDialogu.textContent).toContain('Üyelik')
+  })
+
+  it('KayitPage onay metni düğmeleri onay kutusunun etiketine gömülü değildir', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
+    await kayitAdimlariniDoldur(kullanici, { kvkkOnayi: false })
+
+    // Etikete gömülü etkileşimli öğe, etiket tıklamasıyla çakışır ve kutunun
+    // erişilebilir adını şişirirdi — düğme label'ın dışında durmalı.
+    const dugme = screen.getByRole('button', { name: 'Aydınlatma metnini görüntüle' })
+    expect(dugme.closest('label')).toBeNull()
+
+    // Kutu, düğmeler eklendikten sonra da net adıyla bulunur ve işaretlenebilir.
+    const kutu = screen.getByLabelText(/aydınlatma metnini ve kullanım koşullarını okudum/i)
+    await kullanici.click(kutu)
+    expect((kutu as HTMLInputElement).checked).toBe(true)
+  })
+
+  it('KayitKurumsalPage onay bölümünde aydınlatma metni dialog ile açılır', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitKurumsalPage, oturumluAdapters())} />)
+    await screen.findByLabelText('Ticaret ünvanı')
+    await kurumsalBolumleriniDoldur(kullanici)
+
+    const dugme = screen.getByRole('button', { name: 'Aydınlatma metnini görüntüle' })
+    expect(dugme.getAttribute('aria-haspopup')).toBe('dialog')
+    await kullanici.click(dugme)
+    expect(await screen.findByRole('dialog', { name: /aydınlatma metni/i })).toBeTruthy()
+  })
+
+  it('kayıt parola alanına yapıştırma engellenmez (3.3.8)', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={sayfaRouter(KayitPage, bosAdapters())} />)
+    await screen.findByLabelText(/bireysel/i)
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
+    await screen.findByLabelText('Ad soyad')
+    await kullanici.type(screen.getByLabelText('Ad soyad'), 'Ayşe Kaya')
+    await kullanici.type(screen.getByLabelText('E-posta'), 'ayse@arsam.net')
+    await kullanici.click(screen.getByRole('button', { name: 'Devam et' }))
+
+    const parola = await screen.findByLabelText('Parola')
+    await kullanici.click(parola)
+    await kullanici.paste('YapistirilanParola1')
+    expect((parola as HTMLInputElement).value).toBe('YapistirilanParola1')
   })
 })

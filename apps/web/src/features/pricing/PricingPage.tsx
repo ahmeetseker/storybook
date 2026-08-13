@@ -83,7 +83,7 @@ export function PricingPage() {
   })
 
   return (
-    <PageContainer size="base" className={styles.page}>
+    <PageContainer className={styles.page}>
       <header className={styles.hero}>
         <p className={styles.eyebrow}>Emlak ofisleri için</p>
         <h1>Ofisiniz büyüdükçe ölçeklenen paketler</h1>

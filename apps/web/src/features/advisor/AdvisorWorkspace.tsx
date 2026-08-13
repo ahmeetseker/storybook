@@ -330,7 +330,7 @@ export function AdvisorWorkspace({
   )
 
   return (
-    <PageContainer size="wide" className={styles.page}>
+    <PageContainer className={styles.page}>
       <div
         className={styles.pageFrame}
         data-advisor-page-frame=""

@@ -2,7 +2,7 @@
 name: GlassChip
 category: görüntüleme
 status: hazır
-lastReviewed: 2026-08-03
+lastReviewed: 2026-08-13
 ---
 
 # GlassChip Kuralları
@@ -45,7 +45,7 @@ Chip kullanıcı girdisi alır.
 |---|---|---|---|
 | icon | — | inline ikon | `aria-hidden`; metnin soluna, `gap: 0.4em` |
 | children | ✅ | kısa etiket metni | Tek satır (`white-space: nowrap`) |
-| remove | — (`onRemove` ile) | × butonu | `currentColor` tabanlı zemin — her tint'te okunur |
+| remove | — (`onRemove` ile) | × butonu | `currentColor` tabanlı zemin — her tint'te okunur; ikon ince çizgili stroke SVG (1.5), görünür daire 16px, dokunma hedefi görünmez `::after` ile 24px |
 
 ## 4. Public API
 
@@ -127,10 +127,15 @@ kolaylığı. Geçiş süreleri `0.16s ease-out` raw kalır (süre token'ı yok)
 token kendiliğinden 44px'e çıktığı için ayrı bir `pointer: coarse` yükseltmesi
 yok (AAA 2.5.5 token katmanında karşılanıyor). Chip böylece yanındaki
 input/buton ile aynı satır yüksekliğini paylaşır; kompaktlığı taşıyan asıl
-oran yatay dolgudur. Kaldırma butonu (`.remove`) em tabanlı ama
-`max(1.5em, --lg-space-6)` ile AA 2.5.8'in 24px tabanının altına inmez;
-hedefi 44px'e taşımak mümkün değil — chip kökü GlassSurface'tir ve
-`overflow: hidden` taşır, taşan `::after` ne boyanır ne tıklanır.
+oran yatay dolgudur. Kaldırma butonunda (`.remove`) görünür daire ile dokunma
+hedefi ayrıktır (GlassSiteHeader/GlassSlider deseni): buton kutusu
+`--lg-space-4` (16px) zarif bir daire, görünmez `::after` taşması hedefi
+`--lg-space-6`ya (24px, AA 2.5.8) genişletir. Chip kökündeki
+`overflow: hidden` bunu engellemez — kırpma kök sınırındadır, 24px'lik hedef
+36/40px'lik chip'in içinde kalır (hedefi 44px'e taşımak hâlâ mümkün değil,
+o kök sınırını aşardı). Boşluk simetrisi: metin↔daire ve daire↔kapsül kenarı
+`--lg-space-2` (8px); soldaki marj chip `gap`'ini (0.4em) tamamlar, sağdaki
+kapsül dolgusunu (`--chip-pad-x`) telafi eder.
 
 ## 10. Storybook kapsamı
 
@@ -175,3 +180,11 @@ değerlendirmesi.
   dokunmatikte ikisi de 44px'te kaldığı için `pointer: coarse` yükseltmesi
   kaldırıldı (artık token'ın işi). `.remove` kutusu 1.5em → `max(1.5em,
   --lg-space-6)`; sm chip'te 18px olan hedef 24px'e çıktı (AA 2.5.8).
+- 2026-08-13: Kaldırma butonu inceltildi — koca gri daire şikâyeti. Görünür
+  daire `max(1.5em, --lg-space-6)` (24px) → `--lg-space-4` (16px); dokunma
+  hedefi görünmez `::after` taşmasıyla 24px'te kalıyor (AA 2.5.8,
+  GlassSiteHeader/GlassSlider deseni — chip kökündeki `overflow: hidden`
+  buton içi taşmayı kırpmaz, önceki "mümkün değil" notu yalnız kök sınırı
+  için geçerliydi). Font glyph'i `×` yerine ince çizgili stroke SVG (10px,
+  stroke 1.5). Boşluklar simetrik tokene bağlandı: metin↔daire ve
+  daire↔kapsül kenarı `--lg-space-2` (8px; eski: gap 0.4em + `-0.3em` marj).

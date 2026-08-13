@@ -126,7 +126,7 @@ export function ListingDetailWorkspace({
     // Kademe `base`: karar kolonu 1100px'lik kap eşiğinde açılır; `narrow`
     // (72rem) kabı gutter düştükten sonra 1072px'te kaldığı için o eşiği
     // hiçbir zaman geçemezdi ve ray sessizce hiç görünmezdi.
-    <PageContainer size="base">
+    <PageContainer>
       {/* Izgara kabın KENDİSİNDE değil, içinde duran bu sarmalayıcıdadır:
           bir öğe kendi `@container` sorgusuna yanıt veremez, kap üzerine
           yazılan kolon kuralı hiçbir genişlikte eşleşmezdi. */}

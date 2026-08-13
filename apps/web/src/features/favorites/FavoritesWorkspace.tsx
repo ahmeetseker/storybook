@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { GlassAiSummaryCard, GlassBadge, GlassButton, GlassChip, GlassCompareBar, GlassDrawer, GlassEmptyState, GlassPersonalNote, GlassSelect } from '@repo/ui'
+import { GlassAiSummaryCard, GlassButton, GlassChip, GlassCompareBar, GlassDrawer, GlassEmptyState, GlassListingCard, GlassPersonalNote, GlassRibbon, GlassSelect, type GlassListingCardStatus } from '@repo/ui'
 import { LISTING_FIXTURES } from '../listings/data/listing-adapter'
 import type { ListingSummary } from '../listings/data/listing-adapter'
 import { PageContainer } from '@/components/PageContainer'
@@ -9,9 +9,73 @@ type FavoriteFilter = 'all' | 'price-drop' | 'new' | 'verified'
 const SORTS = [{ value:'recent', label:'En son eklenen' }, { value:'price', label:'En düşük fiyat' }, { value:'area', label:'En geniş alan' }]
 const FAVORITE_IDS = LISTING_FIXTURES.slice(0, 8).map((item) => item.id)
 const PRICE_DROPS = new Set(FAVORITE_IDS.filter((_, index) => index === 1 || index === 4))
+const sayi = (value: number) => value.toLocaleString('tr-TR')
 
+/**
+ * Favori kartı /emlak ızgarasıyla AYNI ilan kartını kullanır
+ * (GlassListingCard `propertyOverlay`): poster görsel, doğrulama köşe
+ * kurdelesi, opak statü kapsülleri, alt künye. Favorilere özgü işlevler kart
+ * dilini bozmadan iki yerde yaşar: sağ üst kalp (favoriden hızlı çıkarma,
+ * ızgara kartıyla aynı glif) ve kartın altına bağlı aksiyon şeridi
+ * (kişisel not + karşılaştır + favoriden çıkar).
+ */
 function FavoriteCard({ listing, priceDrop, compared, onSelect, onRemove, onCompare }: { listing: ListingSummary; priceDrop: boolean; compared: boolean; onSelect(): void; onRemove(): void; onCompare(): void }) {
-  return <article className={styles.card}><button type="button" className={styles.cardOpen} onClick={onSelect}><span className={styles.media}><img src={listing.image.src} alt={listing.image.alt}/><span className={styles.mediaMeta}>{listing.imageCount} fotoğraf</span></span><span className={styles.cardBody}><span className={styles.cardTopline}><GlassBadge tint={listing.verified ? 'var(--lg-success)' : 'var(--lg-label-secondary)'}>{listing.verified ? 'Doğrulandı' : 'İnceleniyor'}</GlassBadge>{priceDrop ? <GlassBadge tint="var(--lg-success)">Fiyat düştü</GlassBadge> : null}</span><strong>{listing.title}</strong><span className={styles.location}>{listing.city} · {listing.district}</span><span className={styles.price}>{listing.price.toLocaleString('tr-TR')} TL</span><span className={styles.unitPrice}>{listing.unitPrice.toLocaleString('tr-TR')} TL/m² · {listing.area.toLocaleString('tr-TR')} m²</span><span className={styles.highlights}>{listing.highlights.slice(0,3).join(' · ')}</span></span></button><div className={styles.cardFooter}><GlassPersonalNote defaultValue="" placeholder="Bu ilan hakkında özel not al"/><div className={styles.cardActions}><GlassButton size="sm" onClick={onCompare}>{compared ? 'Karşılaştırmada' : 'Karşılaştır'}</GlassButton><button type="button" className={styles.removeButton} onClick={onRemove}>Favoriden çıkar</button></div></div></article>
+  // Doğrulama kurdele, geri kalan her statü opak kapsül (kart standardı,
+  // 2026-08-13): 'İnceleniyor' uyarı, 'Fiyat düştü' olumlu tonda.
+  const statuses: GlassListingCardStatus[] = [
+    ...(listing.verified ? [] : [{ label: 'İnceleniyor', tone: 'warning' as const }]),
+    ...(priceDrop ? [{ label: 'Fiyat düştü', tone: 'success' as const }] : []),
+  ]
+  const price = `${sayi(listing.price)} TL${listing.transaction === 'rent' ? ' / ay' : ''}`
+  return (
+    <article className={styles.card} aria-label={`${listing.title} favorisi`}>
+      <div className={styles.cardShell}>
+        <GlassListingCard
+          variant="propertyOverlay"
+          material="flat"
+          image={{ src: listing.image.src, alt: listing.image.alt }}
+          badge={listing.verified ? <GlassRibbon label="Doğrulanmış" note="Temsili görsel" /> : undefined}
+          badgePlacement="corner"
+          statuses={statuses.length > 0 ? statuses : undefined}
+          pricePrefix={listing.transaction === 'sale' ? 'Liste:' : 'Kira:'}
+          price={price}
+          title={listing.title}
+          location={`${listing.city.toLocaleUpperCase('tr-TR')} · ${listing.district.toLocaleUpperCase('tr-TR')}`}
+          metrics={[
+            { value: `${sayi(listing.area)} m²`, label: 'Alan' },
+            { value: `${sayi(listing.unitPrice)} TL`, label: 'm² fiyatı' },
+          ]}
+          seller={listing.sellerName}
+          listedAt={`${listing.publishedDays} gün önce`}
+          onClick={onSelect}
+          style={{ width: '100%' }}
+        />
+        {/* Kart tek bir <button> olduğundan kalp kabukta yaşar (buton içinde
+            buton olmaz — GlassListingCard rules.md §1); /emlak ızgara
+            kabuğuyla aynı desen ve aynı kalp glifi. */}
+        <span className={styles.overlayActions} aria-label="Favori eylemleri">
+          <button
+            type="button"
+            aria-label="Favorilerden çıkar"
+            aria-pressed
+            title="Favorilerden çıkar"
+            onClick={onRemove}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20.2 4.9 13.3a4.6 4.6 0 0 1 0-6.6 4.8 4.8 0 0 1 6.7 0l.4.4.4-.4a4.8 4.8 0 0 1 6.7 0 4.6 4.6 0 0 1 0 6.6Z" />
+            </svg>
+          </button>
+        </span>
+      </div>
+      <div className={styles.cardFooter}>
+        <GlassPersonalNote defaultValue="" placeholder="Bu ilan hakkında özel not al" />
+        <div className={styles.cardActions}>
+          <GlassButton size="sm" aria-pressed={compared} onClick={onCompare}>{compared ? 'Karşılaştırmada' : 'Karşılaştır'}</GlassButton>
+          <button type="button" className={styles.removeButton} onClick={onRemove}>Favoriden çıkar</button>
+        </div>
+      </div>
+    </article>
+  )
 }
 
 function DetailPanel({ listing, onClose }: { listing?: ListingSummary; onClose(): void }) { if (!listing) return null; return <aside className={styles.detail}><div className={styles.detailHeading}><div><p className={styles.eyebrow}>İLAN DETAYI</p><h2>{listing.title}</h2></div><button type="button" className={styles.closeButton} onClick={onClose} aria-label="İlan detayını kapat">×</button></div><img className={styles.detailImage} src={listing.image.src} alt={listing.image.alt}/><p className={styles.detailLocation}>{listing.city} · {listing.district}</p><strong className={styles.detailPrice}>{listing.price.toLocaleString('tr-TR')} TL</strong><dl className={styles.detailFacts}><div><dt>Alan</dt><dd>{listing.area.toLocaleString('tr-TR')} m²</dd></div><div><dt>m² fiyatı</dt><dd>{listing.unitPrice.toLocaleString('tr-TR')} TL</dd></div><div><dt>İlan yaşı</dt><dd>{listing.publishedDays} gün</dd></div><div><dt>Doğrulama</dt><dd>{listing.verified ? 'EİDS doğrulandı' : 'İnceleme bekliyor'}</dd></div></dl><div className={styles.detailActions}><GlassButton prominent>İlanı aç</GlassButton><GlassButton>Ofisle görüş</GlassButton></div></aside> }

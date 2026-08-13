@@ -3,7 +3,9 @@
    Buradan önce her sayfa kendi genişliğini ve kenar boşluğunu tanımlıyordu:
    88rem/92rem/sınırsız üç ayrı genişlik, 16px/32px iki ayrı sabit dolgu.
    Sonuç, rotalar arasında gezerken içeriğin yatay eksende kaymasıydı.
-   Ölçü artık tek yerde durur; sayfa yalnız kademesini seçer.
+   Kademeler (narrow/base/wide) de aynı kaymayı ölçek atlayınca üretiyordu;
+   ölçü artık TEK formüldür: `--lg-container-page` (~%80, merkezli, wide
+   tavanlı — tanımı ve gerekçesi token dosyasında).
 
    Sorgu kabı da burasıdır (`container-name: page`). Sayfaların kendi
    `@container` kuralları isimsiz yazıldığı sürece en yakın kap olarak bunu
@@ -15,18 +17,12 @@
   --page-breath: clamp(var(--lg-space-5), 3vw, var(--lg-space-7));
 
   container: page / inline-size;
-  inline-size: min(100%, var(--lg-container-base));
+  /* min(100%, …): yüzde tabanlı standart dar ekranda taban değerine iner;
+     kap hiçbir zaman kapsayıcısından geniş olamaz, kenar ritmi gutter'da. */
+  inline-size: min(100%, var(--lg-container-page));
   margin-inline: auto;
   padding-inline: var(--lg-container-gutter);
   color: var(--lg-label);
-}
-
-.narrow {
-  inline-size: min(100%, var(--lg-container-narrow));
-}
-
-.wide {
-  inline-size: min(100%, var(--lg-container-wide));
 }
 
 /* Yüzen kabuk katmanlarının payı.

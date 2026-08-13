@@ -105,6 +105,13 @@
 
 /* ---------- Onay adımı ---------- */
 
+/* Onay kutusu + hukuki metin düğmeleri tek blok hâlinde ritimlenir;
+   düğmelerin kendisi HukukiMetinler.module.css'te. */
+.onayBlogu {
+  display: grid;
+  gap: var(--lg-space-2);
+}
+
 /* Onay satırı GlassCheckbox'tır; kökü <label> olduğu için eleman+sınıf
    seçicisiyle yazıyoruz — böylece hizalama component'in kendi kuralını
    (align-items: center) stil sırasından bağımsız olarak ezer. */

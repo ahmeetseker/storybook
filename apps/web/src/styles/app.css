@@ -71,6 +71,10 @@ select {
   min-height: 100dvh;
   display: grid;
   place-items: center;
+  /* Sahne de sayfa container standardına uyar (`--lg-container-page`):
+     placeholder rotalar (ör. blog) gerçek sayfalarla aynı yatay ritimde durur. */
+  inline-size: min(100%, var(--lg-container-page));
+  margin-inline: auto;
   /* Kabuk paylarını sayfa dolgusuyla toplamaz, aynı token'lardan okur —
      header ve dock'un ölçüsü değişince bu sahne kendiliğinden hizada kalır. */
   padding-block:
