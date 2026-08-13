@@ -10,6 +10,7 @@ export type AccountNavId =
   | 'ozet'
   | 'ilanlarim'
   | 'mesajlar'
+  | 'bildirimler'
   | 'randevularim'
   | 'guvenlik'
   | 'hareketler'
@@ -51,6 +52,7 @@ export const accountNavEntries: readonly AccountNavEntry[] = [
     matchPrefix: true,
     fillsViewport: true,
   },
+  { id: 'bildirimler', label: 'Bildirimler', title: 'Bildirimler', href: '/hesabim/bildirimler', matchPrefix: true },
   { id: 'randevularim', label: 'Randevularım', title: 'Randevularım', href: '/hesabim/randevularim', matchPrefix: true },
   { id: 'guvenlik', label: 'Güvenlik', title: 'Güvenlik ve doğrulama', href: '/hesabim/guvenlik', matchPrefix: true },
   { id: 'hareketler', label: 'Hesap hareketleri', title: 'Hesap hareketleri', href: '/hesabim/hareketler', matchPrefix: true },

@@ -38,6 +38,7 @@ import { Route as GirisHataRouteImport } from './routes/giris_.hata'
 import { Route as GirisKodRouteImport } from './routes/giris_.kod'
 import { Route as GirisParolaRouteImport } from './routes/giris_.parola'
 import { Route as HesabimIndexRouteImport } from './routes/hesabim.index'
+import { Route as HesabimBildirimlerRouteImport } from './routes/hesabim.bildirimler'
 import { Route as HesabimFaturalarimRouteImport } from './routes/hesabim.faturalarim'
 import { Route as HesabimGuvenlikRouteImport } from './routes/hesabim.guvenlik'
 import { Route as HesabimHareketlerRouteImport } from './routes/hesabim.hareketler'
@@ -204,6 +205,11 @@ const HesabimIndexRoute = HesabimIndexRouteImport.update({
   path: '/',
   getParentRoute: () => HesabimRoute,
 } as any)
+const HesabimBildirimlerRoute = HesabimBildirimlerRouteImport.update({
+  id: '/bildirimler',
+  path: '/bildirimler',
+  getParentRoute: () => HesabimRoute,
+} as any)
 const HesabimFaturalarimRoute = HesabimFaturalarimRouteImport.update({
   id: '/faturalarim',
   path: '/faturalarim',
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
+  '/hesabim/bildirimler': typeof HesabimBildirimlerRoute
   '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
   '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
   '/hesabim/hareketler': typeof HesabimHareketlerRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/giris/hata': typeof GirisHataRoute
   '/giris/kod': typeof GirisKodRoute
   '/giris/parola': typeof GirisParolaRoute
+  '/hesabim/bildirimler': typeof HesabimBildirimlerRoute
   '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
   '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
   '/hesabim/hareketler': typeof HesabimHareketlerRoute
@@ -435,6 +443,7 @@ export interface FileRoutesById {
   '/giris_/hata': typeof GirisHataRoute
   '/giris_/kod': typeof GirisKodRoute
   '/giris_/parola': typeof GirisParolaRoute
+  '/hesabim/bildirimler': typeof HesabimBildirimlerRoute
   '/hesabim/faturalarim': typeof HesabimFaturalarimRoute
   '/hesabim/guvenlik': typeof HesabimGuvenlikRoute
   '/hesabim/hareketler': typeof HesabimHareketlerRoute
@@ -488,6 +497,7 @@ export interface FileRouteTypes {
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
+    | '/hesabim/bildirimler'
     | '/hesabim/faturalarim'
     | '/hesabim/guvenlik'
     | '/hesabim/hareketler'
@@ -538,6 +548,7 @@ export interface FileRouteTypes {
     | '/giris/hata'
     | '/giris/kod'
     | '/giris/parola'
+    | '/hesabim/bildirimler'
     | '/hesabim/faturalarim'
     | '/hesabim/guvenlik'
     | '/hesabim/hareketler'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/giris_/hata'
     | '/giris_/kod'
     | '/giris_/parola'
+    | '/hesabim/bildirimler'
     | '/hesabim/faturalarim'
     | '/hesabim/guvenlik'
     | '/hesabim/hareketler'
@@ -860,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HesabimIndexRouteImport
       parentRoute: typeof HesabimRoute
     }
+    '/hesabim/bildirimler': {
+      id: '/hesabim/bildirimler'
+      path: '/bildirimler'
+      fullPath: '/hesabim/bildirimler'
+      preLoaderRoute: typeof HesabimBildirimlerRouteImport
+      parentRoute: typeof HesabimRoute
+    }
     '/hesabim/faturalarim': {
       id: '/hesabim/faturalarim'
       path: '/faturalarim'
@@ -1004,6 +1023,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface HesabimRouteChildren {
+  HesabimBildirimlerRoute: typeof HesabimBildirimlerRoute
   HesabimFaturalarimRoute: typeof HesabimFaturalarimRoute
   HesabimGuvenlikRoute: typeof HesabimGuvenlikRoute
   HesabimHareketlerRoute: typeof HesabimHareketlerRoute
@@ -1017,6 +1037,7 @@ interface HesabimRouteChildren {
 }
 
 const HesabimRouteChildren: HesabimRouteChildren = {
+  HesabimBildirimlerRoute: HesabimBildirimlerRoute,
   HesabimFaturalarimRoute: HesabimFaturalarimRoute,
   HesabimGuvenlikRoute: HesabimGuvenlikRoute,
   HesabimHareketlerRoute: HesabimHareketlerRoute,

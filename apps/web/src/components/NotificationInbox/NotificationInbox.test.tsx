@@ -33,6 +33,31 @@ describe('NotificationInbox', () => {
     expect(screen.getByText(/Hepsi okundu/)).toBeTruthy()
   })
 
+  it('mobilde (dar viewport) popover açılmaz; zil onOpenPage çağırır', () => {
+    const asilMatchMedia = window.matchMedia
+    // 48rem sorgusu eşleşiyor → mobil dal
+    window.matchMedia = ((query: string) =>
+      ({
+        matches: query.includes('48rem'),
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        onchange: null,
+        dispatchEvent: () => false,
+      }) as MediaQueryList) as typeof window.matchMedia
+    try {
+      const onOpenPage = vi.fn()
+      render(<NotificationInbox onViewAll={() => {}} onOpenPage={onOpenPage} />)
+      fireEvent.click(screen.getByRole('button', { name: /Bildirimler/ }))
+      expect(onOpenPage).toHaveBeenCalledTimes(1)
+      expect(screen.queryByRole('dialog')).toBeNull()
+    } finally {
+      window.matchMedia = asilMatchMedia
+    }
+  })
+
   it('Tüm bildirimleri gör onViewAll çağırır ve paneli kapatır', async () => {
     const onViewAll = vi.fn()
     render(<NotificationInbox onViewAll={onViewAll} />)

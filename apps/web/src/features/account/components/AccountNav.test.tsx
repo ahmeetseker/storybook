@@ -64,14 +64,16 @@ describe('AccountNav', () => {
     }
   })
 
-  it('Randevularım öğesi raydaki sırasıyla Mesajlar\'dan hemen sonra durur', async () => {
+  it('iletişim üçlüsü sıralı durur: Mesajlar → Bildirimler → Randevularım', async () => {
     await renderNavReady()
     const labels = screen.getAllByRole('button').map((button) => button.textContent ?? '')
     const mesajlarIndex = labels.findIndex((text) => text.includes('Mesajlar'))
+    const bildirimlerIndex = labels.findIndex((text) => text.includes('Bildirimler'))
     const randevularimIndex = labels.findIndex((text) => text.includes('Randevularım'))
 
     expect(mesajlarIndex).toBeGreaterThanOrEqual(0)
-    expect(randevularimIndex).toBe(mesajlarIndex + 1)
+    expect(bildirimlerIndex).toBe(mesajlarIndex + 1)
+    expect(randevularimIndex).toBe(bildirimlerIndex + 1)
   })
 
   it('Randevularım öğesine tıklanınca /hesabim/randevularim rotasına gider', async () => {

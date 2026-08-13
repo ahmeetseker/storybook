@@ -7,6 +7,7 @@ export {
   AccountListingsPage,
   AccountSecurityPage,
   AccountActivityPage,
+  AccountNotificationsPage,
   AccountSavedSearchPage,
   AccountPaymentsPage,
   AccountInvoicesPage,

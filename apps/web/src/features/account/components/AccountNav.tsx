@@ -132,6 +132,18 @@ export function AccountNav({
       >
         Mesajlar
       </GlassSidebar.Item>
+      {/* Zil ikonu ikon setinde yok — kabuk zilindeki SVG'nin aynısı satır içi verilir */}
+      <GlassSidebar.Item
+        id="bildirimler"
+        icon={
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M18 9.5a6 6 0 1 0-12 0c0 6-2.5 7-2.5 7h17s-2.5-1-2.5-7" />
+            <path d="M10.3 20a2 2 0 0 0 3.4 0" />
+          </svg>
+        }
+      >
+        Bildirimler
+      </GlassSidebar.Item>
       {/*
         Takvim/randevu ikonu ikon setinde yok; `clock` zaten Paketim/Ödemeler
         için `card`ın tekrar kullanıldığı gibi zaman anlamı taşıyan en yakın

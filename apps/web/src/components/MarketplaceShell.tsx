@@ -100,10 +100,13 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
     </GlassButton>
   )
 
-  // Bildirim zili popover gelen kutusunu açar; "Tüm bildirimleri gör"
-  // adanmış sayfa olmadığı için hesap hareketleri akışına götürür.
+  // Masaüstünde zil popover gelen kutusunu açar; mobilde (K2 kararı) ve
+  // "Tüm bildirimleri gör"de adanmış bildirim sayfasına gidilir.
   const notificationsAction = (
-    <NotificationInbox onViewAll={() => routeTo('/hesabim/hareketler')} />
+    <NotificationInbox
+      onViewAll={() => routeTo('/hesabim/bildirimler')}
+      onOpenPage={() => routeTo('/hesabim/bildirimler')}
+    />
   )
 
   return (

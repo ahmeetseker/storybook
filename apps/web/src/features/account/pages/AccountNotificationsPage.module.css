@@ -1,0 +1,111 @@
+/* Bildirimler tam sayfası — içerik katmanı: düz yüzeyler, cam yok.
+   Satır dili popover gelen kutusuyla aynıdır (ikon + başlık/detay/zaman +
+   okunmamış noktası); sayfa ölçeğinde satırlar kart yüzeyine oturur. */
+.root {
+  display: grid;
+  gap: var(--lg-space-5);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lg-space-3);
+}
+
+.group {
+  display: grid;
+  gap: var(--lg-space-2);
+}
+
+.groupLabel {
+  margin: 0;
+  font-size: var(--lg-text-caption, 12px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+.list {
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lg-space-3);
+  width: 100%;
+  padding: var(--lg-space-4);
+  border: 0;
+  border-block-end: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.row:last-child {
+  border-block-end: 0;
+}
+.row:hover {
+  background: color-mix(in srgb, var(--lg-label, #24211b) 4%, transparent);
+}
+.row:focus-visible {
+  outline: 2px solid var(--lg-accent, #7c3806);
+  outline-offset: -2px;
+}
+
+.rowIcon {
+  margin-block-start: 2px;
+  color: var(--lg-label-secondary);
+  flex-shrink: 0;
+}
+
+.rowBody {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowTitle {
+  font-size: var(--lg-text-body, 15px);
+  color: var(--lg-label);
+}
+.row[data-unread] .rowTitle {
+  font-weight: 600;
+}
+
+.rowDetail {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary);
+}
+
+.rowTime {
+  font-size: var(--lg-text-caption, 12px);
+  color: var(--lg-label-secondary);
+}
+
+.dot {
+  flex-shrink: 0;
+  margin-block-start: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lg-accent, #7c3806);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--lg-space-7) var(--lg-space-4);
+  text-align: center;
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-body, 15px);
+  background: var(--lg-surface);
+  border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
+  border-radius: var(--lg-radius-card, 20px);
+}
