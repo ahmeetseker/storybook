@@ -18,6 +18,19 @@ export interface RegionListingPin {
   title: string
   meta: string
   fullPrice: string
+  image: { src: string; alt: string }
+  verified: boolean
+  /** İlanın öne çıkanlarından derlenen tek satırlık AI değerlendirme notu */
+  aiNote: string
+  /** Deterministik AI uyum skoru (62-95) — aynı ilan her açılışta aynı puan */
+  aiScore: number
+}
+
+/** `phaseFor` ile aynı aile: id'den deterministik, dar aralıklı bir skor. */
+function aiScoreFor(id: string): number {
+  let hash = 0
+  for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) % 997
+  return 62 + (hash % 34)
 }
 
 /**
@@ -40,7 +53,11 @@ export function listingsForRegion(region: RegionSummary): RegionListingPin[] {
       y: listing.map.y,
       price: compactPrice(listing.price, listing.transaction),
       title: listing.title,
-      meta: `${listing.neighbourhood} · ${listing.area} m²`,
+      meta: `${listing.neighbourhood} · ${listing.area} m² · ${listing.unitPrice.toLocaleString('tr-TR')} ₺/m²`,
       fullPrice: `${listing.price.toLocaleString('tr-TR')} ₺${listing.transaction === 'rent' ? '/ay' : ''}`,
+      image: listing.image,
+      verified: listing.verified,
+      aiNote: listing.highlights.join(' · '),
+      aiScore: aiScoreFor(listing.id),
     }))
 }

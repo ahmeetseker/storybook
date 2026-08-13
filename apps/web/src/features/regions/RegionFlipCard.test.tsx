@@ -48,10 +48,12 @@ describe('RegionFlipCard', () => {
     expect(screen.getByRole('group', { name: 'Urla ilan haritası' })).toBeTruthy()
   })
 
-  it('hover kartı çevirir, ayrılınca geri döner', () => {
+  it('kartın üstüne gelmek çevirmez; yalnız Haritada gör butonu çevirir', () => {
     const { container } = renderCard()
     const root = container.firstElementChild as HTMLElement
     fireEvent.mouseEnter(root)
+    expect(root.dataset.flipped).toBe('false')
+    fireEvent.mouseEnter(screen.getByRole('button', { name: 'Haritada gör' }))
     expect(root.dataset.flipped).toBe('true')
     fireEvent.mouseLeave(root)
     expect(root.dataset.flipped).toBe('false')
@@ -70,6 +72,9 @@ describe('RegionFlipCard', () => {
     fireEvent.click(pinButton!)
     // Tıklama henüz yönlendirmez: önce harita içinde önizleme kartı açılır.
     expect(props.onOpenListing).not.toHaveBeenCalled()
+    // Önizleme bilgilendiricidir: ilan görseli, güven rozeti ve AI değerlendirmesi taşır.
+    expect(screen.getByRole('img', { name: /ilan görseli/ })).toBeTruthy()
+    expect(screen.getByText(/AI uyum/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'İlana git' }))
     expect(props.onOpenListing).toHaveBeenCalledTimes(1)
     expect(props.onOpenListing).toHaveBeenCalledWith(expect.stringMatching(/^listing-/))

@@ -3,7 +3,7 @@
 // bölgenin ilanları gerçek haritada). Hover kartı çevirir; dokunmatik ve
 // klavye için aynı iş açık bir butonla yapılır — hover tek yol olamaz.
 import { useMemo, useState } from 'react'
-import { GlassMap, GlassMapPopupCard, GlassTrendChart } from '@repo/ui'
+import { GlassMap, GlassTrendChart } from '@repo/ui'
 import { pointBasemap } from '@/config/basemap'
 import { listingsForRegion } from './data/region-listings'
 import { regionPriceSeries } from './data/region-price-series'
@@ -60,10 +60,9 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
     <article
       className={styles.root}
       data-flipped={flipped ? 'true' : 'false'}
-      onMouseEnter={() => {
-        setEverFlipped(true)
-        setHovered(true)
-      }}
+      // Çevirme kartın hover'ına değil "Haritada gör" butonuna bağlıdır:
+      // kartın üstünden geçerken istemsiz flip, grafiği okumayı bölüyordu.
+      // Karttan çıkmak yalnız GERİ çevirir (buton hover'ı ile açılmışsa).
       onMouseLeave={() => setHovered(false)}
     >
       <div className={styles.inner}>
@@ -101,7 +100,7 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
           <div className={styles.chart}>
             <GlassTrendChart
               series={[{ id: `${region.id}-m2`, label: 'Son 12 ay m² fiyatı', points: priceSeries }]}
-              height={104}
+              height={176}
               valueSuffix=" ₺/m²"
               showGrid={false}
             />
@@ -113,7 +112,15 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
                 {compared ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
               </button>
             </div>
-            <button type="button" className={styles.flipButton} onClick={() => flip(true)}>
+            <button
+              type="button"
+              className={styles.flipButton}
+              onMouseEnter={() => {
+                setEverFlipped(true)
+                setHovered(true)
+              }}
+              onClick={() => flip(true)}
+            >
               Haritada gör
               <span aria-hidden="true" className={styles.flipGlyph}>↺</span>
             </button>
@@ -154,13 +161,26 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
                 >
                   ×
                 </button>
-                <GlassMapPopupCard
-                  title={preview.title}
-                  meta={preview.meta}
-                  price={preview.fullPrice}
-                  actionLabel="İlana git"
-                  onAction={() => onOpenListing?.(preview.id)}
-                />
+                <div className={styles.previewBody}>
+                  <img className={styles.previewImage} src={preview.image.src} alt={preview.image.alt} loading="lazy" />
+                  <div className={styles.previewInfo}>
+                    <p className={styles.previewTitle}>{preview.title}</p>
+                    <p className={styles.previewMeta}>{preview.meta}</p>
+                    <div className={styles.previewBadges}>
+                      <span className={styles.previewBadge} data-tone={preview.verified ? 'success' : 'warning'}>
+                        {preview.verified ? '✓ Doğrulanmış' : 'Doğrulanmamış'}
+                      </span>
+                      <span className={styles.previewBadge} data-tone="accent">AI uyum %{preview.aiScore}</span>
+                    </div>
+                  </div>
+                </div>
+                <p className={styles.previewNote}>{preview.aiNote}</p>
+                <div className={styles.previewFooter}>
+                  <strong className={styles.previewPrice}>{preview.fullPrice}</strong>
+                  <button type="button" className={styles.previewAction} onClick={() => onOpenListing?.(preview.id)}>
+                    İlana git <span aria-hidden="true">→</span>
+                  </button>
+                </div>
               </div>
             ) : null}
             {everFlipped && !pins.length ? (
