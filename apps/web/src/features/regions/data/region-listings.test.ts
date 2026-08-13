@@ -21,7 +21,6 @@ describe('listingsForRegion', () => {
     expect(pin.price).toMatch(/^₺/)
     expect(pin.lat).toBeGreaterThan(37)
     expect(pin.x).toBeGreaterThanOrEqual(0)
-    expect(pin.title.length).toBeGreaterThan(0)
   })
 
   it('ilanı olmayan bölge için boş liste döner', () => {

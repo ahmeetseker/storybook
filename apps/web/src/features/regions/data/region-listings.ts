@@ -12,12 +12,9 @@ export interface RegionListingPin {
   /** Şematik yedek yüzey konumu (0-1) — zemin yüklenemezse */
   x: number
   y: number
-  /** Kapsül pin etiketi (₺4,2M) */
+  /** Kapsül pin etiketi (₺4,2M) — kart haritasında pinin tek sözü budur;
+      detay popup'a değil doğrudan ilan sayfasına bırakılır. */
   price: string
-  /** Popup içeriği */
-  title: string
-  meta: string
-  fullPrice: string
 }
 
 /**
@@ -39,8 +36,5 @@ export function listingsForRegion(region: RegionSummary): RegionListingPin[] {
       x: listing.map.x,
       y: listing.map.y,
       price: compactPrice(listing.price, listing.transaction),
-      title: listing.title,
-      meta: `${listing.neighbourhood} · ${listing.area} m²`,
-      fullPrice: `${listing.price.toLocaleString('tr-TR')} ₺${listing.transaction === 'rent' ? '/ay' : ''}`,
     }))
 }

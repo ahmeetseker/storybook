@@ -3,7 +3,7 @@
 // bölgenin ilanları gerçek haritada). Hover kartı çevirir; dokunmatik ve
 // klavye için aynı iş açık bir butonla yapılır — hover tek yol olamaz.
 import { useMemo, useState } from 'react'
-import { GlassMap, GlassMapPopupCard } from '@repo/ui'
+import { GlassMap } from '@repo/ui'
 import { pointBasemap } from '@/config/basemap'
 import { listingsForRegion } from './data/region-listings'
 import type { RegionMatch, RegionSummary } from './domain/region-types'
@@ -117,18 +117,12 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
                 pins={pins}
                 basemap={basemap}
                 cluster
-                popupContent={(pinId) => {
-                  const pin = pins.find((candidate) => candidate.id === pinId)
-                  if (!pin) return null
-                  return (
-                    <GlassMapPopupCard
-                      title={pin.title}
-                      meta={pin.meta}
-                      price={pin.fullPrice}
-                      actionLabel="İlana git"
-                      onAction={() => onOpenListing?.(pinId)}
-                    />
-                  )
+                // Kart haritası popup taşıyamayacak kadar küçük: GlassMap
+                // popup'ı bilerek kırpılmadığı için (kenar pinlerinde
+                // okunabilirlik) kısa panelde kartın başlığına taşıyordu.
+                // Küçük yüzeyde sözleşme basittir — kapsüle tıkla, ilana git.
+                onPinSelect={(pinId) => {
+                  if (pinId) onOpenListing?.(pinId)
                 }}
               />
             ) : null}

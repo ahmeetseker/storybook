@@ -51,7 +51,7 @@ describe('RegionFlipCard', () => {
     expect(root.dataset.flipped).toBe('false')
   })
 
-  it('pindeki ilana popup üzerinden gidilir', async () => {
+  it('fiyat pinine tıklamak doğrudan ilana götürür — küçük yüzeyde popup yok', async () => {
     const { props } = renderCard()
     fireEvent.click(screen.getByRole('button', { name: 'Haritada gör' }))
     const pinButton = await waitFor(() => {
@@ -62,7 +62,7 @@ describe('RegionFlipCard', () => {
       return found!
     })
     fireEvent.click(pinButton!)
-    fireEvent.click(screen.getByRole('button', { name: 'İlana git' }))
+    expect(screen.queryByRole('button', { name: 'İlana git' })).toBeNull()
     expect(props.onOpenListing).toHaveBeenCalledTimes(1)
     expect(props.onOpenListing).toHaveBeenCalledWith(expect.stringMatching(/^listing-/))
   })
