@@ -1,0 +1,73 @@
+/* Kart 3B bir levhadır: `perspective` köke, `preserve-3d` gövdeye, yüzler
+   mutlak konumlu ve `backface-visibility:hidden`. Yatay dikdörtgen yukarı
+   devrilir (rotateX) — geniş bir levhayı sağa çevirmek kapı gibi, yukarı
+   çevirmek pano gibi okunur; pano doğrusu bu. Sabit yükseklik şarttır:
+   mutlak konumlu yüzler köke yükseklik veremez. */
+.root{position:relative;block-size:21rem;perspective:1600px;container-type:inline-size}
+.inner{position:relative;inline-size:100%;block-size:100%;transform-style:preserve-3d;transition:transform .65s var(--lg-motion-ease-standard)}
+.root[data-flipped="true"] .inner{transform:rotateX(180deg)}
+.face{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--lg-surface);border:var(--lg-stroke-hairline) solid var(--lg-hairline);border-radius:var(--lg-radius-card);box-shadow:var(--lg-shadow-card,none)}
+.back{transform:rotateX(180deg)}
+
+/* Ön yüz: sol kimlik, ortada metrikler, sağ üstte skor; altta sinyaller ve
+   eylem şeridi. Yıldızlı koyu zemin bilinçli olarak yok — kart artık haritanın
+   kapağıdır, kapak sessiz durur. */
+.front{padding:var(--lg-space-5);gap:var(--lg-space-4)}
+.frontBody{display:grid;grid-template-columns:minmax(10rem,14rem) minmax(0,1fr) auto;grid-template-areas:"identity metrics score";gap:var(--lg-space-5);align-items:start}
+.identity{grid-area:identity;display:grid;gap:var(--lg-space-1)}
+.metrics{grid-area:metrics}
+.score{grid-area:score}
+.eyebrow{margin:0;color:var(--lg-accent);font-size:var(--lg-text-badge);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.title{margin:0;font-size:var(--lg-text-headline)}
+.subtitle{margin:0;color:var(--lg-label-secondary);font-size:var(--lg-text-caption)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--lg-space-3)}
+.metrics div{display:grid;gap:var(--lg-space-1)}
+.metrics strong{font-size:var(--lg-text-headline);font-variant-numeric:tabular-nums}
+.metrics span{color:var(--lg-label-secondary);font-size:var(--lg-text-caption)}
+.positive{color:var(--lg-success)}
+.caution{color:var(--lg-warning)}
+.score{color:var(--lg-accent);font-size:var(--lg-text-headline);font-weight:700;font-variant-numeric:tabular-nums}
+.signals{display:flex;flex-wrap:wrap;gap:var(--lg-space-1)}
+.signal{background:var(--lg-bg);border:var(--lg-stroke-hairline) solid var(--lg-hairline);border-radius:var(--lg-radius-chip);padding:var(--lg-space-1) var(--lg-space-2);font-size:var(--lg-text-caption)}
+.signal[data-tone="positive"]{border-color:color-mix(in srgb,var(--lg-success) 35%,transparent)}
+.signal[data-tone="caution"]{border-color:color-mix(in srgb,var(--lg-warning) 45%,transparent)}
+.reason{margin:0;color:var(--lg-label-secondary);font-size:var(--lg-text-caption)}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:var(--lg-space-3);margin-block-start:auto;border-block-start:var(--lg-stroke-hairline) solid var(--lg-hairline);padding-block-start:var(--lg-space-3)}
+.actionGroup{display:flex;flex-wrap:wrap;gap:var(--lg-space-2)}
+.textButton{background:transparent;border:0;color:var(--lg-accent);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-sm);padding-inline:var(--lg-space-2)}
+.flipButton{display:inline-flex;align-items:center;white-space:nowrap;gap:var(--lg-space-1);background:color-mix(in srgb,var(--lg-accent) 10%,transparent);border:var(--lg-stroke-hairline) solid color-mix(in srgb,var(--lg-accent) 30%,transparent);border-radius:var(--lg-radius-capsule);color:var(--lg-accent);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-sm);padding-inline:var(--lg-space-3)}
+.flipGlyph{font-size:var(--lg-text-caption)}
+
+/* Arka yüz: ince başlık şeridi + haritanın kendisi. Harita kenarlara dayanır;
+   kartın yuvarlak köşesi .face'teki overflow ile korunur. */
+.back .backHeading{display:flex;justify-content:space-between;align-items:center;gap:var(--lg-space-3);padding:var(--lg-space-3) var(--lg-space-4);border-block-end:var(--lg-stroke-hairline) solid var(--lg-hairline)}
+.pinCount{color:var(--lg-label-secondary);font-size:var(--lg-text-caption);font-weight:400}
+.mapArea{position:relative;flex:1;min-block-size:0;display:flex}
+.map{flex:1}
+.mapEmpty{margin:auto;display:grid;gap:var(--lg-space-2);max-inline-size:26rem;padding:var(--lg-space-5);text-align:center;color:var(--lg-label-secondary)}
+.mapEmpty strong{color:var(--lg-label)}
+.mapEmpty p{margin:0;font-size:var(--lg-text-footnote)}
+
+.textButton:focus-visible,.flipButton:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
+
+/* Dar kartta metrikler kimliğin altına iner, kart biraz uzar. */
+@container (width < 40rem){
+  .root{block-size:26rem}
+  .frontBody{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identity score" "metrics metrics"}
+}
+
+/* Hareket azaltıldığında levha dönmez: yüzler yumuşak çapraz geçişle el
+   değiştirir. `transform-style:flat` 3B sahneyi tamamen kapatır. */
+@media (prefers-reduced-motion:reduce){
+  .inner{transform-style:flat;transition:none}
+  .root[data-flipped="true"] .inner{transform:none}
+  .face{transition:opacity var(--lg-motion-duration-normal) var(--lg-motion-ease-standard)}
+  .back{transform:none;opacity:0}
+  .root[data-flipped="true"] .back{opacity:1}
+  .root[data-flipped="true"] .front{opacity:0}
+}
+
+/* Dokunmatikte hover yoktur; hedefler büyür, flip yalnız butonla yapılır. */
+@media (pointer:coarse){
+  .textButton,.flipButton{min-height:var(--lg-control-md)}
+}

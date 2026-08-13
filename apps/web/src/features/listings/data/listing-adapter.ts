@@ -548,6 +548,24 @@ function tidyPrice(value: number): number {
   return Math.max(step, Math.round(value / step) * step)
 }
 
+/**
+ * Harita pini için kısaltılmış fiyat. Kapsül zemini kapatmasın diye tam tutar
+ * değil büyüklük mertebesi yazılır; tam tutarı popup ve ilan kartı taşır.
+ * Milyonun altındaki satışlar da "B" (bin) ile okunur — aksi halde 850.000 TL
+ * "0,9M" olarak yuvarlanıp yanıltıcı hale geliyordu. Arama haritası ve bölge
+ * kartlarının harita yüzü aynı kapsül dilini buradan okur.
+ */
+export function compactPrice(value: number, transaction: TransactionType): string {
+  const suffix = transaction === 'rent' ? '/ay' : ''
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000
+    // 10M üstünde ondalık gürültüdür; altında tek hane ayırt edici.
+    const text = millions >= 10 ? String(Math.round(millions)) : millions.toFixed(1).replace('.', ',')
+    return `₺${text}M${suffix}`
+  }
+  return `₺${Math.round(value / 1000)}B${suffix}`
+}
+
 export const LISTING_FIXTURES: ListingSummary[] = TEMPLATES.flatMap(
   (template, templateIndex) =>
     Array.from({ length: VARIANTS_PER_TEMPLATE }, (_, variantIndex) => {

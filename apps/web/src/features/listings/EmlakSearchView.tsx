@@ -34,6 +34,7 @@ import { AllFiltersModal } from './components/AllFiltersModal'
 import { FilterStream } from './components/FilterStream'
 import { PageContainer } from '@/components/PageContainer'
 import {
+  compactPrice,
   countListings,
   type AiFilterProposal,
   type ListingSearchResponse,
@@ -205,23 +206,6 @@ function locationLabel(item: Pick<ListingSummary, 'city' | 'district'>): string 
   const capitalize = (value: string) =>
     value.charAt(0).toLocaleUpperCase('tr-TR') + value.slice(1)
   return `${capitalize(item.district)}, ${capitalize(item.city)}`
-}
-
-/**
- * Harita pini için kısaltılmış fiyat. Kapsül zemini kapatmasın diye tam tutar
- * değil büyüklük mertebesi yazılır; tam tutarı popup ve ilan kartı taşır.
- * Milyonun altındaki satışlar da "B" (bin) ile okunur — aksi halde 850.000 TL
- * "0,9M" olarak yuvarlanıp yanıltıcı hale geliyordu.
- */
-function compactPrice(value: number, transaction: TransactionType): string {
-  const suffix = transaction === 'rent' ? '/ay' : ''
-  if (value >= 1_000_000) {
-    const millions = value / 1_000_000
-    // 10M üstünde ondalık gürültüdür; altında tek hane ayırt edici.
-    const text = millions >= 10 ? String(Math.round(millions)) : millions.toFixed(1).replace('.', ',')
-    return `₺${text}M${suffix}`
-  }
-  return `₺${Math.round(value / 1000)}B${suffix}`
 }
 
 function updateRange(

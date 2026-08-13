@@ -9,18 +9,6 @@
    Modules'ta hash'lendiği için `:not(.prominent)` TÜM butonları yakalıyor ve
    dolu eylemi kabuktaki "İlan ver" renginden koparıyordu. */
 .proposalActions{align-items:center}.proposalActions :global(button){min-width:var(--lg-control-xl)}
-/* Bölge kartı GlassStarsCard'ın koyu (mürekkep) yüzeyinde durur: aydınlık
-   yüzey renkleri okunmaz kalacağı için buradaki tüm metin/çizgi renkleri
-   fildişi zeminin (--lg-bg) ve semantic renklerin color-mix aydınlatmalarıdır.
-   Ham hex yok; kartın kendisi (zemin, bant, yıldızlar) component'ten gelir. */
-.regionCard .cardEyebrow,.regionCard .cardSubtitle,.regionCard .reason{color:color-mix(in srgb,var(--lg-bg) 68%,transparent)}
-.regionCard .score{color:color-mix(in srgb,var(--lg-accent) 40%,var(--lg-bg))}
-.regionCard .positive{color:color-mix(in srgb,var(--lg-success) 40%,var(--lg-bg))}
-.regionCard .caution{color:color-mix(in srgb,var(--lg-warning) 40%,var(--lg-bg))}
-.regionCard .metricGrid span{color:color-mix(in srgb,var(--lg-bg) 62%,transparent)}
-.regionCard .signal{background:color-mix(in srgb,var(--lg-bg) 10%,transparent);border-color:color-mix(in srgb,var(--lg-bg) 22%,transparent);color:color-mix(in srgb,var(--lg-bg) 88%,transparent)}
-.regionCard .cardActions{border-block-start-color:color-mix(in srgb,var(--lg-bg) 16%,transparent)}
-.regionCard .textButton{color:color-mix(in srgb,var(--lg-accent) 35%,var(--lg-bg))}
-.regionCard .textButton:focus-visible{outline-color:color-mix(in srgb,var(--lg-accent) 35%,var(--lg-bg))}
-/* Tablet ve genişte kartlar iki kolona akar; darda tek kolon kalır. */
-@container (width > 64rem){.cardList{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Bölge kartları her genişlikte TEK kolon akar: kartın kendisi yatay bir
+   dikdörtgen ve arka yüzünde harita taşıyor (bkz. RegionFlipCard.module.css);
+   iki kolona bölmek haritayı kullanılamayacak kadar daraltıyordu. */
