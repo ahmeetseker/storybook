@@ -307,6 +307,15 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
 
 ## Changelog
 
+- 2026-08-13 (4): Boyut kademeleri — panel masaüstünde 400×600, tablette
+  (≤1024px) 440×680, mobilde (≤640px) TAM EKRAN (inset:0, 100dvh, radius/
+  çerçeve yok). Bu, DS'in "breakpoint yerine yetenek sorgusu" ilkesinin
+  BİLİNÇLİ istisnasıdır: tam ekran davranışı içsel `min()` sınırıyla ifade
+  edilemez. Mobilde ek olarak: header/mesaj/composer boşlukları büyütüldü,
+  composer'a `env(safe-area-inset-bottom)` payı eklendi, textarea fontu
+  iOS'un otomatik yakınlaştırmasını önlemek için `max(body, 16px)` yapıldı.
+  Ayrıca placeholder tek satıra kilitlendi (nowrap + ellipsis) — uzun öneri
+  cümlesi kaydırma çubuğu çıkarıyordu.
 - 2026-08-13 (3): OrbInput composer'ı — composer, küre + ayraç + input + gönder
   butonunu TEK kapsülde toplayan `composerShell` yapısına geçti; yeni
   `composerOrnament` prop'u sol uca dekoratif görsel gömer (ayraç otomatik).

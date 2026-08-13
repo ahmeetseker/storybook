@@ -495,3 +495,51 @@
     transform: none;
   }
 }
+
+/* ── boyut kademeleri (bilinçli breakpoint istisnası, bkz. rules.md §9):
+   "mobilde tam ekran" davranışı içsel min() sınırıyla ifade edilemez.
+   masaüstü: 400×600 (varsayılan) · tablet: 440×680 · mobil: tam ekran ── */
+@media (max-width: 1024px) {
+  .root {
+    --glass-chatdock-panel-width: 440px;
+    --glass-chatdock-panel-height: 680px;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+  }
+
+  .header {
+    padding: var(--lg-space-4) var(--lg-space-5);
+  }
+
+  .title {
+    font-size: var(--lg-text-headline);
+  }
+
+  .messages {
+    padding: var(--lg-space-5) var(--lg-space-4);
+    gap: var(--lg-space-4);
+  }
+
+  .disclaimer {
+    padding: var(--lg-space-2) var(--lg-space-5);
+  }
+
+  /* Alt çentik/home göstergesi için güvenli alan payı */
+  .composer {
+    padding: var(--lg-space-3) var(--lg-space-4) calc(var(--lg-space-4) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* iOS Safari 16px altındaki input fontlarında sayfayı yakınlaştırır —
+     mobilde textarea en az 16px olmalı (token 15px'in bilinçli aşımı). */
+  .textarea {
+    font-size: max(var(--lg-text-body), 16px);
+  }
+}
