@@ -49,6 +49,16 @@ function activityLabel(value: string) {
   }).format(new Date(value))
 }
 
+/** İlk iki kelimenin baş harfleri — görselsiz sohbetin monogramı ("Kadıköy Anahtar Ofis" → "KA"). */
+function monogram(displayName: string) {
+  return displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toLocaleUpperCase('tr'))
+    .join('')
+}
+
 function statusLabel(status: ConversationSummary['status']) {
   switch (status) {
     case 'archived': return 'Arşivlendi'
@@ -125,7 +135,14 @@ function ConversationRow({
       >
         {conversation.listing.imageSrc ? (
           <img src={conversation.listing.imageSrc} alt={conversation.listing.imageAlt} className="conversationRail__listingImage" />
-        ) : null}
+        ) : (
+          // Görselsiz sohbet (ör. ofis görüşmesi): monogram, görsel kolonunu
+          // DOLDURMAK ZORUNDA — link iki kolonlu grid'dir; ilk kolon boş
+          // kalırsa içerik 48px'lik görsel kolonuna düşüp harf harf kırılır.
+          <span className="conversationRail__listingImage conversationRail__monogram" aria-hidden="true">
+            {monogram(conversation.counterpart.displayName)}
+          </span>
+        )}
         <span className="conversationRail__content">
           <span className="conversationRail__topline">
             <strong>{conversation.counterpart.displayName}</strong>

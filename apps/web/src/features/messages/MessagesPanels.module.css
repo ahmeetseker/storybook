@@ -111,6 +111,18 @@
   object-fit: cover;
 }
 
+/* Görselsiz sohbetin (ofis görüşmesi) monogramı — görsel kolonunu doldurur,
+   satır grid'i iki kolonlu kalır */
+.panels :global(.conversationRail__monogram) {
+  display: grid;
+  place-items: center;
+  background: var(--lg-bg);
+  border: var(--lg-stroke-hairline) solid var(--lg-hairline);
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+}
+
 .panels :global(.conversationRail__content) {
   display: grid;
   min-inline-size: 0;
