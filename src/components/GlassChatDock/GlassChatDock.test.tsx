@@ -316,6 +316,83 @@ describe('GlassChatDock — içerik özelleştirme', () => {
   })
 })
 
+describe('GlassChatDock — durum göstergesi ve zengin içerik', () => {
+  it('pendingLabel verilen bekleyen mesaj üç nokta yerine durum etiketini gösterir (role=log içinde duyurulur)', () => {
+    render(
+      <GlassChatDock
+        messages={[{ id: 'p1', role: 'ai', text: '', pending: true, pendingLabel: 'İlanlar aranıyor…', pendingState: 'searching' }]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    const log = screen.getByRole('log')
+    expect(log.textContent).toContain('İlanlar aranıyor…')
+    expect(screen.queryByText('yazıyor')).toBeNull()
+  })
+
+  it('pendingLabel verilmeyen bekleyen mesaj eski üç nokta göstergesini korur', () => {
+    render(
+      <GlassChatDock messages={[{ id: 'p1', role: 'ai', text: '', pending: true }]} onSend={vi.fn()} defaultOpen />,
+    )
+    expect(screen.getByText('yazıyor')).toBeTruthy()
+  })
+
+  it('content verilen mesaj metnin altında zengin içeriği render eder', () => {
+    render(
+      <GlassChatDock
+        messages={[
+          {
+            id: 'r1',
+            role: 'ai',
+            text: '2 ilan buldum.',
+            content: <button type="button">İlan kartı</button>,
+          },
+        ]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    expect(screen.getByText('2 ilan buldum.')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'İlan kartı' })).toBeTruthy()
+  })
+
+  it('regresyon: dipteki bekleyen mesaj uzun yanıta dönüşünce liste dibe kayar (48px eşiğini aşsa bile)', () => {
+    const { rerender } = render(
+      <GlassChatDock
+        messages={[...baseMessages, { id: 'p1', role: 'ai', text: '', pending: true, pendingLabel: 'Aranıyor…' }]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    const log = screen.getByRole('log')
+    // Yanıt gelince içerik büyür: kullanıcı eski dipten 750px uzakta kalır
+    Object.defineProperty(log, 'scrollHeight', { value: 1000, configurable: true })
+    Object.defineProperty(log, 'clientHeight', { value: 200, configurable: true })
+    Object.defineProperty(log, 'scrollTop', { value: 50, writable: true, configurable: true })
+    rerender(
+      <GlassChatDock
+        messages={[...baseMessages, { id: 'p1', role: 'ai', text: 'Uzun yanıt', content: <div>kartlar</div> }]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    expect(log.scrollTop).toBe(1000)
+  })
+
+  it('pending mesajda content çizilmez — önce durum, yanıt gelince içerik', () => {
+    render(
+      <GlassChatDock
+        messages={[
+          { id: 'r1', role: 'ai', text: '', pending: true, pendingLabel: 'Hesaplanıyor…', content: <button type="button">Erken kart</button> },
+        ]}
+        onSend={vi.fn()}
+        defaultOpen
+      />,
+    )
+    expect(screen.queryByRole('button', { name: 'Erken kart' })).toBeNull()
+  })
+})
+
 describe('GlassChatDock — daktilo placeholder (placeholders prop)', () => {
   afterEach(() => {
     vi.useRealTimers()

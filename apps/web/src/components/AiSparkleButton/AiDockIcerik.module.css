@@ -1,0 +1,68 @@
+/* AI dock zengin içerik yerleşimi — yalnız token tüketir. */
+.ilanlar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+}
+
+.baglanti {
+  align-self: flex-start;
+  color: var(--lg-accent);
+  font-size: var(--lg-text-footnote);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.baglanti:hover,
+.baglanti:focus-visible {
+  text-decoration: underline;
+}
+
+.baglanti:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+  border-radius: var(--lg-radius-chip);
+}
+
+.egilim {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-3);
+}
+
+.egilimNotu {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-caption);
+}
+
+/* Randevu onay bloğu — balon içinde küçük düz kart */
+.randevu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-1);
+  padding: var(--lg-space-3);
+  border: 1px solid var(--lg-hairline);
+  border-radius: var(--lg-radius-media);
+  background: var(--lg-surface);
+}
+
+.randevuBaslik {
+  font-weight: 700;
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label);
+}
+
+.randevuDetay {
+  font-size: var(--lg-text-footnote);
+  color: var(--lg-label-secondary);
+}
+
+.randevuDurum {
+  align-self: flex-start;
+  padding: var(--lg-space-1) var(--lg-space-2);
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 70%, var(--lg-label));
+  font-size: var(--lg-text-badge);
+  font-weight: 700;
+}

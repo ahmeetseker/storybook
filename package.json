@@ -33,7 +33,8 @@
     "ogl": "^1.0.11",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "recharts": "^3.10.1"
+    "recharts": "^3.10.1",
+    "thinking-orbs": "^0.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",

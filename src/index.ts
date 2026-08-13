@@ -139,7 +139,12 @@ export { GlassAiSummaryCard } from './components/GlassAiSummaryCard'
 export type { GlassAiSummaryCardProps, GlassAiSummaryFeedbackValue } from './components/GlassAiSummaryCard'
 export { GlassMatchScore } from './components/GlassMatchScore'
 export type { GlassMatchScoreProps, GlassMatchScoreCriterion, GlassMatchScoreTone } from './components/GlassMatchScore'
-export { GlassChatDock, type GlassChatDockProps, type GlassChatDockMessage } from './components/GlassChatDock'
+export {
+  GlassChatDock,
+  type GlassChatDockProps,
+  type GlassChatDockMessage,
+  type GlassChatDockPendingState,
+} from './components/GlassChatDock'
 export { GlassTrustSignalPanel } from './components/GlassTrustSignalPanel'
 export type {
   GlassTrustSignalPanelProps,

@@ -149,6 +149,44 @@ export const UzunIcerik: Story = {
   },
 }
 
+/** `pendingLabel`/`pendingState` — bekleyen mesaj thinking-orbs durum orb'u + etiketle nefes alır; `content` — yanıta gömülü zengin içerik. */
+export const DurumVeZenginIcerik: Story = {
+  name: 'Durum ve Zengin İçerik',
+  args: {
+    defaultOpen: true,
+    messages: [
+      { id: 's1', role: 'user', text: 'Kadıköy tarafında 3+1 daire arıyorum.' },
+      {
+        id: 's2',
+        role: 'ai',
+        text: '2 güçlü eşleşme buldum — kartlara dokunup ilana gidebilirsiniz.',
+        content: (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button type="button" style={{ font: 'inherit', textAlign: 'start', padding: 8 }}>
+              Caddebostan Deniz Manzaralı 3+1 — 14.500.000 TL
+            </button>
+            <button type="button" style={{ font: 'inherit', textAlign: 'start', padding: 8 }}>
+              Fenerbahçe Yenilenmiş 3+1 — 12.900.000 TL
+            </button>
+          </div>
+        ),
+      },
+      { id: 's3', role: 'user', text: 'Bu ay ne kadar harcadım?' },
+      { id: 's4', role: 'ai', text: '', pending: true, pendingLabel: 'Harcamalarınız hesaplanıyor…', pendingState: 'solving' },
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Bekleyen mesaj `pendingLabel` + `pendingState` ile üç nokta yerine thinking-orbs durum orb\'u ve ' +
+          'görünür etiket gösterir (niyete göre: searching/solving/connecting…). `content` alanı yanıt balonuna ' +
+          'kart/grafik gibi zengin içerik gömer — pending sürerken çizilmez, yanıtla birlikte gelir.',
+      },
+    },
+  },
+}
+
 /** `placeholders` — composer placeholder'ı öneri cümlelerini daktilo efektiyle sırayla yazar. */
 export const DaktiloPlaceholder: Story = {
   name: 'Daktilo Placeholder',

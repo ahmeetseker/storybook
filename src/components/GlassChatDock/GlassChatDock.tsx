@@ -13,18 +13,42 @@ import {
   useState,
   type FormEvent,
   type KeyboardEvent as ReactKeyboardEvent,
+  type ReactNode,
 } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { ThinkingOrb, type OrbState } from 'thinking-orbs'
 import { prefersReducedMotion } from '../../core/tier'
 import { presets } from '../../motion/presets'
 import styles from './GlassChatDock.module.css'
 
-/** Tek bir sohbet satırı. `pending` true iken `text` yok sayılır — "yazıyor" göstergesi çizilir. */
+/**
+ * Bekleyen mesajın durum animasyonu — `thinking-orbs`'un dokuz durumu.
+ * Ajan fiilleri: 'working' (genel düşünme), 'searching' (arama/tarama),
+ * 'solving' (hesap/analiz), 'connecting' (dış sistemle bağlantı, ör. randevu),
+ * 'composing' (uzun yanıt yazımı) en sık kullanılanlar.
+ */
+export type GlassChatDockPendingState = OrbState
+
+/** Tek bir sohbet satırı. `pending` true iken `text` yok sayılır — durum göstergesi çizilir. */
 export interface GlassChatDockMessage {
   id: string
   role: 'user' | 'ai'
   text: string
   pending?: boolean
+  /**
+   * `pending` iken üç nokta yerine durum orb'u + bu etiket gösterilir
+   * (ör. "İlanlar aranıyor…"). Ekran okuyucuya da bu metin duyurulur.
+   */
+  pendingLabel?: string
+  /** `pending` iken orb animasyonunun durumu. @default 'working' */
+  pendingState?: GlassChatDockPendingState
+  /**
+   * Balonda metnin altında render edilen zengin içerik (ilan kartı, grafik,
+   * bağlantı…). Yalnız `pending` değilken çizilir; içerik varken satır tam
+   * genişliğe açılır. Erişilebilir ad/duyuru `text` üzerinden gelmeye devam
+   * eder — zengin içerik metnin yerine değil, yanına koyulmalı.
+   */
+  content?: ReactNode
 }
 
 export interface GlassChatDockProps {
@@ -129,7 +153,24 @@ function AiBadge() {
   )
 }
 
-function TypingIndicator() {
+/**
+ * Bekleyen mesaj göstergesi. `label` verilirse thinking-orbs durum orb'u +
+ * görünür etiket (ajan ne yapıyor: arıyor, hesaplıyor, bağlanıyor…);
+ * verilmezse klasik üç nokta. Orb, Kağıt temasına sabitlenir
+ * (`theme="light"` → koyu mürekkep) ve `prefers-reduced-motion`'ı kendisi
+ * ele alır (tek statik kare çizer).
+ */
+function TypingIndicator({ label, state }: { label?: string; state?: GlassChatDockPendingState }) {
+  if (label) {
+    return (
+      <span className={styles.status}>
+        <span className={styles.statusOrb} aria-hidden="true">
+          <ThinkingOrb state={state ?? 'working'} size={20} theme="light" />
+        </span>
+        <span className={styles.statusLabel}>{label}</span>
+      </span>
+    )
+  }
   return (
     <span className={styles.typing}>
       <span className={styles.typingDots} aria-hidden="true">
@@ -148,8 +189,13 @@ function MessageRow({ message }: { message: GlassChatDockMessage }) {
   // bölgesini dinleyen ekran okuyucu için bu yeterli değil. Her mesaj
   // metninin başına görsel-gizli "Siz: "/"Asistan: " öneki eklenir.
   const speakerLabel = isUser ? 'Siz: ' : 'Asistan: '
+  const hasRich = !message.pending && message.content != null
   return (
-    <div className={[styles.row, isUser ? styles.rowUser : styles.rowAi].join(' ')}>
+    <div
+      className={[styles.row, isUser ? styles.rowUser : styles.rowAi, hasRich ? styles.rowRich : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
       {!isUser ? (
         <span className={styles.aiMark} aria-hidden="true">
           ✦
@@ -157,12 +203,15 @@ function MessageRow({ message }: { message: GlassChatDockMessage }) {
       ) : null}
       <div className={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAi].join(' ')}>
         {message.pending ? (
-          <TypingIndicator />
+          <TypingIndicator label={message.pendingLabel} state={message.pendingState} />
         ) : (
-          <span>
-            <span className={styles.srOnly}>{speakerLabel}</span>
-            {message.text}
-          </span>
+          <>
+            <span>
+              <span className={styles.srOnly}>{speakerLabel}</span>
+              {message.text}
+            </span>
+            {message.content != null ? <div className={styles.rich}>{message.content}</div> : null}
+          </>
         )}
       </div>
     </div>
@@ -285,16 +334,30 @@ export function GlassChatDock({
   }, [isOpen])
 
   // Mesaj listesi güncellendiğinde: kullanıcı zaten dipteyse (eşik: 48px)
-  // VEYA yeni eklenen son mesaj kullanıcıya aitse dibe kayar. Aksi halde
-  // (geçmişi yukarı kaydırıp okuyan bir kullanıcı) liste zıplatılmaz.
+  // VEYA yeni eklenen son mesaj kullanıcıya aitse VEYA dipteki bekleyen mesaj
+  // az önce gerçek yanıta dönüştüyse dibe kayar. Üçüncü koşul gerekli, çünkü
+  // uzun/zengin bir yanıt bekleme balonunun yerini alınca scrollHeight bir
+  // anda büyür — mesafe ölçümü İÇERİK BÜYÜDÜKTEN sonra yapıldığı için "dipte"
+  // sayılmaz ve yanıtın kartları ekran dışında kalırdı. Aksi halde (geçmişi
+  // yukarı kaydırıp okuyan bir kullanıcı) liste zıplatılmaz.
+  const prevLastMessageRef = useRef<{ id: string; pending: boolean } | null>(null)
   useLayoutEffect(() => {
     if (!isOpen) return
     const el = listRef.current
     if (!el) return
     const lastMessage = messages[messages.length - 1]
+    const pendingResolved =
+      prevLastMessageRef.current !== null &&
+      lastMessage !== undefined &&
+      prevLastMessageRef.current.id === lastMessage.id &&
+      prevLastMessageRef.current.pending &&
+      lastMessage.pending !== true
+    prevLastMessageRef.current = lastMessage
+      ? { id: lastMessage.id, pending: lastMessage.pending === true }
+      : null
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
     const isNearBottom = distanceFromBottom < 48
-    if (isNearBottom || lastMessage?.role === 'user') {
+    if (isNearBottom || lastMessage?.role === 'user' || pendingResolved) {
       el.scrollTop = el.scrollHeight
     }
     // isOpen'ı deps'e almak gereksiz — yukarıdaki effect açılış anını zaten

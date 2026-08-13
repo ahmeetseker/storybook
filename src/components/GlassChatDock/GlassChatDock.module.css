@@ -229,6 +229,42 @@
   border-bottom-left-radius: var(--glass-chatdock-bubble-corner);
 }
 
+/* Zengin içerikli satır: kart/grafik nefes alabilsin diye tam genişlik */
+.rowRich {
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+.rowRich .bubble {
+  width: 100%;
+}
+
+.rich {
+  margin-top: var(--lg-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2);
+  min-width: 0;
+}
+
+/* ── durum göstergesi: thinking-orbs orb'u + etiket ── */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lg-space-2);
+}
+
+.statusOrb {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.statusLabel {
+  color: var(--lg-label-secondary);
+  font-size: var(--lg-text-footnote);
+}
+
 /* ── "yazıyor" göstergesi: yalnız opacity animasyonu ── */
 .typing {
   display: inline-flex;

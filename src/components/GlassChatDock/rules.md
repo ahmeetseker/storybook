@@ -77,7 +77,7 @@ ile aynı karar).
 
 | Ad | Tür | Type | Default | Controlled | Açıklama |
 |---|---|---|---|---|---|
-| messages | prop | `GlassChatDockMessage[]` | — (zorunlu) | — | `{ id, role: 'user'\|'ai', text, pending? }` |
+| messages | prop | `GlassChatDockMessage[]` | — (zorunlu) | — | `{ id, role: 'user'\|'ai', text, pending?, pendingLabel?, pendingState?, content? }` — `pendingLabel` verilirse bekleme göstergesi üç nokta yerine thinking-orbs durum orb'u (`pendingState`, varsayılan `'working'`; Kağıt temasına sabit, reduced-motion'da tek statik kare) + görünür etiket olur; `content` (`ReactNode`) yalnız `pending` değilken metnin altında render edilir ve satırı tam genişliğe açar (ilan kartı, grafik…). Erişilebilir duyuru `text`/görünür etiket üzerinden akar |
 | onSend | prop | `(text: string) => void` | — (zorunlu) | — | Trimlenmiş, boş olmayan metinle çağrılır |
 | open | prop | `boolean` | — | ✅ | Verilirse controlled |
 | defaultOpen | prop | `boolean` | `false` | — | Yalnız uncontrolled başlangıç |
@@ -306,6 +306,16 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
 
 ## Changelog
 
+- 2026-08-13 (2): Ajan durumu + zengin mesaj içeriği — (1) mesaj modeline
+  `pendingLabel`/`pendingState`: bekleme göstergesi üç nokta yerine
+  `thinking-orbs` durum orb'u (canvas, tek renk, Kağıt temasına sabit
+  `theme="light"`; reduced-motion'u paket kendisi ele alır — tek statik kare)
+  + görünür durum etiketi ("İlanlar aranıyor…") çizebilir; etiket `role="log"`
+  içinde ekran okuyucuya da duyurulur. (2) `content?: ReactNode`: yanıt
+  balonuna metnin altında zengin içerik (ilan kartı, grafik, bağlantı)
+  gömülür; içerikli satır tam genişliğe açılır, `pending` sürerken çizilmez.
+  Yeni bağımlılık: `thinking-orbs` (MIT, canvas-2D, bağımsız). Testler: durum
+  etiketi/eski üç nokta/içerik render'ı/pending'te içerik bastırma.
 - 2026-08-13: Composer büyütme + daktilo placeholder — (1) yeni `placeholders`
   prop'u: öneri cümleleri composer placeholder'ında daktilo efektiyle sırayla
   yazılır (60ms/karakter, 2400ms cümle-arası, döngüsel); yalnız panel açık ve
