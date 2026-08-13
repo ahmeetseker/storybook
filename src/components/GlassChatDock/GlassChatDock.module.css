@@ -428,8 +428,13 @@
   line-height: 1.4;
 }
 
+/* Placeholder tek satırda kalır: uzun öneri cümlesi ikinci satıra sarıp
+   textarea'da kaydırma çubuğu çıkarıyordu — sarmaz, sığmazsa … ile kırpılır. */
 .textarea::placeholder {
   color: var(--lg-label-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Halka kapsülde (:has(:focus-visible)) — textarea'nın kendi halkası kapalı */

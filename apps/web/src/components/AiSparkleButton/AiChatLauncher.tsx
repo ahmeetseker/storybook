@@ -92,11 +92,13 @@ export function AiChatLauncher() {
             <AiOrb state={sonMesaj?.pending ? (sonMesaj.pendingState ?? 'working') : 'breathing'} />
           }
           placeholders={[
+            // Dock'un dar composer'ında TEK satıra sığacak uzunlukta tutulur —
+            // uzun cümle placeholder'ı sarıp kaydırma çubuğu çıkarıyordu.
             'Arsa arayışınızı anlatın…',
-            'Urla’da denize yakın imarlı parsel…',
-            'Bütçenize uygun bölge önerisi isteyin…',
-            'Bir parselin imar durumunu sorun…',
-            'Ofislerle görüşme randevusu planlayın…',
+            'Urla’da imarlı parsel…',
+            'Bütçenize göre bölge sorun…',
+            'İmar durumunu sorun…',
+            'Randevu planlayın…',
           ]}
           disclaimer="Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir."
         />
