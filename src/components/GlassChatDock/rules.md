@@ -84,6 +84,7 @@ ile aynı karar).
 | onOpenChange | prop | `(open: boolean) => void` | — | — | Her açma/kapama isteğinde çağrılır (controlled reddi mümkün) |
 | title | prop | `string` | `'İlan Asistanı'` | — | Panel accessible name kaynağı |
 | placeholder | prop | `string` | `'Bir soru yaz…'` | — | Yalnız görsel placeholder — accessible name sabit "Mesajınız" |
+| composerOrnament | prop | `ReactNode` | — | — | Composer kapsülünün sol ucuna gömülen salt dekoratif görsel (ör. animasyonlu AI küresi); verilirse sağına ince dikey ayraç çizilir (OrbInput deseni). Kapsayıcı `aria-hidden` — erişilebilir ad textarea'nın "Mesajınız" etiketinde kalır. Kapsül `:focus-within`'de hafifçe büyür (yalnız transform; reduced-motion'da kapalı), klavye halkası `:has(:focus-visible)` ile kapsüldedir |
 | placeholders | prop | `string[]` | — | — | Verilirse `placeholder`'ın yerine geçer: öneri cümleleri composer placeholder'ında daktilo efektiyle sırayla yazılır (60ms/karakter, cümle sonunda 2400ms bekleme, döngüsel). Yalnız panel açık ve taslak boşken çalışır; `prefers-reduced-motion`'da tamamen kapalı — ilk öneri statik gösterilir. Salt görsel: accessible name ("Mesajınız") değişmez, canlı bölge duyurusu yok |
 | disclaimer | prop | `string` | `'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.'` | — | Panelin altında sabit satır |
 | className | prop | `string` | — | — | Köke birleştirilir |
@@ -306,6 +307,12 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
 
 ## Changelog
 
+- 2026-08-13 (3): OrbInput composer'ı — composer, küre + ayraç + input + gönder
+  butonunu TEK kapsülde toplayan `composerShell` yapısına geçti; yeni
+  `composerOrnament` prop'u sol uca dekoratif görsel gömer (ayraç otomatik).
+  Odaklanınca kapsül `scale(1.02)` büyür ve gölge koyulaşır (yalnız transform
+  animasyonu; reduced-motion'da kapalı), klavye halkası `:has(:focus-visible)`
+  ile kapsülde. Textarea çerçevesiz/şeffaf oldu.
 - 2026-08-13 (2): Ajan durumu + zengin mesaj içeriği — (1) mesaj modeline
   `pendingLabel`/`pendingState`: bekleme göstergesi üç nokta yerine
   `thinking-orbs` durum orb'u (canvas, tek renk, Kağıt temasına sabit

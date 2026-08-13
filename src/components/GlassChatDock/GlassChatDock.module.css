@@ -15,6 +15,8 @@
   --glass-chatdock-textarea-max: 120px;
   --glass-chatdock-dot-size: 5px;
   --glass-chatdock-dot-pad: 2px;
+  --glass-chatdock-orb-size: 40px;
+  --glass-chatdock-divider-height: 28px;
 }
 
 /* ── kapalı: yüzen kapsül buton ── */
@@ -354,24 +356,72 @@
 /* ── composer ── */
 .composer {
   flex: none;
-  display: flex;
-  align-items: flex-end;
-  gap: var(--lg-space-2);
   padding: var(--lg-space-3) var(--lg-space-4) var(--lg-space-4);
 }
 
-/* Kapsül input — vurgu tonlu çerçeve, placeholder'da daktilo efektiyle
-   birlikte composer'ı panelin odak noktası yapar. Renk yalnız token
-   türevi: accent'in hairline'a karışımı (raw hex yok). */
+/* OrbInput deseni: küre + ayraç + input + gönder TEK kapsülde. Vurgu tonlu
+   çerçeve ve daktilo placeholder composer'ı panelin odak noktası yapar.
+   Renkler yalnız token türevi (raw hex yok). Odaklanınca kapsül hafifçe
+   büyür (yalnız transform animasyonu — DS motion kuralı) ve gölge koyulaşır. */
+.composerShell {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-1) var(--lg-space-1) var(--lg-space-1) var(--lg-space-3);
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 55%, var(--lg-hairline));
+  border-radius: var(--lg-radius-capsule);
+  background: var(--lg-surface);
+  box-shadow: var(--lg-shadow-md);
+  transition: transform 0.3s ease-out;
+}
+
+.composerShell:focus-within {
+  transform: scale(1.02);
+  border-color: var(--lg-accent);
+  box-shadow: var(--lg-shadow-lg);
+}
+
+/* Klavye odağında gerçek halka — yalnız :focus-visible (DS kuralı) */
+.composerShell:has(:focus-visible) {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+.composerOrb {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--glass-chatdock-orb-size);
+  height: var(--glass-chatdock-orb-size);
+  border-radius: var(--lg-radius-capsule);
+  overflow: hidden;
+}
+
+.composerOrb img,
+.composerOrb canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.composerDivider {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: var(--glass-chatdock-divider-height);
+  background: var(--lg-hairline);
+}
+
 .textarea {
   flex: 1 1 auto;
   resize: none;
   min-height: var(--lg-control-lg);
   max-height: var(--glass-chatdock-textarea-max);
-  padding: var(--lg-space-3) var(--lg-space-4);
-  border: 1px solid color-mix(in srgb, var(--lg-accent) 55%, var(--lg-hairline));
-  border-radius: var(--lg-radius-capsule);
-  background: var(--lg-surface);
+  padding: var(--lg-space-3) var(--lg-space-2);
+  border: 0;
+  background: transparent;
   color: var(--lg-label);
   font: inherit;
   font-size: var(--lg-text-body);
@@ -382,9 +432,9 @@
   color: var(--lg-label-secondary);
 }
 
+/* Halka kapsülde (:has(:focus-visible)) — textarea'nın kendi halkası kapalı */
 .textarea:focus-visible {
-  outline: 2px solid var(--lg-accent);
-  outline-offset: 1px;
+  outline: none;
 }
 
 .send {
@@ -432,7 +482,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   .launcher,
-  .send {
+  .send,
+  .composerShell {
     transition: none;
+  }
+  .composerShell:focus-within {
+    transform: none;
   }
 }

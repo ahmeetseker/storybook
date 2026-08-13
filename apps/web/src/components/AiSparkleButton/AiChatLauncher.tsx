@@ -84,6 +84,17 @@ export function AiChatLauncher() {
           onSend={gonder}
           title="AI danışman"
           placeholder="Arsa arayışınızı anlatın…"
+          composerOrnament={
+            // OrbInput desenindeki animasyonlu küre — salt dekoratif (alt boş,
+            // kapsayıcı aria-hidden). Yüklenemezse sessizce gizlenir.
+            <img
+              src="https://media.giphy.com/media/26gsuUjoEBmLrNBxC/giphy.gif"
+              alt=""
+              onError={(e) => {
+                e.currentTarget.style.visibility = 'hidden'
+              }}
+            />
+          }
           placeholders={[
             'Arsa arayışınızı anlatın…',
             'Urla’da denize yakın imarlı parsel…',

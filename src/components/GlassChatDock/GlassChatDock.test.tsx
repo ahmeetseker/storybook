@@ -393,6 +393,28 @@ describe('GlassChatDock — durum göstergesi ve zengin içerik', () => {
   })
 })
 
+describe('GlassChatDock — composer süsü (composerOrnament)', () => {
+  it('composerOrnament verilince kapsül içinde süs + ayraç render edilir, erişilebilir ada karışmaz', () => {
+    render(
+      <GlassChatDock
+        messages={[]}
+        onSend={vi.fn()}
+        defaultOpen
+        composerOrnament={<img src="orb.gif" alt="" data-testid="orb-gorsel" />}
+      />,
+    )
+    expect(screen.getByTestId('orb-gorsel')).toBeTruthy()
+    // Süs dekoratif: textarea'nın adı değişmez, süs kapsayıcısı aria-hidden
+    expect(screen.getByRole('textbox', { name: 'Mesajınız' })).toBeTruthy()
+    expect(screen.getByTestId('orb-gorsel').closest('[aria-hidden="true"]')).toBeTruthy()
+  })
+
+  it('composerOrnament verilmezse süs ve ayraç DOM\'da yoktur', () => {
+    const { container } = render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen />)
+    expect(container.querySelector('img')).toBeNull()
+  })
+})
+
 describe('GlassChatDock — daktilo placeholder (placeholders prop)', () => {
   afterEach(() => {
     vi.useRealTimers()

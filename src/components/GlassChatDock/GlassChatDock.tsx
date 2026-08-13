@@ -71,6 +71,13 @@ export interface GlassChatDockProps {
    * tercihinde tamamen kapalıdır — ilk öneri statik gösterilir.
    */
   placeholders?: string[]
+  /**
+   * Composer kapsülünün sol ucuna gömülen süs/kimlik görseli (ör. animasyonlu
+   * AI küresi). Verilirse görselin sağına ince bir dikey ayraç çizilir —
+   * OrbInput deseni. Salt dekoratif: çağıran taraf `aria-hidden`/boş `alt`
+   * vermelidir; erişilebilir ad textarea'nın "Mesajınız" etiketinde kalır.
+   */
+  composerOrnament?: ReactNode
   /** Panelin altında sabit uyarı satırı */
   disclaimer?: string
   className?: string
@@ -240,6 +247,7 @@ export function GlassChatDock({
   title = 'İlan Asistanı',
   placeholder = 'Bir soru yaz…',
   placeholders,
+  composerOrnament,
   disclaimer = 'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.',
   className,
 }: GlassChatDockProps) {
@@ -480,19 +488,31 @@ export function GlassChatDock({
             <p className={styles.disclaimer}>{disclaimer}</p>
 
             <form className={styles.composer} onSubmit={handleFormSubmit}>
-              <textarea
-                ref={inputRef}
-                className={styles.textarea}
-                rows={1}
-                value={draft}
-                placeholder={composerPlaceholder}
-                aria-label="Mesajınız"
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-              <button type="submit" className={styles.send} aria-label="Gönder" disabled={!canSend}>
-                <SendIcon />
-              </button>
+              {/* OrbInput deseni: küre + ayraç + input + gönder tek kapsülde;
+                  odak halkası ve büyüme kapsülün kendisinde (focus-within). */}
+              <div className={styles.composerShell}>
+                {composerOrnament != null ? (
+                  <>
+                    <span className={styles.composerOrb} aria-hidden="true">
+                      {composerOrnament}
+                    </span>
+                    <span className={styles.composerDivider} aria-hidden="true" />
+                  </>
+                ) : null}
+                <textarea
+                  ref={inputRef}
+                  className={styles.textarea}
+                  rows={1}
+                  value={draft}
+                  placeholder={composerPlaceholder}
+                  aria-label="Mesajınız"
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                />
+                <button type="submit" className={styles.send} aria-label="Gönder" disabled={!canSend}>
+                  <SendIcon />
+                </button>
+              </div>
             </form>
           </motion.div>
         ) : null}
