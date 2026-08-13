@@ -100,6 +100,15 @@ export function AiChatLauncher() {
             'İmar durumunu sorun…',
             'Randevu planlayın…',
           ]}
+          suggestions={[
+            // Her öneri motorun zengin yanıtlarından birini tetikler
+            'İzmir’de imarlı arsa bul',
+            'Favorilerimde indirim var mı?',
+            'Bu ay ne kadar harcadım?',
+            'Randevum var mı?',
+            'Emlak endeksi nasıl?',
+            'Bu ilan alınır mı?',
+          ]}
           disclaimer="Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir."
         />
       ) : null}

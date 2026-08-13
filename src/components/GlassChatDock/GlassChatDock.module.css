@@ -353,6 +353,55 @@
   border-top: 1px solid var(--lg-hairline);
 }
 
+/* ── örnek soru pill'leri: composer'ın üstünde yatay kayan sıra ──
+   Not: GlassChip kullanılmadı — o span tabanlı bir SEÇİM (toggle) chip'i;
+   buradaki pill'ler tıklanınca mesaj gönderen gerçek <button> eylemleridir. */
+.suggestions {
+  flex: none;
+  display: flex;
+  gap: var(--lg-space-2);
+  padding: var(--lg-space-2) var(--lg-space-4) 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.suggestions::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestion {
+  flex: none;
+  padding: var(--lg-space-1) var(--lg-space-3);
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 25%, var(--lg-hairline));
+  border-radius: var(--lg-radius-capsule);
+  background: color-mix(in srgb, var(--lg-accent) 6%, var(--lg-surface));
+  color: color-mix(in srgb, var(--lg-accent) 60%, var(--lg-label));
+  font: inherit;
+  font-size: var(--lg-text-footnote);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.suggestion:focus-visible {
+  outline: 2px solid var(--lg-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .suggestion:hover {
+    background: color-mix(in srgb, var(--lg-accent) 12%, var(--lg-surface));
+  }
+}
+
+/* coarse'ta dokunmatik hedef */
+@media (pointer: coarse) {
+  .suggestion {
+    min-height: var(--lg-control-md);
+  }
+}
+
 /* ── composer ── */
 .composer {
   flex: none;

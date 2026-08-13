@@ -78,6 +78,12 @@ export interface GlassChatDockProps {
    * vermelidir; erişilebilir ad textarea'nın "Mesajınız" etiketinde kalır.
    */
   composerOrnament?: ReactNode
+  /**
+   * Composer'ın hemen üstünde yatay kayan örnek soru pill'leri. Tıklanan
+   * öneri `onSend`'e aynen iletilir (composer gönderimiyle aynı sözleşme).
+   * Liste kalıcıdır — gönderimden sonra kaybolmaz.
+   */
+  suggestions?: string[]
   /** Panelin altında sabit uyarı satırı */
   disclaimer?: string
   className?: string
@@ -248,6 +254,7 @@ export function GlassChatDock({
   placeholder = 'Bir soru yaz…',
   placeholders,
   composerOrnament,
+  suggestions,
   disclaimer = 'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.',
   className,
 }: GlassChatDockProps) {
@@ -263,6 +270,26 @@ export function GlassChatDock({
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const launcherRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const suggestionsRef = useRef<HTMLDivElement>(null)
+
+  // Örnek soru sırası yatay kayar — mouse tekerinin DİKEY hareketi yatay
+  // kaydırmaya çevrilir (yoksa masaüstünde sıra tekerle hiç kaymaz). React'in
+  // delegasyonlu wheel dinleyicileri passive olduğundan preventDefault
+  // çalışmaz; native, passive olmayan dinleyici şart.
+  useEffect(() => {
+    const el = suggestionsRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (el.scrollWidth <= el.clientWidth) return
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        el.scrollLeft += e.deltaY
+        e.preventDefault()
+      }
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+    // isOpen/suggestions değişince satır yeniden mount olur — ref tazelenir
+  }, [isOpen, suggestions])
 
   // Yalnız BU component'in kendi setOpen çağrısıyla tetiklenen geçişlerde true
   // olur; effect tükettikten sonra hemen sıfırlanır — bkz. üstteki JSDoc.
@@ -486,6 +513,24 @@ export function GlassChatDock({
             </div>
 
             <p className={styles.disclaimer}>{disclaimer}</p>
+
+            {suggestions !== undefined && suggestions.length > 0 ? (
+              <div ref={suggestionsRef} className={styles.suggestions} role="group" aria-label="Örnek sorular">
+                {suggestions.map((oneri) => (
+                  <button
+                    key={oneri}
+                    type="button"
+                    className={styles.suggestion}
+                    onClick={() => {
+                      const temiz = oneri.trim()
+                      if (temiz) onSend(temiz)
+                    }}
+                  >
+                    {oneri}
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             <form className={styles.composer} onSubmit={handleFormSubmit}>
               {/* OrbInput deseni: küre + ayraç + input + gönder tek kapsülde;

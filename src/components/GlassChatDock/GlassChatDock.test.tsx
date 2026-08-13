@@ -415,6 +415,45 @@ describe('GlassChatDock — composer süsü (composerOrnament)', () => {
   })
 })
 
+describe('GlassChatDock — örnek soru pill\'leri (suggestions prop)', () => {
+  it('suggestions verilince pill\'ler composer üstünde buton olarak render edilir; tıklama onSend\'i aynen çağırır', () => {
+    const onSend = vi.fn()
+    render(
+      <GlassChatDock
+        messages={[]}
+        onSend={onSend}
+        defaultOpen
+        suggestions={['Randevum var mı?', 'Endeks nasıl?']}
+      />,
+    )
+    const grup = screen.getByRole('group', { name: 'Örnek sorular' })
+    expect(grup).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Randevum var mı?' }))
+    expect(onSend).toHaveBeenCalledWith('Randevum var mı?')
+  })
+
+  it('suggestions verilmezse pill grubu DOM\'da yoktur', () => {
+    render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen />)
+    expect(screen.queryByRole('group', { name: 'Örnek sorular' })).toBeNull()
+  })
+
+  it('mouse tekerinin dikey hareketi pill sırasını yatay kaydırır (taşma varken)', () => {
+    render(
+      <GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen suggestions={['Soru 1', 'Soru 2', 'Soru 3']} />,
+    )
+    const grup = screen.getByRole('group', { name: 'Örnek sorular' })
+    Object.defineProperty(grup, 'scrollWidth', { value: 600, configurable: true })
+    Object.defineProperty(grup, 'clientHeight', { value: 40, configurable: true })
+    Object.defineProperty(grup, 'clientWidth', { value: 300, configurable: true })
+    fireEvent.wheel(grup, { deltaY: 80, deltaX: 0 })
+    expect(grup.scrollLeft).toBe(80)
+    // Taşma yokken teker sayfaya bırakılır — scrollLeft değişmez
+    Object.defineProperty(grup, 'scrollWidth', { value: 300, configurable: true })
+    fireEvent.wheel(grup, { deltaY: 80, deltaX: 0 })
+    expect(grup.scrollLeft).toBe(80)
+  })
+})
+
 describe('GlassChatDock — daktilo placeholder (placeholders prop)', () => {
   afterEach(() => {
     vi.useRealTimers()

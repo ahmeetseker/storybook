@@ -85,6 +85,7 @@ ile aynı karar).
 | title | prop | `string` | `'İlan Asistanı'` | — | Panel accessible name kaynağı |
 | placeholder | prop | `string` | `'Bir soru yaz…'` | — | Yalnız görsel placeholder — accessible name sabit "Mesajınız" |
 | composerOrnament | prop | `ReactNode` | — | — | Composer kapsülünün sol ucuna gömülen salt dekoratif görsel (ör. animasyonlu AI küresi); verilirse sağına ince dikey ayraç çizilir (OrbInput deseni). Kapsayıcı `aria-hidden` — erişilebilir ad textarea'nın "Mesajınız" etiketinde kalır. Kapsül `:focus-within`'de hafifçe büyür (yalnız transform; reduced-motion'da kapalı), klavye halkası `:has(:focus-visible)` ile kapsüldedir |
+| suggestions | prop | `string[]` | — | — | Composer'ın üstünde yatay kayan örnek soru pill'leri (`role="group"` + "Örnek sorular" adı; gerçek `<button>`'lar — GlassChip bilinçli kullanılmadı: o span tabanlı seçim chip'i, bunlar eylem). Tıklama `onSend`'e aynen iletilir; liste kalıcıdır. Mouse tekerinin dikey hareketi native passive-olmayan dinleyiciyle yatay kaydırmaya çevrilir (taşma yokken teker sayfaya bırakılır); coarse'ta min yükseklik `--lg-control-md` |
 | placeholders | prop | `string[]` | — | — | Verilirse `placeholder`'ın yerine geçer: öneri cümleleri composer placeholder'ında daktilo efektiyle sırayla yazılır (60ms/karakter, cümle sonunda 2400ms bekleme, döngüsel). Yalnız panel açık ve taslak boşken çalışır; `prefers-reduced-motion`'da tamamen kapalı — ilk öneri statik gösterilir. Salt görsel: accessible name ("Mesajınız") değişmez, canlı bölge duyurusu yok |
 | disclaimer | prop | `string` | `'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.'` | — | Panelin altında sabit satır |
 | className | prop | `string` | — | — | Köke birleştirilir |
@@ -307,6 +308,10 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
 
 ## Changelog
 
+- 2026-08-13 (5): Örnek soru pill'leri — yeni `suggestions` prop'u: composer'ın
+  üstünde yatay kayan, tıklanınca `onSend`'i çağıran kalıcı öneri butonları
+  (`role="group"`, kaydırma çubuğu gizli, mouse tekeri dikey→yatay çevrimi,
+  coarse'ta 44px hedef). GlassChip bilinçli kullanılmadı (seçim değil eylem).
 - 2026-08-13 (4): Boyut kademeleri — panel masaüstünde 400×600, tablette
   (≤1024px) 440×680, mobilde (≤640px) TAM EKRAN (inset:0, 100dvh, radius/
   çerçeve yok). Bu, DS'in "breakpoint yerine yetenek sorgusu" ilkesinin
