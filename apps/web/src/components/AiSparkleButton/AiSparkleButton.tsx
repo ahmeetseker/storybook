@@ -20,11 +20,13 @@ function FourPointStar({ size, color }: { size: number; color: string }) {
 }
 
 export interface AiSparkleButtonProps {
-  /** Tıklanınca (patlama animasyonundan sonra) — kabuk AI danışmana yönlendirir */
+  /** Tıklanınca (patlama animasyonunun tepe anında) — kabuk sohbeti açar */
   onActivate: () => void
+  /** Sohbet kapanınca odağın geri döneceği düğme referansı */
+  buttonRef?: React.Ref<HTMLButtonElement>
 }
 
-export function AiSparkleButton({ onActivate }: AiSparkleButtonProps) {
+export function AiSparkleButton({ onActivate, buttonRef }: AiSparkleButtonProps) {
   const [bursting, setBursting] = useState(false)
   const [reduced, setReduced] = useState(false)
 
@@ -50,10 +52,12 @@ export function AiSparkleButton({ onActivate }: AiSparkleButtonProps) {
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       onClick={handleClick}
       aria-label="AI danışman"
       title="AI danışman"
+      aria-haspopup="dialog"
       className={[styles.root, bursting ? styles.bursting : ''].filter(Boolean).join(' ')}
     >
       <span aria-hidden className={styles.dots}>

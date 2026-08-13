@@ -8,6 +8,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -39,16 +40,73 @@ export interface GlassChatDockProps {
   /** Panel başlığı — accessible name kaynağı (`aria-labelledby`) */
   title?: string
   placeholder?: string
+  /**
+   * Composer placeholder'ında daktilo efektiyle sırayla yazılan öneri
+   * cümleleri. Verilirse `placeholder`'ın yerine geçer. Animasyon yalnız
+   * panel açıkken ve taslak boşken çalışır; `prefers-reduced-motion`
+   * tercihinde tamamen kapalıdır — ilk öneri statik gösterilir.
+   */
+  placeholders?: string[]
   /** Panelin altında sabit uyarı satırı */
   disclaimer?: string
   className?: string
+}
+
+// ── daktilo placeholder ──
+// Composer placeholder'ı öneri cümlelerini karakter karakter yazar. CSS
+// animasyonu değil, salt metin güncellemesi — yine de bir hareket olduğu için
+// `prefers-reduced-motion`'da tamamen kapalıdır (statik cümle gösterilir).
+// Kullanıcı taslak yazarken de duraklar: placeholder o an zaten görünmez,
+// her karakter aralığında boşuna re-render tetiklenmesin.
+const TYPE_CHAR_DELAY = 60 // ms — karakter başına yazım aralığı
+const TYPE_IDLE_DELAY = 2400 // ms — cümle tamamlanınca sonraki cümleye geçmeden bekleme
+
+function useTypewriterPlaceholder(texts: string[], enabled: boolean) {
+  const [textIndex, setTextIndex] = useState(0)
+  const [charCount, setCharCount] = useState(0)
+
+  const current = texts.length > 0 ? texts[textIndex % texts.length] : ''
+  // Array.from: çok baytlı karakterlerde (emoji, birleşik glif) yarım karakter yazmamak için
+  const chars = useMemo(() => Array.from(current), [current])
+
+  useEffect(() => {
+    if (!enabled || chars.length === 0) return
+    setCharCount(0)
+    let shown = 0
+    let idleTimeout: number | null = null
+    const interval = window.setInterval(() => {
+      if (shown < chars.length) {
+        shown += 1
+        setCharCount(shown)
+      } else {
+        window.clearInterval(interval)
+        idleTimeout = window.setTimeout(() => {
+          setTextIndex((prev) => (prev + 1) % Math.max(texts.length, 1))
+        }, TYPE_IDLE_DELAY)
+      }
+    }, TYPE_CHAR_DELAY)
+    return () => {
+      window.clearInterval(interval)
+      if (idleTimeout !== null) window.clearTimeout(idleTimeout)
+    }
+    // `texts` bilinçli olarak deps dışında: çağıran taraf diziyi inline yazarsa
+    // kimliği her render'da değişir ve animasyon her keystroke'ta baştan
+    // başlardı. İçerik değişimi `chars` (string eşitliği) üzerinden, ardışık
+    // iki özdeş cümle ise `textIndex` üzerinden yakalanır.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, chars, textIndex])
+
+  return {
+    text: enabled ? chars.slice(0, charCount).join('') : current,
+    typing: enabled && charCount < chars.length,
+  }
 }
 
 // Non-modal dialog sözleşmesi (GlassPopover ile aynı desen): focus trap YOK,
 // arka plan tıklaması kapanışı tetiklemez — yalnız Escape ve kapat butonu kapatır.
 function SendIcon() {
   return (
-    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true" focusable="false">
       <path
         d="M17.2 2.8 2.6 8.9c-.6.25-.56 1.1.06 1.3l5.3 1.66 1.66 5.3c.2.62 1.05.66 1.3.06l6.1-14.6c.22-.53-.32-1.07-.82-.82Z"
         fill="currentColor"
@@ -132,6 +190,7 @@ export function GlassChatDock({
   onOpenChange,
   title = 'İlan Asistanı',
   placeholder = 'Bir soru yaz…',
+  placeholders,
   disclaimer = 'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.',
   className,
 }: GlassChatDockProps) {
@@ -299,6 +358,17 @@ export function GlassChatDock({
 
   const canSend = draft.trim().length > 0
 
+  // Daktilo placeholder — yalnız `placeholders` verildiyse devrede; reduced
+  // motion'da hook enabled=false döner ve tam cümle statik gösterilir.
+  const hasSuggestions = placeholders !== undefined && placeholders.length > 0
+  const typewriter = useTypewriterPlaceholder(
+    placeholders ?? [],
+    hasSuggestions && !reduced && isOpen && draft === '',
+  )
+  const composerPlaceholder = hasSuggestions
+    ? `${typewriter.text}${typewriter.typing ? '|' : ''}`
+    : placeholder
+
   return (
     <div className={[styles.root, className].filter(Boolean).join(' ')}>
       {!isOpen ? (
@@ -352,7 +422,7 @@ export function GlassChatDock({
                 className={styles.textarea}
                 rows={1}
                 value={draft}
-                placeholder={placeholder}
+                placeholder={composerPlaceholder}
                 aria-label="Mesajınız"
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={handleKeyDown}

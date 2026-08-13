@@ -149,6 +149,31 @@ export const UzunIcerik: Story = {
   },
 }
 
+/** `placeholders` — composer placeholder'ı öneri cümlelerini daktilo efektiyle sırayla yazar. */
+export const DaktiloPlaceholder: Story = {
+  name: 'Daktilo Placeholder',
+  args: {
+    defaultOpen: true,
+    messages: seedMessages,
+    placeholders: [
+      'Bu daire krediye uygun mu?',
+      'Aidat ve ısınma tipini sorun…',
+      'Metroya yürüme mesafesini sorun…',
+      'Tapu ve iskan durumunu sorun…',
+    ],
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`placeholders` verilince composer placeholder\'ı cümleleri karakter karakter yazar, kısa bir ' +
+          'beklemeden sonra sıradakine geçer (döngüsel). Kullanıcı taslak yazarken animasyon duraklar; ' +
+          '`prefers-reduced-motion` tercihinde tamamen kapalıdır — ilk öneri statik gösterilir.',
+      },
+    },
+  },
+}
+
 /** Dar/mobil viewport: panel `min()` sınırıyla kenar boşluklarını koruyarak kendiliğinden daralır (breakpoint yok). */
 export const Responsive: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },

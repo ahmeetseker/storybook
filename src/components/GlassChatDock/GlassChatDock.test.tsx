@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { GlassChatDock, type GlassChatDockMessage } from './GlassChatDock'
 
 const baseMessages: GlassChatDockMessage[] = [
@@ -313,5 +313,94 @@ describe('GlassChatDock — içerik özelleştirme', () => {
   it('disclaimer verilmezse varsayılan metin görünür', () => {
     render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen />)
     expect(screen.getByText('Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.')).toBeTruthy()
+  })
+})
+
+describe('GlassChatDock — daktilo placeholder (placeholders prop)', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const getInput = () => screen.getByRole('textbox', { name: 'Mesajınız' })
+
+  it('placeholders verilince cümle karakter karakter yazılır; yazım sürerken imleç (|) görünür, bitince kalkar', () => {
+    vi.useFakeTimers()
+    render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen placeholders={['Abc', 'De']} />)
+    // effect ilk turda charCount'u sıfırlar — henüz karakter yok, yalnız imleç
+    expect(getInput().getAttribute('placeholder')).toBe('|')
+    act(() => {
+      vi.advanceTimersByTime(60)
+    })
+    expect(getInput().getAttribute('placeholder')).toBe('A|')
+    act(() => {
+      vi.advanceTimersByTime(120)
+    })
+    // cümle tamamlandı → imleç kalkar
+    expect(getInput().getAttribute('placeholder')).toBe('Abc')
+  })
+
+  it('cümle tamamlandıktan sonra bekleme süresi dolunca sıradaki cümleye geçer (döngüsel)', () => {
+    vi.useFakeTimers()
+    render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen placeholders={['Abc', 'De']} />)
+    act(() => {
+      vi.advanceTimersByTime(180) // 'Abc' tamamlanır
+    })
+    act(() => {
+      vi.advanceTimersByTime(60 + 2400) // fazladan bir interval turu + idle bekleme
+    })
+    act(() => {
+      vi.advanceTimersByTime(60) // yeni cümlenin ilk karakteri
+    })
+    expect(getInput().getAttribute('placeholder')).toBe('D|')
+  })
+
+  it('kullanıcı taslak yazarken animasyon duraklar — placeholder tam cümleye sabitlenir, zaman ilerlese de değişmez', () => {
+    vi.useFakeTimers()
+    render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen placeholders={['Abc', 'De']} />)
+    act(() => {
+      vi.advanceTimersByTime(60) // 'A|'
+    })
+    fireEvent.change(getInput(), { target: { value: 'x' } })
+    expect(getInput().getAttribute('placeholder')).toBe('Abc')
+    act(() => {
+      vi.advanceTimersByTime(10_000)
+    })
+    expect(getInput().getAttribute('placeholder')).toBe('Abc')
+  })
+
+  it('prefers-reduced-motion: daktilo tamamen kapalı — ilk öneri statik, imleçsiz gösterilir', () => {
+    const original = window.matchMedia
+    window.matchMedia = ((query: string) =>
+      ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        onchange: null,
+        dispatchEvent: () => false,
+      }) as MediaQueryList) as typeof window.matchMedia
+    vi.useFakeTimers()
+    try {
+      render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen placeholders={['Abc', 'De']} />)
+      expect(getInput().getAttribute('placeholder')).toBe('Abc')
+      act(() => {
+        vi.advanceTimersByTime(10_000)
+      })
+      expect(getInput().getAttribute('placeholder')).toBe('Abc')
+    } finally {
+      window.matchMedia = original
+    }
+  })
+
+  it('placeholders verilmezse statik placeholder prop\'u aynen kullanılır (animasyon yok)', () => {
+    vi.useFakeTimers()
+    render(<GlassChatDock messages={[]} onSend={vi.fn()} defaultOpen placeholder="Bir soru yaz…" />)
+    expect(getInput().getAttribute('placeholder')).toBe('Bir soru yaz…')
+    act(() => {
+      vi.advanceTimersByTime(5000)
+    })
+    expect(getInput().getAttribute('placeholder')).toBe('Bir soru yaz…')
   })
 })

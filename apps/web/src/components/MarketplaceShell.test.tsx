@@ -32,9 +32,9 @@ vi.mock('./NotificationInbox/NotificationInbox', () => ({
   NotificationInbox: () => <button type="button" aria-label="Bildirimler" />,
 }))
 
-// AI kıvılcım butonu kendi test dosyasında sınanır (WebGL/ogl jsdom'a girmesin)
-vi.mock('./AiSparkleButton/AiSparkleButton', () => ({
-  AiSparkleButton: () => <button type="button" aria-label="AI danışman" />,
+// AI sohbet başlatıcısı kendi test dosyasında sınanır (WebGL/ogl jsdom'a girmesin)
+vi.mock('./AiSparkleButton/AiChatLauncher', () => ({
+  AiChatLauncher: () => <button type="button" aria-label="AI danışman" />,
 }))
 
 vi.mock('@repo/ui', () => ({

@@ -84,6 +84,7 @@ ile aynı karar).
 | onOpenChange | prop | `(open: boolean) => void` | — | — | Her açma/kapama isteğinde çağrılır (controlled reddi mümkün) |
 | title | prop | `string` | `'İlan Asistanı'` | — | Panel accessible name kaynağı |
 | placeholder | prop | `string` | `'Bir soru yaz…'` | — | Yalnız görsel placeholder — accessible name sabit "Mesajınız" |
+| placeholders | prop | `string[]` | — | — | Verilirse `placeholder`'ın yerine geçer: öneri cümleleri composer placeholder'ında daktilo efektiyle sırayla yazılır (60ms/karakter, cümle sonunda 2400ms bekleme, döngüsel). Yalnız panel açık ve taslak boşken çalışır; `prefers-reduced-motion`'da tamamen kapalı — ilk öneri statik gösterilir. Salt görsel: accessible name ("Mesajınız") değişmez, canlı bölge duyurusu yok |
 | disclaimer | prop | `string` | `'Yanıtlar yapay zekâ üretimidir, bağlayıcı değildir.'` | — | Panelin altında sabit satır |
 | className | prop | `string` | — | — | Köke birleştirilir |
 
@@ -218,18 +219,21 @@ Katman sırası: `open` (kapalıyken panel hiç render edilmez) → `message.pen
 
 **Borç (raw):** mikro-geometri kökte yerel değişkenlerde toplandı
 (`display:contents` üzerinden kalıtır): `--glass-chatdock-panel-width/height`
-(360×480 spec sabiti — dar viewport'ta `min()` ile içsel akışkan sınır,
+(400×600 spec sabiti — dar viewport'ta `min()` ile içsel akışkan sınır,
 breakpoint yok), `--glass-chatdock-launcher-icon` (15px),
-`--glass-chatdock-aimark-size/offset` (20px/2px ✦ işareti),
+`--glass-chatdock-aimark-size/offset` (24px/2px ✦ işareti),
 `--glass-chatdock-badge-pad-block/inline` (2px/7px rozet içi — kontrat
-sabiti), `--glass-chatdock-bubble-corner` (4px konuşma balonu köşesi),
-`--glass-chatdock-textarea-max` (96px), `--glass-chatdock-dot-size/pad`
+sabiti), `--glass-chatdock-bubble-corner` (6px konuşma balonu köşesi),
+`--glass-chatdock-textarea-max` (120px), `--glass-chatdock-dot-size/pad`
 (5px/2px typing noktaları). Ayrıca `z-index: 60` (z token'ı yok,
-`GlassToast` ile aynı gerekçe/değer) ve "dipte sayılır" kaydırma eşiği
-`48px` (davranışsal sabit, token ölçeğinde yok — bkz. §7). Dokunmatik 44px
-hedefleri (launcher min-height, close, send, textarea min-height)
-`pointer: coarse` bloklarında `--lg-control-md`'ye bağlandı — coarse'ta
-token birebir 44px'tir, raw 44 kalmadı.
+`GlassToast` ile aynı gerekçe/değer), "dipte sayılır" kaydırma eşiği
+`48px` ve daktilo placeholder zamanlamaları `60ms`/karakter + `2400ms`
+cümle-arası bekleme (davranışsal sabitler, token ölçeğinde yok — bkz. §4,
+§7). Composer kapsül input çerçevesi `color-mix(in srgb, var(--lg-accent)
+55%, var(--lg-hairline))` — raw hex yok, token türevi. Dokunmatik hedefler
+(launcher min-height, close: `--lg-control-md` = 44px; send ve textarea
+min-height: `--lg-control-lg` = coarse'ta 48px) `pointer: coarse`
+bloklarında token'a bağlı, raw 44 kalmadı.
 
 ## 10. Storybook kapsamı
 
@@ -302,6 +306,17 @@ istenirse `GlassChatDockMessage` genişletilip bu karar revize edilmeli.
 
 ## Changelog
 
+- 2026-08-13: Composer büyütme + daktilo placeholder — (1) yeni `placeholders`
+  prop'u: öneri cümleleri composer placeholder'ında daktilo efektiyle sırayla
+  yazılır (60ms/karakter, 2400ms cümle-arası, döngüsel); yalnız panel açık ve
+  taslak boşken çalışır, `prefers-reduced-motion`'da tamamen kapalı (ilk öneri
+  statik). CSS animasyonu değil salt metin güncellemesi; accessible name ve
+  canlı bölgeler etkilenmez. (2) Panel 360×480 → 400×600; başlık `headline`,
+  balonlar `body` tipografisine yükseltildi, balon köşeleri `--lg-radius-card`.
+  (3) Composer input kapsül biçime geçti (`--lg-radius-capsule`, accent tonlu
+  `color-mix` çerçeve, `--lg-control-lg` yükseklik); gönder butonu
+  `--lg-control-lg` daireye büyüdü. Testler: daktilo yazım/döngü/duraklatma/
+  reduced-motion + statik `placeholder` regresyonu.
 - 2026-07-17: İlk sürüm — launcher/panel geçişi, controlled `open`, non-modal
   odak sözleşmesi (yalnız kullanıcı etkileşimiyle taşınan odak), `role="log"`
   mesaj listesi, pending "yazıyor" göstergesi (reduced-motion'da statik "…"),

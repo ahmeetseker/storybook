@@ -4,15 +4,15 @@
    rules.md §9. Custom property'ler display:contents üzerinden kalıtır. */
 .root {
   display: contents;
-  --glass-chatdock-panel-width: 360px;
-  --glass-chatdock-panel-height: 480px;
+  --glass-chatdock-panel-width: 400px;
+  --glass-chatdock-panel-height: 600px;
   --glass-chatdock-launcher-icon: 15px;
-  --glass-chatdock-aimark-size: 20px;
+  --glass-chatdock-aimark-size: 24px;
   --glass-chatdock-aimark-offset: 2px;
   --glass-chatdock-badge-pad-block: 2px;
   --glass-chatdock-badge-pad-inline: 7px;
-  --glass-chatdock-bubble-corner: 4px;
-  --glass-chatdock-textarea-max: 96px;
+  --glass-chatdock-bubble-corner: 6px;
+  --glass-chatdock-textarea-max: 120px;
   --glass-chatdock-dot-size: 5px;
   --glass-chatdock-dot-pad: 2px;
 }
@@ -106,7 +106,7 @@
 }
 
 .title {
-  font-size: var(--lg-text-body);
+  font-size: var(--lg-text-headline);
   font-weight: 700;
   color: var(--lg-label);
   overflow: hidden;
@@ -171,7 +171,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--lg-space-3);
+  gap: var(--lg-space-4);
   padding: var(--lg-space-4);
 }
 
@@ -205,10 +205,10 @@
 }
 
 .bubble {
-  padding: var(--lg-space-2) var(--lg-space-3);
-  border-radius: var(--lg-radius-media);
-  font-size: var(--lg-text-footnote);
-  line-height: 1.45;
+  padding: var(--lg-space-3) var(--lg-space-4);
+  border-radius: var(--lg-radius-card);
+  font-size: var(--lg-text-body);
+  line-height: 1.5;
   overflow-wrap: anywhere;
   min-width: 0;
   /* Shift+Enter ile eklenen satır sonları korunsun — composer çok satırlı
@@ -324,18 +324,21 @@
   padding: var(--lg-space-3) var(--lg-space-4) var(--lg-space-4);
 }
 
+/* Kapsül input — vurgu tonlu çerçeve, placeholder'da daktilo efektiyle
+   birlikte composer'ı panelin odak noktası yapar. Renk yalnız token
+   türevi: accent'in hairline'a karışımı (raw hex yok). */
 .textarea {
   flex: 1 1 auto;
   resize: none;
-  min-height: var(--lg-control-md);
+  min-height: var(--lg-control-lg);
   max-height: var(--glass-chatdock-textarea-max);
-  padding: var(--lg-space-2) var(--lg-space-3);
-  border: 1px solid var(--lg-hairline);
-  border-radius: var(--lg-radius-media);
+  padding: var(--lg-space-3) var(--lg-space-4);
+  border: 1px solid color-mix(in srgb, var(--lg-accent) 55%, var(--lg-hairline));
+  border-radius: var(--lg-radius-capsule);
   background: var(--lg-surface);
   color: var(--lg-label);
   font: inherit;
-  font-size: var(--lg-text-footnote);
+  font-size: var(--lg-text-body);
   line-height: 1.4;
 }
 
@@ -353,8 +356,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--lg-control-md);
-  height: var(--lg-control-md);
+  width: var(--lg-control-lg);
+  height: var(--lg-control-lg);
   border: 0;
   border-radius: var(--lg-radius-capsule);
   background: var(--lg-action-prominent);
@@ -380,14 +383,14 @@
   }
 }
 
-/* coarse'ta --lg-control-md = 44px (dokunmatik hedef) */
+/* coarse'ta --lg-control-lg = 48px (dokunmatik hedef fazlasıyla karşılanır) */
 @media (pointer: coarse) {
   .send {
-    width: var(--lg-control-md);
-    height: var(--lg-control-md);
+    width: var(--lg-control-lg);
+    height: var(--lg-control-lg);
   }
   .textarea {
-    min-height: var(--lg-control-md);
+    min-height: var(--lg-control-lg);
   }
 }
 
