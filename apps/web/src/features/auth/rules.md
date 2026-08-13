@@ -890,3 +890,14 @@ katmanı (yalnız `transform` ile süzülen radial degrade) kaldırıldı —
 referans tasarımın taranmış dokusunu üretmiyordu. `.perde` katmanı ve
 `.taban` grubu bu değişikliğin gereğidir: shader'ın canlı bandı panelde
 gezindiği için metin artık sabit bir koyu bandın üstünde durmalı.
+
+Changelog: 2026-08-13 — WCAG 2.4 (Gezinilebilir) denetimi tamamlandı.
+Yeni 2.2 kriterleri kayıt akışında sağlanıyor: 2.4.11 Odak Örtülmesin —
+kayıt sihirbazında sticky/fixed örtücü öğe yok (ileride eklenirse odaklı
+öğeyi örtmemeli, bu sözleşmedir); 2.4.13 (AAA) — odak halkası 2px accent,
+zeminle ~7:1. Mevcut karşılıklar doğrulandı: 2.4.1 AuthShell atlama
+bağlantısı, 2.4.3 adım geçişinde başlığa/ilk hatalı alana odak,
+3.3.7 Yinelenen Giriş — adımlar arası veri sayfa state'inde korunur.
+Eklenen: 2.4.2 Sayfa Başlığı — belge başlığı görünür adımı söyler
+("Adım 2/4: Kimlik — …"), bireysel ve kurumsal sihirbazlarda; ayrılırken
+rota başlığına döner (testli).

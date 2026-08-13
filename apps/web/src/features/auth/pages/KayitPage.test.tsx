@@ -97,6 +97,16 @@ describe('KayitPage — adım adım kayıt', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Hesap tipi' })).toBeTruthy()
   })
 
+  it('belge başlığı görünür adımı söyler ve adım geçişinde güncellenir (WCAG 2.4.2)', async () => {
+    const kullanici = userEvent.setup()
+    render(<RouterProvider router={kayitRouter(sahteAdapters())} />)
+    await screen.findByLabelText(/bireysel/i)
+    expect(document.title).toBe('Adım 1/4: Hesap tipi — Hesap oluşturun | arsam.net')
+    await devamEt(kullanici)
+    await screen.findByLabelText('Ad soyad')
+    expect(document.title).toBe('Adım 2/4: Kimlik — Hesap oluşturun | arsam.net')
+  })
+
   it('yalnız bulunulan adımın alanlarını gösterir', async () => {
     const kullanici = userEvent.setup()
     render(<RouterProvider router={kayitRouter(sahteAdapters())} />)

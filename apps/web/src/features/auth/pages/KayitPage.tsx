@@ -86,6 +86,17 @@ export function KayitPage() {
   const adim = KAYIT_ADIMLARI[adimIndeksi]
   const sonAdimda = adimIndeksi === SON_INDEKS
 
+  // WCAG 2.4.2 Sayfa Başlığı: çok adımlı sihirbazda belge başlığı görünür
+  // adımı da söyler — ekran okuyucu kullanıcı sekme başlığından nerede
+  // olduğunu bilir (rota başlığı statikti, dört adımda da aynıydı).
+  // Ayrılırken rota başlığına geri döner.
+  useEffect(() => {
+    document.title = `Adım ${adimIndeksi + 1}/${KAYIT_ADIMLARI.length}: ${adim.baslik} — Hesap oluşturun | arsam.net`
+    return () => {
+      document.title = 'Hesap oluşturun | arsam.net'
+    }
+  }, [adimIndeksi, adim.baslik])
+
   useEffect(() => {
     // Bilet 0: ilk render. Sayfa açılışında odak çalınmaz.
     if (odak.bilet === 0) return

@@ -315,6 +315,15 @@ export function KayitKurumsalPage() {
   const tuzel = tuzelKisiMi(bilgiler.isletmeTuru)
   const secilenPaket = officePlanById(bilgiler.paketId)
 
+  // WCAG 2.4.2 Sayfa Başlığı: belge başlığı görünür bölümü de söyler
+  // (bireysel kayıt sihirbazıyla aynı desen); ayrılırken rota başlığına döner.
+  useEffect(() => {
+    document.title = `Bölüm ${bolumIndeksi + 1}/${KURUMSAL_ADIMLARI.length}: ${bolum.baslik} — Emlak ofisi başvurusu | arsam.net`
+    return () => {
+      document.title = 'Emlak ofisi başvurusu | arsam.net'
+    }
+  }, [bolumIndeksi, bolum.baslik])
+
   useEffect(() => {
     // Bilet 0: ilk render. Sayfa açılışında odak çalınmaz.
     if (odak.bilet === 0) return
