@@ -13,6 +13,7 @@
 import { useRef, useState } from 'react'
 import { GlassChatDock, type GlassChatDockMessage } from '@repo/ui'
 import { AiSparkleButton } from './AiSparkleButton'
+import { AiOrb } from './AiOrb'
 import { dockYanit } from './ai-dock-engine'
 import { AiDockIcerik } from './AiDockIcerik'
 
@@ -84,17 +85,7 @@ export function AiChatLauncher() {
           onSend={gonder}
           title="AI danışman"
           placeholder="Arsa arayışınızı anlatın…"
-          composerOrnament={
-            // OrbInput desenindeki animasyonlu küre — salt dekoratif (alt boş,
-            // kapsayıcı aria-hidden). Yüklenemezse sessizce gizlenir.
-            <img
-              src="https://media.giphy.com/media/26gsuUjoEBmLrNBxC/giphy.gif"
-              alt=""
-              onError={(e) => {
-                e.currentTarget.style.visibility = 'hidden'
-              }}
-            />
-          }
+          composerOrnament={<AiOrb />}
           placeholders={[
             'Arsa arayışınızı anlatın…',
             'Urla’da denize yakın imarlı parsel…',
