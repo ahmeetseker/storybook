@@ -14,11 +14,17 @@
 }
 
 /* Track segmenti kabını doldurur: sarmalayıcı, filtrenin satırı yutmasını
-   engeller — geniş ekranda makul bir tavan, mobilde kalan alanı paylaşır */
+   engeller — geniş ekranda makul bir tavan, mobilde kalan alanı paylaşır.
+   Kontrol yüksekliği BİLİNÇLİ küçültülür (--lg-control-sm 36/44 → 32px):
+   bu filtre ikincil bir anahtar, sayfanın asıl dokunma hedefleri tam
+   genişlik bildirim satırları. 32px, WCAG 2.5.8 AA tabanının (24px)
+   üstünde kalır; dokunmatikteki 44px AAA sıçraması burada kapsül ölçüsünü
+   içeriğin önüne geçiriyordu. */
 .filterWrap {
   flex: 1;
   min-width: 0;
-  max-width: 340px;
+  max-width: 300px;
+  --lg-control-sm: 32px;
 }
 
 /* Hafif metin eylemi — popover'daki markAll ile aynı dil */

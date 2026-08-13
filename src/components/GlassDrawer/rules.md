@@ -135,3 +135,9 @@ altyapısının (focus trap/scroll kilidi) hook'a çıkarılması.
 
 - 2026-07-16: İlk sürüm — side/size eksenleri, GlassModal ile ortak
   focus/scroll/Escape sözleşmesi, mobil tam genişlik davranışı.
+- 2026-08-13: Gövdeye odak halkası payı. DS halkaları `outline 2px + offset
+  2px` ile kutunun 4px dışına taşar; `.body`nin `overflow: auto` kaydırma
+  kutusu bu taşmayı kenarda kırpıyordu — tam genişlik bir alan (ofise mesaj
+  çekmecesindeki metin alanı) odaklanınca halkanın sağ/sol yayları
+  görünmüyordu. 6px'lik pay padding'le açılır, negatif marj yerleşim
+  genişliğini korur (mikro-geometri, yerel değişkende).

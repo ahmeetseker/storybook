@@ -82,11 +82,21 @@
 
 /* body flex:1 → footer alta yapışır; taşan içerik burada kayar */
 .body {
+  /* Odak halkası payı (mikro-geometri): DS halkaları `outline 2px +
+     offset 2px` ile kutunun 4px dışına taşar; `overflow: auto` bu taşmayı
+     kayma kutusunun kenarında KIRPIYORDU — tam genişlik bir alan (ör.
+     ofise mesaj çekmecesindeki metin alanı) odaklanınca halkanın sağ/sol
+     yayları görünmüyordu. Pay padding'le açılır, negatif marj yerleşim
+     genişliğini aynen korur. */
+  --drawer-ring-pay: 6px;
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
   margin-top: var(--lg-space-4, 16px);
+  padding: var(--drawer-ring-pay);
+  margin-inline: calc(var(--drawer-ring-pay) * -1);
+  margin-bottom: calc(var(--drawer-ring-pay) * -1);
   font-size: var(--lg-text-body, 15px);
 }
 .body:first-child { margin-top: 0; }
