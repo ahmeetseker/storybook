@@ -10,8 +10,38 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: var(--lg-space-3);
+}
+
+/* Track segmenti kabını doldurur: sarmalayıcı, filtrenin satırı yutmasını
+   engeller — geniş ekranda makul bir tavan, mobilde kalan alanı paylaşır */
+.filterWrap {
+  flex: 1;
+  min-width: 0;
+  max-width: 340px;
+}
+
+/* Hafif metin eylemi — popover'daki markAll ile aynı dil */
+.markAll {
+  border: 0;
+  background: none;
+  padding: var(--lg-space-1) var(--lg-space-2);
+  min-height: var(--lg-control-sm, 36px);
+  color: var(--lg-accent, #7c3806);
+  font: inherit;
+  font-size: var(--lg-text-footnote, 13px);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+}
+.markAll:hover {
+  text-decoration: underline;
+}
+.markAll:focus-visible {
+  outline: 2px solid var(--lg-accent, #7c3806);
+  outline-offset: 2px;
+  border-radius: var(--lg-radius-chip, 10px);
 }
 
 .group {
@@ -108,4 +138,47 @@
   background: var(--lg-surface);
   border: var(--lg-stroke-hairline, 1px) solid var(--lg-hairline);
   border-radius: var(--lg-radius-card, 20px);
+}
+
+/* ── Mobil kademe: daha kibar, sıkı ve simetrik ──────────────────────────
+   48rem = zilin sayfaya yönlendiği eşik. Tipografi bir adım küçülür,
+   satır dolguları sıkılaşır, filtre ile okundu say tek satırı paylaşır. */
+@media (max-width: 48rem) {
+  .root {
+    gap: var(--lg-space-4);
+  }
+  .toolbar {
+    gap: var(--lg-space-2);
+  }
+  .filterWrap {
+    max-width: none;
+  }
+  .groupLabel {
+    font-size: var(--lg-text-badge, 11px);
+  }
+  .list {
+    border-radius: var(--lg-radius-media, 16px);
+  }
+  .row {
+    padding: var(--lg-space-3);
+    gap: var(--lg-space-2);
+  }
+  .rowIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+  .rowTitle {
+    font-size: var(--lg-text-footnote, 13px);
+  }
+  .rowDetail {
+    font-size: var(--lg-text-caption, 12px);
+  }
+  .rowTime {
+    font-size: var(--lg-text-badge, 11px);
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    margin-block-start: 6px;
+  }
 }

@@ -7,7 +7,7 @@
 // paylaşılan `bildirimler` modülü) — gerçek akış bağlanınca iki yüzey birden
 // oradan beslenir.
 import { useState } from 'react'
-import { GlassButton, GlassSegmentedControl } from '@repo/ui'
+import { GlassSegmentedControl } from '@repo/ui'
 import {
   BILDIRIM_IKONLARI,
   GUN_ETIKETLERI,
@@ -44,21 +44,27 @@ export function AccountNotificationsPage({ bildirimler }: AccountNotificationsPa
   return (
     <section className={styles.root} aria-label="Bildirimler">
       <div className={styles.toolbar}>
-        <GlassSegmentedControl
-          size="sm"
-          variant="track"
-          label="Bildirim filtresi"
-          value={sekme}
-          onChange={setSekme}
-          options={[
-            { value: 'tumu', label: 'Tümü' },
-            { value: 'okunmamis', label: okunmamis > 0 ? `Okunmamış (${okunmamis})` : 'Okunmamış' },
-          ]}
-        />
+        {/* Track segmenti kabını doldurur — sarmalayıcı genişliği kısıtlar ki
+            filtre ile "okundu say" TEK satırı paylaşsın (mobilde sarma yok) */}
+        <div className={styles.filterWrap}>
+          <GlassSegmentedControl
+            size="sm"
+            variant="track"
+            label="Bildirim filtresi"
+            value={sekme}
+            onChange={setSekme}
+            options={[
+              { value: 'tumu', label: 'Tümü' },
+              { value: 'okunmamis', label: okunmamis > 0 ? `Okunmamış (${okunmamis})` : 'Okunmamış' },
+            ]}
+          />
+        </div>
         {okunmamis > 0 ? (
-          <GlassButton material="flat" size="sm" onClick={hepsiniOkunduSay}>
+          // Popover'daki markAll ile aynı dil: hafif metin eylemi — kapsül
+          // buton mobilde filtreyle yarışıp satırı kırıyordu.
+          <button type="button" className={styles.markAll} onClick={hepsiniOkunduSay}>
             Tümünü okundu say
-          </GlassButton>
+          </button>
         ) : null}
       </div>
 
