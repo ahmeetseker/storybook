@@ -25,7 +25,8 @@
   height: 100%;
   object-fit: cover;
   /* Gif karesinin siyah arka planı küre çevresinde halka gibi görünüyordu —
-     büyütüp daire maskesiyle kırpınca yalnız kürenin yüzeyi kalır. */
-  transform: scale(1.5);
+     küre yüzeyi daireyi HER karede dolduracak kadar yakınlaştırıldı (1.9):
+     küre dalgalanırken köşelerden siyah sızmaz. */
+  transform: scale(1.9);
   filter: sepia(1) saturate(2.2) hue-rotate(-8deg) brightness(1.4) contrast(0.92);
 }
