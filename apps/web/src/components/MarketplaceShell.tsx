@@ -2,6 +2,7 @@ import { useCallback, useMemo, type ReactNode } from 'react'
 import { useRouter, useRouterState } from '@tanstack/react-router'
 import { GlassButton, GlassSiteHeader, type GlassSiteHeaderLink } from '@repo/ui'
 import { useAuthSession } from '@/features/auth'
+import { AiSparkleButton } from './AiSparkleButton/AiSparkleButton'
 import { NotificationInbox } from './NotificationInbox/NotificationInbox'
 import {
   getBreadcrumbTrail,
@@ -127,6 +128,10 @@ export function MarketplaceShell({ children }: MarketplaceShellProps) {
       {/* Footer sayfanın değil kabuğun işidir: tek yerde durur, her sayfada
           aynıdır ve bir sayfanın onu unutması mümkün olmaz. */}
       {!isFocusedFlow ? <SiteFooter /> : null}
+      {/* AI danışman kıvılcımı: pazar yeri sayfalarında sağ altta yüzer;
+          odaklı akışlar (sihirbaz, hesap, mesajlar) kendi işine odaklıdır —
+          orada çizilmez. */}
+      {!isFocusedFlow ? <AiSparkleButton onActivate={() => routeTo('/ai-danisman')} /> : null}
     </div>
   )
 }

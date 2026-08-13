@@ -32,6 +32,11 @@ vi.mock('./NotificationInbox/NotificationInbox', () => ({
   NotificationInbox: () => <button type="button" aria-label="Bildirimler" />,
 }))
 
+// AI kıvılcım butonu kendi test dosyasında sınanır (WebGL/ogl jsdom'a girmesin)
+vi.mock('./AiSparkleButton/AiSparkleButton', () => ({
+  AiSparkleButton: () => <button type="button" aria-label="AI danışman" />,
+}))
+
 vi.mock('@repo/ui', () => ({
   GlassButton: ({
     children,

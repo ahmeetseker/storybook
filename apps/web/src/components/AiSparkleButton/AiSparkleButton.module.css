@@ -1,0 +1,229 @@
+/* AI kıvılcım butonu — lab'daki (ai-btn-deneme #3) cam kürenin FAB ölçeği.
+   Renkler Kağıt temasının sıcak ailesinden sabitlenir (lab paleti zaten
+   bej/kahveydi); mikro-geometri lab kaynağıyla birebir tutulur ki
+   güncellemeler kolay taşınsın. */
+.root {
+  /* Lab'ın --btn-* kancaları — Kağıt karşılıkları */
+  --btn-bg-from: #fffdf9;
+  --btn-bg-to: #f1ead9;
+  --btn-highlight: rgba(255, 255, 255, 0.92);
+  --btn-ring: rgba(138, 107, 63, 0.45);
+  --btn-shadow-color: rgba(36, 33, 27, 0.16);
+  --btn-shadow-glow: rgba(124, 56, 6, 0.14);
+  --spark-glow: rgba(241, 232, 214, 0.55);
+  --spark-halo: rgba(185, 169, 138, 0.28);
+  --spark-speed: 2.4s;
+
+  position: fixed;
+  right: var(--lg-space-6, 24px);
+  bottom: calc(var(--lg-space-6, 24px) + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  width: 76px;
+  height: 76px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  transition:
+    transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 300ms ease;
+  box-shadow:
+    0 1px 0 var(--btn-highlight) inset,
+    0 -1px 1px var(--btn-shadow-color) inset,
+    0 18px 44px var(--btn-shadow-glow),
+    0 8px 18px var(--btn-shadow-color);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.root:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 1px 0 var(--btn-highlight) inset,
+    0 -1px 1px var(--btn-shadow-color) inset,
+    0 26px 60px var(--btn-shadow-glow),
+    0 12px 24px var(--btn-shadow-color);
+}
+.root:active {
+  transform: scale(0.96);
+}
+.root:focus-visible {
+  outline: 2px solid var(--lg-accent, #7c3806);
+  outline-offset: 3px;
+}
+
+/* Izgara dalgası zemini */
+.dots {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: -2;
+  background: radial-gradient(120% 100% at 50% 50%, var(--btn-bg-from) 0%, var(--btn-bg-to) 80%);
+}
+.dots > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* Cam parlaması */
+.glass {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 30% 15%, var(--btn-highlight) 0%, color-mix(in srgb, var(--btn-highlight) 18%, transparent) 40%, transparent 65%),
+    linear-gradient(180deg, color-mix(in srgb, var(--btn-highlight) 20%, transparent), transparent);
+}
+
+/* Açıya göre dönen ince halka */
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1.5px;
+  background: linear-gradient(
+    140deg,
+    var(--btn-ring),
+    color-mix(in srgb, var(--btn-ring) 18%, transparent) 35%,
+    transparent 55%,
+    color-mix(in srgb, var(--btn-ring) 30%, transparent) 80%,
+    var(--btn-ring)
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--spark-halo) 0%, transparent 65%);
+  transform: translate(-50%, -50%);
+  filter: blur(6px);
+  animation: haloPulse var(--spark-speed) ease-in-out infinite;
+  pointer-events: none;
+}
+
+.star {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px var(--spark-glow)) drop-shadow(0 0 16px var(--spark-glow));
+  animation: starPulse var(--spark-speed) ease-in-out infinite;
+  z-index: 2;
+}
+.star svg {
+  transition: transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.root:hover .star svg {
+  transform: rotate(45deg) scale(1.05);
+}
+
+.satellite {
+  position: absolute;
+  display: inline-flex;
+  filter: drop-shadow(0 0 4px var(--spark-glow));
+  opacity: 0.85;
+  z-index: 1;
+}
+.satelliteTl {
+  top: 22%;
+  right: 22%;
+  animation: twinkle calc(var(--spark-speed) * 0.85) ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+.satelliteBr {
+  bottom: 22%;
+  left: 20%;
+  animation: twinkle calc(var(--spark-speed) * 1.1) ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+/* Tıklama patlaması */
+.bursting .star {
+  animation: burst 900ms ease-out;
+}
+.bursting .halo {
+  animation: haloBurst 900ms ease-out;
+}
+.bursting .satelliteTl {
+  animation: flyTl 900ms ease-out;
+}
+.bursting .satelliteBr {
+  animation: flyBr 900ms ease-out;
+}
+
+@keyframes starPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes haloPulse {
+  0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.12); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(35deg); }
+}
+@keyframes burst {
+  0% { transform: scale(1) rotate(0deg); }
+  35% { transform: scale(1.3) rotate(90deg); filter: drop-shadow(0 0 24px var(--spark-glow)) drop-shadow(0 0 40px var(--spark-glow)); }
+  100% { transform: scale(1) rotate(180deg); }
+}
+@keyframes haloBurst {
+  0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+  40% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+  100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes flyTl {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  60% { transform: translate(14px, -14px) scale(1.3); opacity: 1; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+}
+@keyframes flyBr {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  60% { transform: translate(-14px, 14px) scale(1.3); opacity: 1; }
+  100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+}
+
+/* Mobil: bir kademe küçük, kenarlardan eşit pay */
+@media (max-width: 48rem) {
+  .root {
+    width: 64px;
+    height: 64px;
+    right: var(--lg-space-4, 16px);
+    bottom: calc(var(--lg-space-4, 16px) + env(safe-area-inset-bottom, 0px));
+  }
+  .star svg { width: 28px; height: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root { transition: none; }
+  .halo,
+  .star,
+  .satellite { animation: none; }
+  .star svg { transition: none; }
+}
