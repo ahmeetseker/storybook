@@ -57,7 +57,7 @@ describe('RegionFlipCard', () => {
     expect(root.dataset.flipped).toBe('false')
   })
 
-  it('fiyat pinine tıklamak doğrudan ilana götürür — küçük yüzeyde popup yok', async () => {
+  it('pine tıklayınca harita içine sabit önizleme açılır; İlana git yönlendirir', async () => {
     const { props } = renderCard()
     fireEvent.click(screen.getByRole('button', { name: 'Haritada gör' }))
     const pinButton = await waitFor(() => {
@@ -68,9 +68,26 @@ describe('RegionFlipCard', () => {
       return found!
     })
     fireEvent.click(pinButton!)
-    expect(screen.queryByRole('button', { name: 'İlana git' })).toBeNull()
+    // Tıklama henüz yönlendirmez: önce harita içinde önizleme kartı açılır.
+    expect(props.onOpenListing).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'İlana git' }))
     expect(props.onOpenListing).toHaveBeenCalledTimes(1)
     expect(props.onOpenListing).toHaveBeenCalledWith(expect.stringMatching(/^listing-/))
+  })
+
+  it('önizleme kapatma ile kapanır', async () => {
+    renderCard()
+    fireEvent.click(screen.getByRole('button', { name: 'Haritada gör' }))
+    const pinButton = await waitFor(() => {
+      const found = screen
+        .getAllByRole('button')
+        .find((button) => /^₺/.test(button.textContent ?? ''))
+      expect(found).toBeTruthy()
+      return found!
+    })
+    fireEvent.click(pinButton!)
+    fireEvent.click(screen.getByRole('button', { name: 'Önizlemeyi kapat' }))
+    expect(screen.queryByRole('button', { name: 'İlana git' })).toBeNull()
   })
 
   it('ilanı olmayan bölgede harita yerine boş durum anlatılır', () => {

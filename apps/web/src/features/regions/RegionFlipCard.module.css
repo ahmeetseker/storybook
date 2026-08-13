@@ -52,6 +52,14 @@
 .mapEmpty strong{color:var(--lg-label)}
 .mapEmpty p{margin:0;font-size:var(--lg-text-footnote)}
 
+/* Haritadaki ilan önizlemesi: pine çapalanmaz, haritanın alt kenarına demirler.
+   Kabuk (yüzey, kenarlık, gölge, kapatma) burada çizilir — GlassMapPopupCard
+   yalnız gövdedir, kendi yüzeyini getirmez (bkz. GlassMapPopupCard.module.css). */
+.preview{position:absolute;inset-inline:var(--lg-space-3);inset-block-end:var(--lg-space-3);z-index:5;max-inline-size:20rem;margin-inline:auto;padding:var(--lg-space-3);background:var(--lg-surface);border:var(--lg-stroke-hairline) solid var(--lg-hairline);border-radius:var(--lg-radius-chip);box-shadow:0 6px 18px color-mix(in srgb,var(--lg-label) 22%,transparent)}
+.previewClose{position:absolute;inset-block-start:var(--lg-space-1);inset-inline-end:var(--lg-space-1);display:grid;place-items:center;inline-size:22px;block-size:22px;background:transparent;border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-label-secondary);cursor:pointer;font-size:15px;line-height:1}
+.previewClose:hover{color:var(--lg-label)}
+.previewClose:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
+
 .textButton:focus-visible,.flipButton:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
 
 /* Dar kartta metrikler kimliğin altına iner, kart biraz uzar. */

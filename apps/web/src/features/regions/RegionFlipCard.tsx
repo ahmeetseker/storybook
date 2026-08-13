@@ -3,7 +3,7 @@
 // bölgenin ilanları gerçek haritada). Hover kartı çevirir; dokunmatik ve
 // klavye için aynı iş açık bir butonla yapılır — hover tek yol olamaz.
 import { useMemo, useState } from 'react'
-import { GlassMap, GlassTrendChart } from '@repo/ui'
+import { GlassMap, GlassMapPopupCard, GlassTrendChart } from '@repo/ui'
 import { pointBasemap } from '@/config/basemap'
 import { listingsForRegion } from './data/region-listings'
 import { regionPriceSeries } from './data/region-price-series'
@@ -29,6 +29,11 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
   // Leaflet + tile yükü kart başına pahalı: 6 kartın haritası sayfa açılışında
   // değil, kart İLK kez çevrildiğinde kurulur ve sonra sıcak kalır.
   const [everFlipped, setEverFlipped] = useState(false)
+  // Haritada seçili ilanın önizlemesi. Pin'e çapalanmaz: GlassMap'in kendi
+  // popup'ı bilerek kırpılmadığından kısa panelde kartın dışına taşıyordu.
+  // Önizleme haritanın alt kenarına sabitlenir — pin nerede olursa olsun
+  // haritanın içinde kalır.
+  const [previewId, setPreviewId] = useState<string>()
   const flipped = hovered || pinnedOpen
 
   const pins = useMemo(() => listingsForRegion(region), [region])
@@ -45,8 +50,11 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
 
   const flip = (next: boolean) => {
     if (next) setEverFlipped(true)
+    else setPreviewId(undefined)
     setPinnedOpen(next)
   }
+
+  const preview = previewId ? pins.find((pin) => pin.id === previewId) : undefined
 
   return (
     <article
@@ -132,14 +140,28 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
                 pins={pins}
                 basemap={basemap}
                 cluster
-                // Kart haritası popup taşıyamayacak kadar küçük: GlassMap
-                // popup'ı bilerek kırpılmadığı için (kenar pinlerinde
-                // okunabilirlik) kısa panelde kartın başlığına taşıyordu.
-                // Küçük yüzeyde sözleşme basittir — kapsüle tıkla, ilana git.
-                onPinSelect={(pinId) => {
-                  if (pinId) onOpenListing?.(pinId)
-                }}
+                selectedId={previewId ?? null}
+                onPinSelect={(pinId) => setPreviewId(pinId ?? undefined)}
               />
+            ) : null}
+            {preview ? (
+              <div className={styles.preview} role="group" aria-label={`${preview.title} önizlemesi`}>
+                <button
+                  type="button"
+                  className={styles.previewClose}
+                  aria-label="Önizlemeyi kapat"
+                  onClick={() => setPreviewId(undefined)}
+                >
+                  ×
+                </button>
+                <GlassMapPopupCard
+                  title={preview.title}
+                  meta={preview.meta}
+                  price={preview.fullPrice}
+                  actionLabel="İlana git"
+                  onAction={() => onOpenListing?.(preview.id)}
+                />
+              </div>
             ) : null}
             {everFlipped && !pins.length ? (
               <div className={styles.mapEmpty}>
