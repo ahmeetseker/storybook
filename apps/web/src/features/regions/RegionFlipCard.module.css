@@ -79,9 +79,30 @@
 
 .textButton:focus-visible,.flipButton:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
 
-/* Dar kartta metrikler kimliğin altına iner. */
+/* Mobil "İncele" sayfası (GlassDrawer) içeriği */
+.sheetBody{display:grid;gap:var(--lg-space-3)}
+.sheetMap{block-size:22rem;display:flex}
+.sheetButton{display:inline-flex;align-items:center;gap:var(--lg-space-1);white-space:nowrap;background:var(--lg-accent);border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-bg);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-md);padding-inline:var(--lg-space-4)}
+.sheetButton:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
+/* Kapağın dekoratif fiyat çizgisi — yalnız dar kartta görünür */
+.coverSpark{display:none;position:absolute;inset:auto 0 0 0;block-size:4.5rem;inline-size:100%;pointer-events:none}
+.coverSpark polygon{fill:color-mix(in srgb,var(--lg-accent) 8%,transparent)}
+.mobileCta{display:none}
+
+/* Dar KOLONDA metrikler kimliğin altına iner — bu yerleşim meselesi, cihaz
+   meselesi değil; container query doğru araç. */
 @container (width < 40rem){
   .frontBody{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identity score" "metrics metrics"}
+}
+
+/* MOBİLDE (viewport ≤ 640px) flip ve panel içeriği yoktur — kart yalnız karar
+   verdiren kapaktır (kimlik + skor + metrikler + gerekçe), gerisi "İncele" ile
+   alttan açılan tam boy sayfaya taşınır. Bu cihaz meselesi olduğundan media
+   query kullanılır: masaüstünün dar orta kolonu mobil kapağa düşmemeli. */
+@media (max-width:40rem){
+  .front .signals,.front .chart,.front .actions{display:none}
+  .coverSpark{display:block}
+  .mobileCta{display:flex;justify-content:flex-end;position:relative;border-block-start:var(--lg-stroke-hairline) solid var(--lg-hairline);padding-block-start:var(--lg-space-3)}
 }
 
 /* Hareket azaltıldığında levha dönmez: yüzler yumuşak çapraz geçişle el

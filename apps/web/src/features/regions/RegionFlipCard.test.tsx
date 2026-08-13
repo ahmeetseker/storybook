@@ -95,6 +95,15 @@ describe('RegionFlipCard', () => {
     expect(screen.queryByRole('button', { name: 'İlana git' })).toBeNull()
   })
 
+  it('İncele mobil sayfayı (sheet) açar: sinyaller, grafik ve harita orada', async () => {
+    renderCard()
+    fireEvent.click(screen.getByRole('button', { name: 'İncele' }))
+    const sheet = await screen.findByRole('dialog', { name: /Çeşme|Urla/ })
+    expect(sheet).toBeTruthy()
+    expect(screen.getAllByText('Son 12 ay m² fiyatı').length).toBeGreaterThan(1)
+    await waitFor(() => expect(screen.getByRole('group', { name: 'Urla ilan haritası' })).toBeTruthy())
+  })
+
   it('ilanı olmayan bölgede harita yerine boş durum anlatılır', () => {
     renderCard({
       region: konyaalti,
