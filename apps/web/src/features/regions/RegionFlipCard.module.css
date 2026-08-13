@@ -3,7 +3,7 @@
    devrilir (rotateX) — geniş bir levhayı sağa çevirmek kapı gibi, yukarı
    çevirmek pano gibi okunur; pano doğrusu bu. Sabit yükseklik şarttır:
    mutlak konumlu yüzler köke yükseklik veremez. */
-.root{position:relative;block-size:21rem;perspective:1600px;container-type:inline-size}
+.root{position:relative;block-size:31rem;perspective:1600px;container-type:inline-size}
 .inner{position:relative;inline-size:100%;block-size:100%;transform-style:preserve-3d;transition:transform .65s var(--lg-motion-ease-standard)}
 .root[data-flipped="true"] .inner{transform:rotateX(180deg)}
 .face{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--lg-surface);border:var(--lg-stroke-hairline) solid var(--lg-hairline);border-radius:var(--lg-radius-card);box-shadow:var(--lg-shadow-card,none)}
@@ -32,6 +32,10 @@
 .signal[data-tone="positive"]{border-color:color-mix(in srgb,var(--lg-success) 35%,transparent)}
 .signal[data-tone="caution"]{border-color:color-mix(in srgb,var(--lg-warning) 45%,transparent)}
 .reason{margin:0;color:var(--lg-label-secondary);font-size:var(--lg-text-caption)}
+/* Grafik ön yüzün esnek boşluğunu doldurur; kart yüksekliği sabit olduğundan
+   taşan kısım değil grafik yüksekliği sınırlanır (height prop'u). */
+.chart{flex-shrink:0}
+.actions{flex-shrink:0}
 .actions{display:flex;justify-content:space-between;align-items:center;gap:var(--lg-space-3);margin-block-start:auto;border-block-start:var(--lg-stroke-hairline) solid var(--lg-hairline);padding-block-start:var(--lg-space-3)}
 .actionGroup{display:flex;flex-wrap:wrap;gap:var(--lg-space-2)}
 .textButton{background:transparent;border:0;color:var(--lg-accent);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-sm);padding-inline:var(--lg-space-2)}
@@ -52,7 +56,7 @@
 
 /* Dar kartta metrikler kimliğin altına iner, kart biraz uzar. */
 @container (width < 40rem){
-  .root{block-size:26rem}
+  .root{block-size:38rem}
   .frontBody{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"identity score" "metrics metrics"}
 }
 

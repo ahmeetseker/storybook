@@ -3,9 +3,10 @@
 // bölgenin ilanları gerçek haritada). Hover kartı çevirir; dokunmatik ve
 // klavye için aynı iş açık bir butonla yapılır — hover tek yol olamaz.
 import { useMemo, useState } from 'react'
-import { GlassMap } from '@repo/ui'
+import { GlassMap, GlassTrendChart } from '@repo/ui'
 import { pointBasemap } from '@/config/basemap'
 import { listingsForRegion } from './data/region-listings'
+import { regionPriceSeries } from './data/region-price-series'
 import type { RegionMatch, RegionSummary } from './domain/region-types'
 import styles from './RegionFlipCard.module.css'
 
@@ -31,6 +32,12 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
   const flipped = hovered || pinnedOpen
 
   const pins = useMemo(() => listingsForRegion(region), [region])
+  // Ön yüzün grafiği: 12 aylık m² fiyat serisi, endeksle aynı üreticiden.
+  const priceSeries = useMemo(
+    () =>
+      regionPriceSeries(region).map((point) => ({ x: point.period, y: point.value })),
+    [region],
+  )
   const basemap = useMemo(
     () => pointBasemap([region.coordinates.lat, region.coordinates.lng], REGION_ZOOM),
     [region.coordinates.lat, region.coordinates.lng],
@@ -83,6 +90,14 @@ export function RegionFlipCard({ region, match, compared, onSelect, onToggleComp
             ))}
           </div>
           <p className={styles.reason}>{match?.reasons[0] ?? 'Bölge profili değerlendirildi.'}</p>
+          <div className={styles.chart}>
+            <GlassTrendChart
+              series={[{ id: `${region.id}-m2`, label: 'Son 12 ay m² fiyatı', points: priceSeries }]}
+              height={104}
+              valueSuffix=" ₺/m²"
+              showGrid={false}
+            />
+          </div>
           <div className={styles.actions}>
             <div className={styles.actionGroup}>
               <button type="button" className={styles.textButton} onClick={onSelect}>Bölgeyi incele</button>

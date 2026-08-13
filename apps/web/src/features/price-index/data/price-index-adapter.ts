@@ -135,8 +135,10 @@ const SPAN_YEARS: Record<Period, number> = { '1y': 1, '3y': 3, '5y': 5 }
 /**
  * Son değerden ve yıllık değişimden geriye doğru seri üretir. `phase` her bölgeye
  * farklı dalgalanma verir; son nokta her zaman yayımlanan değere oturur.
+ * Bölge rehberinin kart grafiği de aynı seriyi buradan üretir — iki ekran
+ * aynı bölge için farklı geçmiş çizmesin.
  */
-function buildSeries(last: number, annualPct: number, period: Period, basis: PriceBasis, cpi: number, phase: number): TimeSeriesPoint[] {
+export function buildSeries(last: number, annualPct: number, period: Period, basis: PriceBasis, cpi: number, phase: number): TimeSeriesPoint[] {
   const labels = LABELS[period]
   const n = labels.length
   const years = SPAN_YEARS[period]
@@ -152,7 +154,7 @@ function buildSeries(last: number, annualPct: number, period: Period, basis: Pri
   })
 }
 
-function phaseFor(slug: string): number {
+export function phaseFor(slug: string): number {
   let h = 0
   for (const ch of slug) h = (h * 31 + ch.charCodeAt(0)) % 997
   return (h / 997) * Math.PI * 2

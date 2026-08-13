@@ -35,6 +35,12 @@ describe('RegionFlipCard', () => {
     expect(screen.getByRole('button', { name: 'Bölgeyi incele' })).toBeTruthy()
   })
 
+  it('ön yüzde 12 aylık fiyat grafiği durur', () => {
+    renderCard()
+    expect(screen.getAllByText('Son 12 ay m² fiyatı').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('img').length).toBeGreaterThan(0)
+  })
+
   it('harita ilk çevirmeye kadar mount edilmez, çevirince bölge haritası gelir', () => {
     renderCard()
     expect(screen.queryByRole('group', { name: 'Urla ilan haritası' })).toBeNull()
