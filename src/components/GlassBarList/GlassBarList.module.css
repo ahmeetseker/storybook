@@ -1,0 +1,57 @@
+/* GlassBarList — kendi yüzeyi yoktur; kabın zeminini kullanır.
+   Bar genişliği veridir, animasyonla abartılmaz (reduced-motion kuralı gerekmez). */
+
+.root {
+  --bar-tint: var(--lg-accent);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg-space-2, 8px);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(72px, max-content) 1fr max-content;
+  align-items: center;
+  gap: var(--lg-space-3, 12px);
+}
+
+.label {
+  font-size: var(--lg-text-footnote, 13px);
+  color: var(--lg-label-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track {
+  display: block;
+  height: 8px;
+  border-radius: var(--lg-radius-capsule, 999px);
+  background: color-mix(in srgb, var(--lg-label-secondary) 12%, transparent);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--bar-tint) 55%, transparent);
+}
+
+.value {
+  font-size: var(--lg-text-footnote, 13px);
+  font-variant-numeric: tabular-nums;
+  color: var(--lg-label-primary);
+  text-align: end;
+  min-width: 3.5ch;
+}
+
+/* Vurgulu satır: sayfanın kendi bölgesi — bar tam dolulukta, etiket birincil renkte */
+.row[data-prominent='true'] .label {
+  color: var(--lg-label-primary);
+  font-weight: 600;
+}
+
+.row[data-prominent='true'] .fill {
+  background: var(--bar-tint);
+}
