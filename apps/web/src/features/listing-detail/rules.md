@@ -142,9 +142,11 @@ Bunlar süsleme değil, okunabilirlik sözleşmesidir:
   Dock'ta buton yoktur: kararın kanıtı akıştaki bölümlerde, iletişim satıcı
   bölümündedir; dock oraya götürür. Bağlantı olduğu için kartın butonlarıyla
   aynı erişilebilir adı da taşımaz — sayfada tek bir eylemin iki kez çizilmiş
-  hâli gibi okunmaz. Dock'un alt dolgusu kabuğun yüzen dock'unun payını
-  (`--dock-clearance`) okur: çubuk ekranın alt kenarına dayanır ama içeriği
-  yüzen kapsülün üstünde durur.
+  hâli gibi okunmaz. Dock'un alt dolgusu üst dolguyla simetriktir (+
+  safe-area); kabuğun yüzen AI butonu dock görünürken dock'un üstüne çıkar
+  (`data-page-dock` işareti, app.css) — pay artık dock'un içinde taşınmaz
+  (2026-08-14: alttaki büyük boşluk geri bildirimi). Bağlantının görünümü cam
+  kapsüldür (galeri kapsülüyle aynı reçete), dolu kahve zemin değildir.
 - **Yapay zekâ karar özeti kendi yaprağında akar.** Bölüm, yaprağının İÇİNDE
   ikinci bir çerçeveli panel açmaz (`GlassAiSummaryCard` bu sayfada
   kullanılmaz — yaprağın içindeki çerçeveli kart, kart içinde kart olurdu;
@@ -158,9 +160,10 @@ Bunlar süsleme değil, okunabilirlik sözleşmesidir:
 - **Yüzen alt dock için pay sayfa tarafından ayrılır.** Kabuğun dock'u
   viewport'un ortasına sabitlenmiştir ve sayfanın ızgarasını tanımaz; bu yüzden
   `.shell` üzerinde tek bir `--dock-clearance` yerel özelliği tanımlıdır
-  (`--lg-shell-dock-offset` + `env(safe-area-inset-bottom)`). Hem gövdenin alt
-  dolgusu (son etkileşimli öğe: satıcı bölümündeki numara kontrolü), karar
-  kartının hareket alanı ve dar yerleşimdeki dock'un alt dolgusu bunu okur.
+  (`--lg-shell-dock-offset` + `env(safe-area-inset-bottom)`). Gövdenin alt
+  dolgusu (son etkileşimli öğe: satıcı bölümündeki numara kontrolü) ve karar
+  kartının hareket alanı bunu okur; dar yerleşimdeki dock ise payı okumaz —
+  AI butonu dock görünürken onun üstüne çıkar (bkz. yukarıdaki madde).
   Sabit bir piksel değeri yazılmaz.
 - **Doğrulama vektörü dar kolona sıkışmaz.** Vektörün tamamı kanıt akışındaki
   doğrulama defterindedir (`#dogrulama`, `ListingLedger`) — her satır kaynağı
@@ -200,7 +203,10 @@ genişliğidir (`@container page`, kap `PageContainer`):
   ikonları bulunur. İkisi de ikon-tektir ve `aria-label` taşır; favori
   `aria-pressed` ile durumunu bildirir, paylaş `navigator.share` yoksa
   bağlantıyı panoya kopyalar ve sonucu `role="status"` satırında yazar —
-  hiçbiri tıklandığında sessiz kalmaz.
+  hiçbiri tıklandığında sessiz kalmaz. Kapsül sıkıdır: iç dolgu yok, buton
+  görünür kutusu `--lg-control-sm`, dokunma hedefi görünmez `::after`
+  taşmasıyla `--lg-control-hit`e genişler (2026-08-14 geri bildirimi:
+  "bu alan çok büyük").
 - **Tam ekran görünüm kütüphaneden gelir**: `GlassLightbox` (portal, focus trap,
   scroll kilidi, kapanışta tetikleyiciye focus dönüşü, ok/thumbnail/klavye
   gezinmesi). Bu sayfa kendi overlay'ini yazmaz. Bir kareye tıklamak **tek

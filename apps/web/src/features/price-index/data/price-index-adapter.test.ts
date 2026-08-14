@@ -110,6 +110,102 @@ describe('loadPriceIndex', () => {
     expect(snapshot.region.name).toBe('İstanbul')
   })
 
+  it('her bölge demografi taşır: cinsiyet ve medeni durum yüzdeleri 100 eder', async () => {
+    const { snapshot } = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/kadikoy') })
+    const d = snapshot.demographics
+    expect(d.population).toBeGreaterThan(0)
+    expect(d.averageAge).toBeGreaterThan(25)
+    expect(d.averageAge).toBeLessThan(50)
+    expect(d.femalePct + d.malePct).toBe(100)
+    expect(d.marriedPct + d.singlePct).toBe(100)
+    expect(d.sourceLabel).toContain('TÜİK')
+  })
+
+  it('yaş ve eğitim dağılımları yüzde olarak 100 eder', async () => {
+    const { snapshot } = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul') })
+    const toplam = (xs: Array<{ pct: number }>) => xs.reduce((s, x) => s + x.pct, 0)
+    expect(toplam(snapshot.demographics.ageBands)).toBe(100)
+    expect(toplam(snapshot.demographics.education)).toBe(100)
+    expect(snapshot.demographics.ageBands[0].label).toContain('yaş')
+  })
+
+  it('alt kırılımı olan bölgede nüfus dağılımı çocukları listeler, vurgu yoktur', async () => {
+    const { snapshot } = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul') })
+    const { items, label } = snapshot.demographics.subRegionPopulation
+    expect(label).toContain('ilçe')
+    expect(items.map((i) => i.id)).toContain('kadikoy')
+    expect(items.every((i) => !i.prominent)).toBe(true)
+  })
+
+  it('yaprak bölgede nüfus dağılımı kardeşleri listeler ve kendini vurgular', async () => {
+    const { snapshot } = await loadPriceIndex({
+      path: parsePriceIndexPath('konut/satilik/istanbul/kadikoy/feneryolu'),
+    })
+    const { items } = snapshot.demographics.subRegionPopulation
+    expect(items.map((i) => i.id)).toContain('goztepe')
+    expect(items.find((i) => i.id === 'feneryolu')?.prominent).toBe(true)
+  })
+
+  it('demografi deterministiktir — iki yükleme aynı sonucu verir', async () => {
+    const once = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/kadikoy') })
+    const sonra = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/kadikoy') })
+    expect(once.snapshot.demographics).toEqual(sonra.snapshot.demographics)
+  })
+
+  it('kiralık görünüm satılığın kopyası değildir: m² değeri medyan kiradır', async () => {
+    const satilik = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik') })
+    const kiralik = await loadPriceIndex({ path: parsePriceIndexPath('konut/kiralik') })
+    const kira = kiralik.snapshot.headline.medianPricePerSqm.value
+    expect(kira).not.toBe(satilik.snapshot.headline.medianPricePerSqm.value)
+    // Kira m² = satılık m² × getiri / 12 — iki sayfa aynı köprüyü paylaşır.
+    expect(kira).toBe(satilik.snapshot.investment.medianRentPerSqm)
+  })
+
+  it('kiralıkta değişim oranı ve seriler kira verisinden üretilir', async () => {
+    const satilik = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul') })
+    const kiralik = await loadPriceIndex({ path: parsePriceIndexPath('konut/kiralik/istanbul') })
+    expect(kiralik.snapshot.change.nominal).not.toBe(satilik.snapshot.change.nominal)
+    const seri = kiralik.snapshot.series['1y'].nominal.own
+    expect(seri.at(-1)?.value).toBe(kiralik.snapshot.headline.medianPricePerSqm.value)
+  })
+
+  it('kiralıkta alt bölge satırları kira m² değerleri taşır', async () => {
+    const kiralik = await loadPriceIndex({ path: parsePriceIndexPath('konut/kiralik/istanbul') })
+    const kadikoy = kiralik.snapshot.subRegions.find((r) => r.slug === 'kadikoy')
+    expect(kadikoy?.pricePerSqm).toBeLessThan(2_000)
+  })
+
+  it('dağılım bantları bölgenin kendi medyan ölçeğinden üretilir', async () => {
+    const turkiye = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik') })
+    const besiktas = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/besiktas') })
+    expect(besiktas.snapshot.distribution.bins.map((b) => b.label)).not.toEqual(
+      turkiye.snapshot.distribution.bins.map((b) => b.label),
+    )
+    expect(besiktas.snapshot.distribution.bins.find((b) => b.containsMedian)).toBeTruthy()
+  })
+
+  it('Ankara ilçeleri ve Beşiktaş mahalleleri de ağaçta vardır', async () => {
+    const ankara = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/ankara') })
+    expect(ankara.snapshot.subRegions.length).toBeGreaterThan(3)
+    const besiktas = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/besiktas') })
+    expect(besiktas.snapshot.subRegionLabel).toBe('Mahalleler')
+    expect(besiktas.snapshot.subRegions.length).toBeGreaterThan(3)
+  })
+
+  it('oda sayısı ve bina yaşı kırılımları pay olarak 100 eder', async () => {
+    const { snapshot } = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul/kadikoy') })
+    const pay = (xs: Array<{ sharePct: number }>) => xs.reduce((s, x) => s + x.sharePct, 0)
+    expect(pay(snapshot.breakdowns.rooms)).toBe(100)
+    expect(pay(snapshot.breakdowns.buildingAge)).toBe(100)
+    // Küçük daire m² başına daha pahalıdır; sıfır bina en pahalıdır.
+    expect(snapshot.breakdowns.rooms[0].pricePerSqm).toBeGreaterThan(snapshot.breakdowns.rooms.at(-1)!.pricePerSqm)
+  })
+
+  it('kiralık kırılım değerleri kira ölçeğindedir', async () => {
+    const { snapshot } = await loadPriceIndex({ path: parsePriceIndexPath('konut/kiralik/istanbul/kadikoy') })
+    expect(snapshot.breakdowns.rooms[0].pricePerSqm).toBeLessThan(2_000)
+  })
+
   it('iç linkleme rafı ters işlem türüne bağlantı verir', async () => {
     const { discovery } = await loadPriceIndex({ path: parsePriceIndexPath('konut/satilik/istanbul') })
     const digerler = discovery.find((c) => c.id === 'diger-gorunumler')

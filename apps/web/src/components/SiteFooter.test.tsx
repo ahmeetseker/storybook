@@ -71,7 +71,6 @@ describe('SiteFooter', () => {
       ['Arsa ara', '/arsa-ara'],
       ['Bölgeler', '/bolgeler'],
       ['Emlak ofisleri', '/ofisler'],
-      ['Blog', '/blog'],
       ['AI danışman', '/ai-danisman'],
       ['Karşılaştır', '/karsilastir'],
       ['Favoriler', '/favoriler'],

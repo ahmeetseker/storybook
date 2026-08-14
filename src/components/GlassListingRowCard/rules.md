@@ -57,7 +57,7 @@ ilan detay sayfası künyesi (`GlassListingDetailHeader`).
 | başlık | ✅ | `title` | Tek satır + ellipsis |
 | `rating` | — | 0–5 puan | Rakam `aria-hidden`, etiket `GlassRating`'in `role="img"` adından gelir |
 | `location` | — | Konum | Tek satır + ellipsis |
-| `features` | — | `<ul>` rozetleri | Her rozet tek satır; sığmazsa alt satıra sarar |
+| `features` | — | `<ul>` rozetleri | Tek sıra yatay kayar; kaydırma alanı gövde dolgusuna taşar, kenar fade'i devam eden içeriği işaretler |
 | `note` | — | Doğrulama/bilgi notu | Tek tonlu bant; renk tek başına anlam taşımaz, metin zorunlu |
 | ayak | — | `agent` · `listedAt` · `footerMeta` · `actions` | Biri varsa çizilir; üstünde hairline ayraç |
 | `footerMeta` | — | İkincil metrik | Eylemlerden önce (ör. birim fiyat); tek satır |
@@ -111,7 +111,10 @@ Yasak kombinasyonlar:
 
 - `material`/`tone` ekseni **yoktur**: kart içerik katmanıdır, cam olamaz.
   Listede onlarca kez tekrarlandığı için "sayfa başına max 6 cam yüzey"
-  kuralını tek başına tüketirdi (GenelBakis.mdx).
+  kuralını tek başına tüketirdi (GenelBakis.mdx). Tek istisna ayaktaki
+  `actions` kapsülüdür: dolu eylem her zaman cam materyalde çizilir
+  (GlassButton `prominent` kuralı) — kapsül `GlassSurface`'ten gelir,
+  dolgusu yine `--lg-action-prominent`.
 - `href` + `onOpen` birlikte: `href` kazanır, `onOpen` sessizce yok sayılır.
 - `favorite` + `defaultFavorite` birlikte: `favorite` kazanır (controlled).
 
@@ -139,9 +142,10 @@ yayından kalkmış ilan `GlassListingManagementCard`'ın işidir.
 
   | Tuş | Etki |
   |---|---|
-  | `Tab` | favori → başlık → diğer işlemler → iletişim eylemleri |
+  | `Tab` | (galeri şeridi) → favori → başlık → diğer işlemler → özellik şeridi → iletişim eylemleri |
   | `Enter` | Odaklı bağlantı/butonu çalıştırır |
   | `Space` | Odaklı butonu çalıştırır (bağlantıda etkisiz) |
+  | `←` / `→` | Odaklı galeri şeridinde kare kare, özellik şeridinde native kaydırır |
 
 - Focus akışı: kart odak tuzağı kurmaz; odak DOM sırasını izler.
 - Controlled/uncontrolled: yalnız favori state taşır (`favorite` +
@@ -151,7 +155,7 @@ yayından kalkmış ilan `GlassListingManagementCard`'ın işidir.
 ## 8. İçerik kuralları
 
 - Fiyat, başlık ve konum tek satırdır; taşan metin ellipsis'e düşer. Özellik
-  rozetleri ve not sarar, kesilmez.
+  rozetleri tek sıra yatay kayar (sarmaz); not sarar, kesilmez.
 - Fiyat/tarih biçimi çağıranındır; component yalnız puanı `tr-TR` ondalık
   ayracıyla yazar.
 - Boş içerik: verilmeyen her slot hiç render edilmez — boş bant bırakmaz.
@@ -225,7 +229,8 @@ Unit · interaction (`GlassListingRowCard.test.tsx`, 12 test):
 - Menü: yalnız `onMenuOpen` ile çizilir, `menuLabel` ada yansır.
 - İletişim eylemleri: `href` → link, `onClick` → button, hepsi etiketli.
 - Puan tek kez seslendirilir (rakam `aria-hidden`).
-- Özellik rozetleri `listitem` semantiği.
+- Özellik rozetleri `listitem` semantiği; şerit `tabIndex=0` + `aria-label`
+  taşır (axe `scrollable-region-focusable` — taşan çipe klavye erişimi).
 - Nokta göstergesi yalnız `mediaCount > 1` iken, tek aktif nokta.
 - Görsel hatası: `fallbackSrc` varsa ona düşer; `src` değişince yeniden dener
   (bayrak değil başarısız kaynak tutulur — liste geri dönüşümünde şart).
@@ -249,6 +254,8 @@ DOM değişmezine bağlıdır.
   eleman olur ve klavye/sesli okuyucu sözleşmesi bozulur.
 - Not bandını yalnız renkle anlam taşıyan bir uyarıya çevirmeyin; metin şart.
 - Kart üstüne cam yüzey (GlassIconButton vb.) koymayın — içerik katmanı.
+  (Ayaktaki `actions` kapsülü bu yasağın dışındadır: dolu eylem, prominent
+  kuralı gereği camdır — bkz. §5 yasak kombinasyonlar.)
 - `badge`'e saydam tonlu zemin (`color-mix(… 12%, transparent)`) vermeyin:
   rozet fotoğrafın üstünde durur ve kontrast fotoğrafa kalır. Zemin opak olmalı.
 
@@ -274,6 +281,9 @@ DOM değişmezine bağlıdır.
 **Changelog**
 
 - 2026-08-05 — İlk sürüm.
+- 2026-08-14 — Ayaktaki `actions` kapsülü düz boyalı `div`'den `GlassSurface`
+  kapsülüne taşındı: dolu eylem her yerde cam materyalde (GlassButton
+  `prominent` kuralıyla ve `GlassAiSearchBar` gönder butonuyla aynı ses).
 - 2026-08-05 — `mediaCaption`, `footerMeta` ve ikonsuz (metin) eylem desteği
   eklendi; `aria-label` ezme kuralı tanımlandı. Üçü de `EmlakSearchView` liste
   görünümünün gerçek ihtiyacından doğdu. Medya yüksekliği sabit orandan
@@ -297,6 +307,16 @@ DOM değişmezine bağlıdır.
   genişliğinden ayrıştı: çağıran `--row-thumb-w`'yi yüzdeyle verebilir
   (EmlakSearchView dar kapta ~%38 kullanır), px tabanı `--row-thumb-min-h`
   taşır; değişken verilmezse eski kare taban korunur.
+- 2026-08-14 — Özellik çipleri (tüm varyantlarda) sarmadan **tek sıra yatay
+  kaydırmaya** döndü (kullanıcı istemi: sarma, çok çipli kartlarda gövdeyi
+  dikeyde kabartıyordu). 2026-08-12'de kaydırmadan vazgeçiren iki kusur bu
+  kez çözüldü: kaydırma alanı negatif margin ile gövde dolgusuna taşar
+  (çip dolgu ortasında değil kart kenarında kırpılır — devam eden içeriğin
+  doğal izi) ve kenarlarda fade maskesi kaydırılabilirliği işaretler.
+  Gövde dolgusu `--row-body-pad` değişkenine alındı (sm/thumb yalnız
+  değişkeni ezer). Şerit klavye için odaklanabilir; odakta fade kalkar
+  (maske odak halkasını soldururdu). `scroll-snap` proximity + çip başı
+  hizalama.
 - 2026-08-13: Hesap alanı kartları pazar yeriyle aynı `media="thumb"`
   görünümüne geçti; bunun ortaya çıkardığı iki avatarsız-kullanım hatası
   düzeltildi: (1) sm+thumb künye küçültme kuralı `> :first-child` ile ilk

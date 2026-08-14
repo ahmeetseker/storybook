@@ -13,13 +13,13 @@
   margin-block-start: var(--lg-space-6);
   /* Sayfa dolgusundan taşar: dock kabın kenarına dayanır. */
   margin-inline: calc(-1 * var(--lg-container-gutter));
-  /* Alt dolgu kabuğun yüzen dock'unun payını (`--dock-clearance`, sayfa
-     ızgarasından miras alınır) kadar açılır: dock çubuğu ekranın alt kenarına
-     dayanır ama İÇERİĞİ kabuk dock'unun üstünde durur — buton hiçbir zaman
-     yüzen kapsülün altında kalmaz. Pay tek kaynaktan okunur, sabit sayı
-     yazılmaz. */
+  /* Alt dolgu üst dolguyla simetriktir (+ safe-area). Eskiden buraya kabuğun
+     yüzen AI butonu için `--dock-clearance` payı ekleniyordu; bu, dock'un
+     altında koca bir boşluk bırakıyordu (2026-08-14 geri bildirimi). Artık
+     pay burada değil: dock görünürken AI butonu dock'un ÜSTÜNE çıkar
+     (bkz. app.css `[data-page-dock]` kuralı). */
   padding: var(--lg-space-3) var(--lg-container-gutter)
-    calc(var(--dock-clearance, var(--lg-space-4)) + var(--lg-space-2));
+    calc(var(--lg-space-3) + env(safe-area-inset-bottom, 0px));
   border-block-start: var(--lg-stroke-hairline) solid var(--lg-glass-line);
   background: var(--lg-glass);
   backdrop-filter: blur(20px) saturate(1.6);
@@ -52,10 +52,16 @@
   min-block-size: var(--lg-control-lg);
   padding-inline: var(--lg-space-5);
   border-radius: var(--lg-radius-capsule);
-  /* Bir BAĞLANTIDIR ama dolu eylemdir: görünümü `GlassButton prominent` ile
-     aynı token'lardan gelir, yoksa aynı kahve iki farklı tonda çizilirdi. */
-  background: var(--lg-action-prominent);
-  color: var(--lg-action-prominent-label);
+  /* Cam kapsül — galerideki favori/paylaş kapsülüyle aynı reçete
+     (2026-08-14: dolu kahve zemin cam görünümle değişti). Dock zaten blur
+     taşıdığı için burada ikinci bir backdrop-filter açılmaz — cam üstüne
+     cam yok; kapsül yarı geçirgen yüzey + hairline ile okunur. */
+  border: var(--lg-stroke-hairline) solid var(--lg-glass-line);
+  background: color-mix(in srgb, var(--lg-surface) 62%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--lg-surface) 85%, transparent),
+    var(--lg-shadow-sm);
+  color: var(--lg-label);
   font: inherit;
   font-weight: var(--lg-action-weight);
   text-decoration: none;

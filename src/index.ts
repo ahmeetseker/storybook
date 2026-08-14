@@ -24,6 +24,7 @@ export {
   type GlassSidebarDensity,
 } from './components/GlassSidebar'
 export { GlassBadge, type GlassBadgeProps } from './components/GlassBadge'
+export { GlassBarList, type GlassBarListProps, type GlassBarListItem } from './components/GlassBarList'
 export { GlassRibbon, type GlassRibbonProps } from './components/GlassRibbon'
 export { GlassIconButton, type GlassIconButtonProps } from './components/GlassIconButton'
 export { GlassBreadcrumb, type GlassBreadcrumbProps, type GlassBreadcrumbItem } from './components/GlassBreadcrumb'

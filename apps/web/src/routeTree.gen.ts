@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiDanismanRouteImport } from './routes/ai-danisman'
 import { Route as ArsaAraRouteImport } from './routes/arsa-ara'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BolgelerRouteImport } from './routes/bolgeler'
 import { Route as EPostaDogrulaRouteImport } from './routes/e-posta-dogrula'
 import { Route as EmlakRouteImport } from './routes/emlak'
@@ -73,11 +72,6 @@ const AiDanismanRoute = AiDanismanRouteImport.update({
 const ArsaAraRoute = ArsaAraRouteImport.update({
   id: '/arsa-ara',
   path: '/arsa-ara',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BolgelerRoute = BolgelerRouteImport.update({
@@ -315,7 +309,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-danisman': typeof AiDanismanRoute
   '/arsa-ara': typeof ArsaAraRoute
-  '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
   '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
@@ -367,7 +360,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-danisman': typeof AiDanismanRoute
   '/arsa-ara': typeof ArsaAraRoute
-  '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
   '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
@@ -419,7 +411,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/ai-danisman': typeof AiDanismanRoute
   '/arsa-ara': typeof ArsaAraRoute
-  '/blog': typeof BlogRoute
   '/bolgeler': typeof BolgelerRoute
   '/e-posta-dogrula': typeof EPostaDogrulaRoute
   '/emlak': typeof EmlakRoute
@@ -473,7 +464,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-danisman'
     | '/arsa-ara'
-    | '/blog'
     | '/bolgeler'
     | '/e-posta-dogrula'
     | '/emlak'
@@ -525,7 +515,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-danisman'
     | '/arsa-ara'
-    | '/blog'
     | '/bolgeler'
     | '/e-posta-dogrula'
     | '/emlak'
@@ -576,7 +565,6 @@ export interface FileRouteTypes {
     | '/'
     | '/ai-danisman'
     | '/arsa-ara'
-    | '/blog'
     | '/bolgeler'
     | '/e-posta-dogrula'
     | '/emlak'
@@ -629,7 +617,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AiDanismanRoute: typeof AiDanismanRoute
   ArsaAraRoute: typeof ArsaAraRoute
-  BlogRoute: typeof BlogRoute
   BolgelerRoute: typeof BolgelerRoute
   EPostaDogrulaRoute: typeof EPostaDogrulaRoute
   EmlakRoute: typeof EmlakRoute
@@ -688,13 +675,6 @@ declare module '@tanstack/react-router' {
       path: '/arsa-ara'
       fullPath: '/arsa-ara'
       preLoaderRoute: typeof ArsaAraRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bolgeler': {
@@ -1057,7 +1037,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AiDanismanRoute: AiDanismanRoute,
   ArsaAraRoute: ArsaAraRoute,
-  BlogRoute: BlogRoute,
   BolgelerRoute: BolgelerRoute,
   EPostaDogrulaRoute: EPostaDogrulaRoute,
   EmlakRoute: EmlakRoute,

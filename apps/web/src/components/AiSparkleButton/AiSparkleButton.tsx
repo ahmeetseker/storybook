@@ -58,6 +58,7 @@ export function AiSparkleButton({ onActivate, buttonRef }: AiSparkleButtonProps)
       aria-label="AI danışman"
       title="AI danışman"
       aria-haspopup="dialog"
+      data-ai-fab
       className={[styles.root, bursting ? styles.bursting : ''].filter(Boolean).join(' ')}
     >
       <span aria-hidden className={styles.dots}>

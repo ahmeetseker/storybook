@@ -8,10 +8,11 @@
  * arz → getiri → alt bölgeler → metodoloji → iç linkleme.
  */
 import { Fragment, useMemo, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
   GlassAccordion,
   GlassBadge,
+  GlassBarList,
   GlassDataProvenance,
   GlassDistributionChart,
   GlassMetricStrip,
@@ -21,16 +22,26 @@ import {
   GlassSparkline,
   GlassSpecTable,
   GlassTable,
+  GlassTabs,
   GlassTrendChart,
   type GlassTableSortDirection,
   type GlassTrendSeries,
 } from '@repo/ui'
-import type { Period, PriceBasis, PriceIndexResult, SubRegionRow } from './domain/price-index-types'
+import type {
+  BreakdownRow,
+  Period,
+  PriceBasis,
+  PriceIndexResult,
+  SubRegionRow,
+  TransactionType,
+} from './domain/price-index-types'
 import { buildPriceIndexHref, type PriceIndexPath } from './data/price-index-adapter'
 import { PageContainer } from '@/components/PageContainer'
+import { CountUp, Reveal } from './components/IpekMotion'
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -41,6 +52,35 @@ const tl = (n: number) => n.toLocaleString('tr-TR')
 const bir = (n: number) => n.toLocaleString('tr-TR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 const yuzde = (n: number) => `${n > 0 ? '+' : ''}${bir(n)}%`
 
+/** İpek bölüm kicker'ları — sayfa akış sırasına göre Roma rakamı. */
+const ROMA = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX']
+
+/** Konut özelliği kırılım tablosu — segment medyanları + stok payı. */
+function kirilimTablosu(rows: BreakdownRow[], ilkBaslik: string, kiralik: boolean) {
+  return (
+    <GlassTable
+      aria-label={`${ilkBaslik} kırılımı`}
+      columns={[
+        { key: 'segment', label: ilkBaslik },
+        { key: 'm2', label: kiralik ? 'Medyan m² kira' : 'Medyan m²', align: 'end' },
+        { key: 'fiyat', label: kiralik ? 'Medyan ilan kirası' : 'Medyan ilan fiyatı', align: 'end' },
+        { key: 'degisim', label: 'Yıllık nominal', align: 'end' },
+        { key: 'ilan', label: 'İlan', align: 'end' },
+        { key: 'pay', label: 'Pay', align: 'end' },
+      ]}
+      rows={rows.map((r) => ({
+        id: r.id,
+        segment: r.label,
+        m2: `${tl(r.pricePerSqm)} TL`,
+        fiyat: `${tl(r.medianPrice)} TL`,
+        degisim: yuzde(r.changeNominal),
+        ilan: tl(r.listings),
+        pay: `%${r.sharePct}`,
+      }))}
+    />
+  )
+}
+
 export interface PriceIndexViewProps {
   result: PriceIndexResult
   path: PriceIndexPath
@@ -49,6 +89,8 @@ export interface PriceIndexViewProps {
 export function PriceIndexView({ result, path }: PriceIndexViewProps) {
   const { snapshot, discovery } = result
   const { region } = snapshot
+  const navigate = useNavigate()
+  const kiralik = path.transactionType === 'kiralik'
 
   const [donem, setDonem] = useState<Period>('1y')
   const [baz, setBaz] = useState<PriceBasis>('nominal')
@@ -137,6 +179,11 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
   const yetersiz = snapshot.confidence.grade === 'INSUFFICIENT'
   const baslik = `${region.name} ${path.transactionType === 'satilik' ? 'satılık' : 'kiralık'} konut fiyatları ve emlak endeksi`
 
+  // Bölüm kicker'ları render sırasına göre numaralanır — koşullu bölümlerde
+  // (yetersiz veri, mahalle) boşluk kalmaz.
+  let bolumNo = 0
+  const roma = () => `Bölüm ${ROMA[bolumNo++]}`
+
   return (
     // Kabuk yolu kapalı: sayfa kendi bölge breadcrumb'ını (il › ilçe › mahalle)
     // taşır — üstüne bir de 'Anasayfa › Emlak Endeksi' basmak çift yol olurdu.
@@ -147,10 +194,18 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
           <BreadcrumbList>
             {region.path.map((p, index) => {
               const last = index === region.path.length - 1
+              // Atanın segmentleri: kök (Türkiye) hariç, kendisine kadar olan sluglar.
+              const ataSegments = region.path.slice(1, index + 1).map((a) => a.slug)
               return (
                 <Fragment key={p.name}>
                   <BreadcrumbItem>
-                    {last ? <BreadcrumbPage>{p.name}</BreadcrumbPage> : <span>{p.name}</span>}
+                    {last ? (
+                      <BreadcrumbPage>{p.name}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink asChild>
+                        <Link to={buildPriceIndexHref(path, ataSegments)}>{p.name}</Link>
+                      </BreadcrumbLink>
+                    )}
                   </BreadcrumbItem>
                   {!last ? <BreadcrumbSeparator /> : null}
                 </Fragment>
@@ -163,25 +218,43 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
         </span>
       </div>
 
-      {/* 2 — Başlık + tek cümlelik özet */}
+      {/* 2 — İpek hero: eyebrow → serif başlık → dev numeral → italik standfirst */}
       <header className={styles.hero}>
-        <p className={styles.eyebrow}>
-          {region.level === 'country' ? 'Türkiye endeksi' : region.level === 'province' ? 'İl endeksi' : region.level === 'district' ? 'İlçe endeksi' : 'Mahalle endeksi'}
-        </p>
-        <h1 className={styles.title}>{baslik}</h1>
-        {yetersiz ? (
-          <p className={styles.lede}>
-            {region.name} için etkin örneklem 10&apos;un altında. Az sayıda ilandan üretilen medyan yanıltıcı olacağı için{' '}
-            <strong>hiçbir fiyat metriği yayımlanmadı</strong>. Üst bölgenin endeksini inceleyebilirsiniz.
+        <Reveal className={styles.heroInner}>
+          <p className={styles.eyebrow}>
+            {region.level === 'country' ? 'Türkiye Endeksi' : region.level === 'province' ? 'İl Endeksi' : region.level === 'district' ? 'İlçe Endeksi' : 'Mahalle Endeksi'}
+            {' · '}
+            {snapshot.dataAsOf}
           </p>
-        ) : (
-          <p className={styles.lede}>
-            {region.name}&apos;{region.level === 'country' ? 'de' : 'nda'} {path.transactionType === 'satilik' ? 'satılık' : 'kiralık'} konutların medyan
-            ilan m² fiyatı <strong>{tl(snapshot.headline.medianPricePerSqm.value ?? 0)} TL</strong>. Fiyatlar son 12 ayda nominal{' '}
-            <strong>{yuzde(snapshot.change.nominal)}</strong> artarken, TÜFE&apos;den arındırıldığında reel{' '}
-            <strong>{yuzde(snapshot.change.real)}</strong> {snapshot.change.real < 0 ? 'geriledi' : 'arttı'}.
-          </p>
-        )}
+          <h1 className={styles.title}>{baslik}</h1>
+          {yetersiz ? (
+            <p className={styles.standfirst}>
+              {region.name} için etkin örneklem 10&apos;un altında. Az sayıda ilandan üretilen medyan yanıltıcı olacağı
+              için <strong>hiçbir fiyat metriği yayımlanmadı</strong>. Üst bölgenin endeksini inceleyebilirsiniz.
+            </p>
+          ) : (
+            <>
+              <p className={styles.numeral}>
+                <CountUp
+                  value={snapshot.headline.medianPricePerSqm.value ?? 0}
+                  durationMs={1000}
+                  data-testid="hero-medyan"
+                />
+                <span className={styles.numeralUnit}>TL/m²</span>
+              </p>
+              <p className={styles.standfirst}>
+                {kiralik ? 'Kiralar' : 'Fiyatlar'} son on iki ayda nominal{' '}
+                <strong className={styles.pos}>{yuzde(snapshot.change.nominal)}</strong> yükseldi; satın alma gücü
+                cinsinden{' '}
+                <strong className={snapshot.change.real < 0 ? styles.neg : styles.pos}>
+                  {yuzde(snapshot.change.real)}
+                </strong>{' '}
+                {snapshot.change.real < 0 ? 'geriledi' : 'arttı'}.
+              </p>
+            </>
+          )}
+          <hr className={styles.hrule} />
+        </Reveal>
       </header>
 
       {/* Kontrol çubuğu */}
@@ -189,7 +262,11 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
         <GlassSegmentedControl
           label="İşlem türü"
           value={path.transactionType}
-          onChange={() => {}}
+          onChange={(v) => {
+            // İşlem türü sayfa state'i değil URL ekseni: aynı bölgenin kiralık
+            // endeksi ayrı (paylaşılabilir) bir sayfadır.
+            void navigate({ to: buildPriceIndexHref({ ...path, transactionType: v as TransactionType }) })
+          }}
           options={[
             { value: 'satilik', label: 'Satılık' },
             { value: 'kiralik', label: 'Kiralık' },
@@ -218,86 +295,71 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
 
       {!yetersiz ? (
         <>
-          {/* 3 — KPI şeridi */}
-          <div className={styles.card}>
-            <GlassMetricStrip
-              label={`${region.name} endeks özeti`}
-              items={[
-                {
-                  id: 'm2',
-                  label: 'Medyan ilan m² fiyatı',
-                  value: `${tl(snapshot.headline.medianPricePerSqm.value ?? 0)} TL`,
-                  change: bir(snapshot.change.nominal) + '%',
-                  trend: 'up',
-                  hint: `reel ${yuzde(snapshot.change.real)}`,
-                },
-                {
-                  id: 'fiyat',
-                  label: 'Medyan ilan fiyatı',
-                  value: `${tl(snapshot.headline.medianPrice.value ?? 0)} TL`,
-                  hint: 'ortalama 106 m²',
-                },
-                {
-                  id: 'getiri',
-                  label: 'Brüt kira getirisi',
-                  value: `%${bir(snapshot.investment.grossYield)}`,
-                  hint: `amortisman ${snapshot.investment.paybackYears} yıl`,
-                },
-                {
-                  id: 'sure',
-                  label: 'Ortalama pazarlama süresi',
-                  value: `${snapshot.headline.daysOnMarket.value} gün`,
-                  hint: 'ilan kapanma hızı',
-                },
-              ]}
-            />
-          </div>
-
-          {/* 4 — Güven ve kapsam bandı */}
-          <section aria-labelledby="guven-baslik" className={styles.trust}>
-            <GlassScoreMeter
-              value={snapshot.confidence.score}
-              label="Veri güveni"
-              description={`${snapshot.confidence.grade} · ${snapshot.confidence.grade === 'A' ? 'yüksek' : 'orta'}`}
-              variant="ring"
-            />
-            <div className={styles.trustBody}>
-              <h2 id="guven-baslik" className={styles.trustTitle}>
-                Bu sonuç ne kadar güvenilir?
-              </h2>
-              <p className={styles.trustText}>
-                {tl(snapshot.confidence.activeListings)} aktif ilanın tekilleştirilmesinden sonra{' '}
-                <strong>etkin örneklem {tl(snapshot.confidence.effectiveSample)}</strong>. Medyan m² fiyatının %95 güven aralığı{' '}
-                <strong>
-                  {tl(snapshot.confidence.interval.lower)} – {tl(snapshot.confidence.interval.upper)} TL
-                </strong>
-                . {snapshot.confidence.windowLabel}
-              </p>
-            </div>
-          </section>
-
-          {/* 5 — Fiyat eğilimi */}
-          <section aria-labelledby="egilim-baslik" className={styles.section}>
-            <h2 id="egilim-baslik" className={styles.sectionTitle}>
-              Konut fiyatları zaman içinde nasıl değişti?
+          {/* 3 — Veri bandı: hairline'la ayrılmış dört tipografik nokta (kart yok) */}
+          <section aria-labelledby="ozet-baslik" className={styles.band}>
+            <h2 id="ozet-baslik" className={styles.srOnly}>
+              Endeks özeti
             </h2>
-            <GlassTrendChart
-              series={seriler}
-              valueSuffix=" TL/m²"
-              height={260}
-              showGrid
-              title={baz === 'nominal' ? 'Medyan ilan m² fiyatı — nominal' : `Medyan ilan m² fiyatı — reel (${snapshot.dataAsOf} fiyatlarıyla)`}
-            />
-            {seriler.length > 1 ? (
-              <p className={styles.note}>
-                Kesikli çizgiler referans serilerdir; kesik yoğunluğu bölgenin uzaklığını gösterir — yakın bölge daha yoğun
-                çizgiyle çizilir.
-              </p>
-            ) : null}
+            <Reveal className={styles.bandGrid}>
+              <div className={styles.point}>
+                <span className={styles.pointKey}>{kiralik ? 'Medyan ilan kirası' : 'Medyan ilan fiyatı'}</span>
+                <span className={styles.pointValue}>
+                  <CountUp value={snapshot.headline.medianPrice.value ?? 0} />
+                </span>
+                <span className={styles.pointHint}>TL · ortalama 106 m²</span>
+              </div>
+              <div className={styles.point}>
+                <span className={styles.pointKey}>Brüt kira getirisi</span>
+                <span className={styles.pointValue}>
+                  %<CountUp value={snapshot.investment.grossYield} decimals={1} />
+                </span>
+                <span className={styles.pointHint}>amortisman {snapshot.investment.paybackYears} yıl</span>
+              </div>
+              <div className={styles.point}>
+                <span className={styles.pointKey}>Veri güveni</span>
+                <span className={styles.pointValue}>
+                  <CountUp value={snapshot.confidence.score} />
+                  <span className={styles.pointValueSub}>∕100</span>
+                </span>
+                <span className={styles.pointHint}>etkin örneklem {tl(snapshot.confidence.effectiveSample)}</span>
+              </div>
+              <div className={styles.point}>
+                <span className={styles.pointKey}>Pazarlama süresi</span>
+                <span className={styles.pointValue}>
+                  <CountUp value={snapshot.headline.daysOnMarket.value ?? 0} />
+                  <span className={styles.pointValueSub}> gün</span>
+                </span>
+                <span className={styles.pointHint}>ilan kapanma hızı</span>
+              </div>
+            </Reveal>
           </section>
+
+          {/* Bölüm I — Fiyatın seyri */}
+          <Reveal as="section" aria-labelledby="seyir-baslik" className={styles.section}>
+            <p className={styles.kicker}>{roma()}</p>
+            <h2 id="seyir-baslik" className={styles.sectionTitle}>
+              Fiyatın on iki aylık seyri
+            </h2>
+            <div className={styles.wide}>
+              <GlassTrendChart
+                series={seriler}
+                valueSuffix=" TL/m²"
+                height={280}
+                showGrid
+                title={baz === 'nominal' ? 'Medyan ilan m² fiyatı — nominal' : `Medyan ilan m² fiyatı — reel (${snapshot.dataAsOf} fiyatlarıyla)`}
+              />
+            </div>
+            <p className={styles.note}>
+              %95 güven aralığı {tl(snapshot.confidence.interval.lower)}–{tl(snapshot.confidence.interval.upper)} TL.{' '}
+              {seriler.length > 1
+                ? 'Kesikli çizgiler referans serilerdir; kesik yoğunluğu bölgenin uzaklığını gösterir.'
+                : snapshot.confidence.windowLabel}
+            </p>
+          </Reveal>
 
           {/* 6 — Fiyat dağılımı */}
-          <section aria-labelledby="dagilim-baslik" className={styles.section}>
+          <Reveal as="section" aria-labelledby="dagilim-baslik" className={styles.section}>
+            <p className={styles.kicker}>{roma()}</p>
             <h2 id="dagilim-baslik" className={styles.sectionTitle}>
               Fiyatlar hangi aralıkta?
             </h2>
@@ -313,14 +375,33 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
               Vurgulanan sütun medyanın düştüğü banttır. Dağılımın sağ kuyruğu uzun olduğu için sayfada ortalama değil{' '}
               <strong>medyan</strong> gösterilir.
             </p>
-          </section>
+          </Reveal>
+
+          {/* 8 — Konut özelliği kırılımları (oda sayısı · bina yaşı) */}
+          <Reveal as="section" aria-labelledby="kirilim-baslik" className={styles.section}>
+            <p className={styles.kicker}>{roma()}</p>
+            <h2 id="kirilim-baslik" className={styles.sectionTitle}>
+              Konut özelliklerine göre fiyatlar
+            </h2>
+            <GlassTabs
+              material="flat"
+              tabs={[
+                { id: 'oda', label: 'Oda sayısı', content: kirilimTablosu(snapshot.breakdowns.rooms, 'Oda', kiralik) },
+                { id: 'yas', label: 'Bina yaşı', content: kirilimTablosu(snapshot.breakdowns.buildingAge, 'Bina yaşı', kiralik) },
+              ]}
+            />
+            <p className={styles.note}>
+              Segment medyanları bölge medyanından ayrı hesaplanır; pay, segmentin aktif ilan stoğundaki oranıdır.
+            </p>
+          </Reveal>
 
           {/* 9 — Arz ve piyasa hareketi */}
-          <section aria-labelledby="arz-baslik" className={styles.section}>
+          <Reveal as="section" aria-labelledby="arz-baslik" className={styles.section}>
+            <p className={styles.kicker}>{roma()}</p>
             <h2 id="arz-baslik" className={styles.sectionTitle}>
               İlan piyasası ne kadar hareketli?
             </h2>
-            <div className={styles.card}>
+            <div className={styles.narrow}>
               <GlassMetricStrip
                 size="sm"
                 label="Arz göstergeleri"
@@ -332,47 +413,118 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
                 ]}
               />
             </div>
-          </section>
+          </Reveal>
 
           {/* 10 — Kira getirisi ve yatırım */}
-          <section aria-labelledby="getiri-baslik" className={styles.section}>
+          <Reveal as="section" aria-labelledby="getiri-baslik" className={styles.section}>
+            <p className={styles.kicker}>{roma()}</p>
             <h2 id="getiri-baslik" className={styles.sectionTitle}>
               Kira getirisi ve yatırım görünümü
             </h2>
-            <div className={styles.card}>
-              <div className={styles.yield}>
-                <div className={styles.yieldMeter}>
-                  <GlassScoreMeter
-                    value={snapshot.investment.liquidityScore}
-                    label="Likidite skoru"
-                    description="Değer artışından ayrı: çıkışın ne kadar kolay olduğu"
-                    variant="ring"
-                  />
-                </div>
-                <div className={styles.yieldSpecs}>
-                  <GlassSpecTable
-                    columns={2}
-                    items={[
-                      { label: 'Brüt kira getirisi', value: `%${bir(snapshot.investment.grossYield)}` },
-                      { label: 'Amortisman (brüt)', value: `${snapshot.investment.paybackYears} yıl` },
-                      { label: 'Kira çarpanı', value: `${snapshot.investment.rentMultiplier} ay` },
-                      { label: 'Medyan kira m²', value: `${tl(snapshot.investment.medianRentPerSqm)} TL` },
-                    ]}
-                  />
-                </div>
+            <div className={`${styles.narrow} ${styles.yield}`}>
+              <div className={styles.yieldMeter}>
+                <GlassScoreMeter
+                  value={snapshot.investment.liquidityScore}
+                  label="Likidite skoru"
+                  description="Değer artışından ayrı: çıkışın ne kadar kolay olduğu"
+                  variant="ring"
+                />
+              </div>
+              <div className={styles.yieldSpecs}>
+                <GlassSpecTable
+                  columns={2}
+                  items={[
+                    { label: 'Brüt kira getirisi', value: `%${bir(snapshot.investment.grossYield)}` },
+                    { label: 'Amortisman (brüt)', value: `${snapshot.investment.paybackYears} yıl` },
+                    { label: 'Kira çarpanı', value: `${snapshot.investment.rentMultiplier} ay` },
+                    { label: 'Medyan kira m²', value: `${tl(snapshot.investment.medianRentPerSqm)} TL` },
+                  ]}
+                />
               </div>
             </div>
             <p className={styles.note}>
               Getiri, satılık ve kiralık <strong>ilan</strong> medyanlarının oranıdır — gerçekleşen işlem verisi değildir.
               Aidat, vergi, bakım ve boş kalma düşülmemiştir.
             </p>
-          </section>
+          </Reveal>
         </>
       ) : null}
 
+      {/* 12 — Demografi: fiyattan bağımsız resmî veridir, yetersiz örneklemli
+          bölgede de gösterilir — "veri yok" sayfasında bile bölge anlatılır. */}
+      <Reveal as="section" aria-labelledby="demografi-baslik" className={styles.section}>
+        <p className={styles.kicker}>{roma()}</p>
+        <h2 id="demografi-baslik" className={styles.sectionTitle}>
+          Bölgede kim yaşıyor?
+        </h2>
+        <div className={styles.narrow}>
+          <GlassMetricStrip
+            size="sm"
+            label={`${region.name} demografik özeti`}
+            items={[
+              { id: 'nufus', label: 'Nüfus', value: tl(snapshot.demographics.population) },
+              { id: 'yas', label: 'Ortalama yaş', value: bir(snapshot.demographics.averageAge) },
+              {
+                id: 'cinsiyet',
+                label: 'Cinsiyet dağılımı',
+                value: `%${bir(snapshot.demographics.femalePct)} kadın`,
+                hint: `%${bir(snapshot.demographics.malePct)} erkek`,
+              },
+              {
+                id: 'medeni',
+                label: 'Medeni durum',
+                value: `%${snapshot.demographics.marriedPct} evli`,
+                hint: `%${snapshot.demographics.singlePct} bekar`,
+              },
+            ]}
+          />
+          <div className={styles.demoGrid}>
+            <div>
+              <h3 className={styles.demoTitle}>Yaş dağılımı</h3>
+              <GlassBarList
+                label="Yaş dağılımı"
+                items={snapshot.demographics.ageBands.map((b) => ({ id: b.id, label: b.label, value: b.pct }))}
+              />
+            </div>
+            <div>
+              <h3 className={styles.demoTitle}>Eğitim durumu</h3>
+              <GlassBarList
+                label="Eğitim durumu"
+                tint="var(--lg-warning)"
+                items={snapshot.demographics.education.map((b) => ({ id: b.id, label: b.label, value: b.pct }))}
+              />
+            </div>
+          </div>
+          {snapshot.demographics.subRegionPopulation.items.length ? (
+            <div className={styles.demoSub}>
+              <h3 className={styles.demoTitle}>
+                {snapshot.demographics.subRegionPopulation.label.charAt(0).toLocaleUpperCase('tr-TR') +
+                  snapshot.demographics.subRegionPopulation.label.slice(1)}
+              </h3>
+              <GlassBarList
+                label={snapshot.demographics.subRegionPopulation.label}
+                scale="max"
+                formatValue={(v) => tl(v)}
+                items={snapshot.demographics.subRegionPopulation.items.map((i) => ({
+                  id: i.id,
+                  label: i.label,
+                  value: i.population,
+                  prominent: i.prominent,
+                }))}
+              />
+            </div>
+          ) : null}
+        </div>
+        <p className={styles.note}>
+          Demografik veriler <strong>{snapshot.demographics.sourceLabel}</strong> kaynaklıdır; fiyat serilerinden
+          bağımsızdır ve yılda bir güncellenir. Vurgulu satır bu sayfanın bölgesidir.
+        </p>
+      </Reveal>
+
       {/* 11 — Alt bölge sıralaması (mahalle seviyesinde render edilmez) */}
       {snapshot.subRegions.length ? (
-        <section aria-labelledby="alt-baslik" className={styles.section}>
+        <Reveal as="section" aria-labelledby="alt-baslik" className={styles.section}>
+          <p className={styles.kicker}>{roma()}</p>
           <h2 id="alt-baslik" className={styles.sectionTitle}>
             {region.name} {snapshot.subRegionLabel.toLocaleLowerCase('tr-TR')} fiyat sıralaması
           </h2>
@@ -412,11 +564,12 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
             Etkin örneklemi 10&apos;un altında kalan bölgelerde hiçbir fiyat metriği ve trend serisi yayımlanmaz.
             <strong> Zirveye uzaklık</strong>, bölgenin kendi tarihsel zirvesine göre bugünkü konumudur.
           </p>
-        </section>
+        </Reveal>
       ) : null}
 
       {/* 14 — Metodoloji ve SSS */}
-      <section aria-labelledby="yontem-baslik" className={styles.section}>
+      <Reveal as="section" aria-labelledby="yontem-baslik" className={styles.section}>
+        <p className={styles.kicker}>{roma()}</p>
         <h2 id="yontem-baslik" className={styles.sectionTitle}>
           Bu veriler nasıl hesaplanıyor?
         </h2>
@@ -475,7 +628,7 @@ export function PriceIndexView({ result, path }: PriceIndexViewProps) {
             },
           ]}
         />
-      </section>
+      </Reveal>
 
       {/* 15 — İç linkleme rafı */}
       <GlassSeoDiscovery

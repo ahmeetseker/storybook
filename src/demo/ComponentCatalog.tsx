@@ -649,6 +649,14 @@ const ENTRIES: CatalogEntry[] = [
     storyPath: '/story/bilesenler-veri-gosterimi-glasssparkline--default',
   },
   {
+    name: 'Bar Listesi',
+    description:
+      'Kategorik payları etiket + yatay bar + değer satırlarıyla okutan dağılım listesi — yaş/eğitim/alt bölge nüfusu gibi demografik kırılımlar. Bar dekoratiftir; bilgi metinde taşınır.',
+    category: 'İçerik',
+    status: 'hazır',
+    storyPath: '/story/bilesenler-veri-gosterimi-glassbarlist--default',
+  },
+  {
     name: 'Badge',
     description: 'Kapsül cam rozet — "Acil", "Yeni", "Öne Çıkan" gibi durum vurguları için tintli varyantlar.',
     category: 'İçerik',

@@ -6,6 +6,7 @@
 import { useId, useState, type HTMLAttributes, type KeyboardEvent, type ReactNode } from 'react'
 import { GlassAvatar } from '../GlassAvatar'
 import { GlassRating } from '../GlassRating'
+import { GlassSurface } from '../GlassSurface'
 import styles from './GlassListingRowCard.module.css'
 
 /** Kartın orta bandındaki tek satırlık özellik rozeti (ör. "4 Oda"). */
@@ -352,7 +353,10 @@ export function GlassListingRowCard({
         ) : null}
 
         {features?.length ? (
-          <ul className={styles.features}>
+          // Tek sıra yatay kayan şerit (CSS): taşan çipe klavyeyle erişim
+          // için odaklanabilir — odaklıyken ok tuşları native kaydırır
+          // (galeri şeridiyle aynı sözleşme, roving-tab yok).
+          <ul className={styles.features} tabIndex={0} aria-label="İlan özellikleri">
             {features.map((feature) => (
               <li className={styles.feature} key={feature.label}>
                 {feature.icon ? (
@@ -394,7 +398,10 @@ export function GlassListingRowCard({
             <div className={styles.footerEnd}>
               {footerMeta ? <span className={styles.footerMeta}>{footerMeta}</span> : null}
               {actions?.length ? (
-                <div className={styles.actions}>
+                // Dolu eylem her zaman cam materyalde çizilir (GlassButton'ın
+                // prominent kuralıyla aynı ses) — kapsül GlassSurface'ten gelir,
+                // dolgu yine --lg-action-prominent token'ıdır.
+                <GlassSurface shape="capsule" thickness={0.35} className={styles.actions}>
                   {actions.map((action) => {
                     // İkonlu eylemde etiket yalnız erişilebilir addır; ikonsuz
                     // eylemde etiketin kendisi görünür metindir, bu yüzden
@@ -430,7 +437,7 @@ export function GlassListingRowCard({
                       </button>
                     )
                   })}
-                </div>
+                </GlassSurface>
               ) : null}
             </div>
           </div>

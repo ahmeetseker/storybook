@@ -46,12 +46,6 @@ export function AuthShell({ children }: { children: ReactNode }) {
               <Link to="/" className={styles.footerLink}>
                 Ana sayfa
               </Link>
-              {/* Etiket hedefle uyumlu olmalı: burası "Yardım" diyordu ama
-                  /blog'a gidiyordu. Yardım merkezi sayfası yok — etiket
-                  gerçeğe çekildi. */}
-              <Link to="/blog" className={styles.footerLink}>
-                Blog
-              </Link>
             </footer>
           </div>
         </div>

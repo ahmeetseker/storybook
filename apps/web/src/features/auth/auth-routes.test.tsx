@@ -114,7 +114,7 @@ describe('auth rotaları — routeTree.gen.ts smoke testi', () => {
   })
 
   it('pazar yeri rotaları auth kabuğuna düşmez', () => {
-    for (const yol of ['/', '/emlak', '/hesabim', '/ilan-ver', '/favoriler', '/blog']) {
+    for (const yol of ['/', '/emlak', '/hesabim', '/ilan-ver', '/favoriler', '/bolgeler']) {
       expect(isAuthPath(yol), `${yol} yanlışlıkla auth kabuğuna düşüyor`).toBe(false)
     }
   })

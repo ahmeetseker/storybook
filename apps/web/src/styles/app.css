@@ -47,6 +47,22 @@ select {
   );
 }
 
+/* Sayfa kendi yapışkan alt dock'unu taşıyorsa (`data-page-dock`, ör. ilan
+   detayının ListingDock'u) yüzen AI butonu dock'un ÜSTÜNE çıkar: dock artık
+   buton için alt boşluk ayırmaz (2026-08-14). Yükseklik dock'un kendi
+   ölçüsünden türetilir: dikey dolgu (2 × --lg-space-3) + kontrol satırı
+   (--lg-control-lg) + nefes payı (--lg-space-3). Dock, kap İÇERİĞİ 1100px'e
+   ulaşınca yerleşimden düşer; sayfa formülüyle (%80 + gutter) bu ancak
+   ~104rem viewport'ta gerçekleşir — eşik o yüzden --lg-container-wide
+   hizasıdır, dar bir sınır bandındaki sapma kozmetiktir. */
+@media (max-width: 104rem) {
+  .marketplace-shell:has([data-page-dock]) [data-ai-fab] {
+    bottom: calc(
+      var(--lg-control-lg) + (3 * var(--lg-space-3)) + env(safe-area-inset-bottom, 0px)
+    );
+  }
+}
+
 .skip-link {
   position: fixed;
   top: calc(var(--lg-space-2) + env(safe-area-inset-top, 0px));

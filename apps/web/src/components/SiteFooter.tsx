@@ -16,7 +16,6 @@ const footerColumns: GlassFooterColumn[] = [
       { label: "Arsa ara", href: "/arsa-ara" },
       { label: "Bölgeler", href: "/bolgeler" },
       { label: "Emlak ofisleri", href: "/ofisler" },
-      { label: "Blog", href: "/blog" },
     ],
   },
   {

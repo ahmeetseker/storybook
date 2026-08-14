@@ -33,7 +33,9 @@ export function ListingDock({ detail }: ListingDockProps) {
   const closedReason = contactClosedReason(detail.lifecycle)
 
   return (
-    <div className={styles.dock}>
+    // data-page-dock: kabuğun yüzen AI butonu bu işareti görünce dock'un
+    // üstüne çıkar (app.css) — dock alt boşluk taşımaz, buton da ezilmez.
+    <div className={styles.dock} data-page-dock>
       <span className={styles.anchor}>
         {formatPrice(detail.price.amount)}
         <span className={styles.unit}> · {formatUnitPrice(detail.price.unitPrice)}</span>

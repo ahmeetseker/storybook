@@ -86,6 +86,51 @@ export interface DistributionBin {
   containsMedian?: boolean
 }
 
+/** Kategorik demografi payı — GlassBarList satırıyla bire bir eşleşir. */
+export interface DemographicShare {
+  id: string
+  label: string
+  pct: number
+}
+
+/**
+ * Bölgenin demografik profili (sahibindex deseni: 4 özet metrik + iki pay
+ * listesi + alt bölge nüfus dağılımı). Kaynak resmî nüfus verisidir (TÜİK),
+ * fiyat metriklerinden farklı olarak seyrek güncellenir.
+ */
+export interface Demographics {
+  population: number
+  averageAge: number
+  femalePct: number
+  malePct: number
+  marriedPct: number
+  singlePct: number
+  ageBands: DemographicShare[]
+  education: DemographicShare[]
+  /**
+   * Nüfus dağılımı listesi: alt kırılımı olan bölgede çocuklar (vurgusuz),
+   * yaprak bölgede kardeşler + kendisi (`prominent`).
+   */
+  subRegionPopulation: {
+    label: string
+    items: Array<{ id: string; label: string; population: number; prominent?: boolean }>
+  }
+  /** "TÜİK 2025 ADNKS" gibi kaynak künyesi */
+  sourceLabel: string
+}
+
+/** Konut özelliği kırılım satırı (oda sayısı, bina yaşı). */
+export interface BreakdownRow {
+  id: string
+  label: string
+  pricePerSqm: number
+  medianPrice: number
+  changeNominal: number
+  listings: number
+  /** Segmentin ilan stoğundaki payı — satırlar 100'e tamamlanır */
+  sharePct: number
+}
+
 /** Bir bölgenin tek dönemlik endeks anlık görüntüsü. */
 export interface IndexSnapshot {
   region: Region
@@ -115,6 +160,9 @@ export interface IndexSnapshot {
   distribution: { bins: DistributionBin[]; percentiles: Array<{ id: string; label: string; value: string; prominent?: boolean }>; sampleSize: number }
   supply: { activeListings: number; newListings: number; stockRatio: number; priceCutShare: number }
   investment: { grossYield: number; paybackYears: number; rentMultiplier: number; medianRentPerSqm: number; liquidityScore: number }
+  /** Konut özelliği kırılımları — filtre değil bilgi tablosu (sahibindex'in aksine) */
+  breakdowns: { rooms: BreakdownRow[]; buildingAge: BreakdownRow[] }
+  demographics: Demographics
   /** Bir alt seviyedeki bölgeler; mahalle seviyesinde boş */
   subRegions: SubRegionRow[]
   subRegionLabel: string

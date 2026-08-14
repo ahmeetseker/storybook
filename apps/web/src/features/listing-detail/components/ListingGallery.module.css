@@ -5,9 +5,10 @@
    · Geniş kap (≥52rem): solda büyük kapak, sağda iki küçük kare, altlarında
      geniş bir kare; son karenin üstünde "Tümünü gör (N)" örtüsü.
    · Eşik viewport değil KAP genişliğidir (`@container page`).
-   · Fotoğrafın üstünde açılan cam yüzeyler kontrol katmanıdır (ilan no
-     rozeti, favori/paylaş kapsülü, "Tümünü gör" örtüsü); cam üstüne cam
-     gelmez, hepsi doğrudan fotoğrafın üstünde durur. */
+   · Favori/paylaş kapsülü fotoğrafı ÖRTMEZ: akışta, ızgaranın üstünde
+     durur (2026-08-14 geri bildirimi). Fotoğrafın üstünde kalan cam
+     yüzeyler ("Tümünü gör" örtüsü, sayaç) kontrol katmanıdır; cam üstüne
+     cam gelmez. */
 
 .gallery {
   display: grid;
@@ -84,19 +85,20 @@
   color: var(--lg-label);
 }
 
-/* İki ikon-tek kontrol tek kapsülde: fotoğrafın üstünde tek cam yüzey. */
+/* İki ikon-tek kontrol tek kapsülde: fotoğrafın üstünde (akışta) tek cam
+   yüzey — kareyi örtmez, ızgaranın sağ üstüne hizalanır. Kapsül buton
+   kutularını dolgusuz sarar; görünür ölçü sıkı tutulur, dokunma hedefi
+   ::after taşmasıyla korunur (2026-08-14 geri bildirimi: alan küçültüldü). */
 .actions {
-  position: absolute;
-  inset-block-start: var(--lg-space-3);
-  inset-inline-end: var(--lg-space-3);
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--lg-space-1);
-  padding: var(--lg-space-1);
   border-radius: var(--lg-radius-capsule);
 }
 
 .action {
+  position: relative;
   display: grid;
   place-items: center;
   inline-size: var(--lg-control-sm);
@@ -107,6 +109,17 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+}
+
+/* İmleçli cihazda 36px görünür kutu, görünmez ::after ile 44px dokunma
+   hedefine genişler (GlassSiteHeader deseni); dokunmatikte token zaten
+   44px olduğundan min() taşmayı sıfırlar. Yatayda genişletilmez — komşu
+   butonun hedefiyle çakışmasın. */
+.action::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block: min(0px, calc((var(--lg-control-sm) - var(--lg-control-hit)) / 2));
 }
 
 .action:focus-visible {
@@ -125,8 +138,8 @@
 }
 
 .icon {
-  inline-size: var(--lg-space-5);
-  block-size: var(--lg-space-5);
+  inline-size: var(--lg-space-4);
+  block-size: var(--lg-space-4);
 }
 
 /* "Tümünü gör (N)" örtüsü — son karenin üstünde, dekoratif. */

@@ -196,6 +196,29 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
 
   return (
     <section className={styles.gallery} aria-label="İlan görselleri">
+      {/* İkon-tek kontroller tek bir kapsülde yaşar ve fotoğrafın ÜSTÜNDE
+          (akışta, karenin dışında) durur — kareyi örtmez; fotoğraf tam
+          görünür kalır (2026-08-14 geri bildirimi). */}
+      <div className={styles.actions}>
+        <button
+          type="button"
+          className={styles.action}
+          aria-pressed={saved}
+          aria-label={saved ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+          onClick={() => setSaved((current) => !current)}
+        >
+          <HeartIcon filled={saved} />
+        </button>
+        <button
+          type="button"
+          className={styles.action}
+          aria-label="İlan bağlantısını paylaş"
+          onClick={onShare}
+        >
+          <ShareIcon />
+        </button>
+      </div>
+
       <div className={styles.viewport}>
         <div
           className={styles.frames}
@@ -216,28 +239,6 @@ export function ListingGallery({ detail }: ListingGalleryProps) {
                 onError={() => markFailed(cover.representative.src)}
               />
             </button>
-
-            {/* İkon-tek kontroller tek bir kapsülde yaşar: fotoğrafın üstünde
-                tek cam yüzey açılır, cam üstüne cam gelmez. */}
-            <div className={styles.actions}>
-              <button
-                type="button"
-                className={styles.action}
-                aria-pressed={saved}
-                aria-label={saved ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-                onClick={() => setSaved((current) => !current)}
-              >
-                <HeartIcon filled={saved} />
-              </button>
-              <button
-                type="button"
-                className={styles.action}
-                aria-label="İlan bağlantısını paylaş"
-                onClick={onShare}
-              >
-                <ShareIcon />
-              </button>
-            </div>
           </div>
 
           {tiles.map((item, i) => {

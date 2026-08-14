@@ -253,16 +253,16 @@
 /* ── Dar kapsül (≤32rem): telefon ölçüsü ──────────────────────────────
    Masaüstü ritmi (44px satır + 17px wordmark + 15px panel linki) dar
    ekranda kapsülü ve menüyü orantısız büyütüyordu. Görünür kontrol ölçüsü
-   36px'e iner; dokunma hedefleri KÜÇÜLMEZ — link ve panel linki `::after`
-   taşmasıyla `--lg-control-hit`e (44px) genişlemeye devam eder (taşma
-   hesapları görünür ölçüden bağımsız). Panel aksiyon butonları GlassButton
-   olduğu için taşma taşımaz — 36px orada bilinçli AAA istisnasıdır
-   (arama kartındaki kararla aynı, 2026-08-07). */
+   40px'e iner (36px fazla basık kalıyordu — 2026-08-14 geri bildirimi);
+   dokunma hedefleri KÜÇÜLMEZ — link ve panel linki `::after` taşmasıyla
+   `--lg-control-hit`e (44px) genişlemeye devam eder (taşma hesapları
+   görünür ölçüden bağımsız). Panel aksiyon butonları GlassButton olduğu
+   için taşma taşımaz — 40px orada bilinçli AAA istisnasıdır. */
 @container (max-width: 32rem) {
   .capsule {
-    --lg-control-sm: 36px;
-    --lg-control-md: 36px;
-    --capsule-pad-y: var(--lg-space-1);
+    --lg-control-sm: 40px;
+    --lg-control-md: 40px;
+    --capsule-pad-y: var(--lg-space-2);
     --capsule-pad-x: var(--lg-space-3);
   }
 

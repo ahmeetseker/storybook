@@ -142,15 +142,20 @@
   font-weight: 600;
 }
 
-/* ── Gövde ──────────────────────────────────────────────────────────── */
+/* ── Gövde ──────────────────────────────────────────────────────────────
+   `--row-body-pad` gövde dolgusunun tek kaynağıdır: çip şeridi (.features)
+   kaydırma alanını bu dolguya taşırmak için aynı ölçüye negatif margin ile
+   ihtiyaç duyar; sm/thumb kademeleri yalnız değişkeni ezer. */
 .body {
+  --row-body-pad: var(--lg-space-5);
+
   display: flex;
   min-width: 0;
   flex: 3 1 var(--lg-listing-row-body-min);
   flex-direction: column;
   align-items: stretch;
   gap: var(--lg-space-3);
-  padding: var(--lg-space-5);
+  padding: var(--row-body-pad);
 }
 
 .head {
@@ -248,18 +253,57 @@
   white-space: nowrap;
 }
 
+/* Özellik çipleri TEK SIRA yatay kayar (2026-08-14). Sarma, çok çipli
+   kartlarda gövdeyi dikeyde kabartıyordu. 2026-08-12'de sarmaya dönme
+   gerekçesi olan iki kusur burada kapatılır: (1) kaydırma alanı negatif
+   margin ile gövde dolgusuna taşar — çip kartın KENARINDA kırpılır, dolgu
+   ortasında değil; (2) kenarlardaki fade maskesi devam eden içeriği
+   işaretler. Şerit klavye için odaklanabilir (TSX, tabIndex) — odaklıyken
+   ok tuşları native kaydırır. */
 .features {
   display: flex;
-  margin: 0;
-  flex-wrap: wrap;
+  margin: 0 calc(-1 * var(--row-body-pad));
   gap: var(--lg-space-2);
-  padding: 0;
+  padding: 0 var(--row-body-pad);
   list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--row-body-pad);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--row-body-pad),
+    black calc(100% - var(--row-body-pad)),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black var(--row-body-pad),
+    black calc(100% - var(--row-body-pad)),
+    transparent
+  );
+}
+
+.features::-webkit-scrollbar {
+  display: none;
+}
+
+/* Odakta fade kalkar: maske, halkanın dikey kenarlarını da soldururdu —
+   klavye kullanıcısı kesintisiz halka + kırpılmamış içerik görür. */
+.features:focus-visible {
+  outline: var(--lg-focus-ring-width, 2px) solid var(--lg-accent);
+  outline-offset: calc(-1 * var(--lg-focus-ring-width, 2px));
+  mask-image: none;
+  -webkit-mask-image: none;
 }
 
 .feature {
   display: inline-flex;
   min-height: var(--lg-control-sm);
+  flex: none;
   align-items: center;
   gap: var(--lg-space-2);
   padding-inline: var(--lg-space-3);
@@ -267,6 +311,7 @@
   border-radius: var(--lg-radius-chip);
   color: var(--lg-label-secondary);
   font-size: var(--lg-text-footnote);
+  scroll-snap-align: start;
   white-space: nowrap;
 }
 
@@ -360,12 +405,19 @@
 
 /* İletişim kümesi tek kapsül: dolgu ve metin rengi eylem dilinden okunur
    (--lg-action-*), böylece kabuğun diğer dolu aksiyonlarıyla aynı kahveyi
-   kullanır (Tokenlar.mdx → Eylem dili). */
-.actions {
+   kullanır (Tokenlar.mdx → Eylem dili). Kapsül GlassSurface'te çizilir —
+   dolu eylem her zaman cam materyaldedir (GlassButton prominent kuralı);
+   rim ve parlama oradan gelir. Çift sınıf bilinçli: GlassSurface'in kendi
+   yarı saydam zeminini kesin geçer (.submit.submit emsali). */
+.actions.actions {
   display: inline-flex;
-  overflow: hidden;
-  border-radius: var(--lg-radius-capsule);
   background: var(--lg-action-prominent);
+}
+
+/* GlassSurface çocukları bir içerik span'ine sarar; segmentlerin yan yana
+   dizilmesi için o span da flex olmalı. */
+.actions > span {
+  display: inline-flex;
 }
 
 .action {
@@ -427,8 +479,9 @@
 
 /* ── Yoğunluk ekseni ────────────────────────────────────────────────── */
 .card[data-size='sm'] .body {
+  --row-body-pad: var(--lg-space-4);
+
   gap: var(--lg-space-2);
-  padding: var(--lg-space-4);
 }
 
 /* Künye `sm`'de kısalır; medyanın tabanı da onunla birlikte iner ki satırın
@@ -529,18 +582,15 @@
   /* Tek ritim: fiyat/başlık bloğu, konum, çipler ve ayak arası hep space-2 —
      space-1 kademesi satırları birbirine yapıştırıp düzensiz okutuyordu
      (2026-08-12 simetri cilası). */
+  --row-body-pad: var(--lg-space-3);
+
   gap: var(--lg-space-2);
-  padding: var(--lg-space-3);
 }
 
-/* Özellik çipleri SARAR (2026-08-12): tek sıra kaydırma, kenarda yarım
-   kırpılmış çip bırakıyordu («Müstak…») ve kaydırılabilirliği belli eden
-   hiçbir iz yoktu — görünmez içerik yerine ikinci satır. Rozet mikro ölçeğe
-   iner; 24px görünür satır — rozet salt bilgidir, dokunma hedefi değildir. */
-.card[data-media='thumb'] .features {
-  gap: var(--lg-space-1) var(--lg-space-2);
-}
-
+/* Rozet thumb'da mikro ölçeğe iner; 24px görünür satır — rozet salt
+   bilgidir, dokunma hedefi değildir. Tek sıra kaydırma tabandan gelir
+   (2026-08-14 «çipler yatay kayar» kararı — kart kenarında kırpma + fade
+   izi, bkz. .features). */
 .card[data-media='thumb'] .feature {
   min-height: var(--lg-space-6);
   gap: var(--lg-space-1);

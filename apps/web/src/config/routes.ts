@@ -7,7 +7,6 @@ export interface AppRouteDefinition {
     | 'offices'
     | 'regions'
     | 'price-index'
-    | 'blog'
     | 'pricing'
     | 'ai-advisor'
     | 'compare'
@@ -96,16 +95,6 @@ export const appRoutes = [
     indexable: false,
     icon: 'pin',
     group: 'Şirket',
-  },
-  {
-    key: 'blog',
-    label: 'Blog',
-    href: '/blog',
-    description: 'Arsa alım, satış ve mevzuat içeriklerinin yayın merkezi.',
-    statusTrail: ['Anasayfa', 'Blog'],
-    scope: 'public',
-    indexable: false,
-    icon: 'book',
   },
   {
     key: 'pricing',
@@ -213,7 +202,7 @@ export type AppRoute = (typeof appRoutes)[number]
 export type AppRouteKey = AppRoute['key']
 export type AppRouteHref = AppRoute['href']
 
-export const headerRouteKeys = ['search', 'offices', 'price-index', 'regions', 'pricing', 'blog'] as const
+export const headerRouteKeys = ['search', 'offices', 'price-index', 'regions', 'pricing'] as const
 
 export function getRouteByKey(key: AppRouteKey): AppRouteDefinition {
   const route = appRoutes.find((item) => item.key === key)

@@ -71,7 +71,7 @@
 .previewNote{margin:0;color:var(--lg-label-secondary);font-size:var(--lg-text-caption);border-block-start:var(--lg-stroke-hairline) solid var(--lg-hairline);padding-block-start:var(--lg-space-2)}
 .previewFooter{display:flex;justify-content:space-between;align-items:center;gap:var(--lg-space-3)}
 .previewPrice{font-size:var(--lg-text-footnote);font-variant-numeric:tabular-nums}
-.previewAction{display:inline-flex;align-items:center;gap:var(--lg-space-1);white-space:nowrap;background:var(--lg-accent);border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-bg);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-sm);padding-inline:var(--lg-space-3)}
+.previewAction{display:inline-flex;align-items:center;gap:var(--lg-space-1);white-space:nowrap;background:var(--lg-action-prominent);border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-action-prominent-label);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-sm);padding-inline:var(--lg-space-3)}
 .previewAction:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
 .previewClose{position:absolute;inset-block-start:var(--lg-space-1);inset-inline-end:var(--lg-space-1);display:grid;place-items:center;inline-size:22px;block-size:22px;background:transparent;border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-label-secondary);cursor:pointer;font-size:15px;line-height:1}
 .previewClose:hover{color:var(--lg-label)}
@@ -82,7 +82,7 @@
 /* Mobil "İncele" sayfası (GlassDrawer) içeriği */
 .sheetBody{display:grid;gap:var(--lg-space-3)}
 .sheetMap{block-size:22rem;display:flex}
-.sheetButton{display:inline-flex;align-items:center;gap:var(--lg-space-1);white-space:nowrap;background:var(--lg-accent);border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-bg);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-md);padding-inline:var(--lg-space-4)}
+.sheetButton{display:inline-flex;align-items:center;gap:var(--lg-space-1);white-space:nowrap;background:var(--lg-action-prominent);border:0;border-radius:var(--lg-radius-capsule);color:var(--lg-action-prominent-label);cursor:pointer;font:inherit;font-weight:650;min-height:var(--lg-control-md);padding-inline:var(--lg-space-4)}
 .sheetButton:focus-visible{outline:var(--lg-focus-ring-width) solid var(--lg-accent);outline-offset:var(--lg-focus-ring-offset)}
 /* Kapağın dekoratif fiyat çizgisi — yalnız dar kartta görünür */
 .coverSpark{display:none;position:absolute;inset:auto 0 0 0;block-size:4.5rem;inline-size:100%;pointer-events:none}

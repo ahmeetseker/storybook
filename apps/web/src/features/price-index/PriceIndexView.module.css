@@ -1,9 +1,14 @@
-/* Emlak Endeksi sayfa yerleşimi.
-   Zemin fildişi olduğu için okunacak her şey beyaz yüzeye oturur; kendi kartını
-   çizen component'ler (GlassTrendChart, GlassDistributionChart, GlassTable,
-   GlassAccordion, GlassSeoDiscovery) tekrar sarılmaz. */
+/* Emlak Endeksi — "İpek" yerleşimi.
+   Sessiz lüks dili: kart/gölge yok, hairline cetveller + tipografi taşır.
+   Serif yalnız bu sayfanın display sesi içindir (numeral, bölüm başlıkları);
+   gövde ve kontroller sistem fontunda kalır. Animasyonlar yalnız
+   transform/opacity/filter kanallarında; efektler [data-reveal] kurallarında. */
 
 .page {
+  /* İpek display sesi — sistem serif'i (Apple'da New York); rakamlar için
+     lining+tabular istenir, destekleyen kesimlerde kayma sıfırlanır. */
+  --serif: ui-serif, 'New York', 'Times New Roman', Georgia, serif;
+
   display: flex;
   flex-direction: column;
   gap: var(--lg-space-9);
@@ -23,9 +28,16 @@
   color: var(--lg-label-secondary);
 }
 
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+
 .hero {
+  text-align: center;
+}
+
+.heroInner {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--lg-space-4);
 }
 
@@ -33,52 +45,176 @@
   margin: 0;
   font-size: var(--lg-text-caption);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--lg-accent);
+  color: var(--lg-label-secondary);
 }
 
 .title {
   margin: 0;
-  font-size: var(--lg-text-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  max-width: 34ch;
+  font-family: var(--serif);
+  font-size: var(--lg-text-title);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  max-width: 38ch;
 }
 
-.lede {
+.numeral {
   margin: 0;
-  max-width: 60ch;
-  font-size: var(--lg-text-headline);
-  line-height: 1.55;
-  color: var(--lg-label-secondary);
-}
-
-.lede strong {
-  color: var(--lg-label);
+  font-family: var(--serif);
+  font-size: clamp(3.25rem, 11vw, 6.5rem);
   font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
+.numeralUnit {
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  font-weight: 400;
+  color: var(--lg-label-secondary);
+  margin-left: var(--lg-space-2);
+  letter-spacing: 0;
+}
+
+/* Kaymasız count-up: ghost nihai metnin genişliğini rezerve eder,
+   sayan katman üstünde mutlak durur — kapsayıcı genişliği hiç oynamaz. */
+.page [data-part='count'] {
+  position: relative;
+  display: inline-block;
+}
+
+.page [data-part='ghost'] {
+  visibility: hidden;
+}
+
+.page [data-part='live'] {
+  position: absolute;
+  inset: 0;
+  text-align: inherit;
+}
+
+.standfirst {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--lg-text-headline);
+  line-height: 1.6;
+  color: var(--lg-label-secondary);
+  max-width: 52ch;
+}
+
+.standfirst strong {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--lg-label);
+}
+
+.standfirst .pos,
+.pos {
+  color: var(--lg-success);
+}
+
+.standfirst .neg,
+.neg {
+  color: var(--lg-danger);
+}
+
+.hrule {
+  width: var(--lg-space-10);
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--lg-accent) 55%, transparent);
+  margin: var(--lg-space-2) auto 0;
+}
+
+/* Kontroller — hero altında ortalanır; kendi kabuk kartı yok */
 .controls {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--lg-space-3);
-  width: fit-content;
+  margin-inline: auto;
   max-width: 100%;
-  padding: var(--lg-space-3);
-  background: var(--lg-surface);
-  border: 1px solid var(--lg-hairline);
-  border-radius: var(--lg-radius-capsule);
-  box-shadow: var(--lg-shadow-xs);
 }
 
-@media (max-width: 40rem) {
-  .controls {
-    width: 100%;
-    border-radius: var(--lg-radius-card);
+/* ── Veri bandı: hairline'la ayrılmış tipografik noktalar ───────────────── */
+
+.band {
+  border-block: 1px solid var(--lg-hairline);
+}
+
+.bandGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.point {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lg-space-1);
+  text-align: center;
+  padding: var(--lg-space-6) var(--lg-space-4);
+  min-width: 0;
+}
+
+/* Mobil 2×2 simetrisi: iç hairline'lar — tek dikey, tek yatay çizgi */
+.point:nth-child(odd) {
+  border-right: 1px solid var(--lg-hairline);
+}
+
+.point:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--lg-hairline);
+}
+
+@media (min-width: 48rem) {
+  .bandGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .point:nth-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .point:nth-child(odd) {
+    border-right: 0;
+  }
+
+  .point:not(:last-child) {
+    border-right: 1px solid var(--lg-hairline);
   }
 }
+
+.pointKey {
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+.pointValue {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.pointValueSub {
+  font-size: var(--lg-text-footnote);
+  font-weight: 400;
+  color: var(--lg-label-secondary);
+}
+
+.pointHint {
+  font-size: var(--lg-text-caption);
+  color: var(--lg-label-secondary);
+}
+
+/* ── Bölüm ritmi ────────────────────────────────────────────────────────── */
 
 .section {
   display: flex;
@@ -86,74 +222,88 @@
   gap: var(--lg-space-4);
 }
 
-.sectionTitle {
+.kicker {
   margin: 0;
-  font-size: var(--lg-text-title);
+  text-align: center;
+  font-size: var(--lg-text-caption);
   font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--lg-space-2);
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  font-weight: 500;
   letter-spacing: -0.01em;
-  line-height: 1.3;
+  line-height: 1.25;
+}
+
+.narrow {
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.wide {
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
 }
 
 .note {
   margin: 0;
+  margin-inline: auto;
+  max-width: 64ch;
+  text-align: center;
   font-size: var(--lg-text-caption);
-  line-height: 1.5;
-  color: var(--lg-label-secondary);
-}
-
-.card {
-  background: var(--lg-surface);
-  border: 1px solid var(--lg-hairline);
-  border-radius: var(--lg-radius-card);
-  padding: var(--lg-space-6);
-  box-shadow: var(--lg-shadow-xs);
-  box-sizing: border-box;
-}
-
-/* Güven bandı — vurgu tonu %8, Token'lar dokümanındaki %12 tavanının altında. */
-.trust {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--lg-space-6);
-  background: color-mix(in srgb, var(--lg-accent) 8%, var(--lg-surface));
-  border: 1px solid color-mix(in srgb, var(--lg-accent) 28%, var(--lg-hairline));
-  border-radius: var(--lg-radius-card);
-  padding: var(--lg-space-6);
-  box-sizing: border-box;
-}
-
-.trustBody {
-  flex: 1 1 18rem;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--lg-space-2);
-}
-
-.trustTitle {
-  margin: 0;
-  font-size: var(--lg-text-headline);
-  font-weight: 600;
-}
-
-.trustText {
-  margin: 0;
-  font-size: var(--lg-text-footnote);
   line-height: 1.6;
   color: var(--lg-label-secondary);
 }
 
-.trustText strong {
-  color: var(--lg-label);
-  font-weight: 600;
+/* ── Reveal: blur'dan çözülme (İpek imzası) ─────────────────────────────── */
+
+.page [data-reveal] > * {
+  opacity: 0;
+  translate: 0 12px;
+  filter: blur(6px);
+  transition:
+    opacity 0.6s ease,
+    translate 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+    filter 0.6s ease;
 }
+
+.page [data-reveal] > :nth-child(2) { transition-delay: 0.1s; }
+.page [data-reveal] > :nth-child(3) { transition-delay: 0.2s; }
+.page [data-reveal] > :nth-child(4) { transition-delay: 0.3s; }
+.page [data-reveal] > :nth-child(5) { transition-delay: 0.4s; }
+.page [data-reveal] > :nth-child(n + 6) { transition-delay: 0.5s; }
+
+.page [data-reveal][data-in='true'] > * {
+  opacity: 1;
+  translate: 0 0;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page [data-reveal] > * {
+    translate: none;
+    filter: none;
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* ── Getiri bölümü yerleşimi ────────────────────────────────────────────── */
 
 .yield {
   display: flex;
   flex-wrap: wrap;
   gap: var(--lg-space-7);
   align-items: flex-start;
+  justify-content: center;
 }
 
 .yieldMeter {
@@ -166,7 +316,29 @@
   min-width: 0;
 }
 
-/* Tablo hücresi yardımcıları */
+/* ── Demografi ──────────────────────────────────────────────────────────── */
+
+.demoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--lg-space-6);
+  margin-top: var(--lg-space-6);
+}
+
+.demoTitle {
+  margin: 0 0 var(--lg-space-3);
+  font-size: var(--lg-text-badge);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lg-label-secondary);
+}
+
+.demoSub {
+  margin-top: var(--lg-space-6);
+}
+
+/* ── Tablo hücresi yardımcıları ─────────────────────────────────────────── */
 
 .rowSelf {
   display: inline-flex;
@@ -229,4 +401,16 @@
   font-size: var(--lg-text-caption);
   color: var(--lg-label-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
